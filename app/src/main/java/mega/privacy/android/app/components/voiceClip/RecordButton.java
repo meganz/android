@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 
@@ -31,8 +32,12 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
         init(context, attrs);
     }
 
+    public static void log(String message) {
+        Util.log("RecordButton", message);
+    }
+
     private void init(Context context, AttributeSet attrs) {
-        if(attrs == null) return;
+        if (attrs == null) return;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton);
         typedArray.recycle();
 
@@ -42,18 +47,18 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
         this.recordView = recordView;
     }
 
-    public void activateOnClickListener(boolean flag){
-        if(flag){
+    public void activateOnClickListener(boolean flag) {
+        if (flag) {
             this.setOnClickListener(this);
-        }else{
+        } else {
             this.setOnClickListener(null);
         }
     }
 
-    public void activateOnTouchListener(boolean flag){
-        if(flag){
+    public void activateOnTouchListener(boolean flag) {
+        if (flag) {
             this.setOnTouchListener(this);
-        }else{
+        } else {
             this.setOnTouchListener(null);
         }
     }
@@ -75,34 +80,35 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             setClip((View) v.getParent());
         }
     }
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN: {
-                    log("onTouch() - ACTION_DOWN");
-                    recordView.onActionDown((RelativeLayout) v.getParent(), event);
-                    break;
-                }
-                case MotionEvent.ACTION_MOVE: {
-                    log("onTouch() - ACTION_MOVE");
-                    recordView.onActionMove((RelativeLayout) v.getParent(), event);
-                    break;
-                }
-                case MotionEvent.ACTION_UP: {
-                    log("onTouch() - ACTION_UP");
-                    recordView.onActionUp((RelativeLayout) v.getParent());
-                    break;
-                }
-                case MotionEvent.ACTION_CANCEL: {
-                    log("onTouch() - ACTION_CANCEL");
-                    recordView.onActionCancel((RelativeLayout) v.getParent());
-                    break;
-                }
-                default:{
-                    log("onTouch() - default");
-                    break;
-                }
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                log("onTouch() - ACTION_DOWN");
+                recordView.onActionDown((RelativeLayout) v.getParent(), event);
+                break;
             }
+            case MotionEvent.ACTION_MOVE: {
+                log("onTouch() - ACTION_MOVE");
+                recordView.onActionMove((RelativeLayout) v.getParent(), event);
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                log("onTouch() - ACTION_UP");
+                recordView.onActionUp((RelativeLayout) v.getParent());
+                break;
+            }
+            case MotionEvent.ACTION_CANCEL: {
+                log("onTouch() - ACTION_CANCEL");
+                recordView.onActionCancel((RelativeLayout) v.getParent());
+                break;
+            }
+            default: {
+                log("onTouch() - default");
+                break;
+            }
+        }
         return true;
     }
 
@@ -115,9 +121,5 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     public void onClick(View v) {
         if (onRecordClickListener == null) return;
         onRecordClickListener.onClick(v);
-    }
-
-    public static void log(String message) {
-        Util.log("RecordButton",message);
     }
 }

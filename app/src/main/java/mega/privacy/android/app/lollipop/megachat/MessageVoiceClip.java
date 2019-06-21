@@ -2,18 +2,16 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.media.MediaPlayer;
 
-import mega.privacy.android.app.utils.Constants;
-
 public class MessageVoiceClip {
 
-    long idMessage;
-    long userHandle;
-    long messageHandle;
-    int progress = 0;
-    boolean isPaused = false;
-    MediaPlayer mediaPlayer = null;
-    int isAvailable = 0;
-    boolean isPlayingWhenTheScreenRotated = false;
+    private long idMessage;
+    private long userHandle;
+    private long messageHandle;
+    private int progress = 0;
+    private boolean isPaused = false;
+    private MediaPlayer mediaPlayer = null;
+    private int isAvailable = 0;
+    private boolean isPlayingWhenTheScreenRotated = false;
 
     public MessageVoiceClip(long idMessage, long userHandle, long messageHandle) {
         this.idMessage = idMessage;
@@ -46,11 +44,12 @@ public class MessageVoiceClip {
     }
 
     public MediaPlayer getMediaPlayer() {
-        if(this.mediaPlayer == null){
-            this.mediaPlayer =  new MediaPlayer();
+        if (this.mediaPlayer == null) {
+            this.mediaPlayer = new MediaPlayer();
         }
         return mediaPlayer;
     }
+
     public void setMediaPlayer(MediaPlayer mediaPlayer) {
         this.mediaPlayer = mediaPlayer;
     }
@@ -70,6 +69,7 @@ public class MessageVoiceClip {
     public void setPaused(boolean paused) {
         isPaused = paused;
     }
+
     public int getIsAvailable() {
         return isAvailable;
     }
@@ -85,7 +85,4 @@ public class MessageVoiceClip {
     public void setPlayingWhenTheScreenRotated(boolean playingWhenTheScreenRotated) {
         isPlayingWhenTheScreenRotated = playingWhenTheScreenRotated;
     }
-
-
-
 }

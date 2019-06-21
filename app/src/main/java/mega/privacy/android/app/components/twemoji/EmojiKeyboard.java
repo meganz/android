@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiBackspaceClickListener;
@@ -24,40 +25,29 @@ import mega.privacy.android.app.utils.Util;
 
 public class EmojiKeyboard extends LinearLayout {
 
+    private boolean isListenerActivated = true;
     private Activity activity;
     private EmojiEditTextInterface editInterface;
     private RecentEmoji recentEmoji;
     private VariantEmoji variantEmoji;
     private EmojiVariantPopup variantPopup;
-    private View rootView;
-    private ImageButton emojiIcon;
-    private int keyboardHeight;
-    private OnEmojiClickListener onEmojiClickListener;
-    private OnEmojiBackspaceClickListener onEmojiBackspaceClickListener;
-    private OnPlaceButtonListener buttonListener;
-
-
-    boolean isListenerActivated  = true;
-
-
-    private boolean isLetterKeyboardShown = false;
-    private boolean isEmojiKeyboardShown = false;
-
-    //Long click in EMOJI
     final OnEmojiLongClickListener longClickListener = new OnEmojiLongClickListener() {
         @Override
         public void onEmojiLongClick(@NonNull final EmojiImageView view, @NonNull final Emoji emoji) {
-            if(isListenerActivated){
+            if (isListenerActivated) {
                 variantPopup.show(view, emoji);
             }
         }
     };
-
+    private View rootView;
+    private ImageButton emojiIcon;
+    private int keyboardHeight;
+    private OnEmojiClickListener onEmojiClickListener;
     //Click in EMOJI
     final OnEmojiClickListener clickListener = new OnEmojiClickListener() {
         @Override
         public void onEmojiClick(@NonNull final EmojiImageView imageView, @NonNull final Emoji emoji) {
-            if(isListenerActivated) {
+            if (isListenerActivated) {
                 editInterface.input(emoji);
                 recentEmoji.addEmoji(emoji);
                 imageView.updateEmoji(emoji);
@@ -69,6 +59,10 @@ public class EmojiKeyboard extends LinearLayout {
             }
         }
     };
+    private OnEmojiBackspaceClickListener onEmojiBackspaceClickListener;
+    private OnPlaceButtonListener buttonListener;
+    private boolean isLetterKeyboardShown = false;
+    private boolean isEmojiKeyboardShown = false;
 
 
     public EmojiKeyboard(Context context) {
@@ -92,9 +86,14 @@ public class EmojiKeyboard extends LinearLayout {
         init(attrs, defStyleAttr);
     }
 
+    public static void log(String message) {
+        Util.log("EmojiKeyboard", message);
+    }
+
     public void setOnPlaceButtonListener(OnPlaceButtonListener buttonListener) {
         this.buttonListener = buttonListener;
     }
+
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EmojiKeyboard, defStyle, 0);
@@ -142,7 +141,7 @@ public class EmojiKeyboard extends LinearLayout {
     }
 
     //KEYBOARDS:
-    public void showLetterKeyboard(){
+    public void showLetterKeyboard() {
         if (isLetterKeyboardShown || !(editInterface instanceof View)) return;
         log("showLetterKeyboard()");
         hideEmojiKeyboard();
@@ -157,15 +156,14 @@ public class EmojiKeyboard extends LinearLayout {
         needToReplace();
     }
 
-
-    public void showEmojiKeyboard(){
+    public void showEmojiKeyboard() {
         if (isEmojiKeyboardShown) return;
         log("showEmojiKeyboard");
         hideLetterKeyboard();
         setVisibility(VISIBLE);
         isEmojiKeyboardShown = true;
         emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
-        if (editInterface instanceof View){
+        if (editInterface instanceof View) {
             final View view = (View) editInterface;
             view.setFocusableInTouchMode(true);
             view.requestFocus();
@@ -174,7 +172,7 @@ public class EmojiKeyboard extends LinearLayout {
         needToReplace();
     }
 
-    public void hideBothKeyboard(Activity activity){
+    public void hideBothKeyboard(Activity activity) {
         if (activity == null) return;
         log("hideBothKeyboard()");
         hideEmojiKeyboard();
@@ -194,8 +192,8 @@ public class EmojiKeyboard extends LinearLayout {
         needToReplace();
     }
 
-    public void hideEmojiKeyboard(){
-        if(!isEmojiKeyboardShown) return;
+    public void hideEmojiKeyboard() {
+        if (!isEmojiKeyboardShown) return;
         log("hideEmojiKeyboard() ");
         recentEmoji.persist();
         variantEmoji.persist();
@@ -221,10 +219,6 @@ public class EmojiKeyboard extends LinearLayout {
 
     public boolean getEmojiKeyboardShown() {
         return isEmojiKeyboardShown;
-    }
-
-    public static void log(String message) {
-        Util.log("EmojiKeyboard", message);
     }
 }
 

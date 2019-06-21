@@ -14,6 +14,7 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 
@@ -21,6 +22,8 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 public class AnimationHelper {
+    private final static int DURATION_BLINK_MICRO = 500;
+    private final static int DURATION_ALPHA = 250;
     private Context context;
     private AnimatedVectorDrawableCompat animatedVectorDrawable;
     private ImageView basketImg, smallBlinkingMic;
@@ -32,14 +35,16 @@ public class AnimationHelper {
     private TranslateAnimation translateAnimation1;
     private TranslateAnimation translateAnimation2;
     private Handler handler1, handler2;
-    private final static int DURATION_BLINK_MICRO =  500;
-    private final static int DURATION_ALPHA =  250;
 
     public AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic) {
         this.context = context;
         this.smallBlinkingMic = smallBlinkingMic;
         this.basketImg = basketImg;
         animatedVectorDrawable = AnimatedVectorDrawableCompat.create(context, R.drawable.recv_basket_animated);
+    }
+
+    public static void log(String message) {
+        Util.log("AnimationHelper", message);
     }
 
     @SuppressLint("RestrictedApi")
@@ -57,8 +62,8 @@ public class AnimationHelper {
         micAnimation = (AnimatorSet) AnimatorInflaterCompat.loadAnimator(context, R.animator.delete_mic_animation);
         micAnimation.setTarget(smallBlinkingMic); // set the view you want to animate
 
-        translateAnimation1 = initializeTranslateAnimation(basketInitialX,basketInitialX+90);
-        translateAnimation2 = initializeTranslateAnimation(basketInitialX+90,basketInitialX);
+        translateAnimation1 = initializeTranslateAnimation(basketInitialX, basketInitialX + 90);
+        translateAnimation2 = initializeTranslateAnimation(basketInitialX + 90, basketInitialX);
 
         micAnimation.start();
         basketImg.setImageDrawable(animatedVectorDrawable);
@@ -79,6 +84,7 @@ public class AnimationHelper {
                     onBasketAnimationEndListener.deactivateRecordButton();
                 }
             }
+
             @Override
             public void onAnimationEnd(Animation animation) {
 
@@ -92,6 +98,7 @@ public class AnimationHelper {
                     }
                 }, DURATION_ALPHA);
             }
+
             @Override
             public void onAnimationRepeat(Animation animation) {
             }
@@ -102,6 +109,7 @@ public class AnimationHelper {
             public void onAnimationStart(Animation animation) {
 
             }
+
             @Override
             public void onAnimationEnd(Animation animation) {
                 basketImg.setVisibility(INVISIBLE);
@@ -117,44 +125,43 @@ public class AnimationHelper {
         });
     }
 
-    private AlphaAnimation initializeAlphaAnimation(float start, float end){
+    private AlphaAnimation initializeAlphaAnimation(float start, float end) {
         AlphaAnimation anim = new AlphaAnimation(start, end);
         anim.setDuration(DURATION_ALPHA);
         anim.setFillAfter(true);
         return anim;
     }
 
-    private TranslateAnimation initializeTranslateAnimation( float fromX, float toX){
+    private TranslateAnimation initializeTranslateAnimation(float fromX, float toX) {
         TranslateAnimation anim = new TranslateAnimation(fromX, toX, 0, 0);
         anim.setDuration(DURATION_ALPHA);
         return anim;
     }
 
-    private void resetAnimation(Animation anim){
-            if(anim == null) return;
-            anim.reset();
-            anim.cancel();
-    }
-
-    private void resetAnimationSet(AnimatorSet anim){
-        if(anim == null) return;
+    private void resetAnimation(Animation anim) {
+        if (anim == null) return;
+        anim.reset();
         anim.cancel();
     }
 
-    private void clearAnimation(ImageView imageView){
-        if(imageView == null) return;
+    private void resetAnimationSet(AnimatorSet anim) {
+        if (anim == null) return;
+        anim.cancel();
+    }
+
+    private void clearAnimation(ImageView imageView) {
+        if (imageView == null) return;
         imageView.clearAnimation();
     }
 
-    private void removeCallbacks(Handler handler){
-        if(handler == null) return;
+    private void removeCallbacks(Handler handler) {
+        if (handler == null) return;
         handler.removeCallbacksAndMessages(null);
     }
 
-
     /*
-    * Stop the current animation and revert views back to default state
-    */
+     * Stop the current animation and revert views back to default state
+     */
     public void resetBasketAnimation() {
         log("resetBasketAnimation()");
         if (!isBasketAnimating) return;
@@ -175,12 +182,11 @@ public class AnimationHelper {
         isBasketAnimating = false;
     }
 
-
     public void clearAlphaAnimation(boolean hideView) {
         log("clearAlphaAnimation()");
         resetAnimation(alphaAnimation);
         clearAnimation(smallBlinkingMic);
-        if(!hideView)return;
+        if (!hideView) return;
         smallBlinkingMic.setVisibility(View.GONE);
 
     }
@@ -199,11 +205,9 @@ public class AnimationHelper {
         anim.setInterpolator(new AccelerateDecelerateInterpolator());
         anim.setDuration(DURATION_ALPHA);
 
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
-        {
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
-            public void onAnimationUpdate(ValueAnimator animation)
-            {
+            public void onAnimationUpdate(ValueAnimator animation) {
                 float x = (Float) animation.getAnimatedValue();
                 recordBtnLayout.setX(x);
             }
@@ -227,15 +231,10 @@ public class AnimationHelper {
         }
     }
 
-
     /*
-    *Check if a new recording has started when the record button was pressed
-    */
+     *Check if a new recording has started when the record button was pressed
+     */
     public void setStartRecorded(boolean startRecorded) {
         isStartRecorded = startRecorded;
-    }
-
-    public static void log(String message) {
-        Util.log("AnimationHelper",message);
     }
 }

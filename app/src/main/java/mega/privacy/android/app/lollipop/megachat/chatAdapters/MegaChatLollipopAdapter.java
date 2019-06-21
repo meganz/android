@@ -13,7 +13,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.media.ExifInterface;
 import android.media.MediaPlayer;
-import android.media.TimedText;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
@@ -101,14 +100,10 @@ import static mega.privacy.android.app.utils.CacheFolderManager.VOICE_CLIP_FOLDE
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
-
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
-
-    public static int MAX_WIDTH_NAME_SENDER_GROUP_THUMB_LAND_PICTURE = 194;
-    public static int MAX_WIDTH_NAME_SENDER_GROUP_THUMB_PORTRAIT_PICTURE = 136;
 
     public static int MAX_WIDTH_FILENAME_LAND = 455;
     public static int MAX_WIDTH_FILENAME_PORT = 180;
@@ -133,34 +128,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private static final int TYPE_ITEM = 1;
 
     Context context;
-    int positionClicked;
-    ArrayList<AndroidMegaChatMessage> messages;
-    RecyclerView listFragment;
+    private int positionClicked;
+    private ArrayList<AndroidMegaChatMessage> messages;
+    private RecyclerView listFragment;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     boolean multipleSelect;
     private SparseBooleanArray selectedItems;
     private MegaChatLollipopAdapter megaChatAdapter;
-    ArrayList<MessageVoiceClip> messagesPlaying;
+    private ArrayList<MessageVoiceClip> messagesPlaying;
 
-    Handler handlerVoiceNotes;
-    Runnable runnableVC;
+    private Handler handlerVoiceNotes;
+    private Runnable runnableVC;
 
     ChatController cC;
 
-    long myUserHandle = -1;
+    private long myUserHandle = -1;
 
     DisplayMetrics outMetrics;
     DatabaseHandler dbH = null;
     MegaChatRoom chatRoom;
 
-    private ArrayList<Long> pendingPreviews = new ArrayList<Long>();
+    private ArrayList<Long> pendingPreviews = new ArrayList<>();
 
-    private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Integer>{
+    private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Integer> {
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
         int position;
         long userHandle;
-        MegaNodeList nodelist;
+        MegaNodeList nodeList;
+
         public ChatVoiceClipAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder, int position, long userHandle) {
             this.holder = holder;
             this.userHandle = userHandle;
@@ -169,17 +165,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         @Override
         protected void onPreExecute() {
-            if(holder == null){
+            if (holder == null) {
                 holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(position);
             }
-            if(holder==null) return;
+            if (holder == null) return;
 
             log("ChatVoiceClipAsyncTask:onPreExecute");
-            if(userHandle == myUserHandle){
+            if (userHandle == myUserHandle) {
                 holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.VISIBLE);
                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
                 holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
-            }else{
+            } else {
                 holder.uploadingContactProgressbarVoiceclip.setVisibility(View.VISIBLE);
                 holder.contentContactMessageVoiceClipPlay.setVisibility(View.GONE);
                 holder.notAvailableContactVoiceclip.setVisibility(View.GONE);
@@ -189,13 +185,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         @Override
         protected Integer doInBackground(MegaNodeList... params) {
-            nodelist = params[0];
-            ((ChatActivityLollipop)context).sendToDownload(nodelist);
+            nodeList = params[0];
+            ((ChatActivityLollipop) context).sendToDownload(nodeList);
             return 1;
         }
     }
-
-
 
     private class ChatPreviewAsyncTask extends AsyncTask<MegaNode, Void, Integer> {
 
@@ -764,12 +758,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             contentContactMessageContactThumb.setImageBitmap(bitmap);
             contentContactMessageContactInitialLetter.setVisibility(View.GONE);
         }
-
-        public void setContactAvatar(Bitmap bitmap) {
-            contactImageView.setImageBitmap(bitmap);
-            contactInitialLetter.setVisibility(View.GONE);
-        }
-
     }
 
     public static class ViewHolderHeaderChat extends RecyclerView.ViewHolder {
@@ -793,8 +781,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
             outMetrics = new DisplayMetrics();
             display.getMetrics(outMetrics);
-            float density = context.getResources().getDisplayMetrics().density;
-
             dbH = DatabaseHandler.getDbHandler(context);
 
             cC = new ChatController(context);
@@ -802,22 +788,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_chat, parent, false);
             holder = new ViewHolderMessageChat(v);
             holder.contentVisible = true;
-            holder.itemLayout = (RelativeLayout) v.findViewById(R.id.message_chat_item_layout);
-            holder.dateLayout = (RelativeLayout) v.findViewById(R.id.message_chat_date_layout);
+            holder.itemLayout = v.findViewById(R.id.message_chat_item_layout);
+            holder.dateLayout = v.findViewById(R.id.message_chat_date_layout);
             //Margins
             RelativeLayout.LayoutParams dateLayoutParams = (RelativeLayout.LayoutParams) holder.dateLayout.getLayoutParams();
             dateLayoutParams.setMargins(0, Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
             holder.dateLayout.setLayoutParams(dateLayoutParams);
 
-            holder.dateText = (TextView) v.findViewById(R.id.message_chat_date_text);
+            holder.dateText = v.findViewById(R.id.message_chat_date_text);
 
-            holder.newMessagesLayout = (LinearLayout) v.findViewById(R.id.message_chat_new_relative_layout);
-            holder.newMessagesText = (TextView) v.findViewById(R.id.message_chat_new_text);
+            holder.newMessagesLayout = v.findViewById(R.id.message_chat_new_relative_layout);
+            holder.newMessagesText = v.findViewById(R.id.message_chat_new_text);
 
-            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
+            if (((ChatActivityLollipop) context).getDeviceDensity() == 1) {
 
-                MANAGEMENT_MESSAGE_CALL_LAND= 45;
-                MANAGEMENT_MESSAGE_CALL_PORT= 65;
+                MANAGEMENT_MESSAGE_CALL_LAND = 45;
+                MANAGEMENT_MESSAGE_CALL_PORT = 65;
 
                 CONTACT_MESSAGE_LAND = 31;
                 CONTACT_MESSAGE_PORT = 55;
@@ -827,207 +813,205 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             //Own messages
-            holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
-            holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
-            holder.timeOwnText = (TextView) v.findViewById(R.id.message_chat_time_text);
+            holder.ownMessageLayout = v.findViewById(R.id.message_chat_own_message_layout);
+            holder.titleOwnMessage = v.findViewById(R.id.title_own_message_layout);
+            holder.timeOwnText = v.findViewById(R.id.message_chat_time_text);
 
             holder.titleOwnMessage.setGravity(Gravity.RIGHT);
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
-            }else{
-                holder.titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                holder.titleOwnMessage.setPadding(0, 0, Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics), 0);
+            } else {
+                holder.titleOwnMessage.setPadding(0, 0, Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics), 0);
             }
 
-//        holder.meText = (TextView) v.findViewById(R.id.message_chat_me_text);
+            holder.previewFramePort = v.findViewById(R.id.preview_frame_portrait);
+            holder.previewFrameLand = v.findViewById(R.id.preview_frame_landscape);
 
-            holder.previewFramePort = (RelativeLayout) v.findViewById(R.id.preview_frame_portrait);
-            holder.previewFrameLand = (RelativeLayout) v.findViewById(R.id.preview_frame_landscape);
-
-            holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
-            holder.contentOwnMessageText = (EmojiTextView) v.findViewById(R.id.content_own_message_text);
+            holder.contentOwnMessageLayout = v.findViewById(R.id.content_own_message_layout);
+            holder.contentOwnMessageText = v.findViewById(R.id.content_own_message_text);
 
             //Own rich links message
-            holder.urlOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.url_own_message_layout);
+            holder.urlOwnMessageLayout = v.findViewById(R.id.url_own_message_layout);
             holder.urlOwnMessageLayout.setVisibility(View.GONE);
-            holder.urlOwnMessageTextrl = (RelativeLayout) v.findViewById(R.id.url_own_message_text_rl);
+            holder.urlOwnMessageTextrl = v.findViewById(R.id.url_own_message_text_rl);
 
-
-            if(((ChatActivityLollipop) context).getDeviceDensity() == 1  && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            if (((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 holder.urlOwnMessageLayout.getLayoutParams().width = 330;
             }
-            holder.forwardOwnRichLinks = (RelativeLayout) v.findViewById(R.id.forward_own_rich_links);
+            holder.forwardOwnRichLinks = v.findViewById(R.id.forward_own_rich_links);
             holder.forwardOwnRichLinks.setTag(holder);
             holder.forwardOwnRichLinks.setVisibility(View.GONE);
 
-            holder.urlOwnMessageText = (EmojiTextView) v.findViewById(R.id.url_own_message_text);
+            holder.urlOwnMessageText = v.findViewById(R.id.url_own_message_text);
             holder.urlOwnMessageText.setTag(holder);
 
-            holder.urlOwnMessageWarningButtonsLayout = (LinearLayout) v.findViewById(R.id.url_own_message_buttons_warning_layout);
-            holder.neverRichLinkButton = (Button) v.findViewById(R.id.url_never_button);
-            holder.alwaysAllowRichLinkButton = (Button) v.findViewById(R.id.url_always_allow_button);
-            holder.notNowRichLinkButton = (Button) v.findViewById(R.id.url_not_now_button);
+            holder.urlOwnMessageWarningButtonsLayout = v.findViewById(R.id.url_own_message_buttons_warning_layout);
+            holder.neverRichLinkButton = v.findViewById(R.id.url_never_button);
+            holder.alwaysAllowRichLinkButton = v.findViewById(R.id.url_always_allow_button);
+            holder.notNowRichLinkButton = v.findViewById(R.id.url_not_now_button);
 
-            holder.urlOwnMessageDisableButtonsLayout = (LinearLayout) v.findViewById(R.id.url_own_message_buttons_disable_layout);
-            holder.yesDisableButton = (Button) v.findViewById(R.id.url_yes_disable_button);
-            holder.noDisableButton = (Button) v.findViewById(R.id.url_no_disable_button);
-            holder.urlOwnMessageTitleLayout = (RelativeLayout) v.findViewById(R.id.url_own_message_enable_layout_inside);
-            holder.urlOwnMessageTitle = (TextView) v.findViewById(R.id.url_own_message_title);
-            holder.urlOwnMessageDescription = (TextView) v.findViewById(R.id.url_own_message_description);
+            holder.urlOwnMessageDisableButtonsLayout = v.findViewById(R.id.url_own_message_buttons_disable_layout);
+            holder.yesDisableButton = v.findViewById(R.id.url_yes_disable_button);
+            holder.noDisableButton = v.findViewById(R.id.url_no_disable_button);
+            holder.urlOwnMessageTitleLayout = v.findViewById(R.id.url_own_message_enable_layout_inside);
+            holder.urlOwnMessageTitle = v.findViewById(R.id.url_own_message_title);
+            holder.urlOwnMessageDescription = v.findViewById(R.id.url_own_message_description);
 
-            holder.urlOwnMessageIconAndLinkLayout = (LinearLayout) v.findViewById(R.id.url_own_message_icon_link_layout);
-            holder.urlOwnMessageIcon = (ImageView) v.findViewById(R.id.url_own_message_icon);
-            holder.urlOwnMessageLink = (TextView) v.findViewById(R.id.url_own_message_link);
+            holder.urlOwnMessageIconAndLinkLayout = v.findViewById(R.id.url_own_message_icon_link_layout);
+            holder.urlOwnMessageIcon = v.findViewById(R.id.url_own_message_icon);
+            holder.urlOwnMessageLink = v.findViewById(R.id.url_own_message_link);
 
-            holder.urlOwnMessageImage = (RoundedImageView) v.findViewById(R.id.url_own_message_image);
+            holder.urlOwnMessageImage = v.findViewById(R.id.url_own_message_image);
             int radiusImageRL = Util.scaleWidthPx(10, outMetrics);
             holder.urlOwnMessageImage.setCornerRadius(radiusImageRL);
             holder.urlOwnMessageImage.setBorderWidth(0);
             holder.urlOwnMessageImage.setOval(false);
 
             //Group avatar of chat links
-            holder.urlOwnMessageGroupAvatarLayout = (RelativeLayout) v.findViewById(R.id.url_chat_own_message_image);
-            holder.urlOwnMessageGroupAvatar = (RoundedImageView) v.findViewById(R.id.content_url_chat_own_message_contact_thumb);
-            holder.urlOwnMessageGroupAvatarText = (TextView) v.findViewById(R.id.content_url_chat_own_message_contact_initial_letter);
+            holder.urlOwnMessageGroupAvatarLayout = v.findViewById(R.id.url_chat_own_message_image);
+            holder.urlOwnMessageGroupAvatar = v.findViewById(R.id.content_url_chat_own_message_contact_thumb);
+            holder.urlOwnMessageGroupAvatarText = v.findViewById(R.id.content_url_chat_own_message_contact_initial_letter);
 
             //Group avatar of chat links
-            holder.urlContactMessageGroupAvatarLayout = (RelativeLayout) v.findViewById(R.id.url_chat_contact_message_image);
-            holder.urlContactMessageGroupAvatar = (RoundedImageView) v.findViewById(R.id.content_url_chat_contact_message_contact_thumb);
-            holder.urlContactMessageGroupAvatarText = (TextView) v.findViewById(R.id.content_url_chat_contact_message_contact_initial_letter);
+            holder.urlContactMessageGroupAvatarLayout = v.findViewById(R.id.url_chat_contact_message_image);
+            holder.urlContactMessageGroupAvatar = v.findViewById(R.id.content_url_chat_contact_message_contact_thumb);
+            holder.urlContactMessageGroupAvatarText = v.findViewById(R.id.content_url_chat_contact_message_contact_initial_letter);
 
             int radius;
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 radius = Util.scaleWidthPx(10, outMetrics);
-            }else{
+            } else {
                 radius = Util.scaleWidthPx(15, outMetrics);
             }
-            int colors[] = { 0x70000000, 0x00000000};
-            GradientDrawable shape = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, colors);;
+            int colors[] = {0x70000000, 0x00000000};
+            GradientDrawable shape = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, colors);
+            ;
             shape.setShape(GradientDrawable.RECTANGLE);
-            shape.setCornerRadii(new float[]{radius, 0,radius,0,radius,radius,radius,radius});
+            shape.setCornerRadii(new float[]{radius, 0, radius, 0, radius, radius, radius, radius});
 
-            holder.contentOwnMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
+            holder.contentOwnMessageThumbLand = v.findViewById(R.id.content_own_message_thumb_landscape);
             holder.contentOwnMessageThumbLand.setCornerRadius(radius);
             holder.contentOwnMessageThumbLand.setBorderWidth(1);
             holder.contentOwnMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentOwnMessageThumbLand.setOval(false);
 
-            holder.gradientOwnMessageThumbLand = (RelativeLayout) v.findViewById(R.id.gradient_own_message_thumb_landscape);
+            holder.gradientOwnMessageThumbLand = v.findViewById(R.id.gradient_own_message_thumb_landscape);
             holder.gradientOwnMessageThumbLand.setBackground(shape);
 
-            holder.videoIconOwnMessageThumbLand = (ImageView) v.findViewById(R.id.video_icon_own_message_thumb_landscape);
-            holder.videoTimecontentOwnMessageThumbLand = (TextView) v.findViewById(R.id.video_time_own_message_thumb_landscape);
+            holder.videoIconOwnMessageThumbLand = v.findViewById(R.id.video_icon_own_message_thumb_landscape);
+            holder.videoTimecontentOwnMessageThumbLand = v.findViewById(R.id.video_time_own_message_thumb_landscape);
 
             holder.gradientOwnMessageThumbLand.setVisibility(View.GONE);
             holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
             holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
 
-            holder.contentOwnMessageThumbPort = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_portrait);
+            holder.contentOwnMessageThumbPort = v.findViewById(R.id.content_own_message_thumb_portrait);
             holder.contentOwnMessageThumbPort.setCornerRadius(radius);
             holder.contentOwnMessageThumbPort.setBorderWidth(1);
             holder.contentOwnMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentOwnMessageThumbPort.setOval(false);
 
-            holder.errorUploadingFile = (RelativeLayout) v.findViewById(R.id.error_uploading_file);
-            holder.errorUploadingContact = (RelativeLayout) v.findViewById(R.id.error_uploading_contact);
-            holder.errorUploadingRichLink = (RelativeLayout) v.findViewById(R.id.error_uploading_rich_link);
+            holder.errorUploadingFile = v.findViewById(R.id.error_uploading_file);
+            holder.errorUploadingContact = v.findViewById(R.id.error_uploading_contact);
+            holder.errorUploadingRichLink = v.findViewById(R.id.error_uploading_rich_link);
 
-            holder.gradientOwnMessageThumbPort = (RelativeLayout) v.findViewById(R.id.gradient_own_message_thumb_portrait);
+            holder.gradientOwnMessageThumbPort = v.findViewById(R.id.gradient_own_message_thumb_portrait);
             holder.gradientOwnMessageThumbPort.setBackground(shape);
 
-            holder.videoIconOwnMessageThumbPort = (ImageView) v.findViewById(R.id.video_icon_own_message_thumb_portrait);
-            holder.videoTimecontentOwnMessageThumbPort = (TextView) v.findViewById(R.id.video_time_own_message_thumb_portrait);
+            holder.videoIconOwnMessageThumbPort = v.findViewById(R.id.video_icon_own_message_thumb_portrait);
+            holder.videoTimecontentOwnMessageThumbPort = v.findViewById(R.id.video_time_own_message_thumb_portrait);
 
             holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
             holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
             holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
 
-            holder.contentOwnMessageFileLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_file_layout);
-            holder.forwardOwnFile = (RelativeLayout) v.findViewById(R.id.forward_own_file);
+            holder.contentOwnMessageFileLayout = v.findViewById(R.id.content_own_message_file_layout);
+            holder.forwardOwnFile = v.findViewById(R.id.forward_own_file);
             holder.forwardOwnFile.setTag(holder);
             holder.forwardOwnFile.setVisibility(View.GONE);
 
-            holder.contentOwnMessageFileThumb = (ImageView) v.findViewById(R.id.content_own_message_file_thumb);
-            holder.contentOwnMessageFileName = (TextView) v.findViewById(R.id.content_own_message_file_name);
-            holder.contentOwnMessageFileSize = (TextView) v.findViewById(R.id.content_own_message_file_size);
+            holder.contentOwnMessageFileThumb = v.findViewById(R.id.content_own_message_file_thumb);
+            holder.contentOwnMessageFileName = v.findViewById(R.id.content_own_message_file_name);
+            holder.contentOwnMessageFileSize = v.findViewById(R.id.content_own_message_file_size);
 
             holder.totalDurationOfVoiceClip = 0;
 
             //my voice clip:
-            holder.contentOwnMessageVoiceClipLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_voice_clip_layout);
+            holder.contentOwnMessageVoiceClipLayout = v.findViewById(R.id.content_own_message_voice_clip_layout);
             holder.contentOwnMessageVoiceClipLayout.setVisibility(View.GONE);
-            holder.contentOwnMessageVoiceClipPlay = (ImageView) v.findViewById(R.id.content_own_message_voice_clip_play_pause);
+            holder.contentOwnMessageVoiceClipPlay = v.findViewById(R.id.content_own_message_voice_clip_play_pause);
             holder.contentOwnMessageVoiceClipPlay.setTag(holder);
-            holder.contentOwnMessageVoiceClipSeekBar = (SeekBar) v.findViewById(R.id.content_own_message_voice_clip_seekBar);
+            holder.contentOwnMessageVoiceClipSeekBar = v.findViewById(R.id.content_own_message_voice_clip_seekBar);
             holder.contentOwnMessageVoiceClipSeekBar.setProgress(0);
-            holder.contentOwnMessageVoiceClipDuration = (TextView) v.findViewById(R.id.content_own_message_voice_clip_duration);
+            holder.contentOwnMessageVoiceClipDuration = v.findViewById(R.id.content_own_message_voice_clip_duration);
             holder.contentOwnMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(0));
-            holder.uploadingOwnProgressbarVoiceclip = (RelativeLayout) v.findViewById(R.id.uploading_own_progressbar_voiceclip);
+            holder.uploadingOwnProgressbarVoiceclip = v.findViewById(R.id.uploading_own_progressbar_voiceclip);
             holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.GONE);
 
-            holder.notAvailableOwnVoiceclip = (ImageView) v.findViewById(R.id.content_own_message_voice_clip_not_available);
+            holder.notAvailableOwnVoiceclip = v.findViewById(R.id.content_own_message_voice_clip_not_available);
             holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
             holder.notAvailableOwnVoiceclip.setTag(holder);
             holder.notAvailableOwnVoiceclip.setOnClickListener(this);
 
-            holder.errorUploadingVoiceClip = (RelativeLayout) v.findViewById(R.id.error_uploading_voice_clip);
+            holder.errorUploadingVoiceClip = v.findViewById(R.id.error_uploading_voice_clip);
 
-            holder.contentOwnMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_contact_layout);
-            holder.contentOwnMessageContactLayoutAvatar = (RelativeLayout) v.findViewById(R.id.content_own_message_contact_layout_avatar);
-            holder.contentOwnMessageContactThumb = (RoundedImageView) v.findViewById(R.id.content_own_message_contact_thumb);
-            holder.contentOwnMessageContactName = (TextView) v.findViewById(R.id.content_own_message_contact_name);
-            holder.contentOwnMessageContactEmail = (TextView) v.findViewById(R.id.content_own_message_contact_email);
+            holder.contentOwnMessageContactLayout = v.findViewById(R.id.content_own_message_contact_layout);
+            holder.contentOwnMessageContactLayoutAvatar = v.findViewById(R.id.content_own_message_contact_layout_avatar);
+            holder.contentOwnMessageContactThumb = v.findViewById(R.id.content_own_message_contact_thumb);
+            holder.contentOwnMessageContactName = v.findViewById(R.id.content_own_message_contact_name);
+            holder.contentOwnMessageContactEmail = v.findViewById(R.id.content_own_message_contact_email);
 
-            holder.contentOwnMessageContactInitialLetter = (TextView) v.findViewById(R.id.content_own_message_contact_initial_letter);
-            holder.forwardOwnContact = (RelativeLayout) v.findViewById(R.id.forward_own_contact);
+            holder.contentOwnMessageContactInitialLetter = v.findViewById(R.id.content_own_message_contact_initial_letter);
+            holder.forwardOwnContact = v.findViewById(R.id.forward_own_contact);
             holder.forwardOwnContact.setTag(holder);
             holder.forwardOwnContact.setVisibility(View.GONE);
 
-            holder.iconOwnTypeDocLandPreview = (ImageView) v.findViewById(R.id.own_attachment_type_icon_lands);
-            holder.iconOwnTypeDocPortraitPreview = (ImageView) v.findViewById(R.id.own_attachment_type_icon_portrait);
+            holder.iconOwnTypeDocLandPreview = v.findViewById(R.id.own_attachment_type_icon_lands);
+            holder.iconOwnTypeDocPortraitPreview = v.findViewById(R.id.own_attachment_type_icon_portrait);
 
-            holder.retryAlert = (TextView) v.findViewById(R.id.not_sent_own_message_text);
-            holder.triangleIcon = (ImageView) v.findViewById(R.id.own_triangle_icon);
+            holder.retryAlert = v.findViewById(R.id.not_sent_own_message_text);
+            holder.triangleIcon = v.findViewById(R.id.own_triangle_icon);
 
-            holder.transparentCoatingPortrait = (RelativeLayout) v.findViewById(R.id.transparent_coating_portrait);
+            holder.transparentCoatingPortrait = v.findViewById(R.id.transparent_coating_portrait);
             holder.transparentCoatingPortrait.setVisibility(View.GONE);
 
-            holder.transparentCoatingLandscape = (RelativeLayout) v.findViewById(R.id.transparent_coating_landscape);
+            holder.transparentCoatingLandscape = v.findViewById(R.id.transparent_coating_landscape);
             holder.transparentCoatingLandscape.setVisibility(View.GONE);
 
-            holder.uploadingProgressBarPort = (RelativeLayout) v.findViewById(R.id.uploadingProgressBarPort);
+            holder.uploadingProgressBarPort = v.findViewById(R.id.uploadingProgressBarPort);
             holder.uploadingProgressBarPort.setVisibility(View.GONE);
-            holder.uploadingProgressBarLand = (RelativeLayout) v.findViewById(R.id.uploadingProgressBarLand);
+            holder.uploadingProgressBarLand = v.findViewById(R.id.uploadingProgressBarLand);
             holder.uploadingProgressBarLand.setVisibility(View.GONE);
 
-            holder.errorUploadingPortrait = (RelativeLayout) v.findViewById(R.id.error_uploading_portrait);
+            holder.errorUploadingPortrait = v.findViewById(R.id.error_uploading_portrait);
             holder.errorUploadingPortrait.setVisibility(View.GONE);
-            holder.errorUploadingLandscape = (RelativeLayout) v.findViewById(R.id.error_uploading_landscape);
+            holder.errorUploadingLandscape = v.findViewById(R.id.error_uploading_landscape);
             holder.errorUploadingLandscape.setVisibility(View.GONE);
 
-            holder.forwardOwnPortrait = (RelativeLayout) v.findViewById(R.id.forward_own_preview_portrait);
+            holder.forwardOwnPortrait = v.findViewById(R.id.forward_own_preview_portrait);
             holder.forwardOwnPortrait.setTag(holder);
             holder.forwardOwnPortrait.setVisibility(View.GONE);
             holder.forwardOwnPortrait.setOnClickListener(this);
 
-            holder.forwardOwnLandscape = (RelativeLayout) v.findViewById(R.id.forward_own_preview_landscape);
+            holder.forwardOwnLandscape = v.findViewById(R.id.forward_own_preview_landscape);
             holder.forwardOwnLandscape.setTag(holder);
             holder.forwardOwnLandscape.setVisibility(View.GONE);
             holder.forwardOwnLandscape.setOnClickListener(this);
 
-            holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
-            holder.ownManagementMessageText = (EmojiTextView) v.findViewById(R.id.own_management_message_text);
+            holder.ownManagementMessageLayout = v.findViewById(R.id.own_management_message_layout);
+            holder.ownManagementMessageText = v.findViewById(R.id.own_management_message_text);
 
             RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
                 holder.ownManagementMessageText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-            }else{
+            } else {
                 paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
                 holder.ownManagementMessageText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
             }
             holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
 
-            holder.ownManagementMessageIcon = (ImageView) v.findViewById(R.id.own_management_message_icon);
+            holder.ownManagementMessageIcon = v.findViewById(R.id.own_management_message_icon);
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
                 holder.ownManagementMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
@@ -1037,235 +1021,234 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             //Contact messages
-            holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
-            holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
+            holder.contactMessageLayout = v.findViewById(R.id.message_chat_contact_message_layout);
+            holder.titleContactMessage = v.findViewById(R.id.title_contact_message_layout);
 
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
-            }else{
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics), 0, 0, 0);
+            } else {
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics), 0, 0, 0);
             }
 
-            holder.contactImageView = (RoundedImageView) v.findViewById(R.id.contact_thumbnail);
-            holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_initial_letter);
+            holder.contactImageView = v.findViewById(R.id.contact_thumbnail);
+            holder.contactInitialLetter = v.findViewById(R.id.contact_initial_letter);
 
-            holder.timeContactText = (TextView) v.findViewById(R.id.contact_message_chat_time_text);
-            holder.nameContactText = (TextView) v.findViewById(R.id.contact_message_chat_name_text);
+            holder.timeContactText = v.findViewById(R.id.contact_message_chat_time_text);
+            holder.nameContactText = v.findViewById(R.id.contact_message_chat_name_text);
 
-            holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
-            holder.contentContactMessageText = (EmojiTextView) v.findViewById(R.id.content_contact_message_text);
+            holder.contentContactMessageLayout = v.findViewById(R.id.content_contact_message_layout);
+            holder.contentContactMessageText = v.findViewById(R.id.content_contact_message_text);
 
             RelativeLayout.LayoutParams paramsContactMessage = (RelativeLayout.LayoutParams) holder.contentContactMessageText.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 paramsContactMessage.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-            }else{
+            } else {
                 paramsContactMessage.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
             }
             holder.contentContactMessageText.setLayoutParams(paramsContactMessage);
 
-            holder.contentContactMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
+            holder.contentContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
             holder.contentContactMessageThumbLand.setBorderWidth(1);
             holder.contentContactMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentContactMessageThumbLand.setOval(false);
-            holder.forwardContactPreviewLandscape = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_landscape);
+            holder.forwardContactPreviewLandscape = v.findViewById(R.id.forward_contact_preview_landscape);
             holder.forwardContactPreviewLandscape.setTag(holder);
             holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
 
             //Contact rich links message
-            holder.urlContactMessageLayout = (RelativeLayout) v.findViewById(R.id.url_contact_message_layout);
-            if(((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            holder.urlContactMessageLayout = v.findViewById(R.id.url_contact_message_layout);
+            if (((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 holder.urlContactMessageLayout.getLayoutParams().width = 330;
             }
 
             RelativeLayout.LayoutParams paramsContactRichLink = (RelativeLayout.LayoutParams) holder.urlContactMessageLayout.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 paramsContactRichLink.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-            }else{
+            } else {
                 paramsContactRichLink.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
             }
             holder.urlContactMessageLayout.setLayoutParams(paramsContactRichLink);
 
-            holder.forwardContactRichLinks = (RelativeLayout) v.findViewById(R.id.forward_contact_rich_links);
+            holder.forwardContactRichLinks = v.findViewById(R.id.forward_contact_rich_links);
             holder.forwardContactRichLinks.setTag(holder);
             holder.forwardContactRichLinks.setVisibility(View.GONE);
 
-            holder.urlContactMessageText = (EmojiTextView) v.findViewById(R.id.url_contact_message_text);
+            holder.urlContactMessageText = v.findViewById(R.id.url_contact_message_text);
             holder.urlContactMessageText.setTag(holder);
 
-            holder.urlContactMessageTitleLayout = (RelativeLayout) v.findViewById(R.id.url_contact_message_enable_layout_inside);
-            holder.urlContactMessageTitle = (TextView) v.findViewById(R.id.url_contact_message_title);
-            holder.urlContactMessageDescription = (TextView) v.findViewById(R.id.url_contact_message_description);
+            holder.urlContactMessageTitleLayout = v.findViewById(R.id.url_contact_message_enable_layout_inside);
+            holder.urlContactMessageTitle = v.findViewById(R.id.url_contact_message_title);
+            holder.urlContactMessageDescription = v.findViewById(R.id.url_contact_message_description);
 
-            holder.urlContactMessageIconAndLinkLayout = (LinearLayout) v.findViewById(R.id.url_contact_message_icon_link_layout);
-            holder.urlContactMessageIcon = (ImageView) v.findViewById(R.id.url_contact_message_icon);
-            holder.urlContactMessageLink = (TextView) v.findViewById(R.id.url_contact_message_link);
+            holder.urlContactMessageIconAndLinkLayout = v.findViewById(R.id.url_contact_message_icon_link_layout);
+            holder.urlContactMessageIcon = v.findViewById(R.id.url_contact_message_icon);
+            holder.urlContactMessageLink = v.findViewById(R.id.url_contact_message_link);
 
             holder.urlContactMessageImage = (RoundedImageView) v.findViewById(R.id.url_contact_message_image);
             holder.urlContactMessageImage.setCornerRadius(radiusImageRL);
             holder.urlContactMessageImage.setBorderWidth(0);
             holder.urlContactMessageImage.setOval(false);
 
-            holder.contentContactMessageThumbPort = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
+            holder.contentContactMessageThumbPort = v.findViewById(R.id.content_contact_message_thumb_portrait);
             holder.contentContactMessageThumbPort.setCornerRadius(radius);
             holder.contentContactMessageThumbPort.setBorderWidth(1);
             holder.contentContactMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentContactMessageThumbPort.setOval(false);
-            holder.forwardContactPreviewPortrait = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_portrait);
+            holder.forwardContactPreviewPortrait = v.findViewById(R.id.forward_contact_preview_portrait);
             holder.forwardContactPreviewPortrait.setTag(holder);
             holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-            holder.gradientContactMessageThumbLand = (RelativeLayout) v.findViewById(R.id.gradient_contact_message_thumb_landscape);
+            holder.gradientContactMessageThumbLand = v.findViewById(R.id.gradient_contact_message_thumb_landscape);
             holder.gradientContactMessageThumbLand.setBackground(shape);
 
-            holder.videoIconContactMessageThumbLand = (ImageView) v.findViewById(R.id.video_icon_contact_message_thumb_landscape);
-            holder.videoTimecontentContactMessageThumbLand = (TextView) v.findViewById(R.id.video_time_contact_message_thumb_landscape);
+            holder.videoIconContactMessageThumbLand = v.findViewById(R.id.video_icon_contact_message_thumb_landscape);
+            holder.videoTimecontentContactMessageThumbLand = v.findViewById(R.id.video_time_contact_message_thumb_landscape);
 
             holder.gradientContactMessageThumbLand.setVisibility(View.GONE);
 
             holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
             holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
 
-            holder.gradientContactMessageThumbPort = (RelativeLayout) v.findViewById(R.id.gradient_contact_message_thumb_portrait);
+            holder.gradientContactMessageThumbPort = v.findViewById(R.id.gradient_contact_message_thumb_portrait);
             holder.gradientContactMessageThumbPort.setBackground(shape);
 
-            holder.videoIconContactMessageThumbPort = (ImageView) v.findViewById(R.id.video_icon_contact_message_thumb_portrait);
-            holder.videoTimecontentContactMessageThumbPort = (TextView) v.findViewById(R.id.video_time_contact_message_thumb_portrait);
+            holder.videoIconContactMessageThumbPort = v.findViewById(R.id.video_icon_contact_message_thumb_portrait);
+            holder.videoTimecontentContactMessageThumbPort = v.findViewById(R.id.video_time_contact_message_thumb_portrait);
 
             holder.gradientContactMessageThumbPort.setVisibility(View.GONE);
             holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
             holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 
-            holder.contentContactMessageAttachLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_attach_layout);
+            holder.contentContactMessageAttachLayout = v.findViewById(R.id.content_contact_message_attach_layout);
             RelativeLayout.LayoutParams paramsContactAttach = (RelativeLayout.LayoutParams) holder.contentContactMessageAttachLayout.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 paramsContactAttach.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-            }else{
+            } else {
                 paramsContactAttach.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
             }
             holder.contentContactMessageAttachLayout.setLayoutParams(paramsContactAttach);
 
-            holder.contentContactMessageFile = (RelativeLayout) v.findViewById(R.id.content_contact_message_file);
-            holder.forwardContactFile = (RelativeLayout) v.findViewById(R.id.forward_contact_file);
+            holder.contentContactMessageFile = v.findViewById(R.id.content_contact_message_file);
+            holder.forwardContactFile = v.findViewById(R.id.forward_contact_file);
             holder.forwardContactFile.setTag(holder);
             holder.forwardContactFile.setVisibility(View.GONE);
-            holder.contentContactMessageFileThumb = (ImageView) v.findViewById(R.id.content_contact_message_file_thumb);
-            holder.contentContactMessageFileName = (TextView) v.findViewById(R.id.content_contact_message_file_name);
-            holder.contentContactMessageFileSize = (TextView) v.findViewById(R.id.content_contact_message_file_size);
+            holder.contentContactMessageFileThumb = v.findViewById(R.id.content_contact_message_file_thumb);
+            holder.contentContactMessageFileName = v.findViewById(R.id.content_contact_message_file_name);
+            holder.contentContactMessageFileSize = v.findViewById(R.id.content_contact_message_file_size);
 
             //contact voice clip:
-            holder.contentContactMessageVoiceClipLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_voice_clip_layout);
+            holder.contentContactMessageVoiceClipLayout = v.findViewById(R.id.content_contact_message_voice_clip_layout);
             RelativeLayout.LayoutParams paramsVoiceClip = (RelativeLayout.LayoutParams) holder.contentContactMessageVoiceClipLayout.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 paramsVoiceClip.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-            }else{
+            } else {
                 paramsVoiceClip.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
             }
             holder.contentContactMessageVoiceClipLayout.setLayoutParams(paramsVoiceClip);
             holder.contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
-            holder.contentContactMessageVoiceClipPlay = (ImageView) v.findViewById(R.id.content_contact_message_voice_clip_play_pause);
+            holder.contentContactMessageVoiceClipPlay = v.findViewById(R.id.content_contact_message_voice_clip_play_pause);
             holder.contentContactMessageVoiceClipPlay.setTag(holder);
-            holder.contentContactMessageVoiceClipSeekBar = (SeekBar) v.findViewById(R.id.content_contact_message_voice_clip_seekBar);
+            holder.contentContactMessageVoiceClipSeekBar = v.findViewById(R.id.content_contact_message_voice_clip_seekBar);
             holder.contentContactMessageVoiceClipSeekBar.setProgress(0);
-            holder.contentContactMessageVoiceClipDuration = (TextView) v.findViewById(R.id.content_contact_message_voice_clip_duration);
+            holder.contentContactMessageVoiceClipDuration = v.findViewById(R.id.content_contact_message_voice_clip_duration);
             holder.contentContactMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(0));
-            holder.uploadingContactProgressbarVoiceclip = (RelativeLayout) v.findViewById(R.id.uploading_contact_progressbar_voiceclip);
+            holder.uploadingContactProgressbarVoiceclip = v.findViewById(R.id.uploading_contact_progressbar_voiceclip);
             holder.uploadingContactProgressbarVoiceclip.setVisibility(View.GONE);
-            holder.notAvailableContactVoiceclip = (ImageView) v.findViewById(R.id.content_contact_message_voice_clip_not_available);
+            holder.notAvailableContactVoiceclip = v.findViewById(R.id.content_contact_message_voice_clip_not_available);
             holder.notAvailableContactVoiceclip.setVisibility(View.GONE);
             holder.notAvailableContactVoiceclip.setTag(holder);
             holder.notAvailableContactVoiceclip.setOnClickListener(this);
 
-            holder.layoutAvatarMessages = (RelativeLayout) v.findViewById(R.id.layout_avatar);
-            holder.contentContactMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout);
+            holder.layoutAvatarMessages = v.findViewById(R.id.layout_avatar);
+            holder.contentContactMessageContactLayout = v.findViewById(R.id.content_contact_message_contact_layout);
             RelativeLayout.LayoutParams paramsContactContact = (RelativeLayout.LayoutParams) holder.contentContactMessageContactLayout.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 paramsContactContact.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-            }else{
+            } else {
                 paramsContactContact.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
             }
             holder.contentContactMessageContactLayout.setLayoutParams(paramsContactContact);
 
-            holder.forwardContactContact = (RelativeLayout) v.findViewById(R.id.forward_contact_contact);
+            holder.forwardContactContact = v.findViewById(R.id.forward_contact_contact);
             holder.forwardContactContact.setTag(holder);
             holder.forwardContactContact.setVisibility(View.GONE);
 
-//            holder.contentContactMessageContactLayout.setVisibility(View.GONE);
-            holder.contentContactMessageContactLayoutAvatar = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout_avatar);
-            holder.contentContactMessageContactThumb = (RoundedImageView) v.findViewById(R.id.content_contact_message_contact_thumb);
-            holder.contentContactMessageContactName = (TextView) v.findViewById(R.id.content_contact_message_contact_name);
-            holder.contentContactMessageContactEmail = (TextView) v.findViewById(R.id.content_contact_message_contact_email);
-            holder.contentContactMessageContactInitialLetter = (TextView) v.findViewById(R.id.content_contact_message_contact_initial_letter);
+            holder.contentContactMessageContactLayoutAvatar = v.findViewById(R.id.content_contact_message_contact_layout_avatar);
+            holder.contentContactMessageContactThumb = v.findViewById(R.id.content_contact_message_contact_thumb);
+            holder.contentContactMessageContactName = v.findViewById(R.id.content_contact_message_contact_name);
+            holder.contentContactMessageContactEmail = v.findViewById(R.id.content_contact_message_contact_email);
+            holder.contentContactMessageContactInitialLetter = v.findViewById(R.id.content_contact_message_contact_initial_letter);
 
-            holder.iconContactTypeDocLandPreview = (ImageView) v.findViewById(R.id.contact_attachment_type_icon_lands);
-            holder.iconContactTypeDocPortraitPreview = (ImageView) v.findViewById(R.id.contact_attachment_type_icon_portrait);
+            holder.iconContactTypeDocLandPreview = v.findViewById(R.id.contact_attachment_type_icon_lands);
+            holder.iconContactTypeDocPortraitPreview = v.findViewById(R.id.contact_attachment_type_icon_portrait);
 
-            holder.contactManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.contact_management_message_layout);
+            holder.contactManagementMessageLayout = v.findViewById(R.id.contact_management_message_layout);
 
-            holder.contactManagementMessageText = (EmojiTextView) v.findViewById(R.id.contact_management_message_text);
+            holder.contactManagementMessageText = v.findViewById(R.id.contact_management_message_text);
             RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
                 holder.contactManagementMessageText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
 
-            }else{
+            } else {
                 paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
                 holder.contactManagementMessageText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
 
             }
             holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
-            holder.contactManagementMessageIcon = (ImageView) v.findViewById(R.id.contact_management_message_icon);
+            holder.contactManagementMessageIcon = v.findViewById(R.id.contact_management_message_icon);
 
             //Location message
-            holder.transparentCoatingLocation = (RelativeLayout) v.findViewById(R.id.transparent_coating_location);
-            holder.uploadingProgressBarLocation = (RelativeLayout) v.findViewById(R.id.uploadingProgressBarLocation);
-            holder.forwardOwnMessageLocation =  (RelativeLayout) v.findViewById(R.id.forward_own_location);
+            holder.transparentCoatingLocation = v.findViewById(R.id.transparent_coating_location);
+            holder.uploadingProgressBarLocation = v.findViewById(R.id.uploadingProgressBarLocation);
+            holder.forwardOwnMessageLocation = v.findViewById(R.id.forward_own_location);
             holder.forwardOwnMessageLocation.setTag(holder);
             holder.forwardOwnMessageLocation.setVisibility(View.GONE);
-            holder.mainOwnMessageItemLocation =  (RelativeLayout) v.findViewById(R.id.own_main_item_location);
-            holder.previewOwnLocation =  (RoundedImageView) v.findViewById(R.id.own_rounded_imageview_location);
+            holder.mainOwnMessageItemLocation = v.findViewById(R.id.own_main_item_location);
+            holder.previewOwnLocation = v.findViewById(R.id.own_rounded_imageview_location);
             holder.previewOwnLocation.setCornerRadius(Util.px2dp(12, outMetrics));
             holder.previewOwnLocation.setBorderWidth(0);
             holder.previewOwnLocation.setOval(false);
-            holder.separatorPreviewOwnLocation = (RelativeLayout) v.findViewById(R.id.own_separator_imageview_location);
+            holder.separatorPreviewOwnLocation = v.findViewById(R.id.own_separator_imageview_location);
 
-            if(((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            if (((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 holder.previewOwnLocation.getLayoutParams().width = 330;
                 holder.separatorPreviewOwnLocation.getLayoutParams().width = 330;
             }
 
-            holder.triangleErrorLocation =  (RelativeLayout) v.findViewById(R.id.error_uploading_location);
+            holder.triangleErrorLocation = v.findViewById(R.id.error_uploading_location);
 
-            holder.pinnedOwnLocationLayout = (RelativeLayout) v.findViewById(R.id.own_pinned_location_layout);
-            holder.pinnedOwnLocationInfoText = (TextView) v.findViewById(R.id.own_info_pinned_location);
-            holder.pinnedLocationTitleText = (TextView) v.findViewById(R.id.own_title_pinned_location);
+            holder.pinnedOwnLocationLayout = v.findViewById(R.id.own_pinned_location_layout);
+            holder.pinnedOwnLocationInfoText = v.findViewById(R.id.own_info_pinned_location);
+            holder.pinnedLocationTitleText = v.findViewById(R.id.own_title_pinned_location);
 
             holder.forwardContactMessageLocation = (RelativeLayout) v.findViewById(R.id.forward_contact_location);
             holder.forwardContactMessageLocation.setTag(holder);
             holder.forwardContactMessageLocation.setVisibility(View.GONE);
-            holder.mainContactMessageItemLocation = (RelativeLayout) v.findViewById(R.id.contact_main_item_location);
-            holder.previewContactLocation = (RoundedImageView) v.findViewById(R.id.contact_rounded_imageview_location);
+            holder.mainContactMessageItemLocation = v.findViewById(R.id.contact_main_item_location);
+            holder.previewContactLocation = v.findViewById(R.id.contact_rounded_imageview_location);
             holder.previewContactLocation.setCornerRadius(Util.px2dp(12, outMetrics));
             holder.previewContactLocation.setBorderWidth(0);
             holder.previewContactLocation.setOval(false);
-            holder.separatorPreviewContactLocation = (RelativeLayout) v.findViewById(R.id.contact_separator_imageview_location);
-            if(((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            holder.separatorPreviewContactLocation = v.findViewById(R.id.contact_separator_imageview_location);
+            if (((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 holder.previewContactLocation.getLayoutParams().width = 330;
                 holder.separatorPreviewContactLocation.getLayoutParams().width = 330;
             }
 
-            holder.pinnedContactLocationTitleText = (TextView) v.findViewById(R.id.contact_title_pinned_location);
-            holder.pinnedContactLocationLayout = (RelativeLayout) v.findViewById(R.id.contact_pinned_location_layout);
-            holder.pinnedContactLocationInfoText = (TextView) v.findViewById(R.id.contact_info_pinned_location);
+            holder.pinnedContactLocationTitleText = v.findViewById(R.id.contact_title_pinned_location);
+            holder.pinnedContactLocationLayout = v.findViewById(R.id.contact_pinned_location_layout);
+            holder.pinnedContactLocationInfoText = v.findViewById(R.id.contact_info_pinned_location);
 
             RelativeLayout.LayoutParams paramsLocation = (RelativeLayout.LayoutParams) holder.mainContactMessageItemLocation.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 paramsLocation.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-            }else{
+            } else {
                 paramsLocation.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
             }
             holder.mainContactMessageItemLocation.setLayoutParams(paramsLocation);
 
-            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
+            if (((ChatActivityLollipop) context).getDeviceDensity() == 1) {
                 MAX_WIDTH_FILENAME_LAND = 290;
                 MAX_WIDTH_FILENAME_PORT = 140;
             }
@@ -1392,22 +1375,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.GONE);
 
 
-            //Hide layouts location messages
-            ((ViewHolderMessageChat) holder).transparentCoatingLocation.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).uploadingProgressBarLocation.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).forwardOwnMessageLocation.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).mainOwnMessageItemLocation.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).previewOwnLocation.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).triangleErrorLocation.setVisibility(View.GONE);
-
-            ((ViewHolderMessageChat) holder).pinnedOwnLocationLayout.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).pinnedOwnLocationInfoText.setVisibility(View.GONE);
-
-            ((ViewHolderMessageChat) holder).forwardContactMessageLocation.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).mainContactMessageItemLocation.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).previewContactLocation.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).pinnedContactLocationLayout.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).pinnedContactLocationInfoText.setVisibility(View.GONE);
+            hideLayoutsLocationMessages(position, ((ViewHolderMessageChat) holder));
 
             String path = message.getPendingMessage().getFilePath();
             File voiceClipDir = CacheFolderManager.getCacheFolder(context, VOICE_CLIP_FOLDER);
@@ -1525,6 +1493,28 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    private void hideLayoutsLocationMessages(int position, ViewHolderMessageChat holder){
+        if (isHolderNull(position, holder)) {
+            return;
+        }
+
+        holder.transparentCoatingLocation.setVisibility(View.GONE);
+        holder.uploadingProgressBarLocation.setVisibility(View.GONE);
+        holder.forwardOwnMessageLocation.setVisibility(View.GONE);
+        holder.mainOwnMessageItemLocation.setVisibility(View.GONE);
+        holder.previewOwnLocation.setVisibility(View.GONE);
+        holder.triangleErrorLocation.setVisibility(View.GONE);
+        holder.pinnedOwnLocationLayout.setVisibility(View.GONE);
+        holder.pinnedOwnLocationInfoText.setVisibility(View.GONE);
+
+        holder.forwardContactMessageLocation.setVisibility(View.GONE);
+        holder.mainContactMessageItemLocation.setVisibility(View.GONE);
+        holder.previewContactLocation.setVisibility(View.GONE);
+        holder.pinnedContactLocationLayout.setVisibility(View.GONE);
+        holder.pinnedContactLocationInfoText.setVisibility(View.GONE);
+
+    }
+
     public void onBindViewHolderMessage(RecyclerView.ViewHolder holder, int position) {
         log("onBindViewHolderMessage(): " + position);
 
@@ -1559,22 +1549,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).urlContactMessageLayout.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).forwardContactRichLinks.setVisibility(View.GONE);
 
-        //Hide layouts location messages
-        ((ViewHolderMessageChat) holder).transparentCoatingLocation.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).uploadingProgressBarLocation.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardOwnMessageLocation.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).mainOwnMessageItemLocation.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).previewOwnLocation.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).triangleErrorLocation.setVisibility(View.GONE);
-
-        ((ViewHolderMessageChat) holder).pinnedOwnLocationLayout.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).pinnedOwnLocationInfoText.setVisibility(View.GONE);
-
-        ((ViewHolderMessageChat) holder).forwardContactMessageLocation.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).mainContactMessageItemLocation.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).previewContactLocation.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).pinnedContactLocationLayout.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).pinnedContactLocationInfoText.setVisibility(View.GONE);
+        hideLayoutsLocationMessages(position, ((ViewHolderMessageChat) holder));
 
         ((ViewHolderMessageChat) holder).contentContactMessageText.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).contentContactMessageVoiceClipLayout.setVisibility(View.GONE);

@@ -4,11 +4,11 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class MapAddress {
 
-    LatLng latLng;
+    private LatLng latLng;
     private String name;
     private String address;
 
-    public MapAddress (LatLng latLng, String name, String address) {
+    public MapAddress(LatLng latLng, String name, String address) {
         this.latLng = latLng;
         this.name = name;
         this.address = address;
@@ -18,16 +18,16 @@ public class MapAddress {
         return address;
     }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public LatLng getLatLng() {
