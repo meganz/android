@@ -156,7 +156,6 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		long handle;
     	Bitmap preview;
-    	File cacheDir;
     	File destination; 
     	
 		@Override
@@ -248,6 +247,14 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				pendingFullImages.add(handle);
 				log("document.name: " +  node.getName() + "_handle: " + node.getHandle());
 				log("destination.getabsolutepath: " + destination.getAbsolutePath());
+
+				File cacheDir;
+				if (activity.getExternalCacheDir() != null) {
+					cacheDir = activity.getExternalCacheDir();
+				}
+				else{
+					cacheDir = activity.getCacheDir();
+				}
 				megaApi.startDownload(node, cacheDir.getAbsolutePath() + "/", megaFullScreenImageAdapter);
 			}
 		}
