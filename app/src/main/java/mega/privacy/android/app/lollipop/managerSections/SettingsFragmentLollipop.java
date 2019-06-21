@@ -10,13 +10,16 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
@@ -42,6 +45,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.components.dragger.ReturnOriginViewAnimator;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -1410,8 +1414,106 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 	}
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            log("read and write to external storage have granted.");
+            if (requestCode == STORAGE_DOWNLOAD_LOCATION_INTERNAL_SD_CARD) {
+                toSelectFolder();
+            }
+            if (requestCode == STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD) {
+                showSelectDownloadLocationDialog();
+            }
+        } else {
+            Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.no_read_and_write_permissions), -1);
+        }
+    }
 
-	@Override
+    private void toSelectFolder() {
+	    toSelectFolder(null);
+    }
+
+    private void toSelectFolder(String sdRoot) {
+        log("intent to FileStorageActivityLollipop");
+        Intent intent = new Intent(context, FileStorageActivityLollipop.class);
+        intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+        if(sdRoot != null) {
+            intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
+        }
+        startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
+    }
+
+    private boolean hasStoragePermission() {
+        boolean writePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        boolean readPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        return writePermission && readPermission;
+    }
+
+    private void showSelectDownloadLocationDialog() {
+        Dialog downloadLocationDialog;
+        String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
+        AlertDialog.Builder b = new AlertDialog.Builder(context);
+
+        b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+        b.setItems(sdCardOptions, new OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                log("onClick");
+                switch (which) {
+                    case 0: {
+                        toSelectFolder();
+                        break;
+                    }
+                    case 1: {
+                        log("get External Files");
+                        File[] fs = context.getExternalFilesDirs(null);
+                        if (fs.length > 1) {
+                            log("more than one");
+                            if (fs[1] != null) {
+                                log("external not NULL");
+                                String sdRoot = Util.getSDCardRoot(fs[1]);
+                                //some devices don't allow app to write on SD card, for example, HUAWE LDN-LX2(OS 8.0).
+                                if (new File(sdRoot).canWrite()) {
+                                    toSelectFolder(sdRoot);
+                                } else {
+                                    log("device doesn't allow to access SD card except this folder.");
+                                    //fix the default download location on the folder which always has the write permission.
+                                    Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.donot_support_write_on_sdcard), -1);
+                                    String path = fs[1].getAbsolutePath();
+                                    dbH.setStorageDownloadLocation(path);
+                                    if (downloadLocation != null) {
+                                        downloadLocation.setSummary(path);
+                                    }
+                                    if (downloadLocationPreference != null) {
+                                        downloadLocationPreference.setSummary(path);
+                                    }
+                                }
+                            } else {
+                                log("external NULL -- intent to FileStorageActivityLollipop");
+                                toSelectFolder();
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+        b.setNegativeButton(getResources().getString(R.string.general_cancel), new OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                log("Cancel dialog");
+                dialog.cancel();
+            }
+        });
+        downloadLocationDialog = b.create();
+        downloadLocationDialog.show();
+        log("downloadLocationDialog shown");
+    }
+
+    @Override
 	public boolean onPreferenceClick(Preference preference) {
 		log("onPreferenceClick");
 
@@ -1502,83 +1604,23 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
 			log("KEY_STORAGE_DOWNLOAD_LOCATION pressed");
-			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
-			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
-			startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
+            if(hasStoragePermission()) {
+                toSelectFolder();
+            } else {
+                requestPermissions(new String[] {
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE},STORAGE_DOWNLOAD_LOCATION_INTERNAL_SD_CARD);
+            }
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE) == 0){
 			log("KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE pressed");
-			Dialog downloadLocationDialog;
-			String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-	        AlertDialog.Builder b=new AlertDialog.Builder(context);
-
-			b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-			b.setItems(sdCardOptions, new OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					log("onClick");
-					switch(which){
-						case 0:{
-							log("intent to FileStorageActivityLollipop");
-							Intent intent = new Intent(context, FileStorageActivityLollipop.class);
-							intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-							intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
-							startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
-							break;
-						}
-						case 1:{
-							log("get External Files");
-							File[] fs = context.getExternalFilesDirs(null);
-							if (fs.length > 1){
-								log("more than one");
-								if (fs[1] != null){
-									log("external not NULL");
-									String sdRoot = Util.getSDCardRoot(fs[1]);
-									//some devices don't allow app to write on SD card, for example, HUAWE LDN-LX2(OS 8.0).
-									if(new File(sdRoot).canWrite()) {
-                                        Intent intent = new Intent(context, FileStorageActivityLollipop.class);
-                                        intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
-                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
-                                        startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
-                                    } else {
-									    //fix the default download location on the folder which always has the write permission.
-                                        String path = fs[1].getAbsolutePath();
-                                        dbH.setStorageDownloadLocation(path);
-                                        if (downloadLocation != null){
-                                            downloadLocation.setSummary(path);
-                                        }
-                                        if (downloadLocationPreference != null){
-                                            downloadLocationPreference.setSummary(path);
-                                        }
-                                    }
-								}
-								else{
-									log("external NULL -- intent to FileStorageActivityLollipop");
-									Intent intent = new Intent(context, FileStorageActivityLollipop.class);
-									intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
-									startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
-								}
-							}
-							break;
-						}
-					}
-				}
-			});
-			b.setNegativeButton(getResources().getString(R.string.general_cancel), new OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					log("Cancel dialog");
-					dialog.cancel();
-				}
-			});
-			downloadLocationDialog = b.create();
-			downloadLocationDialog.show();
-			log("downloadLocationDialog shown");
+			if(hasStoragePermission()) {
+                showSelectDownloadLocationDialog();
+            } else {
+                requestPermissions(new String[] {
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE},STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD);
+            }
 		}
 		else if (preference.getKey().compareTo(KEY_CACHE) == 0){
 			log("Clear Cache!");
