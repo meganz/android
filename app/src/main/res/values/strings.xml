@@ -2067,7 +2067,7 @@
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
     <string name="choose_chat" context="section title to select a chat to send a file">Choose chat</string>
 
-    <string name="type_mail" context="Hint shown to guide user on activity add contacts">Tap, enter name or email</string>
+    <string name="type_mail" context="Hint shown to guide user on activity add contacts">Tap, enter name, email, phone or searching</string>
 
     <string name="confirmation_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Add %s to your contacts?</string>
     <string name="confirmation_not_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and the contact is already a contact">You have already added the contact %s.</string>

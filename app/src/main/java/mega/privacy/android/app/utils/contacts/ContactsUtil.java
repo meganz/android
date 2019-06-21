@@ -8,6 +8,8 @@ import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.utils.Util;
@@ -151,6 +153,13 @@ public class ContactsUtil {
             }
             emails.close();
         }
+        Collections.sort(localContacts, new Comparator<LocalContact>() {
+
+            @Override
+            public int compare(LocalContact o1, LocalContact o2) {
+                return o1.name.compareTo(o2.name);
+            }
+        });
         return localContacts;
     }
 
