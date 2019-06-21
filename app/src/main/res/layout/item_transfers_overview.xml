@@ -36,7 +36,6 @@
 			android:background="@null"
 			android:layout_marginRight="12dp"
 			android:layout_marginLeft="12dp"
-			android:alpha="0.54"
 			android:src="@drawable/ic_pause"/>
 	</RelativeLayout>
         
@@ -44,9 +43,12 @@
 		android:id="@+id/transfers_overview_title"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="15dp"
-		android:layout_marginLeft="72dp"
-		android:textColor="@color/file_list_first_row"
+		android:layout_marginTop="13dp"
+		android:layout_marginLeft="16dp"
+		android:textColor="@color/name_my_account"
+		android:fontFamily="sans-serif-light"
+		android:textStyle="bold"
+		android:textAllCaps="true"
 		android:singleLine="true"
 		android:ellipsize="middle"
 		android:textSize="16sp"/>
@@ -56,8 +58,8 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_below="@+id/transfers_overview_title"
-		android:textColor="@color/file_list_second_row"
-		android:layout_marginLeft="72dp"
+		android:textColor="@color/mail_my_account"
+		android:layout_marginLeft="16dp"
 		android:textSize="14sp"
 		android:ellipsize="end"
 		android:maxLines="1"/>
@@ -67,6 +69,9 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"  
         android:layout_marginTop="6dp"
+		 android:layout_marginLeft="16dp"
+		 android:layout_marginRight="16dp"
+		 android:paddingBottom="2dp"
         style="@style/TransferProgressBar"
 		android:layout_alignParentBottom="true" />
     

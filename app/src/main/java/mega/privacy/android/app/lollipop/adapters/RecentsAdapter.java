@@ -151,37 +151,44 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             if (parentNode == null) return;
 
             holder.subtitle.setText(parentNode.getName());
-            if (parentNode.isShared()) {
-                holder.actionBy.setVisibility(View.VISIBLE);
-                holder.sharedIcon.setVisibility(View.VISIBLE);
-                String userAction;
-                String mail = bucket.getUserEmail();
-                String user;
-                if (mail.equals(megaApi.getMyEmail())) {
-                    user = context.getString(R.string.bucket_word_me);
-                }
-                else {
-                    user = ((RecentsFragment) fragment).findUserName(mail);
-                }
+
+            String mail = bucket.getUserEmail();
+            String user;
+            String userAction;
+            if (mail.equals(megaApi.getMyEmail())) {
+                holder.actionBy.setVisibility(View.GONE);
+            }
+            else {
+                user = ((RecentsFragment) fragment).findUserName(mail);
                 if (bucket.isUpdate()) {
                     userAction = context.getString(R.string.update_action_bucket, user);
                 }
                 else {
                     userAction = context.getString(R.string.create_action_bucket, user);
                 }
-
+                holder.actionBy.setVisibility(View.VISIBLE);
                 holder.actionBy.setText(formatUserAction(userAction));
-                if (parentNode.isInShare()) {
-                    holder.sharedIcon.setImageResource(R.drawable.ic_folder_incoming_list);
+            }
+
+            boolean isOutShare = false;
+            while (megaApi.getParentNode(parentNode) != null) {
+                if (parentNode.isOutShare()) {
+                    isOutShare = true;
                 }
-                else if (parentNode.isOutShare()) {
-                    holder.sharedIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
-                }
+                parentNode = megaApi.getParentNode(parentNode);
+            }
+
+            holder.sharedIcon.setVisibility(View.VISIBLE);
+            if (parentNode.isInShare()) {
+                holder.sharedIcon.setImageResource(R.drawable.ic_folder_incoming_list);
+            }
+            else if (isOutShare){
+                holder.sharedIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
             }
             else {
-                holder.actionBy.setVisibility(View.GONE);
                 holder.sharedIcon.setVisibility(View.GONE);
             }
+
             holder.time.setText(item.getTime());
 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageThumbnail.getLayoutParams();

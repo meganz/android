@@ -112,10 +112,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-//	private RelativeLayout contentTextLayout;
-//	Button turnOnOff;
-	private RelativeLayout transfersOverViewLayout;
-
 	private SwitchCompat switchCellularConnection;
 	private SwitchCompat switchUploadVideos;
 
@@ -812,9 +808,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			} else {
 				turnOnOff.setText(getString(R.string.settings_set_up_automatic_uploads).toUpperCase(Locale.getDefault()));
 			}
-
-			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
-			transfersOverViewLayout.setVisibility(View.GONE);
 
 			boolean camEnabled = false;
 			prefs = dbH.getPreferences();

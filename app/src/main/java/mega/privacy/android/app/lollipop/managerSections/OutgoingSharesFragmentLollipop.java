@@ -90,7 +90,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 	MegaNodeAdapter adapter;
 	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
-	RelativeLayout transfersOverViewLayout;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -589,8 +588,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
-			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
-			transfersOverViewLayout.setVisibility(View.GONE);
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			if (adapter == null){
 				log("Creating the adapter: "+((ManagerActivityLollipop)context).parentHandleOutgoing);

@@ -64,7 +64,6 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -132,6 +131,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -455,7 +455,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	//Tabs in Shares
 	TabLayout tabLayoutCloud;
 	CloudPageAdapter cloudPageAdapter;
-	ViewPager viewPagerCloud;
+	CustomViewPager viewPagerCloud;
 
     //Tabs in Shares
 	TabLayout tabLayoutShares;
@@ -476,6 +476,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TabLayout tabLayoutTransfers;
 	TransfersPageAdapter mTabsAdapterTransfers;
 	ViewPager viewPagerTransfers;
+
+	private RelativeLayout transfersOverViewLayout;
+	private TextView transfersTitleText;
+	private TextView transfersNumberText;
+	private ImageView playButton;
+	private RelativeLayout actionLayout;
+	private RelativeLayout dotsOptionsTransfersLayout;
+	private ProgressBar progressBarTransfers;
 
 	boolean firstTimeAfterInstallation = true;
 //	String pathNavigation = "/";
@@ -2223,7 +2231,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		//TABS section Cloud Drive
 		tabLayoutCloud = (TabLayout) findViewById(R.id.sliding_tabs_cloud);
-		viewPagerCloud = (ViewPager) findViewById(R.id.cloud_tabs_pager);
+		viewPagerCloud = (CustomViewPager) findViewById(R.id.cloud_tabs_pager);
 		viewPagerCloud.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -2323,6 +2331,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			return;
         }
+
+		transfersOverViewLayout = (RelativeLayout) findViewById(R.id.transfers_overview_item_layout);
+		transfersOverViewLayout.setOnClickListener(this);
+		transfersTitleText = (TextView) findViewById(R.id.transfers_overview_title);
+		transfersNumberText = (TextView) findViewById(R.id.transfers_overview_number);
+		playButton = (ImageView) findViewById(R.id.transfers_overview_button);
+		actionLayout = (RelativeLayout) findViewById(R.id.transfers_overview_action_layout);
+		actionLayout.setOnClickListener(this);
+		dotsOptionsTransfersLayout = (RelativeLayout) findViewById(R.id.transfers_overview_three_dots_layout);
+		dotsOptionsTransfersLayout.setOnClickListener(this);
+		progressBarTransfers = (ProgressBar) findViewById(R.id.transfers_overview_progress_bar);
 
 		///Check the MK file
 		int versionApp = Util.getVersion(this);
@@ -5431,7 +5450,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void setTabsVisibility() {
+	private void setTabsVisibility() {
     	tabLayoutCloud.setVisibility(View.GONE);
     	viewPagerCloud.setVisibility(View.GONE);
 		tabLayoutContacts.setVisibility(View.GONE);
@@ -5498,6 +5517,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	log("selectDrawerItemLollipop: "+item);
 
 		((MegaApplication)getApplication()).setRecentChatVisible(false);
+		setTransfersWidget();
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -12625,7 +12645,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("nodes: "+nodes.size());
 			fbFLol.hideMultipleSelect();
 			fbFLol.setNodes(nodes);
-			fbFLol.setOverviewLayout();
 			fbFLol.getRecyclerView().invalidate();
 		}
 	}
@@ -12829,15 +12848,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onClick");
 
 		switch(v.getId()){
-//			case R.id.custom_search:{
-//				if (searchMenuItem != null) {
-//					MenuItemCompat.expandActionView(searchMenuItem);
-//				}
-//				else{
-//					log("searchMenuItem == null");
-//				}
-//				break;
-//			}
 			case R.id.btnLeft_cancel:{
 				getProLayout.setVisibility(View.GONE);
 				break;
@@ -12925,28 +12935,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				break;
 			}
-//			case R.id.top_control_bar:{
-//				if (nDALol != null){
-//					nDALol.setPositionClicked(-1);
-//				}
-//				drawerItem = DrawerItem.ACCOUNT;
-//				titleAB = drawerItem.getTitle(this);
-//
-//				selectDrawerItemLollipop(drawerItem);
-//
-//				break;
-//			}
-//			case R.id.bottom_control_bar:{
-//				if (nDALol != null){
-//					nDALol.setPositionClicked(-1);
-//				}
-//				drawerItem = DrawerItem.ACCOUNT;
-//				titleAB = drawerItem.getTitle(this);
-//
-//				selectDrawerItemLollipop(drawerItem);
-//
-//				break;
-//			}
+			case R.id.transfers_overview_item_layout: {
+				log("click transfers layout");
+				selectDrawerItemTransfers();
+				setTabsVisibility();
+				setTransfersWidget();
+				invalidateOptionsMenu();
+				break;
+			}
+			case R.id.transfers_overview_three_dots_layout: {
+				log("click show options");
+				showTransfersPanel();
+				break;
+			}
+			case R.id.transfers_overview_action_layout: {
+				log("click play/pause");
+				changeTransfersStatus();
+				break;
+			}
 		}
 	}
 
@@ -15940,8 +15946,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("MegaRequest.TYPE_PAUSE_TRANSFERS");
 			if (e.getErrorCode() == MegaError.API_OK) {
 
-				if(isCloudAdded()){
-					fbFLol.updateTransferButton();
+				if(drawerItem == DrawerItem.CLOUD_DRIVE){
+					updateTransferButton();
 				}
 
 				if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
@@ -15986,13 +15992,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (isCloudAdded()){
-					fbFLol.setOverviewLayout();
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					setTransfersWidget();
 				}
 
-				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-				if (tFLol != null){
-					if (drawerItem == DrawerItem.TRANSFERS){
+				if (drawerItem == DrawerItem.TRANSFERS) {
+					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
+					if (tFLol != null){
 						pauseTransfersMenuIcon.setVisible(false);
 						playTransfersMenuIcon.setVisible(false);
 						cancelAllTransfersMenuItem.setVisible(false);
@@ -16010,8 +16016,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode() == MegaError.API_OK){
 
 				log("REQUEST OK - wait for onTransferFinish()");
-				if (isCloudAdded()){
-					fbFLol.setOverviewLayout();
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					setTransfersWidget();
 				}
 				supportInvalidateOptionsMenu();
 			}
@@ -16929,9 +16935,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
 						log("Pressed button positive to cancel transfer");
-						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-
+						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
+						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -16980,8 +16985,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(!transfer.isFolderTransfer()){
 				transfersInProgress.add(transfer.getTag());
 
-				if (isCloudAdded()){
-					fbFLol.setOverviewLayout();
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					setTransfersWidget();
 				}
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
@@ -17089,8 +17094,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if(transferCallback<transfer.getNotificationNumber()){
 					transferCallback = transfer.getNotificationNumber();
 
-					if (isCloudAdded()){
-						fbFLol.setOverviewLayout();
+					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+						setTransfersWidget();
 					}
 
 					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
@@ -17110,8 +17115,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
 			if (e.getValue() != 0) {
 				log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
-				if (isCloudAdded()){
-					fbFLol.setOverviewLayout();
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					setTransfersWidget();
 				}
 			}
 			else {
@@ -17293,7 +17298,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showTransfersPanel(){
+	private void showTransfersPanel(){
 		log("showChatPanel");
 
 		int pendingTransfers = megaApi.getNumPendingUploads()+megaApi.getNumPendingDownloads();
@@ -18468,11 +18473,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showTabCloud (boolean show) {
-		if (show)
+	/**
+	 * This method show or hide the tabs of Cloud Drive section and blocks or not
+	 * respectively the swipe of the ViewPager
+	 *
+	 * @param show if true, it shows the tabs and enable the swipe, else hide the tabs
+	 *             and disable the swipe
+	 */
+	public void showTabCloud(boolean show) {
+		if (show) {
 			tabLayoutCloud.setVisibility(View.VISIBLE);
-		else
+			viewPagerCloud.disableSwipe(false);
+		} else {
 			tabLayoutCloud.setVisibility(View.GONE);
+			viewPagerCloud.disableSwipe(true);
+		}
 	}
 
 	public void setDeepBrowserTreeRecents (int deepBrowserTreeRecents) {
@@ -18481,5 +18496,79 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public int getDeepBrowserTreeRecents () {
 		return deepBrowserTreeRecents;
+	}
+
+	/**
+	 * This method sets the transfers widget when there are transfers in progress
+	 * and it is in Cloud Drive section or Recents section
+	 */
+	public void setTransfersWidget() {
+		log("setTransfersWidget");
+
+		if (drawerItem != DrawerItem.CLOUD_DRIVE) {
+			transfersOverViewLayout.setVisibility(View.GONE);
+			return;
+		}
+
+		//Check transfers in progress
+		int pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+		int totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
+
+		long totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
+		long totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
+
+		if (pendingTransfers > 0) {
+			log("Transfers in progress");
+			transfersOverViewLayout.setVisibility(View.VISIBLE);
+			dotsOptionsTransfersLayout.setOnClickListener(this);
+			actionLayout.setOnClickListener(this);
+
+			updateTransferButton();
+
+			int progressPercent = (int) Math.round((double) totalSizeTransfered / totalSizePendingTransfer * 100);
+			progressBarTransfers.setProgress(progressPercent);
+			log("Progress Percent: " + progressPercent);
+
+			long delay = megaApi.getBandwidthOverquotaDelay();
+			if (delay == 0) {
+//				transfersTitleText.setText(getString(R.string.section_transfers));
+			} else {
+				log("Overquota delay activated until: " + delay);
+				transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
+			}
+
+			int inProgress = totalTransfers - pendingTransfers + 1;
+			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers, totalTransfers, inProgress, totalTransfers);
+			transfersNumberText.setText(progressText);
+		} else {
+			log("NO TRANSFERS in progress");
+			if (transfersOverViewLayout != null) {
+				transfersOverViewLayout.setVisibility(View.GONE);
+			}
+			dotsOptionsTransfersLayout.setOnClickListener(null);
+			actionLayout.setOnClickListener(null);
+		}
+	}
+
+	/**
+	 * This method updates the action button, play or pause, of the
+	 * transfers widget
+	 */
+	private void updateTransferButton() {
+		log("updateTransferButton");
+
+		if (transfersOverViewLayout.getVisibility() == View.VISIBLE) {
+			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+				log("show PLAY button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play));
+				transfersTitleText.setText(getString(R.string.paused_transfers_title));
+			} else {
+				log("show PAUSE button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_pause));
+				transfersTitleText.setText(getString(R.string.section_transfers));
+			}
+		} else {
+			log("Transfer panel not visible");
+		}
 	}
 }
