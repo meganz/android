@@ -228,7 +228,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         String url = intent.getStringExtra(EXTRA_URL);
         boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
-		type = intent.getStringExtra("type");
+		type = intent.getStringExtra(Constants.EXTRA_TRANSFER_TYPE);
 
 		Uri contentUri = null;
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
@@ -1467,7 +1467,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
 
 		if (isVoiceClipType(transfer.getAppData())) return;
-		if ((transfer.getType() == MegaTransfer.TYPE_DOWNLOAD)) {
+		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
 			transfersCount++;
 			updateProgressNotification();
 		}
@@ -1636,8 +1636,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void resultTransfersVoiceClip(long nodeHandle, int result){
 		log("resultTransfersVoiceClip:nodeHandle =  "+nodeHandle+", the result is "+result);
 		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
-		intent.putExtra("nodeHandle", nodeHandle);
-		intent.putExtra("resultTransfer", result);
+		intent.putExtra(Constants.EXTRA_NODE_HANDLE, nodeHandle);
+		intent.putExtra(Constants.EXTRA_RESULT_TRANSFER, result);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 

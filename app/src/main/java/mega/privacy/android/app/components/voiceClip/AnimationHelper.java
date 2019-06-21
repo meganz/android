@@ -24,6 +24,7 @@ import static android.view.View.VISIBLE;
 public class AnimationHelper {
     private final static int DURATION_BLINK_MICRO = 500;
     private final static int DURATION_ALPHA = 250;
+    private final static int TRASLATE_DISTANCE_BASKET = 90;
     private Context context;
     private AnimatedVectorDrawableCompat animatedVectorDrawable;
     private ImageView basketImg, smallBlinkingMic;
@@ -62,8 +63,8 @@ public class AnimationHelper {
         micAnimation = (AnimatorSet) AnimatorInflaterCompat.loadAnimator(context, R.animator.delete_mic_animation);
         micAnimation.setTarget(smallBlinkingMic); // set the view you want to animate
 
-        translateAnimation1 = initializeTranslateAnimation(basketInitialX, basketInitialX + 90);
-        translateAnimation2 = initializeTranslateAnimation(basketInitialX + 90, basketInitialX);
+        translateAnimation1 = initializeTranslateAnimation(basketInitialX, basketInitialX + TRASLATE_DISTANCE_BASKET);
+        translateAnimation2 = initializeTranslateAnimation(basketInitialX + TRASLATE_DISTANCE_BASKET, basketInitialX);
 
         micAnimation.start();
         basketImg.setImageDrawable(animatedVectorDrawable);
@@ -139,24 +140,28 @@ public class AnimationHelper {
     }
 
     private void resetAnimation(Animation anim) {
-        if (anim == null) return;
-        anim.reset();
-        anim.cancel();
+        if (anim != null) {
+            anim.reset();
+            anim.cancel();
+        }
     }
 
     private void resetAnimationSet(AnimatorSet anim) {
-        if (anim == null) return;
-        anim.cancel();
+        if (anim != null) {
+            anim.cancel();
+        }
     }
 
     private void clearAnimation(ImageView imageView) {
-        if (imageView == null) return;
-        imageView.clearAnimation();
+        if (imageView != null) {
+            imageView.clearAnimation();
+        }
     }
 
     private void removeCallbacks(Handler handler) {
-        if (handler == null) return;
-        handler.removeCallbacksAndMessages(null);
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
     }
 
     /*
@@ -186,9 +191,9 @@ public class AnimationHelper {
         log("clearAlphaAnimation()");
         resetAnimation(alphaAnimation);
         clearAnimation(smallBlinkingMic);
-        if (!hideView) return;
-        smallBlinkingMic.setVisibility(View.GONE);
-
+        if (hideView) {
+            smallBlinkingMic.setVisibility(View.GONE);
+        }
     }
 
     public void animateSmallMicAlpha() {

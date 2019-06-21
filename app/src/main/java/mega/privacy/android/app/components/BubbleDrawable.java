@@ -1,7 +1,6 @@
 package mega.privacy.android.app.components;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -10,9 +9,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
-import android.support.v4.content.ContextCompat;
-
-import mega.privacy.android.app.R;
 
 public class BubbleDrawable extends Drawable {
 

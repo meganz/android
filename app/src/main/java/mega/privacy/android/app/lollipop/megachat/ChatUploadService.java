@@ -298,7 +298,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 			else {
 				long chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1);
-				type = intent.getStringExtra("type");
+				type = intent.getStringExtra(Constants.EXTRA_TRANSFER_TYPE);
 				long idPendMsg = intent.getLongExtra(EXTRA_ID_PEND_MSG, -1);
 				PendingMessageSingle pendingMsg = null;
 				if(idPendMsg!=-1){
@@ -979,7 +979,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
             mNotificationManager.notify(notificationId, notification);
         }
 	}
-	
+
 	public static void log(String log) {
 		Util.log("ChatUploadService", log);
 	}

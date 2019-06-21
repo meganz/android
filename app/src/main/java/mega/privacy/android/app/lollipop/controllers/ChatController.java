@@ -1957,7 +1957,7 @@ public class ChatController {
 
                         if(ChatUtil.isVoiceClip(nodeList.get(0).getName())){
                             service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
-                            service.putExtra("type", Constants.EXTRA_VOICE_CLIP );
+                            service.putExtra(Constants.EXTRA_TRANSFER_TYPE, Constants.EXTRA_VOICE_CLIP );
                         }else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                             service.putExtra("fromMV", true);
                         }

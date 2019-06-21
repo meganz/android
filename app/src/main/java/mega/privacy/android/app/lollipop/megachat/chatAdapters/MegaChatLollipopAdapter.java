@@ -127,6 +127,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
+    private static final int LAYOUT_WIDTH = 330;
+
     Context context;
     private int positionClicked;
     private ArrayList<AndroidMegaChatMessage> messages;
@@ -836,7 +838,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageTextrl = v.findViewById(R.id.url_own_message_text_rl);
 
             if (((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                holder.urlOwnMessageLayout.getLayoutParams().width = 330;
+                holder.urlOwnMessageLayout.getLayoutParams().width = LAYOUT_WIDTH;
             }
             holder.forwardOwnRichLinks = v.findViewById(R.id.forward_own_rich_links);
             holder.forwardOwnRichLinks.setTag(holder);
@@ -1059,7 +1061,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             //Contact rich links message
             holder.urlContactMessageLayout = v.findViewById(R.id.url_contact_message_layout);
             if (((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                holder.urlContactMessageLayout.getLayoutParams().width = 330;
+                holder.urlContactMessageLayout.getLayoutParams().width = LAYOUT_WIDTH;
             }
 
             RelativeLayout.LayoutParams paramsContactRichLink = (RelativeLayout.LayoutParams) holder.urlContactMessageLayout.getLayoutParams();
@@ -1212,8 +1214,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.separatorPreviewOwnLocation = v.findViewById(R.id.own_separator_imageview_location);
 
             if (((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                holder.previewOwnLocation.getLayoutParams().width = 330;
-                holder.separatorPreviewOwnLocation.getLayoutParams().width = 330;
+                holder.previewOwnLocation.getLayoutParams().width = LAYOUT_WIDTH;
+                holder.separatorPreviewOwnLocation.getLayoutParams().width = LAYOUT_WIDTH;
             }
 
             holder.triangleErrorLocation = v.findViewById(R.id.error_uploading_location);
@@ -1232,8 +1234,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.previewContactLocation.setOval(false);
             holder.separatorPreviewContactLocation = v.findViewById(R.id.contact_separator_imageview_location);
             if (((ChatActivityLollipop) context).getDeviceDensity() == 1 && context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                holder.previewContactLocation.getLayoutParams().width = 330;
-                holder.separatorPreviewContactLocation.getLayoutParams().width = 330;
+                holder.previewContactLocation.getLayoutParams().width = LAYOUT_WIDTH;
+                holder.separatorPreviewContactLocation.getLayoutParams().width = LAYOUT_WIDTH;
             }
 
             holder.pinnedContactLocationTitleText = v.findViewById(R.id.contact_title_pinned_location);

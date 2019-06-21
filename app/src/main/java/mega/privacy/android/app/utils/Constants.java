@@ -55,7 +55,10 @@ public class Constants {
 
 	public static String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
 
-	public static String EXTRA_VOICE_CLIP = "VOICE_CLIP";
+	public static final String EXTRA_NODE_HANDLE = "NODE_HANDLE";
+	public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
+	public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
+	public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
 
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;

@@ -397,8 +397,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                long nodeHandle = intent.getLongExtra("nodeHandle", 0);
-                int resultTransfer = intent.getIntExtra("resultTransfer",0);
+                long nodeHandle = intent.getLongExtra(Constants.EXTRA_NODE_HANDLE, 0);
+                int resultTransfer = intent.getIntExtra(Constants.EXTRA_RESULT_TRANSFER,0);
                 if(adapter!=null){
                     adapter.finishedVoiceClipDownload(nodeHandle, resultTransfer);
                 }
@@ -7845,7 +7845,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             sendMessageToUI(newNodeAttachmentMsg);
         }
         intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
-        if(ChatUtil.isVoiceClip(selfie.getAbsolutePath())) intent.putExtra("type", Constants.EXTRA_VOICE_CLIP);
+        if(ChatUtil.isVoiceClip(selfie.getAbsolutePath())) {
+            intent.putExtra(Constants.EXTRA_TRANSFER_TYPE, Constants.EXTRA_VOICE_CLIP);
+        }
 
         startService(intent);
     }

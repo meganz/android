@@ -1,7 +1,6 @@
 package mega.privacy.android.app.components;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
@@ -78,19 +77,19 @@ public class OnSwipeTouchListener implements OnTouchListener {
         }
     }
 
-    public void onUp() {}
+    private void onUp() {}
 
-    public void onSwipeRight() {}
+    private void onSwipeRight() {}
 
-    public void onSwipeLeft() {}
+    private void onSwipeLeft() {}
 
-    public void onSwipeTop() {}
+    private void onSwipeTop() {}
 
-    public void onSwipeBottom() {}
+    private void onSwipeBottom() {}
 
-    public void singleTap() {}
+    private void singleTap() {}
 
-    public void down() {}
+    private void down() {}
 
-    public void longPress() {}
+    private void longPress() {}
 }
