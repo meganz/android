@@ -114,9 +114,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 helperText.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
             }
         }
-        
-        
-        
+
         //country selector
         countrySelector = findViewById(R.id.verify_account_country_selector);
         countrySelector.setOnClickListener(this);
@@ -195,7 +193,6 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 divider1.setBackgroundColor(Color.parseColor("#8A000000"));
             }
         }
-        megaApi.getCountryCallingCodes(this);
     }
     
     @Override
