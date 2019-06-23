@@ -647,7 +647,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video conversion is very power consuming, MEGA will remind you to charge your device if the videos to be converted are larger than %s.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression is very power consuming, MEGA will remind you to charge your device if the videos to be compressed are larger than %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
@@ -2138,7 +2138,7 @@
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d days</string>
 	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notify me when size is larger than</string>
 
-	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to convert are larger than</string>
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to compress are larger than</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a PRO plan.</string>
 
@@ -2262,11 +2262,11 @@
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow your contacts to see the last time you were active on MEGA.</string>
 
 	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
-	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video conversion.</string>
-	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video conversion size is too large</string>
-	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting">The total size of the videos to convert exceeds %s, please plug in your device to continue.</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video compression.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">The total size of the videos to compress exceeds %s, please plug in your device to continue.</string>
 	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
-	<string name="message_compress_video" context="Notification message when compressiong video to show the converted percentage. Please, keep the placeholder because it for add the percentage value in runtime.">%s has been compressed </string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed </string>
 	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
 
