@@ -1253,25 +1253,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			}
 
-			int imageNumber = 0;
-			for (int i=0;i<nodes.size();i++){
-				MegaNode n = nodes.get(i);
-				if (MimeTypeList.typeForName(n.getName()).isImage()){
-					imageHandles.add(n.getHandle());
-					if (i == positionG && savedInstanceState == null){
-						positionG = imageNumber;
-					}
-					imageNumber++;
-				}
-			}
-
-			if(imageHandles.size() == 0) finish();
-
-			if(positionG >= imageHandles.size()) positionG = 0;
-
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
-
-			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+			getImageHandles(nodes, savedInstanceState);
 
 		}else if(adapterType == Constants.SEARCH_BY_ADAPTER){
 			handlesNodesSearched = intent.getLongArrayExtra("handlesNodesSearch");
@@ -1280,34 +1262,31 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			for(Long handle:handlesNodesSearched){
 				nodes.add(megaApi.getNodeByHandle(handle));
 			}
-			int imageNumber = 0;
-			for (int i=0;i<nodes.size();i++){
-				MegaNode n = nodes.get(i);
-				if (MimeTypeList.typeForName(n.getName()).isImage()){
-					imageHandles.add(n.getHandle());
-					if (i == positionG && savedInstanceState == null){
-						positionG = imageNumber;
-					}
-					imageNumber++;
-				}
-			}
-
-			if(imageHandles.size() == 0) finish();
-
-			if(positionG >= imageHandles.size()) positionG = 0;
-
-			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
-
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
+			getImageHandles(nodes,savedInstanceState);
 		}
 		else if (adapterType == Constants.RECENTS_ADAPTER) {
 			long handle = intent.getLongExtra("handle", -1);
 			if (handle == -1) finish();
 
-			imageHandles.add(handle);
-			positionG = 0;
-			fileNameTextView.setText(megaApi.getNodeByHandle(handle).getName());
+			long[] nodeHandles = intent.getLongArrayExtra("nodeHandles");
+			if (nodeHandles != null && nodeHandles.length > 0) {
+				for (int i = 0; i < nodeHandles.length; i++) {
+					if (nodeHandles[i] != -1) {
+						imageHandles.add(nodeHandles[i]);
+						if (nodeHandles[i] == handle) {
+							positionG = i;
+						}
+					}
+				}
 
+			}
+
+			if (imageHandles.isEmpty()) {
+				imageHandles.add(handle);
+				positionG = 0;
+			}
+
+			fileNameTextView.setText(megaApi.getNodeByHandle(handle).getName());
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 		}
 		else{
@@ -1338,24 +1317,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-			int imageNumber = 0;
-			for (int i=0;i<nodes.size();i++){
-				MegaNode n = nodes.get(i);
-				if (MimeTypeList.typeForName(n.getName()).isImage()){
-					imageHandles.add(n.getHandle());
-					if (i == positionG && savedInstanceState == null){
-						positionG = imageNumber;
-					}
-					imageNumber++;
-				}
-			}
-
-			if(imageHandles.size() == 0) finish();
-
-			if(positionG >= imageHandles.size()) positionG = 0;
-
-			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
+			getImageHandles(nodes, savedInstanceState);
 		}
 
 		if (adapterType == Constants.OFFLINE_ADAPTER) {
@@ -1402,6 +1364,28 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		downloadLocationDefaultPath = Util.getDownloadLocation(this);
 
+	}
+
+	private void getImageHandles (ArrayList<MegaNode> nodes, Bundle savedInstanceState) {
+		int imageNumber = 0;
+		for (int i=0;i<nodes.size();i++){
+			MegaNode n = nodes.get(i);
+			if (MimeTypeList.typeForName(n.getName()).isImage()){
+				imageHandles.add(n.getHandle());
+				if (i == positionG && savedInstanceState == null){
+					positionG = imageNumber;
+				}
+				imageNumber++;
+			}
+		}
+
+		if(imageHandles.size() == 0) finish();
+
+		if(positionG >= imageHandles.size()) positionG = 0;
+
+		fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+
+		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
 	}
 
 	public void setImageDragVisibility(int visibility){

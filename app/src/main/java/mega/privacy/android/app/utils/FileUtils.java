@@ -156,6 +156,32 @@ public class FileUtils {
         return setLocalIntentParams(context, node, intent, localPath, true);
     }
 
+    public static MegaNode getOutgoingOrIncomingParent(MegaApiAndroid megaApi, MegaNode node) {
+        if (isOutgoingOrIncomingFolder(node)) {
+            return node;
+        }
+
+        MegaNode parentNode = node;
+
+        while (megaApi.getParentNode(parentNode) != null) {
+            parentNode = megaApi.getParentNode(parentNode);
+
+            if (isOutgoingOrIncomingFolder(parentNode)) {
+                return parentNode;
+            }
+        }
+
+        return null;
+    }
+
+    private static boolean isOutgoingOrIncomingFolder(MegaNode node) {
+        if (node.isOutShare() || node.isInShare()) {
+            return true;
+        }
+
+        return false;
+    }
+
     private static void log(String log) {
         Util.log("FileUtils",log);
     }

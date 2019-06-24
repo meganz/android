@@ -385,8 +385,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		if ((node == null)&&(!isFileLink)){
 			Intent intent = new Intent(activity, LoginActivityLollipop.class);
 			intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
-	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+	        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 	        activity.startActivity(intent);
 	        activity.finish();
 	        return viewLayout;

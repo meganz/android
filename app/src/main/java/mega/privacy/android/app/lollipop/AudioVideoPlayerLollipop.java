@@ -323,6 +323,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     boolean isZip = false;
     GetMediaFilesTask getMediaFilesTask;
 
+    long [] nodeHandles;
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -398,6 +400,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         fromShared = intent.getBooleanExtra("fromShared", false);
         path = intent.getStringExtra("path");
         adapterType = getIntent().getIntExtra("adapterType", 0);
+        isPlayList = intent.getBooleanExtra("isPlayList", true);
+
         if (adapterType == Constants.OFFLINE_ADAPTER){
             isOffline = true;
             pathNavigation = intent.getStringExtra("pathNavigation");
@@ -436,9 +440,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             msgId = intent.getLongExtra("msgId", -1);
             chatId = intent.getLongExtra("chatId", -1);
         }
+        else if (adapterType == Constants.RECENTS_ADAPTER) {
+            nodeHandles = intent.getLongArrayExtra("nodeHandles");
+            if (nodeHandles == null || nodeHandles.length <= 0) isPlayList = false;
+        }
 
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
-        isPlayList = intent.getBooleanExtra("isPlayList", true);
         orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
         parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
 
@@ -896,28 +903,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     nodes = megaApi.getChildren(parentNode, orderGetChildren);
                 }
 
-                int mediaNumber = 0;
-                for (int i=0;i<nodes.size();i++){
-                    MegaNode n = nodes.get(i);
-                    if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
-                            || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())){
-                        mediaHandles.add(n.getHandle());
-                        if (i == currentPosition){
-                            currentPosition = mediaNumber;
-                        }
-                        mediaNumber++;
-                    }
-                }
-
-                if(mediaHandles.size() == 0){
-                    finish();
-                }
-
-                if(currentPosition >= mediaHandles.size()){
-                    currentPosition = 0;
-                }
-
-                size = mediaHandles.size();
+                getMediaHandles(nodes);
             }
             else if(adapterType == Constants.FILE_LINK_ADAPTER){
                 if (currentDocument != null) {
@@ -961,6 +947,21 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         size = 1;
                     }
                 }
+            }
+            else if (adapterType == Constants.RECENTS_ADAPTER) {
+                ArrayList<MegaNode> nodes = new ArrayList<>();
+                MegaNode node;
+
+                for (int i=0; i<nodeHandles.length; i++) {
+                    if (nodeHandles[i] != -1) {
+                        node = megaApi.getNodeByHandle(nodeHandles[i]);
+                        if (node != null) {
+                            nodes.add(node);
+                        }
+                    }
+                }
+
+                getMediaHandles(nodes);
             }
             else{
                 ArrayList<MegaNode> nodes = null;
@@ -1009,32 +1010,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                mediaHandles = new ArrayList<>();
-
-                int mediaNumber = 0;
-                if (nodes != null) {
-                    for (int i = 0; i < nodes.size(); i++) {
-                        MegaNode n = nodes.get(i);
-                        if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
-                                || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())) {
-                            mediaHandles.add(n.getHandle());
-                            if (i == currentPosition) {
-                                currentPosition = mediaNumber;
-                            }
-                            mediaNumber++;
-                        }
-                    }
-                }
-
-                if(mediaHandles.size() == 0) {
-                    finish();
-                }
-
-                if(currentPosition >= mediaHandles.size()){
-                    currentPosition = 0;
-                }
-
-                size = mediaHandles.size();
+                getMediaHandles(nodes);
             }
 
             return null;
@@ -1052,6 +1028,35 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
             mediaSourcePlaylist.clear();
             createPlayer();
+        }
+
+        private void getMediaHandles (ArrayList<MegaNode> nodes) {
+            mediaHandles = new ArrayList<>();
+
+            int mediaNumber = 0;
+            if (nodes != null) {
+                for (int i = 0; i < nodes.size(); i++) {
+                    MegaNode n = nodes.get(i);
+                    if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
+                            || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())) {
+                        mediaHandles.add(n.getHandle());
+                        if (i == currentPosition) {
+                            currentPosition = mediaNumber;
+                        }
+                        mediaNumber++;
+                    }
+                }
+            }
+
+            if(mediaHandles.size() == 0){
+                finish();
+            }
+
+            if(currentPosition >= mediaHandles.size()){
+                currentPosition = 0;
+            }
+
+            size = mediaHandles.size();
         }
     }
 

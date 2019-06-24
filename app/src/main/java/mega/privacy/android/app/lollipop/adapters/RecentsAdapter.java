@@ -26,6 +26,7 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -170,23 +171,18 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 holder.actionBy.setText(formatUserAction(userAction));
             }
 
-            boolean isOutShare = false;
-            while (megaApi.getParentNode(parentNode) != null) {
-                if (parentNode.isOutShare()) {
-                    isOutShare = true;
-                }
-                parentNode = megaApi.getParentNode(parentNode);
-            }
+            parentNode = FileUtils.getOutgoingOrIncomingParent(megaApi, parentNode);
 
-            holder.sharedIcon.setVisibility(View.VISIBLE);
-            if (parentNode.isInShare()) {
-                holder.sharedIcon.setImageResource(R.drawable.ic_folder_incoming_list);
-            }
-            else if (isOutShare){
-                holder.sharedIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
-            }
-            else {
+            if (parentNode == null) {
+//              No outShare, no inShare
                 holder.sharedIcon.setVisibility(View.GONE);
+            } else {
+                holder.sharedIcon.setVisibility(View.VISIBLE);
+                if (parentNode.isInShare()) {
+                    holder.sharedIcon.setImageResource(R.drawable.ic_folder_incoming_list);
+                } else if (parentNode.isOutShare()) {
+                    holder.sharedIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
+                }
             }
 
             holder.time.setText(item.getTime());
@@ -236,7 +232,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     holder.title.setText(getMediaTitle(nodeList));
                     holder.imageThumbnail.setImageResource(R.drawable.media);
 
-                    MediaRecentsAdapter adapter = new MediaRecentsAdapter(context, fragment, bucket.getNodes());
+                    MediaRecentsAdapter adapter = new MediaRecentsAdapter(context, fragment, bucket.getNodes(), bucket);
 
                     holder.mediaRecycler.setHasFixedSize(true);
                     holder.mediaRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
@@ -343,7 +339,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 MegaNodeList nodeList = getMegaNodeListOfItem(item);
                 if (nodeList == null) break;
                 if (nodeList.size() == 1) {
-                    ((RecentsFragment) fragment).openFile(node);
+                    ((RecentsFragment) fragment).openFile(node, false);
                     break;
                 }
                 if (item.getBucket() == null) break;

@@ -20,21 +20,24 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
+import nz.mega.sdk.MegaRecentActionBucket;
 
 public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapter.ViewHolderMediaBucket> implements View.OnClickListener {
 
     private MegaApiAndroid megaApi;
     private Context context;
     private Object fragment;
+    private MegaRecentActionBucket bucket;
 
     private DisplayMetrics outMetrics;
 
     private MegaNodeList nodes;
 
-    public MediaRecentsAdapter(Context context, Object fragment, MegaNodeList nodeList) {
+    public MediaRecentsAdapter(Context context, Object fragment, MegaNodeList nodeList, MegaRecentActionBucket bucket) {
         this.context = context;
         this.fragment = fragment;
         this.nodes = nodeList;
+        this.bucket = bucket;
 
         megaApi = ((MegaApplication)((Activity)context).getApplication()).getMegaApi();
     }
@@ -137,7 +140,8 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         MegaNode node = getItemAtPosition(holder.getAdapterPosition());
         if (node == null) return;
 
-        ((RecentsFragment) fragment).openFile(node);
+        ((RecentsFragment) fragment).setBucketSelected(bucket);
+        ((RecentsFragment) fragment).openFile(node, true);
 
     }
 

@@ -280,13 +280,49 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         context = activity;
     }
 
-    public void openFile (MegaNode node) {
+    private long[] getBucketNodeHandles(boolean areImages, boolean areVideos) {
+        if (getBucketSelected() == null || getBucketSelected().getNodes() == null || getBucketSelected().getNodes().size() == 0)
+            return null;
+
+        MegaNode node;
+        MegaNodeList list = getBucketSelected().getNodes();
+        ArrayList<Long> nodeHandlesList = new ArrayList<>();
+
+        for (int i = 0; i < list.size(); i++) {
+            node = list.get(i);
+            if (node != null) {
+                if (areImages) {
+                    if (MimeTypeList.typeForName(node.getName()).isImage()) {
+                        nodeHandlesList.add(node.getHandle());
+                    }
+                } else if (areVideos) {
+                    if (FileUtils.isAudioOrVideo(node) && FileUtils.isInternalIntent(node)) {
+                        nodeHandlesList.add(node.getHandle());
+                    }
+                } else {
+                    nodeHandlesList.add(node.getHandle());
+                }
+            }
+        }
+
+        long[] nodeHandles = new long[nodeHandlesList.size()];
+        for (int i=0; i<nodeHandlesList.size(); i++) {
+            nodeHandles[i] = nodeHandlesList.get(i);
+        }
+
+        return nodeHandles;
+    }
+
+    public void openFile (MegaNode node, boolean isMedia) {
         Intent intent = null;
 
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
             intent.putExtra("adapterType", Constants.RECENTS_ADAPTER);
             intent.putExtra("handle", node.getHandle());
+            if (isMedia) {
+                intent.putExtra("nodeHandles", getBucketNodeHandles(true, false));
+            }
 
             ((ManagerActivityLollipop) context).overridePendingTransition(0,0);
             context.startActivity(intent);
@@ -306,7 +342,13 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
             intent.putExtra("adapterType", Constants.RECENTS_ADAPTER);
             intent.putExtra("FILENAME", node.getName());
-            intent.putExtra("isPlayList", false);
+            if (isMedia) {
+                intent.putExtra("nodeHandles", getBucketNodeHandles(false, true));
+                intent.putExtra("isPlayList", true);
+            }
+            else {
+                intent.putExtra("isPlayList", false);
+            }
 
             if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
                 paramsSetSuccessfully = FileUtils.setLocalIntentParams(context, node, intent, localPath, false);
