@@ -166,6 +166,8 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_GET_REGISTERED_CONTACTS) {
             if (e.getErrorCode() == MegaError.API_OK) {
+                //when request is successful, update the timestamp.
+                updateLastSyncTimestamp();
                 megaContacts.clear();
                 MegaStringMap map = request.getMegaStringMap();
                 MegaStringTable table = request.getMegaStringTable();
@@ -228,7 +230,6 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 // save to db
                 dbH.clearMegaContacts();
                 dbH.batchInsertMegaContacts(megaContacts);
-                updateLastSyncTimestamp();
 
                 // filter out
                 List<MegaContact> list = filterOut(api, megaContacts);

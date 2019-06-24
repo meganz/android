@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
@@ -37,6 +38,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -95,6 +97,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     int lastFirstVisiblePosition;
 
     int numberOfClicks = 0;
+
+    private ScrollView emptyLayoutContainer;
 
     //Invite bar
     private ImageView collapseBtn;
@@ -270,6 +274,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
 
+        emptyLayoutContainer = v.findViewById(R.id.scroller);
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
         fastScroller = (FastScroller) v.findViewById(R.id.fastscroll_chat);
         listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
@@ -294,7 +299,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
 
         LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
-        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(50, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
+        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(16, outMetrics), 0, Util.scaleHeightPx(16, outMetrics));
         emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
 
         LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams)emptyTextView.getLayoutParams();
@@ -304,9 +309,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setOnClickListener(this);
 
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            adjustLandscape();
             emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
-        }else{
+        } else {
+            addMarginTop();
             emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
         }
 
@@ -320,7 +327,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         callInProgressChrono.setVisibility(View.GONE);
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
-
+        //auto scroll to bottom to show invite button.
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            adjustLandscape();
+        } else {
+            addMarginTop();
+        }
         if(Util.isChatEnabled()){
             log("Chat ENABLED");
 
@@ -374,6 +386,20 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         moreContactsTitle.setOnClickListener(this);
 
         return v;
+    }
+
+    private void adjustLandscape() {
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        layoutParams.setMargins(0,0,0,0);
+        emptyLayoutContainer.setLayoutParams(layoutParams);
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                emptyLayoutContainer.fullScroll(View.FOCUS_DOWN);
+            }
+        },100);
     }
 
     private void showPermissionGrantedView() {
@@ -623,26 +649,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         }
 
-        textToShowB = String.format(context.getString(R.string.recent_chat_empty).toUpperCase());
-        try{
-            textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
-            textToShowB = textToShowB.replace("[/A]", "</font>");
-            textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
-            textToShowB = textToShowB.replace("[/B]", "</font>");
-        }
-        catch (Exception e){}
-        Spanned resultB = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            resultB = Html.fromHtml(textToShowB);
-        }
-        emptyTextView.setText(resultB);
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            emptyTextView.setVisibility(View.GONE);
-        }else{
-            emptyTextView.setVisibility(View.VISIBLE);
-        }
+        emptyTextView.setVisibility(View.GONE);
         emptyLayout.setVisibility(View.VISIBLE);
     }
 
@@ -679,12 +686,20 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         inviteButton.setVisibility(View.VISIBLE);
 
         emptyTextView.setText(R.string.recent_chat_enable_chat);
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            adjustLandscape();
             emptyTextView.setVisibility(View.GONE);
-        }else{
+        } else {
+            addMarginTop();
             emptyTextView.setVisibility(View.VISIBLE);
         }
         emptyLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void addMarginTop() {
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        layoutParams.setMargins(0, Util.scaleHeightPx(60, outMetrics), 0, 0);
+        emptyLayoutContainer.setLayoutParams(layoutParams);
     }
 
     public void showConnectingChatScreen(){
