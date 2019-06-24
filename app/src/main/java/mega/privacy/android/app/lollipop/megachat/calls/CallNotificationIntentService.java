@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -32,6 +31,10 @@ public class CallNotificationIntentService extends IntentService implements Mega
         super("CallNotificationIntentService");
     }
 
+    public static void log(String log) {
+        Util.log("CallNotificationIntentService", log);
+    }
+
     public void onCreate() {
         super.onCreate();
 
@@ -50,7 +53,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
         clearIncomingCallNotification(chatHandleToAnswer);
 
         final String action = intent.getAction();
-        log("onHandleIntent:action: "+action);
+        log("onHandleIntent:action: " + action);
         if (ANSWER.equals(action)) {
             megaChatApi.hangChatCall(chatHandleInProgress, this);
         } else if (IGNORE.equals(action)) {
@@ -61,30 +64,24 @@ public class CallNotificationIntentService extends IntentService implements Mega
         }
     }
 
-    public static void log(String log) {
-        Util.log("CallNotificationIntentService", log);
-    }
-
     public void clearIncomingCallNotification(long chatHandleToAnswer) {
-        log("clearIncomingCallNotification:chatHandleToAnswer: "+chatHandleToAnswer);
+        log("clearIncomingCallNotification:chatHandleToAnswer: " + chatHandleToAnswer);
 
-        try{
+        try {
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if(megaChatApi!=null){
+            if (megaChatApi != null) {
                 MegaChatCall call = megaChatApi.getChatCall(chatHandleToAnswer);
-                if(call!=null){
+                if (call != null) {
                     long chatCallId = call.getId();
                     String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
                     int notificationId = (notificationCallId).hashCode();
                     notificationManager.cancel(notificationId);
-                }
-                else{
+                } else {
                     log("clearIncomingCallNotification:ERROR:NullCallObject");
                 }
             }
 
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             log("clearIncomingCallNotification:EXCEPTION");
         }
     }
@@ -101,19 +98,18 @@ public class CallNotificationIntentService extends IntentService implements Mega
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
-        if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
+        if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
             log("onRequestFinish:TYPE_HANG_CHAT_CALL");
-            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 log("onRequestFinish: TYPE_HANG_CHAT_CALL:OK: ");
                 MegaApplication.setSpeakerStatus(chatHandleToAnswer, false);
                 megaChatApi.answerChatCall(chatHandleToAnswer, false, this);
-            }else{
-                log("onRequestFinish:TYPE_HANG_CHAT_CALL:ERROR: "+e.getErrorCode());
+            } else {
+                log("onRequestFinish:TYPE_HANG_CHAT_CALL:ERROR: " + e.getErrorCode());
             }
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL){
+        } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
             log("onRequestFinish:TYPE_ANSWER_CHAT_CALL");
-            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 log("onRequestFinish:TYPE_ANSWER_CHAT_CALL:OK");
                 MegaApplication.setShowPinScreen(false);
                 Intent i = new Intent(this, ChatCallActivity.class);
@@ -122,8 +118,8 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 this.startActivity(i);
                 stopSelf();
-            }else{
-                log("onRequestFinish:TYPE_ANSWER_CHAT_CALL:ERROR: "+e.getErrorCode());
+            } else {
+                log("onRequestFinish:TYPE_ANSWER_CHAT_CALL:ERROR: " + e.getErrorCode());
             }
         }
     }

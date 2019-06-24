@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
-    tools:context=".LocalCameraCallFullScreenFragment" >
+    tools:context=".LocalCameraCallFullScreenFragment">
 
     <SurfaceView
         android:id="@+id/surface_local_video"

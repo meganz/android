@@ -21,17 +21,15 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
-
 public class LocalCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface {
 
+    public SurfaceView localFullScreenSurfaceView;
     int width = 0;
     int height = 0;
     Bitmap bitmap;
     MegaChatApiAndroid megaChatApi;
     Context context;
     long chatId;
-
-    public SurfaceView localFullScreenSurfaceView;
     MegaSurfaceRenderer localRenderer;
 
     public static LocalCameraCallFullScreenFragment newInstance(long chatId) {
@@ -43,11 +41,15 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         return f;
     }
 
+    private static void log(String log) {
+        Util.log("LocalCameraCallFullScreenFragment", log);
+    }
+
     @Override
-    public void onCreate (Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         log("onCreate");
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
         }
 
         Bundle args = getArguments();
@@ -59,19 +61,18 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        if (!isAdded()) {
-            return null;
-        }
+        if (!isAdded()) return null;
+
 
         View v = inflater.inflate(R.layout.fragment_local_camera_call_full_screen, container, false);
 
-        localFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
+        localFullScreenSurfaceView = (SurfaceView) v.findViewById(R.id.surface_local_video);
         localFullScreenSurfaceView.setZOrderMediaOverlay(true);
         SurfaceHolder localSurfaceHolder = localFullScreenSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localFullScreenSurfaceView);
 
-        log("onCreateView() addChatLocalVideoListener chatId: "+chatId);
+        log("onCreateView() addChatLocalVideoListener chatId: " + chatId);
         megaChatApi.addChatLocalVideoListener(chatId, this);
 
         return v;
@@ -79,9 +80,8 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
-        if((width == 0) || (height == 0)){
-            return;
-        }
+        if ((width == 0) || (height == 0)) return;
+
 
         if (this.width != width || this.height != height) {
             this.width = width;
@@ -100,8 +100,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
                     }
                     this.bitmap = localRenderer.CreateBitmap(width, height);
                     holder.setFixedSize(holderWidth, holderHeight);
-                }
-                else{
+                } else {
                     this.width = -1;
                     this.height = -1;
                 }
@@ -117,7 +116,6 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         }
     }
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -125,33 +123,31 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         log("onDestroy()");
         removeSurfaceView();
         super.onDestroy();
     }
+
     @Override
     public void onResume() {
         log("onResume");
-        this.width=0;
-        this.height=0;
+        this.width = 0;
+        this.height = 0;
         localFullScreenSurfaceView.setVisibility(View.VISIBLE);
 
         super.onResume();
     }
-    public void removeSurfaceView(){
+
+    public void removeSurfaceView() {
         log("removeSurfaceView()");
-        if(localFullScreenSurfaceView.getParent()!=null){
-            if(localFullScreenSurfaceView.getParent().getParent()!=null){
-                log("removeSurfaceView() removeView chatId: "+chatId);
-                ((ViewGroup)localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
+        if (localFullScreenSurfaceView.getParent() != null) {
+            if (localFullScreenSurfaceView.getParent().getParent() != null) {
+                log("removeSurfaceView() removeView chatId: " + chatId);
+                ((ViewGroup) localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
             }
         }
         localFullScreenSurfaceView.setVisibility(View.GONE);
-        megaChatApi.removeChatVideoListener(chatId, -1, -1,this);
-    }
-
-    private static void log(String log) {
-        Util.log("LocalCameraCallFullScreenFragment", log);
+        megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
     }
 }
