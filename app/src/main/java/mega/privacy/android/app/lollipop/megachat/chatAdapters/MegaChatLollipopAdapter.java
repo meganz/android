@@ -307,8 +307,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     private class ChatUploadingPreviewAsyncTask extends AsyncTask<String, Void, Boolean> {
-
-        MegaChatLollipopAdapter.ViewHolderMessageChat holder;
         String filePath;
         MegaChatLollipopAdapter adapter;
         int position;
@@ -398,8 +396,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("Pdf thumbnail could not be created");
                 } finally {
                     try {
-                        if (out != null)
+                        if (out != null) {
                             out.close();
+                        }
                     } catch (Exception e) {
                     }
                 }
@@ -463,7 +462,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("ChatUploadingPreviewAsyncTask-onPostExecute");
             if (isContinue) {
                 //notify adapter to update view
-              adapter.notifyItemChanged(position);
+                adapter.notifyItemChanged(position);
             } else {
                 log("The preview is NULL!");
             }

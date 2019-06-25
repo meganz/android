@@ -472,8 +472,8 @@ public class Util {
            default:
                return bitmap;
         }
-	     
-        try {
+
+		try {
 			Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 			if (bitmap != null && !bitmap.isRecycled()) {
 				bitmap.recycle();
@@ -481,11 +481,10 @@ public class Util {
 				System.gc();
 			}
 			return bmRotated;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {

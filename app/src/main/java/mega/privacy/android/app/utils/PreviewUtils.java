@@ -74,19 +74,18 @@ public class PreviewUtils {
         return bmp;
     }
 
-    public static Bitmap getPreviewFromCacheAndFolder(String path, Context context, MegaApiAndroid megaApi) {
+	public static Bitmap getPreviewFromCacheAndFolder(String path, Context context, MegaApiAndroid megaApi) {
 		long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(path));
 		Bitmap bitmap = previewCache.get(fingerprintCache);
 		if (bitmap == null) {
 			File previewDir = getPreviewFolder(context);
-			File preview = new File(previewDir, fingerprintCache+".jpg");
-			if (preview.exists()){
-				if (preview.length() > 0){
+			File preview = new File(previewDir, fingerprintCache + ".jpg");
+			if (preview.exists()) {
+				if (preview.length() > 0) {
 					bitmap = getBitmapForCache(preview, context);
 					if (bitmap == null) {
 						preview.delete();
-					}
-					else{
+					} else {
 						previewCache.put(fingerprintCache, bitmap);
 					}
 				}
