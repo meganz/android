@@ -5,14 +5,14 @@ import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 
 public class InfoPeerGroupCall {
 
-    long peerId;
-    long clientId;
-    String name;
-    boolean videoOn;
-    boolean audioOn;
-    boolean greenLayer;
-    GroupCallListener listener;
-    boolean goodQuality;
+    private long peerId;
+    private long clientId;
+    private String name;
+    private boolean videoOn;
+    private boolean audioOn;
+    private boolean greenLayer;
+    private GroupCallListener listener;
+    private boolean goodQuality;
 
     public InfoPeerGroupCall(long peerId, long clientId, String name, boolean videoOn, boolean audioOn, boolean greenLayer, boolean goodQuality, GroupCallListener listener) {
 

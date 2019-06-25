@@ -21,10 +21,6 @@ import android.view.TextureView;
 
 import org.webrtc.Logging;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +34,13 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
     private final static String TAG = "WEBRTC";
     protected List<MegaSurfaceRendererGroupListener> listeners;
-    Paint paint;
-    PorterDuffXfermode modesrcover;
-    PorterDuffXfermode modesrcin;
-    int surfaceWidth = 0;
-    int surfaceHeight = 0;
-    long peerId;
-    long clientId;
+    private Paint paint;
+    private PorterDuffXfermode modesrcover;
+    private PorterDuffXfermode modesrcin;
+    private int surfaceWidth = 0;
+    private int surfaceHeight = 0;
+    private long peerId;
+    private long clientId;
     // the bitmap used for drawing.
     private Bitmap bitmap = null;
     private ByteBuffer byteBuffer = null;
@@ -68,7 +64,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         this.peerId = peerId;
         this.clientId = clientId;
-        listeners = new ArrayList<MegaSurfaceRendererGroupListener>();
+        listeners = new ArrayList<>();
     }
 
     private static void log(String log) {
@@ -137,30 +133,26 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     }
 
     public void DrawBitmap(boolean flag, boolean isLocal) {
-        if (bitmap == null) {
-            return;
-        }
-        if (myTexture == null) {
-            return;
-        }
-        Canvas canvas = myTexture.lockCanvas();
-        if (canvas != null) {
-            if (isLocal) {
-                canvas.scale(-1, 1);
-                canvas.translate(-canvas.getWidth(), 0);
-            }
+        if (bitmap == null || myTexture == null) return;
 
-            if (flag) {
-                paint.reset();
-                paint.setXfermode(modesrcover);
-                canvas.drawRoundRect(dstRectf, 20, 20, paint);
-                paint.setXfermode(modesrcin);
-                canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
-            } else {
-                canvas.drawBitmap(bitmap, srcRect, dstRect, null);
-            }
-            myTexture.unlockCanvasAndPost(canvas);
+        Canvas canvas = myTexture.lockCanvas();
+        if (canvas == null) return;
+        if (isLocal) {
+            canvas.scale(-1, 1);
+            canvas.translate(-canvas.getWidth(), 0);
         }
+
+        if (flag) {
+            paint.reset();
+            paint.setXfermode(modesrcover);
+            canvas.drawRoundRect(dstRectf, 20, 20, paint);
+            paint.setXfermode(modesrcin);
+            canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
+        } else {
+            canvas.drawBitmap(bitmap, srcRect, dstRect, null);
+        }
+        myTexture.unlockCanvasAndPost(canvas);
+
     }
 
     private void notifyStateToAll() {
@@ -184,10 +176,10 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         log("onSurfaceTextureAvailable()");
         Bitmap textureViewBitmap = myTexture.getBitmap();
         Canvas canvas = new Canvas(textureViewBitmap);
-        if (canvas != null) {
-            notifyStateToAll();
-            changeDestRect(in_width, in_height);
-        }
+        if (canvas == null) return;
+        notifyStateToAll();
+        changeDestRect(in_width, in_height);
+
     }
 
     @Override
@@ -210,42 +202,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
 
     }
-
-    public ByteBuffer CreateByteBuffer(int width, int height) {
-        log("CreateByteBuffer(): width = " + width + ", height = " + height);
-
-        Logging.d(TAG, "CreateByteBuffer " + width + ":" + height);
-        if (bitmap == null) {
-            bitmap = CreateBitmap(width, height);
-            byteBuffer = ByteBuffer.allocateDirect(width * height * 2);
-        }
-        return byteBuffer;
-    }
-
-    // It saves bitmap data to a JPEG picture, this function is for debug only.
-    private void saveBitmapToJPEG(int width, int height) {
-        log("saveBitmapToJPEG(): width = " + width + ", height = " + height);
-
-        ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutStream);
-
-        try {
-            FileOutputStream output = new FileOutputStream(String.format("/sdcard/render_%d.jpg", System.currentTimeMillis()));
-            output.write(byteOutStream.toByteArray());
-            output.flush();
-            output.close();
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
-        }
-    }
-
-//    public void DrawByteBuffer() {
-//        if(byteBuffer == null)
-//            return;
-//        byteBuffer.rewind();
-//        bitmap.copyPixelsFromBuffer(byteBuffer);
-//        DrawBitmap(false);
-//    }
 
     public interface MegaSurfaceRendererGroupListener {
         void resetSize(long peerId, long clientId);

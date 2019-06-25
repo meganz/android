@@ -23,14 +23,14 @@ import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 public class LocalCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface {
 
-    public SurfaceView localFullScreenSurfaceView;
-    int width = 0;
-    int height = 0;
-    Bitmap bitmap;
-    MegaChatApiAndroid megaChatApi;
-    Context context;
-    long chatId;
-    MegaSurfaceRenderer localRenderer;
+    private SurfaceView localFullScreenSurfaceView;
+    private int width = 0;
+    private int height = 0;
+    private Bitmap bitmap;
+    private MegaChatApiAndroid megaChatApi;
+    private Context context;
+    private long chatId;
+    private MegaSurfaceRenderer localRenderer;
 
     public static LocalCameraCallFullScreenFragment newInstance(long chatId) {
         log("newInstance");
@@ -63,15 +63,13 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
         if (!isAdded()) return null;
 
-
         View v = inflater.inflate(R.layout.fragment_local_camera_call_full_screen, container, false);
 
-        localFullScreenSurfaceView = (SurfaceView) v.findViewById(R.id.surface_local_video);
+        localFullScreenSurfaceView = v.findViewById(R.id.surface_local_video);
         localFullScreenSurfaceView.setZOrderMediaOverlay(true);
         SurfaceHolder localSurfaceHolder = localFullScreenSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localFullScreenSurfaceView);
-
         log("onCreateView() addChatLocalVideoListener chatId: " + chatId);
         megaChatApi.addChatLocalVideoListener(chatId, this);
 
@@ -106,14 +104,10 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
                 }
             }
         }
+        if (bitmap == null) return;
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+        localRenderer.DrawBitmap(false, true);
 
-        if (bitmap != null) {
-            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-
-            // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
-            // The renderer has been modified a bit and an update of WebRTC could break our app
-            localRenderer.DrawBitmap(false, true);
-        }
     }
 
     @Override
@@ -141,11 +135,9 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
     public void removeSurfaceView() {
         log("removeSurfaceView()");
-        if (localFullScreenSurfaceView.getParent() != null) {
-            if (localFullScreenSurfaceView.getParent().getParent() != null) {
-                log("removeSurfaceView() removeView chatId: " + chatId);
-                ((ViewGroup) localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
-            }
+        if (localFullScreenSurfaceView.getParent() != null && localFullScreenSurfaceView.getParent().getParent() != null) {
+            log("removeSurfaceView() removeView chatId: " + chatId);
+            ((ViewGroup) localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
         }
         localFullScreenSurfaceView.setVisibility(View.GONE);
         megaChatApi.removeChatVideoListener(chatId, -1, -1, this);

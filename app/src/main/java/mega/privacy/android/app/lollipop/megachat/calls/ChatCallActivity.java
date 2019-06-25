@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.Vibrator;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
@@ -64,7 +63,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import mega.privacy.android.app.BaseActivity;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
@@ -93,13 +91,11 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 
 import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
-import static mega.privacy.android.app.utils.Util.context;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
@@ -107,107 +103,99 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public static int REMOTE_VIDEO_ENABLED = 1;
     public static int REMOTE_VIDEO_DISABLED = 0;
     final private int MAX_PEERS_GRID = 7;
-    DatabaseHandler dbH = null;
-    MegaUser myUser;
-    Chronometer myChrono;
-    float widthScreenPX, heightScreenPX;
 
-    long chatId;
-    MegaChatRoom chat;
-    MegaChatCall callChat;
-    MegaChatApiAndroid megaChatApi = null;
-    Display display;
-    DisplayMetrics outMetrics;
-    float density;
-    float scaleW;
-    float scaleH;
-    AppBarLayout appBarLayout;
-    Toolbar tB;
-    LinearLayout toolbarElements;
-    TextView titleToolbar;
-    TextView subtitleToobar;
-    Chronometer callInProgressChrono;
-    RelativeLayout mutateContactCallLayout;
-    TextView mutateCallText;
-    RelativeLayout mutateOwnCallLayout;
-    LinearLayout linearParticipants;
-    TextView participantText;
-    TextView infoUsersBar;
-    ActionBar aB;
-    boolean avatarRequested = false;
-    ArrayList<InfoPeerGroupCall> peersOnCall = new ArrayList<>();
-    ArrayList<InfoPeerGroupCall> peersBeforeCall = new ArrayList<>();
-    Timer timer = null;
-    Timer ringerTimer = null;
-    RelativeLayout smallElementsIndividualCallLayout;
-    RelativeLayout bigElementsIndividualCallLayout;
-    RelativeLayout bigElementsGroupCallLayout;
-    RelativeLayout recyclerViewLayout;
-    CustomizedGridCallRecyclerView recyclerView;
-    RelativeLayout bigRecyclerViewLayout;
-    LinearLayoutManager layoutManager;
-    RecyclerView bigRecyclerView;
-    GroupCallAdapter adapterGrid;
-    GroupCallAdapter adapterList;
-    int isRemoteVideo = REMOTE_VIDEO_NOT_INIT;
-    Ringtone ringtone = null;
-    Vibrator vibrator = null;
-    ToneGenerator toneGenerator = null;
+    private float widthScreenPX, heightScreenPX;
+
+    private long chatId;
+    private MegaChatRoom chat;
+    private MegaChatCall callChat;
+    private MegaChatApiAndroid megaChatApi = null;
+    private Display display;
+    private DisplayMetrics outMetrics;
+    private Toolbar tB;
+    private TextView titleToolbar;
+    private TextView subtitleToobar;
+    private Chronometer callInProgressChrono;
+    private RelativeLayout mutateContactCallLayout;
+    private TextView mutateCallText;
+    private RelativeLayout mutateOwnCallLayout;
+    private LinearLayout linearParticipants;
+    private TextView participantText;
+    private TextView infoUsersBar;
+    private ActionBar aB;
+    private boolean avatarRequested = false;
+    private ArrayList<InfoPeerGroupCall> peersOnCall = new ArrayList<>();
+    private ArrayList<InfoPeerGroupCall> peersBeforeCall = new ArrayList<>();
+    private Timer timer = null;
+    private Timer ringerTimer = null;
+    private RelativeLayout smallElementsIndividualCallLayout;
+    private RelativeLayout bigElementsIndividualCallLayout;
+    private RelativeLayout bigElementsGroupCallLayout;
+    private RelativeLayout recyclerViewLayout;
+    private CustomizedGridCallRecyclerView recyclerView;
+    private RelativeLayout bigRecyclerViewLayout;
+    private LinearLayoutManager layoutManager;
+    private RecyclerView bigRecyclerView;
+    private GroupCallAdapter adapterGrid;
+    private GroupCallAdapter adapterList;
+    private int isRemoteVideo = REMOTE_VIDEO_NOT_INIT;
+    private Ringtone ringtone = null;
+    private Vibrator vibrator = null;
+    private ToneGenerator toneGenerator = null;
     //my avatar
-    RelativeLayout myAvatarLayout;
-    RoundedImageView myImage;
-    TextView myInitialLetter;
+    private RelativeLayout myAvatarLayout;
+    private RoundedImageView myImage;
+    private TextView myInitialLetter;
     //contact avatar
-    RelativeLayout contactAvatarLayout;
-    RoundedImageView contactImage;
-    TextView contactInitialLetter;
-    RelativeLayout fragmentContainer;
-    int totalVideosAllowed = 0;
-    FloatingActionButton videoFAB;
-    FloatingActionButton microFAB;
-    FloatingActionButton rejectFAB;
-    FloatingActionButton hangFAB;
-    FloatingActionButton speakerFAB;
-    FloatingActionButton answerCallFAB;
-    boolean isNecessaryCreateAdapter = true;
-    AudioManager audioManager;
-    MediaPlayer thePlayer;
-    FrameLayout fragmentContainerLocalCamera;
-    FrameLayout fragmentContainerLocalCameraFS;
-    FrameLayout fragmentContainerRemoteCameraFS;
-    ViewGroup parentLocal;
-    ViewGroup parentLocalFS;
-    ViewGroup parentRemoteFS;
+    private RelativeLayout contactAvatarLayout;
+    private RoundedImageView contactImage;
+    private TextView contactInitialLetter;
+    private RelativeLayout fragmentContainer;
+    private int totalVideosAllowed = 0;
+    private FloatingActionButton videoFAB;
+    private FloatingActionButton microFAB;
+    private FloatingActionButton rejectFAB;
+    private FloatingActionButton hangFAB;
+    private FloatingActionButton speakerFAB;
+    private FloatingActionButton answerCallFAB;
+    private boolean isNecessaryCreateAdapter = true;
+    private AudioManager audioManager;
+    private MediaPlayer thePlayer;
+    private FrameLayout fragmentContainerLocalCamera;
+    private FrameLayout fragmentContainerLocalCameraFS;
+    private FrameLayout fragmentContainerRemoteCameraFS;
+    private ViewGroup parentLocal;
+    private ViewGroup parentLocalFS;
+    private ViewGroup parentRemoteFS;
     //Big elements for group call (more than 6 users)
-    FrameLayout fragmentBigCameraGroupCall;
-    ImageView microFragmentBigCameraGroupCall;
-    ViewGroup parentBigCameraGroupCall;
-    RelativeLayout avatarBigCameraGroupCallLayout;
-    ImageView avatarBigCameraGroupCallMicro;
-    RoundedImageView avatarBigCameraGroupCallImage;
-    TextView avatarBigCameraGroupCallInitialLetter;
-    AppRTCAudioManager rtcAudioManager = null;
-    Animation shake;
-    long translationAnimationDuration = 500;
-    long alphaAnimationDuration = 600;
-    long alphaAnimationDurationArrow = 1000;
-    LinearLayout linearFAB;
-    LinearLayout linearHangFAB;
-    RelativeLayout relativeCall;
-    LinearLayout linearArrowCall;
-    ImageView firstArrowCall;
-    ImageView secondArrowCall;
-    ImageView thirdArrowCall;
-    ImageView fourArrowCall;
-    RelativeLayout relativeVideo;
-    LinearLayout linearArrowVideo;
-    ImageView firstArrowVideo;
-    ImageView secondArrowVideo;
-    ImageView thirdArrowVideo;
-    ImageView fourArrowVideo;
-    InfoPeerGroupCall peerSelected = null;
-    boolean isManualMode = false;
-    int statusBarHeight = 0;
+    private FrameLayout fragmentBigCameraGroupCall;
+    private ImageView microFragmentBigCameraGroupCall;
+    private ViewGroup parentBigCameraGroupCall;
+    private RelativeLayout avatarBigCameraGroupCallLayout;
+    private ImageView avatarBigCameraGroupCallMicro;
+    private RoundedImageView avatarBigCameraGroupCallImage;
+    private TextView avatarBigCameraGroupCallInitialLetter;
+    private AppRTCAudioManager rtcAudioManager = null;
+    private Animation shake;
+    private long translationAnimationDuration = 500;
+    private long alphaAnimationDuration = 600;
+    private long alphaAnimationDurationArrow = 1000;
+    private LinearLayout linearFAB;
+    private RelativeLayout relativeCall;
+    private LinearLayout linearArrowCall;
+    private ImageView firstArrowCall;
+    private ImageView secondArrowCall;
+    private ImageView thirdArrowCall;
+    private ImageView fourArrowCall;
+    private RelativeLayout relativeVideo;
+    private LinearLayout linearArrowVideo;
+    private ImageView firstArrowVideo;
+    private ImageView secondArrowVideo;
+    private ImageView thirdArrowVideo;
+    private ImageView fourArrowVideo;
+    private InfoPeerGroupCall peerSelected = null;
+    private boolean isManualMode = false;
+    private int statusBarHeight = 0;
     private MegaApiAndroid megaApi = null;
     private Handler handlerArrow1, handlerArrow2, handlerArrow3, handlerArrow4, handlerArrow5, handlerArrow6;
     private LocalCameraCallFragment localCameraFragment = null;
@@ -352,11 +340,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        density = getResources().getDisplayMetrics().density;
-        appBarLayout = findViewById(R.id.app_bar);
-
-        scaleW = Util.getScaleW(outMetrics, density);
-        scaleH = Util.getScaleH(outMetrics, density);
 
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
@@ -394,9 +377,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         megaChatApi.addChatCallListener(this);
-        myUser = megaApi.getMyUser();
 
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
@@ -425,7 +406,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         aB.setTitle(null);
         aB.setSubtitle(null);
 
-        toolbarElements = tB.findViewById(R.id.toolbar_elements);
         titleToolbar = tB.findViewById(R.id.title_toolbar);
         titleToolbar.setText(" ");
         subtitleToobar = tB.findViewById(R.id.subtitle_toolbar);
@@ -433,9 +413,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         linearParticipants = tB.findViewById(R.id.ll_participants);
         participantText = tB.findViewById(R.id.participants_text);
         linearParticipants.setVisibility(View.GONE);
-
-        myChrono = new Chronometer(context);
-
         totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
 
         mutateOwnCallLayout = findViewById(R.id.mutate_own_call);
@@ -449,8 +426,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         bigElementsIndividualCallLayout.setVisibility(GONE);
         linearFAB = findViewById(R.id.linear_buttons);
         displayLinearFAB(false);
-        linearHangFAB = findViewById(R.id.linear_buttons_hang);
-
         infoUsersBar = findViewById(R.id.info_users_bar);
         infoUsersBar.setVisibility(GONE);
 

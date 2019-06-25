@@ -9,9 +9,7 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-
 import java.nio.ByteBuffer;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
@@ -21,16 +19,16 @@ import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 public class BigCameraGroupCallFragment extends Fragment implements MegaChatVideoListenerInterface {
 
-    public TextureView myTexture;
-    int width = 0;
-    int height = 0;
-    Bitmap bitmap;
-    MegaChatApiAndroid megaChatApi;
-    Context context;
-    long chatId;
-    long peerId;
-    long cliendId;
-    MegaSurfaceRendererGroup renderer;
+    private TextureView myTexture;
+    private int width = 0;
+    private int height = 0;
+    private Bitmap bitmap;
+    private MegaChatApiAndroid megaChatApi;
+    private Context context;
+    private long chatId;
+    private long peerId;
+    private long cliendId;
+    private MegaSurfaceRendererGroup renderer;
 
     public static BigCameraGroupCallFragment newInstance(long chatId, long peerId, long cliendId) {
         log("newInstance");
@@ -72,9 +70,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         if (!isAdded()) {
             return null;
         }
-
         View v = inflater.inflate(R.layout.fragment_camera_full_screen_big, container, false);
-        myTexture = (TextureView) v.findViewById(R.id.texture_view_video);
+        myTexture = v.findViewById(R.id.texture_view_video);
         myTexture.setAlpha(1.0f);
         myTexture.setRotation(0);
         myTexture.setVisibility(View.VISIBLE);
@@ -82,7 +79,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         this.height = 0;
         renderer = new MegaSurfaceRendererGroup(myTexture, peerId, cliendId);
 
-        if ((peerId == megaChatApi.getMyUserHandle()) && (cliendId == megaChatApi.getMyClientidHandle(chatId))) {
+        if (peerId == megaChatApi.getMyUserHandle() && cliendId == megaChatApi.getMyClientidHandle(chatId)) {
             log("onCreateView() addChatLocalVideoListener  (LOCAL)  chatId: " + chatId);
             megaChatApi.addChatLocalVideoListener(chatId, this);
         } else {
@@ -94,9 +91,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
-        if ((width == 0) || (height == 0)) {
-            return;
-        }
+        if ((width == 0) || (height == 0)) return;
 
         if (this.width != width || this.height != height) {
             this.width = width;
@@ -118,12 +113,9 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
             }
         }
 
-        if (bitmap != null) {
-            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-            // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
-            // The renderer has been modified a bit and an update of WebRTC could break our app
-            renderer.DrawBitmap(false, false);
-        }
+        if (bitmap == null) return;
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+        renderer.DrawBitmap(false, false);
     }
 
     @Override
@@ -141,21 +133,18 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
     public void removeSurfaceView() {
         log("removeSurfaceView()");
-        if (myTexture.getParent() != null) {
-            if (myTexture.getParent().getParent() != null) {
-                log("removeSurfaceView() removeView chatId: " + chatId);
-                ((ViewGroup) myTexture.getParent()).removeView(myTexture);
-            }
+        if (myTexture.getParent() != null && myTexture.getParent().getParent() != null) {
+            log("removeSurfaceView() removeView chatId: " + chatId);
+            ((ViewGroup) myTexture.getParent()).removeView(myTexture);
         }
-        if (megaChatApi != null) {
-            if ((peerId == megaChatApi.getMyUserHandle()) && (cliendId == megaChatApi.getMyClientidHandle(chatId))) {
-                log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: " + chatId);
-                megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
-            } else {
-                log("removeSurfaceView() removeChatVideoListener chatId: " + chatId + " ( peerId = " + peerId + ", clientId = " + cliendId + ")");
-                megaChatApi.removeChatVideoListener(chatId, peerId, cliendId, this);
 
-            }
+        if (megaChatApi == null) return;
+        if (peerId == megaChatApi.getMyUserHandle() && cliendId == megaChatApi.getMyClientidHandle(chatId)) {
+            log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: " + chatId);
+            megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
+        } else {
+            log("removeSurfaceView() removeChatVideoListener chatId: " + chatId + " ( peerId = " + peerId + ", clientId = " + cliendId + ")");
+            megaChatApi.removeChatVideoListener(chatId, peerId, cliendId, this);
         }
     }
 

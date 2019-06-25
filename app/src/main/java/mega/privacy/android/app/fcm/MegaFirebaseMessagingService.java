@@ -183,13 +183,13 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
                         boolean isIdle = pm.isDeviceIdleMode();
-                        if((!app.isActivityVisible() && megaApi.getRootNode() == null)|| isIdle) {
+                        if ((!app.isActivityVisible() && megaApi.getRootNode() == null) || isIdle) {
                             log("launch foreground service!");
                             wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingCallLock:");
                             wl.acquire();
                             wl.release();
                             log("startService-MegaFirebaseMessagingService:onMessageReceived ");
-                            startService(new Intent(this,IncomingCallService.class));
+                            startService(new Intent(this, IncomingCallService.class));
                             return;
                         }
                     }

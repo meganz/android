@@ -24,14 +24,12 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 
-import static android.view.View.GONE;
-
 public class ChatUtil {
 
     /*Method to know if i'm participating in any A/V call*/
-    public static boolean participatingInACall(MegaChatApiAndroid megaChatApi){
+    public static boolean participatingInACall(MegaChatApiAndroid megaChatApi) {
         log("participatingInACall");
-        if(megaChatApi == null )return false;
+        if (megaChatApi == null) return false;
         MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
         MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
         MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
@@ -41,14 +39,14 @@ public class ChatUtil {
         log("participatingInACall: No calls in progress ");
 
 
-        if((listCalls.size() - listCallsDestroy.size()) == 0)return false;
+        if ((listCalls.size() - listCallsDestroy.size()) == 0) return false;
         log("participatingInACall:There is some call in progress");
 
-        if((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsRingIn.size())) {
+        if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsRingIn.size())) {
             log("participatingInACall:I'm not participating in any of the calls there");
             return false;
         }
-        if(listCallsRequestSent.size()>0){
+        if (listCallsRequestSent.size() > 0) {
             log("participatingInACall: I'm doing a outgoing call");
             return true;
         }
@@ -58,19 +56,19 @@ public class ChatUtil {
     }
 
     /*Method to know the chat id which A / V call I am participating in*/
-    public static long getChatCallInProgress(MegaChatApiAndroid megaChatApi){
+    public static long getChatCallInProgress(MegaChatApiAndroid megaChatApi) {
         log("getChatCallInProgress()");
         long chatId = -1;
-        if(megaChatApi!=null){
+        if (megaChatApi != null) {
             MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-            if((listCallsRequestSent!=null) && (listCallsRequestSent.size() > 0)){
+            if ((listCallsRequestSent != null) && (listCallsRequestSent.size() > 0)) {
                 log("getChatCallInProgress: Request Sent");
                 //Return to request sent
                 chatId = listCallsRequestSent.get(0);
-            }else{
+            } else {
                 log("getChatCallInProgress: NOT Request Sent");
                 MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-                if((listCallsInProgress!=null) && (listCallsInProgress.size() > 0)){
+                if ((listCallsInProgress != null) && (listCallsInProgress.size() > 0)) {
                     //Return to in progress
                     log("getChatCallInProgress: In progress");
                     chatId = listCallsInProgress.get(0);
@@ -81,9 +79,10 @@ public class ChatUtil {
     }
 
     /*Method to return to the call which I am participating*/
-    public static void returnCall(Context context, MegaChatApiAndroid megaChatApi){
+    public static void returnCall(Context context, MegaChatApiAndroid megaChatApi) {
         log("returnCall()");
-        if((megaChatApi == null) || (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)) == null)) return;
+        if ((megaChatApi == null) || (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)) == null))
+            return;
         long chatId = getChatCallInProgress(megaChatApi);
         MegaChatCall call = megaChatApi.getChatCall(chatId);
         MegaApplication.setShowPinScreen(false);
@@ -96,9 +95,9 @@ public class ChatUtil {
     }
 
     /*Method to show or hide the "return the call" layout*/
-    public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono){
-        if(megaChatApi == null)return;
-        if(!Util.isChatEnabled() || !(context instanceof ManagerActivityLollipop) || !participatingInACall(megaChatApi) ){
+    public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono) {
+        if (megaChatApi == null) return;
+        if (!Util.isChatEnabled() || !(context instanceof ManagerActivityLollipop) || !participatingInACall(megaChatApi)) {
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
             return;
@@ -106,9 +105,9 @@ public class ChatUtil {
         callInProgressLayout.setVisibility(View.VISIBLE);
 
         long chatId = getChatCallInProgress(megaChatApi);
-        if(chatId == -1)return;
+        if (chatId == -1) return;
         MegaChatCall call = megaChatApi.getChatCall(chatId);
-        if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+        if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
             activateChrono(true, callInProgressChrono, call);
             return;
         }
@@ -116,24 +115,25 @@ public class ChatUtil {
     }
 
     /*Method to know if a call is established*/
-    public static boolean isEstablishedCall(MegaChatApiAndroid megaChatApi, long chatId){
+    public static boolean isEstablishedCall(MegaChatApiAndroid megaChatApi, long chatId) {
 
-        if((megaChatApi == null) || (megaChatApi.getChatCall(chatId) == null)) return false;
+        if ((megaChatApi == null) || (megaChatApi.getChatCall(chatId) == null)) return false;
         MegaChatCall call = megaChatApi.getChatCall(chatId);
-        if((call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)) return true;
+        if ((call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS))
+            return true;
         return false;
     }
+
     public static void log(String origin, String message) {
-        MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
+        MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] " + origin + ": " + message, origin);
     }
 
-    public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
+    public static void showShareChatLinkDialog(final Context context, MegaChatRoom chat, final String chatLink) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         LayoutInflater inflater = null;
         if (context instanceof GroupChatInfoActivityLollipop) {
             inflater = ((GroupChatInfoActivityLollipop) context).getLayoutInflater();
-        }
-        else if (context instanceof ChatActivityLollipop){
+        } else if (context instanceof ChatActivityLollipop) {
             inflater = ((ChatActivityLollipop) context).getLayoutInflater();
         }
         View v = inflater.inflate(R.layout.chat_link_share_dialog, null);
@@ -157,8 +157,7 @@ public class ChatUtil {
                         clipboard.setPrimaryClip(clip);
                         if (context instanceof GroupChatInfoActivityLollipop) {
                             ((GroupChatInfoActivityLollipop) context).showSnackbar(context.getString(R.string.chat_link_copied_clipboard));
-                        }
-                        else if (context instanceof ChatActivityLollipop) {
+                        } else if (context instanceof ChatActivityLollipop) {
                             ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), -1);
 
                         }
@@ -195,8 +194,7 @@ public class ChatUtil {
         Button deleteButton = (Button) v.findViewById(R.id.delete_button);
         if (isModerator) {
             deleteButton.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             deleteButton.setVisibility(View.GONE);
         }
         deleteButton.setOnClickListener(clickListener);
@@ -207,7 +205,8 @@ public class ChatUtil {
         shareLinkDialog.setCanceledOnTouchOutside(false);
         try {
             shareLinkDialog.show();
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
     static void dismissShareChatLinkDialog(Context context, AlertDialog shareLinkDialog) {
@@ -216,21 +215,21 @@ public class ChatUtil {
             if (context instanceof ChatActivityLollipop) {
                 ((ChatActivityLollipop) context).setShareLinkDialogDismissed(true);
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
-    public static void showConfirmationRemoveChatLink (final Context context){
+    public static void showConfirmationRemoveChatLink(final Context context) {
         log("showConfirmationRemoveChatLink");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         if (context instanceof GroupChatInfoActivityLollipop) {
                             ((GroupChatInfoActivityLollipop) context).removeChatLink();
-                        }
-                        else if (context instanceof ChatActivityLollipop){
+                        } else if (context instanceof ChatActivityLollipop) {
                             ((ChatActivityLollipop) context).removeChatLink();
                         }
                         break;
@@ -248,11 +247,11 @@ public class ChatUtil {
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
-    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat){
-        if(chronometer == null || callChat == null)return;
-        if(activateChrono){
+    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat) {
+        if (chronometer == null || callChat == null) return;
+        if (activateChrono) {
             chronometer.setVisibility(View.VISIBLE);
-            chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration()*1000));
+            chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration() * 1000));
             chronometer.start();
             chronometer.setFormat(" %s");
             return;

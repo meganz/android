@@ -1109,9 +1109,9 @@ public final class ChatAdvancedNotificationBuilder {
 
         MegaChatRoom chat = megaChatApi.getChatRoom(call.getChatid());
         String notificationContent;
-        if(chat.isGroup()){
+        if (chat.isGroup()) {
             notificationContent = chat.getTitle();
-        }else{
+        } else {
             notificationContent = chat.getPeerFullname(0);
         }
 

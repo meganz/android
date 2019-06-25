@@ -69,18 +69,14 @@ public class CallNotificationIntentService extends IntentService implements Mega
 
         try {
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (megaChatApi != null) {
-                MegaChatCall call = megaChatApi.getChatCall(chatHandleToAnswer);
-                if (call != null) {
-                    long chatCallId = call.getId();
-                    String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
-                    int notificationId = (notificationCallId).hashCode();
-                    notificationManager.cancel(notificationId);
-                } else {
-                    log("clearIncomingCallNotification:ERROR:NullCallObject");
-                }
-            }
+            if (megaChatApi == null) return;
+            MegaChatCall call = megaChatApi.getChatCall(chatHandleToAnswer);
+            if (call == null) return;
 
+            long chatCallId = call.getId();
+            String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
+            int notificationId = (notificationCallId).hashCode();
+            notificationManager.cancel(notificationId);
         } catch (Exception e) {
             log("clearIncomingCallNotification:EXCEPTION");
         }

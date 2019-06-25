@@ -9,9 +9,7 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
-import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -53,7 +51,6 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
@@ -61,7 +58,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
@@ -1597,30 +1593,29 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
-    public void refreshNode(MegaChatListItem item){
+    public void refreshNode(MegaChatListItem item) {
         log("refreshNode");
         ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         //elements of adapter
         long chatHandleToUpdate = item.getChatId();
         int indexToUpdate = -1;
-        if(chats!=null){
+        if (chats != null) {
             ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
             while (itrReplace.hasNext()) {
                 MegaChatListItem chat = itrReplace.next();
-                if(chat!=null){
-                    if(chat.getChatId() == chatHandleToUpdate){
-                        indexToUpdate = itrReplace.nextIndex()-1;
+                if (chat != null) {
+                    if (chat.getChatId() == chatHandleToUpdate) {
+                        indexToUpdate = itrReplace.nextIndex() - 1;
                         break;
                     }
-                }
-                else{
+                } else {
                     break;
                 }
             }
-            if(indexToUpdate!=-1){
-                log("Index to replace: "+indexToUpdate);
-                if(adapterList!=null){
+            if (indexToUpdate != -1) {
+                log("Index to replace: " + indexToUpdate);
+                if (adapterList != null) {
                     adapterList.notifyItemChanged(indexToUpdate);
                 }
             }
@@ -1707,15 +1702,15 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     @Override
     public void onResume() {
-        log("onResume: lastFirstVisiblePosition " +lastFirstVisiblePosition);
-        if(lastFirstVisiblePosition>0){
+        log("onResume: lastFirstVisiblePosition " + lastFirstVisiblePosition);
+        if (lastFirstVisiblePosition > 0) {
             (listView.getLayoutManager()).scrollToPosition(lastFirstVisiblePosition);
-        }else{
+        } else {
             (listView.getLayoutManager()).scrollToPosition(0);
         }
-        lastFirstVisiblePosition=0;
-    
-        if(aB != null && aB.getTitle() != null){
+        lastFirstVisiblePosition = 0;
+
+        if (aB != null && aB.getTitle() != null) {
             aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
         }
         ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
