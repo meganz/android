@@ -116,6 +116,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
+import mega.privacy.android.app.BucketSaved;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -540,7 +541,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public long parentHandleSearch;
 	public long parentHandleInbox;
 	public String pathNavigationOffline;
-	private  int deepBrowserTreeRecents = 0;
+	private int deepBrowserTreeRecents = 0;
+	private BucketSaved bucketSaved;
 	public int deepBrowserTreeIncoming = 0;
 	public int deepBrowserTreeOutgoing = 0;
 	int indexCloud = -1;
@@ -1679,6 +1681,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			outState.putInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
 		}
 
+		if (deepBrowserTreeRecents > 0 && isRecentsAdded() && getBucketSaved() != null) {
+			outState.putSerializable("bucketSaved", getBucketSaved());
+		}
+		else {
+			setDeepBrowserTreeRecents(0);
+		}
 		outState.putInt("deepBrowserTreeRecents", deepBrowserTreeRecents);
 
 		if (viewPagerCloud != null) {
@@ -1789,7 +1797,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("savedInstanceState -> parentHandleOutgoing: "+parentHandleOutgoing);
 			parentHandleSearch = savedInstanceState.getLong("parentHandleSearch", -1);
 			parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
-			deepBrowserTreeRecents =  savedInstanceState.getInt("deepBrowserTreeRecents", 0);
+			deepBrowserTreeRecents = savedInstanceState.getInt("deepBrowserTreeRecents", 0);
+			if (deepBrowserTreeRecents > 0) {
+				setBucketSaved((BucketSaved) savedInstanceState.getSerializable("bucketSaved"));
+			}
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
@@ -4493,7 +4504,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if (getTabItemCloud() == RECENTS_TAB) {
 					if (isRecentsAdded() && getDeepBrowserTreeRecents() > 0
-							&& rF.isBucketSelectedMedia() && rF.getBucketSelected().getNodes() != null) {
+							&& rF.getBucketSelected() != null) {
 						aB.setTitle((rF.getBucketSelected().getNodes().size() + " " + getString(R.string.general_files)).toUpperCase());
 						firstNavigationLevel = false;
 						break;
@@ -18488,6 +18499,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			tabLayoutCloud.setVisibility(View.GONE);
 			viewPagerCloud.disableSwipe(true);
 		}
+	}
+
+	public void setBucketSaved (BucketSaved bucketSaved) {
+		this.bucketSaved = bucketSaved;
+	}
+
+	public BucketSaved getBucketSaved() {
+		return bucketSaved;
 	}
 
 	public void setDeepBrowserTreeRecents (int deepBrowserTreeRecents) {
