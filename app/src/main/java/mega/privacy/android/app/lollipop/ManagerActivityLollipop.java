@@ -17942,7 +17942,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 		if (item != null){
-			log("onChatListItemUpdate:" + item.getTitle());
+			log("onChatListItemUpdate:" + item.getChatId());
 			if (item.isPreview()) {
 				return;
 			}
@@ -17959,7 +17959,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(Util.isChatEnabled()){
 			if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-				log("Change unread count: " + item.getTitle());
+				log("Change unread count: " + item.getUnreadCount());
 				setChatBadge();
 				updateNavigationToolbarIcon();
 			}
