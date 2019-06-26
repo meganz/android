@@ -1985,66 +1985,84 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                 if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
                     log("callStatus: CALL_STATUS_REQUEST_SENT");
-
-                    if (localCameraFragmentFS == null) {
-                        localCameraFragmentFS = LocalCameraCallFullScreenFragment.newInstance(chatId);
-                        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-                        ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
-                        ftFS.commitNowAllowingStateLoss();
-                    }
-                    contactAvatarLayout.setVisibility(GONE);
-                    parentLocalFS.setVisibility(View.VISIBLE);
-                    fragmentContainerLocalCameraFS.setVisibility(View.VISIBLE);
-
+                    optionsLocalCameraFragmentFS(true);
                 } else if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     log("callStatus: CALL_STATUS_IN_PROGRESS");
-
-                    if (localCameraFragment == null) {
-                        localCameraFragment = LocalCameraCallFragment.newInstance(chatId);
-                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                        ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
-                        ft.commitNowAllowingStateLoss();
-                    }
-
-                    myAvatarLayout.setVisibility(GONE);
-                    parentLocal.setVisibility(View.VISIBLE);
-                    fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
+                    optionsLocalCameraFragment(true);
                 }
 
             } else {
                 log("updateLocalVideoStatus:Video local NOT connected");
                 videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
                 videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
+
                 if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
                     log("callStatus: CALL_STATUS_REQUEST_SENT");
-
-                    if (localCameraFragmentFS != null) {
-                        localCameraFragmentFS.removeSurfaceView();
-                        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-                        ftFS.remove(localCameraFragmentFS);
-                        localCameraFragmentFS = null;
-                    }
-                    parentLocalFS.setVisibility(View.GONE);
-                    fragmentContainerLocalCameraFS.setVisibility(View.GONE);
-                    contactAvatarLayout.setVisibility(View.VISIBLE);
-
+                    optionsLocalCameraFragmentFS(false);
                 } else if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     log("callStatus: CALL_STATUS_IN_PROGRESS ");
-                    if (localCameraFragment != null) {
-                        localCameraFragment.removeSurfaceView();
-                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                        ft.remove(localCameraFragment);
-                        localCameraFragment = null;
-                    }
-                    parentLocal.setVisibility(View.GONE);
-                    fragmentContainerLocalCamera.setVisibility(View.GONE);
-                    myAvatarLayout.setVisibility(View.VISIBLE);
+                    optionsLocalCameraFragment(false);
                 }
             }
         }
     }
 
-    private void updateChangesVideo(int position){
+    private void optionsLocalCameraFragment(boolean isNecessaryCreate) {
+        if (isNecessaryCreate) {
+            if (localCameraFragment == null) {
+                localCameraFragment = LocalCameraCallFragment.newInstance(chatId);
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
+                ft.commitNowAllowingStateLoss();
+            }
+
+            myAvatarLayout.setVisibility(GONE);
+            parentLocal.setVisibility(View.VISIBLE);
+            fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
+            return;
+        }
+        removeLocalCameraFragment();
+        parentLocal.setVisibility(View.GONE);
+        fragmentContainerLocalCamera.setVisibility(View.GONE);
+        myAvatarLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void removeLocalCameraFragment() {
+        if (localCameraFragment == null) return;
+        localCameraFragment.removeSurfaceView();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.remove(localCameraFragment);
+        localCameraFragment = null;
+    }
+
+    private void optionsLocalCameraFragmentFS(boolean isNecessaryCreate) {
+        if (isNecessaryCreate) {
+            if (localCameraFragmentFS == null) {
+                localCameraFragmentFS = LocalCameraCallFullScreenFragment.newInstance(chatId);
+                FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+                ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
+                ftFS.commitNowAllowingStateLoss();
+            }
+            contactAvatarLayout.setVisibility(GONE);
+            parentLocalFS.setVisibility(View.VISIBLE);
+            fragmentContainerLocalCameraFS.setVisibility(View.VISIBLE);
+            return;
+        }
+        removeLocalCameraFragmentFS();
+        parentLocalFS.setVisibility(View.GONE);
+        fragmentContainerLocalCameraFS.setVisibility(View.GONE);
+        contactAvatarLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void removeLocalCameraFragmentFS() {
+        if (localCameraFragmentFS == null) return;
+        localCameraFragmentFS.removeSurfaceView();
+        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+        ftFS.remove(localCameraFragmentFS);
+        localCameraFragmentFS = null;
+    }
+
+    private void updateChangesVideo(int position) {
         if (peersOnCall.size() < MAX_PEERS_GRID && adapterGrid != null) {
             adapterGrid.notifyItemChanged(position);
             return;
@@ -2056,7 +2074,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         updatePeers();
     }
 
-    private void updateChangesAudio(int position){
+    private void updateChangesAudio(int position) {
         if (peersOnCall.size() < MAX_PEERS_GRID && adapterGrid != null) {
             adapterGrid.changesInAudio(position, null);
             return;
@@ -2175,7 +2193,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         break;
                     }
                 }
-
             }
 
         } else {
@@ -2185,64 +2202,53 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (isRemoteVideo == REMOTE_VIDEO_NOT_INIT) {
                 if (userSession.hasVideo()) {
                     log("updateRemoteVideoStatus:REMOTE_VIDEO_NOT_INIT Contact Video remote connected");
-                    isRemoteVideo = REMOTE_VIDEO_ENABLED;
-
-                    if (remoteCameraFragmentFS == null) {
-                        remoteCameraFragmentFS = RemoteCameraCallFullScreenFragment.newInstance(chatId, callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
-                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                        ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
-                        ft.commitNowAllowingStateLoss();
-                    }
-                    contactAvatarLayout.setVisibility(GONE);
-                    parentRemoteFS.setVisibility(View.VISIBLE);
-                    fragmentContainerRemoteCameraFS.setVisibility(View.VISIBLE);
-
+                    optionsRemoteCameraFragmentFS(true);
                 } else {
                     log("updateRemoteVideoStatus:REMOTE_VIDEO_NOT_INIT Contact Video remote NOT connected");
-                    isRemoteVideo = REMOTE_VIDEO_DISABLED;
-                    if (remoteCameraFragmentFS != null) {
-                        remoteCameraFragmentFS.removeSurfaceView();
-                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                        ft.remove(remoteCameraFragmentFS);
-                        remoteCameraFragmentFS = null;
-                    }
-                    contactAvatarLayout.setVisibility(View.VISIBLE);
-                    parentRemoteFS.setVisibility(View.GONE);
-                    fragmentContainerRemoteCameraFS.setVisibility(View.GONE);
+                    optionsRemoteCameraFragmentFS(false);
                 }
             } else {
                 if (isRemoteVideo == REMOTE_VIDEO_ENABLED && !userSession.hasVideo()) {
                     log("updateRemoteVideoStatus:REMOTE_VIDEO_ENABLED Contact Video remote connected");
-
-                    isRemoteVideo = REMOTE_VIDEO_DISABLED;
-
-                    if (remoteCameraFragmentFS != null) {
-                        remoteCameraFragmentFS.removeSurfaceView();
-                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                        ft.remove(remoteCameraFragmentFS);
-                        remoteCameraFragmentFS = null;
-                    }
-                    contactAvatarLayout.setVisibility(View.VISIBLE);
-                    parentRemoteFS.setVisibility(View.GONE);
-                    fragmentContainerRemoteCameraFS.setVisibility(View.GONE);
+                    optionsRemoteCameraFragmentFS(false);
 
                 } else if ((isRemoteVideo == REMOTE_VIDEO_DISABLED) && userSession.hasVideo()) {
                     log("updateRemoteVideoStatus:REMOTE_VIDEO_DISABLED Contact Video remote connected");
-
-                    isRemoteVideo = REMOTE_VIDEO_ENABLED;
-
-                    if (remoteCameraFragmentFS == null) {
-                        remoteCameraFragmentFS = RemoteCameraCallFullScreenFragment.newInstance(chatId, callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
-                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                        ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
-                        ft.commitNowAllowingStateLoss();
-                    }
-                    contactAvatarLayout.setVisibility(GONE);
-                    parentRemoteFS.setVisibility(View.VISIBLE);
-                    fragmentContainerRemoteCameraFS.setVisibility(View.VISIBLE);
+                    optionsRemoteCameraFragmentFS(true);
                 }
             }
         }
+    }
+
+    private void optionsRemoteCameraFragmentFS(boolean isNecessaryCreate) {
+        if (isNecessaryCreate) {
+            isRemoteVideo = REMOTE_VIDEO_ENABLED;
+            if (remoteCameraFragmentFS == null) {
+                remoteCameraFragmentFS = RemoteCameraCallFullScreenFragment.newInstance(chatId, callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
+                ft.commitNowAllowingStateLoss();
+            }
+            contactAvatarLayout.setVisibility(GONE);
+            parentRemoteFS.setVisibility(View.VISIBLE);
+            fragmentContainerRemoteCameraFS.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        isRemoteVideo = REMOTE_VIDEO_DISABLED;
+        removeRemoteCameraFragmentFS();
+        contactAvatarLayout.setVisibility(View.VISIBLE);
+        parentRemoteFS.setVisibility(View.GONE);
+        fragmentContainerRemoteCameraFS.setVisibility(View.GONE);
+    }
+
+    private void removeRemoteCameraFragmentFS() {
+        if (remoteCameraFragmentFS == null) return;
+        remoteCameraFragmentFS.removeSurfaceView();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.remove(remoteCameraFragmentFS);
+        remoteCameraFragmentFS = null;
+
     }
 
     private void updateRemoteAudioStatus(long userPeerId, long userClientId) {
@@ -2696,12 +2702,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         adapterList = null;
                     }
 
-                    if (bigCameraGroupCallFragment != null) {
-                        bigCameraGroupCallFragment.removeSurfaceView();
-                        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-                        ftFS.remove(bigCameraGroupCallFragment);
-                        bigCameraGroupCallFragment = null;
-                    }
+                    removeBigFragment();
+
                     avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
@@ -2812,12 +2814,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             parentBigCameraGroupCall.setVisibility(View.VISIBLE);
             if (peerSelected != null) return;
             //First time:Remove Camera element, because with incoming, avatar is the only showed
-            if (bigCameraGroupCallFragment != null) {
-                bigCameraGroupCallFragment.removeSurfaceView();
-                FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-                ftFS.remove(bigCameraGroupCallFragment);
-                bigCameraGroupCallFragment = null;
-            }
+            removeBigFragment();
+
             fragmentBigCameraGroupCall.setVisibility(View.GONE);
 
             //Create Avatar, get the last peer of peersBeforeCall
@@ -2994,35 +2992,32 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    public void createBigFragment(long peerId, long clientId) {
+    private void createBigFragment(long peerId, long clientId) {
         log("createBigFragment()");
-        if (bigCameraGroupCallFragment != null) {
-            bigCameraGroupCallFragment.removeSurfaceView();
-            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-            ftFS.remove(bigCameraGroupCallFragment);
-            bigCameraGroupCallFragment = null;
-        }
+        removeBigFragment();
 
-        if (bigCameraGroupCallFragment == null) {
-            bigCameraGroupCallFragment = BigCameraGroupCallFragment.newInstance(chatId, peerId, clientId);
-            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-            ftFS.replace(R.id.fragment_big_camera_group_call, bigCameraGroupCallFragment, "bigCameraGroupCallFragment");
-            ftFS.commitNowAllowingStateLoss();
-        }
+        bigCameraGroupCallFragment = BigCameraGroupCallFragment.newInstance(chatId, peerId, clientId);
+        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+        ftFS.replace(R.id.fragment_big_camera_group_call, bigCameraGroupCallFragment, "bigCameraGroupCallFragment");
+        ftFS.commitNowAllowingStateLoss();
 
         fragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
         parentBigCameraGroupCall.setVisibility(View.VISIBLE);
         avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
     }
 
+    private void removeBigFragment() {
+        if (bigCameraGroupCallFragment == null) return;
+        bigCameraGroupCallFragment.removeSurfaceView();
+        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+        ftFS.remove(bigCameraGroupCallFragment);
+        bigCameraGroupCallFragment = null;
+
+    }
+
     public void createBigAvatar() {
         log("createBigAvatar()");
-        if (bigCameraGroupCallFragment != null) {
-            bigCameraGroupCallFragment.removeSurfaceView();
-            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-            ftFS.remove(bigCameraGroupCallFragment);
-            bigCameraGroupCallFragment = null;
-        }
+        removeBigFragment();
 
         fragmentBigCameraGroupCall.setVisibility(View.GONE);
         avatarBigCameraGroupCallImage.setImageBitmap(null);
@@ -3033,32 +3028,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void clearSurfacesViews() {
         log("clearSurfacesViews");
-        if (localCameraFragment != null) {
-            localCameraFragment.removeSurfaceView();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.remove(localCameraFragment);
-            localCameraFragment = null;
-        }
-
-        if (localCameraFragmentFS != null) {
-            localCameraFragmentFS.removeSurfaceView();
-            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-            ftFS.remove(localCameraFragmentFS);
-            localCameraFragmentFS = null;
-        }
-        if (remoteCameraFragmentFS != null) {
-            remoteCameraFragmentFS.removeSurfaceView();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.remove(remoteCameraFragmentFS);
-            remoteCameraFragmentFS = null;
-        }
-
-        if (bigCameraGroupCallFragment != null) {
-            bigCameraGroupCallFragment.removeSurfaceView();
-            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-            ftFS.remove(bigCameraGroupCallFragment);
-            bigCameraGroupCallFragment = null;
-        }
+        removeLocalCameraFragment();
+        removeLocalCameraFragmentFS();
+        removeRemoteCameraFragmentFS();
+        removeBigFragment();
     }
 
     private void clearHandlers() {
