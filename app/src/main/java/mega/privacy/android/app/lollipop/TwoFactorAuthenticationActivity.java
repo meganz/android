@@ -69,6 +69,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 /**
  * Created by mega on 28/05/18.
@@ -1262,7 +1263,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
                 log("parentPath no NULL");
-                String[] split = Util.rKFile.split("/");
+                String[] split = rKFile.split("/");
                 parentPath = parentPath+"/"+split[split.length-1];
                 Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
                 newIntent.putExtra("parentPath", parentPath);

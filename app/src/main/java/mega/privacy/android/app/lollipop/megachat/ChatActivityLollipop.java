@@ -12,7 +12,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -139,9 +138,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
-import static mega.privacy.android.app.utils.Util.context;
-import static mega.privacy.android.app.utils.Util.toCDATA;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener{
 
@@ -3548,8 +3547,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         mediaIntent.putExtra("msgId", m.getMessage().getMsgId());
                                         mediaIntent.putExtra("chatId", idChat);
 
-                                        String downloadLocationDefaultPath = Util.getDownloadLocation(this);
-                                        String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+                                        String downloadLocationDefaultPath = getDownloadLocation(this);
+                                        String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
                                         File f = new File(downloadLocationDefaultPath, node.getName());
                                         boolean isOnMegaDownloads = false;
                                         if(f.exists() && (f.length() == node.getSize())){
@@ -3658,8 +3657,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         pdfIntent.putExtra("msgId", m.getMessage().getMsgId());
                                         pdfIntent.putExtra("chatId", idChat);
 
-                                        String downloadLocationDefaultPath = Util.getDownloadLocation(this);
-                                        String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+                                        String downloadLocationDefaultPath = getDownloadLocation(this);
+                                        String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
                                         File f = new File(downloadLocationDefaultPath, node.getName());
                                         boolean isOnMegaDownloads = false;
                                         if(f.exists() && (f.length() == node.getSize())){

@@ -87,6 +87,9 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, MegaRequestListenerInterface{
 
@@ -1190,7 +1193,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						countTitles++;
 						monthPic.nodeHandles.add(n.getHandle());
 						monthPic.setPosition(n, i);
-						if (!Util.isVideoFile(n.getName())) {
+						if (!isVideoFile(n.getName())) {
 							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
 						} else {
 							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
@@ -1204,7 +1207,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //						year = d.getYear();
 						monthPic.monthYearString = getImageDateString(month, year);
 
-						if (!Util.isVideoFile(n.getName())) {
+						if (!isVideoFile(n.getName())) {
 							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
 						} else {
 							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
@@ -1219,7 +1222,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						countTitles++;
 						monthPic.nodeHandles.add(n.getHandle());
 						monthPic.setPosition(n, i);
-						if (!Util.isVideoFile(n.getName())) {
+						if (!isVideoFile(n.getName())) {
 							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
 						} else {
 							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
@@ -1325,7 +1328,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		dbH.setStorageAskAlways(false);
 		File defaultDownloadLocation = null;
 		if (Environment.getExternalStorageDirectory() != null){
-			defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+			defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + downloadDIR + "/");
 		}
 		else{
 			defaultDownloadLocation = context.getFilesDir();
@@ -1868,7 +1871,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		if (localPath == null){
 			boolean isOnMegaDownloads = false;
-			localPath = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+			localPath = getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
 			File f = new File(downloadLocationDefaultPath, file.getName());
 			if(f.exists() && (f.length() == file.getSize())){
 				isOnMegaDownloads = true;
@@ -1899,7 +1902,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						}
 					} else {
 						boolean isOnMegaDownloads = false;
-						path = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+						path = getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
 						File f = new File(downloadLocationDefaultPath, file.getName());
 						if (f.exists() && (f.length() == file.getSize())) {
 							isOnMegaDownloads = true;
@@ -2283,7 +2286,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					countTitles++;
 					monthPic.nodeHandles.add(n.getHandle());
 					monthPic.setPosition(n, i);
-					if(!Util.isVideoFile(n.getName())){
+					if(!isVideoFile(n.getName())){
 						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
 					}
 					else{
@@ -2302,7 +2305,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //						else{
 					monthPic.nodeHandles.add(n.getHandle());
 					monthPic.setPosition(n, i);
-					if(!Util.isVideoFile(n.getName())){
+					if(!isVideoFile(n.getName())){
 						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
 					}
 					else{
@@ -2320,7 +2323,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					countTitles++;
 					monthPic.nodeHandles.add(n.getHandle());
 					monthPic.setPosition(n, i);
-					if(!Util.isVideoFile(n.getName())){
+					if(!isVideoFile(n.getName())){
 						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
 					}
 					else{

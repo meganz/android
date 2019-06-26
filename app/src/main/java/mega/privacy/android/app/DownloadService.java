@@ -66,6 +66,9 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 /*
  * Background service to download files
  */
@@ -382,7 +385,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             }
             storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
 
-			if (currentDir.getAbsolutePath().contains(Util.offlineDIR)){
+			if (currentDir.getAbsolutePath().contains(offlineDIR)){
 				log("currentDir contains offlineDIR");
 				openFile = false;
 			}
@@ -447,7 +450,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     log("IS FILE_:_");
                 }
 
-				if (currentDir.getAbsolutePath().contains(Util.offlineDIR)){
+				if (currentDir.getAbsolutePath().contains(offlineDIR)){
                 	log("currentDir contains offlineDIR");
 					openFile = false;
 				}
@@ -1498,7 +1501,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					log("DOWNLOADFILE: " + transfer.getPath());
 
 					//To update thumbnails for videos
-					if(Util.isVideoFile(transfer.getPath())){
+					if(isVideoFile(transfer.getPath())){
 						log("Is video!!!");
 						MegaNode videoNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 						if (videoNode != null){
@@ -1561,7 +1564,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						alterDocument(tranfersUri, node.getName());
 					}
 
-					if(transfer.getPath().contains(Util.offlineDIR)){
+					if(transfer.getPath().contains(offlineDIR)){
 						log("YESSSS it is Offline file");
 						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 						offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
@@ -1606,7 +1609,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("alterUri");
 	    try {
 
-	    	String sourceLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR + "/"+fileName;
+	    	String sourceLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + advancesDevicesDIR + "/"+fileName;
 
 	    	log("Gonna copy: "+sourceLocation);
 
@@ -1672,7 +1675,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			nodesToDB.add(document);
 		}
 
-        String inboxPath = Util.offlineDIR+"/in/";
+        String inboxPath = offlineDIR+"/in/";
         if(path.contains(inboxPath)){
             insertDB(nodesToDB, true);
         }

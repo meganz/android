@@ -21,6 +21,9 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 /**
  * Created by mega on 22/06/18.
  */
@@ -95,9 +98,9 @@ public class UtilsModalBottomSheet {
         mediaIntent.putExtra("HANDLE", node.getHandle());
         mediaIntent.putExtra("FILENAME", node.getName());
 
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation(context);
         boolean isOnMegaDownloads = false;
-        String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
+        String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
         File f = new File(downloadLocationDefaultPath, node.getName());
         if(f.exists() && (f.length() == node.getSize())){
             isOnMegaDownloads = true;

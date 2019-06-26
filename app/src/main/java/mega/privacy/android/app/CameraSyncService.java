@@ -68,6 +68,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 
 public class CameraSyncService extends Service implements MegaRequestListenerInterface, MegaTransferListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 
@@ -2352,7 +2354,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					dbH.setCamSyncTimeStamp(currentTimeStamp);
 				}
 
-				if(Util.isVideoFile(transfer.getPath())){
+				if(isVideoFile(transfer.getPath())){
 					log("Is video!!!");
 					File previewDir = PreviewUtils.getPreviewFolder(this);
 					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");

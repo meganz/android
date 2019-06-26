@@ -47,6 +47,8 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+
 
 public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener {
 	
@@ -300,7 +302,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 	boolean isRKSavedForOffline (MegaOffline currentNode) {
 		if(currentNode.getHandle().equals("0")){
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
 			File file= new File(path);
 			if(file.exists()){
 				return true;
@@ -430,7 +432,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						log("List not empty");
 						MegaOffline lastItem = mOffList.get(mOffList.size()-1);
 						if(!(lastItem.getHandle().equals("0"))){
-							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
 							log("Export in: "+path);
 							File file= new File(path);
 							if(file.exists()){
@@ -440,7 +442,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						}	
 					}
 					else{
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
 						log("Export in: "+path);
 						File file= new File(path);
 						if(file.exists()){
@@ -645,13 +647,13 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		String path=null;
 		
 		if(currentNode.getOrigin()==MegaOffline.INCOMING){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
+			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
 		}
 		else if(currentNode.getOrigin()==MegaOffline.INBOX){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
+			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/";
 		}
 		else{
-			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
+			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR;
 		}	
 		
 		File currentFile = null;
@@ -804,7 +806,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			//The node is the MasterKey File
 			holder.textViewFileName.setText(currentNode.getName());
 			
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
 			File file= new File(path);
 			long nodeSize;
 			if(file.exists()){
@@ -822,13 +824,13 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		String path=null;
 		
 		if(currentNode.getOrigin()==MegaOffline.INCOMING){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
+			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
 		}
 		else if(currentNode.getOrigin()==MegaOffline.INBOX){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
+			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/";
 		}
 		else{
-			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
+			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR;
 		}	
 		
 		File currentFile = null;

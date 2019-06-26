@@ -33,8 +33,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 /**
  * Created by mega on 20/02/18.

@@ -15,8 +15,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 public class UserAvatarListener implements MegaRequestListenerInterface {
     

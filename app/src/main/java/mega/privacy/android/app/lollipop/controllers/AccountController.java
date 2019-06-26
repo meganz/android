@@ -50,9 +50,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class AccountController implements View.OnClickListener{
 
@@ -163,13 +162,13 @@ public class AccountController implements View.OnClickListener{
 
         BufferedWriter out;
         try {
-            String mainDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + Util.mainDIR;
+            String mainDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + mainDIR;
             File mainDir = new File(mainDirPath);
             log("Path main Dir: " + mainDirPath);
             mainDir.mkdirs();
 
             if (path == null){
-                path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+                path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
                 pathNull = true;
             }
             log("Export in: "+path);
@@ -299,10 +298,10 @@ public class AccountController implements View.OnClickListener{
     public void renameMK(){
         log("renameMK");
 
-        final String oldPath = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
+        final String oldPath = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
         File oldMKFile = new File(oldPath);
 
-        final String newPath = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+        final String newPath = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
         File newMKFile = new File(newPath);
 
         oldMKFile.renameTo(newMKFile);
@@ -444,12 +443,12 @@ public class AccountController implements View.OnClickListener{
 
     public void removeMK() {
         log("removeMK");
-        final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+        final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
         final File f = new File(path);
         f.delete();
 
         //Check if old MK file exists
-        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
+        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
         final File fOldMK = new File(pathOldMK);
         if(fOldMK.exists()){
             log("The old file of MK was also removed");
@@ -484,7 +483,7 @@ public class AccountController implements View.OnClickListener{
 
         File offlineDirectory = null;
         if (Environment.getExternalStorageDirectory() != null){
-            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
+            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR);
         }
         else{
             offlineDirectory = context.getFilesDir();
@@ -504,29 +503,29 @@ public class AccountController implements View.OnClickListener{
         File cacheDir = context.getCacheDir();
         removeFolder(context, cacheDir);
 
-        File temporalPicDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR);
+        File temporalPicDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR);
         removeFolder(context, temporalPicDir);
 
-        File profilePicDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.profilePicDIR);
+        File profilePicDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + profilePicDIR);
         removeFolder(context, profilePicDir);
 
-        File logDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR);
+        File logDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR);
         removeFolder(context, logDir);
 
-        File advancesDevicesDIR = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR);
-        removeFolder(context, advancesDevicesDIR);
+        File advancesDevicesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + advancesDevicesDIR);
+        removeFolder(context, advancesDevicesDir);
 
-        File chatTempDIR = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR);
-        removeFolder(context, chatTempDIR);
+        File chatTempDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + chatTempDIR);
+        removeFolder(context, chatTempDir);
 
-        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
+        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
         final File fMKOld = new File(pathOldMK);
         if (fMKOld.exists()){
             log("Old MK file removed!");
             fMKOld.delete();
         }
 
-        final String pathMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+        final String pathMK = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
         final File fMK = new File(pathMK);
         if (fMK.exists()){
             log("MK file removed!");
@@ -580,7 +579,7 @@ public class AccountController implements View.OnClickListener{
 
     public static void removeFolder(Context context, File folder) {
         try {
-            Util.deleteFolderAndSubfolders(context, folder);
+            deleteFolderAndSubfolders(context, folder);
         } catch (IOException e) {
             log("Exception deleting" + folder.getName() + "directory");
             e.printStackTrace();

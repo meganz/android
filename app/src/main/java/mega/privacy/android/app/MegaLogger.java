@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import mega.privacy.android.app.utils.Util;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 /**
  * Used to display console log from app, SDK and chatSDK,
@@ -32,7 +32,7 @@ public abstract class MegaLogger {
     public MegaLogger(String fileName, boolean fileLogger) {
         simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logFile = null;
-        dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
+        dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR + "/";
         this.fileName = fileName;
         fileLogQueue = new ConcurrentLinkedDeque<>();
         logToFile();

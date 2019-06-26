@@ -35,6 +35,8 @@ import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatFileStora
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+
 public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
     RecyclerView recyclerView;
@@ -57,7 +59,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     public ActionMode actionMode;
     RelativeLayout rlfragment;
     ArrayList<Integer> posSelected = new ArrayList<>();
-    String downloadLocationDefaultPath = Util.downloadDIR;
+    String downloadLocationDefaultPath = downloadDIR;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

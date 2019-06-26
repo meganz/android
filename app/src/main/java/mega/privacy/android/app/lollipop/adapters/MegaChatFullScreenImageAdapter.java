@@ -54,8 +54,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface  {
 
@@ -72,7 +72,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	MegaApiAndroid megaApi;
 	Context context;
 
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath = downloadDIR;
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 
@@ -316,7 +316,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			}
 
 			boolean isOnMegaDownloads = false;
-			String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
+			String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
 			log("isOnMegaDownloads: "+isOnMegaDownloads+" nodeName: "+node.getName()+" localPath: "+localPath);
 			if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))){
 

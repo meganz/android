@@ -56,8 +56,8 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
 
 public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
 	
@@ -78,7 +78,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	MegaNode fileLink = null;
 	boolean isFolderLink = false;
 
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath = downloadDIR;
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 
@@ -488,7 +488,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				}
 
 				boolean isOnMegaDownloads = false;
-				String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
+				String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
 				log("isOnMegaDownloads: " + isOnMegaDownloads + " nodeName: " + node.getName() + " localPath: " + localPath);
 				if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))) {
 

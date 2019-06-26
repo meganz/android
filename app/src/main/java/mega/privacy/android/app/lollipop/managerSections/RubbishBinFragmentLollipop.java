@@ -66,6 +66,8 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class RubbishBinFragmentLollipop extends Fragment{
 
 	public static ImageView imageDrag;
@@ -921,7 +923,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -995,7 +997,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("APP", true);
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1052,7 +1054,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					MegaNode file = nodes.get(position);
 
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if (f.exists() && (f.length() == file.getSize())) {
 						isOnMegaDownloads = true;

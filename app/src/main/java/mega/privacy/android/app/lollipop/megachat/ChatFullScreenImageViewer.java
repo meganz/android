@@ -80,6 +80,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
 
@@ -913,10 +914,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
 				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					log("ISFILE");
-					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+					String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
 					if(localPath != null){	
 						try { 
-							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
+							copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 						}
 						catch(Exception e) {}
 

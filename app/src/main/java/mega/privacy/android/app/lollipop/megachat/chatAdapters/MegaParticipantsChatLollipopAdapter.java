@@ -43,8 +43,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 
 public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<MegaParticipantsChatLollipopAdapter.ViewHolderParticipants> implements OnClickListener {

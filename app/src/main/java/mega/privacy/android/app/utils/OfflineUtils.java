@@ -23,6 +23,9 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class OfflineUtils {
 
     static DatabaseHandler dbH;
@@ -139,7 +142,7 @@ public class OfflineUtils {
         log("Path: " + mOffDelete.getPath());
         if (mOffDelete.getOrigin() == MegaOffline.INCOMING) {
             if (Environment.getExternalStorageDirectory() != null) {
-                destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + mOffDelete.getHandleIncoming() + "/" + mOffDelete.getPath());
+                destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + mOffDelete.getHandleIncoming() + "/" + mOffDelete.getPath());
             } else {
                 destination = new File(context.getFilesDir(),mOffDelete.getHandle() + "");
             }
@@ -148,7 +151,7 @@ public class OfflineUtils {
 
             try {
                 File offlineFile = new File(destination,mOffDelete.getName());
-                Util.deleteFolderAndSubfolders(context,offlineFile);
+                deleteFolderAndSubfolders(context,offlineFile);
             } catch (Exception e) {
                 log("EXCEPTION: removeOffline - file " + e.toString());
             }
@@ -158,14 +161,14 @@ public class OfflineUtils {
         } else {
             if (from == Constants.FROM_INBOX) {
                 if (Environment.getExternalStorageDirectory() != null) {
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + mOffDelete.getPath());
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/" + mOffDelete.getPath());
                     log("offline File INCOMING: " + destination.getAbsolutePath());
                 } else {
                     destination = context.getFilesDir();
                 }
             } else {
                 if (Environment.getExternalStorageDirectory() != null) {
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffDelete.getPath());
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + mOffDelete.getPath());
                 } else {
                     destination = new File(context.getFilesDir(),mOffDelete.getHandle() + "");
                 }
@@ -175,7 +178,7 @@ public class OfflineUtils {
 
             try {
                 File offlineFile = new File(destination,mOffDelete.getName());
-                Util.deleteFolderAndSubfolders(context,offlineFile);
+                deleteFolderAndSubfolders(context,offlineFile);
             } catch (Exception e) {
                 log("EXCEPTION: removeOffline - file");
             }
@@ -236,7 +239,7 @@ public class OfflineUtils {
                     log("FROM_INCOMING_SHARES");
                     //Find in the filesystem
                     if (Environment.getExternalStorageDirectory() != null) {
-                        offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming() + offlineNode.getPath()+ "/" + node.getName());
+                        offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + offlineNode.getHandleIncoming() + offlineNode.getPath()+ "/" + node.getName());
                         log("offline File INCOMING: " + offlineFile.getAbsolutePath());
                     }
                     else {
@@ -246,7 +249,7 @@ public class OfflineUtils {
                 else if(from==Constants.INBOX_ADAPTER){
 
                     if (Environment.getExternalStorageDirectory() != null) {
-                        offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + offlineNode.getPath()+ "/" + node.getName());
+                        offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/" + offlineNode.getPath()+ "/" + node.getName());
                         log("offline File INCOMING: " + offlineFile.getAbsolutePath());
                     }
                     else {
@@ -257,7 +260,7 @@ public class OfflineUtils {
                     log("NOT INCOMING NEITHER INBOX");
                     //Find in the filesystem
                     if (Environment.getExternalStorageDirectory() != null) {
-                        offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + megaApi.getNodePath(node));
+                        offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + megaApi.getNodePath(node));
                         log("offline File: " + offlineFile.getAbsolutePath());
                     }
                     else {

@@ -61,6 +61,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
 	static final float DOWNSCALE_IMAGES_PX = 2000000f;
@@ -368,7 +371,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						log("DATA connection scaled Bitmap != null");
 						File defaultDownloadLocation = null;
 						if (Environment.getExternalStorageDirectory() != null) {
-							defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
+							defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + chatTempDIR + "/");
 						}
 						else{
 							defaultDownloadLocation = getFilesDir();
@@ -445,7 +448,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				numberVideosPending++;
 				File defaultDownloadLocation = null;
 				if (Environment.getExternalStorageDirectory() != null){
-					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
+					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + chatTempDIR + "/");
 				}
 				else{
 					defaultDownloadLocation = getFilesDir();
@@ -567,7 +570,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		log("after stopSelf");
 
 		try{
-			String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
+			String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ temporalPicDIR;
 			File f = new File(pathSelfie);
 			//Delete recursively all files and folder
 			if (f.exists()) {
@@ -583,7 +586,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		try{
-			String pathVideoDownsampling = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.chatTempDIR;
+			String pathVideoDownsampling = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ chatTempDIR;
 			File fVideo = new File(pathVideoDownsampling);
 			//Delete recursively all files and folder
 			if (fVideo.exists()) {
@@ -933,7 +936,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					ChatUploadService.this.cancel();
 					log("after cancel");
-					String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+					String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR;
 					File f = new File(pathSelfie);
 					//Delete recursively all files and folder
 					if (f.exists()) {
@@ -949,7 +952,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					if (error.getErrorCode() == MegaError.API_OK) {
 						log("Upload OK: " + transfer.getFileName());
 
-						if(Util.isVideoFile(transfer.getPath())){
+						if(isVideoFile(transfer.getPath())){
 							log("Is video!!!");
 
 							File previewDir = PreviewUtils.getPreviewFolder(this);
@@ -1076,7 +1079,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 
 					log("IN Finish: "+transfer.getFileName()+" path: "+transfer.getPath());
-					String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+					String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR;
 					if (transfer.getPath() != null) {
 						if (transfer.getPath().startsWith(pathSelfie)) {
 							File f = new File(transfer.getPath());
@@ -1136,7 +1139,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
 			megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 
-			if(Util.isVideoFile(transfer.getPath())){
+			if(isVideoFile(transfer.getPath())){
 				String pathDownsampled = pendMsg.getVideoDownSampled();
 				if(transfer.getPath().equals(pathDownsampled)){
 					//Delete the local temp video file

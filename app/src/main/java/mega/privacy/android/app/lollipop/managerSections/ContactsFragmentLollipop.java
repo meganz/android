@@ -74,8 +74,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 public class ContactsFragmentLollipop extends Fragment implements MegaRequestListenerInterface, View.OnClickListener{
 

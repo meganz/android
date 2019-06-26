@@ -48,6 +48,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_FILE_INFO;
 
 public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -1344,7 +1345,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 //Find in the filesystem
                 if (Environment.getExternalStorageDirectory() != null) {
                     long handleIncoming = OfflineUtils.findIncomingParentHandle(node, megaApi);
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + Long.toString(handleIncoming) + "/" + MegaApiUtils.createStringTree(node, context));
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + Long.toString(handleIncoming) + "/" + MegaApiUtils.createStringTree(node, context));
                     log("offline File INCOMING: " + destination.getAbsolutePath());
                 } else {
                     destination = context.getFilesDir();
@@ -1354,7 +1355,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             else if(comesFrom==Constants.INBOX_ADAPTER){
                 log("FROM_INBOX");
                 if (Environment.getExternalStorageDirectory() != null) {
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + MegaApiUtils.createStringTree(node, context));
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/" + MegaApiUtils.createStringTree(node, context));
                     log("offline File INBOX: " + destination.getAbsolutePath());
                 } else {
                     destination = context.getFilesDir();
@@ -1365,7 +1366,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 //Find in the filesystem
 
                 if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, context));
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/"+MegaApiUtils.createStringTree(node, context));
                 }
                 else{
                     destination = context.getFilesDir();
@@ -1391,7 +1392,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("ParentHandleIncoming: "+megaNode.getName());
                 }
                 String handleString = Long.toString(result);
-                String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+MegaApiUtils.createStringTree(node, context);
+                String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + handleString + "/"+MegaApiUtils.createStringTree(node, context);
                 log("Not owner path destination: "+destinationPath);
 
                 if (Environment.getExternalStorageDirectory() != null){

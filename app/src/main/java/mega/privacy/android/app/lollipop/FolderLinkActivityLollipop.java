@@ -93,6 +93,9 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener{
 
 	public static ImageView imageDrag;
@@ -161,7 +164,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	MegaNode pN = null;
 	boolean fileLinkFolderLink = false;
 
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath = downloadDIR;
 	public static final int FOLDER_LINK = 2;
 
 	public void activateActionMode(){
@@ -900,7 +903,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 		
 		boolean askMe = true;
-		String downloadLocationDefaultPath = Util.getDownloadLocation(this);
+		String downloadLocationDefaultPath = getDownloadLocation(this);
 			
 		if (askMe){
 
@@ -1789,7 +1792,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 					imageDrag = imageView;
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1882,7 +1885,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					pdfIntent.putExtra("APP", true);
 					pdfIntent.putExtra("adapterType", Constants.FOLDER_LINK_ADAPTER);
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;

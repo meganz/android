@@ -23,8 +23,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 /**
  * Created by mega on 12/01/18.

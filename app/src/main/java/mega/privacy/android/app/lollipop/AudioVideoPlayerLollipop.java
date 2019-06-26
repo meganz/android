@@ -115,7 +115,6 @@ import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
-import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -155,6 +154,8 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface {
@@ -168,9 +169,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     int screenWidth;
     int screenHeight;
     int placeholderCount;
-
-    private final String offLineDIR = mega.privacy.android.app.utils.Util.offlineDIR;
-    private final String oldMKFile = mega.privacy.android.app.utils.Util.oldMKFile;
 
     static AudioVideoPlayerLollipop audioVideoPlayerLollipop;
 
@@ -344,7 +342,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
 
-        downloadLocationDefaultPath = mega.privacy.android.app.utils.Util.getDownloadLocation(this);
+        downloadLocationDefaultPath = getDownloadLocation(this);
 
         draggableView.setViewAnimator(new ExitViewAnimator());
 
@@ -802,7 +800,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         log("isIncomingOffline");
 
                         if (Environment.getExternalStorageDirectory() != null){
-                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
+                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
                             log("offlineDirectory: "+offlineDirectory);
                         }
                         else{
@@ -811,7 +809,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                     else if(checkOffline.getOrigin()==MegaOffline.INBOX){
                         if (Environment.getExternalStorageDirectory() != null){
-                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
+                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
                             log("offlineDirectory: "+offlineDirectory);
                         }
                         else{
@@ -821,7 +819,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     else{
                         log("NOT isIncomingOffline");
                         if (Environment.getExternalStorageDirectory() != null){
-                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + checkOffline.getPath()+checkOffline.getName());
+                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + checkOffline.getPath()+checkOffline.getName());
                         }
                         else{
                             offlineDirectory = getFilesDir();
@@ -3594,7 +3592,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     setTitle(fileName);
 
                     boolean isOnMegaDownloads = false;
-                    String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
                     File f = new File(downloadLocationDefaultPath, file.getName());
                     if(f.exists() && (f.length() == file.getSize())){
                         isOnMegaDownloads = true;
@@ -4317,21 +4315,21 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 else {
                     mediaSourcePlaylist.clear();
                 }
-                downloadLocationDefaultPath = mega.privacy.android.app.utils.Util.getDownloadLocation(getApplicationContext());
+                downloadLocationDefaultPath = getDownloadLocation(getApplicationContext());
                 if (isOffline) {
                     for (int i = 0; i < mediaOffList.size(); i++) {
                         MegaOffline currentNode = mediaOffList.get(i);
                         mSource = null;
                         if (currentNode.getOrigin() == MegaOffline.INCOMING) {
                             String handleString = currentNode.getHandleIncoming();
-                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" + handleString + "/" + currentNode.getPath() + "/" + currentNode.getName());
+                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + handleString + "/" + currentNode.getPath() + "/" + currentNode.getName());
                         }
                         else if (currentNode.getOrigin() == MegaOffline.INBOX) {
                             String handleString = currentNode.getHandleIncoming();
-                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/" + currentNode.getPath() + "/" + currentNode.getName());
+                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/" + currentNode.getPath() + "/" + currentNode.getName());
                         }
                         else {
-                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + currentNode.getPath() + "/" + currentNode.getName());
+                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
                         }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && currentNode.getPath().contains(Environment.getExternalStorageDirectory().getPath())) {
                             mediaUri = FileProvider.getUriForFile(audioVideoPlayerLollipop, "mega.privacy.android.app.providers.fileprovider", mediaFile);
@@ -4385,7 +4383,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         }
                         mSource = null;
                         boolean isOnMegaDownloads = false;
-                        localPath = mega.privacy.android.app.utils.Util.getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
+                        localPath = getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
                         File f = new File(downloadLocationDefaultPath, n.getName());
                         if (f.exists() && (f.length() == n.getSize())) {
                             isOnMegaDownloads = true;

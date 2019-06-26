@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
@@ -32,7 +30,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -68,6 +65,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -505,7 +504,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 			File defaultDownloadLocation = null;
 			if (Environment.getExternalStorageDirectory() != null){
-				defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+				defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + downloadDIR + "/");
 			}
 			else{
 				defaultDownloadLocation = context.getFilesDir();
@@ -724,7 +723,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 				File defaultDownloadLocation = null;
 				if (Environment.getExternalStorageDirectory() != null){
-					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + downloadDIR + "/");
 				}
 				else{
 					defaultDownloadLocation = context.getFilesDir();
@@ -749,7 +748,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				if (prefs.getStorageDownloadLocation() == null){
 					File defaultDownloadLocation = null;
 					if (Environment.getExternalStorageDirectory() != null){
-						defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+						defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + downloadDIR + "/");
 					}
 					else{
 						defaultDownloadLocation = context.getFilesDir();
@@ -774,7 +773,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					if (downloadLocationPath.compareTo("") == 0){
 						File defaultDownloadLocation = null;
 						if (Environment.getExternalStorageDirectory() != null){
-							defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+							defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + downloadDIR + "/");
 						}
 						else{
 							defaultDownloadLocation = context.getFilesDir();

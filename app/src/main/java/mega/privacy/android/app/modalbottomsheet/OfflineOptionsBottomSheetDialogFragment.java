@@ -42,6 +42,8 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+
 public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
@@ -85,7 +87,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             log("Handle of the node offline: "+handle);
             if(handle.equals("0")){
                 //recovery key will have handle as 0 and have to be handled specifically
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
                 nodeOffline = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
             }else{
                 nodeOffline = dbH.findByHandle(handle);
@@ -155,7 +157,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
             //Check if the node is the Master Key file
             if(nodeOffline.getHandle().equals("0")){
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
                 file= new File(path);
                 if(file.exists()){
                     if(file.exists()){
@@ -185,13 +187,13 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 String path=null;
 
                 if(nodeOffline.getOrigin()==MegaOffline.INCOMING){
-                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + nodeOffline.getHandleIncoming() + "/";
+                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + nodeOffline.getHandleIncoming() + "/";
                 }
                 else if(nodeOffline.getOrigin()==MegaOffline.INBOX){
-                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in";
+                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in";
                 }
                 else{
-                    path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
+                    path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR;
                 }
 
                 if (Environment.getExternalStorageDirectory() != null){

@@ -70,7 +70,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -82,6 +81,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener{
 
@@ -137,7 +139,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	CustomizedGridLayoutManager gridLayoutManager;
 
 	boolean allFiles = true;
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath = downloadDIR;
     
     private int placeholderCount;
 
@@ -538,7 +540,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
-		downloadLocationDefaultPath = Util.getDownloadLocation(context);
+		downloadLocationDefaultPath = getDownloadLocation(context);
 		lastPositionStack = new Stack<>();
 
 		if(Util.isChatEnabled()){
@@ -992,7 +994,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					mediaIntent.putExtra("FILENAME", file.getName());
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1092,7 +1094,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					MegaNode file = nodes.get(position);
 
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1192,7 +1194,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;

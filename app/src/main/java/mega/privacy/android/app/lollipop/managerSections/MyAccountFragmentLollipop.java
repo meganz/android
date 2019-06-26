@@ -72,8 +72,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
 	
@@ -360,7 +359,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setMkButtonText(){
 		log("setMkButtonText");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
 		log("Exists MK in: "+path);
 		File file= new File(path);
 		String mkButtonText;
@@ -575,7 +574,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.MK_button:{
 				log("Master Key button");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
 				log("Exists MK in: "+path);
 				File file= new File(path);
 				if(file.exists()){

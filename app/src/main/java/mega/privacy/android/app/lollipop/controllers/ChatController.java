@@ -63,6 +63,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatController {
@@ -1393,7 +1395,7 @@ public class ChatController {
             if (document != null) {
                 document = authorizeNodeIfPreview(document, chatRoom);
                 if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(document, context));
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/"+MegaApiUtils.createStringTree(document, context));
                 }
                 else{
                     destination = context.getFilesDir();
@@ -1516,7 +1518,7 @@ public class ChatController {
         }
 
         boolean askMe = Util.askMe(context);
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation(context);
 
         if (askMe){
             log("askMe");
@@ -1631,7 +1633,7 @@ public class ChatController {
         }
 
         boolean advancedDevices=false;
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation(context);
 
         File defaultPathF = new File(downloadLocationDefaultPath);
         defaultPathF.mkdirs();
@@ -1754,16 +1756,16 @@ public class ChatController {
                 }
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
                     log("ISFILE");
-                    String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+                    String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
                     if(localPath != null){
                         log("localPath != null");
                         
                         try {
                             log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
-                            Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+                            copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
                             
-                            if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
+                            if(isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
 //								MegaNode videoNode = megaApi.getNodeByHandle(tempNode.getNodeHandle());
                                 if (tempNode != null){

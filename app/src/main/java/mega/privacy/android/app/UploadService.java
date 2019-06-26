@@ -51,8 +51,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 /*
  * Service to Upload files
@@ -456,7 +457,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mNotificationManager.cancel(notificationIdForFolderUpload);
         stopSelf();
         log("after stopSelf");
-        String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+        String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR;
         File f = new File(pathSelfie);
         //Delete recursively all files and folder
         if (f.exists()) {
@@ -662,7 +663,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         String logMessage = isFolderTransfer ? "****updateProgressNotificationForFolderUpload: " : "****updateProgressNotificationForFileUpload: ";
         log(logMessage + progressPercent + " " + message);
         String actionString = isOverquota == 0 ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
-        String info = Util.getProgressSize(UploadService.this,inProgress,total);
+        String info = getProgressSize(UploadService.this,inProgress,total);
 
         if(isFolderTransfer){
             notifyProgressNotification(progressPercent,message,info,actionString,notificationIdForFolderUpload,notificationChannelIdForFolderUpload,notificationChannelNameForFolderUpload);
@@ -770,7 +771,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 totalFileUploadsCompleted++;
                 mapProgressFileTransfers.put(transfer.getTag(), transfer);
                 if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-                    String size = Util.getSizeString(transfer.getTotalBytes());
+                    String size = getSizeString(transfer.getTotalBytes());
                     AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
                     dbH.setCompletedTransfer(completedTransfer);
                 }
@@ -782,7 +783,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 releaseLocks();
 				UploadService.this.cancel();
 				log("after cancel");
-				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR;
 				File f = new File(pathSelfie);
 				//Delete recursively all files and folder
 				if (f.isDirectory()) {
@@ -799,7 +800,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     }else{
                         totalFileUploadsCompletedSuccessfully++;
                     }
-					if (Util.isVideoFile(transfer.getPath())) {
+					if (isVideoFile(transfer.getPath())) {
 						log("Is video!!!");
 
 						File previewDir = PreviewUtils.getPreviewFolder(this);
@@ -983,7 +984,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 }
 
 				log("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
-				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR;
 				if (transfer.getPath() != null) {
 					if (transfer.getPath().startsWith(pathSelfie)) {
 						File f = new File(transfer.getPath());

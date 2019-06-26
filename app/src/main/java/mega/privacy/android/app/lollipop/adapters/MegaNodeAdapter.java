@@ -57,6 +57,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
@@ -713,7 +715,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.fileGridIconForFile.setVisibility(View.VISIBLE);
             holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 
-            if (Util.isVideoFile(node.getName())) {
+            if (isVideoFile(node.getName())) {
                 holder.videoInfoLayout.setVisibility(View.VISIBLE);
                 holder.videoDuration.setVisibility(View.GONE);
                 log(node.getName() + " DURATION: " + node.getDuration());

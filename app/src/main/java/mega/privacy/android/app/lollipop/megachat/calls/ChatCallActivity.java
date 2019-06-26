@@ -95,8 +95,7 @@ import nz.mega.sdk.MegaUser;
 
 import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Util.context;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {

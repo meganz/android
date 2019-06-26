@@ -71,6 +71,8 @@ import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+
 
 public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 	
@@ -484,7 +486,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if(!hasSDCard) {
             prefs = dbH.getPreferences();
             if (prefs == null){
-                path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
+                path = new File(Environment.getExternalStorageDirectory().toString() + "/" + downloadDIR);
             }
             else{
                 String lastFolder = prefs.getLastFolderUpload();
@@ -496,14 +498,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                     }
                 }
                 else{
-                    path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
+                    path = new File(Environment.getExternalStorageDirectory().toString() + "/" + downloadDIR);
                 }
                 if (cameraFolderSettings){
                     camSyncLocalPath = prefs.getCamSyncLocalPath();
                 }
             }
             if (path == null) {
-                path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
+                path = new File(Environment.getExternalStorageDirectory().toString() + "/" + downloadDIR);
             }
         } else {
 		    //always pick from SD card root

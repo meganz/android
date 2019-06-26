@@ -88,6 +88,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
 
 	public static int NUMBER_MESSAGES_TO_LOAD = 20;
@@ -575,7 +577,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 									}
 								}
 							}
-							String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+							String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
 							File f = new File(downloadLocationDefaultPath, node.getName());
 							boolean isOnMegaDownloads = false;
 							if(f.exists() && (f.length() == node.getSize())){
@@ -696,7 +698,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 								}
 							}
 
-							String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+							String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
 							File f = new File(downloadLocationDefaultPath, node.getName());
 							boolean isOnMegaDownloads = false;
 							if(f.exists() && (f.length() == node.getSize())){

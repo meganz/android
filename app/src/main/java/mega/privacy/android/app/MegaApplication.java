@@ -94,6 +94,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 
@@ -571,7 +572,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 		EmojiCompat.init(config);
 		// clear the cache files stored in the external cache folder.
-        CacheFolderManager.clearPublicCache(this);
+        clearPublicCache(this);
 
 //		initializeGA();
 		

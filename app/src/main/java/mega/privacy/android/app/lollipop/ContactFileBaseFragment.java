@@ -22,6 +22,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+
 public class ContactFileBaseFragment extends Fragment{
     
     public static int REQUEST_CODE_GET = 1000;
@@ -41,7 +43,7 @@ public class ContactFileBaseFragment extends Fragment{
     protected int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
     protected DatabaseHandler dbH = null;
     protected MegaPreferences prefs = null;
-    protected String downloadLocationDefaultPath = Util.downloadDIR;
+    protected String downloadLocationDefaultPath = downloadDIR;
     protected DisplayMetrics outMetrics;
     
     @Override

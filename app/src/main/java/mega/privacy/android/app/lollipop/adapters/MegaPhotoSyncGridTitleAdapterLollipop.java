@@ -65,6 +65,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle> implements SectionTitleProvider {
 
     private class Media {
@@ -1439,7 +1441,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         if (localPath == null){
             boolean isOnMegaDownloads = false;
-            localPath = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+            localPath = getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
             File f = new File(downloadLocationDefaultPath, file.getName());
             if(f.exists() && (f.length() == file.getSize())){
                 isOnMegaDownloads = true;
@@ -1471,7 +1473,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     }
                     else {
                         boolean isOnMegaDownloads = false;
-                        path = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+                        path = getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
                         File f = new File(downloadLocationDefaultPath, file.getName());
                         if(f.exists() && (f.length() == file.getSize())){
                             isOnMegaDownloads = true;
@@ -1647,7 +1649,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             }
             if(position > 0 && position-1 < temp.nodeHandles.size()){
                 MegaNode n = megaApi.getNodeByHandle(temp.nodeHandles.get(position - 1));
-                if(Util.isVideoFile(n.getName())){
+                if(isVideoFile(n.getName())){
                     return TYPE_ITEM_VIDEO;
                 }
                 else{
