@@ -53,10 +53,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.ContactsHorizontalAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -70,6 +72,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
+import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 
 public class RecentChatsFragmentLollipop extends Fragment implements View.OnClickListener, MegaContactGetter.MegaContactUpdater {
@@ -855,7 +858,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             case R.id.more_contacts_title:
             case R.id.more_contacts:
                 log("to InviteContactActivity");
-                context.startActivity(new Intent(context, InviteContactActivity.class));
+                startActivityForResult(new Intent(context, InviteContactActivity.class), Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 break;
         }
     }
@@ -2126,6 +2129,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     grantedContactPermission = false;
                 }
                 break;
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
+            log("onActivityResult REQUEST_INVITE_CONTACT_FROM_DEVICE OK");
+            ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+            if (contactsData != null) {
+                ContactController cC = new ContactController(context);
+                cC.inviteMultipleContacts(contactsData);
             }
         }
     }

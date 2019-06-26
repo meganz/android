@@ -1755,7 +1755,7 @@
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Click to go back to the call</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Return to the call</string>
 
-    <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list's header">On MEGA</string>
+    <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list's header">Contacts on MEGA</string>
     <string name="contacts_phone" context="When it lists contacts of phone, the title of list's header">Phone contacts</string>
 
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Your account has been suspended due to multiple breaches of MEGA’s Terms of Service. Please check your email inbox.</string>
@@ -2489,6 +2489,7 @@
     <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
 
+    <string name="invite_contact_chooser_title" context="Title of popup when user click 'Share' button on invite contact page">Invite a friend via</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>

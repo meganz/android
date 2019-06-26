@@ -111,6 +111,23 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
     private List<ContactsUtil.LocalContact> rawLocalContacts;
     private String contactLink;
 
+    //work around for android bug - https://issuetracker.google.com/issues/37007605#c10
+    class LinearLayoutManagerWrapper extends LinearLayoutManager {
+
+        LinearLayoutManagerWrapper(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            } catch (IndexOutOfBoundsException e) {
+                log("IndexOutOfBoundsException in RecyclerView happens");
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
@@ -171,7 +188,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
         RelativeLayout scanQRButton = findViewById(R.id.layout_scan_qr);
         scanQRButton.setOnClickListener(this);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManagerWrapper(this);
         recyclerViewList = findViewById(R.id.invite_contact_list);
         recyclerViewList.setClipToPadding(false);
         recyclerViewList.setHasFixedSize(true);
@@ -283,7 +300,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, message);
                 sendIntent.setType("text/plain");
-                startActivity(sendIntent);
+                startActivity(Intent.createChooser(sendIntent, getString(R.string.invite_contact_chooser_title)));
                 break;
             }
         }
