@@ -902,15 +902,15 @@ public final class ChatAdvancedNotificationBuilder {
             int notificationId = (notificationCallId).hashCode();
 
             Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
-            ignoreIntent.putExtra("chatHandleInProgress", chatHandleInProgress);
-            ignoreIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
+            ignoreIntent.putExtra(Constants.CHAT_ID_IN_PROGRESS, chatHandleInProgress);
+            ignoreIntent.putExtra(Constants.CHAT_ID_TO_ANSWER, callToAnswer.getChatid());
             ignoreIntent.setAction(CallNotificationIntentService.IGNORE);
             int requestCodeIgnore = notificationId + 1;
             PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore, ignoreIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
             Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
-            answerIntent.putExtra("chatHandleInProgress", chatHandleInProgress);
-            answerIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
+            answerIntent.putExtra(Constants.CHAT_ID_IN_PROGRESS, chatHandleInProgress);
+            answerIntent.putExtra(Constants.CHAT_ID_TO_ANSWER, callToAnswer.getChatid());
             answerIntent.setAction(CallNotificationIntentService.ANSWER);
             int requestCodeAnswer = notificationId + 2;
             PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer /* Request code */, answerIntent,  PendingIntent.FLAG_CANCEL_CURRENT);

@@ -1848,8 +1848,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		MegaApplication.setShowPinScreen(false);
 		MegaApplication.setOpenCallChatId(call.getChatid());
 		Intent i = new Intent(this, ChatCallActivity.class);
-		i.putExtra("chatHandle", call.getChatid());
-		i.putExtra("callId", call.getId());
+		i.putExtra(Constants.CHAT_ID, call.getChatid());
+		i.putExtra(Constants.CALL_ID, call.getId());
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(i);
 

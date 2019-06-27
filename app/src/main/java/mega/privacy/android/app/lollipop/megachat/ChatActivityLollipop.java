@@ -1735,7 +1735,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 MegaApplication.setShowPinScreen(false);
                 Intent intent = new Intent(this, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("chatHandle", idChat);
+                intent.putExtra(Constants.CHAT_ID, idChat);
                 startActivity(intent);
                 return;
             }

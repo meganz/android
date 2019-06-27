@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -47,8 +48,8 @@ public class CallNotificationIntentService extends IntentService implements Mega
     protected void onHandleIntent(Intent intent) {
         log("onHandleIntent");
 
-        chatHandleToAnswer = intent.getExtras().getLong("chatHandleToAnswer", -1);
-        chatHandleInProgress = intent.getExtras().getLong("chatHandleInProgress", -1);
+        chatHandleToAnswer = intent.getExtras().getLong(Constants.CHAT_ID_TO_ANSWER, -1);
+        chatHandleInProgress = intent.getExtras().getLong(Constants.CHAT_ID_IN_PROGRESS, -1);
 
         clearIncomingCallNotification(chatHandleToAnswer);
 
@@ -109,8 +110,8 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 log("onRequestFinish:TYPE_ANSWER_CHAT_CALL:OK");
                 MegaApplication.setShowPinScreen(false);
                 Intent i = new Intent(this, ChatCallActivity.class);
-                i.putExtra("chatHandle", chatHandleToAnswer);
-                i.setAction("SECOND_CALL");
+                i.putExtra(Constants.CHAT_ID, chatHandleToAnswer);
+                i.setAction(Constants.SECOND_CALL);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 this.startActivity(i);
                 stopSelf();

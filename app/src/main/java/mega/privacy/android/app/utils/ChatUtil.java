@@ -88,8 +88,8 @@ public class ChatUtil {
         MegaApplication.setShowPinScreen(false);
         Intent intent = new Intent(context, ChatCallActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra("chatHandle", chatId);
-        intent.putExtra("callId", call.getId());
+        intent.putExtra(Constants.CHAT_ID, chatId);
+        intent.putExtra(Constants.CALL_ID, call.getId());
         context.startActivity(intent);
 
     }

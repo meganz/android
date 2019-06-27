@@ -907,7 +907,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		if (chatRoomTo != null) {
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
 				Intent i = new Intent(this, ChatCallActivity.class);
-				i.putExtra("chatHandle", chatRoomTo.getChatId());
+				i.putExtra(Constants.CHAT_ID, chatRoomTo.getChatId());
 				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
 			} else {
