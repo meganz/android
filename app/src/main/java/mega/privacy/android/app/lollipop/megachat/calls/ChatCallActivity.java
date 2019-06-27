@@ -2540,6 +2540,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             //I'M NOT IN THE CALL
             log("updatePeers:incoming call: peersBeforeCall");
             clearArrayList(peersOnCall);
+
             isNecessaryCreateAdapter = true;
             linearParticipants.setVisibility(View.GONE);
 
@@ -2554,10 +2555,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 //1-6 users
 
                 destroyAdapter(true);
+
                 avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
+
                 bigRecyclerView.setAdapter(null);
                 bigRecyclerView.setVisibility(View.GONE);
                 bigRecyclerViewLayout.setVisibility(View.GONE);
+
+                parentBigCameraGroupCall.setOnClickListener(null);
                 parentBigCameraGroupCall.setVisibility(View.GONE);
 
                 recyclerViewLayout.setVisibility(View.VISIBLE);
@@ -2579,22 +2584,24 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     recyclerView.setAdapter(null);
                     adapterGrid = new GroupCallAdapter(this, recyclerView, peersBeforeCall, chatId, true);
                     recyclerView.setAdapter(adapterGrid);
-                    return;
+                }else{
+                    log("notifyDataSetChanged");
+                    adapterGrid.notifyDataSetChanged();
                 }
-
-                log("notifyDataSetChanged");
-                adapterGrid.notifyDataSetChanged();
 
             } else {
                 log("updatePeers:peersBeforeCall LIST ");
                 //7 + users
 
                 destroyAdapter(false);
+
                 recyclerView.setAdapter(null);
                 recyclerView.setVisibility(View.GONE);
                 recyclerViewLayout.setVisibility(View.GONE);
 
+                parentBigCameraGroupCall.setOnClickListener(this);
                 parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+
                 bigRecyclerViewLayout.setVisibility(View.VISIBLE);
                 bigRecyclerView.setVisibility(View.VISIBLE);
 
@@ -2625,11 +2632,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 //1-6 users
 
                 destroyAdapter(true);
+
                 removeBigFragment();
+
                 avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
                 bigRecyclerView.setAdapter(null);
                 bigRecyclerView.setVisibility(View.GONE);
                 bigRecyclerViewLayout.setVisibility(View.GONE);
+
+                parentBigCameraGroupCall.setOnClickListener(null);
                 parentBigCameraGroupCall.setVisibility(View.GONE);
 
                 recyclerViewLayout.setVisibility(View.VISIBLE);
@@ -2652,20 +2663,19 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     recyclerView.setAdapter(null);
                     adapterGrid = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, true);
                     recyclerView.setAdapter(adapterGrid);
-                    return;
-                }
 
-                if (isNecessaryCreateAdapter) {
-                    log("create adapter(2º)");
-                    destroyAdapter(false);
-                    recyclerView.setAdapter(null);
-                    adapterGrid = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, true);
-                    recyclerView.setAdapter(adapterGrid);
-                    return;
+                }else{
+                    if (isNecessaryCreateAdapter) {
+                        log("create adapter(2º)");
+                        destroyAdapter(false);
+                        recyclerView.setAdapter(null);
+                        adapterGrid = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, true);
+                        recyclerView.setAdapter(adapterGrid);
+                    }else{
+                        log(" notifyDataSetChanged");
+                        adapterGrid.notifyDataSetChanged();
+                    }
                 }
-
-                log(" notifyDataSetChanged");
-                adapterGrid.notifyDataSetChanged();
 
             } else {
                 log("updatePeers:peersOnCall LIST ");
@@ -2675,7 +2685,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 recyclerView.setVisibility(View.GONE);
                 recyclerViewLayout.setVisibility(View.GONE);
 
+                parentBigCameraGroupCall.setOnClickListener(this);
                 parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+
                 bigRecyclerViewLayout.setVisibility(View.VISIBLE);
                 bigRecyclerView.setVisibility(View.VISIBLE);
 
@@ -2705,12 +2717,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void resetPeers() {
         destroyAdapters();
+
         recyclerView.setAdapter(null);
         recyclerView.setVisibility(View.GONE);
         recyclerViewLayout.setVisibility(View.GONE);
+
         bigRecyclerView.setAdapter(null);
         bigRecyclerView.setVisibility(View.GONE);
         bigRecyclerViewLayout.setVisibility(View.GONE);
+
+        parentBigCameraGroupCall.setOnClickListener(null);
         parentBigCameraGroupCall.setVisibility(View.GONE);
     }
 
