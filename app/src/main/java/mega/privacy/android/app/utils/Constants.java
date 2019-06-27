@@ -353,6 +353,4 @@ public class Constants {
 	public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
 	public static final String SECOND_CALL = "SECOND_CALL";
 
-
-
 }
