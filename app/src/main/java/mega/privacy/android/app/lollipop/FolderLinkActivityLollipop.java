@@ -93,7 +93,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener{
@@ -164,7 +163,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	MegaNode pN = null;
 	boolean fileLinkFolderLink = false;
 
-	String downloadLocationDefaultPath = downloadDIR;
+	String downloadLocationDefaultPath;
 	public static final int FOLDER_LINK = 2;
 
 	public void activateActionMode(){
@@ -432,19 +431,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 
 		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+		downloadLocationDefaultPath = getDownloadLocation(this);
 
 		lastPositionStack = new Stack<>();
 		
@@ -790,20 +777,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 		
 		boolean askMe = true;
-		String downloadLocationDefaultPath = "";
-		prefs = dbH.getPreferences();		
-		if (prefs != null){
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							askMe = false;
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}		
+		prefs = dbH.getPreferences();
+		downloadLocationDefaultPath = getDownloadLocation(this);
 			
 		if (askMe){
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

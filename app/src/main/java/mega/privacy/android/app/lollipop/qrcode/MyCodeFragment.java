@@ -61,6 +61,7 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 /**
  * Created by mega on 22/01/18.

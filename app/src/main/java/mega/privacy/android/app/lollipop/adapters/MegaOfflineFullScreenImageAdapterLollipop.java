@@ -44,6 +44,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.OfflineUtils.offlineDIR;
 
 
 public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener{

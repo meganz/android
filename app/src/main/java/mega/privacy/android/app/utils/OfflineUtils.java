@@ -25,8 +25,11 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineUtils {
+
+    public static final String offlineDIR = File.separator + "MEGA" + File.separator + "MEGA Offline";
 
     static DatabaseHandler dbH;
     static MegaApiAndroid megaApi;
@@ -293,8 +296,6 @@ public class OfflineUtils {
         }
     }
 
-
-
     public static long findIncomingParentHandle(MegaNode nodeToFind, MegaApiAndroid megaApi){
         log("findIncomingParentHandle");
 
@@ -311,6 +312,70 @@ public class OfflineUtils {
             }
             log("findIncomingParentHandle B: "+nodeToFind.getHandle());
             return result;
+        }
+    }
+
+    public static File buildOfflineFile(Context context, MegaOffline offlineNode) {
+        String finalPath;
+
+        switch (offlineNode.getOrigin()) {
+            case MegaOffline.INCOMING: {
+                finalPath = File.separator + offlineNode.getHandleIncoming() + File.separator + offlineNode.getPath() + File.separator + offlineNode.getName();
+                break;
+            }
+            case MegaOffline.INBOX: {
+                finalPath = File.separator + "in" + File.separator + offlineNode.getPath() + File.separator + offlineNode.getName();
+                break;
+            }
+            default: {
+                finalPath = offlineNode.getPath() + File.separator + offlineNode.getName();
+            }
+        }
+
+        return getCacheFile(context, offlineDIR, finalPath);
+    }
+
+    public static File buildOfflineFolder(Context context, MegaApiAndroid megaApi, int adapterType, MegaNode node) {
+        String finalPath;
+
+        switch (adapterType) {
+            case Constants.INCOMING_SHARES_ADAPTER: {
+                finalPath = offlineDIR + File.separator + OfflineUtils.findIncomingParentHandle(node, megaApi) + File.separator + MegaApiUtils.createStringTree(node, context);
+                break;
+            }
+            case Constants.INBOX_ADAPTER: {
+                finalPath = offlineDIR + File.separator + "in" + File.separator + MegaApiUtils.createStringTree(node, context);
+                break;
+            }
+            default: {
+                finalPath = offlineDIR + File.separator + MegaApiUtils.createStringTree(node, context);
+            }
+        }
+
+        return getCacheFolder(context, finalPath);
+    }
+
+    public static String getOfflineSize(Context context){
+        log("getOfflineSize");
+        File offline = getCacheFolder(context, offlineDIR);
+        long size = 0;
+        if(isFileAvailable(offline)){
+            size = getDirSize(offline);
+
+            String sizeOffline = getSizeString(size);
+            return sizeOffline;
+        }
+        else{
+            return getSizeString(0);
+        }
+    }
+
+    public static void clearOffline(Context context){
+        log("clearOffline");
+        File offline = getCacheFolder(context, offlineDIR);
+        if(isFileAvailable(offline)){
+            cleanDir(offline);
+            offline.delete();
         }
     }
 

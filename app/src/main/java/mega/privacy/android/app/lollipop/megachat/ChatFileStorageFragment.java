@@ -36,6 +36,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
 
 public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
@@ -59,7 +60,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     public ActionMode actionMode;
     RelativeLayout rlfragment;
     ArrayList<Integer> posSelected = new ArrayList<>();
-    String downloadLocationDefaultPath = downloadDIR;
+    String downloadLocationDefaultPath;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -77,19 +78,9 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
         prefs = dbH.getPreferences();
-        if (prefs != null){
-            log("prefs != null");
-            if (prefs.getStorageAskAlways() != null){
-                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-                    log("askMe==false");
-                    if (prefs.getStorageDownloadLocation() != null){
-                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-                        }
-                    }
-                }
-            }
-        }
+
+        downloadLocationDefaultPath = getDownloadLocation(context);
+
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
     }

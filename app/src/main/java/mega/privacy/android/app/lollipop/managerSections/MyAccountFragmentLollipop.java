@@ -73,6 +73,7 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
 	

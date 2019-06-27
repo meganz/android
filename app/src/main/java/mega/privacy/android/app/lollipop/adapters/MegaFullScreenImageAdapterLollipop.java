@@ -57,7 +57,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
 	
@@ -78,7 +78,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	MegaNode fileLink = null;
 	boolean isFolderLink = false;
 
-	String downloadLocationDefaultPath = downloadDIR;
+	String downloadLocationDefaultPath;
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 
@@ -322,19 +322,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+
+		downloadLocationDefaultPath = getDownloadLocation(context);
 	}
 
 	@Override

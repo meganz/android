@@ -15,6 +15,7 @@ import mega.privacy.android.app.PreviewCache;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 
 public class PreviewUtils {

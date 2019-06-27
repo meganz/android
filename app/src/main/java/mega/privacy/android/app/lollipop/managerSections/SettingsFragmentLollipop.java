@@ -67,6 +67,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.downloadDIR;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {

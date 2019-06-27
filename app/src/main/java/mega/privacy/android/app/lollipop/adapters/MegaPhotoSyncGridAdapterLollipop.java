@@ -57,7 +57,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid> {
@@ -100,7 +99,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
-	String downloadLocationDefaultPath = downloadDIR;
+	String downloadLocationDefaultPath;
 	String defaultPath;
 	
 	private ActionMode actionMode;
@@ -1033,19 +1032,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+		downloadLocationDefaultPath = getDownloadLocation(context);
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();

@@ -34,6 +34,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.OfflineUtils.offlineDIR;
+
 /**
  * Created by mega on 24/04/18.
  */

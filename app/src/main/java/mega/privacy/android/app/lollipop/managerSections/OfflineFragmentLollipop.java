@@ -74,6 +74,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.rKFile;
+import static mega.privacy.android.app.utils.OfflineUtils.offlineDIR;
 
 public class OfflineFragmentLollipop extends Fragment{
 

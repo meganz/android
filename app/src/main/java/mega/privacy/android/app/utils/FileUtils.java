@@ -18,11 +18,21 @@ import java.io.OutputStreamWriter;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.temporalPicDIR;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 public class FileUtils {
+
+    public static final String downloadDIR = File.separator + "MEGA" + File.separator + "MEGA Downloads";
+
+    public static final String logDIR = File.separator + "MEGA" + File.separator + "MEGA Logs";
+
+    public static final String oldMKFile = File.separator + "MEGA" + File.separator + "MEGAMasterKey.txt";
+
+    public static final String rKFile = File.separator + "MEGA" + File.separator + "MEGARecoveryKey.txt";
 
     public static void cleanDir(File dir) {
         File[] files = dir.listFiles();
@@ -330,6 +340,30 @@ public class FileUtils {
         else{
             return false;
         }
+    }
+
+    public static String getDownloadLocation (Context context) {
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+        MegaPreferences prefs = dbH.getPreferences();
+
+        if (prefs != null){
+            log("prefs != null");
+            if (prefs.getStorageAskAlways() != null){
+                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                    log("askMe==false");
+                    if (prefs.getStorageDownloadLocation() != null){
+                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                            return prefs.getStorageDownloadLocation();
+                        }
+                    }
+                }
+            }
+        }
+        return downloadDIR;
+    }
+
+    public static boolean isFileAvailable(File file) {
+        return file != null && file.exists();
     }
 
     public static void log(String message) {

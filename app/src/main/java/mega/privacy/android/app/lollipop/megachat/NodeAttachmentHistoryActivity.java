@@ -561,22 +561,9 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 							mediaIntent.putExtra("msgId", m.getMsgId());
 							mediaIntent.putExtra("chatId", chatId);
 
-							String downloadLocationDefaultPath = null;
 							mediaIntent.putExtra("FILENAME", node.getName());
 							MegaPreferences prefs = dbH.getPreferences();
-							if (prefs != null){
-								log("prefs != null");
-								if (prefs.getStorageAskAlways() != null){
-									if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-										log("askMe==false");
-										if (prefs.getStorageDownloadLocation() != null){
-											if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-												downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-											}
-										}
-									}
-								}
-							}
+							String downloadLocationDefaultPath = getDownloadLocation(this);
 							String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
 							File f = new File(downloadLocationDefaultPath, node.getName());
 							boolean isOnMegaDownloads = false;
@@ -681,22 +668,9 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 							pdfIntent.putExtra("msgId", m.getMsgId());
 							pdfIntent.putExtra("chatId", chatId);
 
-							String downloadLocationDefaultPath = null;
 							pdfIntent.putExtra("FILENAME", node.getName());
 							MegaPreferences prefs = dbH.getPreferences();
-							if (prefs != null){
-								log("prefs != null");
-								if (prefs.getStorageAskAlways() != null){
-									if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-										log("askMe==false");
-										if (prefs.getStorageDownloadLocation() != null){
-											if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-												downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-											}
-										}
-									}
-								}
-							}
+							String downloadLocationDefaultPath = getDownloadLocation(this);
 
 							String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
 							File f = new File(downloadLocationDefaultPath, node.getName());

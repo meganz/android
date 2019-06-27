@@ -55,7 +55,7 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 
 public class ZipBrowserActivityLollipop extends PinActivityLollipop{
@@ -421,19 +421,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
-		String downloadLocationDefaultPath = downloadDIR;
-		prefs = dbH.getPreferences();		
-		if (prefs != null){
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}		
+		String downloadLocationDefaultPath = getDownloadLocation(this);
 		
 		String absolutePath= downloadLocationDefaultPath+"/"+currentPath;
 		if(!folderzipped){

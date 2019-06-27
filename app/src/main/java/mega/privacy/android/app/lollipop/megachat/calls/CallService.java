@@ -40,6 +40,7 @@ import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.context;
 
 public class CallService extends Service implements MegaChatCallListenerInterface {
