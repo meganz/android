@@ -883,7 +883,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     /*Group call: Profile peer selected*/
-    private void setProfilePeerSelected(long peerId, String fullName, String peerEmail) {
+    public void setProfilePeerSelected(long peerId, String fullName, String peerEmail) {
         log("setProfilePeerSelected:peerId: " + peerId);
 
         if (peerId == megaChatApi.getMyUserHandle()) {
@@ -2280,7 +2280,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    private void remoteCameraClick() {
+    public void remoteCameraClick() {
         log("remoteCameraClick");
         if (getCall() == null || callChat.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS)
             return;
@@ -2295,7 +2295,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         showInitialFABConfiguration();
     }
 
-    private void itemClicked(InfoPeerGroupCall peer) {
+    public void itemClicked(InfoPeerGroupCall peer) {
 
         log("itemClicked:userSelected: -> (peerId = " + peer.getPeerId() + ", clientId = " + peer.getClientId() + ")");
         if (peerSelected.getPeerId() == peer.getPeerId() && peerSelected.getClientId() == peer.getClientId()) {
@@ -2931,7 +2931,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         return name;
     }
 
-    private void updateNonContactName(long peerid, String peerEmail) {
+    public void updateNonContactName(long peerid, String peerEmail) {
         log("updateNonContactName: Email found it");
         if (!peersBeforeCall.isEmpty()) {
             for (InfoPeerGroupCall peer : peersBeforeCall) {
@@ -3123,7 +3123,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         mutateOwnCallLayout.setVisibility(option);
     }
 
-    private void refreshOwnMicro() {
+    public void refreshOwnMicro() {
         log("refreshOwnMicro");
 
         if (chat.isGroup() || getCall() == null) return;
