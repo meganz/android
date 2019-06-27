@@ -337,10 +337,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout fileStorageLayout;
     private ChatFileStorageFragment fileStorageF;
 
-    private ArrayList<AndroidMegaChatMessage> messages;
-    private ArrayList<AndroidMegaChatMessage> bufferMessages;
-    private ArrayList<AndroidMegaChatMessage> bufferSending;
-    private ArrayList<MessageVoiceClip> messagesPlaying;
+    private ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+    private ArrayList<AndroidMegaChatMessage> bufferMessages = new ArrayList<>();
+    private ArrayList<AndroidMegaChatMessage> bufferSending = new ArrayList<>();
+    private ArrayList<MessageVoiceClip> messagesPlaying =  new ArrayList<>();
 
     RelativeLayout messageJumpLayout;
     TextView messageJumpText;
@@ -566,10 +566,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         emptyImageView = findViewById(R.id.empty_image_view_chat);
 
         updateNavigationToolbarIcon();
-
-        messages = new ArrayList<>();
-        bufferMessages = new ArrayList<>();
-        bufferSending = new ArrayList<>();
 
         fragmentContainer = findViewById(R.id.fragment_container_chat);
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
@@ -4370,7 +4366,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         if (location != null) {
                                             float latitude = location.getLatitude();
                                             float longitude = location.getLongitude();
-                                            List<Address> addresses = getAddresses(this, latitude, longitude, 1);
+                                            List<Address> addresses = getAddresses(this, latitude, longitude);
                                             if (addresses != null && !addresses.isEmpty()) {
                                                 String address = addresses.get(0).getAddressLine(0);
                                                 if (address != null) {

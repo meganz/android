@@ -77,7 +77,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     private static Geocoder geocoder;
     public final int SNAPSHOT_SIZE = 750;
     private final int MAX_SIZE = 45000;
-    private boolean isGPSEnabled = false;
     private DisplayMetrics outMetrics;
     private Toolbar tB;
     private ActionBar aB;
@@ -105,13 +104,21 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     private Marker fullScreenMarker;
     private MapAddress fullScreenAddress;
 
-    public static List<Address> getAddresses(Context context, double latitude, double longitude, int maxResults) {
+    /**
+     * This method gets an address from the coordinates passed like parameters
+     *
+     * @param context   from which the action is done
+     * @param latitude  is the latitude of a coordinate
+     * @param longitude is the longitude of a coordinate
+     * @return
+     */
+    public static List<Address> getAddresses(Context context, double latitude, double longitude) {
         if (geocoder == null) {
             geocoder = new Geocoder(context, Locale.getDefault());
         }
 
         try {
-            return geocoder.getFromLocation(latitude, longitude, maxResults);
+            return geocoder.getFromLocation(latitude, longitude, 1);
         } catch (IOException e) {
             log("Exception trying to get an address from a latitude and a longitude");
             e.printStackTrace();
@@ -195,25 +202,74 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             mapFragment.getMapAsync(this);
         }
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            sendCurrentLocationLayout.setVisibility(View.GONE);
-            sendCurrentLocationLandscapeLayout.setVisibility(View.VISIBLE);
-            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) mapLayout.getLayoutParams();
-            params1.bottomMargin = Util.px2dp(45, outMetrics);
-            mapLayout.setLayoutParams(params1);
-        }
-
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         geocoder = new Geocoder(this, Locale.getDefault());
 
         fullscreenIconMarker = drawableBitmap(Util.mutateIconSecondary(this, R.drawable.ic_send_location, R.color.dark_primary_color_secondary));
     }
 
+    /**
+     * This method determines if the view of the send current
+     * location option has to be shown or hide
+     */
+    private void setCurrentLocationVisibility() {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mapLayout.getLayoutParams();
+
+        if (isGPSEnabled()) {
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                sendCurrentLocationLayout.setVisibility(View.GONE);
+                sendCurrentLocationLandscapeLayout.setVisibility(View.VISIBLE);
+                params.bottomMargin = Util.px2dp(45, outMetrics);
+            } else {
+                sendCurrentLocationLayout.setVisibility(View.VISIBLE);
+                sendCurrentLocationLandscapeLayout.setVisibility(View.GONE);
+                params.bottomMargin = Util.px2dp(72, outMetrics);
+            }
+            mapLayout.setLayoutParams(params);
+            return;
+        } else {
+            sendCurrentLocationLayout.setVisibility(View.GONE);
+            sendCurrentLocationLandscapeLayout.setVisibility(View.GONE);
+            params.bottomMargin = 0;
+        }
+
+        mapLayout.setLayoutParams(params);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        disableLocationUpdates();
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        disableLocationUpdates();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        enableLocationUpdates();
+    }
+
+    /**
+     * This method disable the updates of the Location Manager service
+     */
+    private void disableLocationUpdates() {
         if (locationManager != null) locationManager.removeUpdates(this);
+    }
+
+    /**
+     * This method enable the updates of the Location Manager service
+     */
+    private void enableLocationUpdates() {
+        if (locationManager == null) {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        }
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
     }
 
     @Override
@@ -222,6 +278,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         outState.putBoolean(IS_FULL_SCREEN_ENABLED, isFullScreenEnabled);
     }
 
+    /**
+     * This methods sets the correspondent icon of the full screen
+     * mode button
+     */
     private void setLocationFabDrawable() {
         Drawable setFullScreenFabDrawable;
         if (isFullScreenEnabled) {
@@ -233,12 +293,12 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         setFullScreenFab.setImageDrawable(setFullScreenFabDrawable);
     }
 
+    /**
+     * This method queries if the GPS of the devide is enabled
+     *
+     * @return if the GPS is enabled or not
+     */
     private boolean isGPSEnabled() {
-        if (locationManager == null) {
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        }
-
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
@@ -247,28 +307,31 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         log("onMapReady");
         mMap = googleMap;
 
-        isGPSEnabled = isGPSEnabled();
+        enableLocationUpdates();
 
-        if (!isGPSEnabled) {
+        if (!isGPSEnabled()) {
             showEnableLocationDialog();
         } else {
             initMap();
         }
+
+        setCurrentLocationVisibility();
     }
 
+    /**
+     * This method sets all the necessary map views
+     */
     private void initMap() {
 
         if (mMap == null) {
             return;
         }
 
-        isGPSEnabled = isGPSEnabled();
-
         if (isFullScreenEnabled) {
             progressBar.setVisibility(View.GONE);
         }
 
-        if (isGPSEnabled) {
+        if (isGPSEnabled()) {
             if (myLocationFab.getVisibility() != View.VISIBLE) {
                 myLocationFab.setVisibility(View.VISIBLE);
             }
@@ -295,7 +358,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
 
-        if (isGPSEnabled) {
+        if (isGPSEnabled()) {
             if (isFullScreenEnabled) {
                 setMyLocation(false);
             } else {
@@ -305,6 +368,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         setFullScreen();
     }
 
+    /**
+     * This method shows an alert dialog advertising the device
+     * does not have the GPS enabled, and permit he proceed to enable it
+     */
     private void showEnableLocationDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.gps_disabled)
@@ -329,6 +396,11 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         alert.show();
     }
 
+    /**
+     * This method sets the approximate current location
+     *
+     * @param animateCamera determines if has to have an animation or not while the camera of the map is moving
+     */
     private void setMyLocation(final boolean animateCamera) {
         log("setMyLocation");
         if (mMap == null) {
@@ -346,7 +418,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             public void onSuccess(Location location) {
                 if (location != null) {
                     log("getLastLocation() onSuccess");
-                    addresses = getAddresses(getApplicationContext(), location.getLatitude(), location.getLongitude(), 1);
+                    addresses = getAddresses(getApplicationContext(), location.getLatitude(), location.getLongitude());
                     if (addresses != null) {
                         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                             currentAddress = new MapAddress(new LatLng(location.getLatitude(), location.getLongitude()), getString(R.string.current_location_label), addresses.get(0).getAddressLine(0));
@@ -381,6 +453,12 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         });
     }
 
+    /**
+     * This method creates a Bitmap from a drawable
+     *
+     * @param drawable from which the Bitmap will be created
+     * @return the Bitmap created
+     */
     private Bitmap drawableBitmap(Drawable drawable) {
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
 
@@ -390,6 +468,13 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         return bitmap;
     }
 
+    /**
+     * This method establish the results for create a message and send it to a chat.
+     * It creates a view of a map that represents the location selected to send to
+     * a chat and does a snapshot
+     *
+     * @param location address to send to chat
+     */
     private void setActivityResult(final MapAddress location) {
 
         if (location == null) return;
@@ -503,6 +588,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     }
 
+    /**
+     * This method sets the attributes of the full screen marker
+     * depending on if the mode is enabled or not
+     */
     private void getMarkerInfo() {
         if (mMap == null) {
             return;
@@ -511,7 +600,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         LatLng latLng = mMap.getCameraPosition().target;
         if (latLng == null) return;
 
-        addresses = getAddresses(getApplicationContext(), latLng.latitude, latLng.longitude, 1);
+        addresses = getAddresses(getApplicationContext(), latLng.latitude, latLng.longitude);
         String title = getString(R.string.title_marker_maps);
 
         if (addresses != null && addresses.size() > 0) {
@@ -530,7 +619,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                     fullscreenMarkerIcon.animate().translationY(0).setDuration(100L).withEndAction(new Runnable() {
                         @Override
                         public void run() {
-                            fullscreenMarkerIcon.setVisibility(View.INVISIBLE);
                             fullScreenMarker.setVisible(true);
                             fullScreenMarker.showInfoWindow();
                         }
@@ -554,6 +642,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         }
     }
 
+    /**
+     * This method establishes the corresponding view depending on
+     * if the full screen mode is enabled or not
+     */
     private void setFullScreen() {
         setLocationFabDrawable();
 
@@ -622,6 +714,12 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         }
     }
 
+    /**
+     * This method starts an animation of the full screen marker
+     * with a duration received by the duration parameter
+     *
+     * @param duration length of the animation
+     */
     private void setAnimatingMarker(long duration) {
         if (isFullScreenEnabled && fullScreenMarker != null) {
             fullScreenMarker.setVisible(false);
@@ -649,11 +747,8 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     @Override
     public void onProviderEnabled(String provider) {
         log("LocationListener onProviderEnabled");
-        if (isGPSEnabled) return;
 
-        if (mMap == null) {
-            return;
-        }
+        if (!provider.equals(LocationManager.GPS_PROVIDER) || mMap == null) return;
 
         progressBar.setVisibility(View.VISIBLE);
         mMap.clear();
@@ -662,17 +757,21 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             @Override
             public void run() {
                 isFullScreenEnabled = false;
+                setCurrentLocationVisibility();
                 initMap();
             }
         }, 3000);
+        return;
     }
 
     @Override
     public void onProviderDisabled(String provider) {
         log("LocationListener onProviderDisabled");
-        if (!isGPSEnabled || mMap == null) return;
+
+        if (!provider.equals(LocationManager.GPS_PROVIDER) || mMap == null) return;
 
         mMap.clear();
+        setCurrentLocationVisibility();
         initMap();
     }
 }
