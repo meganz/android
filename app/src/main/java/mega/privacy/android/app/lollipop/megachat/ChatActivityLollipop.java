@@ -156,6 +156,7 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener {
 
@@ -2398,9 +2399,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
                     Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
-                    intent.putExtra("editingMessage", editingMessage);
+                    intent.putExtra(EDITING_MESSAGE, editingMessage);
                     if (messageToEdit != null) {
-                        intent.putExtra("msg_id", messageToEdit.getMsgId());
+                        intent.putExtra(MSG_ID, messageToEdit.getMsgId());
                     }
                     startActivityForResult(intent, Constants.REQUEST_CODE_SEND_LOCATION);
                 }
@@ -2665,26 +2666,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if (intent == null) {
                 return;
             }
-            byte[] byteArray = intent.getByteArrayExtra("snapshot");
+            byte[] byteArray = intent.getByteArrayExtra(SNAPSHOT);
             //
             if (byteArray == null) return;
             Bitmap snapshot = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
             String encodedSnapshot = Base64.encodeToString(byteArray, Base64.DEFAULT);
             log("info bitmap: "+snapshot.getByteCount()+" "+snapshot.getWidth()+" "+snapshot.getHeight());
 
-            double latitude = intent.getDoubleExtra("latitude", 0);
-            double longitude = intent.getDoubleExtra("longitude", 0);
-            editingMessage = intent.getBooleanExtra("editingMessage", false);
+            double latitude = intent.getDoubleExtra(LATITUDE, 0);
+            double longitude = intent.getDoubleExtra(LONGITUDE, 0);
+            editingMessage = intent.getBooleanExtra(EDITING_MESSAGE, false);
             if (editingMessage) {
-                long msgId = intent.getLongExtra("msg_id", -1);
+                long msgId = intent.getLongExtra(MSG_ID, -1);
                 if (msgId != -1) {
                     messageToEdit = megaChatApi.getMessage(idChat, msgId);
                 }
             }
-            String locationName = intent.getStringExtra("name");
-            String locationAddress = intent.getStringExtra("address");
-
-            log("Send location [latitude]: " + latitude + " [longitude]: " + longitude + " [name]: " + locationName + " [address]: " + locationAddress);
 
             float longLongitude = (float)longitude;
 
@@ -3270,9 +3267,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else {
             Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
-            intent.putExtra("editingMessage", editingMessage);
+            intent.putExtra(EDITING_MESSAGE, editingMessage);
             if (messageToEdit != null) {
-                intent.putExtra("msg_id", messageToEdit.getMsgId());
+                intent.putExtra(MSG_ID, messageToEdit.getMsgId());
             }
             startActivityForResult(intent, Constants.REQUEST_CODE_SEND_LOCATION);
         }
@@ -4373,7 +4370,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         if (location != null) {
                                             float latitude = location.getLatitude();
                                             float longitude = location.getLongitude();
-                                            List<Address> addresses = MapsActivity.getAddresses(this, latitude, longitude, 1);
+                                            List<Address> addresses = getAddresses(this, latitude, longitude, 1);
                                             if (addresses != null && !addresses.isEmpty()) {
                                                 String address = addresses.get(0).getAddressLine(0);
                                                 if (address != null) {

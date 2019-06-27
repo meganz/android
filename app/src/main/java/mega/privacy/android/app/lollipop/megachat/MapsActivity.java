@@ -65,6 +65,14 @@ import mega.privacy.android.app.utils.Util;
 @SuppressLint("MissingPermission")
 public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, View.OnClickListener, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener, LocationListener {
 
+    public static final String SNAPSHOT = "snapshot";
+    public static final String LATITUDE = "latitude";
+    public static final String LONGITUDE = "longitude";
+    public static final String EDITING_MESSAGE = "editingMessage";
+    public static final String MSG_ID = "msg_id";
+
+    private final String IS_FULL_SCREEN_ENABLED = "isFullScreenEnabled";
+
     public static final float DEFAULT_ZOOM = 18f;
     private static Geocoder geocoder;
     public final int SNAPSHOT_SIZE = 750;
@@ -101,19 +109,26 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         if (geocoder == null) {
             geocoder = new Geocoder(context, Locale.getDefault());
         }
-        try {
-            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, maxResults);
-            if (addresses != null) {
-                return addresses;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return null;
+        try {
+            return geocoder.getFromLocation(latitude, longitude, maxResults);
+        } catch (IOException e) {
+            log("Exception trying to get an address from a latitude and a longitude");
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    private static LatLngBounds getLatLngBounds(int radius, LatLng latLng) {
+    /**
+     * This method obtains an area circle represented by an LatLngBounds object,
+     * which center is represented by some coordinates and his distance from the center
+     * represented by an integer received as parameters
+     *
+     * @param radius distance from the center of the circle in metres
+     * @param latLng latitude and longitude that will be the center of the circle
+     * @return the circle represented by a LatLngBounds object
+     */
+    private LatLngBounds getLatLngBounds(int radius, LatLng latLng) {
         double distanceFromCenterToCorner = radius * Math.sqrt(2);
         LatLng southwestCorner = SphericalUtil.computeOffset(latLng, distanceFromCenterToCorner, 225.0);
         LatLng northeastCorner = SphericalUtil.computeOffset(latLng, distanceFromCenterToCorner, 45.0);
@@ -132,7 +147,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
         if (savedInstanceState != null) {
-            isFullScreenEnabled = savedInstanceState.getBoolean("isFullScreenEnabled", false);
+            isFullScreenEnabled = savedInstanceState.getBoolean(IS_FULL_SCREEN_ENABLED, false);
         } else {
             isFullScreenEnabled = false;
         }
@@ -190,6 +205,8 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         geocoder = new Geocoder(this, Locale.getDefault());
+
+        fullscreenIconMarker = drawableBitmap(Util.mutateIconSecondary(this, R.drawable.ic_send_location, R.color.dark_primary_color_secondary));
     }
 
     @Override
@@ -202,14 +219,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("isFullScreenEnabled", isFullScreenEnabled);
+        outState.putBoolean(IS_FULL_SCREEN_ENABLED, isFullScreenEnabled);
     }
 
     private void setLocationFabDrawable() {
-        if (setFullScreenFab == null) {
-            setFullScreenFab = findViewById(R.id.set_fullscreen_fab);
-        }
-
         Drawable setFullScreenFabDrawable;
         if (isFullScreenEnabled) {
             setFullScreenFabDrawable = (ContextCompat.getDrawable(this, R.drawable.ic_fullscreen_exit_location));
@@ -218,7 +231,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         }
         setFullScreenFabDrawable.setAlpha(143);
         setFullScreenFab.setImageDrawable(setFullScreenFabDrawable);
-        setFullScreenFab.setOnClickListener(this);
     }
 
     private boolean isGPSEnabled() {
@@ -327,6 +339,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             @Override
             public void onFailure(@NonNull Exception e) {
                 log("getLastLocation() onFailure: " + e.getMessage());
+                showSnackbar(findViewById(R.id.parent_layout_maps), getString(R.string.general_error));
             }
         }).addOnSuccessListener(this, new OnSuccessListener<Location>() {
             @Override
@@ -346,6 +359,8 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                                 textToShow = textToShow.replace("[A]", "<font color=\'#8c8c8c\'>");
                                 textToShow = textToShow.replace("[/A]", "</font>");
                             } catch (Exception e) {
+                                e.printStackTrace();
+                                log("Exception changing the format of a string");
                             }
                             Spanned result = null;
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -438,13 +453,13 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                         log("The bitmaps has " + byteArray.length + " final size with quality: " + quality);
 
                         Intent intent = new Intent();
-                        intent.putExtra("snapshot", byteArray);
-                        intent.putExtra("latitude", latitude);
-                        intent.putExtra("longitude", longitude);
+                        intent.putExtra(SNAPSHOT, byteArray);
+                        intent.putExtra(LATITUDE, latitude);
+                        intent.putExtra(LONGITUDE, longitude);
 
                         if (getIntent() != null) {
-                            intent.putExtra("editingMessage", getIntent().getBooleanExtra("editingMessage", false));
-                            intent.putExtra("msg_id", getIntent().getLongExtra("msg_id", -1));
+                            intent.putExtra(EDITING_MESSAGE, getIntent().getBooleanExtra(EDITING_MESSAGE, false));
+                            intent.putExtra(MSG_ID, getIntent().getLongExtra(MSG_ID, -1));
                         }
                         setResult(RESULT_OK, intent);
                         finish();
@@ -498,9 +513,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
         addresses = getAddresses(getApplicationContext(), latLng.latitude, latLng.longitude, 1);
         String title = getString(R.string.title_marker_maps);
-        if (fullscreenIconMarker == null) {
-            fullscreenIconMarker = drawableBitmap(Util.mutateIconSecondary(this, R.drawable.ic_send_location, R.color.dark_primary_color_secondary));
-        }
+
         if (addresses != null && addresses.size() > 0) {
             String address = addresses.get(0).getAddressLine(0);
             fullScreenAddress = new MapAddress(latLng, null, address);
