@@ -1610,7 +1610,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("alterUri");
 	    try {
 
-	    	String sourceLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + advancesDevicesDIR + "/"+fileName;
+	    	File tempFolder = getCacheFolder(getApplicationContext(), TEMPORAL_FOLDER);
+	    	if (!isFileAvailable(tempFolder)) return;
+
+	    	String sourceLocation = tempFolder.getAbsolutePath() + File.separator +fileName;
 
 	    	log("Gonna copy: "+sourceLocation);
 

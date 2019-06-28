@@ -2076,10 +2076,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
     private void createFile(String name, String data, MegaNode parentNode, boolean isURL){
 		File file;
 		if (isURL){
-			file = createTemporalURLFile(name, data);
+			file = createTemporalURLFile(this, name, data);
 		}
 		else {
-			file = createTemporalTextFile(name, data);
+			file = createTemporalTextFile(this, name, data);
 		}
 		if(file!=null){
 			showSnackbar(getString(R.string.upload_began));

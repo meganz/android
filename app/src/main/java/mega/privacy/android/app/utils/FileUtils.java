@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 
@@ -25,6 +24,8 @@ import mega.privacy.android.app.MimeTypeList;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 public class FileUtils {
+
+    public static final String mainDIR = File.separator + "MEGA";
 
     public static final String downloadDIR = File.separator + "MEGA" + File.separator + "MEGA Downloads";
 
@@ -85,48 +86,20 @@ public class FileUtils {
         }
     }
 
-    public static File createTemporalTextFile(String name, String data){
-
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR + "/";
-        File tempDownDirectory = new File(path);
-        if(!tempDownDirectory.exists()){
-            tempDownDirectory.mkdirs();
-        }
-
+    public static File createTemporalTextFile(Context context, String name, String data){
         String fileName = name+".txt";
-        final File file = new File(path, fileName);
 
-        try
-        {
-            file.createNewFile();
-            FileOutputStream fOut = new FileOutputStream(file);
-            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.append(data);
-
-            myOutWriter.close();
-
-            fOut.flush();
-            fOut.close();
-
-            return file;
-        }
-        catch (IOException e)
-        {
-            log("File write failed: " + e.toString());
-            return null;
-        }
+        return createTemporalFile(context, fileName, data);
     }
 
-    public static File createTemporalURLFile(String name, String data){
-
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR + "/";
-        File tempDownDirectory = new File(path);
-        if(!tempDownDirectory.exists()){
-            tempDownDirectory.mkdirs();
-        }
-
+    public static File createTemporalURLFile(Context context, String name, String data){
         String fileName = name+".url";
-        final File file = new File(path, fileName);
+
+        return createTemporalFile(context, fileName, data);
+    }
+
+    public static File createTemporalFile(Context context, String fileName, String data) {
+        final File file = buildTempFile(context, fileName);
 
         try
         {

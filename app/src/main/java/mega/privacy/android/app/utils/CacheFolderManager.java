@@ -1,11 +1,10 @@
 package mega.privacy.android.app.utils;
 
 import android.content.Context;
-import java.io.File;
+import android.os.Environment;
 
-import mega.privacy.android.app.MegaOffline;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
+import java.io.File;
+import java.io.IOException;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.getSizeString;
@@ -20,15 +19,17 @@ public final class CacheFolderManager {
 
     public static final String QR_FOLDER = "qrMEGA";
 
-    public static final String temporalPicDIR = "appTempMEGA";
+    public static final String TEMPORAL_FOLDER = "tempMEGA";
 
-    public static final String profilePicDIR = "profileImagesMEGA";
+    public static final String CHAT_TEMPORAL_FOLDER = "chatTempMEGA";
 
-    public static final String advancesDevicesDIR = "tempMEGA";
+    public static final String oldTemporalPicDIR = "MEGA/MEGA AppTemp";
 
-    public static final String chatTempDIR = "chatTempMEGA";
+    public static final String oldProfilePicDIR = "MEGA/MEGA Profile Images";
 
-    public static final String mainDIR = File.separator + "MEGA";
+    public static final String oldAdvancesDevicesDIR = "MEGA/MEGA Temp";
+
+    public static final String oldChatTempDIR = "MEGA/MEGA Temp/Chat";
 
     public static File getCacheFolder(Context context, String folderName) {
         log("create cache folder: " + folderName);
@@ -51,6 +52,7 @@ public final class CacheFolderManager {
         createCacheFolder(context, PREVIEW_FOLDER);
         createCacheFolder(context, AVATAR_FOLDER);
         createCacheFolder(context, QR_FOLDER);
+        removeOldTempFolders(context);
     }
 
     public static void clearPublicCache(final Context context) {
@@ -86,12 +88,19 @@ public final class CacheFolderManager {
         return getCacheFile(context, AVATAR_FOLDER, fileName);
     }
 
+    public static File buildTempFile(Context context, String fileName) {
+        return getCacheFile(context, TEMPORAL_FOLDER, fileName);
+    }
+
+    public static File buildChatTempFile(Context context, String fileName) {
+        return getCacheFile(context, CHAT_TEMPORAL_FOLDER, fileName);
+    }
+
     public static File getCacheFile(Context context, String folderName, String fileName) {
         File parent = getCacheFolder(context, folderName);
-        if (parent != null) {
-            return new File(parent, fileName);
-        }
-        return null;
+        if (!isFileAvailable(parent)) return null;
+
+        return new File(parent, fileName);
     }
 
     public static String getCacheSize(Context context){
@@ -114,6 +123,37 @@ public final class CacheFolderManager {
 
         cleanDir(cacheIntDir);
         cleanDir(cacheExtDir);
+    }
+
+    public static void deleteCacheFolderIfEmpty (Context context, String folderName) {
+        File folder = getCacheFolder(context, folderName);
+        if (isFileAvailable(folder) && folder.list().length <= 0) {
+            folder.delete();
+        }
+    }
+
+    public static void removeOldTempFolders(final Context context) {
+        new Thread() {
+            @Override
+            public void run() {
+                removeOldTempFolder(context, oldTemporalPicDIR);
+                removeOldTempFolder(context, oldProfilePicDIR);
+                removeOldTempFolder(context, oldAdvancesDevicesDIR);
+                removeOldTempFolder(context, oldChatTempDIR);
+            }
+        }.start();
+    }
+
+    private static void removeOldTempFolder(Context context, String folderName) {
+        File oldTempFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + folderName);
+        if (!isFileAvailable(oldTempFolder)) return;
+
+        try {
+            deleteFolderAndSubfolders(context, oldTempFolder);
+        } catch (IOException e) {
+            log("Exception deleting" + oldTempFolder.getName() + "directory");
+            e.printStackTrace();
+        }
     }
 
     public static void log(String message) {

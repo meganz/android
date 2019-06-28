@@ -64,7 +64,6 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -11090,12 +11089,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void takePicture(){
 		log("takePicture");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ temporalPicDIR;
-        File newFolder = new File(path);
-        newFolder.mkdirs();
-
-        String file = path + "/picture.jpg";
-        File newFile = new File(file);
+        File newFile = buildTempFile(this, "picture.jpg");
         try {
         	newFile.createNewFile();
         } catch (IOException e) {}
@@ -11144,13 +11138,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void takeProfilePicture(){
-		log("takeProfilePicture");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ profilePicDIR;
-		File newFolder = new File(path);
-		newFolder.mkdirs();
-
-		String file = path + "/picture.jpg";
-		File newFile = new File(file);
+		File newFile = buildTempFile(this, "picture.jpg");
 		try {
 			newFile.createNewFile();
 		} catch (IOException e) {}
@@ -13572,12 +13560,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				Intent service = new Intent(this, DownloadService.class);
 				service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
 				service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + advancesDevicesDIR + "/";
-				File tempDownDirectory = new File(path);
-				if(!tempDownDirectory.exists()){
-					tempDownDirectory.mkdirs();
-				}
-				service.putExtra(DownloadService.EXTRA_PATH, path);
+				File tempFolder = getCacheFolder(this, TEMPORAL_FOLDER);
+				if (!isFileAvailable(tempFolder)) {
+				    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
+				    return;
+                }
+				service.putExtra(DownloadService.EXTRA_PATH, tempFolder.getAbsolutePath());
 				startService(service);
 			}
 		}
@@ -13965,17 +13953,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
 			log("TAKE_PHOTO_CODE");
 			if(resultCode == Activity.RESULT_OK){
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ temporalPicDIR + "/picture.jpg";
-				File imgFile = new File(filePath);
+				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
+				if (!isFileAvailable(imgFile)) return;
 
 				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
 				log("Taken picture Name: "+name);
-				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ temporalPicDIR + "/"+name;
-				log("----NEW Name: "+newPath);
-				File newFile = new File(newPath);
+				File newFile = buildTempFile(this, name);
 				imgFile.renameTo(newFile);
 
-				uploadTakePicture(newPath);
+				uploadTakePicture(newFile.getAbsolutePath());
 			}
 			else{
 				log("TAKE_PHOTO_CODE--->ERROR!");
@@ -13987,8 +13973,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(resultCode == Activity.RESULT_OK){
 
 				String myEmail =  megaApi.getMyUser().getEmail();
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ profilePicDIR + "/picture.jpg";
-				File imgFile = new File(filePath);
+				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
+				if (!isFileAvailable(imgFile)) return;
 
                 File qrFile = buildQrFile(this,myEmail + "QRcode.jpg");
                 File newFile = buildAvatarFile(this,myEmail + "Temp.jpg");
@@ -15196,7 +15182,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	private void createFile(String name, String data, MegaNode parentNode){
 
-		File file = createTemporalTextFile(name, data);
+		File file = createTemporalTextFile(this, name, data);
 		if(file!=null){
 			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_began), -1);
 

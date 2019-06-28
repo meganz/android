@@ -504,20 +504,10 @@ public class AccountController implements View.OnClickListener{
         File cacheDir = context.getCacheDir();
         removeFolder(context, cacheDir);
 
-        File temporalPicDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR);
-        removeFolder(context, temporalPicDir);
-
-        File profilePicDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + profilePicDIR);
-        removeFolder(context, profilePicDir);
-
         File logDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR);
         removeFolder(context, logDir);
 
-        File advancesDevicesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + advancesDevicesDIR);
-        removeFolder(context, advancesDevicesDir);
-
-        File chatTempDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + chatTempDIR);
-        removeFolder(context, chatTempDir);
+        removeOldTempFolders(context);
 
         final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
         final File fMKOld = new File(pathOldMK);

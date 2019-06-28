@@ -14,7 +14,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
@@ -457,16 +456,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mNotificationManager.cancel(notificationIdForFolderUpload);
         stopSelf();
         log("after stopSelf");
-        String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR;
-        File f = new File(pathSelfie);
-        //Delete recursively all files and folder
-        if (f.exists()) {
-            if (f.isDirectory()) {
-                if (f.list().length <= 0) {
-                    f.delete();
-                }
-            }
-        }
+        //Delete recursively all files and folder-??????
+        deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
 	}
 
     private void notifyNotification(String notificationTitle,String size,int notificationId,String channelId,String channelName) {
@@ -783,14 +774,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 releaseLocks();
 				UploadService.this.cancel();
 				log("after cancel");
-				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR;
-				File f = new File(pathSelfie);
-				//Delete recursively all files and folder
-				if (f.isDirectory()) {
-					if(f.list().length<=0){
-						f.delete();
-					}
-				}
+				//Delete recursively all files and folder-??????
+				deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
 
 			} else {
 				if (error.getErrorCode() == MegaError.API_OK) {
@@ -983,15 +968,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     localFile.delete();
                 }
 
+                File tempPic = getCacheFolder(getApplicationContext(), TEMPORAL_FOLDER);
 				log("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
-				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + temporalPicDIR;
-				if (transfer.getPath() != null) {
-					if (transfer.getPath().startsWith(pathSelfie)) {
+				if (isFileAvailable(tempPic) && transfer.getPath() != null) {
+					if (transfer.getPath().startsWith(tempPic.getAbsolutePath())) {
 						File f = new File(transfer.getPath());
 						f.delete();
 					}
 				} else {
-					log("transfer.getPath() is NULL");
+					log("transfer.getPath() is NULL or temporal folder unavailable");
 				}
 
 				if (transfersCopy.isEmpty() && totalFileUploadsCompleted==totalFileUploads && transfersCount == 0) {

@@ -2701,12 +2701,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				Intent service = new Intent(this, DownloadService.class);
 				service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
 				service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + advancesDevicesDIR + "/";
-				File tempDownDirectory = new File(path);
-				if(!tempDownDirectory.exists()){
-					tempDownDirectory.mkdirs();
-				}
-				service.putExtra(DownloadService.EXTRA_PATH, path);
+				File tempFolder = getCacheFolder(this, TEMPORAL_FOLDER);
+				if (!isFileAvailable(tempFolder)) {
+				    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
+				    return;
+                }
+				service.putExtra(DownloadService.EXTRA_PATH, tempFolder.getAbsolutePath());
 				service.putExtra("fromMV", true);
 				service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
 				startService(service);
