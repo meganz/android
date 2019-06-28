@@ -8,8 +8,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 241
-        versionName "3.6.3 (241)"
+        versionCode 242
+        versionName "3.6.3 (242)"
         multiDexEnabled true
     }
 
