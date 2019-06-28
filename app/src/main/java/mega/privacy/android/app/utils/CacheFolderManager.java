@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 
 public final class CacheFolderManager {
@@ -33,17 +34,22 @@ public final class CacheFolderManager {
 
     public static File getCacheFolder(Context context, String folderName) {
         log("create cache folder: " + folderName);
-        File cacheFolder = new File(context.getCacheDir(), folderName);
+        File cacheFolder;
+        if (folderName.equals(CHAT_TEMPORAL_FOLDER)) {
+            cacheFolder = new File(context.getFilesDir(), folderName);
+        }
+        else {
+            cacheFolder = new File(context.getCacheDir(), folderName);
+        }
+
         if (cacheFolder == null) return null;
 
-        if (cacheFolder.exists()) {
+        if (cacheFolder.exists()) return cacheFolder;
+
+        if (cacheFolder.mkdir()) {
             return cacheFolder;
         } else {
-            if (cacheFolder.mkdir()) {
-                return cacheFolder;
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 
@@ -140,12 +146,23 @@ public final class CacheFolderManager {
                 removeOldTempFolder(context, oldProfilePicDIR);
                 removeOldTempFolder(context, oldAdvancesDevicesDIR);
                 removeOldTempFolder(context, oldChatTempDIR);
+                File oldOfflineFolder = getOldTempFolder(oldOfflineDIR);
+                if (isFileAvailable(oldOfflineFolder)) {
+                    try {
+                        copyFolder(getOldTempFolder(oldOfflineDIR), getOfflineFolder(context, offlineDIR));
+                    } catch (IOException e) {
+                        log("Exception trying to copy old offline folder into the new location");
+                        e.printStackTrace();
+                    } finally {
+                        removeOldTempFolder(context, oldOfflineDIR);
+                    }
+                }
             }
         }.start();
     }
 
     private static void removeOldTempFolder(Context context, String folderName) {
-        File oldTempFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + folderName);
+        File oldTempFolder = getOldTempFolder(folderName);
         if (!isFileAvailable(oldTempFolder)) return;
 
         try {
@@ -154,6 +171,10 @@ public final class CacheFolderManager {
             log("Exception deleting" + oldTempFolder.getName() + "directory");
             e.printStackTrace();
         }
+    }
+
+    private static File getOldTempFolder(String folderName) {
+        return new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + folderName);
     }
 
     public static void log(String message) {

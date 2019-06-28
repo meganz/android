@@ -188,28 +188,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 separatorRK.setVisibility(View.GONE);
 
                 log("Set node info");
-                file = buildOfflineFile(context, nodeOffline);
-                if (!isFileAvailable(file)) return;
-//                String path=null;
-//
-//                if(nodeOffline.getOrigin()==MegaOffline.INCOMING){
-//                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + CacheFolderManager.offlineDIR + "/" + nodeOffline.getHandleIncoming() + "/";
-//                }
-//                else if(nodeOffline.getOrigin()==MegaOffline.INBOX){
-//                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + CacheFolderManager.offlineDIR + "/in";
-//                }
-//                else{
-//                    path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + CacheFolderManager.offlineDIR;
-//                }
-//
-//                if (Environment.getExternalStorageDirectory() != null){
-//                    String finalPath = path + nodeOffline.getPath()+nodeOffline.getName();
-//                    file = new File(finalPath);
-//                    log("Path to find file: "+finalPath);
-//                }
-//                else{
-//                    file = context.getFilesDir();
-//                }
+                file = getOfflineFile(context, nodeOffline);
+                if (file == null) return;
 
                 int folders=0;
                 int files=0;

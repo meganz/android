@@ -68,7 +68,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.OfflineUtils.offlineDIR;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 /*
  * Background service to download files
@@ -1679,8 +1679,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			nodesToDB.add(document);
 		}
 
-        String inboxPath = offlineDIR+"/in/";
-        if(path.contains(inboxPath)){
+        if(path.contains(offlineInboxDIR)){
             insertDB(nodesToDB, true);
         }
         else{

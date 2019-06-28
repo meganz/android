@@ -13,6 +13,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
@@ -337,6 +339,36 @@ public class FileUtils {
 
     public static boolean isFileAvailable(File file) {
         return file != null && file.exists();
+    }
+
+    public static void copyFolder(File source, File destination) throws IOException {
+
+        if (source.isDirectory()) {
+            if (!destination.exists() && !destination.mkdirs()) {
+                throw new IOException("Cannot create dir " + destination.getAbsolutePath());
+            }
+
+            String[] children = source.list();
+            for (int i = 0; i < children.length; i++) {
+                copyFolder(new File(source, children[i]), new File(destination, children[i]));
+            }
+        } else {
+            File directory = destination.getParentFile();
+            if (directory != null && !directory.exists() && !directory.mkdirs()) {
+                throw new IOException("Cannot create dir " + directory.getAbsolutePath());
+            }
+
+            InputStream in = new FileInputStream(source);
+            OutputStream out = new FileOutputStream(destination);
+
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+        }
     }
 
     public static void log(String message) {

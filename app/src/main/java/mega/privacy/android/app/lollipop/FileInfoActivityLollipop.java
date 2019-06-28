@@ -114,7 +114,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.OfflineUtils.offlineDIR;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 
 @SuppressLint("NewApi")

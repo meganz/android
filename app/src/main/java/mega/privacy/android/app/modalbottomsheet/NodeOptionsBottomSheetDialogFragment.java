@@ -1343,84 +1343,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         File offlineFile = null;
 
         if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
-//            if (comesFrom == Constants.INCOMING_SHARES_ADAPTER) {
-//                log("FROM_INCOMING_SHARES");
-//                //Find in the filesystem
-//                if (Environment.getExternalStorageDirectory() != null) {
-//                    long handleIncoming = OfflineUtils.findIncomingParentHandle(node, megaApi);
-//                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + CacheFolderManager.offlineDIR + "/" + Long.toString(handleIncoming) + "/" + MegaApiUtils.createStringTree(node, context));
-//                    log("offline File INCOMING: " + destination.getAbsolutePath());
-//                } else {
-//                    destination = context.getFilesDir();
-//                }
-//
-//            }
-//            else if(comesFrom==Constants.INBOX_ADAPTER){
-//                log("FROM_INBOX");
-//                if (Environment.getExternalStorageDirectory() != null) {
-//                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + CacheFolderManager.offlineDIR + "/in/" + MegaApiUtils.createStringTree(node, context));
-//                    log("offline File INBOX: " + destination.getAbsolutePath());
-//                } else {
-//                    destination = context.getFilesDir();
-//                }
-//            }
-//            else {
-//                log("NOT INCOMING NOT INBOX");
-//                //Find in the filesystem
-//
-//                if (Environment.getExternalStorageDirectory() != null){
-//                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + CacheFolderManager.offlineDIR + "/"+MegaApiUtils.createStringTree(node, context));
-//                }
-//                else{
-//                    destination = context.getFilesDir();
-//                }
-//            }
-//
-//            log("Path destination: "+destination);
-//
-//            if (destination.exists() && destination.isDirectory()){
-//                File offlineFile = new File(destination, node.getName());
-//                if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //context means that is already available offline
-//                    return;
-//                }
-//            }
             destination = buildOfflineFolder(context, megaApi, comesFrom, node);
         }
         else{
-//            long result = -1;
-//            result=OfflineUtils.findIncomingParentHandle(node, megaApi);
-//            log("IncomingParentHandle: "+result);
-//            if(result!=-1){
-//                MegaNode megaNode = megaApi.getNodeByHandle(result);
-//                if(megaNode!=null){
-//                    log("ParentHandleIncoming: "+megaNode.getName());
-//                }
-//                String handleString = Long.toString(result);
-//                String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + CacheFolderManager.offlineDIR + "/" + handleString + "/"+MegaApiUtils.createStringTree(node, context);
-//                log("Not owner path destination: "+destinationPath);
-//
-//                if (Environment.getExternalStorageDirectory() != null){
-//                    destination = new File(destinationPath);
-//                }
-//                else{
-//                    destination = context.getFilesDir();
-//                }
-//
-//                if (destination.exists() && destination.isDirectory()){
-//                    File offlineFile = new File(destination, node.getName());
-//                    if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-//                        return;
-//                    }
-//                }
-//            }
-//            else{
-//                log("result=findIncomingParentHandle NOT result!");
-//            }
             destination = buildOfflineFolder(context, megaApi, Constants.INCOMING_SHARES_ADAPTER, node);
         }
 
         if (isFileAvailable(destination)) {
-            offlineFile = getCacheFile(context, destination.getAbsolutePath(), node.getName());
+            offlineFile = new File(destination, node.getName());
             if (isFileAvailable(offlineFile)) {
                 return;
             }
