@@ -1229,7 +1229,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     videoFAB.setOnTouchListener(null);
                     videoFAB.setOnClickListener(this);
                     stopAudioSignals();
-
                     showInitialFABConfiguration();
                     updateSubTitle();
                     updateSubtitleNumberOfVideos();
@@ -1334,7 +1333,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             }
                         }
                     }
-
+                    updateSubTitle();
                     updateRemoteAV(userPeerId, userClientId);
                     updateLocalAV();
 
