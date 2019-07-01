@@ -588,7 +588,7 @@ public class ChatController {
                 return builder.toString();
             } else {
                 log("Participant privilege change!");
-                log("Message type PRIVILEGE CHANGE: " + message.getContent());
+                log("Message type PRIVILEGE CHANGE - Message ID: " + message.getMsgId());
 
                 String fullNameTitle = getFullName(message.getHandleOfAction(), chatRoom);
 
@@ -707,7 +707,7 @@ public class ChatController {
                     builder.append(result);
                     return builder.toString();
                 }else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
-                    log("Message type TITLE CHANGE: " + message.getContent());
+                    log("Message type TITLE CHANGE - Message ID: " + message.getMsgId());
 
                     String messageContent = message.getContent();
                     String textToShow = String.format(context.getString(R.string.non_format_change_title_messages), megaChatApi.getMyFullname(), messageContent);
@@ -896,7 +896,7 @@ public class ChatController {
                     return builder.toString();
 
                 } else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
-                    log("Message type CHANGE TITLE " + message.getContent());
+                    log("Message type CHANGE TITLE - Message ID: " + message.getMsgId());
 
                     String messageContent = message.getContent();
 
@@ -1021,7 +1021,7 @@ public class ChatController {
                 }
                 else{
                     log("Type message: " + message.getType());
-                    log("Content: " + message.getContent());
+                    log("Message ID: " + message.getMsgId());
                     return "";
                 }
             }
