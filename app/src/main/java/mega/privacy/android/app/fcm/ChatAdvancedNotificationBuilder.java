@@ -475,7 +475,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         MegaChatMessage lastMsg = unreadMessageList.get(0);
         if(lastMsg!=null){
-            log("Last message ts: "+lastMsg.getTimestamp());
+            log("Last message ts: " + lastMsg.getTimestamp());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notificationBuilderO.setWhen(lastMsg.getTimestamp()*1000);
             }
