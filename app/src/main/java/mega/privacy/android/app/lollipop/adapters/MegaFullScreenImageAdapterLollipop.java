@@ -246,8 +246,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			else if (param == 2){
 				MegaNode node = megaApi.getNodeByHandle(handle);
 				pendingFullImages.add(handle);
-				log("document.name: " +  node.getName() + "_handle: " + node.getHandle());
-				log("destination.getabsolutepath: " + destination.getAbsolutePath());
+				log("Node handle: " + node.getHandle());
 				String previewFolder = CacheFolderManager.getCacheFolder(context, CacheFolderManager.PREVIEW_FOLDER).getAbsolutePath() + File.separator;
 				megaApi.startDownload(node, previewFolder, megaFullScreenImageAdapter);
 			}
