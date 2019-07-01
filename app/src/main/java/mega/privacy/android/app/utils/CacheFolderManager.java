@@ -67,7 +67,12 @@ public final class CacheFolderManager {
             public void run() {
                 File dir = context.getExternalCacheDir();
                 if (dir != null) {
-                    cleanDir(dir);
+                    try {
+                        deleteFolderAndSubfolders(context, dir);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        log("IOException deleting external cache");
+                    }
                 }
             }
         }.start();
@@ -125,10 +130,15 @@ public final class CacheFolderManager {
     public static void clearCache(Context context){
         log("clearCache");
         File cacheIntDir = context.getCacheDir();
-        File cacheExtDir = context.getExternalCacheDir();
 
-        cleanDir(cacheIntDir);
-        cleanDir(cacheExtDir);
+        try {
+            deleteFolderAndSubfolders(context, cacheIntDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+            log("Exception deleting private cache");
+        }
+
+        clearPublicCache(context);
     }
 
     public static void deleteCacheFolderIfEmpty (Context context, String folderName) {

@@ -1394,17 +1394,11 @@ public class ChatController {
             MegaNode document = nodeList.get(i);
             if (document != null) {
                 document = authorizeNodeIfPreview(document, chatRoom);
-                if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/"+MegaApiUtils.createStringTree(document, context));
-                }
-                else{
-                    destination = context.getFilesDir();
-                }
-
+                destination = getOfflineFile(context, Constants.FROM_OTHERS, document, true, null);
                 destination.mkdirs();
 
                 log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
-                if (destination.exists() && destination.isDirectory()){
+                if (isFileAvailable(destination) && destination.isDirectory()){
 
                     File offlineFile = new File(destination, document.getName());
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline

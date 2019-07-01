@@ -47,9 +47,8 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.rKFile;
-import static mega.privacy.android.app.utils.OfflineUtils.offlineDIR;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
 
 public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener {
@@ -646,26 +645,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 //			return;
 //		}
 
-		String path=null;
 		
-		if(currentNode.getOrigin()==MegaOffline.INCOMING){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
-		}
-		else if(currentNode.getOrigin()==MegaOffline.INBOX){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/";
-		}
-		else{
-			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR;
-		}	
-		
-		File currentFile = null;
-		if (Environment.getExternalStorageDirectory() != null){
-			currentFile = new File(path + currentNode.getPath()+currentNode.getName());
-		}
-		else{
-			currentFile = context.getFilesDir();
-		}
-		
+		File currentFile = getOfflineFile(context, currentNode);
+
 		holder.currentPath = currentFile.getAbsolutePath();
 		holder.currentHandle = currentNode.getHandle();
 
@@ -823,25 +805,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			return;
 		}
 		
-		String path=null;
-		
-		if(currentNode.getOrigin()==MegaOffline.INCOMING){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
-		}
-		else if(currentNode.getOrigin()==MegaOffline.INBOX){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/";
-		}
-		else{
-			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR;
-		}	
-		
-		File currentFile = null;
-		if (Environment.getExternalStorageDirectory() != null){
-			currentFile = new File(path + currentNode.getPath()+currentNode.getName());
-		}
-		else{
-			currentFile = context.getFilesDir();
-		}
+		File currentFile = getOfflineFile(context, currentNode);
 		
 		holder.currentPath = currentFile.getAbsolutePath();
 		holder.currentHandle = currentNode.getHandle();

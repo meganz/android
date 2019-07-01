@@ -115,6 +115,7 @@ import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFolder;
 import static mega.privacy.android.app.utils.OfflineUtils.offlineDIR;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
@@ -2701,12 +2702,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				Intent service = new Intent(this, DownloadService.class);
 				service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
 				service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
-				File tempFolder = getCacheFolder(this, TEMPORAL_FOLDER);
-				if (!isFileAvailable(tempFolder)) {
-				    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
-				    return;
-                }
-				service.putExtra(DownloadService.EXTRA_PATH, tempFolder.getAbsolutePath());
+				String path = getOfflineFolder(context, TEMPORAL_FOLDER).getAbsolutePath();
+				service.putExtra(DownloadService.EXTRA_PATH, path);
 				service.putExtra("fromMV", true);
 				service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
 				startService(service);

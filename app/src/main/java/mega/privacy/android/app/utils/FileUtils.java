@@ -37,24 +37,6 @@ public class FileUtils {
 
     public static final String rKFile = File.separator + "MEGA" + File.separator + "MEGARecoveryKey.txt";
 
-    public static void cleanDir(File dir) {
-        File[] files = dir.listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-
-                if (file.isFile()) {
-                    file.delete();
-                } else {
-                    cleanDir(file);
-                    file.delete();
-                }
-            }
-        } else {
-            log("Files is NULL");
-        }
-    }
-
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
 
         if (f == null) return;
@@ -144,7 +126,7 @@ public class FileUtils {
             }
             return size;
         }
-        log("Files is NULL");
+        log("Dir size: "+size);
         return size;
     }
 

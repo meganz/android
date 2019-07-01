@@ -795,8 +795,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 for(int i=0; i<offList.size();i++){
                     MegaOffline checkOffline = offList.get(i);
-                    File offlineDirectory = getOfflineFile(audioVideoPlayerLollipop, checkOffline);
-                    if (!isFileAvailable(offlineDirectory)) {
+                    File offlineFile = getOfflineFile(audioVideoPlayerLollipop, checkOffline);
+                    if (!isFileAvailable(offlineFile)) {
                         offList.remove(i);
                         i--;
                     }

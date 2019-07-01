@@ -702,8 +702,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		for(int i=0; i<mOffList.size();i++){
 
 			MegaOffline checkOffline = mOffList.get(i);
-			File offlineDirectory = getOfflineFile(context, checkOffline);
-			if (!isFileAvailable(offlineDirectory)) {
+			File offlineFile = getOfflineFile(context, checkOffline);
+			if (!isFileAvailable(offlineFile)) {
 				mOffList.remove(i);
 				i--;
 			}

@@ -1310,68 +1310,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				break;
 			}
 			case R.id.cab_menu_file_info_download: {
-				if (!availableOfflineBoolean){
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(node.getHandle());
-                    if(nC==null){
-                        nC = new NodeController(this);
-                    }
-                    nC.prepareForDownload(handleList, false);
-				}
-				else{
+                ArrayList<Long> handleList = new ArrayList<Long>();
+                handleList.add(node.getHandle());
+                if(nC==null){
+                    nC = new NodeController(this);
+                }
+                nC.prepareForDownload(handleList, false);
 
-					File destination = null;
-					File offlineFile = null;
-					if (Environment.getExternalStorageDirectory() != null){
-						destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
-					}
-					else{
-						destination = new File(getFilesDir(), node.getHandle()+"");
-					}
-
-					if (destination.exists() && destination.isDirectory()){
-						offlineFile = new File(destination, node.getName());
-						if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-							availableOfflineBoolean = true;
-							availableOfflineView.setText(R.string.context_delete_offline);
-							offlineSwitch.setChecked(true);
-						}
-						else{
-							availableOfflineBoolean = false;
-                            availableOfflineView.setText(R.string.save_for_offline);
-							offlineSwitch.setChecked(false);
-							mOffDelete = dbH.findByHandle(node.getHandle());
-							OfflineUtils.removeOffline(mOffDelete, dbH, this, from);
-							supportInvalidateOptionsMenu();
-						}
-					}
-					else{
-						availableOfflineBoolean = false;
-                        availableOfflineView.setText(R.string.save_for_offline);
-						offlineSwitch.setChecked(false);
-						mOffDelete = dbH.findByHandle(node.getHandle());
-                        OfflineUtils.removeOffline(mOffDelete, dbH, this, from);
-						supportInvalidateOptionsMenu();
-					}
-
-					try {
-						Intent intent = new Intent(Intent.ACTION_VIEW);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
-						} else {
-							intent.setDataAndType(Uri.fromFile(offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
-						}
-						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						if (MegaApiUtils.isIntentAvailable(this, intent)) {
-							startActivity(intent);
-						} else {
-						    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
-						}
-					}
-					catch(Exception e){
-						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
-					}
-				}
 				break;
 			}
 			case R.id.cab_menu_file_info_share_folder: {
@@ -1756,79 +1701,16 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		}
 
 		//Choose the button offlineSwitch
+        if (availableOffline(this, node)) {
+            availableOfflineBoolean = true;
+            availableOfflineView.setText(R.string.context_delete_offline);
+            offlineSwitch.setChecked(true);
+            return;
+        }
 
-		File offlineFile = null;
-
-		if(dbH.exists(node.getHandle())) {
-			log("Exists OFFLINE in the DB!!!");
-
-			MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
-			if (offlineNode != null) {
-				log("YESS FOUND: " + node.getName());
-				if (from == Constants.FROM_INCOMING_SHARES) {
-					log("FROM_INCOMING_SHARES");
-					//Find in the filesystem
-					if (Environment.getExternalStorageDirectory() != null) {
-						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + offlineNode.getHandleIncoming() + offlineNode.getPath()+ "/" + node.getName());
-						log("offline File INCOMING: " + offlineFile.getAbsolutePath());
-					} else {
-						offlineFile = this.getFilesDir();
-					}
-
-				}
-				else if(from==Constants.FROM_INBOX){
-
-					if (Environment.getExternalStorageDirectory() != null) {
-						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/" + offlineNode.getPath()+ "/" + node.getName());
-						log("offline File INCOMING: " + offlineFile.getAbsolutePath());
-					} else {
-						offlineFile = this.getFilesDir();
-					}
-				}
-				else {
-					log("NOT INCOMING NEITHER INBOX");
-					//Find in the filesystem
-					if (Environment.getExternalStorageDirectory() != null) {
-						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + megaApi.getNodePath(node));
-						log("offline File: " + offlineFile.getAbsolutePath());
-					} else {
-						offlineFile = this.getFilesDir();
-					}
-				}
-
-				if (offlineFile != null) {
-					if (offlineFile.exists()) {
-						log("FOUND!!!: " + node.getHandle() + " " + node.getName());
-						availableOfflineBoolean = true;
-                        availableOfflineView.setText(R.string.context_delete_offline);
-						offlineSwitch.setChecked(true);
-					} else {
-						log("Not found: " + node.getHandle() + " " + node.getName());
-						availableOfflineBoolean = false;
-                        availableOfflineView.setText(R.string.save_for_offline);
-						offlineSwitch.setChecked(false);
-					}
-				} else {
-					log("Not found offLineFile is NULL");
-					availableOfflineBoolean = false;
-                    availableOfflineView.setText(R.string.save_for_offline);
-					offlineSwitch.setChecked(false);
-				}
-			}
-			else{
-				log("offLineNode is NULL");
-				availableOfflineBoolean = false;
-                availableOfflineView.setText(R.string.save_for_offline);
-				offlineSwitch.setChecked(false);
-			}
-
-		}
-		else{
-			log("NOT Exists in DB OFFLINE: setChecket FALSE: "+node.getHandle());
-			availableOfflineBoolean = false;
-            availableOfflineView.setText(R.string.save_for_offline);
-			offlineSwitch.setChecked(false);
-		}
+        availableOfflineBoolean = false;
+        availableOfflineView.setText(R.string.save_for_offline);
+        offlineSwitch.setChecked(false);
 	}
 
 	public void createDefaultAvatar(ImageView ownerRoundeImage, MegaUser user, String name){
@@ -1962,7 +1844,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         availableOfflineView.setText(R.string.save_for_offline);
 						offlineSwitch.setChecked(false);
 						mOffDelete = dbH.findByHandle(handle);
-                        OfflineUtils.removeOffline(mOffDelete, dbH, this, from);
+                        removeOffline(mOffDelete, dbH, this);
 						supportInvalidateOptionsMenu();
 					}
 					else{
@@ -1973,43 +1855,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         availableOfflineView.setText(R.string.context_delete_offline);
 						offlineSwitch.setChecked(true);
 
-						File destination = null;
-						if (from == Constants.FROM_INCOMING_SHARES) {
-							log("FROM_INCOMING_SHARES");
-							//Find in the filesystem
-							if (Environment.getExternalStorageDirectory() != null) {
-								long handleIncoming = OfflineUtils.findIncomingParentHandle(node, megaApi);
-								destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + Long.toString(handleIncoming) + "/" + MegaApiUtils.createStringTree(node, this));
-								log("offline File INCOMING: " + destination.getAbsolutePath());
-							} else {
-								destination = this.getFilesDir();
-							}
-
-						}
-						else if(from==Constants.FROM_INBOX){
-							log("FROM_INBOX");
-							if (Environment.getExternalStorageDirectory() != null) {
-								destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/" + MegaApiUtils.createStringTree(node, this));
-								log("offline File INBOX: " + destination.getAbsolutePath());
-							} else {
-								destination = this.getFilesDir();
-							}
-						}
-						else {
-							log("NOT INCOMING NOT INBOX");
-							//Find in the filesystem
-
-							if (Environment.getExternalStorageDirectory() != null){
-								destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
-							}
-							else{
-								destination = getFilesDir();
-							}
-						}
-
+						File destination = getOfflineFile(this, from, node, true, megaApi);
 						log("Path destination: "+destination);
 
-						if (destination.exists() && destination.isDirectory()){
+						if (isFileAvailable(destination) && destination.isDirectory()){
 							File offlineFile = new File(destination, node.getName());
 							if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
 								return;
@@ -2017,21 +1866,19 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						}
 
 						log("Handle to save for offline : "+node.getHandle());
-                        OfflineUtils.saveOffline(destination, node, this, fileInfoActivity, megaApi);
+                        saveOffline(destination, node, this, fileInfoActivity, megaApi);
 
 						supportInvalidateOptionsMenu();
 					}
 				}
 				else{
-
 					log("not owner");
-
 					if (!isChecked){
 						availableOfflineBoolean = false;
                         availableOfflineView.setText(R.string.save_for_offline);
 						offlineSwitch.setChecked(false);
 						mOffDelete = dbH.findByHandle(node.getHandle());
-                        OfflineUtils.removeOffline(mOffDelete, dbH, this, from);
+                        removeOffline(mOffDelete, dbH, this);
 						supportInvalidateOptionsMenu();
 					}
 					else{
@@ -2045,32 +1892,18 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						//check the parent
 						long result = -1;
-						result=OfflineUtils.findIncomingParentHandle(node, megaApi);
+						result= findIncomingParentHandle(node, megaApi);
 						log("IncomingParentHandle: "+result);
 						if(result!=-1){
-							MegaNode megaNode = megaApi.getNodeByHandle(result);
-							if(megaNode!=null){
-								log("ParentHandleIncoming: "+megaNode.getName());
-							}
-							String handleString = Long.toString(result);
-							String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + handleString + "/"+MegaApiUtils.createStringTree(node, this);
-							log("Not owner path destination: "+destinationPath);
+							File destination = getOfflineFile(this, Constants.INCOMING_REQUEST_ADAPTER, node, true, megaApi);
 
-							File destination = null;
-							if (Environment.getExternalStorageDirectory() != null){
-								destination = new File(destinationPath);
-							}
-							else{
-								destination = getFilesDir();
-							}
-
-							if (destination.exists() && destination.isDirectory()){
+							if (isFileAvailable(destination) && destination.isDirectory()){
 								File offlineFile = new File(destination, node.getName());
 								if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
 									return;
 								}
 							}
-							OfflineUtils.saveOffline(destination, node, this, fileInfoActivity, megaApi);
+							saveOffline(destination, node, this, fileInfoActivity, megaApi);
 						}
 						else{
 							log("result=findIncomingParentHandle NOT result!");

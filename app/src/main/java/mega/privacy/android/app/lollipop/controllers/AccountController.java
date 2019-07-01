@@ -482,30 +482,14 @@ public class AccountController implements View.OnClickListener{
             e.printStackTrace();
         }
 
-        File offlineDirectory = null;
-        if (Environment.getExternalStorageDirectory() != null){
-            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR);
-        }
-        else{
-            offlineDirectory = context.getFilesDir();
-        }
-
-        removeFolder(context, offlineDirectory);
-
-        File thumbDir = ThumbnailUtils.getThumbFolder(context);
-        removeFolder(context, thumbDir);
-
-        File previewDir = PreviewUtils.getPreviewFolder(context);
-        removeFolder(context, previewDir);
+        File privateDir = context.getFilesDir();
+        removeFolder(context, privateDir);
 
         File externalCacheDir = context.getExternalCacheDir();
         removeFolder(context, externalCacheDir);
 
         File cacheDir = context.getCacheDir();
         removeFolder(context, cacheDir);
-
-        File logDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR);
-        removeFolder(context, logDir);
 
         removeOldTempFolders(context);
 

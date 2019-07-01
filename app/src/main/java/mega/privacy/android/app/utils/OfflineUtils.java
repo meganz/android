@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,6 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -65,7 +65,7 @@ public class OfflineUtils {
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         if (node.getType() == MegaNode.TYPE_FOLDER) {
             log("saveOffline:isFolder");
-            getDlList(dlFiles, node, new File(destination, new String(node.getName())));
+            getDlList(dlFiles, node, new File(destination, node.getName()));
         } else {
             log("saveOffline:isFile");
             dlFiles.put(node, destination.getAbsolutePath());
@@ -112,7 +112,7 @@ public class OfflineUtils {
         }
     }
 
-    public static void removeOffline(MegaOffline mOffDelete, DatabaseHandler dbH, Context context, int from) {
+    public static void removeOffline(MegaOffline mOffDelete, DatabaseHandler dbH, Context context) {
 
         OfflineUtils.dbH = dbH;
 
@@ -144,53 +144,13 @@ public class OfflineUtils {
         }
 
         //Remove the node physically
-        File destination;
-        log("Path: " + mOffDelete.getPath());
-        if (mOffDelete.getOrigin() == MegaOffline.INCOMING) {
-            if (Environment.getExternalStorageDirectory() != null) {
-                destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + mOffDelete.getHandleIncoming() + "/" + mOffDelete.getPath());
-            } else {
-                destination = new File(context.getFilesDir(),mOffDelete.getHandle() + "");
-            }
-
-            log("Remove incoming: " + destination.getAbsolutePath());
-
-            try {
-                File offlineFile = new File(destination,mOffDelete.getName());
-                deleteFolderAndSubfolders(context,offlineFile);
-            } catch (Exception e) {
-                log("EXCEPTION: removeOffline - file " + e.toString());
-            }
-            ;
-
-            dbH.removeById(mOffDelete.getId());
-        } else {
-            if (from == Constants.FROM_INBOX) {
-                if (Environment.getExternalStorageDirectory() != null) {
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/" + mOffDelete.getPath());
-                    log("offline File INCOMING: " + destination.getAbsolutePath());
-                } else {
-                    destination = context.getFilesDir();
-                }
-            } else {
-                if (Environment.getExternalStorageDirectory() != null) {
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + mOffDelete.getPath());
-                } else {
-                    destination = new File(context.getFilesDir(),mOffDelete.getHandle() + "");
-                }
-            }
-
-            log("Remove node: " + destination.getAbsolutePath());
-
-            try {
-                File offlineFile = new File(destination,mOffDelete.getName());
-                deleteFolderAndSubfolders(context,offlineFile);
-            } catch (Exception e) {
-                log("EXCEPTION: removeOffline - file");
-            }
-
-            dbH.removeById(mOffDelete.getId());
+        File offlineFile = getOfflineFile(context, mOffDelete);
+        try {
+            deleteFolderAndSubfolders(context,offlineFile);
+        } catch (Exception e) {
+            log("EXCEPTION: removeOffline - file " + e.toString());
         }
+
     }
 
     public static void updateParentOfflineStatus(int parentId) {
@@ -229,8 +189,8 @@ public class OfflineUtils {
         }
     }
 
-    public static boolean availableOffline (int from, MegaNode node, Context context, MegaApiAndroid megaApi) {
-        File offlineFile = null;
+    public static boolean availableOffline (Context context, MegaNode node) {
+
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
         }
@@ -240,63 +200,16 @@ public class OfflineUtils {
 
             MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
             if (offlineNode != null) {
+                File offlineFile = getOfflineFile(context, offlineNode);
                 log("YESS FOUND: " + node.getName());
-                if (from == Constants.INCOMING_SHARES_ADAPTER) {
-                    log("FROM_INCOMING_SHARES");
-                    //Find in the filesystem
-                    if (Environment.getExternalStorageDirectory() != null) {
-                        offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + offlineNode.getHandleIncoming() + offlineNode.getPath()+ "/" + node.getName());
-                        log("offline File INCOMING: " + offlineFile.getAbsolutePath());
-                    }
-                    else {
-                        offlineFile = context.getFilesDir();
-                    }
-                }
-                else if(from==Constants.INBOX_ADAPTER){
 
-                    if (Environment.getExternalStorageDirectory() != null) {
-                        offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/" + offlineNode.getPath()+ "/" + node.getName());
-                        log("offline File INCOMING: " + offlineFile.getAbsolutePath());
-                    }
-                    else {
-                        offlineFile = context.getFilesDir();
-                    }
-                }
-                else {
-                    log("NOT INCOMING NEITHER INBOX");
-                    //Find in the filesystem
-                    if (Environment.getExternalStorageDirectory() != null) {
-                        offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" + megaApi.getNodePath(node));
-                        log("offline File: " + offlineFile.getAbsolutePath());
-                    }
-                    else {
-                        offlineFile = context.getFilesDir();
-                    }
-                }
-                if (offlineFile != null) {
-                    if (offlineFile.exists()) {
-                        log("FOUND!!!: " + node.getHandle() + " " + node.getName());
-                        return true;
-                    }
-                    else {
-                        log("Not found: " + node.getHandle() + " " + node.getName());
-                        return false;
-                    }
-                }
-                else {
-                    log("Not found offLineFile is NULL");
-                    return false;
-                }
+                if (isFileAvailable(offlineFile)) return true;
             }
-            else{
-                log("offLineNode is NULL");
-                return false;
-            }
+
         }
-        else{
-            log("NOT Exists in DB OFFLINE: setChecket FALSE: "+node.getHandle());
-            return false;
-        }
+
+        log("Not found offLineFile");
+        return false;
     }
 
     public static long findIncomingParentHandle(MegaNode nodeToFind, MegaApiAndroid megaApi){
@@ -319,13 +232,13 @@ public class OfflineUtils {
     }
 
     public static File getOfflineFolder(Context context, String path) {
-        File offlineFolder = new File(context.getFilesDir() + path);
+        File offlineFolder = new File(context.getFilesDir() + File.separator + path);
 
         if (offlineFolder == null) return null;
 
         if (offlineFolder.exists()) return offlineFolder;
 
-        if (offlineFolder.mkdir()) {
+        if (offlineFolder.mkdirs()) {
             return offlineFolder;
         } else {
             return null;
@@ -348,57 +261,58 @@ public class OfflineUtils {
     }
 
     public static File getOfflineFile(Context context, MegaOffline offlineNode) {
-        String parentPath;
+        String path =  context.getFilesDir().getAbsolutePath() + File.separator;
 
         switch (offlineNode.getOrigin()) {
             case MegaOffline.INCOMING: {
-                parentPath = offlineDIR + File.separator + offlineNode.getHandleIncoming() + File.separator + offlineNode.getPath();
+                path = path + offlineDIR + File.separator + offlineNode.getHandleIncoming();
                 break;
             }
             case MegaOffline.INBOX: {
-                parentPath = offlineInboxDIR + File.separator + offlineNode.getPath();
+                path = path + offlineInboxDIR;
                 break;
             }
             default: {
-                parentPath = offlineDIR + File.separator + offlineNode.getPath();
+                path = path + offlineDIR;
             }
         }
+        path =  path + File.separator + offlineNode.getPath() + File.separator + offlineNode.getName();
 
-        File parent = getOfflineFolder(context, parentPath);
-        if (!isFileAvailable(parent)) return null;
-
-       return new File(parent, offlineNode.getName());
+       return new File(path);
     }
 
-    public static File buildOfflineFolder(Context context, MegaApiAndroid megaApi, int adapterType, MegaNode node) {
-        String finalPath;
+    public static File getOfflineFile(Context context, int from, MegaNode node, boolean onlyParent, MegaApiAndroid megaApi) {
+        String path = context.getFilesDir().getAbsolutePath() + File.separator;
 
-        switch (adapterType) {
-            case Constants.INCOMING_SHARES_ADAPTER: {
-                finalPath = offlineDIR + File.separator + OfflineUtils.findIncomingParentHandle(node, megaApi) + File.separator + MegaApiUtils.createStringTree(node, context);
+        switch (from) {
+            case Constants.FROM_INCOMING_SHARES: {
+                path = path + offlineDIR + File.separator + OfflineUtils.findIncomingParentHandle(node, megaApi);
                 break;
             }
-            case Constants.INBOX_ADAPTER: {
-                finalPath = offlineInboxDIR + File.separator + MegaApiUtils.createStringTree(node, context);
+            case Constants.FROM_INBOX: {
+                path = path + offlineInboxDIR;
                 break;
             }
             default: {
-                finalPath = offlineDIR + File.separator + MegaApiUtils.createStringTree(node, context);
+                path = path + offlineDIR;
             }
         }
+        if (onlyParent) {
+            path = path + File.separator + MegaApiUtils.createStringTree(node, context);
+        } else {
+            path = path + File.separator + MegaApiUtils.createStringTree(node, context) + File.separator + node.getName();
+        }
 
-        return getOfflineFolder(context, finalPath);
+        return new File(path);
     }
 
     public static String getOfflineSize(Context context){
         log("getOfflineSize");
-        File offline = getCacheFolder(context, offlineDIR);
-        long size = 0;
+        File offline = getOfflineFolder(context, offlineDIR);
+        long size;
         if(isFileAvailable(offline)){
             size = getDirSize(offline);
-
-            String sizeOffline = getSizeString(size);
-            return sizeOffline;
+            return getSizeString(size);
         }
         else{
             return getSizeString(0);
@@ -407,10 +321,14 @@ public class OfflineUtils {
 
     public static void clearOffline(Context context){
         log("clearOffline");
-        File offline = getCacheFolder(context, offlineDIR);
+        File offline = getOfflineFolder(context, offlineDIR);
         if(isFileAvailable(offline)){
-            cleanDir(offline);
-            offline.delete();
+            try {
+                deleteFolderAndSubfolders(context, offline);
+            } catch (IOException e) {
+                e.printStackTrace();
+                log("Exception deleting offline folder");
+            }
         }
     }
 
