@@ -57,7 +57,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -2973,16 +2972,28 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	@Override
-	protected void onResume(){
+	protected void onResume() {
 		log("onResume");
 		super.onResume();
-		if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.FILE_LINK_ADAPTER && adapterType != Constants.ZIP_ADAPTER){
-			if (imageHandles.get(positionG) != -1){
+
+		if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.FILE_LINK_ADAPTER && adapterType != Constants.ZIP_ADAPTER) {
+			if (imageHandles.get(positionG) != -1) {
 				log("node updated");
 				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+				if (node == null) {
+					finish();
+				} else {
+					MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
+					while (megaApi.getParentNode(parent) != null) {
+						parent = megaApi.getParentNode(parent);
+					}
+					if (parent.getHandle() == megaApi.getRubbishNode().getHandle() && adapterType != Constants.SEARCH_ADAPTER && adapterType != Constants.RUBBISH_BIN_ADAPTER) {
+						finish();
+					}
+				}
 			}
 
-			if (node == null){
+			if (node == null) {
 				finish();
 			}
 		}
