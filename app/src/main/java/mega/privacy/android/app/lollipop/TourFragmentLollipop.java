@@ -76,7 +76,9 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         baseContainer.post(new Runnable() {
             @Override
             public void run() {
-                baseContainer.fullScroll(View.FOCUS_DOWN);
+                if (baseContainer != null) {
+                    baseContainer.fullScroll(View.FOCUS_DOWN);
+                }
             }
         });
     }
