@@ -83,7 +83,7 @@ public final class CacheFolderManager {
         if (isFileAvailable(file)) {
             log(file.getName() + " folder created: " + file.getAbsolutePath());
         } else {
-            log("create file failed");
+            log("create " + name + " file failed");
         }
     }
 

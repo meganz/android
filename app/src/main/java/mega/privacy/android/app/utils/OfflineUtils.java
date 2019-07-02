@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -22,10 +21,13 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Util.getSizeString;
 
 public class OfflineUtils {
 
@@ -34,13 +36,11 @@ public class OfflineUtils {
 
     public static final String oldOfflineDIR = mainDIR + File.separator + offlineDIR;
 
-    static DatabaseHandler dbH;
-    static MegaApiAndroid megaApi;
+    private static final String DB_FILE = "0";
+    private static final String DB_FOLDER = "1";
 
     public static void saveOffline (File destination, MegaNode node, Context context, Activity activity, MegaApiAndroid megaApi){
         log("saveOffline");
-
-        OfflineUtils.megaApi = megaApi;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -65,7 +65,7 @@ public class OfflineUtils {
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         if (node.getType() == MegaNode.TYPE_FOLDER) {
             log("saveOffline:isFolder");
-            getDlList(dlFiles, node, new File(destination, node.getName()));
+            getDlList(dlFiles, node, new File(destination, node.getName()), megaApi);
         } else {
             log("saveOffline:isFile");
             dlFiles.put(node, destination.getAbsolutePath());
@@ -76,7 +76,7 @@ public class OfflineUtils {
             String path = dlFiles.get(document);
 
             if(availableFreeSpace <document.getSize()){
-                Util.showErrorAlertDialog(context.getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, activity);
+                Util.showErrorAlertDialog(context.getString(R.string.error_not_enough_free_space) + " (" + document.getName() + ")", false, activity);
                 continue;
             }
 
@@ -93,7 +93,7 @@ public class OfflineUtils {
     /*
      * Get list of all child files
      */
-    public static void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
+    public static void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder, MegaApiAndroid megaApi) {
 
         if (megaApi.getRootNode() == null)
             return;
@@ -104,7 +104,7 @@ public class OfflineUtils {
             MegaNode document = nodeList.get(i);
             if (document.getType() == MegaNode.TYPE_FOLDER) {
                 File subfolder = new File(folder, new String(document.getName()));
-                getDlList(dlFiles, document, subfolder);
+                getDlList(dlFiles, document, subfolder, megaApi);
             }
             else {
                 dlFiles.put(document, folder.getAbsolutePath());
@@ -113,8 +113,6 @@ public class OfflineUtils {
     }
 
     public static void removeOffline(MegaOffline mOffDelete, DatabaseHandler dbH, Context context) {
-
-        OfflineUtils.dbH = dbH;
 
         if (mOffDelete == null) {
             return;
@@ -130,7 +128,7 @@ public class OfflineUtils {
             mOffListChildren = dbH.findByParentId(mOffDelete.getId());
             if (mOffListChildren.size() > 0) {
                 log("Children: " + mOffListChildren.size());
-                deleteChildrenDB(mOffListChildren);
+                deleteChildrenDB(mOffListChildren, dbH);
             }
         } else {
             log("NOT children... ");
@@ -140,7 +138,7 @@ public class OfflineUtils {
         int parentId = mOffDelete.getParentId();
         dbH.removeById(mOffDelete.getId());
         if (parentId != -1) {
-            updateParentOfflineStatus(parentId);
+            updateParentOfflineStatus(parentId, dbH);
         }
 
         //Remove the node physically
@@ -153,7 +151,7 @@ public class OfflineUtils {
 
     }
 
-    public static void updateParentOfflineStatus(int parentId) {
+    public static void updateParentOfflineStatus(int parentId, DatabaseHandler dbH) {
         ArrayList<MegaOffline> offlineSiblings = dbH.findByParentId(parentId);
 
         if(offlineSiblings.size() > 0){
@@ -166,12 +164,12 @@ public class OfflineUtils {
             if (parentNode != null) {
                 int grandParentNodeId = parentNode.getParentId();
                 dbH.removeById(parentId);
-                updateParentOfflineStatus(grandParentNodeId);
+                updateParentOfflineStatus(grandParentNodeId, dbH);
             }
         }
     }
 
-    public static void deleteChildrenDB(ArrayList<MegaOffline> mOffList){
+    public static void deleteChildrenDB(ArrayList<MegaOffline> mOffList, DatabaseHandler dbH){
 
         log("deleteChildenDB");
         MegaOffline mOffDelete=null;
@@ -182,7 +180,7 @@ public class OfflineUtils {
             ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
             if(mOffList.size()>0){
                 //The node have children, delete
-                deleteChildrenDB(mOffListChildren2);
+                deleteChildrenDB(mOffListChildren2, dbH);
 
             }
             dbH.removeById(mOffDelete.getId());
@@ -191,9 +189,7 @@ public class OfflineUtils {
 
     public static boolean availableOffline (Context context, MegaNode node) {
 
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context);
-        }
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 
         if(dbH.exists(node.getHandle())) {
             log("Exists OFFLINE in the DB!!!");
@@ -330,6 +326,485 @@ public class OfflineUtils {
                 log("Exception deleting offline folder");
             }
         }
+    }
+
+    public static void saveOffline (Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, MegaNode node, String path){
+        log("saveOffline destination: "+path);
+
+        File destination = new File(path);
+        destination.mkdirs();
+
+        log("saveOffline: "+ destination.getAbsolutePath());
+        log("Handle to save for offline : "+node.getHandle());
+
+        Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+        if (node.getType() == MegaNode.TYPE_FOLDER) {
+            log("saveOffline:isFolder");
+            getDlList(dlFiles, node, new File(destination, node.getName()), megaApi);
+        } else {
+            log("saveOffline:isFile");
+            dlFiles.put(node, destination.getAbsolutePath());
+        }
+
+        ArrayList<MegaNode> nodesToDB = new ArrayList<MegaNode>();
+
+        for (MegaNode document : dlFiles.keySet()) {
+            nodesToDB.add(document);
+        }
+
+        if(path.contains(offlineInboxDIR)){
+            insertDB(context, megaApi, dbH, nodesToDB, true);
+        }
+        else{
+            insertDB(context, megaApi, dbH, nodesToDB, false);
+        }
+    }
+
+    public static void saveOfflineChatFile (DatabaseHandler dbH, MegaTransfer transfer){
+        log("saveOfflineChatFile: "+transfer.getNodeHandle()+ " " + transfer.getFileName());
+
+        MegaOffline mOffInsert = new MegaOffline(Long.toString(transfer.getNodeHandle()), "/", transfer.getFileName(),-1, DB_FILE, 0, "-1");
+        long checkInsert=dbH.setOfflineFile(mOffInsert);
+        log("Test insert Chat File: "+checkInsert);
+
+    }
+
+    private static void insertDB (Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, ArrayList<MegaNode> nodesToDB, boolean fromInbox){
+        log("insertDB");
+
+        MegaNode parentNode = null;
+        MegaNode nodeToInsert = null;
+
+        String path = "/";
+        MegaOffline mOffParent=null;
+        MegaOffline mOffNode = null;
+
+        for(int i=nodesToDB.size()-1; i>=0; i--){
+
+            nodeToInsert = nodesToDB.get(i);
+            log("Node to insert: "+nodeToInsert.getName());
+
+            //If I am the owner
+            if (megaApi.checkAccess(nodeToInsert, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
+
+                if(megaApi.getParentNode(nodeToInsert).getType() != MegaNode.TYPE_ROOT){
+
+                    parentNode = megaApi.getParentNode(nodeToInsert);
+                    log("ParentNode: "+parentNode.getName());
+                    log("PARENT NODE nooot ROOT");
+
+                    path = MegaApiUtils.createStringTree(nodeToInsert, context);
+                    if(path==null){
+                        path="/";
+                    }
+                    else{
+                        path="/"+path;
+                    }
+                    log("PAth node to insert: --- "+path);
+                    //Get the node parent
+                    mOffParent = dbH.findByHandle(parentNode.getHandle());
+                    //If the parent is not in the DB
+                    //Insert the parent in the DB
+                    if(mOffParent==null){
+                        if(parentNode!=null){
+                            insertParentDB(context, megaApi, dbH, parentNode, fromInbox);
+                        }
+                    }
+
+                    mOffNode = dbH.findByHandle(nodeToInsert.getHandle());
+                    mOffParent = dbH.findByHandle(parentNode.getHandle());
+                    if(mOffNode == null){
+
+                        if(mOffParent!=null){
+                            log("Parent of the node is NOT null");
+                            if(nodeToInsert.isFile()){
+                                if(fromInbox){
+                                    MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE,MegaOffline.INBOX, "-1");
+                                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                                    log("Test insert A: "+checkInsert);
+                                }
+                                else{
+                                    MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE,MegaOffline.OTHER, "-1");
+                                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                                    log("Test insert A: "+checkInsert);
+                                }
+                            }
+                            else{
+                                if(fromInbox){
+                                    MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FOLDER, MegaOffline.INBOX, "-1");
+                                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                                    log("Test insert B1: "+checkInsert);
+                                }
+                                else{
+                                    MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FOLDER, MegaOffline.OTHER, "-1");
+                                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                                    log("Test insert B2: "+checkInsert);
+                                }
+                            }
+                        }
+                        else{
+                            log("Parent of the node is NULL");
+                            path="/";
+
+                            if(nodeToInsert.isFile()){
+                                if(fromInbox){
+                                    MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(),-1, DB_FILE, MegaOffline.INBOX, "-1");
+                                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                                    log("Test insert E1: "+checkInsert);
+                                }
+                                else{
+                                    MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(),-1, DB_FILE, MegaOffline.OTHER, "-1");
+                                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                                    log("Test insert E2: "+checkInsert);
+                                }
+                            }
+                            else{
+                                if(fromInbox){
+                                    MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), -1, DB_FOLDER, MegaOffline.INBOX, "-1");
+                                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                                    log("Test insert F1: "+checkInsert);
+                                }
+                                else{
+                                    MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), -1, DB_FOLDER, MegaOffline.OTHER, "-1");
+                                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                                    log("Test insert F2: "+checkInsert);
+                                }
+                            }
+                        }
+                    }
+
+                }
+                else{
+                    path="/";
+
+                    if(nodeToInsert.isFile()){
+                        if(fromInbox){
+                            MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(),-1, DB_FILE, MegaOffline.INBOX, "-1");
+                            long checkInsert=dbH.setOfflineFile(mOffInsert);
+                            log("Test insert C1: "+checkInsert);
+                        }
+                        else{
+                            MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(),-1, DB_FILE, MegaOffline.OTHER, "-1");
+                            long checkInsert=dbH.setOfflineFile(mOffInsert);
+                            log("Test insert C2: "+checkInsert);
+                        }
+
+                    }
+                    else{
+                        if(fromInbox){
+                            MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), -1, DB_FOLDER, MegaOffline.INBOX, "-1");
+                            long checkInsert=dbH.setOfflineFile(mOffInsert);
+                            log("Test insert D1: "+checkInsert);
+                        }
+                        else{
+                            MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), -1, DB_FOLDER, MegaOffline.OTHER, "-1");
+                            long checkInsert=dbH.setOfflineFile(mOffInsert);
+                            log("Test insert D2: "+checkInsert);
+                        }
+                    }
+                }
+
+            }
+            else{
+                //If I am not the owner
+                log("Im not the owner: "+megaApi.getParentNode(nodeToInsert));
+
+                parentNode = megaApi.getParentNode(nodeToInsert);
+                log("ParentNode: "+parentNode.getName());
+
+                path = MegaApiUtils.createStringTree(nodeToInsert, context);
+                if(path==null){
+                    path="/";
+                }
+                else{
+                    path="/"+path;
+                }
+
+                log("PAth node to insert: --- "+path);
+                //Get the node parent
+                mOffParent = dbH.findByHandle(parentNode.getHandle());
+                //If the parent is not in the DB
+                //Insert the parent in the DB
+                if(mOffParent==null){
+                    if(parentNode!=null){
+                        insertIncomingParentDB(context, megaApi, dbH, parentNode);
+                    }
+                }
+
+                mOffNode = dbH.findByHandle(nodeToInsert.getHandle());
+                mOffParent = dbH.findByHandle(parentNode.getHandle());
+
+                String handleIncoming = "";
+                if(parentNode!=null){
+                    MegaNode ownerNode = megaApi.getParentNode(parentNode);
+                    if(ownerNode!=null){
+                        MegaNode nodeWhile = ownerNode;
+                        while (nodeWhile!=null){
+                            ownerNode=nodeWhile;
+                            nodeWhile = megaApi.getParentNode(nodeWhile);
+                        }
+
+                        handleIncoming=Long.toString(ownerNode.getHandle());
+                    }
+                    else{
+                        handleIncoming=Long.toString(parentNode.getHandle());
+                    }
+
+                }
+
+                if(mOffNode == null){
+                    log("Inserto el propio nodo: "+ nodeToInsert.getName() + "handleIncoming: "+handleIncoming);
+
+                    if(mOffParent!=null){
+                        if(nodeToInsert.isFile()){
+                            MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE,MegaOffline.INCOMING, handleIncoming);
+                            long checkInsert=dbH.setOfflineFile(mOffInsert);
+                            log("Test insert A: "+checkInsert);
+                        }
+                        else{
+                            MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FOLDER, MegaOffline.INCOMING, handleIncoming);
+                            long checkInsert=dbH.setOfflineFile(mOffInsert);
+                            log("Test insert B: "+checkInsert);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //Insert for incoming
+    private static void insertIncomingParentDB (Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, MegaNode parentNode){
+        log("insertIncomingParentDB: Check SaveOffline: "+parentNode.getName());
+
+        MegaOffline mOffParentParent = null;
+        String path=MegaApiUtils.createStringTree(parentNode, context);
+        if(path==null){
+            path="/";
+        }
+        else{
+            path="/"+path;
+        }
+
+        log("PATH   IncomingParentDB: "+path);
+
+        MegaNode parentparentNode = megaApi.getParentNode(parentNode);
+
+        if(parentparentNode==null){
+
+            if(parentNode.isFile()){
+                MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, MegaOffline.INCOMING, Long.toString(parentNode.getHandle()));
+                long checkInsert=dbH.setOfflineFile(mOffInsert);
+                log("Test insert C: "+checkInsert);
+            }
+            else{
+                MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, MegaOffline.INCOMING, Long.toString(parentNode.getHandle()));
+                long checkInsert=dbH.setOfflineFile(mOffInsert);
+                log("Test insert D: "+checkInsert);
+            }
+        }
+        else{
+
+            String handleIncoming = "";
+
+            MegaNode ownerNode = megaApi.getParentNode(parentparentNode);
+            if(ownerNode!=null){
+                MegaNode nodeWhile = ownerNode;
+                while (nodeWhile!=null){
+                    ownerNode=nodeWhile;
+                    nodeWhile = megaApi.getParentNode(nodeWhile);
+                }
+
+                handleIncoming=Long.toString(ownerNode.getHandle());
+            }
+            else{
+                handleIncoming=Long.toString(parentparentNode.getHandle());
+            }
+
+
+            mOffParentParent = dbH.findByHandle(parentparentNode.getHandle());
+            if(mOffParentParent==null){
+                insertIncomingParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode));
+                //Insert the parent node
+                mOffParentParent = dbH.findByHandle(megaApi.getParentNode(parentNode).getHandle());
+                if(mOffParentParent==null){
+                    insertIncomingParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode));
+
+                }
+                else{
+
+                    if(parentNode.isFile()){
+                        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, MegaOffline.INCOMING, handleIncoming);
+                        long checkInsert=dbH.setOfflineFile(mOffInsert);
+                        log("Test insert E: "+checkInsert);
+                    }
+                    else{
+                        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, MegaOffline.INCOMING, handleIncoming);
+                        long checkInsert=dbH.setOfflineFile(mOffInsert);
+                        log("Test insert F: "+checkInsert);
+                    }
+                }
+            }
+            else{
+
+                if(parentNode.isFile()){
+                    MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, MegaOffline.INCOMING, handleIncoming);
+                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                    log("Test insert G: "+checkInsert);
+                }
+                else{
+                    MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, MegaOffline.INCOMING, handleIncoming);
+                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                    log("Test insert H: "+checkInsert);
+                }
+            }
+        }
+    }
+
+    private static void insertParentDB (Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, MegaNode parentNode, boolean fromInbox){
+        log("insertParentDB: Check SaveOffline: "+parentNode.getName());
+
+        MegaOffline mOffParentParent = null;
+        String path=MegaApiUtils.createStringTree(parentNode, context);
+        if(path==null){
+            path="/";
+        }
+        else{
+            path="/"+path;
+        }
+
+        MegaNode parentparentNode = megaApi.getParentNode(parentNode);
+        if(parentparentNode==null){
+            log("return insertParentDB");
+            return;
+        }
+
+        if(parentparentNode.getType() != MegaNode.TYPE_ROOT){
+
+            if(parentparentNode.getHandle()==megaApi.getInboxNode().getHandle()){
+                log("En algun momento!!!");
+                log("---------------PARENT NODE INBOX------");
+                if(parentNode.isFile()){
+                    if(fromInbox){
+                        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, MegaOffline.INBOX, "-1");
+                        long checkInsert=dbH.setOfflineFile(mOffInsert);
+                        log("Test insert M: "+checkInsert);
+                    }
+                    else{
+                        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, MegaOffline.OTHER, "-1");
+                        long checkInsert=dbH.setOfflineFile(mOffInsert);
+                        log("Test insert M: "+checkInsert);
+                    }
+                }
+                else{
+                    if(fromInbox){
+                        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, MegaOffline.INBOX, "-1");
+                        long checkInsert=dbH.setOfflineFile(mOffInsert);
+                        log("Test insert N: "+checkInsert);
+                    }
+                    else{
+                        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, MegaOffline.OTHER, "-1");
+                        long checkInsert=dbH.setOfflineFile(mOffInsert);
+                        log("Test insert N: "+checkInsert);
+                    }
+
+                }
+                return;
+            }
+
+            mOffParentParent = dbH.findByHandle(parentparentNode.getHandle());
+            if(mOffParentParent==null){
+                log("mOffParentParent==null");
+                insertParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode), fromInbox);
+                //Insert the parent node
+                mOffParentParent = dbH.findByHandle(megaApi.getParentNode(parentNode).getHandle());
+                if(mOffParentParent==null){
+                    log("call again");
+                    insertParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode), fromInbox);
+                }
+                else{
+                    log("second check NOOOTTT mOffParentParent==null");
+                    if(parentNode.isFile()){
+                        if(fromInbox){
+                            MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, MegaOffline.INBOX, "-1");
+                            long checkInsert=dbH.setOfflineFile(mOffInsert);
+                            log("Test insert I1: "+checkInsert);
+                        }
+                        else{
+                            MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, MegaOffline.OTHER, "-1");
+                            long checkInsert=dbH.setOfflineFile(mOffInsert);
+                            log("Test insert I2: "+checkInsert);
+                        }
+                    }
+                    else{
+                        if(fromInbox){
+                            MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, MegaOffline.INBOX, "-1");
+                            long checkInsert=dbH.setOfflineFile(mOffInsert);
+                            log("Test insert J1: "+checkInsert);
+                        }
+                        else{
+                            MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, MegaOffline.OTHER, "-1");
+                            long checkInsert=dbH.setOfflineFile(mOffInsert);
+                            log("Test insert J2: "+checkInsert);
+                        }
+                    }
+                }
+            }
+            else{
+                log("NOOOTTT mOffParentParent==null");
+                if(parentNode.isFile()){
+                    if(fromInbox){
+                        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, MegaOffline.INBOX, "-1");
+                        long checkInsert=dbH.setOfflineFile(mOffInsert);
+                        log("Test insert K1: "+checkInsert);
+                    }
+                    else{
+                        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, MegaOffline.OTHER, "-1");
+                        long checkInsert=dbH.setOfflineFile(mOffInsert);
+                        log("Test insert K2: "+checkInsert);
+                    }
+                }
+                else{
+                    if(fromInbox){
+                        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, MegaOffline.INBOX, "-1");
+                        long checkInsert=dbH.setOfflineFile(mOffInsert);
+                        log("Test insert L1: "+checkInsert);
+                    }
+                    else{
+                        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, MegaOffline.OTHER, "-1");
+                        long checkInsert=dbH.setOfflineFile(mOffInsert);
+                        log("Test insert L2: "+checkInsert);
+                    }
+                }
+            }
+        }
+        else{
+            log("---------------PARENT NODE ROOT------");
+            if(parentNode.isFile()){
+                if(fromInbox){
+                    MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, MegaOffline.INBOX, "-1");
+                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                    log("Test insert M1: "+checkInsert);
+                }
+                else{
+                    MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, MegaOffline.OTHER, "-1");
+                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                    log("Test insert M2: "+checkInsert);
+                }
+            }
+            else{
+                if(fromInbox){
+                    MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, MegaOffline.INBOX, "-1");
+                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                    log("Test insert N1: "+checkInsert);
+                }
+                else{
+                    MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, MegaOffline.OTHER, "-1");
+                    long checkInsert=dbH.setOfflineFile(mOffInsert);
+                    log("Test insert N2: "+checkInsert);
+                }
+            }
+        }
+
     }
 
     public static void log(String message) {
