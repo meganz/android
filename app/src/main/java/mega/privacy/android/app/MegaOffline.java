@@ -65,14 +65,6 @@ public class MegaOffline {
 		this.name = name;
 	}
 
-	public int getparentId() {
-		return parentId;
-	}
-
-	public void setparentId(int parentId) {
-		this.parentId = parentId;
-	}
-
 	public String getType() {
 		return type;
 	}

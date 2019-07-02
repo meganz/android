@@ -158,20 +158,13 @@ public final class CacheFolderManager {
                 removeOldTempFolder(context, oldChatTempDIR);
                 File oldOfflineFolder = getOldTempFolder(oldOfflineDIR);
                 if (isFileAvailable(oldOfflineFolder)) {
-                    try {
-                        copyFolder(getOldTempFolder(oldOfflineDIR), getOfflineFolder(context, offlineDIR));
-                    } catch (IOException e) {
-                        log("Exception trying to copy old offline folder into the new location");
-                        e.printStackTrace();
-                    } finally {
-                        removeOldTempFolder(context, oldOfflineDIR);
-                    }
+                    moveOfflineFiles(context);
                 }
             }
         }.start();
     }
 
-    private static void removeOldTempFolder(Context context, String folderName) {
+    public static void removeOldTempFolder(Context context, String folderName) {
         File oldTempFolder = getOldTempFolder(folderName);
         if (!isFileAvailable(oldTempFolder)) return;
 
@@ -183,7 +176,7 @@ public final class CacheFolderManager {
         }
     }
 
-    private static File getOldTempFolder(String folderName) {
+    public static File getOldTempFolder(String folderName) {
         return new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + folderName);
     }
 

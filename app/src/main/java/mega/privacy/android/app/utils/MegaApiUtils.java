@@ -262,6 +262,17 @@ public class MegaApiUtils {
         return s;
     }
 
+    public static String getNodePath(Context context, MegaNode node) {
+        String path=MegaApiUtils.createStringTree(node, context);
+
+        if(path==null){
+            return "/";
+        }
+        else{
+            return "/"+path;
+        }
+    }
+
     public static ArrayList<MegaUser> getLastContactedUsers(Context context) {
 
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();

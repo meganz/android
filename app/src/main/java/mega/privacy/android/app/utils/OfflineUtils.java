@@ -18,6 +18,7 @@ import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
@@ -26,7 +27,9 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.getNodePath;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 
 public class OfflineUtils {
@@ -258,7 +261,10 @@ public class OfflineUtils {
 
     public static File getOfflineFile(Context context, MegaOffline offlineNode) {
         String path =  context.getFilesDir().getAbsolutePath() + File.separator;
+        return setOfflinePath(path, offlineNode);
+    }
 
+    private static File setOfflinePath (String path, MegaOffline offlineNode) {
         switch (offlineNode.getOrigin()) {
             case MegaOffline.INCOMING: {
                 path = path + offlineDIR + File.separator + offlineNode.getHandleIncoming();
@@ -274,7 +280,7 @@ public class OfflineUtils {
         }
         path =  path + File.separator + offlineNode.getPath() + File.separator + offlineNode.getName();
 
-       return new File(path);
+        return new File(path);
     }
 
     public static File getOfflineFile(Context context, int from, MegaNode node, boolean onlyParent, MegaApiAndroid megaApi) {
@@ -681,7 +687,6 @@ public class OfflineUtils {
         if(parentparentNode.getType() != MegaNode.TYPE_ROOT){
 
             if(parentparentNode.getHandle()==megaApi.getInboxNode().getHandle()){
-                log("En algun momento!!!");
                 log("---------------PARENT NODE INBOX------");
                 if(parentNode.isFile()){
                     if(fromInbox){
@@ -805,6 +810,61 @@ public class OfflineUtils {
             }
         }
 
+    }
+
+    /**
+     * This method move the old offline files that exist in database into the private space. The conditions to move each file are:
+     * 1.- Exist a MegaOffline representing the file with id diferent to -1
+     * 2.- Exist a MegaNode on Cloud with the same handle that the MegaOffline object
+     * 3.- Exist the File to move
+     * 4.- The size of the MegaNode and the File are the same
+     * 5.- The path of the MegaNode and the MegaOffline are the same
+     *
+     * If any of these conditions are not comply, any file will not be moved
+     * and will be removed from database. If some error happens when moving the file,
+     * it will be removed from database too.
+     *
+     * @param context
+     */
+    public static void moveOfflineFiles(Context context) {
+        String nodePath = "/";
+        MegaApiAndroid megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+        ArrayList<MegaOffline> offlineFiles = dbH.getOfflineFiles();
+        if (offlineFiles == null || offlineFiles.isEmpty()) return; //No files to move
+
+        for (MegaOffline offlineNode : offlineFiles) {
+            if (offlineNode.getId() == -1) continue;
+
+            MegaNode node = megaApi.getNodeByHandle(offlineNode.getId());
+            if (node != null) {
+                nodePath = getNodePath(context, node);
+            }
+
+            File oldOfflineFile = findOldOfflineFile(offlineNode);
+
+            if (node == null
+                    || !isFileAvailable(oldOfflineFile)
+                    || node.getSize() != oldOfflineFile.length()
+                    || !node.getName().equals(oldOfflineFile.getName())
+                    || !nodePath.equals(offlineNode.getPath())) {
+                dbH.removeById(offlineNode.getId());
+                continue;
+            }
+
+            File newOfflineFile = getOfflineFile(context, offlineNode);
+            if (!moveFile(oldOfflineFile, newOfflineFile)) {
+                dbH.removeById(offlineNode.getId());
+            }
+        }
+
+        removeOldTempFolder(context, oldOfflineDIR);
+    }
+
+    private static File findOldOfflineFile(MegaOffline offlineNode) {
+        String path = getOldTempFolder(oldOfflineDIR).getAbsolutePath() + File.separator;
+        return setOfflinePath(path, offlineNode);
     }
 
     public static void log(String message) {
