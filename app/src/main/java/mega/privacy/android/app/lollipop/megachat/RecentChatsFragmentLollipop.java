@@ -127,10 +127,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     private ContactsHorizontalAdapter adapter;
 
     //Empty screen
-    TextView emptyTextView;
-    LinearLayout emptyLayout;
-    TextView emptyTextViewInvite;
-    ImageView emptyImageView;
+    private TextView emptyTextView;
+    private RelativeLayout emptyLayout;
+    private TextView emptyTextViewInvite;
+    private ImageView emptyImageView;
 
     //Call
     RelativeLayout callInProgressLayout;
@@ -296,20 +296,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         });
 //        listView.setClipToPadding(false);
 
-        emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);
-        emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_chat_recent_invite);
+        emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
+        emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
         emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
-        emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
-
-        LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
-        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(16, outMetrics), 0, Util.scaleHeightPx(16, outMetrics));
-        emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
-
-        LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams)emptyTextView.getLayoutParams();
-        emptyTextViewParams2.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics));
-        emptyTextView.setLayoutParams(emptyTextViewParams2);
-
-        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_recent);
+        emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
+        emptyImageView = v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setOnClickListener(this);
 
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -614,46 +605,63 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
-    public void showEmptyChatScreen(){
+    public void showEmptyChatScreen() {
         log("showEmptyChatScreen");
 
         listView.setVisibility(View.GONE);
+        emptyLayout.setVisibility(View.VISIBLE);
+        String textToShow, colorStart, colorEnd;
+        Spanned result;
 
-        String textToShowB = "";
+        if (context instanceof ArchivedChatsActivity) {
+            textToShow = context.getString(R.string.recent_chat_empty).toUpperCase();
+            colorStart = "\'#7a7a7a\'";
+            colorEnd = "\'#000000\'";
+            result = getSpannedMessageForEmptyChat(textToShow, colorStart, colorEnd);
 
-        if(context instanceof ArchivedChatsActivity){
-            textToShowB = String.format(context.getString(R.string.archived_chats_empty));
-            emptyTextViewInvite.setVisibility(View.INVISIBLE);
-            inviteButton.setVisibility(View.GONE);
-        }
-        else{
-            String textToShow = String.format(context.getString(R.string.context_empty_chat_recent));
-
-            try{
-                textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-                textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-                textToShow = textToShow.replace("[/B]", "</font>");
-            }
-            catch (Exception e){}
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                emptyTextView.setVisibility(View.GONE);
             } else {
-                result = Html.fromHtml(textToShow);
+                emptyTextView.setVisibility(View.VISIBLE);
             }
+
+            emptyTextViewInvite.setVisibility(View.GONE);
+            inviteButton.setVisibility(View.GONE);
+            emptyTextView.setText(result);
+
+
+        } else {
+            textToShow = context.getString(R.string.context_empty_chat_recent);
+            colorStart = "\'#000000\'";
+            colorEnd = "\'#7a7a7a\'";
+            result = getSpannedMessageForEmptyChat(textToShow, colorStart, colorEnd);
 
             emptyTextViewInvite.setText(result);
             emptyTextViewInvite.setVisibility(View.VISIBLE);
-
             inviteButton.setText(getString(R.string.contact_invite));
             inviteButton.setVisibility(View.VISIBLE);
+        }
+    }
 
-
+    private Spanned getSpannedMessageForEmptyChat(String originalMessage, String colorStart, String colorEnd){
+        String textToShow = originalMessage;
+        Spanned result;
+        try {
+            textToShow = textToShow.replace("[A]", "<font color=" + colorStart + ">");
+            textToShow = textToShow.replace("[/A]", "</font>");
+            textToShow = textToShow.replace("[B]", "<font color=" + colorEnd + ">");
+            textToShow = textToShow.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            log(e.getStackTrace().toString());
         }
 
-        emptyTextView.setVisibility(View.GONE);
-        emptyLayout.setVisibility(View.VISIBLE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(textToShow);
+        }
+
+        return result;
     }
 
     public void showDisableChatScreen(){

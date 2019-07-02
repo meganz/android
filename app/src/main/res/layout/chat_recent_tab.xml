@@ -133,46 +133,59 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"/>
         </android.support.design.widget.AppBarLayout>
+
         <ScrollView
             android:id="@+id/scroller"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
             android:layout_marginBottom="10dp"
-            android:fadeScrollbars="false"
             android:elevation="-1dp"
-            android:layout_centerVertical="true">
-            <LinearLayout
+            android:fadeScrollbars="false"
+            android:fillViewport="true">
+
+            <RelativeLayout
                 android:id="@+id/linear_empty_layout_chat_recent"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <ImageView
                     android:id="@+id/empty_image_view_recent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"/>
+                    android:layout_above="@+id/empty_text_chat_recent_invite"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true" />
+
                 <TextView
                     android:id="@+id/empty_text_chat_recent_invite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_above="@+id/empty_text_chat_recent"
+                    android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:maxWidth="300dp"
                     android:textColor="@color/mail_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
+
                 <TextView
                     android:id="@+id/empty_text_chat_recent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_centerInParent="true"
                     android:gravity="center"
                     android:textColor="@color/adapters_background"
-                    android:textSize="18sp"/>
+                    android:textSize="18sp" />
+
                 <Button
                     android:id="@+id/invite_button"
                     style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/empty_text_chat_recent"
+                    android:layout_centerHorizontal="true"
                     android:layout_gravity="center_horizontal"
                     android:background="@drawable/background_button_border_accent"
                     android:gravity="center"
@@ -182,9 +195,8 @@
                     android:paddingRight="20dp"
                     android:paddingBottom="10dp"
                     android:textColor="@color/accentColor"
-                    android:focusedByDefault="true"
-                    android:textSize="16sp"/>
-            </LinearLayout>
+                    android:textSize="16sp" />
+            </RelativeLayout>
         </ScrollView>
         <include layout="@layout/item_call_in_progress_layout"
             android:layout_width="match_parent"
