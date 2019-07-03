@@ -31,6 +31,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
@@ -41,8 +42,12 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class ArchivedChatsActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface {
+public class ArchivedChatsActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
 
     AppBarLayout abL;
     Toolbar tB;
@@ -432,6 +437,39 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
 
     @Override
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT) {
+            long requestNumber = request.getNumber();
+            log("MegaRequest.TYPE_INVITE_CONTACT finished: " + requestNumber);
+            int errorCode = e.getErrorCode();
+            if (errorCode == MegaError.API_OK && requestNumber == MegaContactRequest.INVITE_ACTION_ADD) {
+                showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
+            } else if (errorCode == MegaError.API_EEXIST) {
+                showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+            } else if (errorCode == MegaError.API_EARGS && requestNumber == MegaContactRequest.INVITE_ACTION_ADD) {
+                showSnackbar(getString(R.string.error_own_email_as_contact));
+            } else {
+                showSnackbar(getString(R.string.general_error));
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
     }
 }
