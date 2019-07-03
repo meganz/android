@@ -9,7 +9,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 243
-        versionName "3.6.3 (243)"
+        versionName "3.6.3 (244)"
         multiDexEnabled true
     }
 
