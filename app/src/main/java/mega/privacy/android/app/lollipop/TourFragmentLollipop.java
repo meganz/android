@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
@@ -31,6 +32,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     private ImageView fourthItem;
     private Button bRegister;
     private Button bLogin;
+    private ScrollView baseContainer;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -68,6 +70,17 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     public void onResume() {
         super.onResume();
         setStatusBarColor(viewPager.getCurrentItem());
+
+        // For small screen like nexus one or bigger screen, this is to force the scroll view to bottom to show buttons
+        // Meanwhile, tour image glide could also be shown
+        baseContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                if (baseContainer != null) {
+                    baseContainer.fullScroll(View.FOCUS_DOWN);
+                }
+            }
+        });
     }
 
     @Override
@@ -84,6 +97,8 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         secondItem = (ImageView) v.findViewById(R.id.second_item);
         thirdItem = (ImageView) v.findViewById(R.id.third_item);
         fourthItem = (ImageView) v.findViewById(R.id.fourth_item);
+
+        baseContainer = (ScrollView) v.findViewById(R.id.tour_fragment_base_container);
 
         bLogin = (Button) v.findViewById(R.id.button_login_tour);
         bRegister = (Button) v.findViewById(R.id.button_register_tour);
