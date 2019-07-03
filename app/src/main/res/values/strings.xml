@@ -2485,8 +2485,8 @@
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">Slide to cancel</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">This voice clip is not available</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a Voice clip">Slide to cancel</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a Voice clip that it is not available">This Voice clip is not available</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
@@ -2498,8 +2498,8 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
 	</plurals>
 
-    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice clip while on a call in progress">Recording voice clip is not allowed during a call</string>
-    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice clip and occurs an error to process the action">An error occurred while trying to upload the Voice clip.</string>
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a Voice clip while on a call in progress">Recording Voice clip is not allowed during a call</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a Voice clip and occurs an error to process the action">An error occurred while trying to upload the Voice clip.</string>
 
 
 </resources>

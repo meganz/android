@@ -17,12 +17,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -155,8 +153,8 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                 }
             });
 
-            if (adapter == null){
-                adapter = new MegaChatFileStorageAdapter(context, this, recyclerView, aB, mPhotoUris, dimImages);
+            if (adapter == null) {
+                adapter = new MegaChatFileStorageAdapter(context, this, aB, mPhotoUris, dimImages);
                 adapter.setHasStableIds(true);
 
             }else{
@@ -207,11 +205,11 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
 
-    public void updateIconSend(boolean flag){
-        log("updateIconSend() - "+flag);
-        if(flag){
+    public void updateIconSend(boolean isVisible) {
+        log("updateIconSend() - " + isVisible);
+        if (isVisible) {
             sendIcon.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             sendIcon.setVisibility(View.GONE);
         }
     }

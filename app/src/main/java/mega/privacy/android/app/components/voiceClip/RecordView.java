@@ -63,19 +63,19 @@ public class RecordView extends RelativeLayout {
     private AnimationHelper animationHelper;
     private View layoutLock;
     private ImageView imageLock, imageArrow;
-    private boolean flagRB = false;
+    private boolean isPadlockShouldBeShown = false;
     private boolean isLockpadShown = false;
     private boolean isRecordingNow = false;
     private Handler handlerStartRecord = new Handler();
     private Handler handlerShowPadLock = new Handler();
     private float previewX = 0;
     private Animation animJump, animJumpFast;
-    private int cont = 0;
+    private int count = 0;
     private DisplayMetrics outMetrics;
     final Runnable runPadLock = new Runnable() {
         @Override
         public void run() {
-            if (flagRB) {
+            if (isPadlockShouldBeShown) {
                 showLock(true);
             }
         }
@@ -83,7 +83,7 @@ public class RecordView extends RelativeLayout {
     final Runnable runStartRecord = new Runnable() {
         @Override
         public void run() {
-            if (flagRB) {
+            if (isPadlockShouldBeShown) {
                 handlerShowPadLock.postDelayed(runPadLock, TIME_ANIMATION);
             }
         }
@@ -201,7 +201,7 @@ public class RecordView extends RelativeLayout {
 
     public void showLock(boolean needToShow) {
         if (needToShow) {
-            cont = 0;
+            count = 0;
             if (layoutLock.getVisibility() == View.GONE) {
                 layoutLock.setVisibility(View.VISIBLE);
                 imageArrow.setVisibility(VISIBLE);
@@ -209,9 +209,9 @@ public class RecordView extends RelativeLayout {
                 createAnimation(needToShow, Util.px2dp(175, outMetrics), 500);
             }
         } else {
-            flagRB = false;
-            cont++;
-            if (cont == 1 && layoutLock.getVisibility() == View.VISIBLE) {
+            isPadlockShouldBeShown = false;
+            count++;
+            if (count == 1 && layoutLock.getVisibility() == View.VISIBLE) {
                 layoutLock.setVisibility(View.GONE);
                 isLockpadShown = false;
                 createAnimation(needToShow, 10, 250);
@@ -336,7 +336,7 @@ public class RecordView extends RelativeLayout {
         log("StartRecordingTime");
 
         handlerStartRecord.postDelayed(runStartRecord, 100); //500 milliseconds delay to record
-        flagRB = true;
+        isPadlockShouldBeShown = true;
     }
 
     public void playSound(int type) {
@@ -509,7 +509,7 @@ public class RecordView extends RelativeLayout {
         lastY = motionEvent.getRawY();
     }
 
-    private void inicializateAnimationHelper() {
+    private void resetAnimationHelper() {
         if (animationHelper == null) return;
         animationHelper.clearAlphaAnimation(false);
         animationHelper.setStartRecorded(false);
@@ -519,7 +519,7 @@ public class RecordView extends RelativeLayout {
         log("onActionCancel()");
         userBehaviour = UserBehaviour.NONE;
         removeHandlerPadLock();
-        flagRB = false;
+        isPadlockShouldBeShown = false;
         firstX = 0;
         firstY = 0;
         lastX = 0;
@@ -527,7 +527,7 @@ public class RecordView extends RelativeLayout {
         recordButtonTranslation(recordBtnLayout, 0, 0);
         slideToCancelTranslation(0);
         startStopCounterTime(false);
-        inicializateAnimationHelper();
+        resetAnimationHelper();
         showLock(false);
         recordListenerOptions(CANCEL_RECORD, 0);
     }
@@ -541,7 +541,7 @@ public class RecordView extends RelativeLayout {
             finalTime = System.currentTimeMillis() - startTime;
         }
         removeHandlerPadLock();
-        flagRB = false;
+        isPadlockShouldBeShown = false;
         firstX = 0;
         firstY = 0;
         lastX = 0;
@@ -555,7 +555,7 @@ public class RecordView extends RelativeLayout {
             log("onActionUp:less than a second");
             startTime = 0;
             recordListenerOptions(LESS_SECOND_RECORD, 0);
-            inicializateAnimationHelper();
+            resetAnimationHelper();
             return;
         }
 
@@ -600,21 +600,13 @@ public class RecordView extends RelativeLayout {
     }
 
     private void removeHandlerPadLock() {
-        if (handlerShowPadLock == null) return;
         handlerShowPadLock.removeCallbacksAndMessages(null);
-
-        if (runPadLock == null) return;
         handlerShowPadLock.removeCallbacks(runPadLock);
-
     }
 
     private void removeHandlerRecord() {
-        if (handlerStartRecord == null) return;
         handlerStartRecord.removeCallbacksAndMessages(null);
-
-        if (runStartRecord == null) return;
         handlerStartRecord.removeCallbacks(runStartRecord);
-
     }
 
     private void clearAnimations(ImageView image1) {

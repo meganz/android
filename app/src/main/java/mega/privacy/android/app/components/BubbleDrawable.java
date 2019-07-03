@@ -49,8 +49,7 @@ public class BubbleDrawable extends Drawable {
     }
 
     public void setPointerAlignment(int pointerAlignment) {
-        if (pointerAlignment < 0 || pointerAlignment > 3) {
-        } else {
+        if (pointerAlignment >= 0 && pointerAlignment <= 3) {
             mPointerAlignment = pointerAlignment;
         }
     }

@@ -24,7 +24,7 @@ import static android.view.View.VISIBLE;
 public class AnimationHelper {
     private final static int DURATION_BLINK_MICRO = 500;
     private final static int DURATION_ALPHA = 250;
-    private final static int TRASLATE_DISTANCE_BASKET = 90;
+    private final static int MOVE_BASKET = 90;
     private Context context;
     private AnimatedVectorDrawableCompat animatedVectorDrawable;
     private ImageView basketImg, smallBlinkingMic;
@@ -63,8 +63,8 @@ public class AnimationHelper {
         micAnimation = (AnimatorSet) AnimatorInflaterCompat.loadAnimator(context, R.animator.delete_mic_animation);
         micAnimation.setTarget(smallBlinkingMic); // set the view you want to animate
 
-        translateAnimation1 = initializeTranslateAnimation(basketInitialX, basketInitialX + TRASLATE_DISTANCE_BASKET);
-        translateAnimation2 = initializeTranslateAnimation(basketInitialX + TRASLATE_DISTANCE_BASKET, basketInitialX);
+        translateAnimation1 = initializeTranslateAnimation(basketInitialX, basketInitialX + MOVE_BASKET);
+        translateAnimation2 = initializeTranslateAnimation(basketInitialX + MOVE_BASKET, basketInitialX);
 
         micAnimation.start();
         basketImg.setImageDrawable(animatedVectorDrawable);

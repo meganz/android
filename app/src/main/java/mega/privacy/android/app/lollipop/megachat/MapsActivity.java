@@ -420,12 +420,14 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                     log("getLastLocation() onSuccess");
                     addresses = getAddresses(getApplicationContext(), location.getLatitude(), location.getLongitude());
                     if (addresses != null) {
+                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                        String addressLine = addresses.get(0).getAddressLine(0);
                         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                            currentAddress = new MapAddress(new LatLng(location.getLatitude(), location.getLongitude()), getString(R.string.current_location_label), addresses.get(0).getAddressLine(0));
+                            currentAddress = new MapAddress(latLng, getString(R.string.current_location_label), addressLine);
                             currentLocationName.setText(currentAddress.getName());
                             currentLocationAddres.setText(currentAddress.getAddress());
                         } else {
-                            currentAddress = new MapAddress(new LatLng(location.getLatitude(), location.getLongitude()), getString(R.string.current_location_landscape_label, addresses.get(0).getAddressLine(0)), addresses.get(0).getAddressLine(0));
+                            currentAddress = new MapAddress(latLng, getString(R.string.current_location_landscape_label, addressLine), addressLine);
                             String textToShow = String.format(currentAddress.getName());
                             try {
                                 textToShow = textToShow.replace("[A]", "<font color=\'#8c8c8c\'>");

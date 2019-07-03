@@ -1171,21 +1171,7 @@ public class Util {
 		return speedString;
 	}
 
-	public static String getVoiceClipName(long timestamp) {
-		log("getVoiceNoteName() - timestamp: "+timestamp);
-		//Get date time:
-		try{
-			Calendar calendar = Calendar.getInstance();
-			TimeZone tz = TimeZone.getDefault();
-			calendar.setTimeInMillis(timestamp * 1000L);
-			calendar.add(Calendar.MILLISECOND, tz.getOffset(calendar.getTimeInMillis()));
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-			return sdf.format(calendar.getTime()) + ".m4a";
 
-		}catch (Exception e) {}
-
-		return null;
-	}
 	
 	public static String getPhotoSyncName (long timeStamp, String fileName){
 		String photoSyncName = null;

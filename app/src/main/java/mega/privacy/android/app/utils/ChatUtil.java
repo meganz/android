@@ -6,12 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
-import android.util.TypedValue;
 import android.support.v7.app.AlertDialog;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -107,7 +108,7 @@ public class ChatUtil {
     }
 
     public static long getVoiceClipDuration(MegaNode node) {
-        return node.getDuration() < 0 ? 0 : node.getDuration()*1000;
+        return node.getDuration() <= 0 ? 0 : node.getDuration() * 1000;
     }
 
     /* Get the height of the action bar */
@@ -261,21 +262,34 @@ public class ChatUtil {
     }
 
     public static String milliSecondsToTimer(long milliseconds) {
-        String finalTimerString = "";
-        String secondsString = "";
+        String minutesString;
+        String secondsString;
+        String finalTime = "";
         int hours = (int) (milliseconds / (1000 * 60 * 60));
         int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
         int seconds = (int) ((milliseconds % (1000 * 60 * 60)) % (1000 * 60) / 1000);
-        if (hours > 0) {
-            finalTimerString = hours + ":";
+
+        if (minutes < 10) {
+            minutesString = "0" + minutes;
+        } else {
+            minutesString = "" + minutes;
         }
         if (seconds < 10) {
             secondsString = "0" + seconds;
         } else {
             secondsString = "" + seconds;
         }
-        finalTimerString = finalTimerString + minutes + ":" + secondsString;
-        return finalTimerString;
+
+        if (hours > 0) {
+            if (hours < 10) {
+                finalTime = "0" + hours + ":";
+            } else {
+                finalTime = "" + hours;
+            }
+        }
+
+        finalTime = finalTime + minutesString + ":" + secondsString;
+        return finalTime;
     }
 
     private static void log(String message) {

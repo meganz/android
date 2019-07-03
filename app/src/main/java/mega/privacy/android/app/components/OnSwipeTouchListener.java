@@ -17,10 +17,19 @@ public class OnSwipeTouchListener implements OnTouchListener {
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_UP){
-            onUp();
-        }
         return gestureDetector.onTouchEvent(event);
+    }
+
+    public void onSwipeRight() {
+    }
+
+    public void onSwipeLeft() {
+    }
+
+    public void onSwipeTop() {
+    }
+
+    public void onSwipeBottom() {
     }
 
     private final class GestureListener extends SimpleOnGestureListener {
@@ -30,25 +39,11 @@ public class OnSwipeTouchListener implements OnTouchListener {
 
         @Override
         public boolean onDown(MotionEvent e) {
-            down();
             return true;
         }
-
-        @Override
-        public boolean onSingleTapUp (MotionEvent e) {
-            singleTap();
-            return true;
-        }
-
-        @Override
-        public void onLongPress (MotionEvent e) {
-            longPress();
-        }
-
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-
             boolean result = false;
             try {
                 float diffY = e2.getY() - e1.getY();
@@ -76,20 +71,4 @@ public class OnSwipeTouchListener implements OnTouchListener {
             return result;
         }
     }
-
-    private void onUp() {}
-
-    private void onSwipeRight() {}
-
-    private void onSwipeLeft() {}
-
-    private void onSwipeTop() {}
-
-    private void onSwipeBottom() {}
-
-    private void singleTap() {}
-
-    private void down() {}
-
-    private void longPress() {}
 }

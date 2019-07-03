@@ -63,6 +63,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
+
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.toCDATA;
@@ -277,14 +278,14 @@ public class ChatController {
         }
     }
 
-    public void deleteMessage(MegaChatMessage message, long chatId){
+    public void deleteMessage(MegaChatMessage message, long chatId) {
         log("deleteMessage");
         MegaChatMessage messageToDelete;
-        if(message == null) return;
+        if (message == null) return;
 
-        if(message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP){
+        if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
             log("deleteMessage:Delete node attachment message or voice clip message");
-            if(message.getType() == MegaChatMessage.TYPE_VOICE_CLIP && message.getMegaNodeList() != null && message.getMegaNodeList().size() > 0 && message.getMegaNodeList().get(0) != null){
+            if (message.getType() == MegaChatMessage.TYPE_VOICE_CLIP && message.getMegaNodeList() != null && message.getMegaNodeList().size() > 0 && message.getMegaNodeList().get(0) != null) {
                 deleteOwnVoiceClip(context, message.getMegaNodeList().get(0).getName());
             }
             megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
@@ -293,7 +294,7 @@ public class ChatController {
 
         log("Delete normal message");
         messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
-        if(messageToDelete == null){
+        if (messageToDelete == null) {
             log("The message cannot be deleted");
         }
     }
@@ -301,11 +302,10 @@ public class ChatController {
     /*
      * Delete a voice note from local storage
      */
-    public static void deleteOwnVoiceClip(Context mContext, String nameFile){
+    public static void deleteOwnVoiceClip(Context mContext, String nameFile) {
         log("deleteOwnVoiceClip");
         File localFile = buildVoiceClipFile(mContext, nameFile);
-        if(!isFileAvailable(localFile) || !localFile.exists()) return;
-
+        if (!isFileAvailable(localFile)) return;
         localFile.delete();
     }
 
@@ -1562,13 +1562,13 @@ public class ChatController {
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        if(ChatUtil.isVoiceClip(nodeList.get(0).getName())){
+        if(!nodeList.isEmpty() && ChatUtil.isVoiceClip(nodeList.get(0).getName())){
             File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
             checkSizeBeforeDownload(vcFile.getParentFile().getPath(), nodeList);
             return;
         }
 
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);;
+        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
 
 
         boolean askMe = Util.askMe(context);

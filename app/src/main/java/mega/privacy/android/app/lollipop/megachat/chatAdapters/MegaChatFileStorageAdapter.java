@@ -21,16 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatFileStorageFragment;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
 
 public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFileStorageAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener {
 
     Context context;
-    MegaApiAndroid megaApi;
     ActionBar aB;
     ArrayList<String> uriImages;
     Object fragment;
@@ -41,17 +38,13 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     private SparseBooleanArray selectedItems;
     private int dimPhotos;
 
-    public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<String> _uriImages, int dimPhotos) {
+    public MegaChatFileStorageAdapter(Context _context, Object fragment, ActionBar aB, ArrayList<String> _uriImages, int dimPhotos) {
         this.context = _context;
         this.fragment = fragment;
         this.uriImages = _uriImages;
         this.dimPhotos = dimPhotos;
         dbH = DatabaseHandler.getDbHandler(context);
         this.aB = aB;
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
     }
 
     private static void log(String log) {
