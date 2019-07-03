@@ -1494,7 +1494,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_OFF_HANDLE, encrypt(offline.getHandle()));
             values.put(KEY_OFF_PATH, encrypt(offline.getPath()));
             values.put(KEY_OFF_NAME, encrypt(offline.getName()));
-            values.put(KEY_OFF_PARENT, offline.getparentId());
+            values.put(KEY_OFF_PARENT, offline.getParentId());
             values.put(KEY_OFF_TYPE, encrypt(offline.getType()));
             values.put(KEY_OFF_INCOMING, offline.getOrigin());
             values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.getHandleIncoming()));
@@ -1519,7 +1519,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_OFF_HANDLE, encrypt(offline.getHandle()));
             values.put(KEY_OFF_PATH, encrypt(offline.getPath()));
             values.put(KEY_OFF_NAME, encrypt(offline.getName()));
-            values.put(KEY_OFF_PARENT, offline.getparentId());
+            values.put(KEY_OFF_PARENT, offline.getParentId());
             values.put(KEY_OFF_TYPE, encrypt(offline.getType()));
             values.put(KEY_OFF_INCOMING, offline.getOrigin());
             values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.getHandleIncoming()));
@@ -1544,7 +1544,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_OFF_HANDLE, (offline.getHandle()));
             values.put(KEY_OFF_PATH, (offline.getPath()));
             values.put(KEY_OFF_NAME, (offline.getName()));
-            values.put(KEY_OFF_PARENT, offline.getparentId());
+            values.put(KEY_OFF_PARENT, offline.getParentId());
             values.put(KEY_OFF_TYPE, (offline.getType()));
             values.put(KEY_OFF_INCOMING, offline.getOrigin());
             values.put(KEY_OFF_HANDLE_INCOMING, (offline.getHandleIncoming()));
@@ -1569,7 +1569,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_OFF_HANDLE, (offline.getHandle()));
             values.put(KEY_OFF_PATH, (offline.getPath()));
             values.put(KEY_OFF_NAME, (offline.getName()));
-            values.put(KEY_OFF_PARENT, offline.getparentId());
+            values.put(KEY_OFF_PARENT, offline.getParentId());
             values.put(KEY_OFF_TYPE, (offline.getType()));
             values.put(KEY_OFF_INCOMING, offline.getOrigin());
             values.put(KEY_OFF_HANDLE_INCOMING, (offline.getHandleIncoming()));

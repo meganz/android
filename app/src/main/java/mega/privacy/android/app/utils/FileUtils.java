@@ -353,14 +353,8 @@ public class FileUtils {
         }
     }
 
-    public static boolean moveFile(File source, File destination) {
-        if (source.renameTo(destination)) {
-            log("File moved successfully");
-            return true;
-        } else {
-            log("Error moving file");
-            return false;
-        }
+    public static boolean moveFile (File source, File destination) {
+        return source.renameTo(destination);
     }
 
     public static void log(String message) {

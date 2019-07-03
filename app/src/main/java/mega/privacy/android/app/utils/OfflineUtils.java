@@ -278,8 +278,12 @@ public class OfflineUtils {
                 path = path + offlineDIR;
             }
         }
-        path =  path + File.separator + offlineNode.getPath() + File.separator + offlineNode.getName();
-
+        if (offlineNode.getPath().equals(File.separator)) {
+            path = path + File.separator + offlineNode.getName();
+        }
+        else {
+            path = path + offlineNode.getPath() + offlineNode.getName();
+        }
         return new File(path);
     }
 
@@ -827,17 +831,20 @@ public class OfflineUtils {
      * @param context
      */
     public static void moveOfflineFiles(Context context) {
-        String nodePath = "/";
+        log("moveOfflineFiles");
+        String nodePath = File.separator;
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+        if (megaApi == null || megaApi.getRootNode() == null) return;
 
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         ArrayList<MegaOffline> offlineFiles = dbH.getOfflineFiles();
+
         if (offlineFiles == null || offlineFiles.isEmpty()) return; //No files to move
 
         for (MegaOffline offlineNode : offlineFiles) {
-            if (offlineNode.getId() == -1) continue;
+            if (offlineNode.getHandle() == "-1" || offlineNode.isFolder()) continue;
 
-            MegaNode node = megaApi.getNodeByHandle(offlineNode.getId());
+            MegaNode node = megaApi.getNodeByHandle(Long.parseLong(offlineNode.getHandle()));
             if (node != null) {
                 nodePath = getNodePath(context, node);
             }
@@ -849,21 +856,28 @@ public class OfflineUtils {
                     || node.getSize() != oldOfflineFile.length()
                     || !node.getName().equals(oldOfflineFile.getName())
                     || !nodePath.equals(offlineNode.getPath())) {
+                log("moveOfflineFiles remove from database");
                 dbH.removeById(offlineNode.getId());
                 continue;
             }
 
             File newOfflineFile = getOfflineFile(context, offlineNode);
+            new File(newOfflineFile.getParent()).mkdirs();
             if (!moveFile(oldOfflineFile, newOfflineFile)) {
+                log("moveOfflineFiles error moving: " + offlineNode.getHandle());
                 dbH.removeById(offlineNode.getId());
+                oldOfflineFile.delete();
+                continue;
             }
+
+            log("moveOfflineFiles moved: " + offlineNode.getHandle());
         }
 
         removeOldTempFolder(context, oldOfflineDIR);
     }
 
     private static File findOldOfflineFile(MegaOffline offlineNode) {
-        String path = getOldTempFolder(oldOfflineDIR).getAbsolutePath() + File.separator;
+        String path = getOldTempFolder(mainDIR).getAbsolutePath() + File.separator;
         return setOfflinePath(path, offlineNode);
     }
 
