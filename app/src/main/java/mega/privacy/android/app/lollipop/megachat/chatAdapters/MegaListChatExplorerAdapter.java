@@ -136,8 +136,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         holder.lastSeenStateText = (MarqueeTextView) v.findViewById(R.id.chat_explorer_list_last_seen_state);
         holder.participantsText = (TextView) v.findViewById(R.id.chat_explorer_list_participants);
 
-        holder.titleText.setEmojiSize(Util.px2dp(20, outMetrics));
-        holder.initialLetter.setEmojiSize(Util.px2dp(30, outMetrics));
+        holder.titleText.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+        holder.initialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
 
         v.setTag(holder);
         return holder;

@@ -501,27 +501,27 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if(viewType == ITEM_VIEW_TYPE_NORMAL) {
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
 			holder = new ViewHolderNormalChatList(v);
-			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.recent_chat_list_item_layout);
-			((ViewHolderNormalChatList)holder).muteIcon = (ImageView) v.findViewById(R.id.recent_chat_list_mute_icon);
+			holder.itemLayout = v.findViewById(R.id.recent_chat_list_item_layout);
+			((ViewHolderNormalChatList)holder).muteIcon = v.findViewById(R.id.recent_chat_list_mute_icon);
 
-			((ViewHolderNormalChatList)holder).imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
-			((ViewHolderNormalChatList)holder).contactInitialLetter = (EmojiTextView) v.findViewById(R.id.recent_chat_list_initial_letter);
-			((ViewHolderNormalChatList)holder).textViewContactName = (EmojiTextView) v.findViewById(R.id.recent_chat_list_name);
-			((ViewHolderNormalChatList)holder).textViewContent = (EmojiTextView) v.findViewById(R.id.recent_chat_list_content);
+			((ViewHolderNormalChatList)holder).imageView = v.findViewById(R.id.recent_chat_list_thumbnail);
+			((ViewHolderNormalChatList)holder).contactInitialLetter = v.findViewById(R.id.recent_chat_list_initial_letter);
+			((ViewHolderNormalChatList)holder).textViewContactName = v.findViewById(R.id.recent_chat_list_name);
+			((ViewHolderNormalChatList)holder).textViewContent = v.findViewById(R.id.recent_chat_list_content);
 
-			((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.px2dp(20, outMetrics));
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setEmojiSize(Util.px2dp(30,outMetrics));
-			((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.px2dp(15, outMetrics));
+			((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE,outMetrics));
+			((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
 
-			((ViewHolderNormalChatList)holder).textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
-			((ViewHolderNormalChatList)holder).iconMyAudioOff = (ImageView) v.findViewById(R.id.recent_chat_list_micro_off);
+			((ViewHolderNormalChatList)holder).textViewDate = v.findViewById(R.id.recent_chat_list_date);
+			((ViewHolderNormalChatList)holder).iconMyAudioOff = v.findViewById(R.id.recent_chat_list_micro_off);
 			((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.GONE);
 
-			((ViewHolderNormalChatList)holder).iconMyVideoOn = (ImageView) v.findViewById(R.id.recent_chat_list_video_on);
+			((ViewHolderNormalChatList)holder).iconMyVideoOn = v.findViewById(R.id.recent_chat_list_video_on);
 			((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
 
 
-			((ViewHolderNormalChatList)holder).imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
+			((ViewHolderNormalChatList)holder).imageButtonThreeDots = v.findViewById(R.id.recent_chat_list_three_dots);
 
 			if((context instanceof ManagerActivityLollipop) || (context instanceof ArchivedChatsActivity)){
 				((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);

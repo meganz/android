@@ -10,6 +10,7 @@ import android.support.v7.widget.AppCompatEditText;
 import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -25,6 +26,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         this(context, null);
         mContext = context;
     }
+
     public EmojiEditText(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
@@ -38,7 +40,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         if (attrs == null) {
             emojiSize = defaultEmojiSize;
         } else {
-            final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EmojiEditText);
+            final TypedArray a = mContext.obtainStyledAttributes(attrs, R.styleable.EmojiEditText);
             try {
                 emojiSize = a.getDimension(R.styleable.EmojiEditText_emojiSize, defaultEmojiSize);
             } finally {
@@ -48,27 +50,34 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         setText(getText());
     }
 
-    @Override protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
-        if(text.toString().equals("")){
+    public static void log(String message) {
+        Util.log("EmojiEditText", message);
+    }
+
+    @Override
+    protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
+        if (text.toString().equals("")) {
             return;
         }
 
         final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
         final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-        EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
+        EmojiManager.getInstance().replaceWithImages(mContext, getText(), emojiSize, defaultEmojiSize);
 
-        if((mContext instanceof GroupChatInfoActivityLollipop) || (mContext instanceof AddContactActivityLollipop)){
+        if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof AddContactActivityLollipop) {
             int maxAllowed = ChatUtil.getMaxAllowed(getText());
-            setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
-            super.onTextChanged( getText(),start,lengthBefore,lengthAfter);
-        }else{
-            if(lengthAfter>lengthBefore){
-                super.onTextChanged( getText(),start,lengthBefore,lengthAfter);
+            setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxAllowed)});
+            super.onTextChanged(getText(), start, lengthBefore, lengthAfter);
+        } else {
+            if (lengthAfter > lengthBefore) {
+                super.onTextChanged(getText(), start, lengthBefore, lengthAfter);
             }
         }
     }
 
-    @Override @CallSuper public void input(final Emoji emoji) {
+    @Override
+    @CallSuper
+    public void input(final Emoji emoji) {
         if (emoji != null) {
             final int start = getSelectionStart();
             final int end = getSelectionEnd();
@@ -81,33 +90,39 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         }
     }
 
-    @Override public float getEmojiSize() {
+    @Override
+    public float getEmojiSize() {
         return emojiSize;
     }
 
-    @Override @CallSuper public void backspace() {
+    @Override
+    public final void setEmojiSize(@Px final int pixels) {
+        setEmojiSize(pixels, true);
+    }
+
+    @Override
+    @CallSuper
+    public void backspace() {
         final KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0, KeyEvent.KEYCODE_ENDCALL);
         dispatchKeyEvent(event);
     }
 
-    @Override public final void setEmojiSize(@Px final int pixels) {
-        setEmojiSize(pixels, true);
-    }
-    @Override public final void setEmojiSize(@Px final int pixels, final boolean shouldInvalidate) {
+    @Override
+    public final void setEmojiSize(@Px final int pixels, final boolean shouldInvalidate) {
         emojiSize = pixels;
         if (shouldInvalidate) {
             setText(getText());
         }
     }
-    @Override public final void setEmojiSizeRes(@DimenRes final int res) {
+
+    @Override
+    public final void setEmojiSizeRes(@DimenRes final int res) {
         setEmojiSizeRes(res, true);
     }
-    @Override public final void setEmojiSizeRes(@DimenRes final int res, final boolean shouldInvalidate) {
-        setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
-    }
 
-    public static void log(String message) {
-        Util.log("EmojiEditText", message);
+    @Override
+    public final void setEmojiSizeRes(@DimenRes final int res, final boolean shouldInvalidate) {
+        setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
     }
 
 }

@@ -1,31 +1,36 @@
 package mega.privacy.android.app.components.twemoji;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.code.regexp.Matcher;
 
 import java.util.List;
+
 public final class EmojiShortcodes extends AbstractEmoji implements Parcelable {
 
+    public static final Creator<EmojiShortcodes> CREATOR = new Creator<EmojiShortcodes>() {
+        @Override
+        public EmojiShortcodes createFromParcel(Parcel in) {
+            return new EmojiShortcodes(in);
+        }
+
+        @Override
+        public EmojiShortcodes[] newArray(int size) {
+            return new EmojiShortcodes[size];
+        }
+    };
     private String emoji;
-
     private List<String> aliases;
-
     private String category;
-
     private String description;
-
     private List<String> tags;
-
     private String hexHtml;
-
     private String decimalHtml;
-
     private String decimalHtmlShort;
-
     private String hexHtmlShort;
-
     private String decimalSurrogateHtml;
+    private static final String HTML_GROUP = "H";
 
     protected EmojiShortcodes(Parcel in) {
         emoji = in.readString();
@@ -40,20 +45,9 @@ public final class EmojiShortcodes extends AbstractEmoji implements Parcelable {
         decimalSurrogateHtml = in.readString();
     }
 
-    public static final Creator<EmojiShortcodes> CREATOR = new Creator<EmojiShortcodes>() {
-        @Override
-        public EmojiShortcodes createFromParcel(Parcel in) {
-            return new EmojiShortcodes(in);
-        }
-
-        @Override
-        public EmojiShortcodes[] newArray(int size) {
-            return new EmojiShortcodes[size];
-        }
-    };
-
     /**
      * Gets the unicode emoji character
+     *
      * @return Emoji String
      */
     public String getEmoji() {
@@ -61,14 +55,15 @@ public final class EmojiShortcodes extends AbstractEmoji implements Parcelable {
     }
 
     public void setEmoji(String emoji) {
-        setDecimalHtml(EmojiUtilsShortcodes.htmlifyHelper(emoji,false, false));
-        setHexHtml(EmojiUtilsShortcodes.htmlifyHelper(emoji,true, false));
-        setDecimalSurrogateHtml(EmojiUtilsShortcodes.htmlifyHelper(emoji,false, true));
+        setDecimalHtml(EmojiUtilsShortcodes.htmlifyHelper(emoji, false, false));
+        setHexHtml(EmojiUtilsShortcodes.htmlifyHelper(emoji, true, false));
+        setDecimalSurrogateHtml(EmojiUtilsShortcodes.htmlifyHelper(emoji, false, true));
         this.emoji = emoji;
     }
 
     /**
      * Gets the list of all shortcodes for the emoji. shortcode is not enclosed in colons.
+     *
      * @return List of all aliases
      */
     public List<String> getAliases() {
@@ -89,6 +84,7 @@ public final class EmojiShortcodes extends AbstractEmoji implements Parcelable {
 
     /**
      * Gets the hexadecimal html entity for the emoji
+     *
      * @return the hexadecimal html string
      */
     public String getHexHtml() {
@@ -98,8 +94,8 @@ public final class EmojiShortcodes extends AbstractEmoji implements Parcelable {
     public void setHexHtml(String hexHtml) {
         this.hexHtml = hexHtml;
         Matcher matcher = htmlSurrogateEntityPattern.matcher(hexHtml);
-        if(matcher.find()) {
-            String signifiantHtmlEntity = matcher.group("H");
+        if (matcher.find()) {
+            String signifiantHtmlEntity = matcher.group(HTML_GROUP);
             this.setHexHtmlShort(signifiantHtmlEntity);
         } else {
             this.setHexHtmlShort(hexHtml);
@@ -108,6 +104,7 @@ public final class EmojiShortcodes extends AbstractEmoji implements Parcelable {
 
     /**
      * Gets the decimal html entity for the emoji
+     *
      * @return the decimal html string
      */
     public String getDecimalHtml() {
@@ -118,8 +115,8 @@ public final class EmojiShortcodes extends AbstractEmoji implements Parcelable {
 
         this.decimalHtml = decimalHtml;
         Matcher matcher = htmlSurrogateEntityPattern.matcher(decimalHtml);
-        if(matcher.find()) {
-            String signifiantHtmlEntity = matcher.group("H");
+        if (matcher.find()) {
+            String signifiantHtmlEntity = matcher.group(HTML_GROUP);
             this.setDecimalHtmlShort(signifiantHtmlEntity);
         } else {
             this.setDecimalHtmlShort(decimalHtml);

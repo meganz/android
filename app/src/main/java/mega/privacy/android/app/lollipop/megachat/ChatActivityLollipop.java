@@ -12,7 +12,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -83,7 +82,6 @@ import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -231,7 +229,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     LinearLayout toolbarElements;
     RelativeLayout toolbarElementsInside;
 
-    EmojiTextView titleToolbar;
+    private EmojiTextView titleToolbar;
     MarqueeTextView individualSubtitleToobar;
     TextView groupalSubtitleToolbar;
     LinearLayout subtitleCall;
@@ -262,17 +260,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     TextView userTypingText;
     boolean sendIsTyping=true;
     long userTypingTimeStamp = -1;
-    ImageButton keyboardTwemojiButton;
+    private ImageButton keyboardTwemojiButton;
     ImageButton mediaButton;
     ImageButton sendContactButton ;
     ImageButton pickFileSystemButton;
     ImageButton pickCloudDriveButton;
     ImageButton pickFileStorageButton;
 
-    EmojiKeyboard emojiKeyboard;
-    LinearLayout linearLayoutTwemoji;
+    private EmojiKeyboard emojiKeyboard;
 
-    RelativeLayout rLKeyboardTwemojiButton;
+    private RelativeLayout rLKeyboardTwemojiButton;
     RelativeLayout rLMediaButton;
     RelativeLayout rLSendContactButton ;
     RelativeLayout rLPickFileSystemButton;
@@ -285,7 +282,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean startVideo = false;
 
-    EmojiEditText textChat;
+    private EmojiEditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
 
@@ -481,7 +478,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         density  = getResources().getDisplayMetrics().density;
 
         //Set toolbar
-        tB = (Toolbar) findViewById(R.id.toolbar_chat);
+        tB = findViewById(R.id.toolbar_chat);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         aB.setDisplayHomeAsUpEnabled(true);
@@ -490,19 +487,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         aB.setSubtitle(null);
 
         tB.setOnClickListener(this);
-        toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
-        toolbarElementsInside = (RelativeLayout) findViewById(R.id.toolbar_elements_inside);
-        titleToolbar = (EmojiTextView) tB.findViewById(R.id.title_toolbar);
-        titleToolbar.setEmojiSize(Util.px2dp(20, outMetrics));
+        toolbarElements = tB.findViewById(R.id.toolbar_elements);
+        toolbarElementsInside = findViewById(R.id.toolbar_elements_inside);
+        titleToolbar = tB.findViewById(R.id.title_toolbar);
+        titleToolbar.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 
-        individualSubtitleToobar = (MarqueeTextView) tB.findViewById(R.id.individual_subtitle_toolbar);
-        groupalSubtitleToolbar = (TextView) tB.findViewById(R.id.groupal_subtitle_toolbar);
-        subtitleCall = (LinearLayout) tB.findViewById(R.id.subtitle_call);
-        chronoCall = (Chronometer) tB.findViewById(R.id.chrono_call);
-        participantsLayout = (LinearLayout) tB.findViewById(R.id.ll_participants);
-        participantsText = (TextView) tB.findViewById(R.id.participants_text);
-        iconStateToolbar = (ImageView) tB.findViewById(R.id.state_icon_toolbar);
-        privateIconToolbar = (ImageView) tB.findViewById(R.id.private_icon_toolbar);
+        individualSubtitleToobar = tB.findViewById(R.id.individual_subtitle_toolbar);
+        groupalSubtitleToolbar = tB.findViewById(R.id.groupal_subtitle_toolbar);
+        subtitleCall = tB.findViewById(R.id.subtitle_call);
+        chronoCall = tB.findViewById(R.id.chrono_call);
+        participantsLayout = tB.findViewById(R.id.ll_participants);
+        participantsText = tB.findViewById(R.id.participants_text);
+        iconStateToolbar = tB.findViewById(R.id.state_icon_toolbar);
+        privateIconToolbar = tB.findViewById(R.id.private_icon_toolbar);
 
         titleToolbar.setText("");
         individualSubtitleToobar.setText("");
@@ -518,9 +515,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        emptyLayout = (LinearLayout) findViewById(R.id.empty_messages_layout);
-        emptyTextView = (TextView) findViewById(R.id.empty_text_chat_recent);
-        emptyImageView = (ImageView) findViewById(R.id.empty_image_view_chat);
+        emptyLayout = findViewById(R.id.empty_messages_layout);
+        emptyTextView = findViewById(R.id.empty_text_chat_recent);
+        emptyImageView = findViewById(R.id.empty_image_view_chat);
 
         updateNavigationToolbarIcon();
 
@@ -529,47 +526,46 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         bufferManualSending = new ArrayList<>();
         bufferSending = new ArrayList<>();
 
-        fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_chat);
-        writingContainerLayout = (RelativeLayout) findViewById(R.id.writing_container_layout_chat_layout);
+        fragmentContainer = findViewById(R.id.fragment_container_chat);
+        writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
 
-        joinChatLinkLayout = (RelativeLayout) findViewById(R.id.join_chat_layout_chat_layout);
-        joinButton = (Button) findViewById(R.id.join_button);
+        joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
+        joinButton = findViewById(R.id.join_button);
         joinButton.setOnClickListener(this);
 
-        messageJumpLayout = (RelativeLayout) findViewById(R.id.message_jump_layout);
-        messageJumpText = (TextView) findViewById(R.id.message_jump_text);
+        messageJumpLayout = findViewById(R.id.message_jump_layout);
+        messageJumpText = findViewById(R.id.message_jump_text);
         messageJumpLayout.setVisibility(View.GONE);
 
-        writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
-        disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
+        writingLayout = findViewById(R.id.writing_linear_layout_chat);
+        disabledWritingLayout = findViewById(R.id.writing_disabled_linear_layout_chat);
 
-        linearLayoutTwemoji = (LinearLayout)findViewById(R.id.linear_layout_twemoji);
-        rLKeyboardTwemojiButton = (RelativeLayout) findViewById(R.id.rl_keyboard_twemoji_chat);
-        rLMediaButton = (RelativeLayout) findViewById(R.id.rl_media_icon_chat);
-        rLSendContactButton = (RelativeLayout) findViewById(R.id.rl_send_contact_icon_chat);
-        rLPickFileSystemButton = (RelativeLayout) findViewById(R.id.rl_pick_file_system_icon_chat);
-        rLPickFileStorageButton = (RelativeLayout) findViewById(R.id.rl_pick_file_storage_icon_chat);
-        rLPickCloudDriveButton = (RelativeLayout) findViewById(R.id.rl_pick_cloud_drive_icon_chat);
+        rLKeyboardTwemojiButton = findViewById(R.id.rl_keyboard_twemoji_chat);
+        rLMediaButton = findViewById(R.id.rl_media_icon_chat);
+        rLSendContactButton = findViewById(R.id.rl_send_contact_icon_chat);
+        rLPickFileSystemButton = findViewById(R.id.rl_pick_file_system_icon_chat);
+        rLPickFileStorageButton = findViewById(R.id.rl_pick_file_storage_icon_chat);
+        rLPickCloudDriveButton = findViewById(R.id.rl_pick_cloud_drive_icon_chat);
 
-        keyboardTwemojiButton = (ImageButton) findViewById(R.id.keyboard_twemoji_chat);
-        mediaButton = (ImageButton) findViewById(R.id.media_icon_chat);
-        sendContactButton = (ImageButton) findViewById(R.id.send_contact_icon_chat);
-        pickFileSystemButton = (ImageButton) findViewById(R.id.pick_file_system_icon_chat);
-        pickFileStorageButton = (ImageButton) findViewById(R.id.pick_file_storage_icon_chat);
-        pickCloudDriveButton = (ImageButton) findViewById(R.id.pick_cloud_drive_icon_chat);
+        keyboardTwemojiButton = findViewById(R.id.keyboard_twemoji_chat);
+        mediaButton = findViewById(R.id.media_icon_chat);
+        sendContactButton = findViewById(R.id.send_contact_icon_chat);
+        pickFileSystemButton = findViewById(R.id.pick_file_system_icon_chat);
+        pickFileStorageButton = findViewById(R.id.pick_file_storage_icon_chat);
+        pickCloudDriveButton = findViewById(R.id.pick_cloud_drive_icon_chat);
 
-        textChat = (EmojiEditText) findViewById(R.id.edit_text_chat);
-        textChat.setEmojiSize(Util.px2dp(20, outMetrics));
+        textChat = findViewById(R.id.edit_text_chat);
+        textChat.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 
-        emojiKeyboard = (EmojiKeyboard)findViewById(R.id.emojiView);
+        emojiKeyboard = findViewById(R.id.emojiView);
         emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
         handlerKeyboard = new Handler();
         handlerEmojiKeyboard = new Handler();
 
-        callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
+        callInProgressLayout = findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
-        callInProgressText = (TextView) findViewById(R.id.call_in_progress_text);
-        callInProgressChrono = (Chronometer) findViewById(R.id.call_in_progress_chrono);
+        callInProgressText = findViewById(R.id.call_in_progress_text);
+        callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
         callInProgressChrono.setVisibility(View.GONE);
 
         rLKeyboardTwemojiButton.setOnClickListener(this);
@@ -588,13 +584,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         messageJumpLayout.setOnClickListener(this);
 
-        fragmentContainerFileStorage = (FrameLayout) findViewById(R.id.fragment_container_file_storage);
-        fileStorageLayout = (RelativeLayout) findViewById(R.id.relative_layout_file_storage);
+        fragmentContainerFileStorage = findViewById(R.id.fragment_container_file_storage);
+        fileStorageLayout = findViewById(R.id.relative_layout_file_storage);
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
 
-        observersLayout = (RelativeLayout) findViewById(R.id.observers_layout);
-        observersNumberText = (TextView) findViewById(R.id.observers_text);
+        observersLayout = findViewById(R.id.observers_layout);
+        observersNumberText = findViewById(R.id.observers_text);
 
         textChat.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
@@ -2960,7 +2956,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             switch(item.getItemId()){
                 case R.id.chat_cab_menu_edit:{
                     log("Edit text");
-                    if((messagesSelected!=null)&&(messagesSelected.size()>0)&& (messagesSelected.get(0)!=null)){
+                    if (messagesSelected != null && messagesSelected.size() > 0 && messagesSelected.get(0) != null) {
                         editingMessage = true;
                         messageToEdit = messagesSelected.get(0).getMessage();
                         textChat.setText(messageToEdit.getContent());

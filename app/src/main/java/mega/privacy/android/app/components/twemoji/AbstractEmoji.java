@@ -28,10 +28,10 @@ abstract class AbstractEmoji {
                 if (isHex) {
                     sb.append("&#x" + Integer.toHexString(ch) + ";");
                 } else {
-                    if(isSurrogate) {
+                    if (isSurrogate) {
                         double H = Math.floor((ch - 0x10000) / 0x400) + 0xD800;
                         double L = ((ch - 0x10000) % 0x400) + 0xDC00;
-                        sb.append("&#"+ String.format("%.0f", H)+";&#"+ String.format("%.0f", L)+";");
+                        sb.append("&#" + String.format("%.0f", H) + ";&#" + String.format("%.0f", L) + ";");
                     } else {
                         sb.append("&#" + ch + ";");
                     }

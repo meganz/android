@@ -146,7 +146,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.chat_list_chat_mail_text);
         chatImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_chat_list_thumbnail);
         chatInitialLetter = (EmojiTextView) contentView.findViewById(R.id.sliding_chat_list_initial_letter);
-        chatInitialLetter.setEmojiSize(Util.scaleWidthPx(30, outMetrics));
+        chatInitialLetter.setEmojiSize(Util.scaleWidthPx(Constants.EMOJI_AVATAR_SIZE, outMetrics));
         infoChatText = (TextView) contentView.findViewById(R.id.chat_list_info_chat_text);
         optionInfoChat = (LinearLayout) contentView.findViewById(R.id.chat_list_info_chat_layout);
         optionLeaveChat= (LinearLayout) contentView.findViewById(R.id.chat_list_leave_chat_layout);

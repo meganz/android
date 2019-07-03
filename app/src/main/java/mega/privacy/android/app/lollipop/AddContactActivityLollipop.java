@@ -38,7 +38,6 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.view.ActionMode;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -85,7 +84,6 @@ import mega.privacy.android.app.lollipop.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.lollipop.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
-import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -1606,17 +1604,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         containerAddedContactsRecyclerView = (RelativeLayout) findViewById(R.id.contacts_adds_container);
         containerAddedContactsRecyclerView.setVisibility(View.GONE);
         fabImageGroup = (FloatingActionButton) findViewById(R.id.image_group_floating_button);
-        nameGroup = (EmojiEditText) findViewById(R.id.name_group_edittext);
-        nameGroup.setEmojiSize(Util.px2dp(15, outMetrics));
+        nameGroup = findViewById(R.id.name_group_edittext);
+        nameGroup.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
         nameGroup.setFilters(new InputFilter[] {new InputFilter.LengthFilter(MAX_ALLOWED_CHARACTERS_AND_EMOJIS)});
-
-        nameGroup.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return false;
-            }
-        });
-        nameGroup.setLongClickable(false);
 
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         addedContactsRecyclerView.setLayoutManager(mLayoutManager);
@@ -3054,18 +3044,15 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if (comesFromChat) {
             addParticipants(contactsSelected);
-        }
-        else if (onNewGroup) {
+        } else if (onNewGroup) {
             String chatTitle = "";
-            if(nameGroup!=null && (nameGroup.getText()).length()>0){
+            if (nameGroup != null && nameGroup.getText().length() > 0) {
                 chatTitle = nameGroup.getText().toString();
                 startConversation(contactsSelected, megaContacts, chatTitle);
-            }
-            else{
+            } else {
                 startConversation(contactsSelected, megaContacts, null);
             }
-        }
-        else {
+        } else {
             newGroup();
         }
         Util.hideKeyboard(addContactActivityLollipop, 0);

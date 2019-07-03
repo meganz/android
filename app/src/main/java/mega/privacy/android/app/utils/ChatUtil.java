@@ -4,18 +4,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.Nullable;
-import java.util.Locale;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.components.twemoji.EmojiManager;
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.Locale;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -119,21 +119,21 @@ public class ChatUtil {
 
     }
 
-    public static String getFirstLetter(String title){
+    public static String getFirstLetter(String title) {
         String result = "";
         String resultTitle = EmojiUtilsShortcodes.emojify(title);
         resultTitle = resultTitle.trim();
 
-        if(!resultTitle.isEmpty() && resultTitle.length() == 1){
+        if (!resultTitle.isEmpty() && resultTitle.length() == 1) {
             return resultTitle;
         }
 
-        if(!resultTitle.isEmpty()){
-            String lastEmoji = resultTitle.substring(0,2);
+        if (!resultTitle.isEmpty()) {
+            String lastEmoji = resultTitle.substring(0, 2);
             int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
-            if(numEmojis >0 ){
+            if (numEmojis > 0) {
                 result = lastEmoji;
-            }else{
+            } else {
                 result = String.valueOf(resultTitle.charAt(0));
                 result = result.toUpperCase(Locale.getDefault());
             }

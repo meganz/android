@@ -1,19 +1,18 @@
 package mega.privacy.android.app.components.twemoji;
 
-import android.util.Log;
-
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
 import org.hamcrest.Matchers;
 
-import java.util.List;
-
 public class EmojiUtilsShortcodes extends AbstractEmoji {
 
-    public static List<EmojiShortcodes> getAllEmojis() {
-        return EmojiManagerShortcodes.emojiData;
-    }
+    private static final String HIGH_SURROGATE = "H";
+    private static final String HIGH_SURROGATE_FIRST = "H1";
+    private static final String HIGH_SURROGATE_SECOND = "H2";
+    private static final String LOW_SURROGATE = "L";
+    private static final String LOW_SURROGATE_FIRST = "L1";
+    private static final String LOW_SURROGATE_SECOND = "L2";
 
     /**
      * Get emoji by unicode, short code, decimal html entity or hexadecimal html
@@ -27,8 +26,8 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
         if (m.find()) {
             code = m.group(1);
         }
-        if((EmojiManagerShortcodes.emojiData!=null)&&(EmojiManagerShortcodes.emojiData.size()>0)){
-            for (EmojiShortcodes emoji: EmojiManagerShortcodes.emojiData) {
+        if ((EmojiManagerShortcodes.emojiData != null) && (EmojiManagerShortcodes.emojiData.size() > 0)) {
+            for (EmojiShortcodes emoji : EmojiManagerShortcodes.emojiData) {
                 if (Matchers.equalTo(code).matches(emoji.getEmoji()) || Matchers.equalToIgnoringCase(code).matches(emoji.getEmoji()) ||
                         Matchers.equalToIgnoringCase(code).matches(emoji.getHexHtml()) || Matchers.equalToIgnoringCase(code).matches(emoji.getDecimalHtml()) ||
                         Matchers.equalToIgnoringCase(code).matches(emoji.getDecimalSurrogateHtml()) || Matchers.equalToIgnoringCase(code).matches(emoji.getHexHtmlShort()) ||
@@ -88,7 +87,7 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
         StringBuffer sb = new StringBuffer();
         int resetIndex = 0;
 
-        if(startIndex > 0) {
+        if (startIndex > 0) {
             matcher.region(startIndex, text.length());
         }
 
@@ -97,20 +96,20 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
             EmojiShortcodes emoji = getEmoji(emojiCode);
             // replace matched tokens with emojis
 
-            if(emoji!=null) {
+            if (emoji != null) {
                 matcher.appendReplacement(sb, emoji.getEmoji());
             } else {
-                if(htmlSurrogateEntityPattern2.matcher(emojiCode).matches()) {
-                    String highSurrogate1 = matcher.group("H1");
-                    String highSurrogate2 = matcher.group("H2");
-                    String lowSurrogate1 = matcher.group("L1");
-                    String lowSurrogate2 = matcher.group("L2");
-                    matcher.appendReplacement(sb, processStringWithRegex(highSurrogate1+highSurrogate2, shortCodeOrHtmlEntityPattern, 0, false));
+                if (htmlSurrogateEntityPattern2.matcher(emojiCode).matches()) {
+                    String highSurrogate1 = matcher.group(HIGH_SURROGATE_FIRST);
+                    String highSurrogate2 = matcher.group(HIGH_SURROGATE_SECOND);
+                    String lowSurrogate1 = matcher.group(LOW_SURROGATE_FIRST);
+                    String lowSurrogate2 = matcher.group(LOW_SURROGATE_SECOND);
+                    matcher.appendReplacement(sb, processStringWithRegex(highSurrogate1 + highSurrogate2, shortCodeOrHtmlEntityPattern, 0, false));
 
                     //basically this handles &#junk1;&#10084;&#65039;&#junk2; scenario
                     //verifies if &#junk1;&#10084; or &#junk1; are valid emojis via recursion
                     //if not move past &#junk1; and reset the cursor to &#10084;
-                    if(sb.toString().endsWith(highSurrogate2)) {
+                    if (sb.toString().endsWith(highSurrogate2)) {
                         resetIndex = sb.length() - highSurrogate2.length();
                     } else {
                         resetIndex = sb.length();
@@ -118,10 +117,10 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
                     sb.append(lowSurrogate1);
                     sb.append(lowSurrogate2);
                     break;
-                } else if(htmlSurrogateEntityPattern.matcher(emojiCode).matches()) {
+                } else if (htmlSurrogateEntityPattern.matcher(emojiCode).matches()) {
                     //could be individual html entities assumed as surrogate pair
-                    String highSurrogate = matcher.group("H");
-                    String lowSurrogate = matcher.group("L");
+                    String highSurrogate = matcher.group(HIGH_SURROGATE);
+                    String lowSurrogate = matcher.group(LOW_SURROGATE);
                     matcher.appendReplacement(sb, processStringWithRegex(highSurrogate, htmlEntityPattern, 0, true));
                     resetIndex = sb.length();
                     sb.append(lowSurrogate);
@@ -137,7 +136,7 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
 
         //do not recurse emojify when coming here through htmlSurrogateEntityPattern2..so we get a chance to check if the tail
         //is part of a surrogate entity
-        if(recurseEmojify && resetIndex > 0) {
+        if (recurseEmojify && resetIndex > 0) {
             return emojify(sb.toString(), resetIndex);
         }
         return sb.toString();
@@ -194,7 +193,6 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
     }
 
 
-
     /**
      * Converts emojis, hex, decimal htmls, emoticons in a string to short codes
      *
@@ -218,6 +216,7 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
     /**
      * Removes all emoji characters from the passed string. This method does not remove html characters, shortcodes.
      * To remove all shortcodes, html characters, emojify and then pass the emojified string to this method.
+     *
      * @param emojiText String to remove emoji's from.
      * @return emoji stripped string
      */
