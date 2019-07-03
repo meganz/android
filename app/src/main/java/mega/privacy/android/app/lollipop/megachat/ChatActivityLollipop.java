@@ -180,6 +180,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private final static int NUMBER_MESSAGES_TO_LOAD = 20;
     private final static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
 
+    private final static int ROTATION_PORTRAIT = 0;
+    private final static int ROTATION_LANDSCAPE = 1;
+    private final static int ROTATION_REVERSE_PORTRAIT = 2;
+    private final static int ROTATION_REVERSE_LANDSCAPE = 3;
+
+
     public static int MEGA_FILE_LINK = 1;
     public static int MEGA_FOLDER_LINK = 2;
     public static int MEGA_CHAT_LINK = 3;
@@ -2242,26 +2248,35 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * Know if you're recording right now
      */
     public void setRecordingNow(boolean recordingNow) {
-        log("setRecordingNow -> " + recordingNow);
+        log("setRecordingNow: " + recordingNow);
         recordView.setRecordingNow(recordingNow);
         if (recordView.isRecordingNow()) {
             recordButtonStates(RECORD_BUTTON_ACTIVATED);
-
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                log("lockOrientationLandscape ");
-
-                ChatUtil.lockOrientationLandscape(this);
-            } else {
-                log("lockOrientationPortrait ");
-
-                ChatUtil.lockOrientationPortrait(this);
+            int screenRotation = display.getRotation();
+            switch (screenRotation) {
+                case ROTATION_PORTRAIT: {
+                    ChatUtil.lockOrientationPortrait(this);
+                    break;
+                }
+                case ROTATION_LANDSCAPE: {
+                    ChatUtil.lockOrientationLandscape(this);
+                    break;
+                }
+                case ROTATION_REVERSE_PORTRAIT: {
+                    ChatUtil.lockOrientationReversePortrait(this);
+                }
+                case ROTATION_REVERSE_LANDSCAPE: {
+                    ChatUtil.lockOrientationReverseLandscape(this);
+                    break;
+                }
+                default: {
+                    ChatUtil.unlockOrientation(this);
+                    break;
+                }
             }
-
             if (emojiKeyboard != null) emojiKeyboard.setListenerActivated(false);
             return;
         }
-
-        log("unlockOrientation ");
 
         ChatUtil.unlockOrientation(this);
         recordButtonStates(RECORD_BUTTON_DEACTIVATED);

@@ -246,17 +246,37 @@ public class ChatUtil {
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
-    /** Locks the device window in landscape mode. */
+    /**
+     * Locks the device window in landscape mode.
+     */
     public static void lockOrientationLandscape(Activity activity) {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
-    /** Locks the device window in portrait mode. */
+    /**
+     * Locks the device window in reverse landscape mode.
+     */
+    public static void lockOrientationReverseLandscape(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+    }
+
+    /**
+     * Locks the device window in portrait mode.
+     */
     public static void lockOrientationPortrait(Activity activity) {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
-    /** Allows user to freely use portrait or landscape mode. */
+    /**
+     * Locks the device window in reverse portrait mode.
+     */
+    public static void lockOrientationReversePortrait(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+    }
+
+    /**
+     * Allows user to freely use portrait or landscape mode.
+     */
     public static void unlockOrientation(Activity activity) {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
