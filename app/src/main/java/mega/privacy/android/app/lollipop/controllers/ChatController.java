@@ -1394,7 +1394,7 @@ public class ChatController {
             MegaNode document = nodeList.get(i);
             if (document != null) {
                 document = authorizeNodeIfPreview(document, chatRoom);
-                destination = getOfflineFile(context, Constants.FROM_OTHERS, document, true, null);
+                destination = getOfflineParentFile(context, Constants.FROM_OTHERS, document, null);
                 destination.mkdirs();
 
                 log ("DESTINATION!!!!!: " + destination.getAbsolutePath());

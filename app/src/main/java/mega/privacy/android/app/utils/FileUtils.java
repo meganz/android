@@ -353,10 +353,6 @@ public class FileUtils {
         }
     }
 
-    public static boolean moveFile (File source, File destination) {
-        return source.renameTo(destination);
-    }
-
     public static void log(String message) {
         Util.log("FileUtils", message);
     }

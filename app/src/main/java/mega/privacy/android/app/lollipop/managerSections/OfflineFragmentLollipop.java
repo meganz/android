@@ -73,11 +73,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
-import static mega.privacy.android.app.utils.FileUtils.rKFile;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflinePath;
-import static mega.privacy.android.app.utils.OfflineUtils.offlineDIR;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class OfflineFragmentLollipop extends Fragment{
 
@@ -943,7 +940,7 @@ public class OfflineFragmentLollipop extends Fragment{
 		int numFiles=0;
 		
 		if(mOffInfo.size()>0){
-			String pathI = getOfflinePath(context, mOffInfo.get(0));
+			String pathI = getOfflineAbsolutePath(context, mOffInfo.get(0));
 			
 			for(int i=0; i<mOffInfo.size();i++){
 				MegaOffline mOff = (MegaOffline) mOffInfo.get(i);
@@ -1071,7 +1068,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 				else{
 					File offlineDirectory = null;
-					String path = getOfflinePath(context, currentNode);
+					String path = getOfflineAbsolutePath(context, currentNode);
 											
 					for(int i=0; i<mOffList.size();i++){
 						
@@ -1373,7 +1370,7 @@ public class OfflineFragmentLollipop extends Fragment{
 		int files=0;
 		
 		if(documents.size()>0){
-			String pathI = getOfflinePath(context, documents.get(0));
+			String pathI = getOfflineAbsolutePath(context, documents.get(0));
 			
 			for(int i=0; i<documents.size();i++){
 				MegaOffline mOff = (MegaOffline) documents.get(i);

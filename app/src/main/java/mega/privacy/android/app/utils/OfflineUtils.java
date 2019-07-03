@@ -244,7 +244,7 @@ public class OfflineUtils {
         }
     }
 
-    public static String getOfflinePath(Context context, MegaOffline offlineNode) {
+    public static String getOfflineAbsolutePath(Context context, MegaOffline offlineNode) {
 
         switch (offlineNode.getOrigin()) {
             case MegaOffline.INCOMING: {
@@ -261,10 +261,10 @@ public class OfflineUtils {
 
     public static File getOfflineFile(Context context, MegaOffline offlineNode) {
         String path =  context.getFilesDir().getAbsolutePath() + File.separator;
-        return setOfflinePath(path, offlineNode);
+        return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
     }
 
-    private static File setOfflinePath (String path, MegaOffline offlineNode) {
+    private static String getOfflinePath(String path, MegaOffline offlineNode) {
         switch (offlineNode.getOrigin()) {
             case MegaOffline.INCOMING: {
                 path = path + offlineDIR + File.separator + offlineNode.getHandleIncoming();
@@ -279,15 +279,14 @@ public class OfflineUtils {
             }
         }
         if (offlineNode.getPath().equals(File.separator)) {
-            path = path + File.separator + offlineNode.getName();
+            return path;
         }
         else {
-            path = path + offlineNode.getPath() + offlineNode.getName();
+            return path + offlineNode.getPath();
         }
-        return new File(path);
     }
 
-    public static File getOfflineFile(Context context, int from, MegaNode node, boolean onlyParent, MegaApiAndroid megaApi) {
+    public static File getOfflineParentFile(Context context, int from, MegaNode node, MegaApiAndroid megaApi) {
         String path = context.getFilesDir().getAbsolutePath() + File.separator;
 
         switch (from) {
@@ -303,13 +302,8 @@ public class OfflineUtils {
                 path = path + offlineDIR;
             }
         }
-        if (onlyParent) {
-            path = path + File.separator + MegaApiUtils.createStringTree(node, context);
-        } else {
-            path = path + File.separator + MegaApiUtils.createStringTree(node, context) + File.separator + node.getName();
-        }
 
-        return new File(path);
+        return new File(path + File.separator + MegaApiUtils.createStringTree(node, context));
     }
 
     public static String getOfflineSize(Context context){
@@ -832,6 +826,9 @@ public class OfflineUtils {
      */
     public static void moveOfflineFiles(Context context) {
         log("moveOfflineFiles");
+        int filesMoved = 0;
+        int filesNotMoved = 0;
+
         String nodePath = File.separator;
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         if (megaApi == null || megaApi.getRootNode() == null) return;
@@ -840,6 +837,7 @@ public class OfflineUtils {
         ArrayList<MegaOffline> offlineFiles = dbH.getOfflineFiles();
 
         if (offlineFiles == null || offlineFiles.isEmpty()) return; //No files to move
+        log("moveOfflineFiles offline files size on database:  " + offlineFiles.size());
 
         for (MegaOffline offlineNode : offlineFiles) {
             if (offlineNode.getHandle() == "-1" || offlineNode.isFolder()) continue;
@@ -856,29 +854,54 @@ public class OfflineUtils {
                     || node.getSize() != oldOfflineFile.length()
                     || !node.getName().equals(oldOfflineFile.getName())
                     || !nodePath.equals(offlineNode.getPath())) {
-                log("moveOfflineFiles remove from database");
-                dbH.removeById(offlineNode.getId());
+                log("moveOfflineFiles file not founded or not equal to the saved in database --> Remove");
+                deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
+                filesNotMoved++;
+                continue;
+            }
+
+            File newOfflineFileDir = getOfflineFolder(context, getOfflinePath("", offlineNode));
+            if (!isFileAvailable(newOfflineFileDir)) {
+                log("moveOfflineFiles error creating new directory");
+                deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
+                filesNotMoved++;
                 continue;
             }
 
             File newOfflineFile = getOfflineFile(context, offlineNode);
-            new File(newOfflineFile.getParent()).mkdirs();
-            if (!moveFile(oldOfflineFile, newOfflineFile)) {
-                log("moveOfflineFiles error moving: " + offlineNode.getHandle());
-                dbH.removeById(offlineNode.getId());
-                oldOfflineFile.delete();
+            if (newOfflineFile == null) {
+                log("moveOfflineFiles error creating new file");
+                deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
+                filesNotMoved++;
                 continue;
             }
 
+            try {
+                copyFile(oldOfflineFile, newOfflineFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+                log("moveOfflineFiles error copying: " + offlineNode.getHandle() + " trace: " + e.getMessage());
+                deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
+                filesNotMoved++;
+                continue;
+            }
+            filesMoved++;
             log("moveOfflineFiles moved: " + offlineNode.getHandle());
         }
-
+        log("moveOfflineFiles files moved: " + filesMoved + " files NOT moved: " + filesNotMoved);
         removeOldTempFolder(context, oldOfflineDIR);
+    }
+
+    private static void deleteOldOfflineReference(DatabaseHandler dbH, File oldOfflineFile, MegaOffline oldOfflineNode) {
+        dbH.removeById(oldOfflineNode.getId());
+        if (isFileAvailable(oldOfflineFile)) {
+            oldOfflineFile.delete();
+        }
     }
 
     private static File findOldOfflineFile(MegaOffline offlineNode) {
         String path = getOldTempFolder(mainDIR).getAbsolutePath() + File.separator;
-        return setOfflinePath(path, offlineNode);
+        return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
     }
 
     public static void log(String message) {

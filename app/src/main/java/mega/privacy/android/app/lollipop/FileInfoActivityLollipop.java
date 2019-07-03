@@ -1855,7 +1855,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         availableOfflineView.setText(R.string.context_delete_offline);
 						offlineSwitch.setChecked(true);
 
-						File destination = getOfflineFile(this, from, node, true, megaApi);
+						File destination = getOfflineParentFile(this, from, node, megaApi);
 						log("Path destination: "+destination);
 
 						if (isFileAvailable(destination) && destination.isDirectory()){
@@ -1895,7 +1895,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						result= findIncomingParentHandle(node, megaApi);
 						log("IncomingParentHandle: "+result);
 						if(result!=-1){
-							File destination = getOfflineFile(this, Constants.INCOMING_REQUEST_ADAPTER, node, true, megaApi);
+							File destination = getOfflineParentFile(this, Constants.INCOMING_REQUEST_ADAPTER, node, megaApi);
 
 							if (isFileAvailable(destination) && destination.isDirectory()){
 								File offlineFile = new File(destination, node.getName());

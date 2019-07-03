@@ -1337,7 +1337,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
         }
 
-        File offlineParent = getOfflineFile(context, adapterType, node, true, megaApi);
+        File offlineParent = getOfflineParentFile(context, adapterType, node, megaApi);
 
         if (isFileAvailable(offlineParent)) {
             File offlineFile = new File(offlineParent, node.getName());
