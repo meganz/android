@@ -270,16 +270,22 @@ if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     ./autogen.sh &>> ${LOG_FILE}
     echo "#include <limits.h>" >>  src/libsodium/include/sodium/export.h
     sed -i 's/enable-minimal/enable-minimal --disable-pie/g' dist-build/android-build.sh
-    echo "* Prebuilding libsodium for ARM"
-    dist-build/android-arm.sh &>> ${LOG_FILE}
+    #echo "* Prebuilding libsodium for ARM"
+    #dist-build/android-arm.sh &>> ${LOG_FILE}
     echo "* Prebuilding libsodium for ARMv7"
     dist-build/android-armv7-a.sh &>> ${LOG_FILE}
+    echo "* Prebuilding libsodium for ARMv8"
+    dist-build/android-armv8-a.sh &>> ${LOG_FILE}
     echo "* Prebuilding libsodium for x86"
     dist-build/android-x86.sh &>> ${LOG_FILE}
-    ln -sf libsodium-android-armv6 libsodium-android-armeabi
-    ln -sf libsodium-android-armv6 libsodium-android-armeabi-v7
+    echo "* Prebuilding libsodium for x86_64"
+    dist-build/android-x86_64.sh &>> ${LOG_FILE}
+    #ln -sf libsodium-android-armv6 libsodium-android-armeabi
+    #ln -sf libsodium-android-armv6 libsodium-android-armeabi-v7
     ln -sf libsodium-android-armv7-a libsodium-android-armeabi-v7a
+    ln -sf libsodium-android-armv8-a libsodium-android-arm64-v8a
     ln -sf libsodium-android-i686 libsodium-android-x86
+    ln -sf libsodium-android-i686 libsodium-android-x86_64
     popd &>> ${LOG_FILE}
     touch ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
 fi
