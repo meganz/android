@@ -43,6 +43,7 @@ import org.webrtc.ContextUtils;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -60,6 +61,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -98,7 +100,7 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.6.2_239";
+	static final public String USER_AGENT = "MEGAAndroid/3.6.3_244";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -568,7 +570,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					});
 		}
 		EmojiCompat.init(config);
-
+		// clear the cache files stored in the external cache folder.
+        CacheFolderManager.clearPublicCache(this);
 
 //		initializeGA();
 		

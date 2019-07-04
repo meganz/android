@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -1091,12 +1092,15 @@ public class NodeController {
         megaApi.renameNode(document, newName, ((ManagerActivityLollipop) context));
     }
 
-    public void importLink(String url) {
-
+    public int importLink(String url) {
         try {
             url = URLDecoder.decode(url, "UTF-8");
         }
-        catch (UnsupportedEncodingException e) {}
+        catch (Exception e) {
+            log("Error decoding URL: " + url);
+            log(e.toString());
+        }
+
         url.replace(' ', '+');
         if(url.startsWith("mega://")){
             url = url.replace("mega://", "https://mega.co.nz/");
@@ -1105,36 +1109,31 @@ public class NodeController {
         log("url " + url);
 
         // Download link
-        if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
-            log("open link url");
-
-//			Intent openIntent = new Intent(this, ManagerActivityLollipop.class);
+        if (AndroidMegaRichLinkMessage.isFileLink(url)) {
             Intent openFileIntent = new Intent(context, FileLinkActivityLollipop.class);
             openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFileIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
             openFileIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFileIntent);
-//			finish();
-            return;
+            return Constants.FILE_LINK;
         }
-
-        // Folder Download link
-        else if (url != null && (url.matches("^https://mega.co.nz/#F!.+$") || url.matches("^https://mega.nz/#F!.+$"))) {
-            log("folder link url");
+        else if (AndroidMegaRichLinkMessage.isFolderLink(url)) {
             Intent openFolderIntent = new Intent(context, FolderLinkActivityLollipop.class);
             openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
             openFolderIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFolderIntent);
-//			finish();
-            return;
+            return Constants.FOLDER_LINK;
         }
-        else{
-            log("wrong url");
-            Intent errorIntent = new Intent(context, ManagerActivityLollipop.class);
-            errorIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            ((ManagerActivityLollipop) context).startActivity(errorIntent);
+        else if (AndroidMegaRichLinkMessage.isChatLink(url)) {
+            return Constants.CHAT_LINK;
         }
+        else if (AndroidMegaRichLinkMessage.isContactLink(url)) {
+            return Constants.CONTACT_LINK;
+        }
+
+        log("wrong url");
+        return Constants.ERROR_LINK;
     }
 
     //old getPublicLinkAndShareIt

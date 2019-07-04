@@ -719,7 +719,6 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Gönder</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">10 başarısız denemeden sonra bütün yerel dosyalar silinecek ve hesaptan çıkış yapılacaktır</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Yanlış kod</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Hatalı PIN kodu, lütfen tekrar deneyin. %2d hakkınız kaldı</string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Kodları eşleşmiyor</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">PIN Kodunu girin</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">PIN Kodunu tekrar girin</string>
@@ -1967,8 +1966,6 @@
 
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Geçersiz mesaj biçimi</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Geçersiz mesaj imzası</string>
-
-    <string name="add_to_cloud_import" context="Menu option">Bulut Sürücüye ekle</string>
 
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">Medya akışı oluşturulurken hata oluştu</string>
 
