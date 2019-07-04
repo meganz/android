@@ -67,6 +67,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Display;
@@ -14677,11 +14678,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             case MegaApiJava.STORAGE_STATE_GREEN:
                 log("STORAGE STATE GREEN");
                 intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-					startForegroundService(intent);
-				} else {
+
+                // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
+                try {
 					startService(intent);
 				}
+				catch (Exception e) {
+					log("Exception starting UploadService: " + e.getMessage());
+					e.printStackTrace();
+				}
+
 				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
 				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
 					log("ACCOUNT TYPE FREE");
@@ -14695,11 +14701,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case MegaApiJava.STORAGE_STATE_ORANGE:
 				log("STORAGE STATE ORANGE");
                 intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-					startForegroundService(intent);
-				} else {
+
+				// TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
+                try {
 					startService(intent);
 				}
+				catch (Exception e) {
+					log("Exception starting UploadService: " + e.getMessage());
+					e.printStackTrace();
+				}
+
 				if (onCreate && isStorageStatusDialogShown) {
 					isStorageStatusDialogShown = false;
 					showStorageAlmostFullDialog();
