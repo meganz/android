@@ -1656,11 +1656,10 @@ public class ChatController {
 
         //Check if there is available space
         double availableFreeSpace = Double.MAX_VALUE;
-        try{
+        try {
             StatFs stat = new StatFs(parentPath);
-            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-        }
-        catch(Exception ex){}
+            availableFreeSpace = stat.getAvailableBytes();
+        } catch (Exception ex) { }
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
         if(availableFreeSpace < sizeC) {
