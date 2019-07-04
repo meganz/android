@@ -183,10 +183,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public int onStartCommand(final Intent intent,int flags,int startId) {
 		log("onStartCommand");
 		canceled = false;
-        uploadCount = intent.getIntExtra(EXTRA_UPLOAD_COUNT,0);
-		if(intent == null){
+
+		if (intent == null) {
 			return START_NOT_STICKY;
 		}
+
+		uploadCount = intent.getIntExtra(EXTRA_UPLOAD_COUNT, 0);
 
 		if ((intent.getAction() != null)){
 			if (intent.getAction().equals(ACTION_CANCEL)) {

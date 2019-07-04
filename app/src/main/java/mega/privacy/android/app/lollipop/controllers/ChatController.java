@@ -603,7 +603,7 @@ public class ChatController {
                 return builder.toString();
             } else {
                 log("Participant privilege change!");
-                log("Message type PRIVILEGE CHANGE: " + message.getContent());
+                log("Message type PRIVILEGE CHANGE - Message ID: " + message.getMsgId());
 
                 String fullNameTitle = getFullName(message.getHandleOfAction(), chatRoom);
 
@@ -722,7 +722,7 @@ public class ChatController {
                     builder.append(result);
                     return builder.toString();
                 }else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
-                    log("Message type TITLE CHANGE: " + message.getContent());
+                    log("Message type TITLE CHANGE - Message ID: " + message.getMsgId());
 
                     String messageContent = message.getContent();
                     String textToShow = String.format(context.getString(R.string.non_format_change_title_messages), megaChatApi.getMyFullname(), messageContent);
@@ -911,7 +911,7 @@ public class ChatController {
                     return builder.toString();
 
                 } else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
-                    log("Message type CHANGE TITLE " + message.getContent());
+                    log("Message type CHANGE TITLE - Message ID: " + message.getMsgId());
 
                     String messageContent = message.getContent();
 
@@ -1036,7 +1036,7 @@ public class ChatController {
                 }
                 else{
                     log("Type message: " + message.getType());
-                    log("Content: " + message.getContent());
+                    log("Message ID: " + message.getMsgId());
                     return "";
                 }
             }
@@ -1757,6 +1757,7 @@ public class ChatController {
                     log("IsFile");
                     String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
+                    MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
                     if(localPath != null){
                         log("localPath != null");
                         try {
@@ -1826,6 +1827,7 @@ public class ChatController {
                                 mediaIntent.putExtra("isPlayList", false);
                                 mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                                 mediaIntent.putExtra("adapterType", Constants.FROM_CHAT);
+                                mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 }
