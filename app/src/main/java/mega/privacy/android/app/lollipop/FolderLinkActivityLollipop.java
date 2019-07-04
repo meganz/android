@@ -1158,7 +1158,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			statusDialog.setMessage(getString(R.string.general_importing));
 			statusDialog.show();
 
-			if(adapterList.isMultipleSelect()){
+			if(adapterList != null && adapterList.isMultipleSelect()){
 				log("is multiple select");
 				List<MegaNode> nodes = adapterList.getSelectedNodes();
 				if(nodes.size() != 0){
