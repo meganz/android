@@ -475,7 +475,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 if(chat==null){
                     log("Selected chat NULL");
                 }
-                log("Leave chat with: "+chat.getTitle());
+                log("Leave chat - Chat ID: " + chat.getChatId());
                 ((ManagerActivityLollipop)context).showConfirmationLeaveChat(chat);
                 break;
             }
@@ -484,7 +484,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 if(chat==null){
                     log("Selected chat NULL");
                 }
-                log("Clear chat with: "+chat.getTitle());
+                log("Clear chat - Chat ID: " + chat.getChatId());
                 ((ManagerActivityLollipop)context).showConfirmationClearChat(chat);
 
                 break;
