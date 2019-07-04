@@ -260,8 +260,12 @@ public class OfflineUtils {
     }
 
     public static File getOfflineFile(Context context, MegaOffline offlineNode) {
-        String path =  context.getFilesDir().getAbsolutePath() + File.separator;
-        return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
+        String path = context.getFilesDir().getAbsolutePath() + File.separator;
+        if (offlineNode.isFolder()) {
+            return new File(getOfflinePath(path, offlineNode) + File.separator + offlineNode.getName());
+        } else {
+            return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
+        }
     }
 
     private static String getOfflinePath(String path, MegaOffline offlineNode) {
@@ -826,8 +830,6 @@ public class OfflineUtils {
      */
     public static void moveOfflineFiles(Context context) {
         log("moveOfflineFiles");
-        int filesMoved = 0;
-        int filesNotMoved = 0;
 
         String nodePath = File.separator;
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -837,7 +839,6 @@ public class OfflineUtils {
         ArrayList<MegaOffline> offlineFiles = dbH.getOfflineFiles();
 
         if (offlineFiles == null || offlineFiles.isEmpty()) return; //No files to move
-        log("moveOfflineFiles offline files size on database:  " + offlineFiles.size());
 
         for (MegaOffline offlineNode : offlineFiles) {
             if (offlineNode.getHandle() == "-1" || offlineNode.isFolder()) continue;
@@ -856,23 +857,14 @@ public class OfflineUtils {
                     || !nodePath.equals(offlineNode.getPath())) {
                 log("moveOfflineFiles file not founded or not equal to the saved in database --> Remove");
                 deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
-                filesNotMoved++;
                 continue;
             }
 
             File newOfflineFileDir = getOfflineFolder(context, getOfflinePath("", offlineNode));
-            if (!isFileAvailable(newOfflineFileDir)) {
-                log("moveOfflineFiles error creating new directory");
-                deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
-                filesNotMoved++;
-                continue;
-            }
-
             File newOfflineFile = getOfflineFile(context, offlineNode);
-            if (newOfflineFile == null) {
-                log("moveOfflineFiles error creating new file");
+            if (!isFileAvailable(newOfflineFileDir) || newOfflineFile == null) {
+                log("moveOfflineFiles error creating new directory or creating new file");
                 deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
-                filesNotMoved++;
                 continue;
             }
 
@@ -882,13 +874,10 @@ public class OfflineUtils {
                 e.printStackTrace();
                 log("moveOfflineFiles error copying: " + offlineNode.getHandle() + " trace: " + e.getMessage());
                 deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
-                filesNotMoved++;
                 continue;
             }
-            filesMoved++;
-            log("moveOfflineFiles moved: " + offlineNode.getHandle());
         }
-        log("moveOfflineFiles files moved: " + filesMoved + " files NOT moved: " + filesNotMoved);
+
         removeOldTempFolder(context, oldOfflineDIR);
     }
 
