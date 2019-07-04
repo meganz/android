@@ -533,7 +533,6 @@
                         android:orientation="vertical"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="25dp"
-                        android:layout_marginBottom="-10dp"
                         android:layout_above="@+id/record_button_layout"
                         android:visibility="visible">
                         <TextView
