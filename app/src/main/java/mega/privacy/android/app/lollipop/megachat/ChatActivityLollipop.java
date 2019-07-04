@@ -314,10 +314,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout fileStorageLayout;
     private ChatFileStorageFragment fileStorageF;
 
-    ArrayList<AndroidMegaChatMessage> messages;
-    ArrayList<AndroidMegaChatMessage> bufferMessages;
-    ArrayList<AndroidMegaChatMessage> bufferManualSending;
-    ArrayList<AndroidMegaChatMessage> bufferSending;
+    ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+    ArrayList<AndroidMegaChatMessage> bufferMessages = new ArrayList<>();
+    ArrayList<AndroidMegaChatMessage> bufferSending = new ArrayList<>();
 
     public static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
     public static int TYPE_MESSAGE_NEW_MESSAGE = 1;
@@ -519,11 +518,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         emptyImageView = (ImageView) findViewById(R.id.empty_image_view_chat);
 
         updateNavigationToolbarIcon();
-
-        messages = new ArrayList<>();
-        bufferMessages = new ArrayList<>();
-        bufferManualSending = new ArrayList<>();
-        bufferSending = new ArrayList<>();
 
         fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_chat);
         writingContainerLayout = (RelativeLayout) findViewById(R.id.writing_container_layout_chat_layout);
