@@ -66,6 +66,7 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Display;
@@ -14488,7 +14489,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             case MegaApiJava.STORAGE_STATE_GREEN:
                 log("STORAGE STATE GREEN");
                 intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
-                startService(intent);
+
+                // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
+                try {
+					startService(intent);
+				}
+				catch (Exception e) {
+					log("Exception starting UploadService: " + e.getMessage());
+					e.printStackTrace();
+				}
+
 				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
 				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
 					log("ACCOUNT TYPE FREE");
@@ -14502,7 +14512,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case MegaApiJava.STORAGE_STATE_ORANGE:
 				log("STORAGE STATE ORANGE");
                 intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
-                startService(intent);
+
+				// TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
+                try {
+					startService(intent);
+				}
+				catch (Exception e) {
+					log("Exception starting UploadService: " + e.getMessage());
+					e.printStackTrace();
+				}
+
 				if (onCreate && isStorageStatusDialogShown) {
 					isStorageStatusDialogShown = false;
 					showStorageAlmostFullDialog();
@@ -14936,7 +14955,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
-					startService(intent);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+						startForegroundService(intent);
+					} else {
+						startService(intent);
+					}
 				}
 			}
 		}
@@ -14970,7 +14993,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				String id = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
 				String name = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-				Integer hasPhone = cursorID.getInt(cursorID.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+				int hasPhone = cursorID.getInt(cursorID.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
 				// get the user's email address
 				String email = null;
@@ -15004,6 +15027,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				createFile(name, data.toString(), parentNode);
 			}
+			cursorID.close();
 		}
 		else{
 			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_temporary_unavaible), -1);
@@ -17719,7 +17743,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 		if (item != null){
-			log("onChatListItemUpdate:" + item.getTitle());
+			log("onChatListItemUpdate:" + item.getChatId());
 			if (item.isPreview()) {
 				return;
 			}
@@ -17736,7 +17760,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(Util.isChatEnabled()){
 			if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-				log("Change unread count: " + item.getTitle());
+				log("Change unread count: " + item.getUnreadCount());
 				setChatBadge();
 				updateNavigationToolbarIcon();
 			}

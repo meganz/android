@@ -42,6 +42,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -156,7 +157,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		long handle;
     	Bitmap preview;
-    	File destination; 
+    	File destination;
+
     	
 		@Override
 		protected Integer doInBackground(Long... params){
@@ -245,17 +247,9 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			else if (param == 2){
 				MegaNode node = megaApi.getNodeByHandle(handle);
 				pendingFullImages.add(handle);
-				log("document.name: " +  node.getName() + "_handle: " + node.getHandle());
-				log("destination.getabsolutepath: " + destination.getAbsolutePath());
-
-				File cacheDir;
-				if (activity.getExternalCacheDir() != null) {
-					cacheDir = activity.getExternalCacheDir();
-				}
-				else{
-					cacheDir = activity.getCacheDir();
-				}
-				megaApi.startDownload(node, cacheDir.getAbsolutePath() + "/", megaFullScreenImageAdapter);
+				log("Node handle: " + node.getHandle());
+				String previewFolder = CacheFolderManager.getCacheFolder(context, CacheFolderManager.PREVIEW_FOLDER).getAbsolutePath() + File.separator;
+				megaApi.startDownload(node, previewFolder, megaFullScreenImageAdapter);
 			}
 		}
 	}	
