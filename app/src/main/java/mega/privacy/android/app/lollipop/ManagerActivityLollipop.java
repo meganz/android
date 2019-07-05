@@ -5478,7 +5478,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     	switch (drawerItem) {
 			case CLOUD_DRIVE: {
-				tabLayoutCloud.setVisibility(View.VISIBLE);
+				if (getTabItemCloud() == CLOUD_TAB
+						|| (getTabItemCloud() == RECENTS_TAB && getDeepBrowserTreeRecents() == 0)) {
+					tabLayoutCloud.setVisibility(View.VISIBLE);
+				}
 				viewPagerCloud.setVisibility(View.VISIBLE);
 				break;
 			}
@@ -18516,6 +18519,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 *             and disable the swipe
 	 */
 	public void showTabCloud(boolean show) {
+		if (drawerItem != DrawerItem.CLOUD_DRIVE) return;
+
 		if (show) {
 			tabLayoutCloud.setVisibility(View.VISIBLE);
 			viewPagerCloud.disableSwipe(false);

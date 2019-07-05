@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/mail_my_account"
                 android:singleLine="true"
                 android:ellipsize="middle"/>
 
@@ -62,13 +62,14 @@
 
     <RelativeLayout
         android:id="@+id/media_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp">
 
         <ImageView
             android:id="@+id/thumbnail_media"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
         <RelativeLayout
             android:id="@+id/video_layout"

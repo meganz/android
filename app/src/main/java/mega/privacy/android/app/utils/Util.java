@@ -123,7 +123,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
@@ -2303,6 +2303,14 @@ public class Util {
 		if (v != null){
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+		}
+	}
+
+	public static boolean isScreenInPortrait(Context context) {
+		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 

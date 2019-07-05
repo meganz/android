@@ -24,6 +24,7 @@ import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -92,6 +93,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         ViewHolderMultipleBucket holder = new ViewHolderMultipleBucket(v);
 
         holder.multipleBucketLayout = v.findViewById(R.id.multiple_bucket_layout);
+        holder.multipleBucketLayout.setTag(holder);
         holder.multipleBucketLayout.setOnClickListener(this);
         holder.mediaView = v.findViewById(R.id.media_layout);
         holder.thumbnailMedia = v.findViewById(R.id.thumbnail_media);
@@ -101,6 +103,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         holder.nameText = v.findViewById(R.id.name_text);
         holder.infoText = v.findViewById(R.id.info_text);
         holder.threeDots = v.findViewById(R.id.three_dots);
+        holder.threeDots.setTag(holder);
         holder.threeDots.setOnClickListener(this);
 
         v.setTag(holder);
@@ -123,12 +126,23 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             } else {
                 holder.videoLayout.setVisibility(View.GONE);
             }
+
+            int size;
+            if (Util.isScreenInPortrait(context)) {
+                size = outMetrics.widthPixels / 4;
+            } else {
+                size = outMetrics.widthPixels / 6;
+            }
+            size -= Util.px2dp(2, outMetrics);
+            log("outMetrics.widthPixels: "+outMetrics.widthPixels+" final size: "+size);
+            holder.thumbnailMedia.getLayoutParams().width = size;
+            holder.thumbnailMedia.getLayoutParams().height = size;
             holder.thumbnailMedia.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
         } else {
             holder.mediaView.setVisibility(View.GONE);
             holder.listView.setVisibility(View.VISIBLE);
             holder.nameText.setText(node.getName());
-            holder.infoText.setText(Util.getSizeString(node.getSize()));
+            holder.infoText.setText(Util.getSizeString(node.getSize()) + " · " + TimeUtils.formatTime(node.getCreationTime()));
 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnailList.getLayoutParams();
             params.width = params.height = Util.px2dp(48, outMetrics);
@@ -179,7 +193,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
     @Override
     public void onClick(View v) {
-        RecentsAdapter.ViewHolderBucket holder = (RecentsAdapter.ViewHolderBucket) v.getTag();
+        log("onClick");
+        MultipleBucketAdapter.ViewHolderMultipleBucket holder = (MultipleBucketAdapter.ViewHolderMultipleBucket) v.getTag();
         if (holder == null) return;
 
         MegaNode node = getItemAtPosition(holder.getAdapterPosition());
