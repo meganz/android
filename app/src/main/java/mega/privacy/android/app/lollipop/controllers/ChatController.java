@@ -1729,6 +1729,10 @@ public class ChatController {
                     ActivityCompat.requestPermissions(((ChatFullScreenImageViewer) context),
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             Constants.REQUEST_WRITE_STORAGE);
+                }else if (context instanceof ChatActivityLollipop){
+                    ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
                 }
                 else if (context instanceof PdfViewerActivityLollipop){
                     ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context),

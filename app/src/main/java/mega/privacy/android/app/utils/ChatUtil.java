@@ -304,7 +304,7 @@ public class ChatUtil {
             if (hours < 10) {
                 finalTime = "0" + hours + ":";
             } else {
-                finalTime = "" + hours;
+                finalTime = "" + hours + ":";
             }
         }
 
