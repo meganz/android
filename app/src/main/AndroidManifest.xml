@@ -41,7 +41,8 @@
     <application
         android:name="mega.privacy.android.app.MegaApplication"
         android:allowBackup="false"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher_mega"
+        android:roundIcon="@mipmap/ic_launcher_mega_round"
         android:label="@string/app_name"
         android:theme="@style/Theme.Megaactionbar" >
 
