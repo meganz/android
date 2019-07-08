@@ -73,12 +73,37 @@
 
         <RelativeLayout
             android:id="@+id/video_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:background="@drawable/gradient_cam_uploads"
+                android:id="@+id/cell_photosync_title_gradient_effect"
+                android:layout_alignParentBottom="true"/>
+
             <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_play_white"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="4dp"/>
+            
+            <TextView
+                android:id="@+id/duration_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:paddingRight="4dp"
+                android:paddingBottom="2dp"/>
+
         </RelativeLayout>
+
     </RelativeLayout>
 
 </LinearLayout>

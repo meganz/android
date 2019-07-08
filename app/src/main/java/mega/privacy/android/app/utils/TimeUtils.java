@@ -319,6 +319,22 @@ public class TimeUtils implements Comparator<Calendar> {
         }
     }
 
+    public static String getVideoDuration(int duration) {
+        if(duration>0) {
+            int hours = duration / 3600;
+            int minutes = (duration % 3600) / 60;
+            int seconds = duration % 60;
+
+            if (hours > 0) {
+                return String.format("%d:%d:%02d", hours, minutes, seconds);
+            } else {
+                return String.format("%d:%02d", minutes, seconds);
+            }
+        }
+
+        return null;
+    }
+
     private static void log(String message) {
         Util.log("TimeUtils", message);
     }

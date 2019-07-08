@@ -50,6 +50,7 @@ import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLol
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -783,21 +784,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 								log(n.getName()+" DURATION: "+n.getDuration());
 								int duration = n.getDuration();
 								if(duration>0){
-									int hours = duration / 3600;
-									int minutes = (duration % 3600) / 60;
-									int seconds = duration % 60;
-
-									String timeString;
-									if(hours>0){
-										timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
-									}
-									else{
-										timeString = String.format("%d:%02d", minutes, seconds);
-									}
-
-									log("The duration is: "+hours+" "+minutes+" "+seconds);
-
-									holder.videoDuration.get(i).setText(timeString);
+									holder.videoDuration.get(i).setText(TimeUtils.getVideoDuration(duration));
 									RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams)holder.relativeLayoutsVideoInfo.get(i).getLayoutParams();
 									relativeParams.bottomMargin=Util.scaleWidthPx(3, outMetrics);
 									relativeParams.leftMargin=Util.scaleWidthPx(3, outMetrics);
@@ -921,21 +908,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 							log(n.getName()+" DURATION: "+n.getDuration());
 							int duration = n.getDuration();
 							if(duration>0){
-								int hours = duration / 3600;
-								int minutes = (duration % 3600) / 60;
-								int seconds = duration % 60;
-
-								String timeString;
-								if(hours>0){
-									timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
-								}
-								else{
-									timeString = String.format("%d:%02d", minutes, seconds);
-								}
-
-								log("The duration is: "+hours+" "+minutes+" "+seconds);
-
-								holder.videoDuration.get(i).setText(timeString);
+								holder.videoDuration.get(i).setText(TimeUtils.getVideoDuration(duration));
 								RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams)holder.relativeLayoutsVideoInfo.get(i).getLayoutParams();
 								relativeParams.bottomMargin=Util.scaleWidthPx(3, outMetrics);
 								relativeParams.leftMargin=Util.scaleWidthPx(3, outMetrics);

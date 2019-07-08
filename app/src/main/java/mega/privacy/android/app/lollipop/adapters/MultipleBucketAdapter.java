@@ -21,6 +21,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -56,6 +57,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         private RelativeLayout mediaView;
         private ImageView thumbnailMedia;
         private RelativeLayout videoLayout;
+        private TextView videoDuration;
         private RelativeLayout listView;
         private ImageView thumbnailList;
         private TextView nameText;
@@ -98,6 +100,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         holder.mediaView = v.findViewById(R.id.media_layout);
         holder.thumbnailMedia = v.findViewById(R.id.thumbnail_media);
         holder.videoLayout = v.findViewById(R.id.video_layout);
+        holder.videoDuration = v.findViewById(R.id.duration_text);
         holder.listView = v.findViewById(R.id.list_layout);
         holder.thumbnailList = v.findViewById(R.id.thumbnail_list);
         holder.nameText = v.findViewById(R.id.name_text);
@@ -123,6 +126,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             holder.listView.setVisibility(View.GONE);
             if (FileUtils.isAudioOrVideo(node)) {
                 holder.videoLayout.setVisibility(View.VISIBLE);
+                holder.videoDuration.setText(TimeUtils.getVideoDuration(node.getDuration()));
             } else {
                 holder.videoLayout.setVisibility(View.GONE);
             }
@@ -202,6 +206,10 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         switch (v.getId()) {
             case R.id.three_dots:{
                 log("three_dots click");
+                if (!Util.isOnline(context)) {
+                    ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                    break;
+                }
                 ((ManagerActivityLollipop) context).showNodeOptionsPanel(node);
                 break;
             }

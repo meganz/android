@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -16,6 +18,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -46,7 +49,8 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
 
         private long document;
         private ImageView thumbnail;
-        private ImageView videoIcon;
+        private RelativeLayout videoLayout;
+        private TextView videoDuration;
 
         public void setImage (Bitmap image) {
             this.thumbnail.setImageBitmap(image);
@@ -73,7 +77,8 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         ViewHolderMediaBucket holder = new ViewHolderMediaBucket(v);
 
         holder.thumbnail = (ImageView) v.findViewById(R.id.thumbnail_view);
-        holder.videoIcon = (ImageView) v.findViewById(R.id.video_icon);
+        holder.videoLayout = (RelativeLayout) v.findViewById(R.id.video_layout);
+        holder.videoDuration = (TextView) v.findViewById(R.id.duration_text);
         holder.itemView.setOnClickListener(this);
 
         v.setTag(holder);
@@ -111,10 +116,11 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         }
 
         if (MimeTypeList.typeForName(node.getName()).isVideo()) {
-            holder.videoIcon.setVisibility(View.VISIBLE);
+            holder.videoLayout.setVisibility(View.VISIBLE);
+            holder.videoDuration.setText(TimeUtils.getVideoDuration(node.getDuration()));
         }
         else {
-            holder.videoIcon.setVisibility(View.GONE);
+            holder.videoLayout.setVisibility(View.GONE);
         }
     }
 

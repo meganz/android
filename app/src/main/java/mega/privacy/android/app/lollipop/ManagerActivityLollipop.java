@@ -12952,10 +12952,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case R.id.transfers_overview_item_layout: {
 				log("click transfers layout");
-				selectDrawerItemTransfers();
-				setTabsVisibility();
-				setTransfersWidget();
-				invalidateOptionsMenu();
+				drawerItem = DrawerItem.TRANSFERS;
+				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.transfers_overview_three_dots_layout: {
@@ -17111,6 +17109,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else{
 					log("tF is null!");
 				}
+
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					setTransfersWidget();
+				}
 			}
 		}
 	}
@@ -18552,6 +18554,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 */
 	public void setTransfersWidget() {
 		log("setTransfersWidget");
+
+		if (!Util.isOnline(this)) return;
 
 		if (drawerItem != DrawerItem.CLOUD_DRIVE) {
 			transfersOverViewLayout.setVisibility(View.GONE);

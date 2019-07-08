@@ -7455,23 +7455,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public String timeVideo(MegaNode n) {
         log("timeVideo");
-        if(n!=null){
-            int duration = n.getDuration();
-            String timeString = "";
-            if (duration > 0) {
-                int hours = duration / 3600;
-                int minutes = (duration % 3600) / 60;
-                int seconds = duration % 60;
-
-                if (hours > 0) {
-                    timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
-                } else {
-                    timeString = String.format("%d:%02d", minutes, seconds);
-                }
-             }
-            return timeString;
-        }
-        return "";
+        return TimeUtils.getVideoDuration(n.getDuration());
     }
 
     public void checkItem (View v, ViewHolderMessageChat holder, int[] screenPosition, int[] dimens) {

@@ -51,6 +51,7 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.OfflineUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -719,20 +720,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 log(node.getName() + " DURATION: " + node.getDuration());
                 int duration = node.getDuration();
                 if (duration > 0) {
-                    int hours = duration / 3600;
-                    int minutes = (duration % 3600) / 60;
-                    int seconds = duration % 60;
-
-                    String timeString;
-                    if (hours > 0) {
-                        timeString = String.format("%d:%d:%02d",hours,minutes,seconds);
-                    } else {
-                        timeString = String.format("%d:%02d",minutes,seconds);
-                    }
-
-                    log("The duration is: " + hours + " " + minutes + " " + seconds);
-
-                    holder.videoDuration.setText(timeString);
+                    holder.videoDuration.setText(TimeUtils.getVideoDuration(duration));
                     holder.videoDuration.setVisibility(View.VISIBLE);
                 }
             }
