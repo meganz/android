@@ -1911,9 +1911,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Nouvelle demande de contact</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen">Écrivez un message à « %s »&#8230;</string>
-    <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Aucun[/B][A] transfert[/A][B]actif.[/B]</string>
-    <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Aucun[/B][A] transfert[/A][B]terminé.[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[A]Le dossier[/A] [B]est vide[/B][B].[/B]</string>
+    <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Aucun[/B] [A]transfert[/A] [B]actif.[/B]</string>
+    <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Aucun[/B] [A]transfert[/A] [B]terminé.[/B]</string>
+    <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[A]Le dossier[/A] [B]est vide.[/B]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Écrivez un message à « %s »&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Écrivez un message à %s&#8230;</string>
