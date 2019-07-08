@@ -115,8 +115,7 @@ import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFolder;
-import static mega.privacy.android.app.utils.OfflineUtils.offlineDIR;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
 public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
@@ -755,16 +754,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				log("Share option");
 				File previewFile = null;
 				if (adapterType == Constants.OFFLINE_ADAPTER){
-					String offlineDirectory;
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR;
+					File offline = getOfflineFolder(this, offlineDIR + File.separator + mOffListImages.get(positionG).getPath());
+					if (isFileAvailable(offline)) {
+						previewFile = new File(offline.getAbsolutePath(), mOffListImages.get(positionG).getName());
 					}
-					else{
-						offlineDirectory = getFilesDir().getPath();
-					}
-
-					String fileName = offlineDirectory + mOffListImages.get(positionG).getPath() + mOffListImages.get(positionG).getName();
-					previewFile = new File(fileName);
 				}else if (adapterType == Constants.ZIP_ADAPTER){
 					String fileName = paths.get(positionG);
 					previewFile = new File(fileName);
@@ -1047,44 +1040,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			for(int i=0; i<mOffList.size();i++){
 				MegaOffline checkOffline = mOffList.get(i);
-				File offlineDirectory = null;
-				if(checkOffline.getOrigin()==MegaOffline.INCOMING){
-					log("isIncomingOffline");
-
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-						log("offlineDirectory: "+offlineDirectory);
-					}
-					else{
-						offlineDirectory = getFilesDir();
-					}
-				}
-				else if(checkOffline.getOrigin()==MegaOffline.INBOX){
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
-						log("offlineDirectory: "+offlineDirectory);
-					}
-					else{
-						offlineDirectory = getFilesDir();
-					}
-				}
-				else{
-					log("NOT isIncomingOffline");
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR + checkOffline.getPath()+checkOffline.getName());
-					}
-					else{
-						offlineDirectory = getFilesDir();
-					}
-				}
-
-				if(offlineDirectory!=null){
-					if (!offlineDirectory.exists()){
-						log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-						//dbH.removeById(mOffList.get(i).getId());
-						mOffList.remove(i);
-						i--;
-					}
+				File offlineFile = getOfflineFile(this, checkOffline);
+				if(!isFileAvailable(offlineFile)){
+					log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
+					mOffList.remove(i);
+					i--;
 				}
 			}
 
@@ -2702,7 +2662,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				Intent service = new Intent(this, DownloadService.class);
 				service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
 				service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
-				String path = getOfflineFolder(context, TEMPORAL_FOLDER).getAbsolutePath();
+				String path = getCacheFolder(context, TEMPORAL_FOLDER).getAbsolutePath();
 				service.putExtra(DownloadService.EXTRA_PATH, path);
 				service.putExtra("fromMV", true);
 				service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);

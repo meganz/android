@@ -143,7 +143,7 @@ public final class CacheFolderManager {
 
     public static void deleteCacheFolderIfEmpty (Context context, String folderName) {
         File folder = getCacheFolder(context, folderName);
-        if (isFileAvailable(folder) && folder.list().length <= 0) {
+        if (isFileAvailable(folder) && folder.list() != null && folder.list().length <= 0) {
             folder.delete();
         }
     }

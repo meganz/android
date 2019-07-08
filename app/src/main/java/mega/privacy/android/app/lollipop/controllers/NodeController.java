@@ -1622,7 +1622,7 @@ public class NodeController {
                     MegaOffline checkOffline = mOffList.get(i);
                     File offlineFile = getOfflineFile(context, checkOffline);
 
-                    if(isFileAvailable(offlineFile)){
+                    if(!isFileAvailable(offlineFile)){
                         log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
                         mOffList.remove(i);
                         i--;
@@ -1660,7 +1660,7 @@ public class NodeController {
                         MegaOffline checkOffline = mOffList.get(i);
                         File offlineFile = getOfflineFile(context, checkOffline);
 
-                        if(isFileAvailable(offlineFile)){
+                        if(!isFileAvailable(offlineFile)){
                             log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
                             mOffList.remove(i);
                             i--;
