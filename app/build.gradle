@@ -11,6 +11,7 @@ android {
         versionCode 239
         versionName "3.6.2 (239)"
         multiDexEnabled true
+        ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'armeabi-v8a'
     }
 
     sourceSets.main {
