@@ -1608,9 +1608,8 @@ public class NodeController {
         log("deleteOffline");
         if (selectedNode == null){
             log("Delete RK");
-            String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
-            File file= new File(path);
-            if(file.exists()){
+            File file= buildExternalStorageFile(rKFile);
+            if(isFileAvailable(file)){
                 file.delete();
 
                 ArrayList<MegaOffline> mOffList=dbH.findByPath(pathNavigation);
@@ -1638,9 +1637,8 @@ public class NodeController {
         else {
             if (selectedNode.getHandle().equals("0")) {
                 log("Delete RK");
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath() + rKFile;
-                File file = new File(path);
-                if (file.exists()) {
+                File file = buildExternalStorageFile(rKFile);
+                if (isFileAvailable(file)) {
                     file.delete();
 
                     if(context instanceof ManagerActivityLollipop){

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 
@@ -351,6 +352,14 @@ public class FileUtils {
             in.close();
             out.close();
         }
+    }
+
+    public static String getExternalStoragePath(String file) {
+        return Environment.getExternalStorageDirectory().getAbsolutePath() + file;
+    }
+
+    public static File buildExternalStorageFile(String file) {
+        return new File(getExternalStoragePath(file));
     }
 
     public static void log(String message) {

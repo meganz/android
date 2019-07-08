@@ -806,21 +806,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if(!offList.isEmpty()) {
                         MegaOffline lastItem = offList.get(offList.size()-1);
                         if(!(lastItem.getHandle().equals("0"))){
-                            String path = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
-                            log("Export in: "+path);
-                            File file= new File(path);
-                            if(file.exists()){
-                                MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                            log("Export in: "+getExternalStoragePath(oldMKFile));
+                            File file= buildExternalStorageFile(oldMKFile);
+                            if(isFileAvailable(file)){
+                                MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(oldMKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
                                 offList.add(masterKeyFile);
                             }
                         }
                     }
                     else{
-                        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
-                        log("Export in: "+path);
-                        File file= new File(path);
-                        if(file.exists()){
-                            MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                        log("Export in: "+getExternalStoragePath(oldMKFile));
+                        File file= buildExternalStorageFile(oldMKFile);
+                        if(isFileAvailable(file)){
+                            MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(oldMKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
                             offList.add(masterKeyFile);
                         }
                     }

@@ -962,10 +962,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 		
 		//Check if the file MarterKey is exported
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
-		log("Export in: "+path);
-		File file= new File(path);
-		if(file.exists()){
+		log("Export in: "+getExternalStoragePath(rKFile));
+		File file= buildExternalStorageFile(rKFile);
+		if(isFileAvailable(file)){
 			numFiles++;
 		}
 		
@@ -1028,8 +1027,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			
 			if(currentNode.getHandle().equals("0")){
 				log("click on Master Key");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
-				openFile(new File(path));
+				openFile(buildExternalStorageFile(rKFile));
 //				viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
 //				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
 				return;

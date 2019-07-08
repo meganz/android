@@ -360,11 +360,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setMkButtonText(){
 		log("setMkButtonText");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
-		log("Exists MK in: "+path);
-		File file= new File(path);
+		File file= buildExternalStorageFile(rKFile);
 		String mkButtonText;
-		if(file.exists()){
+		if(isFileAvailable(file)){
 			mkButtonText = getString(R.string.action_remove_master_key);
 		}
 		else{
@@ -575,10 +573,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.MK_button:{
 				log("Master Key button");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
-				log("Exists MK in: "+path);
-				File file= new File(path);
-				if(file.exists()){
+				log("Exists MK in: "+getExternalStoragePath(rKFile));
+				File file= buildExternalStorageFile(rKFile);
+				if(isFileAvailable(file)){
 					((ManagerActivityLollipop)context).showConfirmationRemoveMK();
 				}
 				else{

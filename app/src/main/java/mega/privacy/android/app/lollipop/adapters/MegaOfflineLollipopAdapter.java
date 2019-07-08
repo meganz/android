@@ -47,7 +47,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 
-import static mega.privacy.android.app.utils.FileUtils.rKFile;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
 
@@ -302,13 +302,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
 	boolean isRKSavedForOffline (MegaOffline currentNode) {
-		if(currentNode.getHandle().equals("0")){
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
-			File file= new File(path);
-			if(file.exists()){
-				return true;
-			}
+		if(currentNode.getHandle().equals("0") && isFileAvailable(buildExternalStorageFile(rKFile))){
+			return true;
 		}
+
     	return false;
 	}
 
@@ -433,21 +430,17 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						log("List not empty");
 						MegaOffline lastItem = mOffList.get(mOffList.size()-1);
 						if(!(lastItem.getHandle().equals("0"))){
-							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
-							log("Export in: "+path);
-							File file= new File(path);
-							if(file.exists()){
-								MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+							log("Export in: "+getExternalStoragePath(rKFile));
+							if(isFileAvailable(buildExternalStorageFile(rKFile))){
+								MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(rKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
 								mOffList.add(masterKeyFile);
 							}
 						}	
 					}
 					else{
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
-						log("Export in: "+path);
-						File file= new File(path);
-						if(file.exists()){
-							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+						log("Export in: "+getExternalStoragePath(rKFile));
+						if(isFileAvailable(buildExternalStorageFile(rKFile))){
+							MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(rKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
 							mOffList.add(masterKeyFile);
 						}
 					}
@@ -789,12 +782,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		if(currentNode.getHandle().equals("0")){
 			//The node is the MasterKey File
 			holder.textViewFileName.setText(currentNode.getName());
-			
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
-			File file= new File(path);
+
 			long nodeSize;
-			if(file.exists()){
-				nodeSize = file.length();
+			if(isFileAvailable(buildExternalStorageFile(rKFile))){
+				nodeSize = buildExternalStorageFile(rKFile).length();
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			}			
 			holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());

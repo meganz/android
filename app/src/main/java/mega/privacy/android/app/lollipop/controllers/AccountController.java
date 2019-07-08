@@ -13,7 +13,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
-import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -43,8 +42,6 @@ import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -52,7 +49,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class AccountController implements View.OnClickListener{
 
@@ -163,13 +159,12 @@ public class AccountController implements View.OnClickListener{
 
         BufferedWriter out;
         try {
-            String mainDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + mainDIR;
-            File mainDir = new File(mainDirPath);
-            log("Path main Dir: " + mainDirPath);
+            File mainDir = buildExternalStorageFile(mainDIR);
+            log("Path main Dir: " + getExternalStoragePath(mainDIR));
             mainDir.mkdirs();
 
             if (path == null){
-                path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
+                path = getExternalStoragePath(rKFile);
                 pathNull = true;
             }
             log("Export in: "+path);
@@ -298,14 +293,10 @@ public class AccountController implements View.OnClickListener{
 
     public void renameMK(){
         log("renameMK");
+        File oldMKF = buildExternalStorageFile(oldMKFile);
+        File newMKFile = buildExternalStorageFile(rKFile);
 
-        final String oldPath = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
-        File oldMKFile = new File(oldPath);
-
-        final String newPath = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
-        File newMKFile = new File(newPath);
-
-        oldMKFile.renameTo(newMKFile);
+        oldMKF.renameTo(newMKFile);
     }
 
     public void copyMK(boolean logout){
@@ -444,14 +435,14 @@ public class AccountController implements View.OnClickListener{
 
     public void removeMK() {
         log("removeMK");
-        final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
-        final File f = new File(path);
-        f.delete();
+        final File f = buildExternalStorageFile(rKFile);
+        if (isFileAvailable(f)) {
+            f.delete();
+        }
 
         //Check if old MK file exists
-        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
-        final File fOldMK = new File(pathOldMK);
-        if(fOldMK.exists()){
+        final File fOldMK = buildExternalStorageFile(oldMKFile);
+        if(isFileAvailable(fOldMK)){
             log("The old file of MK was also removed");
             f.delete();
         }
@@ -493,16 +484,14 @@ public class AccountController implements View.OnClickListener{
 
         removeOldTempFolders(context);
 
-        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
-        final File fMKOld = new File(pathOldMK);
-        if (fMKOld.exists()){
+        final File fMKOld = buildExternalStorageFile(oldMKFile);
+        if (isFileAvailable(fMKOld)){
             log("Old MK file removed!");
             fMKOld.delete();
         }
 
-        final String pathMK = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
-        final File fMK = new File(pathMK);
-        if (fMK.exists()){
+        final File fMK = buildExternalStorageFile(rKFile);
+        if (isFileAvailable(fMK)){
             log("MK file removed!");
             fMK.delete();
         }

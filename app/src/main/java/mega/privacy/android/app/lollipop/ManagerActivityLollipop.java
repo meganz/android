@@ -2283,13 +2283,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		///Check the MK file
 		int versionApp = Util.getVersion(this);
 		log("-------------------Version app: "+versionApp);
-		final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
-		final File fMKOld = new File(pathOldMK);
-		if (fMKOld != null) {
-			if (fMKOld.exists()) {
-				log("Old MK file need to be renamed!");
-				aC.renameMK();
-			}
+		final File fMKOld = buildExternalStorageFile(oldMKFile);
+		if (isFileAvailable(fMKOld)) {
+			log("Old MK file need to be renamed!");
+			aC.renameMK();
 		}
 
 		rootNode = megaApi.getRootNode();
@@ -7178,10 +7175,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					int index = viewPagerMyAccount.getCurrentItem();
 					if(index==0){
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
-						log("Exists MK in: "+path);
-						File file= new File(path);
-						if(file.exists()){
+						if(isFileAvailable(buildExternalStorageFile(rKFile))){
 							removeMK.setVisible(true);
 							exportMK.setVisible(false);
 						}
@@ -14119,7 +14113,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String[] split = rKFile.split("/");
+				String[] split = rKFile.split(File.separator);
 				String path = parentPath+"/"+split[split.length-1];
 				log("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
@@ -14129,7 +14123,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.REQUEST_SAVE_MK_FROM_OFFLINE && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String[] split = rKFile.split("/");
+				String[] split = rKFile.split(File.separator);
 				String path = parentPath+"/"+split[split.length-1];
 				log("REQUEST_SAVE_MK_FROM_OFFLINE:path to download: "+path);
 				AccountController ac = new AccountController(this);

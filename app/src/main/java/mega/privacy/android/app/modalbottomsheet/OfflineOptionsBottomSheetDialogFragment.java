@@ -90,9 +90,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             log("Handle of the node offline: "+handle);
             if(handle.equals("0")){
                 //recovery key will have handle as 0 and have to be handled specifically
-
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ rKFile;
-                nodeOffline = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                nodeOffline = new MegaOffline("0", getExternalStoragePath(rKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
             }else{
                 nodeOffline = dbH.findByHandle(handle);
             }
@@ -161,9 +159,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
             //Check if the node is the Master Key file
             if(nodeOffline.getHandle().equals("0")){
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+rKFile;
-                file= new File(path);
-                if(file.exists()){
+                file= buildExternalStorageFile(rKFile);
+                if(isFileAvailable(file)){
                     if(file.exists()){
                         long nodeSize = file.length();
                         nodeInfo.setText(Util.getSizeString(nodeSize));
