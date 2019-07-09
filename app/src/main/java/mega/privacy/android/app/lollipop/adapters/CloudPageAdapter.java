@@ -23,23 +23,21 @@ public class CloudPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        log("getItem: "+position);
-        switch (position){
+        log("getItem: " + position);
+        switch (position) {
             case 0: {
                 FileBrowserFragmentLollipop fbF = (FileBrowserFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag((ManagerActivityLollipop.FragmentTag.CLOUD_DRIVE.getTag()));
                 if (fbF != null) {
                     return fbF;
-                }
-                else {
+                } else {
                     return FileBrowserFragmentLollipop.newInstance();
                 }
             }
-            case 1:{
+            case 1: {
                 RecentsFragment rF = (RecentsFragment) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag((ManagerActivityLollipop.FragmentTag.RECENTS.getTag()));
                 if (rF != null) {
                     return rF;
-                }
-                else {
+                } else {
                     return RecentsFragment.newInstance();
                 }
             }
@@ -55,11 +53,11 @@ public class CloudPageAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         // Generate title based on item position
-        switch (position){
+        switch (position) {
             case 0: {
                 return context.getString(R.string.section_cloud_drive).toLowerCase();
             }
-            case 1:{
+            case 1: {
                 return context.getString(R.string.section_recents).toLowerCase();
             }
         }

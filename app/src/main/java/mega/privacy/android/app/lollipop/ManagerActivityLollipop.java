@@ -253,24 +253,24 @@ import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
-	final int ERROR_TAB = -1;
-	final int CLOUD_TAB = 0;
-	public final int RECENTS_TAB = 1;
-	final int INCOMING_TAB = 0;
-	final int OUTGOING_TAB = 1;
-	final int CONTACTS_TAB = 0;
-	final int SENT_REQUESTS_TAB = 1;
-	final int RECEIVED_REQUESTS_TAB = 2;
-	final int GENERAL_TAB = 0;
-	final int STORAGE_TAB = 1;
+	private final int ERROR_TAB = -1;
+	private final int CLOUD_TAB = 0;
+	private final int RECENTS_TAB = 1;
+	private final int INCOMING_TAB = 0;
+	private final int OUTGOING_TAB = 1;
+	private final int CONTACTS_TAB = 0;
+	private final int SENT_REQUESTS_TAB = 1;
+	private final int RECEIVED_REQUESTS_TAB = 2;
+	private final int GENERAL_TAB = 0;
+	private final int STORAGE_TAB = 1;
 
-	final int CLOUD_DRIVE_BNV = 0;
-	final int CAMERA_UPLOADS_BNV = 1;
-	final int CHAT_BNV = 2;
-	final int SHARED_BNV = 3;
-	final int OFFLINE_BNV = 4;
-	final int HIDDEN_BNV = 5;
-	final int MEDIA_UPLOADS_BNV = 6;
+	private final int CLOUD_DRIVE_BNV = 0;
+	private final int CAMERA_UPLOADS_BNV = 1;
+	private final int CHAT_BNV = 2;
+	private final int SHARED_BNV = 3;
+	private final int OFFLINE_BNV = 4;
+	private final int HIDDEN_BNV = 5;
+	private final int MEDIA_UPLOADS_BNV = 6;
 
 	public int accountFragment;
 
@@ -455,29 +455,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	ProgressBar usedSpacePB;
 
 	//Tabs in Shares
-	TabLayout tabLayoutCloud;
-	CloudPageAdapter cloudPageAdapter;
-	CustomViewPager viewPagerCloud;
+	private TabLayout tabLayoutCloud;
+	private CloudPageAdapter cloudPageAdapter;
+	private CustomViewPager viewPagerCloud;
 
     //Tabs in Shares
-	TabLayout tabLayoutShares;
-	SharesPageAdapter sharesPageAdapter;
-    ViewPager viewPagerShares;
+	private TabLayout tabLayoutShares;
+	private SharesPageAdapter sharesPageAdapter;
+	private ViewPager viewPagerShares;
 
 	//Tabs in Contacts
-	TabLayout tabLayoutContacts;
-	ContactsPageAdapter contactsPageAdapter;
-	ViewPager viewPagerContacts;
+	private TabLayout tabLayoutContacts;
+	private ContactsPageAdapter contactsPageAdapter;
+	private ViewPager viewPagerContacts;
 
 	//Tabs in My Account
-	TabLayout tabLayoutMyAccount;
-	MyAccountPageAdapter mTabsAdapterMyAccount;
-	ViewPager viewPagerMyAccount;
+	private TabLayout tabLayoutMyAccount;
+	private MyAccountPageAdapter mTabsAdapterMyAccount;
+	private ViewPager viewPagerMyAccount;
 
 	//Tabs in Transfers
-	TabLayout tabLayoutTransfers;
-	TransfersPageAdapter mTabsAdapterTransfers;
-	ViewPager viewPagerTransfers;
+	private TabLayout tabLayoutTransfers;
+	private TransfersPageAdapter mTabsAdapterTransfers;
+	private ViewPager viewPagerTransfers;
 
 	private RelativeLayout transfersOverViewLayout;
 	private TextView transfersTitleText;
@@ -18532,7 +18532,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void setBucketSaved (BucketSaved bucketSaved) {
+	public void setBucketSaved(BucketSaved bucketSaved) {
 		this.bucketSaved = bucketSaved;
 	}
 
@@ -18540,11 +18540,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return bucketSaved;
 	}
 
-	public void setDeepBrowserTreeRecents (int deepBrowserTreeRecents) {
+	public void setDeepBrowserTreeRecents(int deepBrowserTreeRecents) {
 		this.deepBrowserTreeRecents = deepBrowserTreeRecents;
 	}
 
-	public int getDeepBrowserTreeRecents () {
+	public int getDeepBrowserTreeRecents() {
 		return deepBrowserTreeRecents;
 	}
 

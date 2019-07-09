@@ -1031,7 +1031,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             createPlayer();
         }
 
-        private void getMediaHandles (ArrayList<MegaNode> nodes) {
+        private void getMediaHandles(ArrayList<MegaNode> nodes) {
             mediaHandles = new ArrayList<>();
 
             int mediaNumber = 0;
@@ -1049,11 +1049,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             }
 
-            if(mediaHandles.size() == 0){
+            if (mediaHandles.size() == 0) {
                 finish();
             }
 
-            if(currentPosition >= mediaHandles.size()){
+            if (currentPosition >= mediaHandles.size()) {
                 currentPosition = 0;
             }
 

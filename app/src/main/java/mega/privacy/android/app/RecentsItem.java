@@ -15,14 +15,14 @@ public class RecentsItem {
     private String date = "";
     private String time = "";
 
-    public RecentsItem (Context context, MegaRecentActionBucket bucket) {
+    public RecentsItem(Context context, MegaRecentActionBucket bucket) {
         setViewType(TYPE_BUCKET);
         setBucket(bucket);
         setDate(TimeUtils.formatBucketDate(context, bucket.getTimestamp()));
         setTime(TimeUtils.formatTime(bucket.getTimestamp()));
     }
 
-    public RecentsItem (String date) {
+    public RecentsItem(String date) {
         setViewType(TYPE_HEADER);
         setDate(date);
     }

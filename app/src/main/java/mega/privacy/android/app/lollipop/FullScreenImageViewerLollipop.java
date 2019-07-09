@@ -1366,26 +1366,26 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	}
 
-	private void getImageHandles (ArrayList<MegaNode> nodes, Bundle savedInstanceState) {
+	private void getImageHandles(ArrayList<MegaNode> nodes, Bundle savedInstanceState) {
 		int imageNumber = 0;
-		for (int i=0;i<nodes.size();i++){
+		for (int i = 0; i < nodes.size(); i++) {
 			MegaNode n = nodes.get(i);
-			if (MimeTypeList.typeForName(n.getName()).isImage()){
+			if (MimeTypeList.typeForName(n.getName()).isImage()) {
 				imageHandles.add(n.getHandle());
-				if (i == positionG && savedInstanceState == null){
+				if (i == positionG && savedInstanceState == null) {
 					positionG = imageNumber;
 				}
 				imageNumber++;
 			}
 		}
 
-		if(imageHandles.size() == 0) finish();
+		if (imageHandles.size() == 0) finish();
 
-		if(positionG >= imageHandles.size()) positionG = 0;
+		if (positionG >= imageHandles.size()) positionG = 0;
 
 		fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
-		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
+		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 	}
 
 	public void setImageDragVisibility(int visibility){

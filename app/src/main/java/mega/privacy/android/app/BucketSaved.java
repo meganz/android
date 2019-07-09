@@ -13,7 +13,7 @@ public class BucketSaved implements Serializable {
     private boolean isUpdate;
 
 
-    public BucketSaved (MegaRecentActionBucket bucket) {
+    public BucketSaved(MegaRecentActionBucket bucket) {
         this.timestamp = bucket.getTimestamp();
         this.userMail = bucket.getUserEmail();
         this.parentHandle = bucket.getParentHandle();
@@ -21,7 +21,7 @@ public class BucketSaved implements Serializable {
         this.isUpdate = bucket.isUpdate();
     }
 
-    public boolean isTheSameBucket (MegaRecentActionBucket bucket) {
+    public boolean isTheSameBucket(MegaRecentActionBucket bucket) {
 
         if (bucket.getTimestamp() == this.getTimestamp()
                 && bucket.getUserEmail().equals(this.getUserMail())

@@ -46,13 +46,13 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     private ArrayList<RecentsItem> recentsItems;
 
-    public RecentsAdapter (Context context, Object fragment, ArrayList<RecentsItem> items) {
+    public RecentsAdapter(Context context, Object fragment, ArrayList<RecentsItem> items) {
         log("new RecentsAdapter");
         this.context = context;
-        this.fragment = (RecentsFragment)fragment;
+        this.fragment = (RecentsFragment) fragment;
         setItems(items);
 
-        megaApi = ((MegaApplication)((Activity)context).getApplication()).getMegaApi();
+        megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
     }
 
     public class ViewHolderBucket extends RecyclerView.ViewHolder {
@@ -81,7 +81,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.imageThumbnail.getLayoutParams();
             params.width = params.height = Util.px2dp(36, outMetrics);
             int margin = Util.px2dp(18, outMetrics);
-            params.setMargins(margin, margin, margin,0);
+            params.setMargins(margin, margin, margin, 0);
 
             this.imageThumbnail.setLayoutParams(params);
             this.imageThumbnail.setImageBitmap(image);
@@ -101,7 +101,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         log("onCreateViewHolder");
 
         outMetrics = context.getResources().getDisplayMetrics();
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bucket,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bucket, parent, false);
         ViewHolderBucket holder = new ViewHolderBucket(v);
 
         holder.headerLayout = (RelativeLayout) v.findViewById(R.id.header_layout);
@@ -126,7 +126,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(RecentsAdapter.ViewHolderBucket holder, int position) {
-        log("onBindViewHolder: "+position);
+        log("onBindViewHolder: " + position);
         RecentsItem item = getItemtAtPosition(position);
         if (item == null) return;
 
@@ -135,15 +135,15 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             holder.itemBucketLayout.setVisibility(View.GONE);
             holder.headerLayout.setVisibility(View.VISIBLE);
             holder.headerText.setText(item.getDate());
-        }
-        else if (item.getViewType() == RecentsItem.TYPE_BUCKET) {
+        } else if (item.getViewType() == RecentsItem.TYPE_BUCKET) {
             log("onBindViewHolder: TYPE_BUCKET");
             holder.itemBucketLayout.setVisibility(View.VISIBLE);
             holder.itemBucketLayout.setOnClickListener(this);
             holder.headerLayout.setVisibility(View.GONE);
 
             MegaRecentActionBucket bucket = item.getBucket();
-            if (bucket == null || bucket.getNodes() == null || bucket.getNodes().size() == 0) return;
+            if (bucket == null || bucket.getNodes() == null || bucket.getNodes().size() == 0)
+                return;
 
             MegaNodeList nodeList = bucket.getNodes();
             MegaNode node = nodeList.get(0);
@@ -159,13 +159,11 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             String userAction;
             if (mail.equals(megaApi.getMyEmail())) {
                 holder.actionBy.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 user = ((RecentsFragment) fragment).findUserName(mail);
                 if (bucket.isUpdate()) {
                     userAction = context.getString(R.string.update_action_bucket, user);
-                }
-                else {
+                } else {
                     userAction = context.getString(R.string.create_action_bucket, user);
                 }
                 holder.actionBy.setVisibility(View.VISIBLE);
@@ -191,7 +189,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageThumbnail.getLayoutParams();
             params.width = params.height = Util.px2dp(48, outMetrics);
             int margin = Util.px2dp(12, outMetrics);
-            params.setMargins(margin, margin, margin,0);
+            params.setMargins(margin, margin, margin, 0);
             holder.imageThumbnail.setLayoutParams(params);
             holder.imageThumbnail.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
@@ -210,9 +208,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                         try {
                             if (node.hasThumbnail()) {
                                 thumbnail = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
-                            }
-                            else  {
-                                ThumbnailUtilsLollipop.createThumbnailList(context, node, holder,megaApi,this);
+                            } else {
+                                ThumbnailUtilsLollipop.createThumbnailList(context, node, holder, megaApi, this);
                             }
                         } catch (Exception e) {
                             log("Error getting or creating node thumbnail");
@@ -223,8 +220,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 if (thumbnail != null) {
                     holder.setImageThumbnail(thumbnail);
                 }
-            }
-            else {
+            } else {
                 holder.threeDots.setVisibility(View.INVISIBLE);
                 holder.threeDots.setOnClickListener(null);
 
@@ -238,32 +234,29 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     holder.mediaRecycler.setHasFixedSize(true);
                     holder.mediaRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
                     holder.mediaRecycler.setAdapter(adapter);
-                }
-                else {
-                    holder.title.setText(context.getString(R.string.title_bucket, node.getName(), (nodeList.size()-1)));
+                } else {
+                    holder.title.setText(context.getString(R.string.title_bucket, node.getName(), (nodeList.size() - 1)));
                 }
             }
 
-            if (bucket.isUpdate()){
+            if (bucket.isUpdate()) {
                 holder.actionIcon.setImageResource(R.drawable.ic_versions_small);
-            }
-            else {
+            } else {
                 holder.actionIcon.setImageResource(R.drawable.ic_recents_up);
             }
         }
     }
 
-    private Spanned formatUserAction (String userAction) {
-        try{
+    private Spanned formatUserAction(String userAction) {
+        try {
             userAction = userAction.replace("[A]", "<font color=\'#7a7a7a\'>");
             userAction = userAction.replace("[/A]", "</font>");
+        } catch (Exception e) {
         }
-        catch (Exception e){}
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            return Html.fromHtml(userAction,Html.FROM_HTML_MODE_LEGACY);
-        }
-        else {
+            return Html.fromHtml(userAction, Html.FROM_HTML_MODE_LEGACY);
+        } else {
             return Html.fromHtml(userAction);
         }
     }
@@ -273,38 +266,32 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         int numVideos = 0;
         String mediaTitle = null;
 
-        for (int i=0; i<nodeList.size(); i++) {
+        for (int i = 0; i < nodeList.size(); i++) {
             if (MimeTypeList.typeForName(nodeList.get(i).getName()).isImage()) {
                 numImages++;
-            }
-            else {
+            } else {
                 numVideos++;
             }
         }
 
         if (numImages > 0 && numVideos == 0) {
             mediaTitle = context.getString(R.string.title_media_bucket_only_images, numImages);
-        }
-        else if (numImages == 0 && numVideos > 0) {
+        } else if (numImages == 0 && numVideos > 0) {
             mediaTitle = context.getString(R.string.title_media_bucket_only_videos, numVideos);
-        }
-        else if (numImages == 1 && numVideos == 1) {
+        } else if (numImages == 1 && numVideos == 1) {
             mediaTitle = context.getString(R.string.title_media_bucket_image_and_video);
-        }
-        else if (numImages == 1 && numVideos > 1) {
+        } else if (numImages == 1 && numVideos > 1) {
             mediaTitle = context.getString(R.string.title_media_bucket_image_and_videos, numVideos);
-        }
-        else if (numImages > 1 && numVideos == 1) {
+        } else if (numImages > 1 && numVideos == 1) {
             mediaTitle = context.getString(R.string.title_media_bucket_images_and_video, numImages);
-        }
-        else {
+        } else {
             mediaTitle = context.getString(R.string.title_media_bucket_images_and_videos, numImages, numVideos);
         }
 
         return mediaTitle;
     }
 
-    public void setItems (ArrayList<RecentsItem> recentsItems) {
+    public void setItems(ArrayList<RecentsItem> recentsItems) {
         this.recentsItems = recentsItems;
         notifyDataSetChanged();
     }
@@ -328,10 +315,10 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         MegaNode node = getNodeOfItem(item);
 
         switch (v.getId()) {
-            case R.id.three_dots:{
+            case R.id.three_dots: {
                 log("three_dots click");
                 if (!Util.isOnline(context)) {
-                    ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     break;
                 }
                 if (node != null) {
@@ -356,31 +343,33 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     @Override
     public int getItemViewType(int pos) {
-        if (recentsItems == null || recentsItems.isEmpty() || pos >= recentsItems.size()) return super.getItemViewType(pos);
+        if (recentsItems == null || recentsItems.isEmpty() || pos >= recentsItems.size())
+            return super.getItemViewType(pos);
 
         return recentsItems.get(pos).getViewType();
     }
 
-    private RecentsItem getItemtAtPosition (int pos) {
-        if (recentsItems == null || recentsItems.isEmpty() || pos >= recentsItems.size()) return null;
+    private RecentsItem getItemtAtPosition(int pos) {
+        if (recentsItems == null || recentsItems.isEmpty() || pos >= recentsItems.size())
+            return null;
 
         return recentsItems.get(pos);
     }
 
-    private MegaRecentActionBucket getBucketOfItem (RecentsItem item) {
+    private MegaRecentActionBucket getBucketOfItem(RecentsItem item) {
         if (item == null) return null;
 
         return item.getBucket();
     }
 
-    private MegaNodeList getMegaNodeListOfItem (RecentsItem item) {
-       MegaRecentActionBucket bucket = getBucketOfItem(item);
+    private MegaNodeList getMegaNodeListOfItem(RecentsItem item) {
+        MegaRecentActionBucket bucket = getBucketOfItem(item);
         if (bucket == null) return null;
 
         return bucket.getNodes();
     }
 
-    private MegaNode getNodeOfItem (RecentsItem item) {
+    private MegaNode getNodeOfItem(RecentsItem item) {
         MegaNodeList nodeList = getMegaNodeListOfItem(item);
         if (nodeList == null || nodeList.size() > 1) return null;
 
@@ -395,6 +384,6 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     }
 
     private static void log(String log) {
-        Util.log("RecentsAdapter",log);
+        Util.log("RecentsAdapter", log);
     }
 }

@@ -309,18 +309,16 @@ public class TimeUtils implements Comparator<Calendar> {
 
         if (tc.compare(cal, calToday) == 0) {
             return context.getString(R.string.label_today);
-        }
-        else if (tc.compare(cal, calYesterday) == 0) {
+        } else if (tc.compare(cal, calYesterday) == 0) {
             return context.getString(R.string.label_yesterday);
-        }
-        else {
+        } else {
             Date date = cal.getTime();
             return new SimpleDateFormat("EEEE, d MMM yyyy").format(date);
         }
     }
 
     public static String getVideoDuration(int duration) {
-        if(duration>0) {
+        if (duration > 0) {
             int hours = duration / 3600;
             int minutes = (duration % 3600) / 60;
             int seconds = duration % 60;

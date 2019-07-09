@@ -24,37 +24,40 @@ import nz.mega.sdk.MegaNode;
 
 public class FileUtils {
 
-    public static boolean isAudioOrVideo (MegaNode node) {
-        if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) return true;
+    public static boolean isAudioOrVideo(MegaNode node) {
+        if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio())
+            return true;
 
         return false;
     }
 
-    public static boolean isInternalIntent (MegaNode node) {
-        if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported() || MimeTypeList.typeForName(node.getName()).isAudioNotSupported()) return false;
+    public static boolean isInternalIntent(MegaNode node) {
+        if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported() || MimeTypeList.typeForName(node.getName()).isAudioNotSupported())
+            return false;
 
         return true;
     }
 
-    public static boolean isOpusFile (MegaNode node) {
+    public static boolean isOpusFile(MegaNode node) {
         String[] s = node.getName().split("\\.");
-        if (s != null && s.length > 1 && s[s.length-1].equals("opus")) return true;
+        if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) return true;
 
         return false;
     }
 
-    public static boolean isOnMegaDownloads (Context context, MegaNode node) {
+    public static boolean isOnMegaDownloads(Context context, MegaNode node) {
         File f = new File(Util.getDownloadLocation(context), node.getName());
 
-        if(f.exists() && (f.length() == node.getSize())){
+        if (f.exists() && (f.length() == node.getSize())) {
             return true;
         }
 
         return false;
     }
 
-    public static boolean isLocalFile (Context context, MegaNode node, MegaApiAndroid megaApi, String localPath) {
-        if (localPath != null && (isOnMegaDownloads(context, node) || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))) return true;
+    public static boolean isLocalFile(Context context, MegaNode node, MegaApiAndroid megaApi, String localPath) {
+        if (localPath != null && (isOnMegaDownloads(context, node) || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath)))))
+            return true;
 
         return false;
     }
@@ -65,23 +68,21 @@ public class FileUtils {
         Uri mediaFileUri;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
             mediaFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile);
-        }
-        else{
+        } else {
             mediaFileUri = Uri.fromFile(mediaFile);
         }
 
-        if(mediaFileUri!=null){
+        if (mediaFileUri != null) {
             if (isText) {
                 intent.setDataAndType(mediaFileUri, "text/plain");
-            }
-            else {
+            } else {
                 intent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
             }
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             return true;
         }
 
-        ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
         return false;
     }
 
@@ -94,12 +95,11 @@ public class FileUtils {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         activityManager.getMemoryInfo(mi);
 
-        if(mi.totalMem>Constants.BUFFER_COMP){
-            log("Total mem: "+mi.totalMem+" allocate 32 MB");
+        if (mi.totalMem > Constants.BUFFER_COMP) {
+            log("Total mem: " + mi.totalMem + " allocate 32 MB");
             megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-        }
-        else{
-            log("Total mem: "+mi.totalMem+" allocate 16 MB");
+        } else {
+            log("Total mem: " + mi.totalMem + " allocate 16 MB");
             megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
         }
 
@@ -112,11 +112,11 @@ public class FileUtils {
             }
         }
 
-        ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
         return false;
     }
 
-    public static boolean setURLIntentParams (Context context, MegaNode node, Intent intent, String localPath) {
+    public static boolean setURLIntentParams(Context context, MegaNode node, Intent intent, String localPath) {
         File mediaFile = new File(localPath);
         InputStream instream = null;
         boolean paramsSetSuccessfully = false;
@@ -131,9 +131,9 @@ public class FileUtils {
                 BufferedReader buffreader = new BufferedReader(inputreader);
 
                 String line1 = buffreader.readLine();
-                if(line1!=null){
-                    String line2= buffreader.readLine();
-                    String url = line2.replace("URL=","");
+                if (line1 != null) {
+                    String line2 = buffreader.readLine();
+                    String url = line2.replace("URL=", "");
                     log("Is URL - launch browser intent");
                     intent.setData(Uri.parse(url));
                     paramsSetSuccessfully = true;
@@ -183,6 +183,6 @@ public class FileUtils {
     }
 
     private static void log(String log) {
-        Util.log("FileUtils",log);
+        Util.log("FileUtils", log);
     }
 }

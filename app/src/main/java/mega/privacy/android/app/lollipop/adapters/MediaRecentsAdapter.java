@@ -42,7 +42,7 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         this.nodes = nodeList;
         this.bucket = bucket;
 
-        megaApi = ((MegaApplication)((Activity)context).getApplication()).getMegaApi();
+        megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
     }
 
     public class ViewHolderMediaBucket extends RecyclerView.ViewHolder {
@@ -52,7 +52,7 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         private RelativeLayout videoLayout;
         private TextView videoDuration;
 
-        public void setImage (Bitmap image) {
+        public void setImage(Bitmap image) {
             this.thumbnail.setImageBitmap(image);
         }
 
@@ -64,7 +64,7 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
             return document;
         }
 
-        public  ViewHolderMediaBucket (View itemView) {
+        public ViewHolderMediaBucket(View itemView) {
             super(itemView);
         }
     }
@@ -100,9 +100,8 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
                 try {
                     if (node.hasThumbnail()) {
                         thumbnail = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
-                    }
-                    else  {
-                        ThumbnailUtilsLollipop.createThumbnailList(context, node, holder,megaApi,this);
+                    } else {
+                        ThumbnailUtilsLollipop.createThumbnailList(context, node, holder, megaApi, this);
                     }
                 } catch (Exception e) {
                     log("Error getting or creating node thumbnail");
@@ -118,13 +117,12 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         if (MimeTypeList.typeForName(node.getName()).isVideo()) {
             holder.videoLayout.setVisibility(View.VISIBLE);
             holder.videoDuration.setText(TimeUtils.getVideoDuration(node.getDuration()));
-        }
-        else {
+        } else {
             holder.videoLayout.setVisibility(View.GONE);
         }
     }
 
-    private MegaNode getItemAtPosition (int pos) {
+    private MegaNode getItemAtPosition(int pos) {
         if (nodes == null || nodes.size() == 0 || pos >= nodes.size()) return null;
 
         return nodes.get(pos);
@@ -152,6 +150,6 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
     }
 
     private static void log(String log) {
-        Util.log("MediaRecentsAdapter",log);
+        Util.log("MediaRecentsAdapter", log);
     }
 }
