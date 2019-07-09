@@ -313,10 +313,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout fileStorageLayout;
     private ChatFileStorageFragment fileStorageF;
 
-    ArrayList<AndroidMegaChatMessage> messages;
-    ArrayList<AndroidMegaChatMessage> bufferMessages;
-    ArrayList<AndroidMegaChatMessage> bufferManualSending;
-    ArrayList<AndroidMegaChatMessage> bufferSending;
+    ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+    ArrayList<AndroidMegaChatMessage> bufferMessages = new ArrayList<>();
+    ArrayList<AndroidMegaChatMessage> bufferSending = new ArrayList<>();
 
     public static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
     public static int TYPE_MESSAGE_NEW_MESSAGE = 1;
@@ -520,11 +519,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         emptyImageView = findViewById(R.id.empty_image_view_chat);
 
         updateNavigationToolbarIcon();
-
-        messages = new ArrayList<>();
-        bufferMessages = new ArrayList<>();
-        bufferManualSending = new ArrayList<>();
-        bufferSending = new ArrayList<>();
 
         fragmentContainer = findViewById(R.id.fragment_container_chat);
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
@@ -5335,7 +5329,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void loadMessage(AndroidMegaChatMessage messageToShow){
         log("loadMessage");
-
         messageToShow.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
         messages.add(0,messageToShow);
 
@@ -5541,10 +5534,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             userHandleToCompare = myUserHandle;
         }
         else{
-            if ((msg.getMessage().getType() == MegaChatMessage.TYPE_CALL_ENDED) || (msg.getMessage().getType() == MegaChatMessage.TYPE_CALL_STARTED)){
-                msg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME);
-                return AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME;
-            }
 
             if ((msg.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
                 userHandleToCompare = msg.getMessage().getHandleOfAction();
