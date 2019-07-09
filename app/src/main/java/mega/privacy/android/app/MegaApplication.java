@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,13 +19,11 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.provider.CallLog;
 import android.support.annotation.Nullable;
 import android.support.multidex.MultiDexApplication;
 import android.support.text.emoji.EmojiCompat;
 import android.support.text.emoji.FontRequestEmojiCompatConfig;
 import android.support.text.emoji.bundled.BundledEmojiCompatConfig;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -44,7 +41,6 @@ import org.webrtc.ContextUtils;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -563,18 +559,19 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					.setReplaceAll(false)
 					.registerInitCallback(new EmojiCompat.InitCallback() {
 						@Override
-						public  void onInitialized() {
+						public void onInitialized() {
 							log("EmojiCompat initialized");
 						}
+
 						@Override
-						public  void onFailed(@Nullable Throwable throwable) {
+						public void onFailed(@Nullable Throwable throwable) {
 							log("EmojiCompat initialization failed");
 						}
 					});
 		}
 		EmojiCompat.init(config);
 		// clear the cache files stored in the external cache folder.
-        CacheFolderManager.clearPublicCache(this);
+		CacheFolderManager.clearPublicCache(this);
 
 //		initializeGA();
 		

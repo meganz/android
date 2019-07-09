@@ -72,13 +72,10 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             display = ((Activity) mContext).getWindowManager().getDefaultDisplay();
             display.getMetrics(mOutMetrics);
             textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH, mOutMetrics);
-        } else if (mContext instanceof ContextWrapper) {
-            if (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity) {
-
-                display = ((Activity) ((ContextWrapper) mContext).getBaseContext()).getWindowManager().getDefaultDisplay();
-                display.getMetrics(mOutMetrics);
-                textViewMaxWidth = Util.px2dp(TITLE_TOOLBAR, mOutMetrics);
-            }
+        } else if (mContext instanceof ContextWrapper && (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity)) {
+            display = ((Activity) ((ContextWrapper) mContext).getBaseContext()).getWindowManager().getDefaultDisplay();
+            display.getMetrics(mOutMetrics);
+            textViewMaxWidth = Util.px2dp(TITLE_TOOLBAR, mOutMetrics);
         }
 
         setText(getText());
@@ -103,15 +100,13 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof ManagerActivityLollipop || mContext instanceof ArchivedChatsActivity || mContext instanceof ChatExplorerActivity) {
             CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
             super.setText(textF, type);
+        }else if (mContext instanceof ContextWrapper && (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity)) {
+            CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+            super.setText(textF, type);
         }
 
-        if (mContext instanceof ContextWrapper) {
-            if (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity) {
-                CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-                super.setText(textF, type);
-            }
-        }
         super.setText(spannableStringBuilder, type);
+
     }
 
     @Override
