@@ -419,7 +419,7 @@ public class AccountController implements View.OnClickListener{
         final File fOldMK = buildExternalStorageFile(oldMKFile);
         if(isFileAvailable(fOldMK)){
             log("The old file of MK was also removed");
-            f.delete();
+            fOldMK.delete();
         }
 
         String message = context.getString(R.string.toast_master_key_removed);

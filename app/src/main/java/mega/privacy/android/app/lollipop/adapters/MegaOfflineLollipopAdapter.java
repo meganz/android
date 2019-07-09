@@ -760,8 +760,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.textViewFileName.setText(currentNode.getName());
 
 			long nodeSize;
-			if(isFileAvailable(buildExternalStorageFile(rKFile))){
-				nodeSize = buildExternalStorageFile(rKFile).length();
+			File fileRK = buildExternalStorageFile(rKFile);
+			if(isFileAvailable(fileRK)){
+				nodeSize = fileRK.length();
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			}			
 			holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());

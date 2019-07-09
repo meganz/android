@@ -502,14 +502,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			log("pref is NULL");
 			dbH.setStorageAskAlways(false);
 
-			File defaultDownloadLocation = null;
-			if (Environment.getExternalStorageDirectory() != null){
-				defaultDownloadLocation = buildExternalStorageFile(downloadDIR);
-			}
-			else{
-				defaultDownloadLocation = context.getFilesDir();
-			}
-
+			File defaultDownloadLocation = buildDefaultDownloadDir(context);
 			defaultDownloadLocation.mkdirs();
 
 			dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());

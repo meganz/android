@@ -263,13 +263,12 @@ public class MegaApiUtils {
     }
 
     public static String getNodePath(Context context, MegaNode node) {
-        String path=MegaApiUtils.createStringTree(node, context);
+        String path = MegaApiUtils.createStringTree(node, context);
 
-        if(path==null){
-            return "/";
-        }
-        else{
-            return "/"+path;
+        if (path == null) {
+            return File.separator;
+        } else {
+            return File.separator + path;
         }
     }
 

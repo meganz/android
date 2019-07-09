@@ -71,7 +71,7 @@ import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.buildExternalStorageFile;
 import static mega.privacy.android.app.utils.FileUtils.downloadDIR;
 
 
@@ -469,13 +469,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			root = new File(Environment.getExternalStorageDirectory().toString());
+			root = buildExternalStorageFile("");
 			if (root == null){
-				root = new File("/");
+				root = new File(File.separator);
 			}
 		}
 		else{
-			root = new File("/");
+			root = new File(File.separator);
 		}
 		//pick file from SD card
 		if(hasSDCard) {
@@ -487,7 +487,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if(!hasSDCard) {
             prefs = dbH.getPreferences();
             if (prefs == null){
-                path = new File(Environment.getExternalStorageDirectory().toString() + "/" + downloadDIR);
+                path = buildExternalStorageFile(downloadDIR);
             }
             else{
                 String lastFolder = prefs.getLastFolderUpload();
@@ -499,14 +499,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                     }
                 }
                 else{
-                    path = new File(Environment.getExternalStorageDirectory().toString() + "/" + downloadDIR);
+                    path = buildExternalStorageFile(downloadDIR);
                 }
                 if (cameraFolderSettings){
                     camSyncLocalPath = prefs.getCamSyncLocalPath();
                 }
             }
             if (path == null) {
-                path = new File(Environment.getExternalStorageDirectory().toString() + "/" + downloadDIR);
+                path = buildExternalStorageFile(downloadDIR);
             }
         } else {
 		    //always pick from SD card root
