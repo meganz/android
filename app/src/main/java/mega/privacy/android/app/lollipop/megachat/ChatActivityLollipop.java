@@ -316,6 +316,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
     ArrayList<AndroidMegaChatMessage> bufferMessages = new ArrayList<>();
     ArrayList<AndroidMegaChatMessage> bufferSending = new ArrayList<>();
+    ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
+
 
     public static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
     public static int TYPE_MESSAGE_NEW_MESSAGE = 1;
@@ -2945,12 +2947,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            ArrayList<AndroidMegaChatMessage> messagesSelected = adapter.getSelectedMessages();
+           messagesSelected = adapter.getSelectedMessages();
 
             switch(item.getItemId()){
                 case R.id.chat_cab_menu_edit:{
                     log("Edit text");
-                    if (messagesSelected != null && messagesSelected.size() > 0 && messagesSelected.get(0) != null) {
+                    if (!messagesSelected.isEmpty() && messagesSelected.get(0) != null) {
                         editingMessage = true;
                         messageToEdit = messagesSelected.get(0).getMessage();
                         textChat.setText(messageToEdit.getContent());

@@ -89,8 +89,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public long chatHandle;
     public long selectedHandleParticipant;
-    GroupChatInfoActivityLollipop groupChatInfoActivity;
-    MegaChatRoom chat;
+    private GroupChatInfoActivityLollipop groupChatInfoActivity;
+    private MegaChatRoom chat;
     AlertDialog permissionsDialog;
     AlertDialog changeTitleDialog;
     AlertDialog chatLinkDialog;
@@ -868,7 +868,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     private int getAvatarTextSize(float density) {
-        float textSize = 0.0f;
+        float textSize;
 
         if (density > 3.0) {
             textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);

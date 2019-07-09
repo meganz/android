@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -19,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -99,15 +97,15 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chip_avatar, parent, false);
 
         holder = new ViewHolderChips(v);
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
+        holder.itemLayout = v.findViewById(R.id.item_layout_chip);
 
-        holder.textViewName = (EmojiTextView) v.findViewById(R.id.name_chip);
+        holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setEmojiSize(Util.px2dp(10, outMetrics));
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
 
-        holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
+        holder.avatar = v.findViewById(R.id.rounded_avatar);
 
-        holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
+        holder.deleteIcon = v.findViewById(R.id.delete_icon_chip);
         holder.deleteIcon.setOnClickListener(this);
 
         holder.deleteIcon.setTag(holder);

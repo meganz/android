@@ -20,6 +20,7 @@ public final class EmojiShortcodes extends AbstractEmoji implements Parcelable {
             return new EmojiShortcodes[size];
         }
     };
+    private static final String HTML_GROUP = "H";
     private String emoji;
     private List<String> aliases;
     private String category;
@@ -30,7 +31,6 @@ public final class EmojiShortcodes extends AbstractEmoji implements Parcelable {
     private String decimalHtmlShort;
     private String hexHtmlShort;
     private String decimalSurrogateHtml;
-    private static final String HTML_GROUP = "H";
 
     protected EmojiShortcodes(Parcel in) {
         emoji = in.readString();

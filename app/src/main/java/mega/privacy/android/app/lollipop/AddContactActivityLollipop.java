@@ -107,7 +107,7 @@ import nz.mega.sdk.MegaUser;
 public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface {
 
     public static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
-    public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
+    private static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
     public static final String BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT = "INTENT_FILTER_INVITE_CONTACT";
 
     DisplayMetrics outMetrics;
@@ -1606,7 +1606,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         fabImageGroup = (FloatingActionButton) findViewById(R.id.image_group_floating_button);
         nameGroup = findViewById(R.id.name_group_edittext);
         nameGroup.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
-        nameGroup.setFilters(new InputFilter[] {new InputFilter.LengthFilter(MAX_ALLOWED_CHARACTERS_AND_EMOJIS)});
+        nameGroup.setFilters(new InputFilter[]{new InputFilter.LengthFilter(MAX_ALLOWED_CHARACTERS_AND_EMOJIS)});
 
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         addedContactsRecyclerView.setLayoutManager(mLayoutManager);
@@ -3044,15 +3044,18 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if (comesFromChat) {
             addParticipants(contactsSelected);
-        } else if (onNewGroup) {
+        }
+        else if (onNewGroup) {
             String chatTitle = "";
             if (nameGroup != null && nameGroup.getText().length() > 0) {
                 chatTitle = nameGroup.getText().toString();
                 startConversation(contactsSelected, megaContacts, chatTitle);
-            } else {
+            }
+            else {
                 startConversation(contactsSelected, megaContacts, null);
             }
-        } else {
+        }
+        else {
             newGroup();
         }
         Util.hideKeyboard(addContactActivityLollipop, 0);

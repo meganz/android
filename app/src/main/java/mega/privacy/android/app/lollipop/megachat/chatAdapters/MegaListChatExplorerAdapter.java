@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -128,13 +127,13 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_explorer_list, parent, false);
         holder = new ViewHolderChatExplorerList(v);
 
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.chat_explorer_list_item_layout);
-        holder.avatarImage = (RoundedImageView) v.findViewById(R.id.chat_explorer_list_avatar);
-        holder.initialLetter = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_initial_letter);
-        holder.titleText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_title);
-        holder.stateIcon = (ImageView) v.findViewById(R.id.chat_explorer_list_contact_state);
-        holder.lastSeenStateText = (MarqueeTextView) v.findViewById(R.id.chat_explorer_list_last_seen_state);
-        holder.participantsText = (TextView) v.findViewById(R.id.chat_explorer_list_participants);
+        holder.itemLayout = v.findViewById(R.id.chat_explorer_list_item_layout);
+        holder.avatarImage = v.findViewById(R.id.chat_explorer_list_avatar);
+        holder.initialLetter = v.findViewById(R.id.chat_explorer_list_initial_letter);
+        holder.titleText = v.findViewById(R.id.chat_explorer_list_title);
+        holder.stateIcon = v.findViewById(R.id.chat_explorer_list_contact_state);
+        holder.lastSeenStateText = v.findViewById(R.id.chat_explorer_list_last_seen_state);
+        holder.participantsText = v.findViewById(R.id.chat_explorer_list_participants);
 
         holder.titleText.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
         holder.initialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
