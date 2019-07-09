@@ -1,8 +1,8 @@
 package mega.privacy.android.app.components.twemoji;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.support.annotation.CallSuper;
@@ -28,12 +28,8 @@ import mega.privacy.android.app.utils.Util;
 
 public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface {
 
-    public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
-    public static final int TITLE_TOOLBAR_CHAT_PORTRAIT = 170;
-    public static final int TITLE_TOOLBAR_CALL_PORTRAIT = 200;
-    public static final int TITLE_TOOLBAR_CHAT_LANDSCAPE = 300;
-    public static final int TITLE_TOOLBAR_CALL_LANDSCAPE = 350;
-    public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
+    public static final int LAST_MESSAGE_TEXTVIEW_WIDTH = 190;
+    public static final int TITLE_TOOLBAR = 180;
     private float emojiSize;
     private Context mContext;
     private Display display;
@@ -46,21 +42,18 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     }
 
     public EmojiTextView(Context context, @Nullable AttributeSet attrs) {
-        this(context,attrs, 0);
+        this(context, attrs, 0);
         mContext = context;
     }
 
     public EmojiTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context);
+        super(context, attrs, defStyleAttr);
         mContext = context;
 
-        if (mContext == null) {
+        if (mContext == null || (mContext instanceof ContextWrapper && ((ContextWrapper) mContext).getBaseContext() == null))
             return;
-        }
 
-        if (!isInEditMode()) {
-            EmojiManager.getInstance().verifyInstalled();
-        }
+        if (!isInEditMode()) EmojiManager.getInstance().verifyInstalled();
 
         final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
         final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
@@ -75,34 +68,19 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             }
         }
 
-        if (mContext != null) {
-            if (mContext instanceof GroupChatInfoActivityLollipop) {
-                display = ((GroupChatInfoActivityLollipop) mContext).getWindowManager().getDefaultDisplay();
-                setTextViewMax(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT);
-            } else if (mContext instanceof ManagerActivityLollipop) {
-                display = ((ManagerActivityLollipop) mContext).getWindowManager().getDefaultDisplay();
-                setTextViewMax(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT);
-            } else if (mContext instanceof ChatExplorerActivity) {
-                display = ((ChatExplorerActivity) mContext).getWindowManager().getDefaultDisplay();
-                setTextViewMax(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT);
-            } else if (mContext instanceof ArchivedChatsActivity) {
-                display = ((ArchivedChatsActivity) mContext).getWindowManager().getDefaultDisplay();
-                setTextViewMax(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT);
-            } else if (mContext instanceof ContextWrapper) {
-                Context inContext = ((ContextWrapper) mContext).getBaseContext();
-                if (inContext == null) {
-                    return;
-                }
-                if (inContext instanceof ChatCallActivity) {
-                    display = ((ChatCallActivity) inContext).getWindowManager().getDefaultDisplay();
-                    setTextViewMax(TITLE_TOOLBAR_CALL_LANDSCAPE, TITLE_TOOLBAR_CALL_PORTRAIT);
+        if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof ManagerActivityLollipop || mContext instanceof ChatExplorerActivity || mContext instanceof ArchivedChatsActivity) {
+            display = ((Activity) mContext).getWindowManager().getDefaultDisplay();
+            display.getMetrics(mOutMetrics);
+            textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH, mOutMetrics);
+        } else if (mContext instanceof ContextWrapper) {
+            if (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity) {
 
-                } else if (inContext instanceof ChatActivityLollipop) {
-                    display = ((ChatActivityLollipop) inContext).getWindowManager().getDefaultDisplay();
-                    setTextViewMax(TITLE_TOOLBAR_CHAT_LANDSCAPE, TITLE_TOOLBAR_CHAT_PORTRAIT);
-                }
+                display = ((Activity) ((ContextWrapper) mContext).getBaseContext()).getWindowManager().getDefaultDisplay();
+                display.getMetrics(mOutMetrics);
+                textViewMaxWidth = Util.px2dp(TITLE_TOOLBAR, mOutMetrics);
             }
         }
+
         setText(getText());
     }
 
@@ -112,54 +90,28 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
 
     @Override
     public void setText(CharSequence rawText, BufferType type) {
-
         CharSequence text = rawText == null ? "" : rawText;
         String resultText = EmojiUtilsShortcodes.emojify(text.toString());
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultText);
         Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
         float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
         EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
-        if((mContext!=null) && ((mContext instanceof GroupChatInfoActivityLollipop) ||
-                (mContext instanceof ManagerActivityLollipop) ||
-                (mContext instanceof ArchivedChatsActivity) ||
-                (mContext instanceof ChatExplorerActivity) ||
-                ((mContext instanceof ContextWrapper) && (((ContextWrapper) mContext).getBaseContext()!=null) &&
-                        ((((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop) ||
-                                (((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity))))) {
+
+        if (mContext == null || (mContext instanceof ContextWrapper && ((ContextWrapper) mContext).getBaseContext() == null))
+            super.setText(spannableStringBuilder, type);
+
+        if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof ManagerActivityLollipop || mContext instanceof ArchivedChatsActivity || mContext instanceof ChatExplorerActivity) {
             CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
             super.setText(textF, type);
-        }else{
-            super.setText(spannableStringBuilder, type);
         }
 
-//        if (mContext == null) super.setText(spannableStringBuilder, type);
-//
-//        EmojiManager.getInstance().replaceWithImages(mContext, spannableStringBuilder, emojiSize, defaultEmojiSize);
-//
-//        if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof ManagerActivityLollipop || mContext instanceof ArchivedChatsActivity || mContext instanceof ChatExplorerActivity) {
-//            CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-//            super.setText(textF, type);
-//        }
-//
-//        if (mContext instanceof ContextWrapper && ((ContextWrapper) mContext).getBaseContext() == null)
-//            super.setText(spannableStringBuilder, type);
-//
-//        if (mContext instanceof ContextWrapper && (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity)) {
-//            CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-//            super.setText(textF, type);
-//        }
-
-    }
-
-    private void setTextViewMax(int landscape, int portrait) {
-
-        display.getMetrics(mOutMetrics);
-
-        if (mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            textViewMaxWidth = Util.scaleWidthPx(landscape, mOutMetrics);
-        } else {
-            textViewMaxWidth = Util.scaleWidthPx(portrait, mOutMetrics);
+        if (mContext instanceof ContextWrapper) {
+            if (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity) {
+                CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+                super.setText(textF, type);
+            }
         }
+        super.setText(spannableStringBuilder, type);
     }
 
     @Override
@@ -201,151 +153,3 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
     }
 }
-
-//public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface {
-//
-//    public EmojiTextView(final Context context) {
-//        this(context, null);
-//        log("********** 1");
-//
-//        mContext = context;
-//    }
-//
-//    public EmojiTextView(Context context, @Nullable AttributeSet attrs) {
-//        this(context,attrs, 0);
-//        log("********** 2");
-//
-//        mContext = context;
-//    }
-//
-//    public EmojiTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-//        super(context, attrs, defStyleAttr);
-//        mContext = context;
-//        log("********** 3");
-//
-//        if (mContext == null) {
-//            return;
-//        }
-//
-//        if (!isInEditMode()) {
-//            EmojiManager.getInstance().verifyInstalled();
-//        }
-//
-//        final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-//        final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-//        if (attrs == null) {
-//            emojiSize = defaultEmojiSize;
-//        } else {
-//            final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EmojiTextView);
-//            try {
-//                emojiSize = a.getDimension(R.styleable.EmojiTextView_emojiSize, defaultEmojiSize);
-//            } finally {
-//                a.recycle();
-//            }
-//        }
-//
-//        if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof ManagerActivityLollipop || mContext instanceof ChatExplorerActivity || mContext instanceof ArchivedChatsActivity) {
-//
-//            display = ((Activity) mContext).getWindowManager().getDefaultDisplay();
-//            display.getMetrics(mOutMetrics);
-//            textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH, mOutMetrics);
-//
-//        } else if (mContext instanceof ContextWrapper) {
-//
-//            Context inContext = ((ContextWrapper) mContext).getBaseContext();
-//            if (inContext == null) return;
-//            display = ((Activity) inContext).getWindowManager().getDefaultDisplay();
-//            display.getMetrics(mOutMetrics);
-//            textViewMaxWidth = Util.px2dp(TITLE_TOOLBAR, mOutMetrics);
-//
-//        }
-//
-//        setText(getText());
-//
-//
-////        if (mContext instanceof GroupChatInfoActivityLollipop) {
-////
-////            display = ((GroupChatInfoActivityLollipop) mContext).getWindowManager().getDefaultDisplay();
-////            display.getMetrics(mOutMetrics);
-////            textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH, mOutMetrics);
-////
-////        } else if (mContext instanceof ManagerActivityLollipop) {
-////
-////            display = ((ManagerActivityLollipop) mContext).getWindowManager().getDefaultDisplay();
-////            display.getMetrics(mOutMetrics);
-////            textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH, mOutMetrics);
-////
-////        } else if (mContext instanceof ChatExplorerActivity) {
-////
-////            display = ((ChatExplorerActivity) mContext).getWindowManager().getDefaultDisplay();
-////            display.getMetrics(mOutMetrics);
-////            textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH, mOutMetrics);
-////
-////        } else if (mContext instanceof ArchivedChatsActivity) {
-////
-////            display = ((ArchivedChatsActivity) mContext).getWindowManager().getDefaultDisplay();
-////            display.getMetrics(mOutMetrics);
-////            textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH, mOutMetrics);
-////
-////        } else if (mContext instanceof ContextWrapper) {
-////
-////            Context inContext = ((ContextWrapper) mContext).getBaseContext();
-////            if (inContext == null) return;
-////
-////            if (inContext instanceof ChatCallActivity) {
-////                display = ((ChatCallActivity) inContext).getWindowManager().getDefaultDisplay();
-////                display.getMetrics(mOutMetrics);
-////
-////                textViewMaxWidth = Util.px2dp(TITLE_TOOLBAR_CALL, mOutMetrics);
-////
-////            } else if (inContext instanceof ChatActivityLollipop) {
-////                display = ((ChatActivityLollipop) inContext).getWindowManager().getDefaultDisplay();
-////                display.getMetrics(mOutMetrics);
-////
-////                textViewMaxWidth = Util.px2dp(TITLE_TOOLBAR_CHAT, mOutMetrics);
-////            }
-////        }
-//
-////        setText(getText());
-//    }
-//
-//    @Override
-//    public void setText(CharSequence rawText, BufferType type) {
-//        CharSequence text = rawText == null ? "" : rawText;
-//        String resultText = EmojiUtilsShortcodes.emojify(text.toString());
-//        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultText);
-//        Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-//        float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-//        EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
-//
-//        if (mContext == null || mContext instanceof ContextWrapper && ((ContextWrapper) mContext).getBaseContext() == null)
-//            super.setText(spannableStringBuilder, type);
-//
-//        if (mContext instanceof GroupChatInfoActivityLollipop ||
-//                mContext instanceof ManagerActivityLollipop ||
-//                mContext instanceof ArchivedChatsActivity ||
-//                mContext instanceof ChatExplorerActivity ||
-//                mContext instanceof ContextWrapper &&
-//                        ((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop ||
-//                ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity) {
-//            CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-//            super.setText(textF, type);
-//        }
-//
-//
-////        if ((mContext != null) && ((mContext instanceof GroupChatInfoActivityLollipop) ||
-////                (mContext instanceof ManagerActivityLollipop) ||
-////                (mContext instanceof ArchivedChatsActivity) ||
-////                (mContext instanceof ChatExplorerActivity) ||
-////                ((mContext instanceof ContextWrapper) && (((ContextWrapper) mContext).getBaseContext() != null) &&
-////                        ((((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop) ||
-////                                (((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity))))) {
-////            CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-////            super.setText(textF, type);
-////        } else {
-////            super.setText(spannableStringBuilder, type);
-////        }
-//    }
-//
-
-//}
