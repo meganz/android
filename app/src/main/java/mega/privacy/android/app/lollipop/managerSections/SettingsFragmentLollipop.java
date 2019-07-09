@@ -66,8 +66,7 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.downloadDIR;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -505,7 +504,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 			File defaultDownloadLocation = null;
 			if (Environment.getExternalStorageDirectory() != null){
-				defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + downloadDIR + "/");
+				defaultDownloadLocation = buildExternalStorageFile(downloadDIR);
 			}
 			else{
 				defaultDownloadLocation = context.getFilesDir();
@@ -722,14 +721,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			if (prefs.getStorageAskAlways() == null){
 				dbH.setStorageAskAlways(false);
 
-				File defaultDownloadLocation = null;
-				if (Environment.getExternalStorageDirectory() != null){
-					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + downloadDIR + "/");
-				}
-				else{
-					defaultDownloadLocation = context.getFilesDir();
-				}
-
+				File defaultDownloadLocation = buildDefaultDownloadDir(context);
 				defaultDownloadLocation.mkdirs();
 
 				dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
@@ -747,14 +739,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			else{
 				askMe = Boolean.parseBoolean(prefs.getStorageAskAlways());
 				if (prefs.getStorageDownloadLocation() == null){
-					File defaultDownloadLocation = null;
-					if (Environment.getExternalStorageDirectory() != null){
-						defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + downloadDIR + "/");
-					}
-					else{
-						defaultDownloadLocation = context.getFilesDir();
-					}
-
+					File defaultDownloadLocation = buildDefaultDownloadDir(context);
 					defaultDownloadLocation.mkdirs();
 
 					dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
@@ -772,14 +757,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					downloadLocationPath = prefs.getStorageDownloadLocation();
 
 					if (downloadLocationPath.compareTo("") == 0){
-						File defaultDownloadLocation = null;
-						if (Environment.getExternalStorageDirectory() != null){
-							defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + downloadDIR + "/");
-						}
-						else{
-							defaultDownloadLocation = context.getFilesDir();
-						}
-
+						File defaultDownloadLocation = buildDefaultDownloadDir(context);
 						defaultDownloadLocation.mkdirs();
 
 						dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());

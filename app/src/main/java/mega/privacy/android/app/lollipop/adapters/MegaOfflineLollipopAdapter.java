@@ -614,30 +614,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.itemLayout.setVisibility(View.INVISIBLE);
 			return;
 		}
-//		if(currentNode.getHandle().equals("0")){
-//			//The node is the MasterKey File
-//			holder.textViewFileName.setText(currentNode.getName());
-//
-//			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-//			File file= new File(path);
-//			long nodeSize;
-//			if(file.exists()){
-//				nodeSize = file.length();
-//				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-//			}
-//			holder.iconView.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
-//			holder.iconView.setVisibility(View.VISIBLE);
-//			holder.imageView.setVisibility(View.GONE);
-//			holder.imageButtonThreeDots.setTag(holder);
-//			holder.imageButtonThreeDots.setOnClickListener(this);
-//
-//			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
-//			holder.separator.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-//
-////			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-//			return;
-//		}
-
 		
 		File currentFile = getOfflineFile(context, currentNode);
 

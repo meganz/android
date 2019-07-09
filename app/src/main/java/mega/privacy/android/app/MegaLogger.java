@@ -32,7 +32,7 @@ public abstract class MegaLogger {
     public MegaLogger(String fileName, boolean fileLogger) {
         simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logFile = null;
-        dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR + "/";
+        dir = getExternalStoragePath(logDIR);
         this.fileName = fileName;
         fileLogQueue = new ConcurrentLinkedDeque<>();
         logToFile();

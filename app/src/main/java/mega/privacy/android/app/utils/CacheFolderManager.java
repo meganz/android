@@ -177,7 +177,7 @@ public final class CacheFolderManager {
     }
 
     public static File getOldTempFolder(String folderName) {
-        return new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + folderName);
+        return new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + folderName);
     }
 
     public static void log(String message) {

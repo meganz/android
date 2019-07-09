@@ -2103,16 +2103,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
             if (resultCode == Activity.RESULT_OK) {
                 log("TAKE_PHOTO_CODE ");
-//                String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.TEMPORAL_FOLDER + "/picture.jpg";
-//                File imgFile = new File(filePath);
-//                String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-//                String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.TEMPORAL_FOLDER + "/" + name;
-//                File newFile = new File(newPath);
-//                imgFile.renameTo(newFile);
-//                uploadPicture(newPath);
-
                 onCaptureImageResult();
-//                uploadPicture(finalUri);
 
             } else {
                 log("TAKE_PHOTO_CODE--->ERROR!");

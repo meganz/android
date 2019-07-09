@@ -266,31 +266,6 @@ public class AccountController implements View.OnClickListener{
         recoveryKeyExportedDialog.show();
     }
 
-//    public void updateMK(){
-//        log("updateMK");
-//
-//        String key = megaApi.exportMasterKey();
-//        BufferedWriter out;
-//        try {
-//
-//            final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-//            log("Export in: "+path);
-//            FileWriter fileWriter= new FileWriter(path);
-//            out = new BufferedWriter(fileWriter);
-//            if(out==null){
-//                log("Error!!!");
-//                return;
-//            }
-//            out.write(key);
-//            out.close();
-//
-//        }catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public void renameMK(){
         log("renameMK");
         File oldMKF = buildExternalStorageFile(oldMKFile);

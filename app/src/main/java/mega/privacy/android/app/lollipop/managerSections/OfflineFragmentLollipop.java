@@ -889,30 +889,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 //		contentText.setText(getInfoFolder(mOffList));
 	}
-	
-//	public void updateView (){
-//		log("updateView");
-//		mOffList=dbH.findByPath(pathNavigation);
-//		
-//		for(int i=0; i<mOffList.size();i++){
-//			
-//			File offlineDirectory = null;
-//			if (Environment.getExternalStorageDirectory() != null){
-//				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
-//			}
-//			else{
-//				offlineDirectory = context.getFilesDir();
-//			}	
-//			
-//			if (!offlineDirectory.exists()){
-//				dbH.removeById(mOffList.get(i).getId());
-//				mOffList.remove(i);
-//				
-//			}			
-//		}
-//		this.setNodes(mOffList);
-//	}
-//	
 
 	public boolean isFolder(String path){
 		log("isFolder");

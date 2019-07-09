@@ -15059,13 +15059,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         } else {
                             log("ERROR! Destination PATH is NULL");
                         }
-
-
-//						String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/"+name;
-//						log("----NEW Name: "+newPath);
-//						File newFile = new File(newPath);
-//						MegaUtilsAndroid.createAvatar(imgFile, newFile);
-
 					}
 					else{
 						log("The chosen avatar path is NULL");

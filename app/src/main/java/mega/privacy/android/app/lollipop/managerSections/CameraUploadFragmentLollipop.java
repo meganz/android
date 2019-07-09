@@ -87,7 +87,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 
 
@@ -1326,14 +1325,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		dbH.setFirstTime(false);
 //		dbH.setCamSyncEnabled(false);
 		dbH.setStorageAskAlways(false);
-		File defaultDownloadLocation = null;
-		if (Environment.getExternalStorageDirectory() != null){
-			defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + downloadDIR + "/");
-		}
-		else{
-			defaultDownloadLocation = context.getFilesDir();
-		}
-		
+		File defaultDownloadLocation = buildDefaultDownloadDir(context);
 		defaultDownloadLocation.mkdirs();
 		
 		dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());

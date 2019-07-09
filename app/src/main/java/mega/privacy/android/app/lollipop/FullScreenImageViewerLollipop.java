@@ -1150,12 +1150,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 			File currentImage = new File(offlinePathDirectory);
 			File offlineDirectory = new File(currentImage.getParent());
-//			if (Environment.getExternalStorageDirectory() != null){
-//				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
-//			}
-//			else{
-//				offlineDirectory = getFilesDir();
-//			}
 
 			paths.clear();
 			int imageNumber = 0;

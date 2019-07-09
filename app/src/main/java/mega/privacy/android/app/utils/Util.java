@@ -610,9 +610,7 @@ public class Util {
 //		if (fileLogger) {
 //			//Send the log to a file
 //
-//			String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR + "/";
-//			//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
-//			File dirFile = new File(dir);
+//			File dirFile = buildExternalStorageFile(logDIR);
 //			if (!dirFile.exists()) {
 //				dirFile.mkdirs();
 //				logFile = new File(dirFile, "log.txt");

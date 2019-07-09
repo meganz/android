@@ -618,15 +618,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             scrollContainerVerify.setVisibility(View.GONE);
             scrollContainer2FAEnabled.setVisibility(View.VISIBLE);
             if (rkSaved) {
-//                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-//                log("Exists MK in: "+path);
-//                File file= new File(path);
-//                if(file.exists()){
-//                    exportRKButton.setVisibility(View.GONE);
-//                }
-//                else{
-//                    exportRKButton.setVisibility(View.VISIBLE);
-//                }
                 dismissRKButton.setVisibility(View.VISIBLE);
             }
             else {
@@ -1171,15 +1162,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
                 if (e.getErrorCode() == MegaError.API_OK && request.getAccess() == 1) {
                     rkSaved = true;
-//                    String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-//                    log("Exists MK in: "+path);
-//                    File file= new File(path);
-//                    if(file.exists()){
-//                        exportRKButton.setVisibility(View.GONE);
-//                    }
-//                    else{
-//                        exportRKButton.setVisibility(View.VISIBLE);
-//                    }
                     dismissRKButton.setVisibility(View.VISIBLE);
                 }
                 else {

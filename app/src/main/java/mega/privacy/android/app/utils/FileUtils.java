@@ -354,12 +354,20 @@ public class FileUtils {
         }
     }
 
-    public static String getExternalStoragePath(String file) {
-        return Environment.getExternalStorageDirectory().getAbsolutePath() + file;
+    public static String getExternalStoragePath(String filePath) {
+        return Environment.getExternalStorageDirectory().getAbsolutePath() + filePath;
     }
 
-    public static File buildExternalStorageFile(String file) {
-        return new File(getExternalStoragePath(file));
+    public static File buildExternalStorageFile(String filePath) {
+        return new File(getExternalStoragePath(filePath));
+    }
+
+    public static File buildDefaultDownloadDir(Context context) {
+        if (Environment.getExternalStorageDirectory() != null){
+            return buildExternalStorageFile(downloadDIR);
+        } else {
+            return context.getFilesDir();
+        }
     }
 
     public static void log(String message) {
