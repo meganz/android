@@ -9569,16 +9569,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		switch (menuItem.getItemId()){
 			case R.id.bottom_navigation_item_cloud_drive: {
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-					long rootHandle = megaApi.getRootNode().getHandle();
-					if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
-						parentHandleBrowser = rootHandle;
-						refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-						if (cloudPageAdapter != null) {
-							cloudPageAdapter.notifyDataSetChanged();
+					if (getTabItemCloud() == CLOUD_TAB) {
+						long rootHandle = megaApi.getRootNode().getHandle();
+						if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
+							parentHandleBrowser = rootHandle;
+							refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+							if (cloudPageAdapter != null) {
+								cloudPageAdapter.notifyDataSetChanged();
+							}
+							if (isCloudAdded()) {
+								fbFLol.scrollToFirstPosition();
+							}
 						}
-						if (isCloudAdded()) {
-							fbFLol.scrollToFirstPosition();
-						}
+					} else if (getDeepBrowserTreeRecents() > 0 && isRecentsAdded()) {
+                        rF.onBackPressed();
 					}
 				}
 				else {
