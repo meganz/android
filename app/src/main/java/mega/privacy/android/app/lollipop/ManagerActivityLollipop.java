@@ -5531,6 +5531,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop: "+item);
 
+    	drawerItem = item;
 		((MegaApplication)getApplication()).setRecentChatVisible(false);
 		setTransfersWidget();
 
@@ -5739,13 +5740,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 
-    			drawerItem = DrawerItem.SEARCH;
     			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
     			if (sFLol != null) {
     				getSupportFragmentManager().beginTransaction().remove(sFLol).commitNowAllowingStateLoss();
 				}
 				sFLol = SearchFragmentLollipop.newInstance();
-
+				changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH);
 				replaceFragment(sFLol, FragmentTag.SEARCH.getTag());
 				showFabButton();
 
@@ -18523,7 +18523,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showTabCloud(boolean show) {
 		if (drawerItem != DrawerItem.CLOUD_DRIVE) return;
 
-		if (show) {
+		if (show || getTabItemCloud() == CLOUD_TAB) {
 			tabLayoutCloud.setVisibility(View.VISIBLE);
 			viewPagerCloud.disableSwipe(false);
 		} else {

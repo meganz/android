@@ -90,7 +90,6 @@ public class SearchFragmentLollipop extends Fragment{
 
     MegaNodeAdapter adapter;
 	SearchFragmentLollipop searchFragment = this;
-	ProgressBar progressBar;
 	MegaApiAndroid megaApi;
 
 	Stack<Integer> lastPositionStack;
@@ -561,7 +560,6 @@ public class SearchFragmentLollipop extends Fragment{
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 
-		((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH);
 		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
 			if(((ManagerActivityLollipop)context).searchQuery!=null){
 				if(!((ManagerActivityLollipop)context).searchQuery.isEmpty()){
@@ -603,9 +601,6 @@ public class SearchFragmentLollipop extends Fragment{
 					checkScroll();
 				}
 			});
-
-			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
-			progressBar.setVisibility(View.GONE);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
@@ -649,8 +644,6 @@ public class SearchFragmentLollipop extends Fragment{
 					checkScroll();
 				}
 			});
-			
-			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);

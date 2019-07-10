@@ -304,6 +304,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     public int onBackPressed() {
         if (((ManagerActivityLollipop) context).getDeepBrowserTreeRecents() > 0) {
             ((ManagerActivityLollipop) context).setDeepBrowserTreeRecents(0);
+            setBucketSelected(null);
             setRecentsView();
             return 1;
         }
@@ -519,7 +520,11 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
     public void setBucketSelected(MegaRecentActionBucket bucketSelected) {
         this.bucketSelected = bucketSelected;
-        ((ManagerActivityLollipop) context).setBucketSaved(new BucketSaved(bucketSelected));
+        if (bucketSelected == null) {
+            ((ManagerActivityLollipop) context).setBucketSaved(null);
+        } else {
+            ((ManagerActivityLollipop) context).setBucketSaved(new BucketSaved(bucketSelected));
+        }
     }
 
     public MegaRecentActionBucket getBucketSelected() {

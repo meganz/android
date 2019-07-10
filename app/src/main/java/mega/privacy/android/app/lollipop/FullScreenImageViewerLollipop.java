@@ -1286,7 +1286,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				positionG = 0;
 			}
 
-			fileNameTextView.setText(megaApi.getNodeByHandle(handle).getName());
+			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 		}
 		else{
@@ -1958,6 +1958,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		super.onSaveInstanceState(savedInstanceState);
 		if (getIntent() != null) {
 			getIntent().putExtra("position", positionG);
+			if (adapterType == Constants.RECENTS_ADAPTER) {
+				getIntent().putExtra("handle", imageHandles.get(positionG));
+			}
 		}
 		savedInstanceState.putInt("adapterType", adapterType);
 		if ((adapterType == Constants.OFFLINE_ADAPTER) || (adapterType == Constants.ZIP_ADAPTER)){
