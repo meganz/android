@@ -379,6 +379,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         moreContactsTitle = v.findViewById(R.id.more_contacts_title);
         moreContactsTitle.setOnClickListener(this);
 
+        refreshMegaContactsList();
+
         return v;
     }
 

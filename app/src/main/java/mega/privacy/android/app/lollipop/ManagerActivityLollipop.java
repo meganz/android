@@ -4331,7 +4331,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		ft.commitNowAllowingStateLoss();
 		// refresh manually
 		if(f instanceof RecentChatsFragmentLollipop) {
-            ((RecentChatsFragmentLollipop) f).refreshMegaContactsList();
+		    if(f.isResumed()) {
+                ((RecentChatsFragmentLollipop) f).refreshMegaContactsList();
+            }
         }
 	}
 

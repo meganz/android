@@ -313,7 +313,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         return megaContacts.get(currentContactIndex);
     }
 
-    public void getMegaContacts(MegaApiAndroid api, List<ContactsUtil.LocalContact> localContacts, long period) {
+    public synchronized void getMegaContacts(MegaApiAndroid api, List<ContactsUtil.LocalContact> localContacts, long period) {
         if (System.currentTimeMillis() - lastSyncTimestamp > period) {
             log("getMegaContacts request from server");
             api.getRegisteredContacts(getRequestParameter(localContacts), this);
