@@ -26,26 +26,24 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 
 public class ChatUtil {
-    public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
 
+    private static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
 
     /*Method to know if i'm participating in any A/V call*/
-    public static boolean participatingInACall(MegaChatApiAndroid megaChatApi){
-        boolean activeCall = false;
-        if(megaChatApi!=null){
-            MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
-            MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-            MegaHandleList listCalls = megaChatApi.getChatCalls();
-            if((listCallsUserNoPresent!=null)&&(listCallsRingIn!=null)&&(listCalls!=null)){
-                long totalCallsNotPresent = listCallsUserNoPresent.size() + listCallsRingIn.size();
-                if(totalCallsNotPresent == listCalls.size()){
-                    activeCall = false;
-                }else{
-                    activeCall = true;
-                }
-            }
-        }
-        return activeCall;
+    public static boolean participatingInACall(MegaChatApiAndroid megaChatApi) {
+        if (megaChatApi == null) return false;
+
+        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
+        MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
+        MegaHandleList listCalls = megaChatApi.getChatCalls();
+
+        if (listCallsUserNoPresent == null || listCallsRingIn == null || listCalls == null)
+            return false;
+
+        long totalCallsNotPresent = listCallsUserNoPresent.size() + listCallsRingIn.size();
+        if (totalCallsNotPresent == listCalls.size()) return false;
+
+        return true;
     }
 
     /*Method to know the chat id which A / V call I am participating in*/
@@ -107,37 +105,28 @@ public class ChatUtil {
         MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
     }
 
-    public static int getMaxAllowed(@Nullable final CharSequence text){
+    public static int getMaxAllowed(@Nullable final CharSequence text) {
         int numEmojis = EmojiManager.getInstance().getNumEmojis(text);
-        if(numEmojis > 0){
-            int realLenght = ((text.length() - (numEmojis*2)) + (numEmojis*4));
-            if(realLenght>=MAX_ALLOWED_CHARACTERS_AND_EMOJIS){
-                return text.length();
-            }
+        if (numEmojis > 0) {
+            int realLenght = ((text.length() - (numEmojis * 2)) + (numEmojis * 4));
+            if (realLenght >= MAX_ALLOWED_CHARACTERS_AND_EMOJIS) return text.length();
         }
         return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
-
     }
 
     public static String getFirstLetter(String title) {
-        String result = "";
+
         String resultTitle = EmojiUtilsShortcodes.emojify(title);
         resultTitle = resultTitle.trim();
+        if (!resultTitle.isEmpty() && resultTitle.length() == 1) return resultTitle;
 
-        if (!resultTitle.isEmpty() && resultTitle.length() == 1) {
-            return resultTitle;
-        }
+        if (resultTitle.isEmpty()) return "";
 
-        if (!resultTitle.isEmpty()) {
-            String lastEmoji = resultTitle.substring(0, 2);
-            int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
-            if (numEmojis > 0) {
-                result = lastEmoji;
-            } else {
-                result = String.valueOf(resultTitle.charAt(0));
-                result = result.toUpperCase(Locale.getDefault());
-            }
-        }
+        String lastEmoji = resultTitle.substring(0, 2);
+        int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
+        if (numEmojis > 0) return lastEmoji;
+
+        String result = String.valueOf(resultTitle.charAt(0)).toUpperCase(Locale.getDefault());
         return result;
     }
 

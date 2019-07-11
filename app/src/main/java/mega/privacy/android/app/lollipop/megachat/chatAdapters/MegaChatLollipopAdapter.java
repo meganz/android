@@ -119,11 +119,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private static int MAX_WIDTH_MESSAGE_LAND = 310;
     private static int MAX_WIDTH_MESSAGE_PORT = 275;
 
-    private static int EMOJI_SIZE_STANDARD = 20;
-    private static int EMOJI_SIZE_MEDIUM = 25;
-    private static int EMOJI_SIZE_HIGH = 30;
-    private static int EMOJI_SIZE_EXTRA_HIGH = 35;
-
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
@@ -1065,8 +1060,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.titleOwnMessage.setPadding(0, 0, Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics), 0);
             }
 
-            holder.ownManagementMessageText.setEmojiSize(Util.px2dp(EMOJI_SIZE_STANDARD, outMetrics));
-            holder.contactManagementMessageText.setEmojiSize(Util.px2dp(EMOJI_SIZE_STANDARD, outMetrics));
+            holder.ownManagementMessageText.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+            holder.contactManagementMessageText.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 
             holder.contentContactMessageContactLayout.setLayoutParams(paramsContactContact);
             holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
@@ -3994,26 +3989,26 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("Only emojis ");
             switch (numEmojis) {
                 case 1: {
-                    textView.setEmojiSize(Util.px2dp(EMOJI_SIZE_EXTRA_HIGH, outMetrics));
+                    textView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_HIGH, outMetrics));
                     break;
                 }
                 case 2: {
-                    textView.setEmojiSize(Util.px2dp(EMOJI_SIZE_HIGH, outMetrics));
+                    textView.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
                     break;
                 }
                 case 3: {
-                    textView.setEmojiSize(Util.px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
+                    textView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
                     break;
                 }
                 default: {
-                    textView.setEmojiSize(Util.px2dp(EMOJI_SIZE_STANDARD, outMetrics));
+                    textView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
                     break;
                 }
             }
         } else {
             log("Not only emojis");
             textView.setLineSpacing(1, 1.0f);
-            textView.setEmojiSize(Util.px2dp(EMOJI_SIZE_STANDARD, outMetrics));
+            textView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
         }
     }
 

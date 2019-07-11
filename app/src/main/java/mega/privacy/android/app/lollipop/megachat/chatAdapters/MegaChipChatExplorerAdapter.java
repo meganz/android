@@ -100,7 +100,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         holder.itemLayout = v.findViewById(R.id.item_layout_chip);
 
         holder.textViewName = v.findViewById(R.id.name_chip);
-        holder.textViewName.setEmojiSize(Util.px2dp(10, outMetrics));
+        holder.textViewName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
 
         holder.avatar = v.findViewById(R.id.rounded_avatar);

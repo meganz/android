@@ -346,8 +346,13 @@ public class Constants {
 	public static final int ERROR_LINK = -1;
 
 	public static final String CONTACT_HANDLE = "contactHandle";
+
+	public static final int EMOJI_SIZE_EXTRA_SMALL = 10;
 	public static final int EMOJI_SIZE_SMALL = 15;
 	public static final int EMOJI_SIZE = 20;
+	public static final int EMOJI_SIZE_MEDIUM = 25;
 	public static final int EMOJI_AVATAR_SIZE = 30;
+	public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
+
 
 }
