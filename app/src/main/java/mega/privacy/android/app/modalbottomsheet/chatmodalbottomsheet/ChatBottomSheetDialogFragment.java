@@ -46,6 +46,9 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
@@ -349,15 +352,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
     public void addAvatarChatPanel(String contactMail, MegaChatListItem chat){
 
-        File avatar = null;
-        if (getActivity().getExternalCacheDir() != null){
-            avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        }
-        else{
-            avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        }
+        File avatar = buildAvatarFile(getActivity(), contactMail + ".jpg");
         Bitmap bitmap = null;
-        if (avatar.exists()){
+        if (isFileAvailable(avatar)){
             if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
@@ -478,7 +475,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 if(chat==null){
                     log("Selected chat NULL");
                 }
-                log("Leave chat with: "+chat.getTitle());
+                log("Leave chat - Chat ID: " + chat.getChatId());
                 ((ManagerActivityLollipop)context).showConfirmationLeaveChat(chat);
                 break;
             }
@@ -487,7 +484,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 if(chat==null){
                     log("Selected chat NULL");
                 }
-                log("Clear chat with: "+chat.getTitle());
+                log("Clear chat - Chat ID: " + chat.getChatId());
                 ((ManagerActivityLollipop)context).showConfirmationClearChat(chat);
 
                 break;

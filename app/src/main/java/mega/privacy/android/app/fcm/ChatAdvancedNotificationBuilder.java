@@ -35,7 +35,6 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -49,6 +48,9 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public final class ChatAdvancedNotificationBuilder {
 
@@ -100,7 +102,7 @@ public final class ChatAdvancedNotificationBuilder {
         ArrayList<MegaChatMessage> unreadMessages = new ArrayList<>();
         for(int i=0;i<unreadHandleList.size();i++){
             MegaChatMessage message = megaChatApi.getMessage(chatId, unreadHandleList.get(i));
-            log("Chat: "+chat.getTitle()+" messagID: "+unreadHandleList.get(i));
+            log("Chat: "+chat.getChatId()+" messagID: "+unreadHandleList.get(i));
             if(message!=null){
                 unreadMessages.add(message);
             }
@@ -228,7 +230,7 @@ public final class ChatAdvancedNotificationBuilder {
                             if(nodeList != null) {
                                 if (nodeList.size() == 1) {
                                     MegaNode node = nodeList.get(0);
-                                    log("Node Name: " + node.getName());
+                                    log("Node Handle: " + node.getHandle());
                                     messageContent = node.getName();
                                 }
                             }
@@ -244,7 +246,6 @@ public final class ChatAdvancedNotificationBuilder {
                                     name = message.getUserName(0);
                                 }
                                 String email = message.getUserName(0);
-                                log("Contact Name: " + name);
                                 messageContent = email;
                             }
                             else{
@@ -407,7 +408,7 @@ public final class ChatAdvancedNotificationBuilder {
                     if(nodeList != null) {
                         if (nodeList.size() == 1) {
                             MegaNode node = nodeList.get(0);
-                            log("Node Name: " + node.getName());
+                            log("Node Handle: " + node.getHandle());
                             messageContent = node.getName();
                         }
                     }
@@ -423,7 +424,6 @@ public final class ChatAdvancedNotificationBuilder {
                             name = msg.getUserName(0);
                         }
                         String email = msg.getUserName(0);
-                        log("Contact EMail: " + name);
                         messageContent = email;
                     }
                     else{
@@ -475,7 +475,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         MegaChatMessage lastMsg = unreadMessageList.get(0);
         if(lastMsg!=null){
-            log("Last message: "+lastMsg.getContent()+" "+lastMsg.getTimestamp());
+            log("Last message ts: " + lastMsg.getTimestamp());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notificationBuilderO.setWhen(lastMsg.getTimestamp()*1000);
             }
@@ -581,15 +581,9 @@ public final class ChatAdvancedNotificationBuilder {
 
             String contactMail = chat.getPeerEmail(0);
 
-            File avatar = null;
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-            }
-            else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-            }
+            File avatar = buildAvatarFile(context, contactMail + ".jpg");
             Bitmap bitmap = null;
-            if (avatar.exists()){
+            if (isFileAvailable(avatar)){
                 if (avatar.length() > 0){
                     BitmapFactory.Options bOpts = new BitmapFactory.Options();
                     bOpts.inPurgeable = true;
