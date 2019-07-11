@@ -36,6 +36,8 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private SharedPreferences preferences;
 
+    private static boolean requestInProgress;
+
     //different instance should share
     private static long lastSyncTimestamp;
 
@@ -49,6 +51,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         this.context = context;
         dbH = DatabaseHandler.getDbHandler(context);
         preferences = context.getSharedPreferences(LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
+        getLastSyncTimeStamp();
+    }
+
+    private void getLastSyncTimeStamp() {
         lastSyncTimestamp = preferences.getLong(LAST_SYNC_TIMESTAMP_KEY, 0);
     }
 
@@ -179,7 +185,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     contact = new MegaContact();
                     MegaStringList list = table.get(i);
                     contact.id = list.get(1);
-                    if(api.getMyUserHandle().equals(contact.id)) {
+                    if (api.getMyUserHandle().equals(contact.id)) {
                         log("it's myself");
                         continue;
                     }
@@ -209,6 +215,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     updater.onException(e.getErrorCode(), request.getRequestString());
                 }
             }
+            requestInProgress = false;
         } else if (request.getType() == MegaRequest.TYPE_GET_USER_EMAIL) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 String email = request.getEmail();
@@ -216,7 +223,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     MegaContact currentContact = getCurrentContactIndex();
                     if (currentContact != null) {
                         currentContact.email = email;
-                        if(currentContact.localName == null) {
+                        if (currentContact.localName == null) {
                             currentContact.localName = email;
                         }
                     }
@@ -313,8 +320,12 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         return megaContacts.get(currentContactIndex);
     }
 
-    public synchronized void getMegaContacts(MegaApiAndroid api, List<ContactsUtil.LocalContact> localContacts, long period) {
+    public void getMegaContacts(MegaApiAndroid api, List<ContactsUtil.LocalContact> localContacts, long period) {
+        if(requestInProgress) {
+            return;
+        }
         if (System.currentTimeMillis() - lastSyncTimestamp > period) {
+            requestInProgress = true;
             log("getMegaContacts request from server");
             api.getRegisteredContacts(getRequestParameter(localContacts), this);
         } else {
