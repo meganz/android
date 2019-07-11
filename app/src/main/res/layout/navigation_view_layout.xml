@@ -136,7 +136,6 @@
                 android:textColor="@color/name_my_account"
                 android:text="@string/section_account"/>
 
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"

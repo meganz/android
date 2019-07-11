@@ -18,6 +18,8 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
 import android.support.design.widget.TabLayout;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -154,8 +156,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	DisplayMetrics outMetrics;
     float scaleText;
 	Display display;
-	EditText et_user;
-	EditText et_password;
+	TextInputEditText et_user;
+	TextInputEditText et_password;
 	TextView bRegisterLol;
 	Button bLoginLol;
 
@@ -223,9 +225,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	private boolean is2FAEnabled = false;
 	private boolean accountConfirmed = false;
 	private boolean pinLongClick = false;
-
-	private RelativeLayout loginEmailErrorLayout;
-	private RelativeLayout loginPasswordErrorLayout;
 
 	private ImageView toggleButton;
 	private boolean passwdVisibility;
@@ -552,13 +551,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		loginTitle.setText(R.string.login_text);
 		loginTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 		
-		et_user = (EditText) findViewById(R.id.login_email_text);
+		et_user = findViewById(R.id.login_email_text);
 
 		toggleButton = (ImageView) findViewById(R.id.toggle_button);
 		toggleButton.setOnClickListener(this);
 		passwdVisibility = false;
 
-		et_password = (EditText) findViewById(R.id.login_password_text);
+		et_password = findViewById(R.id.login_password_text);
 
 		et_password.setOnEditorActionListener(new OnEditorActionListener() {
 			
@@ -620,11 +619,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
 		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
 		serversBusyText = (TextView) findViewById(R.id.login_servers_busy_text);
-
-		loginEmailErrorLayout = (RelativeLayout) findViewById(R.id.login_email_text_error);
-		loginEmailErrorLayout.setVisibility(View.GONE);
-		loginPasswordErrorLayout = (RelativeLayout) findViewById(R.id.login_password_text_error);
-		loginPasswordErrorLayout.setVisibility(View.GONE);
 
 		tB  =(Toolbar) findViewById(R.id.toolbar);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

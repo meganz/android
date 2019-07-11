@@ -259,7 +259,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
 //				getFragmentManager()
 //						.beginTransaction()
@@ -299,7 +299,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                     Window window = this.getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
                 }
                 break;
 
@@ -348,7 +348,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                     Window window = this.getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
                 }
 
                 break;
@@ -999,7 +999,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
         }
     }
 }

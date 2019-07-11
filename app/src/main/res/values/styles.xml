@@ -284,4 +284,7 @@
         <item name="android:layout">@layout/my_category_preference</item>
     </style>
 
+    <style name="TextAppearanceError" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/dark_primary_color</item>
+    </style>
 </resources>

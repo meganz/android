@@ -1361,7 +1361,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		if (event.getType() == MegaEvent.EVENT_STORAGE) {
 			log("Storage status changed");
-			int state = event.getNumber();
+			int state = (int) event.getNumber();
 			if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
 				api.getAccountDetails(null);
 			}
