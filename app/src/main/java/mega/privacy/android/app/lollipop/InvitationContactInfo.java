@@ -5,6 +5,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
+import java.util.Objects;
+
 public class InvitationContactInfo implements Parcelable {
 
     public static final int TYPE_MEGA_CONTACT_HEADER = 0;
@@ -30,6 +32,7 @@ public class InvitationContactInfo implements Parcelable {
     private int type;
     private Bitmap bitmap;
     private String name, displayInfo, handle, avatarColor;
+    private String normalizedNumber = "";
 
     public InvitationContactInfo(long id, String name, int type, String displayInfo, String avatarColor) {
         this.id = id;
@@ -45,6 +48,14 @@ public class InvitationContactInfo implements Parcelable {
         this.type = type;
         this.name = name;
         this.displayInfo = "";
+    }
+
+    @Override
+    public String toString() {
+        return "InvitationContactInfo{" +
+                "name='" + name + '\'' +
+                ", normalizedNumber='" + normalizedNumber + '\'' +
+                '}';
     }
 
     public int getType() {
@@ -117,6 +128,12 @@ public class InvitationContactInfo implements Parcelable {
         return avatarColor;
     }
 
+    public void setNormalizedNumber(String normalizedNumber) {
+        if(normalizedNumber != null) {
+            this.normalizedNumber = normalizedNumber;
+        }
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -141,5 +158,19 @@ public class InvitationContactInfo implements Parcelable {
         displayInfo = in.readString();
         handle = in.readString();
         avatarColor = in.readString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InvitationContactInfo that = (InvitationContactInfo) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(normalizedNumber, that.normalizedNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, normalizedNumber);
     }
 }

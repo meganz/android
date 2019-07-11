@@ -1947,14 +1947,16 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }
+        super.onResume();
+    }
 
+    public void refreshMegaContactsList() {
         grantedContactPermission = Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, context);
         if (grantedContactPermission) {
             showPermissionGrantedView();
         } else {
             showPermissionDeniedView();
         }
-        super.onResume();
     }
 
     public int getItemCount(){
@@ -2145,12 +2147,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
             log("onActivityResult REQUEST_INVITE_CONTACT_FROM_DEVICE OK");
-            ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
-            if (contactsData != null) {
-                ContactController cC = new ContactController(context);
-                cC.inviteMultipleContacts(contactsData);
-            }
         }
+        refreshMegaContactsList();
     }
 
     private void loadMegaContacts() {

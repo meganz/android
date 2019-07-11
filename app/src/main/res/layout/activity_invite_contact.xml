@@ -68,6 +68,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_marginRight="18dp"
+                            android:paddingLeft="6dp"
                             android:layout_toRightOf="@+id/label_container"
                             android:backgroundTint="@color/white"
                             android:hint="@string/type_mail"
@@ -75,8 +76,8 @@
                             android:maxLines="1"
                             android:minWidth="100dp"
                             android:singleLine="true"
-                            android:textColor="@color/text_login"
-                            android:textColorHint="@color/mail_my_account"
+                            android:textColor="#FF4A4A4A"
+                            android:textColorHint="@color/emoji_icons"
                             android:textCursorDrawable="@drawable/cursor_color"
                             android:textSize="13sp" />
 

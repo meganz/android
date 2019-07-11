@@ -36,7 +36,8 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private SharedPreferences preferences;
 
-    private long lastSyncTimestamp;
+    //different instance should share
+    private static long lastSyncTimestamp;
 
     public static final int DAY = 24 * 60 * 60 * 1000;
     public static final int WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -52,7 +53,8 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     }
 
     private void updateLastSyncTimestamp() {
-        preferences.edit().putLong(LAST_SYNC_TIMESTAMP_KEY, System.currentTimeMillis()).apply();
+        lastSyncTimestamp = System.currentTimeMillis();
+        preferences.edit().putLong(LAST_SYNC_TIMESTAMP_KEY, lastSyncTimestamp).apply();
     }
 
     public void setMegaContactUpdater(MegaContactUpdater updater) {
@@ -190,6 +192,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     megaContacts.add(contact);
                 }
                 if (megaContacts.size() > 0) {
+                    currentContactIndex = 0;
                     MegaContact firstContact = getCurrentContactIndex();
                     if (firstContact != null) {
                         api.getUserEmail(getUserHandler(firstContact.id), this);
@@ -213,6 +216,9 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     MegaContact currentContact = getCurrentContactIndex();
                     if (currentContact != null) {
                         currentContact.email = email;
+                        if(currentContact.localName == null) {
+                            currentContact.localName = email;
+                        }
                     }
                 } else {
                     log("Contact's email is empty!");
@@ -234,10 +240,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 // filter out
                 List<MegaContact> list = filterOut(api, megaContacts);
 
+                currentContactIndex = 0;
                 if (updater != null) {
                     updater.onFinish(list);
                 }
-                currentContactIndex = 0;
             } else {
                 MegaContact nextContact = getCurrentContactIndex();
                 if (nextContact != null) {

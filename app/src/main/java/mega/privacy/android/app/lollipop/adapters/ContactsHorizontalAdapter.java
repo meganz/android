@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -150,7 +151,11 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     }
 
     private String getFirstLetter(ContactViewHolder holder) {
-        return String.valueOf(holder.textViewName.getText().charAt(0));
+        CharSequence name = holder.textViewName.getText();
+        if(TextUtils.isEmpty(name)) {
+            return "";
+        }
+        return String.valueOf(name.charAt(0));
     }
 
     private static void log(String log) {

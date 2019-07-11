@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.telephony.PhoneNumberUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,10 +81,6 @@ public class ContactsUtil {
     }
 
     static List<LocalContact> getLocalContactList(Context context) {
-        // use current default country code to normalize phonenumber.
-        String countryCode = Util.getCountryCodeByNetwork(context);
-        log("coutry code is: " + countryCode);
-
         List<LocalContact> localContacts = new ArrayList<>();
         ContentResolver resolver = context.getContentResolver();
 
@@ -123,7 +118,7 @@ public class ContactsUtil {
                             //If roaming, don't normalize the phone number.
                             if (!Util.isRoaming(context)) {
                                 // use current country code to normalize the phone number.
-                                normalizedPhone = PhoneNumberUtils.formatNumberToE164(phone, countryCode);
+                                normalizedPhone = Util.normalizePhoneNumberByNetwork(context,phone);
                             }
                         }
                         if (normalizedPhone != null) {

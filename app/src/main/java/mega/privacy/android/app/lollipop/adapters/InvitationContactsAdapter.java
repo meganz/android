@@ -78,7 +78,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
     }
 
-    class ViewHolderPhoneContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolderPhoneContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener {
         private RelativeLayout contactLayout;
         private TextView contactNameTextView, displayLabelTextView, headerTextView, initialLetter;
         private RoundedImageView imageView;
@@ -183,6 +183,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
         holder.headerTextView = rowView.findViewById(R.id.section_header);
         holder.contactId = HEADER_HOLDER_ID;
+        rowView.setTag(holder);
         return holder;
     }
 
@@ -196,6 +197,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         holder.imageView = rowView.findViewById(R.id.contact_explorer_thumbnail);
         holder.initialLetter = rowView.findViewById(R.id.contact_explorer_initial_letter);
         holder.initialLetter.setVisibility(View.GONE);
+        rowView.setTag(holder);
         return holder;
     }
 
