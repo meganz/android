@@ -5868,7 +5868,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void updatingRemovedMessage(MegaChatMessage message){
         for(int i=0;i<messages.size();i++){
-            if((messages.get(i).getMessage().getTempId() == message.getTempId()) && (messages.get(i).getMessage().getMsgId() == message.getMsgId())){
+            if( messages.get(i).getMessage() != null && messages.get(i).getMessage().getTempId() == message.getTempId() && messages.get(i).getMessage().getMsgId() == message.getMsgId()){
                 RemovedMessage msg = new RemovedMessage(messages.get(i).getMessage().getTempId(), messages.get(i).getMessage().getMsgId());
                 removedMessages.add(msg);
                 adapter.notifyItemChanged(i+1);
