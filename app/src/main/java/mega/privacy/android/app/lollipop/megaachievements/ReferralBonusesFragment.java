@@ -122,12 +122,6 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
 				break;
 			}
-			case R.id.card_view_invite_friends:{
-				log("Invite friends");
-
-				break;
-			}
-
 		}
 	}
 

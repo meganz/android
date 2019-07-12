@@ -48,8 +48,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 
-	CardView inviteFriendsCard;
-
 	RelativeLayout referralBonusesLayout;
 
     RelativeLayout registrationLayout;
@@ -66,8 +64,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 	LinearLayout figuresInstallDesktopLayout;
 	TextView zeroFiguresInstallDesktopText;
-
-	TextView titleCardInvite;
 
 	ImageView installAppIcon;
 	ImageView installDesktopIcon;
@@ -163,11 +159,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout_achievements);
 
-		titleCardInvite = (TextView) (TextView) v.findViewById(R.id.title_card);
-
-		inviteFriendsCard = (CardView) v.findViewById(R.id.card_view_invite_friends);
 		inviteFriendsButton = (Button) v.findViewById(R.id.invite_button);
-		inviteFriendsCard.setOnClickListener(this);
 		inviteFriendsButton.setOnClickListener(this);
 
 		referralBonusesLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_layout);
@@ -371,7 +363,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 				((AchievementsActivity)context).showFragment(Constants.INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
 				break;
 			}
-			case R.id.card_view_invite_friends:
 			case R.id.invite_button:{
 				log("Invite friends");
 				((AchievementsActivity)context).showFragment(Constants.INVITE_FRIENDS_FRAGMENT, -1);
@@ -399,8 +390,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		long installAppTransferValue = ((AchievementsActivity)context).megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
 		long installDesktopStorageValue = ((AchievementsActivity)context).megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
 		long installDesktopTransferValue = ((AchievementsActivity)context).megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
-
-		titleCardInvite.setText(getString(R.string.figures_achievements_text_referrals, Util.getSizeString(referralsStorageValue), Util.getSizeString(referralsTransferValue)));
 
 		if(transferReferrals>0||storageReferrals>0){
 

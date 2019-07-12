@@ -382,22 +382,15 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         log("onActivityResult");
-        if (requestCode == Constants.REQUEST_CODE_GET_CONTACTS && resultCode == RESULT_OK){
+        if (requestCode == Constants.REQUEST_CODE_GET_CONTACTS && resultCode == RESULT_OK) {
             log("REQUEST_CODE_GET_CONTACTS");
             ArrayList<String> contacts = data.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
-            if (contacts != null){
-                if (inviteFriendsFragment != null && inviteFriendsFragment.isAdded()){
-                    for (int i=0; i<contacts.size(); i++){
-                        inviteFriendsFragment.addMail(contacts.get(i));
-                    }
-                }
-                else {
-                    megaApi.getAccountAchievements(this);
-                    pendingAttaches = true;
-                    pendingContacts = contacts;
-                    visibleFragment = Constants.INVITE_FRIENDS_FRAGMENT;
-                    achievementType = -1;
-                }
+            if (contacts != null) {
+                megaApi.getAccountAchievements(this);
+                pendingAttaches = true;
+                pendingContacts = contacts;
+                visibleFragment = Constants.INVITE_FRIENDS_FRAGMENT;
+                achievementType = -1;
             }
         }
         else{
@@ -407,13 +400,8 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
     void attachPendig () {
         if (pendingContacts != null) {
-            if (inviteFriendsFragment != null && inviteFriendsFragment.isAdded()) {
-                for (int i = 0; i < pendingContacts.size(); i++) {
-                    inviteFriendsFragment.addMail(pendingContacts.get(i));
-                }
-                pendingAttaches = false;
-                pendingContacts.clear();
-            }
+            pendingAttaches = false;
+            pendingContacts.clear();
         }
     }
 
