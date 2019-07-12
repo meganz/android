@@ -2498,4 +2498,5 @@
 	</plurals>
 
     <string name="sign_up_mega" context="Title of the login screen">Sign up for MEGA</string>
+    <string name="create_account_title" context="Title of the create account screen">Create your MEGA account</string>
 </resources>

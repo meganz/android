@@ -34,15 +34,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
-                    android:text="@string/create_account_text"
+                    android:text="@string/create_account_title"
                     android:layout_marginTop="17dp"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"
                     android:textAllCaps="true"
                     android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginBottom="24dp" />
+                    android:textStyle="bold" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -204,7 +202,9 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_marginTop="55dp"
-                        android:layout_alignTop="@+id/create_account_password_text_layout">
+                        android:paddingBottom="20dp"
+                        android:layout_alignTop="@+id/create_account_password_text_layout"
+                        android:visibility="gone">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -324,8 +324,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:layout_marginBottom="31dp"
-                    android:layout_marginTop="36dp"
-                    android:layout_marginLeft="-4dp"
+                    android:layout_marginTop="12dp"
                     android:orientation="horizontal" >
 
                     <CheckBox

@@ -3,10 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
@@ -30,7 +27,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -131,8 +127,8 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         userNameError.setVisibility(View.GONE);
         userLastNameLayout = v.findViewById(R.id.create_account_last_name_text_layout);
         userLastName = v.findViewById(R.id.create_account_last_name_text);
-        userNameError = v.findViewById(R.id.create_account_last_name_text_error_icon);
-        userNameError.setVisibility(View.GONE);
+        userLastNameError = v.findViewById(R.id.create_account_last_name_text_error_icon);
+        userLastNameError.setVisibility(View.GONE);
         userEmailLayout = v.findViewById(R.id.create_account_email_text_layout);
         userEmail = v.findViewById(R.id.create_account_email_text);
         userEmailError = v.findViewById(R.id.create_account_email_text_error_icon);
@@ -428,6 +424,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             userPasswordLayout.setErrorTextAppearance(R.style.InputTextAppearanceStrong);
         }
 
+        userPasswordError.setVisibility(View.GONE);
         userPasswordLayout.setError(" ");
     }
 
@@ -650,7 +647,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     private String getPasswordError() {
         String value = userPassword.getText().toString();
-        if (value.length() == 0) {
+        if (value.isEmpty()) {
             return getString(R.string.error_enter_password);
         }
         else if (!passwdValid){
@@ -663,7 +660,9 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     private String getPasswordConfirmError() {
         String password = userPassword.getText().toString();
         String confirm = userPasswordConfirm.getText().toString();
-        if (password.equals(confirm) == false) {
+        if (confirm.isEmpty()) {
+            return getString(R.string.error_enter_password);
+        } else if (password.equals(confirm) == false) {
             return getString(R.string.error_passwords_dont_match);
         }
         return null;
@@ -812,7 +811,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_last_name_text:{
                 userLastNameLayout.setError(error);
                 userLastNameLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
-                userNameError.setVisibility(View.VISIBLE);
+                userLastNameError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.create_account_password_text:{
@@ -851,7 +850,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_last_name_text:{
                 userLastNameLayout.setError(null);
                 userLastNameLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
-                userNameError.setVisibility(View.GONE);
+                userLastNameError.setVisibility(View.GONE);
                 break;
             }
             case R.id.create_account_password_text:{
