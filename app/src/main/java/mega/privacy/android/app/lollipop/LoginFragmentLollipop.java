@@ -8,9 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -433,18 +431,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         yesMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
         yesMK.setLayoutParams(yesMKParams);
         yesMK.setOnClickListener(this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            yesMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-        }
+        yesMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
 
         noMK = (Button) v.findViewById(R.id.no_MK_button);
         LinearLayout.LayoutParams noMKParams = (LinearLayout.LayoutParams)noMK.getLayoutParams();
         noMKParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
         noMK.setLayoutParams(noMKParams);
         noMK.setOnClickListener(this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            noMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-        }
+        noMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
 
         parkAccountLayout = (RelativeLayout) v.findViewById(R.id.park_account_layout);
         parkAccountTitle = (TextView) v.findViewById(R.id.title_park_account_layout);
@@ -968,9 +962,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 intent.setData(Uri.parse(url));
                             }
                         }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        }
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                             ((LoginActivityLollipop) context).startCameraSyncService(false, 5 * 60 * 1000);
@@ -1027,9 +1019,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             intent.setData(Uri.parse(url));
                         }
                     }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    }
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                     MegaPreferences prefs = dbH.getPreferences();
                     if(prefs!=null)
@@ -3127,13 +3117,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         switch (editText.getId()){
             case R.id.login_email_text:{
                 et_userLayout.setError(error);
-                et_userLayout.setHintTextAppearance(R.style.TextAppearanceError);
+                et_userLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
                 et_userError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.login_password_text:{
                 et_passwordLayout.setError(error);
-                et_passwordLayout.setHintTextAppearance(R.style.TextAppearanceError);
+                et_passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
                 et_passwordError.setVisibility(View.VISIBLE);
                 break;
             }
