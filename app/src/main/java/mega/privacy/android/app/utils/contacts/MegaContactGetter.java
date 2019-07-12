@@ -321,7 +321,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     }
 
     public void getMegaContacts(MegaApiAndroid api, List<ContactsUtil.LocalContact> localContacts, long period) {
-        if(requestInProgress) {
+        if (requestInProgress) {
             return;
         }
         if (System.currentTimeMillis() - lastSyncTimestamp > period) {

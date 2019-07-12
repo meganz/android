@@ -1,9 +1,9 @@
 /*
  * This code was taken from:
- * 
+ *
  * http://stackoverflow.com/questions/31242812/how-to-add-divider-line-in-recyclerview-in-android
  * Username: Nilesh
- * 
+ *
  */
 
 package mega.privacy.android.app.components;
@@ -22,7 +22,7 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDivider;
     DisplayMetrics outMetrics;
     Context context;
- 
+
     public SimpleDividerItemDecoration(Context context, DisplayMetrics outMetrics) {
         mDivider = ContextCompat.getDrawable(context, R.drawable.line_divider);
         this.outMetrics = outMetrics;

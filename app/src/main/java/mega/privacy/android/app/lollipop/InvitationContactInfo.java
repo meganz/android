@@ -129,7 +129,7 @@ public class InvitationContactInfo implements Parcelable {
     }
 
     public void setNormalizedNumber(String normalizedNumber) {
-        if(normalizedNumber != null) {
+        if (normalizedNumber != null) {
             this.normalizedNumber = normalizedNumber;
         }
     }
