@@ -36,8 +36,8 @@ public class ContactsUtil {
             return id;
         }
 
-        public void addPhoneNumber(String phoneNumer) {
-            phoneNumberList.add(phoneNumer);
+        public void addPhoneNumber(String phoneNumber) {
+            phoneNumberList.add(phoneNumber);
         }
 
         public void addNormalizedPhoneNumber(String normalizedPhoneNumber) {

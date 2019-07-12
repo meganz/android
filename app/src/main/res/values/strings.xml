@@ -1332,6 +1332,7 @@
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">No files Saved for Offline</string>
 
     <string name="general_enable" context="Positive confirmation to enable logs">Enable</string>
+    <string name="general_allow" context="Positive confirmation to allow MEGA to read contacts book.">Allow</string>
     <string name="enable_log_text_dialog" context="Dialog to confirm the action of enabling logs">Logs can contain information related to your account</string>
 
     <string name="confirmation_to_reconnect" context="Dialog to confirm the reconnect action">Network connection recovered. Connect to MEGA?</string>

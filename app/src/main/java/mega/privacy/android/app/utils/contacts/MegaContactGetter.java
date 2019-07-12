@@ -296,11 +296,11 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         for (MegaContactRequest request : api.getOutgoingContactRequests()) {
             log("contact request: " + request.getStatus() + " -> " + request.getTargetEmail());
             for (MegaContact contact : list) {
-                boolean hasSameEamil = request.getTargetEmail().equals(contact.getEmail());
+                boolean hasSameEmail = request.getTargetEmail().equals(contact.getEmail());
                 boolean isAccepted = request.getStatus() == MegaContactRequest.STATUS_ACCEPTED;
                 boolean isPending = request.getStatus() == MegaContactRequest.STATUS_UNRESOLVED;
 
-                if (hasSameEamil && (isAccepted || isPending)) {
+                if (hasSameEmail && (isAccepted || isPending)) {
                     list.remove(contact);
                     break;
                 }
