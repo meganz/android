@@ -285,7 +285,7 @@ if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     
     echo "* Prebuilding libsodium for x86_64"
     dist-build/android-x86_64.sh &>> ${LOG_FILE}
-    ln -sf libsodium-android-i686 libsodium-android-x86_64
+    ln -sf libsodium-android-westmere libsodium-android-x86_64
     
     popd &>> ${LOG_FILE}
     touch ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
