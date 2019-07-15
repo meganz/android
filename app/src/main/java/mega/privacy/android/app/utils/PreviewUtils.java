@@ -114,11 +114,26 @@ public class PreviewUtils {
             //half of the screen size.
             inSampleSize = calculateInSampleSize(bOpts,size.x / 2,size.y / 2);
         }
+        inSampleSize = calculateInSampleSizeBySize(bmpFile, inSampleSize);
         log("inSampleSize: " + inSampleSize);
         bOpts.inJustDecodeBounds = false;
         bOpts.inSampleSize = inSampleSize;
         log("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
         return BitmapFactory.decodeFile(bmpFile.getAbsolutePath(),bOpts);
+    }
+
+    public static int calculateInSampleSizeBySize(File bmpFile, int inSampleSize) {
+        while (!testAllocation(bmpFile,inSampleSize)) {
+            inSampleSize *= 2;
+        }
+        return inSampleSize;
+    }
+
+    public static boolean testAllocation(File bmpFile, int inSampleSize) {
+        long toAllocate = bmpFile.length() / (inSampleSize * inSampleSize);
+        long free = Runtime.getRuntime().freeMemory();
+        log(toAllocate + "/" + free);
+        return toAllocate < free;
     }
 
 	/*code from developer.android, https://developer.android.com/topic/performance/graphics/load-bitmap.html*/
