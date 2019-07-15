@@ -82,7 +82,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginBottom="8dp"
-                        android:src="@drawable/ic_g_start_conversation" />
+                        android:src="@drawable/ic_chat_fill" />
 
                     <TextView
                         android:id="@+id/chat_contact_properties_send_message_label"
@@ -118,7 +118,7 @@
                         android:layout_marginBottom="8dp"
                         android:tint="@color/accentColor"
                         android:layout_centerHorizontal="true"
-                        android:src="@drawable/ic_phone_white" />
+                        android:src="@drawable/ic_call" />
 
                     <TextView
                         android:id="@+id/chat_contact_properties_call_label"
@@ -154,7 +154,7 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginBottom="8dp"
                         android:tint="@color/accentColor"
-                        android:src="@drawable/ic_videocam_white" />
+                        android:src="@drawable/ic_video" />
 
                     <TextView
                         android:id="@+id/chat_contact_properties_video_label"
@@ -185,17 +185,8 @@
             android:id="@+id/chat_contact_properties_shared_folders_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:layout_marginLeft="72dp"
             android:layout_gravity="left|center_vertical">
-
-            <ImageView
-                android:id="@+id/chat_contact_properties_shared_folder_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|center_vertical"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:alpha="0.64"
-                android:src="@drawable/ic_share" />
 
             <TextView
                 android:id="@+id/chat_contact_properties_shared_folders_label"
@@ -203,8 +194,6 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_gravity="left|center_vertical"
-                android:layout_marginLeft="32dp"
-                android:layout_toRightOf="@id/chat_contact_properties_shared_folder_icon"
                 android:text="@string/title_incoming_shares_explorer"
                 android:textColor="@color/name_my_account"
                 android:textSize="16sp" />
@@ -236,6 +225,7 @@
             android:id="@+id/divider_shared_folder_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
+            android:layout_marginLeft="72dp"
             android:background="@color/divider_upgrade_account" />
 
         <!-- NOTIFICATIONS LAYOUT -->
@@ -245,27 +235,12 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="@color/white"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:layout_marginLeft="72dp">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_gravity="left|center_vertical">
-
-                <ImageView
-                    android:id="@+id/chat_contact_properties_notification_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:alpha="0.54"
-                    android:src="@drawable/ic_unmute" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="32dp"
                 android:layout_gravity="center">
 
                 <TextView
@@ -293,6 +268,7 @@
             android:id="@+id/divider_notifications_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
+            android:layout_marginLeft="72dp"
             android:background="@color/divider_upgrade_account" />
 
         <!-- SHARE CONTACT LAYOUT -->
@@ -330,6 +306,7 @@
             android:id="@+id/divider_share_contact_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
+            android:layout_marginLeft="72dp"
             android:background="@color/divider_upgrade_account" />
 
         <!-- SHARED FILES LAYOUT -->
@@ -368,6 +345,7 @@
             android:id="@+id/divider_chat_files_shared_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
+            android:layout_marginLeft="72dp"
             android:background="@color/divider_upgrade_account" />
 
 
@@ -407,6 +385,7 @@
             android:id="@+id/divider_clear_chat_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
+            android:layout_marginLeft="72dp"
             android:background="@color/divider_upgrade_account" />
 
         <!-- REMOVE CONTACT LAYOUT -->

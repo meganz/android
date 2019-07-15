@@ -8,14 +8,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
@@ -26,22 +24,15 @@ import mega.privacy.android.app.utils.Util;
 public class TourFragmentLollipop extends Fragment implements View.OnClickListener{
 
     Context context;
-    LinearLayout mainLinearLayout;
     private TourImageAdapter adapter;
     private LoopViewPager viewPager;
-    private LinearLayout bar1;
-    private LinearLayout bar2;
-    private LinearLayout bar3;
-    private LinearLayout bar4;
+    private ImageView firstItem;
+    private ImageView secondItem;
+    private ImageView thirdItem;
+    private ImageView fourthItem;
     private Button bRegister;
     private Button bLogin;
-    TextView tourText1;
-    TextView tourText2;
-    TextView achievementProgramText;
-    LinearLayout shapeGrey;
-    private LinearLayout tourLoginCreate;
-    private LinearLayout optionsLayout;
-    ScrollView scrollView;
+    private ScrollView baseContainer;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -54,6 +45,44 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         }
     }
 
+    void setStatusBarColor (int position) {
+        switch (position) {
+            case 0: {
+                ((LoginActivityLollipop) context).getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.statusbar_tour_1));
+                break;
+            }
+            case 1: {
+                ((LoginActivityLollipop) context).getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.statusbar_tour_2));
+                break;
+            }
+            case 2: {
+                ((LoginActivityLollipop) context).getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.statusbar_tour_3));
+                break;
+            }
+            case 3: {
+                ((LoginActivityLollipop) context).getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.statusbar_tour_4));
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setStatusBarColor(viewPager.getCurrentItem());
+
+        // For small screen like nexus one or bigger screen, this is to force the scroll view to bottom to show buttons
+        // Meanwhile, tour image glide could also be shown
+        baseContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                if (baseContainer != null) {
+                    baseContainer.fullScroll(View.FOCUS_DOWN);
+                }
+            }
+        });
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         log("onCreateView");
@@ -63,27 +92,13 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         display.getMetrics(metrics);
 
         View v = inflater.inflate(R.layout.fragment_tour, container, false);
-        mainLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout_tour);
-        scrollView = (ScrollView) v.findViewById(R.id.scroll_view_tour);
         viewPager = (LoopViewPager) v.findViewById(R.id.pager);
-        bar1 = (LinearLayout) v.findViewById(R.id.bar_tour_layout_1);
-        bar2 = (LinearLayout) v.findViewById(R.id.bar_tour_layout_2);
-        bar3 = (LinearLayout) v.findViewById(R.id.bar_tour_layout_3);
-        bar4 = (LinearLayout) v.findViewById(R.id.bar_tour_layout_4);
-        tourLoginCreate = (LinearLayout) v.findViewById(R.id.tour_login_create);
+        firstItem = (ImageView) v.findViewById(R.id.first_item);
+        secondItem = (ImageView) v.findViewById(R.id.second_item);
+        thirdItem = (ImageView) v.findViewById(R.id.third_item);
+        fourthItem = (ImageView) v.findViewById(R.id.fourth_item);
 
-       // mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-        tourText1 = (TextView) v.findViewById(R.id.tour_text_1);
-        tourText1.setGravity(Gravity.CENTER_VERTICAL);
-
-        tourText2 = (TextView) v.findViewById(R.id.tour_text_2);
-        tourText2.setGravity(Gravity.CENTER_VERTICAL);
-
-        achievementProgramText = (TextView) v.findViewById(R.id.text_achievements_program);
-        achievementProgramText.setText("*"+getString(R.string.footnote_achievements));
-
-        shapeGrey = (LinearLayout) v.findViewById(R.id.shape_grey);
-        optionsLayout = (LinearLayout) v.findViewById(R.id.options_layout);
+        baseContainer = (ScrollView) v.findViewById(R.id.tour_fragment_base_container);
 
         bLogin = (Button) v.findViewById(R.id.button_login_tour);
         bRegister = (Button) v.findViewById(R.id.button_register_tour);
@@ -95,75 +110,51 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(0);
 
-        bar1.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-        bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-        bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-        bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
+        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+        setStatusBarColor(0);
 
-        viewPager.getLayoutParams().height = metrics.widthPixels-70;
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
 
             @Override
             public void onPageSelected (int position){
-                int[] barTitles = new int[] {
-                        R.string.tour_space_title,
-                        R.string.tour_speed_title,
-                        R.string.tour_privacy_title,
-                        R.string.tour_access_title
-                };
 
-                int[] barTexts = new int[] {
-                        R.string.tour_space_text,
-                        R.string.tour_speed_text,
-                        R.string.tour_privacy_text,
-                        R.string.tour_access_text
-                };
+                setStatusBarColor(position);
 
-                tourText1.setText(barTitles[position]);
-                tourText2.setText(barTexts[position]);
                 switch(position){
                     case 0:{
-                        bar1.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-                        bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        achievementProgramText.setVisibility(View.VISIBLE);
+                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
+                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
                     case 1:{
-                        bar1.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-                        bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        achievementProgramText.setVisibility(View.GONE);
+                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
+                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
                     case 2:{
-                        bar1.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-                        bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        achievementProgramText.setVisibility(View.GONE);
+                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
+                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
                     case 3:{
-                        bar1.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
-                        bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-                        achievementProgramText.setVisibility(View.GONE);
+                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
                         break;
                     }
                 }
             }
         });
-        //Set the scroll at the end of the screen
-        scrollView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                scrollView.scrollTo(0, scrollView.getBottom());
-            }
-        },100);
 
         return v;
     }

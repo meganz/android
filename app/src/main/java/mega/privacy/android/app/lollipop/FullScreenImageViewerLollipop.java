@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -78,6 +77,7 @@ import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -86,7 +86,6 @@ import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
@@ -96,9 +95,10 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -227,7 +227,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	ArrayList<File> zipFiles = new ArrayList<>();
 
-	boolean sendToChat = false;
 	private String downloadLocationDefaultPath = "";
 
 	@Override
@@ -291,6 +290,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		moveToTrashIcon = menu.findItem(R.id.full_image_viewer_move_to_trash);
 		removeIcon = menu.findItem(R.id.full_image_viewer_remove);
 		chatIcon = menu.findItem(R.id.full_image_viewer_chat);
+		chatIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
@@ -677,15 +677,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				if(nC ==null){
 					nC = new NodeController(this, isFolderLink);
 				}
-				if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
-					MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
-					if (attachNode != null) {
-						nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
-					}
+
+				MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+				if (attachNode != null) {
+					nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
 				}
-				else {
-					nC.selectChatsToSendNodes(longArray);
-				}
+
 				break;
 			}
 
@@ -901,11 +898,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.full_image_viewer_not_preview), -1);
 			}
 		}
 		else{
-			Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.full_image_viewer_not_preview), -1);
 		}
 	}
 
@@ -2296,7 +2293,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 
 		if(!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 			return;
 		}
 
@@ -2364,7 +2361,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		final long handle = node.getHandle();
 		moveToRubbish = false;
 		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 			return;
 		}
 
@@ -2492,10 +2489,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_renamed), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -2528,18 +2525,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
 				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
 					finish();
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
 				}
 				log("move nodes request finished");
 			}
@@ -2553,12 +2550,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						statusDialog.dismiss();
 					}
 					catch (Exception ex) {}
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_removed), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
 				}
 				finish();
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_removed), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
 			}
 			log("remove request finished");
 		}
@@ -2569,17 +2566,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
-						&& adapterType == Constants.INCOMING_SHARES_ADAPTER) {
-					log("Incoming node copied to Send to chat");
-					MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
-					if (attachNode != null) {
-						nC.selectChatsToSendNode(attachNode);
-					}
-				}
-				else {
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
-				}
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -2597,9 +2584,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				finish();
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 			}
-			sendToChat = false;
 			log("copy nodes request finished");
 		}
 	}
@@ -2726,7 +2712,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
 			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return;
 			}
 
@@ -2754,7 +2740,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return;
 			}
 
@@ -2784,7 +2770,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					log("cN == null, i = " + i + " of " + copyHandles.length);
 					try {
 						statusDialog.dismiss();
-						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 					}
 					catch (Exception ex) {}
 				}
@@ -2792,64 +2778,61 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			log("Send to "+chatHandles.length+" chats");
+			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+			log("Send to "+(chatHandles.length+contactHandles.length)+" chats");
 
 			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
 			log("Send "+nodeHandles.length+" nodes");
 
-			countChat = chatHandles.length;
-			if(countChat==1){
-				megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
-			}
-			else if(countChat>1){
+			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
+				if (contactHandles != null && contactHandles.length > 0) {
+					ArrayList<MegaChatRoom> chats = new ArrayList<>();
+					ArrayList<MegaUser> users = new ArrayList<>();
 
-				for(int i=0; i<chatHandles.length; i++){
-					megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+					for (int i=0; i<contactHandles.length; i++) {
+						MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
+						if (user != null) {
+							users.add(user);
+						}
+					}
+
+					if (chatHandles != null) {
+						for (int i = 0; i < chatHandles.length; i++) {
+							MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+							if (chatRoom != null) {
+								chats.add(chatRoom);
+							}
+						}
+					}
+
+					if(nodeHandles!=null){
+						CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, nodeHandles[0], this, CreateChatToPerformActionListener.SEND_FILE);
+						for (MegaUser user : users) {
+							MegaChatPeerList peers = MegaChatPeerList.createInstance();
+							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+							megaChatApi.createChat(false, peers, listener);
+						}
+					}
+					else{
+						log("Error on sending to chat");
+					}
+				}
+				else {
+					countChat = chatHandles.length;
+					for (int i = 0; i < chatHandles.length; i++) {
+						megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+					}
 				}
 			}
-//			megaChatApi.attachNode();
 
-		}
-	}
-
-	// Get list of all child files
-
-	private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
-		log("getDlList");
-
-		if (megaApi.getRootNode() == null)
-			return;
-
-		folder.mkdir();
-		ArrayList<MegaNode> nodeList = megaApi.getChildren(parent, orderGetChildren);
-		for(int i=0; i<nodeList.size(); i++){
-			MegaNode document = nodeList.get(i);
-			if (document.getType() == MegaNode.TYPE_FOLDER) {
-				File subfolder = new File(folder, new String(document.getName()));
-				getDlList(dlFiles, document, subfolder);
-			}
-			else {
-				dlFiles.put(document, folder.getAbsolutePath());
-			}
 		}
 	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
 
-	public void showSnackbar(String s){
-		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
-	}
-
-	public void showSnackbarNotSpace(){
-		log("showSnackbarNotSpace");
-		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
-		mySnackbar.show();
+	public void showSnackbar(int type, String s, long idChat){
+		showSnackbar(type, fragmentContainer, s, idChat);
 	}
 
 	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
@@ -3009,7 +2992,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void onBackPressed() {
 		log("onBackPressed");
 		setImageDragVisibility(View.VISIBLE);
-		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 
@@ -3103,25 +3085,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if(countChat==errorSent+successSent){
 				if(successSent==countChat){
 					if(countChat==1){
-						long handle = request.getChatHandle();
-						MegaChatListItem chatItem = megaChatApi.getChatListItem(handle);
-						if(chatItem!=null){
-							Intent intent = new Intent(this, ManagerActivityLollipop.class);
-							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-							intent.putExtra("CHAT_ID", handle);
-							startActivity(intent);
-							finish();
-						}
-					}else{
-						showSnackbar(getString(R.string.success_attaching_node_from_cloud_chats, countChat));
+						showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), request.getChatHandle());
+					}
+					else{
+						showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), -1);
 					}
 				}
 				else if(errorSent==countChat){
-					showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_attaching_node_from_cloud), -1);
 				}
 				else{
-					showSnackbar(getString(R.string.error_attaching_node_from_cloud_chats));
+					showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.error_sent_as_message), -1);
 				}
 			}
 		}
@@ -3223,9 +3197,4 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public MegaNode getCurrentDocument() {
 		return currentDocument;
 	}
-
-	public void setSendToChat (boolean sendToChat) {
-		this.sendToChat = sendToChat;
-	}
-
 }

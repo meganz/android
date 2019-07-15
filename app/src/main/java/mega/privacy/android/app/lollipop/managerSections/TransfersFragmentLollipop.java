@@ -101,7 +101,7 @@ public class TransfersFragmentLollipop extends Fragment {
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setHasFixedSize(true);
-		listView.setItemAnimator(new DefaultItemAnimator());
+		listView.setItemAnimator(null);
 		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -253,9 +253,22 @@ public class TransfersFragmentLollipop extends Fragment {
 		adapter.notifyItemChanged(index);
 	}
 
-    public void transferFinish(int position){
-		log("transferFinish: "+position);
-		if(!tL.isEmpty()){
+    public void transferFinish(int transferTag){
+		log("transferFinish: transferTag is " + transferTag);
+		int position = -1;
+        for (int i=0; i<tL.size(); i++) {
+            MegaTransfer transfer = tL.get(i);
+            if(transfer != null && transfer.getTag() == transferTag){
+                position = i;
+                break;
+            }
+        }
+
+		if(position == -1){
+		    return;
+        }
+
+		if(!tL.isEmpty() && position < tL.size()){
 			tL.remove(position);
 		}
 

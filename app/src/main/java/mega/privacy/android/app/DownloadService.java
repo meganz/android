@@ -133,8 +133,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	MegaNode offlineNode;
 
 	boolean isLoggingIn = false;
+    private long lastUpdated;
 
-	@SuppressLint("NewApi")
+    @SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
 		super.onCreate();
@@ -253,7 +254,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						int ret = megaChatApi.getInitState();
 
-						if(ret==0||ret==MegaChatApi.INIT_ERROR){
+						if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
 							ret = megaChatApi.init(gSession);
 							log("result of init ---> " + ret);
 							chatSettings = dbH.getChatSettings();
@@ -273,7 +274,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								megaChatApi.logout(this);
 							} else {
 								log("Chat correctly initialized");
-								megaChatApi.enableGroupChatCalls(true);
 							}
 						}
 					}
@@ -626,8 +626,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		else
 		{
 			try {
-				if (openFile) {
-					log("openFile true");
+                boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
+                if (openFile && autoPlayEnabled) {
+                    log("both openFile and autoPlayEnabled are true");
 					Boolean externalFile;
 					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
 						externalFile = true;
@@ -743,6 +744,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							mediaIntent.putExtra("isPlayList", false);
 							mediaIntent.putExtra("HANDLE", handle);
 							mediaIntent.putExtra("fromDownloadService", true);
+                            mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							} else {
@@ -1189,7 +1191,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	 */
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
-
 		int pendingTransfers = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
         int totalTransfers = megaApi.getTotalDownloads() + megaApiFolder.getTotalDownloads();
 
@@ -1215,6 +1216,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		if(update){
+            //refresh UI every 1 seconds to avoid too much workload on main thread
+            if(!isOverquota) {
+                long now = System.currentTimeMillis();
+                if (now - lastUpdated > 1000) {
+                    lastUpdated = now;
+                } else {
+                    return;
+                }
+            }
 			int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
 			log("updateProgressNotification: "+progressPercent);
 

@@ -12,6 +12,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -91,7 +92,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         if(context instanceof ManagerActivityLollipop) {
                             ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
                             managerActivity.refreshAfterMovingToRubbish();
-                            ((MegaApplication) managerActivity.getApplication()).askForAccountDetails();
+                            DBUtil.resetAccountDetailsTimeStamp(context);
                         }
                         else {
                             ((ContactFileListActivityLollipop) context).refreshAfterMovingToRubbish();
@@ -108,7 +109,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
                         ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
                         managerActivity.refreshAfterMovingToRubbish();
-                        ((MegaApplication) managerActivity.getApplication()).askForAccountDetails();
+                        DBUtil.resetAccountDetailsTimeStamp(context);
                     }
                     else{
                         log("move nodes request finished");
@@ -144,7 +145,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
                         ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
                         managerActivity.refreshAfterRemoving();
-                        ((MegaApplication) managerActivity.getApplication()).askForAccountDetails();
+                        DBUtil.resetAccountDetailsTimeStamp(context);
                     }
 
                     break;
@@ -197,6 +198,8 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else{
                             message = context.getString(R.string.number_correctly_copied, max_items);
                         }
+
+                        DBUtil.resetAccountDetailsTimeStamp(context);
                     }
                     break;
                 }
@@ -289,11 +292,11 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     break;
             }
             if(context instanceof ManagerActivityLollipop){
-                ((ManagerActivityLollipop) context).showSnackbar(message);
+                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
             }
             else if(context instanceof ChatActivityLollipop){
-                ((ChatActivityLollipop) context).removeRequestDialog();
-                ((ChatActivityLollipop) context).showSnackbar(message);
+                ((ChatActivityLollipop) context).removeProgressDialog();
+                ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
             }
             else if(context instanceof ContactAttachmentActivityLollipop){
                 ((ContactAttachmentActivityLollipop) context).showSnackbar(message);
@@ -306,7 +309,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
             }
             else if(context instanceof NodeAttachmentHistoryActivity){
                 ((NodeAttachmentHistoryActivity) context).removeProgressDialog();
-                ((NodeAttachmentHistoryActivity) context).showSnackbar(message);
+                ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, message);
             }
         }
     }

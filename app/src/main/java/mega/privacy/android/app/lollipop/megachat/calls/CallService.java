@@ -29,6 +29,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -38,6 +39,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.context;
 
 public class CallService extends Service implements MegaChatCallListenerInterface {
@@ -62,7 +64,6 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-
         megaChatApi.addChatCallListener(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
@@ -89,7 +90,6 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         if(MegaApplication.getOpenCallChatId()!=chatId){
             MegaApplication.setOpenCallChatId(chatId);
         }
-
         showCallInProgressNotification();
         return START_NOT_STICKY;
     }
@@ -116,10 +116,8 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             channel.setSound(null, null);
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.createNotificationChannel(channel);
-
             Intent intent = new Intent(this, ChatCallActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.setAction(Long.toString(System.currentTimeMillis()));
             intent.putExtra("chatHandle", chatId);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -169,16 +167,13 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             Notification notif = mBuilderCompatO.build();
 
             startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
-        }
-        else {
+
+        }else{
 
             mBuilderCompat = new NotificationCompat.Builder(this);
-
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-
             Intent intent = new Intent(this, ChatCallActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.setAction(Long.toString(System.currentTimeMillis()));
             intent.putExtra("chatHandle", chatId);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -235,14 +230,9 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
 
     public Bitmap setProfileContactAvatar(long userHandle,  String fullName, String email){
         Bitmap bitmap = null;
-        File avatar = null;
-        if (context.getExternalCacheDir() != null) {
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-        } else {
-            avatar = new File(context.getCacheDir().getAbsolutePath(), email + ".jpg");
-        }
+        File avatar = CacheFolderManager.buildAvatarFile(context, email + ".jpg");
 
-        if (avatar.exists()) {
+        if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;

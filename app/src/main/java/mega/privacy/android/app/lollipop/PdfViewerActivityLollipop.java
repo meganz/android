@@ -19,7 +19,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.OpenableColumns;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -46,6 +46,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -85,6 +86,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -93,7 +95,6 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -102,10 +103,11 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -231,8 +233,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     boolean notChangePage = false;
     MegaNode currentDocument;
 
-    boolean sendToChat = false;
-
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -339,6 +339,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (!isOffLine && type != Constants.ZIP_ADAPTER) {
             app = (MegaApplication) getApplication();
             megaApi = app.getMegaApi();
+            if (isFolderLink) {
+                megaApiFolder = app.getMegaApiFolder();
+            }
 
             if (Util.isChatEnabled()) {
                 megaChatApi = app.getMegaChatApi();
@@ -349,7 +352,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             msgChat = megaChatApi.getMessageFromNodeHistory(chatId, chatId);
                         }
                         if (msgChat != null) {
-                            nodeChat = msgChat.getMegaNodeList().get(0);
+                            nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
                             if (isDeleteDialogShow) {
                                 showConfirmationDeleteNode(chatId, msgChat);
                             }
@@ -420,18 +423,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
                     }
                     else {
-                        showSnackbar(getString(R.string.error_streaming));
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_streaming), -1);
                     }
                 }
             }
 
             if (isFolderLink){
-                megaApiFolder = app.getMegaApiFolder();
                 log("Folder link node");
                 MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
                 if (currentDocumentAuth == null){
                     log("CurrentDocumentAuth is null");
-                    showSnackbar(getString(R.string.error_streaming)+ ": node not authorized");
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_streaming)+ ": node not authorized", -1);
                 }
                 else{
                     log("CurrentDocumentAuth is not null");
@@ -612,13 +614,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        log("onBackPressed");
-        super.callToSuperBack = true;
-        super.onBackPressed();
-    }
-
     public void runEnterAnimation() {
         final long duration = 400;
         if (aB != null && aB.isShowing()) {
@@ -710,7 +705,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
         else {
-
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
             currentPage = 1;
@@ -768,12 +762,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             if (!isOffLine && type != Constants.ZIP_ADAPTER){
                 app = (MegaApplication)getApplication();
-                if (isFolderLink){
-                    megaApi = app.getMegaApiFolder();
-                }
-                else {
-                    megaApi = app.getMegaApi();
-                }
+                megaApi = app.getMegaApi();
 
                 if(Util.isChatEnabled()){
                     megaChatApi = app.getMegaChatApi();
@@ -1056,24 +1045,22 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     public void download(){
 
         if (type == Constants.FILE_LINK_ADAPTER){
-            MegaNode node = megaApi.getNodeByHandle(currentDocument.getHandle());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                if (!hasStoragePermission) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            Constants.REQUEST_WRITE_STORAGE);
-
-                    handleListM.add(node.getHandle());
-                }
-            }
-
             if (nC == null) {
                 nC = new NodeController(this);
             }
             nC.downloadFileLink(currentDocument, uri.toString());
         }
         else if (fromChat){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (!hasStoragePermission) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                    handleListM.add(nodeChat.getHandle());
+                    return;
+                }
+            }
             if (chatC == null){
                 chatC = new ChatController(this);
             }
@@ -1091,6 +1078,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             Constants.REQUEST_WRITE_STORAGE);
 
                     handleListM.add(node.getHandle());
+                    return;
                 }
             }
 
@@ -1101,6 +1089,39 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 nC = new NodeController(this, isFolderLink);
             }
             nC.prepareForDownload(handleList, false);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+            case Constants.REQUEST_WRITE_STORAGE:{
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (hasStoragePermission) {
+                    if (type == Constants.FILE_LINK_ADAPTER) {
+                        if(nC==null){
+                            nC = new NodeController(this, isFolderLink);
+                        }
+                        nC.downloadFileLink(currentDocument, uri.toString());
+                    }
+                    else if (fromChat) {
+                        if (chatC == null){
+                            chatC = new ChatController(this);
+                        }
+                        if (nodeChat != null){
+                            chatC.prepareForChatDownload(nodeChat);
+                        }
+                    }
+                    else{
+                        if(nC==null){
+                            nC = new NodeController(this, isFolderLink);
+                        }
+                        nC.prepareForDownload(handleListM, false);
+                    }
+                }
+                break;
+            }
         }
     }
 
@@ -1223,6 +1244,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         shareMenuItem = menu.findItem(R.id.pdf_viewer_share);
         downloadMenuItem = menu.findItem(R.id.pdf_viewer_download);
         chatMenuItem = menu.findItem(R.id.pdf_viewer_chat);
+        chatMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
         propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties);
         getlinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link);
         renameMenuItem = menu.findItem(R.id.pdf_viewer_rename);
@@ -1341,50 +1363,36 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
 
-                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle())) {
-                        if (msgChat.isDeletable()){
-                            chatRemoveMenuItem.setVisible(true);
-                        }
-                        else {
-                            chatRemoveMenuItem.setVisible(false);
-                        }
+                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle()) && msgChat.isDeletable()) {
+                        chatRemoveMenuItem.setVisible(true);
                     }
                     else {
-                        log("The message is not mine");
+                        chatRemoveMenuItem.setVisible(false);
+                    }
+                }
+                else if (nodeChat != null){
+                    downloadMenuItem.setVisible(true);
+                    if (chatC.isInAnonymousMode()) {
+                        importMenuItem.setVisible(false);
+                        saveForOfflineMenuItem.setVisible(false);
+                    }
+                    else {
+                        importMenuItem.setVisible(true);
+                        saveForOfflineMenuItem.setVisible(true);
+                    }
+
+                    if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle() && msgChat.isDeletable()) {
+                        chatRemoveMenuItem.setVisible(true);
+                    }
+                    else {
                         chatRemoveMenuItem.setVisible(false);
                     }
                 }
                 else {
-                    if (nodeChat != null){
-                        downloadMenuItem.setVisible(true);
-                        importMenuItem.setVisible(true);
-                        saveForOfflineMenuItem.setVisible(true);
-
-                        if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle()) {
-                            if((megaApi.getNodeByHandle(nodeChat.getHandle()))==null){
-                                log("The node is not mine");
-                                chatRemoveMenuItem.setVisible(false);
-                            }
-                            else{
-                                if(msgChat.isDeletable()){
-                                    chatRemoveMenuItem.setVisible(true);
-                                }
-                                else{
-                                    chatRemoveMenuItem.setVisible(false);
-                                }
-                            }
-                        }
-                        else {
-                            log("The message is not mine");
-                            chatRemoveMenuItem.setVisible(false);
-                        }
-                    }
-                    else {
-                        downloadMenuItem.setVisible(false);
-                        importMenuItem.setVisible(false);
-                        saveForOfflineMenuItem.setVisible(false);
-                        chatRemoveMenuItem.setVisible(false);
-                    }
+                    downloadMenuItem.setVisible(false);
+                    importMenuItem.setVisible(false);
+                    saveForOfflineMenuItem.setVisible(false);
+                    chatRemoveMenuItem.setVisible(false);
                 }
             }
             else if (type == Constants.FILE_LINK_ADAPTER) {
@@ -1621,7 +1629,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         int id = item.getItemId();
         switch(id) {
             case android.R.id.home: {
-                super.callToSuperBack = true;
                 super.onBackPressed();
                 break;
             }
@@ -1640,14 +1647,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 if(nC ==null){
                     nC = new NodeController(this, isFolderLink);
                 }
-                if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                    MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
-                    if (attachNode != null) {
-                        nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
-                    }
-                }
-                else {
-                    nC.selectChatsToSendNodes(longArray);
+
+                MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+                if (attachNode != null) {
+                    nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
                 }
                 break;
             }
@@ -1694,7 +1697,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     chatC = new ChatController(this);
                 }
                 if (msgChat != null){
-                    chatC.saveForOffline(msgChat.getMegaNodeList());
+                    chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId));
                 }
                 break;
             }
@@ -1764,7 +1767,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         moveToRubbish = false;
         if (!Util.isOnline(this)){
-            Snackbar.make(pdfviewerContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -2080,7 +2083,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
 
         if(!Util.isOnline(this)){
-            Snackbar.make(pdfviewerContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -2235,7 +2238,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
             else {
-                Snackbar.make(pdfviewerContainer, getString(R.string.not_download), Snackbar.LENGTH_LONG).show();
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.not_download), -1);
             }
         }
     }
@@ -2326,25 +2329,51 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-            log("Send to "+chatHandles.length+" chats");
+            long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+            log("Send to "+(chatHandles.length+contactHandles.length)+" chats");
 
             long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
             log("Send "+nodeHandles.length+" nodes");
 
-            countChat = chatHandles.length;
-            if (megaChatApi != null) {
-                if(countChat==1){
-                    megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
-                }
-                else if(countChat>1){
+            if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
+                if (contactHandles != null && contactHandles.length > 0) {
+                    ArrayList<MegaChatRoom> chats = new ArrayList<>();
+                    ArrayList<MegaUser> users = new ArrayList<>();
 
-                    for(int i=0; i<chatHandles.length; i++){
+                    for (int i=0; i<contactHandles.length; i++) {
+                        MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
+                        if (user != null) {
+                            users.add(user);
+                        }
+                    }
+
+                    if (chatHandles != null) {
+                        for (int i = 0; i < chatHandles.length; i++) {
+                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+                            if (chatRoom != null) {
+                                chats.add(chatRoom);
+                            }
+                        }
+                    }
+
+                    if(nodeHandles!=null){
+                        CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, nodeHandles[0], this, CreateChatToPerformActionListener.SEND_FILE);
+                        for (MegaUser user : users) {
+                            MegaChatPeerList peers = MegaChatPeerList.createInstance();
+                            peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+                            megaChatApi.createChat(false, peers, listener);
+                        }
+                    }
+                    else{
+                        log("Error on sending to chat");
+                    }
+                }
+                else {
+                    countChat = chatHandles.length;
+                    for (int i = 0; i < chatHandles.length; i++) {
                         megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
                     }
                 }
-            }
-            else{
-                log("megaChatApi is Null - cannot attach nodes");
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
@@ -2355,6 +2384,24 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     nC = new NodeController(this);
                 }
                 nC.downloadTo(currentDocument, parentPath, uri.toString());
+            }
+            else if (type == Constants.FROM_CHAT) {
+                long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+                if (hashes != null) {
+                    ArrayList<MegaNode> megaNodes = new ArrayList<>();
+                    for (int i=0; i<hashes.length; i++) {
+                        MegaNode node = megaApi.getNodeByHandle(hashes[i]);
+                        if (node != null) {
+                            megaNodes.add(node);
+                        }
+                        else {
+                            log("Node NULL, not added");
+                        }
+                    }
+                    if (megaNodes.size() > 0) {
+                        chatC.checkSizeBeforeDownload(parentPath, megaNodes);
+                    }
+                }
             }
             else {
                 String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
@@ -2371,7 +2418,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         else if (requestCode == Constants.REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
             if(!Util.isOnline(this)){
-                Snackbar.make(pdfviewerContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -2399,7 +2446,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
             if(!Util.isOnline(this)){
-                Snackbar.make(pdfviewerContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -2429,7 +2476,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     log("cN == null, i = " + i + " of " + copyHandles.length);
                     try {
                         statusDialog.dismiss();
-                        Snackbar.make(pdfviewerContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
                     }
                     catch (Exception ex) {}
                 }
@@ -2442,7 +2489,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 try{
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
-                Snackbar.make(pdfviewerContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -2459,12 +2506,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     megaApi.copyNode(nodeChat, target, this);
                 } else {
                     log("TARGET: null");
-                    Snackbar.make(pdfviewerContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
                 }
             }
             else{
                 log("DOCUMENT: null");
-                Snackbar.make(pdfviewerContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
             }
         }
     }
@@ -2655,11 +2702,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                Snackbar.make(pdfviewerContainer, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_LONG).show();
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
                 updateFile();
             }
             else{
-                Snackbar.make(pdfviewerContainer, getString(R.string.context_no_renamed), Snackbar.LENGTH_LONG).show();
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
             }
         }
         else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -2673,18 +2720,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     this.finish();
                 }
                 else{
-                    Snackbar.make(pdfviewerContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                 }
                 moveToRubbish = false;
                 log("move to rubbish request finished");
             }
             else{
                 if (e.getErrorCode() == MegaError.API_OK){
-                    Snackbar.make(pdfviewerContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
                     finish();
                 }
                 else{
-                    Snackbar.make(pdfviewerContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                 }
                 log("move nodes request finished");
             }
@@ -2698,12 +2745,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         moveToTrashStatusDialog.dismiss();
                     }
                     catch (Exception ex) {}
-                    Snackbar.make(pdfviewerContainer, getString(R.string.context_correctly_removed), Snackbar.LENGTH_LONG).show();
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
                 }
                 finish();
             }
             else{
-                Snackbar.make(pdfviewerContainer, getString(R.string.context_no_removed), Snackbar.LENGTH_LONG).show();
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
             }
             log("remove request finished");
         }
@@ -2714,17 +2761,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
-                        && type == Constants.INCOMING_SHARES_ADAPTER) {
-                    log("Incoming node copied to Send to chat");
-                    MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
-                    if (attachNode != null) {
-                        nC.selectChatsToSendNode(attachNode);
-                    }
-                }
-                else {
-                    Snackbar.make(pdfviewerContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
-                }
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
                 log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -2741,9 +2778,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 finish();
             }
             else{
-                Snackbar.make(pdfviewerContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
             }
-            sendToChat = false;
             log("copy nodes request finished");
         }
     }
@@ -2790,26 +2826,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if(countChat==errorSent+successSent){
                 if(successSent==countChat){
                     if(countChat==1){
-                        long handle = request.getChatHandle();
-                        MegaChatListItem chatItem = megaChatApi.getChatListItem(handle);
-                        if(chatItem!=null){
-                            Intent intent = new Intent(this, ManagerActivityLollipop.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-                            intent.putExtra("CHAT_ID", handle);
-                            startActivity(intent);
-                            finish();
-                        }
+                        showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, request.getChatHandle());
                     }
                     else{
-                        showSnackbar(getString(R.string.success_attaching_node_from_cloud_chats, countChat));
+                        showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), -1);
                     }
                 }
                 else if(errorSent==countChat){
-                    showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_attaching_node_from_cloud), -1);
                 }
                 else{
-                    showSnackbar(getString(R.string.error_attaching_node_from_cloud_chats));
+                    showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.error_sent_as_message), -1);
                 }
             }
         }
@@ -2976,12 +3003,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         return false;
     }
 
-    public void showSnackbar(String s){
-        log("showSnackbar");
-        Snackbar snackbar = Snackbar.make(pdfviewerContainer, s, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+    public void showSnackbar(int type, String s, long idChat){
+        showSnackbar(type, pdfviewerContainer, s, idChat);
     }
 
     public void openAdvancedDevices (long handleToDownload, boolean highPriority){
@@ -3027,13 +3050,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
             toast.show();
         }
-    }
-
-    public void showSnackbarNotSpace(){
-        log("showSnackbarNotSpace");
-        Snackbar mySnackbar = Snackbar.make(pdfviewerContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-        mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
-        mySnackbar.show();
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
@@ -3182,10 +3198,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     public String getPassword () {
         return password;
-    }
-
-    public void setSendToChat (boolean sendToChat) {
-        this.sendToChat = sendToChat;
     }
 
     public int getMaxIntents() {

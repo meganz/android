@@ -250,9 +250,7 @@
 	<!--
     <string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Изпразни Кошчето</string>
 	-->
-	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">Няма входящи споделени папки</string>
-	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">Няма изходящи споделени папки</string>
-    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Празна папка</string>
+	<string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Празна папка</string>
     
     <!--
     <string name="choose_account_activity" context="Title of the activity Choose Account">Изберете Профил</string>
@@ -279,10 +277,7 @@
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Пълен достъп</string>
 	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Четене &amp; запис</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Само четене</string>
-	<!--
-    <string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Споделени със:</string>
-	-->
-    <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Разрешения:</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Разрешения:</string>
 	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Сподели Права</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Промяна разрешения</string>
 	<string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">Споделено със</string>
@@ -296,8 +291,7 @@
 	<!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Съдържание</string>
 	-->
-    <string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Споделени Папки със:</string>
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Добавете нови контакти, използвайки бутона по-долу.</string>	
+    <string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Добавете нови контакти, използвайки бутона по-долу.</string>
 	<!--
     <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are no contacts in the account. Please add them on the Contacts screen.</string>
     -->
@@ -705,7 +699,6 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Влез</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Вашите локални файлове ще бъдат изтрити и ще излезете от системата след 10 неуспешни опита.</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Грешен код</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Грешен ПИН код, моля опитайте отново. Остават ви %2d опита.</string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">ПИН кодовете не съвпадат</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Въведете своя Пин Код</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Въведете отново ПИН Код</string>
@@ -741,11 +734,7 @@
     <string name="my_account_title" context="title of the My Account screen">Тип на профила:</string>
     <string name="expires_on" context="title of the Expiration Date">Изтича на</string>
     <string name="free_account">БЕЗПЛАТЕН</string>
-    <string name="prolite_account" context="Not translate">Lite</string>
-    <string name="pro1_account" context="Not translate">Pro I</string>
-    <string name="pro2_account" context="Not translate">Pro II</string>
-    <string name="pro3_account" context="Not translate">Pro III</string>
-    
+
     <!--
     <string name="free_storage" context="Not translate">50 GB</string>
     -->
@@ -835,7 +824,6 @@
     <string name="four_pin_lock" context="PIN with 4 digits">4 цифрен PIN</string>
     <string name="six_pin_lock" context="PIN with 6 digits">6 цифрен PIN</string>
     <string name="AN_pin_lock" context="PIN alphanumeric">Буквено-числов PIN</string>
-    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Празна папка</string>
     <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Изпратен във Входящи</string>
     <string name="context_no_sent_node" context="error message when sending a node to Inbox">Грешка. Не беше изпратено във Входящи </string>
     <!--

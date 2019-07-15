@@ -23,6 +23,9 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 /**
  * Created by mega on 12/01/18.
  */
@@ -78,17 +81,9 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
         }
         MegaNode parentNode = megaApi.getRootNode();
         String myEmail = megaApi.getMyUser().getEmail();
-        File qrFile = null;
-        if (getActivity().getExternalCacheDir() != null){
-            File qrDir = new File (getActivity().getExternalCacheDir(), "qrMEGA");
-            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-        }
-        else{
-            File qrDir = getActivity().getDir("qrMEGA", 0);
-            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-        }
+        File qrFile = buildQrFile(getActivity(),myEmail + "QRcode.jpg");
 
-        if (qrFile != null && qrFile.exists()){
+        if (isFileAvailable(qrFile)){
             ShareInfo info = ShareInfo.infoFromFile(qrFile);
             Intent intent = new Intent(getActivity().getApplicationContext(), UploadService.class);
             intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -97,10 +92,10 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
             intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
             intent.putExtra("qrfile", true);
             getActivity().startService(intent);
-            ((QRCodeActivity) getActivity()).showSnackbar(getString(R.string.save_qr_cloud_drive, qrFile.getName()));
+            ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.save_qr_cloud_drive, qrFile.getName()));
         }
         else {
-            ((QRCodeActivity) getActivity()).showSnackbar(getString(R.string.error_upload_qr));
+            ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.error_upload_qr));
         }
     }
 

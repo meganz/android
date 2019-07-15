@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
@@ -625,13 +624,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                         else{
                         	log("PIN NOT match - show snackBar");
                         	secondRound = false;
-//                        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
-                        	Snackbar snack = Snackbar.make(coordinatorLayout, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
-                        	View view = snack.getView();
-    			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-                        	params.gravity = Gravity.TOP;
-                        	view.setLayoutParams(params);
-                        	snack.show();
+							showSnackbar(getString(R.string.pin_lock_not_match));
 
                             //Re-enter pass
                             passFirstLetter.setText("");
@@ -660,6 +653,10 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
             public void onTextChanged(CharSequence s, int start, int before, int count){}
         });
+	}
+
+	void showSnackbar (String s) {
+		showSnackbar(coordinatorLayout, s);
 	}
 
 	private void add4DigitsPin(){
@@ -854,13 +851,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                         else{
                         	log("PIN NOT match - show snackBar");
                         	secondRound = false;
-//                        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
-                        	Snackbar snack = Snackbar.make(coordinatorLayout, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
-                        	View view = snack.getView();
-    			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-                        	params.gravity = Gravity.TOP;
-                        	view.setLayoutParams(params);
-                        	snack.show();
+							showSnackbar(getString(R.string.pin_lock_not_match));
 
                             //Re-enter pass
                             passFirstLetter.setText("");
@@ -977,16 +968,11 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		warningLayout.setVisibility(View.INVISIBLE);
 		            	}
 		            	else{
-		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+							message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
+									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
-
-			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
-			        	View view = snack.getView();
-			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-			        	params.gravity = Gravity.TOP;
-			        	view.setLayoutParams(params);
-			        	snack.show();
+		            	showSnackbar(message);
 
 			            //Re-enter pass
 			            passFirstLetter.setText("");
@@ -1032,7 +1018,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				}
 				else{
 					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
-//		        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
 					attemps=attemps+1;
 					att.setAttemps(attemps);
 //						dbH.setAttributes(att);
@@ -1084,15 +1069,11 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		warningLayout.setVisibility(View.INVISIBLE);
 		            	}
 		            	else{
-		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
+									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
-			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
-			        	View view = snack.getView();
-			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-			        	params.gravity = Gravity.TOP;
-			        	view.setLayoutParams(params);
-			        	snack.show();
+			        	showSnackbar(message);
 
 			            //Re-enter pass
 			            passFirstLetter.setText("");
@@ -1188,16 +1169,12 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		warningLayout.setVisibility(View.INVISIBLE);
 		            	}
 		            	else{
-		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
+									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
 
-			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
-			        	View view = snack.getView();
-			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-			        	params.gravity = Gravity.TOP;
-			        	view.setLayoutParams(params);
-			        	snack.show();
+			        	showSnackbar(message);
 
 			            //Re-enter pass
 			        	passwordText.setText("");
@@ -1233,7 +1210,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				}
 				else{
 					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
-//		        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
 					attemps=attemps+1;
 					att.setAttemps(attemps);
 //						dbH.setAttributes(att);
@@ -1281,15 +1257,11 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		warningLayout.setVisibility(View.INVISIBLE);
 		            	}
 		            	else{
-		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
+									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
-			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
-			        	View view = snack.getView();
-			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-			        	params.gravity = Gravity.TOP;
-			        	view.setLayoutParams(params);
-			        	snack.show();
+			        	showSnackbar(message);
 
 			            //Re-enter pass
 			        	passwordText.setText("");
@@ -1572,13 +1544,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                 else{
                 	log("Alphanumeric PIN NOT match - show snackBar");
                 	secondRound = false;
-//                	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
-                	Snackbar snack = Snackbar.make(coordinatorLayout, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
-                	View view = snack.getView();
-		        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-                	params.gravity = Gravity.TOP;
-                	view.setLayoutParams(params);
-                	snack.show();
+                	showSnackbar(getString(R.string.pin_lock_not_match));
 
                     //Re-enter pass
                 	passwordText.setText("");

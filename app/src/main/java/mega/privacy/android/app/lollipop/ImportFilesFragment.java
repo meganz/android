@@ -76,6 +76,23 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
         filePreparedInfos = ((FileExplorerActivityLollipop) context).getFilePreparedInfos();
     }
 
+    public void changeActionBarElevation () {
+        if (scrollView != null) {
+            if (scrollView.canScrollVertically(-1)) {
+                ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+            }
+            else {
+                ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        changeActionBarElevation();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -95,12 +112,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
         new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (scrollView.canScrollVertically(-1)){
-                    ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
-                }
-                else {
-                    ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
-                }
+                changeActionBarElevation();
             }
         });
 
@@ -114,20 +126,23 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
         incomingButton = (RelativeLayout) v.findViewById(R.id.incoming_layout);
         incomingButton.setOnClickListener(this);
         ArrayList<MegaNode> inShares = megaApi.getInShares();
-        if (inShares != null) {
-            if (inShares.size() <= 0) {
-                incomingButton.setVisibility(View.GONE);
-            }
-            else {
-                incomingButton.setVisibility(View.VISIBLE);
-            }
+        if (inShares == null || inShares.size() <= 0) {
+            incomingButton.setVisibility(View.GONE);
         }
         else {
-            incomingButton.setVisibility(View.GONE);
+            incomingButton.setVisibility(View.VISIBLE);
         }
 
         chatButton = (RelativeLayout) v.findViewById(R.id.chat_layout);
         chatButton.setOnClickListener(this);
+
+        if (Util.isChatEnabled()) {
+            chatButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            chatButton.setVisibility(View.GONE);
+        }
+
         showMoreLayout = (RelativeLayout) v.findViewById(R.id.show_more_layout);
         showMoreLayout.setOnClickListener(this);
         showMoreText  = (TextView) v.findViewById(R.id.show_more_text);
