@@ -830,7 +830,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			array[i] = ids.get(i);
 		}
 		intent.putExtra("messageIds", array);
-		intent.putExtra("fromNodeHistory", true);
 		startActivity(intent);
 	}
 	

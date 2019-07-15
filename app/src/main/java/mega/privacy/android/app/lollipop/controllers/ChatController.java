@@ -63,6 +63,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.ChatUtil.getMegaChatMessage;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatController {
@@ -269,13 +270,7 @@ public class ChatController {
 
     public void deleteMessageById(long messageId, long chatId) {
         log("deleteMessage");
-        MegaChatMessage message = null;
-        if(context instanceof NodeAttachmentHistoryActivity){
-            message = megaChatApi.getMessageFromNodeHistory(chatId, messageId);
-        }
-        else{
-            message = megaChatApi.getMessage(chatId, messageId);
-        }
+        MegaChatMessage message = getMegaChatMessage(context, megaChatApi, chatId, messageId);
 
         if(message!=null){
             deleteMessage(message, chatId);
@@ -1978,13 +1973,7 @@ public class ChatController {
     public void importNode(long idMessage, long idChat) {
         log("importNode");
         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-        MegaChatMessage m = null;
-        if(context instanceof NodeAttachmentHistoryActivity){
-            m = megaChatApi.getMessageFromNodeHistory(idChat, idMessage);
-        }
-        else{
-            m = megaChatApi.getMessage(idChat, idMessage);
-        }
+        MegaChatMessage m = getMegaChatMessage(context, megaChatApi, idChat, idMessage);
 
         if(m!=null){
             AndroidMegaChatMessage aMessage = new AndroidMegaChatMessage(m);
@@ -2036,14 +2025,7 @@ public class ChatController {
     public void prepareMessageToForward(long idMessage, long idChat) {
         log("prepareMessageToForward");
         ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
-        MegaChatMessage m = null;
-
-        if(context instanceof NodeAttachmentHistoryActivity){
-            m = megaChatApi.getMessageFromNodeHistory(idChat, idMessage);
-        }
-        else{
-            m = megaChatApi.getMessage(idChat, idMessage);
-        }
+        MegaChatMessage m = getMegaChatMessage(context, megaChatApi, idChat, idMessage);
 
         if(m!=null){
             messagesSelected.add(m);

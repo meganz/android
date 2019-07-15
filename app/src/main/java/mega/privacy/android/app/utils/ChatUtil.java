@@ -13,10 +13,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 
@@ -219,6 +221,15 @@ public class ChatUtil {
         builder.setTitle(R.string.action_delete_link);
         builder.setMessage(R.string.context_remove_chat_link_warning_text).setPositiveButton(R.string.delete_button, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
+    public static MegaChatMessage getMegaChatMessage(Context context, MegaChatApiAndroid megaChatApi, long chatId, long messageId) {
+        if(context instanceof NodeAttachmentHistoryActivity){
+            return megaChatApi.getMessageFromNodeHistory(chatId, messageId);
+        }
+        else{
+            return megaChatApi.getMessage(chatId, messageId);
+        }
     }
 
     private static void log(String message) {

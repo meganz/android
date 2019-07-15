@@ -95,7 +95,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	RelativeLayout relativeImageViewerLayout;
 	ImageView ivShadow;
 	private Handler handler;
-	boolean fromNodeHistory;
 
 	private DisplayMetrics outMetrics;
 
@@ -434,8 +433,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		messageIds = intent.getLongArrayExtra("messageIds");
 		chatId = intent.getLongExtra("chatId", -1);
 
-		fromNodeHistory = intent.getBooleanExtra("fromNodeHistory", false);
-
 		messages = new ArrayList<MegaChatMessage>();
 
 		imageHandles = new ArrayList<Long>();
@@ -446,12 +443,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 
 		for(int j=0; j<messageIds.length; j++){
-			MegaChatMessage message = null;
-			if(fromNodeHistory){
+			MegaChatMessage message = megaChatApi.getMessage(chatId, messageIds[j]);
+			if(message==null){
 				message = megaChatApi.getMessageFromNodeHistory(chatId, messageIds[j]);
-			}
-			else{
-				message = megaChatApi.getMessage(chatId, messageIds[j]);
 			}
 
 			if(message!=null){

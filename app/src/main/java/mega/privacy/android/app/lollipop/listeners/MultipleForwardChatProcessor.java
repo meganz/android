@@ -24,6 +24,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 
+import static mega.privacy.android.app.utils.ChatUtil.getMegaChatMessage;
+
 
 //Listener for  multi forward
 public class MultipleForwardChatProcessor implements MegaChatRequestListenerInterface {
@@ -72,13 +74,8 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         if(chatHandles.length==1){
             log("Forward to one chat");
             for(int i=0;i<idMessages.length;i++){
-                MegaChatMessage messageToForward = null;
-                if(context instanceof NodeAttachmentHistoryActivity){
-                    messageToForward = megaChatApi.getMessageFromNodeHistory(idChat, idMessages[i]);
-                }
-                else{
-                    messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
-                }
+                MegaChatMessage messageToForward = getMegaChatMessage(context, megaChatApi, idChat, idMessages[i]);
+
                 if(messageToForward!=null){
                     int type = messageToForward.getType();
                     log("Type of message to forward: "+type);
@@ -178,13 +175,8 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
             log("Forward to many chats");
             for(int k=0;k<chatHandles.length;k++){
                 for(int i=0;i<idMessages.length;i++){
-                    MegaChatMessage messageToForward = null;
-                    if(context instanceof NodeAttachmentHistoryActivity){
-                        messageToForward = megaChatApi.getMessageFromNodeHistory(idChat, idMessages[i]);
-                    }
-                    else{
-                        messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
-                    }
+                    MegaChatMessage messageToForward = getMegaChatMessage(context, megaChatApi, idChat, idMessages[i]);
+
                     log("Forward: "+ idMessages[i] + " chat id: "+chatHandles[k]);
                     if(messageToForward!=null){
                         int type = messageToForward.getType();
