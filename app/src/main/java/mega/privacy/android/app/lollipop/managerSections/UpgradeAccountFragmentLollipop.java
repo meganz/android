@@ -788,9 +788,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	private String storageOrTransferLabel(int labelType) {
 		switch (labelType) {
-			case TYPE_STORAGE_LABEL : return getString(R.string.label_storage_upgrade_account);
-			case TYPE_TRANSFER_LABEL: return getString(R.string.label_transfer_quota_upgrade_account);
-			default: return "";
+			case TYPE_STORAGE_LABEL:
+				return getString(R.string.label_storage_upgrade_account);
+			case TYPE_TRANSFER_LABEL:
+				return getString(R.string.label_transfer_quota_upgrade_account);
+			default:
+				return "";
 		}
 	}
 
