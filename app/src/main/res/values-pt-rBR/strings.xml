@@ -22,7 +22,7 @@
     <!-- This string is commented in FileStorageActivityLollipop.java
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     -->
-    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Fazer download</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Download</string>
     <string name="general_add" context="button">Adicionar</string>
     <string name="general_move" context="button">Mover</string>
     <string name="general_remove" context="button">Remover</string>
@@ -352,7 +352,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Abrir</string>
     <string name="context_renaming" context="while renaming a file or folder">Renomeando</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Preparando arquivo</string>
-    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Fazer download</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
 
     <!--
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Download folder</string>
@@ -848,7 +848,7 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Conta PRO Lite</string>
 
-    <string name="backup_title" context="Title of the screen to backup the master key">Salve a sua chave de recuperação</string>
+    <string name="backup_title" context="Title of the screen to backup the master key">Salve sua Key de recuperacao</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">A sua senha desbloqueia a sua chave de recuperação</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Os seus dados só podem ser lidos através de uma série de operações de decodificação que começam com a sua chave mestre de criptografia, que é armazenada criptografada com a sua senha. Isso significa que, se você perder a sua senha, a sua chave mestra já não poderá ser descriptografada, e você já não poderá decodificar os seus dados.</string>
@@ -866,7 +866,7 @@
 
     <string name="forgot_pass_menu" context="Option of the overflow menu to show the screen info to reset the password">Esqueceu a sua senha?</string>
     <string name="forgot_pass" context="Button in the Login screen to reset the password">Esqueceu a sua senha?</string>
-    <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">Se você tiver um backup da sua chave de recuperação, você pode resetar a sua senha selecionando SIM. Nenhum dado será perdido.</string>
+    <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">Se você tem um backup da sua chave de recuperação, você pode redefinir sua senha, selecionando YES. Nenhum dado será perdido.</string>
     <string name="forgot_pass_second_paragraph" context="Second paragraph of the screen when the password has been forgotten">Você ainda pode exportar a sua chave de recuperação agora se você tiver uma sessão do MEGA ativa em outro navegador, neste ou em qualquer outro computador. Se você não fizer isso, você não poderá decodificar a sua conta existente, mas poderá criar uma nova com o mesmo endereço de email selecionando NÃO.</string>
     <!--
     <string name="forgot_pass_second_paragraph_logged_in" context="Second paragraph of the screen when the password has been forgotten and the user is still logged in">If you don\&apos;t, you can still export your recovery key now in this MEGA session. Please, go back and backup your recovery key.</string>
@@ -905,7 +905,7 @@
     <string name="park_account_dialog_title" context="Title of the dialog to park an account">Estacionar a minha conta</string>
     <string name="park_account_button" context="Button to park an account">Estacionar</string>
     <string name="park_account_title" context="Title of the screen to park an account">Oops!</string>
-    <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Devido ao nosso paradigma de criptografia de ponta a ponta, você não poderá acessar os seus dados sem a sua senha ou um backup da sua chave de recuperação.</string>
+    <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Devido ao nosso paradigma de criptografia end-to-end, você não será capaz de acessar seus dados sem sua senha ou um backup de sua chave de recuperação.</string>
     <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">Você pode estacionar sua conta existente e iniciar uma fresca sob o mesmo endereço de e-mail. Os seus dados serão conservados durante pelo menos 60 dias. No caso em que você se lembra a senha da sua conta estacionado, por favor contacte support&#64;mega.nz</string>
 
     <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">Por favor, indique o seu endereço de e-mail abaixo. Você receberá um link de recuperação que permitirá que você estacionar sua conta.</string>
@@ -943,7 +943,7 @@
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Escolher foto</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Deletar foto</string>
 
-    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">A chave proporcionada não coincide com esta conta. Por favor, comprove que você está usando a chave de recuperação correta e tente novamente.</string>
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">A chave que você forneceu não corresponde esta conta. Por favor, certifique-se de usar a chave de recuperação correto e tente novamente.</string>
     <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">Chave de recuperação inválida</string>
 
     <string name="option_full_link" context="Alert Dialog to get link">Link com chave</string>
@@ -1000,7 +1000,7 @@
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Este link foi removido por infringir os nossos Termos de serviço.</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Esperando confirmação por email.</string>
-    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Por favor, cheque o seu e-mail e clique no link para confirmar sua conta.</string>
+    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Por favor, verifique seu e-mail e clique no link para confirmar sua conta.</string>
 
     <plurals name="general_num_items">
         <item context="Singular of items which contains a folder. 1 item" quantity="one">item</item>
@@ -1844,7 +1844,7 @@
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">A chave de recuperação foi exportada para a seção Offline como MEGARecoveryKey.txt.\nAviso: a chave será excluída se você fizer logout. Por favor, guarde-a em um local seguro.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Você está prestes a sair. Por favor, confirme a sua senha para garantir que você se lembra dela.\nSe você perder a sua senha, perderá o acesso aos seus dados no MEGA.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Copiar para a área de transferência</string>
-    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Exportar chave de recuperação</string>
+    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Exportar a Chave de recuperação</string>
     <string name="proceed_to_logout" context="Option that permits user logout">Fazer logout</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Chave de recuperação</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Salvar no sistema de arquivos</string>
@@ -1941,7 +1941,7 @@
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Ocorreu um erro ao gerar a chave ou o código QR. Tente novamente.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Autenticação de dois fatores ativada</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">Na próxima vez que você fizer login na sua conta, você deverá inserir um código de seis dígitos proporcionado pelo seu aplicativo de autenticação.</string>
-    <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Salve a sua chave de recuperação</b></string>
+    <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Salve sua Key de recuperacao</b></string>
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Código inválido</string>
     <string name="lost_your_authenticator_device" context="When a user tries to login with Two-Factor Authentication and lost his device, button that permits get information about how login">Você perdeu o seu dispositivo de autenticação?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Verificação de login</string>
@@ -2484,8 +2484,8 @@
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDENTE)</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Mantenha pressionado para gravar, solte para enviar.</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">Deslize para cancelar</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">Este clipe de voz não está disponível</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Deslize para cancelar</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">Este clipe de voz não está disponível</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">Já foi feito o download de %d arquivo.&#160;</item>
@@ -2496,4 +2496,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d arquivo pendente.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d arquivos pendentes.</item>
 	</plurals>
+
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 </resources>
