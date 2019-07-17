@@ -256,6 +256,7 @@
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
 
     <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares</string>
+
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Incoming shares with</string>
     <!--
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
@@ -1169,7 +1170,7 @@
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants were successfully invited but %2$d participants were not invited.</string>
 
     <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed">[A]%1$s[/A][B] was changed to [/B][C]%2$s[/C][D] by [/D][E]%3$s[/E]</string>
-    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">[A]%1$s[/A][B] joined the group chat by invitation from [/B][C]%2$s[/C]</string>
+    <string name="message_add_participant" context="chat message when a participant was added to a group chat" formatted="false">[A]%1$s[/A][B] joined the group chat by invitation from [/B][C]%2$s[/C]</string>
     <string name="message_remove_participant" context="chat message when a participant was removed from a group chat">[A]%1$s[/A][B] was removed from group chat by [/B][C]%2$s[/C]</string>
 
     <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s[/A][B] changed the group chat name to [/B][C]“%2$s”[/C]</string>
@@ -1220,7 +1221,7 @@
     <string name="non_format_text_cleared_history" context="Text shown when a user cleared the history of a chat">%1$s cleared the chat history</string>
     -->
     <string name="non_format_message_permissions_changed" context="chat message when the permissions for a user has been changed">%1$s was changed to %2$s by %3$s</string>
-    <string name="non_format_message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">%1$s was added to this group chat by invitation from %2$s</string>
+    <string name="non_format_message_add_participant" context="chat message when a participant was added to a group chat" formatted="false">%1$s was added to this group chat by invitation from %2$s</string>
     <string name="non_format_message_remove_participant" context="chat message when a participant was removed from a group chat">%1$s was removed from group chat by %2$s</string>
 
     <string name="non_format_change_title_messages" context="Message shown when a participant change the title of a group chat.">%1$s changed the group chat name to “%2$s”</string>
@@ -1515,7 +1516,7 @@
 
     <string name="confirmation_delete_one_attachment" context="Confirmation before deleting one attachment">Remove attachment?</string>
 
-    <string name="general_view_with_revoke" formatted="false" context="Menu option">View files (%1$d deleted)</string>
+    <string name="general_view_with_revoke" context="Menu option" formatted="false">View files (%1$d deleted)</string>
 
     <string name="success_attaching_node_from_cloud" context="Success message when the attachment has been sent to a chat">File sent to %1$s</string>
     <string name="success_attaching_node_from_cloud_chats" context="Success message when the attachment has been sent to a many chats">File sent to %1$d chats</string>
@@ -1538,7 +1539,7 @@
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone">[A]%1$s[/A][B] cleared the chat history[/B]</string>
 
-    <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d unread chats</string>
+    <string name="number_messages_chat_notification" context="messages string in chat notification" formatted="false">%1$d unread chats</string>
 
     <string name="context_permissions_changing_folder" context="Item menu option upon clicking on one or multiple files.">Changing permissions</string>
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Removing contact from shared folder</string>
@@ -1762,7 +1763,7 @@
     <string name="label_file_size_giga_byte" context="size in gigabyte">GB</string>
     <string name="label_file_size_tera_byte" context="size in terabyte">TB</string>
 
-    <plurals name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">
+    <plurals name="number_of_versions" context="Number of versions of a file shown on the screen info of the file" formatted="false">
         <item context="version item" quantity="one">%1$d version</item>
         <item context="version items" quantity="other">%1$d versions</item>
     </plurals>
@@ -1800,18 +1801,18 @@
     <string name="file_properties_folder_current_versions" cotext="Title of the label to show the size of the current files inside a folder">Current versions</string>
     <string name="file_properties_folder_previous_versions" cotext="Title of the label to show the size of the versioned files inside a folder">Previous versions</string>
 
-    <plurals name="number_of_versions_inside_folder" formatted="false" context="Number of versioned files inside a folder shown on the screen info of the folder">
+    <plurals name="number_of_versions_inside_folder" context="Number of versioned files inside a folder shown on the screen info of the folder" formatted="false">
         <item context="version item" quantity="one">%1$d versioned file</item>
         <item context="version items" quantity="other">%1$d versioned files</item>
     </plurals>
 
     <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
     <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
-    <plurals name="messages_forwarded_partial_error" formatted="false" context="Error message if any of the forwarded messages fails">
+    <plurals name="messages_forwarded_partial_error" context="Error message if any of the forwarded messages fails" formatted="false">
         <item context="message item" quantity="one">Error. %1$d message not successfully forwarded</item>
         <item context="message items" quantity="other">Error. %1$d messages not successfully forwarded</item>
     </plurals>
-    <plurals name="messages_forwarded_error_not_available" formatted="false" context="Error non existing resource after forwarding one or several messages to several chats">
+    <plurals name="messages_forwarded_error_not_available" context="Error non existing resource after forwarding one or several messages to several chats" formatted="false">
         <item context="message item" quantity="one">Error. The resource is no longer available</item>
         <item context="message items" quantity="other">Error. The resources are no longer available</item>
     </plurals>
@@ -2350,12 +2351,12 @@
 
     <string name="error_meta_message_invalid" context="Content of a invalid meta message">Message contains invalid metadata</string>
 
-    <string name="title_activity_maps" context="Title of the activity that sends a location">Send Location</string>
+    <string name="title_activity_maps" context="Title of the activity that sends a location">Send location</string>
     <string name="current_location_label" context="Label layout on maps activity that permits send current location">Send your current location</string>
     <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">Send your current location: [A]%1$s[/A]</string>
     <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Nearby places</string>
     <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">This location will be opened using a third party maps provider outside the end-to-end encrypted MEGA platform.</string>
-    <string name="title_marker_maps" context="Title of the location marker set by the user">Send This Location</string>
+    <string name="title_marker_maps" context="Title of the location marker set by the user">Send this location</string>
     <string name="no_places_found" context="Label shown when after a maps search and no places were found">No places were found</string>
     <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">The GPS is disabled</string>
     <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">Would you like to open the location settings?</string>
@@ -2367,7 +2368,8 @@
         <item context="version items" quantity="other">Messages forwarded</item>
     </plurals>
 
-    <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Pinned Location</string>
+    <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Pinned location</string>
+
     <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">From File System</string>
 
     <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
@@ -2484,8 +2486,8 @@
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">Slide to cancel</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">This voice clip is not available</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">This voice messages is not available</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
@@ -2496,4 +2498,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
 	</plurals>
+
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 </resources>
