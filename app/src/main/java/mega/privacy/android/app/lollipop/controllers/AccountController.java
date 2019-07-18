@@ -50,6 +50,10 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public class AccountController implements View.OnClickListener{
 
     Context context;
@@ -110,51 +114,28 @@ public class AccountController implements View.OnClickListener{
         megaApi.confirmChangeEmail(link, pass, (ManagerActivityLollipop)context);
     }
 
-    public boolean existsAvatar(){
-
-
-        File avatar = null;
-        if (context.getExternalCacheDir() != null){
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
-        }
-        else{
-            avatar = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail()+ ".jpg");
-        }
-
-        if (avatar.exists()) {
+    public boolean existsAvatar() {
+        File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
+        if (isFileAvailable(avatar)) {
             log("avatar exists in: " + avatar.getAbsolutePath());
             return true;
         }
-
         return false;
     }
 
-    public void removeAvatar(){
+    public void removeAvatar() {
         log("removeAvatar");
+        File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
+        File qrFile = buildQrFile(context,megaApi.getMyEmail() + "QRcode.jpg");
 
-        File avatar = null;
-        File qrFile = null;
-        if (context.getExternalCacheDir() != null){
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
-            File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
-            qrFile = new File(qrDir.getAbsolutePath(), megaApi.getMyEmail() + "QRcode.jpg");
-        }
-        else{
-            avatar = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
-            File qrDir = context.getDir("qrMEGA", 0);
-            qrFile = new File(qrDir.getAbsolutePath(), megaApi.getMyEmail() + "QRcode.jpg");
-        }
-
-        if (avatar.exists()) {
+        if (isFileAvailable(avatar)) {
             log("avatar to delete: " + avatar.getAbsolutePath());
             avatar.delete();
         }
-
-        if (qrFile.exists()){
+        if (isFileAvailable(qrFile)) {
             qrFile.delete();
         }
-
-        megaApi.setAvatar(null, (ManagerActivityLollipop)context);
+        megaApi.setAvatar(null,(ManagerActivityLollipop)context);
     }
 
     public void exportMK(String path, boolean fromOffline){
