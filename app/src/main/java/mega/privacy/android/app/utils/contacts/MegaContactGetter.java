@@ -13,14 +13,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringMap;
 import nz.mega.sdk.MegaStringTable;
-import nz.mega.sdk.MegaUser;
 
 public class MegaContactGetter implements MegaRequestListenerInterface {
 
@@ -28,7 +26,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private Context context;
 
-    private List<MegaContact> megaContacts = new ArrayList<>();
+    private ArrayList<MegaContact> megaContacts = new ArrayList<>();
 
     private int currentContactIndex;
 
@@ -67,7 +65,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         this.updater = updater;
     }
 
-    public static class MegaContact {
+    public static class MegaContact implements ContactWithEmail {
 
         private String id;
 
@@ -260,9 +258,9 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         }
     }
 
-    private List<MegaContact> filterOut(MegaApiJava api, List<MegaContact> list) {
-        List<MegaContact> contacts = filterOutContacts(api, list);
-        List<MegaContact> returnList = filterOutPendingContacts(api, contacts);
+    private ArrayList<MegaContact> filterOut(MegaApiJava api, ArrayList<MegaContact> list) {
+        ArrayList<MegaContact> contacts = ContactsFilter.filterOutContacts(api, list);
+        ArrayList<MegaContact> returnList = ContactsFilter.filterOutPendingContacts(api, contacts);
         Collections.sort(returnList, new Comparator<MegaContact>() {
 
             @Override
@@ -271,42 +269,6 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
             }
         });
         return returnList;
-    }
-
-    private List<MegaContact> filterOutContacts(MegaApiJava api, List<MegaContact> list) {
-        log("filterOutContacts");
-        for (MegaUser user : api.getContacts()) {
-            log("contact visibility: " + user.getVisibility() + " -> " + user.getEmail());
-            for (MegaContact contact : list) {
-                boolean hasSameEamil = user.getEmail().equals(contact.getEmail());
-                boolean isContact = user.getVisibility() == MegaUser.VISIBILITY_VISIBLE;
-                boolean isBlocked = user.getVisibility() == MegaUser.VISIBILITY_BLOCKED;
-
-                if (hasSameEamil && (isContact || isBlocked)) {
-                    list.remove(contact);
-                    break;
-                }
-            }
-        }
-        return list;
-    }
-
-    private List<MegaContact> filterOutPendingContacts(MegaApiJava api, List<MegaContact> list) {
-        log("filterOutPendingContacts");
-        for (MegaContactRequest request : api.getOutgoingContactRequests()) {
-            log("contact request: " + request.getStatus() + " -> " + request.getTargetEmail());
-            for (MegaContact contact : list) {
-                boolean hasSameEmail = request.getTargetEmail().equals(contact.getEmail());
-                boolean isAccepted = request.getStatus() == MegaContactRequest.STATUS_ACCEPTED;
-                boolean isPending = request.getStatus() == MegaContactRequest.STATUS_UNRESOLVED;
-
-                if (hasSameEmail && (isAccepted || isPending)) {
-                    list.remove(contact);
-                    break;
-                }
-            }
-        }
-        return list;
     }
 
     private MegaContact getCurrentContactIndex() {
@@ -331,7 +293,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         } else {
             log("getMegaContacts load from database");
             if (updater != null) {
-                List<MegaContact> list = dbH.getMegaContacts();
+                ArrayList<MegaContact> list = dbH.getMegaContacts();
                 list = filterOut(api, list);
                 updater.onFinish(list);
             }

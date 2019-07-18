@@ -350,7 +350,9 @@ public class Util {
 		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		if (cm != null) {
 			NetworkInfo ni = cm.getActiveNetworkInfo();
-			return ni.isRoaming();
+			if(ni != null) {
+                return ni.isRoaming();
+            }
 		}
 		return true;
 	}

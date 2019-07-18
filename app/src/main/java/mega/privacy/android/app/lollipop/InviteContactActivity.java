@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -47,6 +48,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ContactsDividerDecoration;
@@ -55,6 +57,7 @@ import mega.privacy.android.app.lollipop.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.contacts.ContactsFilter;
 import mega.privacy.android.app.utils.contacts.ContactsUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
@@ -72,7 +75,7 @@ import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE
 import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_BASE_URL;
 
 
-public class InviteContactActivity extends PinActivityLollipop implements InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
+public class InviteContactActivity extends PinActivityLollipop implements MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
 
     public static final int SCAN_QR_FOR_INVITE_CONTACTS = 1111;
     public static final String INVITE_CONTACT_SCAN_QR = "inviteContacts";
@@ -113,6 +116,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
     private MegaContactGetter megaContactGetter;
     private List<ContactsUtil.LocalContact> rawLocalContacts;
     private String contactLink;
+    private DatabaseHandler dbH;
 
     //work around for android bug - https://issuetracker.google.com/issues/37007605#c10
     class LinearLayoutManagerWrapper extends LinearLayoutManager {
@@ -137,6 +141,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
         log("onCreate");
 
         super.onCreate(savedInstanceState);
+        dbH = DatabaseHandler.getDbHandler(this);
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -693,7 +698,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
             }
 
             for (String email : emailList) {
-                InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_MEGA_CONTACT, email, defaultLocalContactAvatarColor);
+                InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_PHONE_CONTACT, email, defaultLocalContactAvatarColor);
                 result.add(info);
             }
         }
@@ -735,6 +740,9 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
             rawLocalContacts = megaContactGetter.getLocalContacts();
             filteredContacts.addAll(megaContacts);
             phoneContacts.addAll(localContactToContactInfo(rawLocalContacts));
+            ContactsFilter.filterOutContacts(megaApi, phoneContacts);
+            ContactsFilter.filterOutPendingContacts(megaApi, phoneContacts);
+
             filteredContacts.addAll(phoneContacts);
 
             //keep all contacts for records
@@ -927,49 +935,104 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
 
     private int numberToSend;
     private int numberSent;
+    private StringBuilder message = new StringBuilder(64);
 
-    private void inviteEmailContacts(ArrayList<String> emails) {
-        numberToSend = emails.size();
-        log("invitePhoneContacts: " + numberToSend);
-        String message = null;
-        if (numberToSend > 1) {
-            message = getString(R.string.number_correctly_invite_contact_request, numberToSend);
-        } else if (numberToSend == 1) {
-            message = getString(R.string.context_contact_request_sent, emails.get(0));
-        }
-        showSnackbar(Constants.SNACKBAR_TYPE, scrollView, message, -1);
-        for (String email : emails) {
-            log("setResultEmailContacts: " + email);
-            megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, new MegaRequestListenerInterface() {
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
-                @Override
-                public void onRequestStart(MegaApiJava api, MegaRequest request) {
+    }
 
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT) {
+            numberSent++;
+            log("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
+            if (message.length() > 0) {
+                message.append("\n");
+            }
+            if (e.getErrorCode() == MegaError.API_OK) {
+                log("OK INVITE CONTACT: " + request.getEmail());
+                if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
+                    message.append(getString(R.string.context_contact_request_sent, request.getEmail()));
                 }
-
-                @Override
-                public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
+            } else {
+                log("Code: " + e.getErrorString());
+                if (e.getErrorCode() == MegaError.API_EEXIST) {
+                    message.append(getString(R.string.context_contact_already_exists, request.getEmail()));
+                } else if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode() == MegaError.API_EARGS) {
+                    message.append(getString(R.string.error_own_email_as_contact));
+                } else {
+                    message.append(getString(R.string.general_error));
                 }
+                log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+            }
+            if (numberSent == numberToSend) {
+                showSnackbar(message.toString());
+                numberSent = 0;
+                numberToSend = 0;
+                message = new StringBuilder(64);
+                Util.hideKeyboard(InviteContactActivity.this, 0);
+                new Handler().postDelayed(new Runnable() {
 
-                @Override
-                public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-                    numberSent++;
-                    if (numberSent == numberToSend) {
-                        numberToSend = 0;
-                        numberSent = 0;
-                        Util.hideKeyboard(InviteContactActivity.this, 0);
-                        setResult(RESULT_OK);
+                    @Override
+                    public void run() {
+                        setResult(Activity.RESULT_OK);
                         finish();
                     }
-                }
-
-                @Override
-                public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
-                }
-            });
+                }, 1000);
+            }
         }
+
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
+    }
+
+    private void inviteEmailContacts(ArrayList<String> emails) {
+        ArrayList<String> contacts = ContactsFilter.getContact(megaApi, emails);
+        if (contacts.size() > 0) {
+            for (int i = 0; i < contacts.size(); i++) {
+                message.append(getString(R.string.context_contact_already_exists, contacts.get(i)));
+                if (i != contacts.size() - 1) {
+                    message.append("\n");
+                }
+            }
+        }
+
+        ArrayList<String> pendings = ContactsFilter.getPendingRequest(megaApi, emails);
+        if (pendings.size() > 0) {
+            if (message.length() > 0) {
+                message.append("\n");
+            }
+            for (int i = 0; i < pendings.size(); i++) {
+                message.append(getString(R.string.invite_not_sent_already_sent_short, pendings.get(i)));
+                if (i != pendings.size() - 1) {
+                    message.append("\n");
+                }
+            }
+        }
+
+        numberToSend = emails.size();
+        if (numberToSend > 0) {
+            for (String email : emails) {
+                log("setResultEmailContacts: " + email);
+                megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, this);
+            }
+        } else {
+            showSnackbar(message.toString());
+            message = new StringBuilder(64);
+        }
+    }
+
+    public void showSnackbar(String message) {
+        showSnackbar(Constants.SNACKBAR_TYPE, scrollView, message, -1);
     }
 
     private void addContactInfo(String inputString, int type) {
@@ -1017,7 +1080,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
 
     private void fillUpLists() {
         // remove duplicated data from phone contacts.
-        phoneContacts.removeAll(megaContacts);
+        ContactsFilter.filterOutMegaUsers(megaContactToContactInfo(dbH.getMegaContacts()), phoneContacts);
         filteredContacts.addAll(megaContacts);
         filteredContacts.addAll(phoneContacts);
         totalContacts.addAll(filteredContacts);

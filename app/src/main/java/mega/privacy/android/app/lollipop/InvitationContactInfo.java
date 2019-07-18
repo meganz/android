@@ -7,7 +7,9 @@ import android.text.TextUtils;
 
 import java.util.Objects;
 
-public class InvitationContactInfo implements Parcelable {
+import mega.privacy.android.app.utils.contacts.ContactWithEmail;
+
+public class InvitationContactInfo implements Parcelable, ContactWithEmail {
 
     public static final int TYPE_MEGA_CONTACT_HEADER = 0;
     public static final int TYPE_PHONE_CONTACT_HEADER = 1;
@@ -52,8 +54,15 @@ public class InvitationContactInfo implements Parcelable {
 
     @Override
     public String toString() {
-        return "InvitationContactInfo{" +
-                "name='" + name + '\'' +
+        return "\n{" +
+                "id=" + id +
+                ", isHighlighted=" + isHighlighted +
+                ", type=" + type +
+                ", bitmap=" + bitmap +
+                ", name='" + name + '\'' +
+                ", displayInfo='" + displayInfo + '\'' +
+                ", handle='" + handle + '\'' +
+                ", avatarColor='" + avatarColor + '\'' +
                 ", normalizedNumber='" + normalizedNumber + '\'' +
                 '}';
     }
@@ -108,8 +117,16 @@ public class InvitationContactInfo implements Parcelable {
         return "";
     }
 
+    public String getEmail() {
+        return getDisplayInfo();
+    }
+
     public String getHandle() {
         return handle;
+    }
+
+    public String getNormalizedNumber() {
+        return  normalizedNumber;
     }
 
     public void setHandle(String handle) {
@@ -158,19 +175,5 @@ public class InvitationContactInfo implements Parcelable {
         displayInfo = in.readString();
         handle = in.readString();
         avatarColor = in.readString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        InvitationContactInfo that = (InvitationContactInfo) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(normalizedNumber, that.normalizedNumber);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, normalizedNumber);
     }
 }

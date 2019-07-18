@@ -2068,7 +2068,7 @@
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
     <string name="choose_chat" context="section title to select a chat to send a file">Choose chat</string>
 
-    <string name="type_mail" context="Hint shown to guide user on activity add contacts">Tap, enter name, email, phone or searching</string>
+    <string name="type_mail" context="Hint shown to guide user on activity add contacts">Enter contact detail to search or add</string>
 
     <string name="confirmation_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Add %s to your contacts?</string>
     <string name="confirmation_not_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and the contact is already a contact">You have already added the contact %s.</string>
@@ -2187,6 +2187,7 @@
     <string name="action_open_chat_link" context="Menu item">Open chat link</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
+    <string name="invite_not_sent_already_sent_short" context="The short version of message shown when a contact request has not been sent because the invitation has been sent before">The invitation to %s has been sent before.</string>
 
     <string name="save_qr_cloud_drive" context="Label shown to indicate the QR is saving in Cloud Drive">Saving %s in Cloud Drive&#8230;</string>
 

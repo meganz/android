@@ -174,9 +174,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         contactGetter.setMegaContactUpdater(this);
     }
 
-    private class FourColumnLayoutManager extends GridLayoutManager {
+    /*
+        Just disable scroll
+     */
+    private class DisableScrollLayoutManager extends GridLayoutManager {
 
-        public FourColumnLayoutManager(Context context, int spanCount, int orientation, boolean reverseLayout) {
+        public DisableScrollLayoutManager(Context context, int spanCount, int orientation, boolean reverseLayout) {
             super(context, spanCount, orientation, reverseLayout);
         }
 
@@ -206,7 +209,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             moreContactsTitle.setVisibility(View.GONE);
 
             adapter = new ContactsHorizontalAdapter((Activity) context, this, megaContacts);
-            contactsList.setLayoutManager(new FourColumnLayoutManager(getContext(), CONTACTS_COUNT, GridLayoutManager.VERTICAL, false));
+            contactsList.setLayoutManager(new DisableScrollLayoutManager(getContext(), CONTACTS_COUNT, GridLayoutManager.VERTICAL, false));
             contactsList.setAdapter(adapter);
         } else {
             noContacts();
@@ -375,9 +378,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         moreContacts.setOnClickListener(this);
         moreContactsTitle = v.findViewById(R.id.more_contacts_title);
         moreContactsTitle.setOnClickListener(this);
-
-        refreshMegaContactsList();
-
         return v;
     }
 
@@ -1946,6 +1946,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }
+        refreshMegaContactsList();
         super.onResume();
     }
 

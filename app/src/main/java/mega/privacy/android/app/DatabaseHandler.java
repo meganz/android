@@ -821,11 +821,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public List<MegaContactGetter.MegaContact> getMegaContacts() {
+    public ArrayList<MegaContactGetter.MegaContact> getMegaContacts() {
         String sql = "SELECT * FROM " + TABLE_MEGA_CONTACTS;
         Cursor cursor = db.rawQuery(sql, null);
         if (cursor != null) {
-            List<MegaContactGetter.MegaContact> contacts = new ArrayList<>();
+            ArrayList<MegaContactGetter.MegaContact> contacts = new ArrayList<>();
             try {
                 MegaContactGetter.MegaContact contact;
                 while(cursor.moveToNext()) {

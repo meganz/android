@@ -96,13 +96,17 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 
-public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface {
+public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaGlobalListenerInterface {
 
     public static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT = "INTENT_FILTER_INVITE_CONTACT";
@@ -1455,6 +1459,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(megaApi != null) {
+            megaApi.removeGlobalListener(this);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
 
@@ -1497,6 +1509,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
+        megaApi.addGlobalListener(this);
         if(megaApi==null||megaApi.getRootNode()==null){
             log("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
@@ -3378,6 +3391,52 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
         }
+    }
+
+    @Override
+    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+
+    }
+
+    @Override
+    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+
+    }
+
+    @Override
+    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
+
+    }
+
+    @Override
+    public void onReloadNeeded(MegaApiJava api) {
+
+    }
+
+    @Override
+    public void onAccountUpdate(MegaApiJava api) {
+
+    }
+
+    @Override
+    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+        if (requests != null) {
+            for (int i = 0; i < requests.size(); i++) {
+                MegaContactRequest cr = requests.get(i);
+                if (cr != null) {
+                    if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
+                        log("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+                        getContactsTask = new GetContactsTask();
+                        getContactsTask.execute();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onEvent(MegaApiJava api, MegaEvent event) {
+
     }
 
     @Override
