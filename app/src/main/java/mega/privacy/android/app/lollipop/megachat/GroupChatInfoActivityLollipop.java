@@ -1712,9 +1712,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UPDATE_PREVIEWERS)){
                 updatePreviewers();
             }
-            else{
-                log("Changes other: "+item.getChanges());
-                log("Chat title: "+item.getTitle());
+            else {
+                log("Changes other: " + item.getChanges());
+                log("Chat ID: " + item.getChatId());
             }
         }
         else{

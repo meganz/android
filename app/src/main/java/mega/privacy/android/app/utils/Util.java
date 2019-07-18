@@ -26,6 +26,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -110,7 +111,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
 	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
@@ -677,7 +678,7 @@ public class Util {
 	        ex.printStackTrace();
 	    }
 	}
-	
+
 	/*
 	 * Get localized progress size
 	 */
@@ -742,6 +743,8 @@ public class Util {
 		
 		return speedString;
 	}
+
+
 	
 	public static String getPhotoSyncName (long timeStamp, String fileName){
 		String photoSyncName = null;
@@ -1810,6 +1813,58 @@ public class Util {
         return rootView;
     }
 
+	/**
+	 * This method formats the coordinates of a location in degrees, minutes and seconds
+	 * and returns a string with it
+	 *
+	 * @param latitude latitude of the location to format
+	 * @param longitude longitude of the location to format
+	 * @return string with the location formatted in degrees, minutes and seconds
+	 */
+	public static String convertToDegrees(float latitude, float longitude) {
+        StringBuilder builder = new StringBuilder();
+
+		formatCoordinate(builder, latitude);
+        if (latitude < 0) {
+            builder.append("S ");
+        } else {
+            builder.append("N ");
+        }
+
+		formatCoordinate(builder, longitude);
+        if (longitude < 0) {
+            builder.append("W");
+        } else {
+            builder.append("E");
+        }
+
+        return builder.toString();
+    }
+
+	/**
+	 * This method formats a coordinate in degrees, minutes and seconds
+	 *
+	 * @param builder StringBuilder where the string formatted it's going to be built
+	 * @param coordinate coordinate to format
+	 */
+	private static void formatCoordinate (StringBuilder builder, float coordinate) {
+		String degrees = Location.convert(Math.abs(coordinate), Location.FORMAT_SECONDS);
+		String[] degreesSplit = degrees.split(":");
+		builder.append(degreesSplit[0]);
+		builder.append("°");
+		builder.append(degreesSplit[1]);
+		builder.append("'");
+
+		try {
+			builder.append(Math.round(Float.parseFloat(degreesSplit[2].replace(",", "."))));
+		} catch (Exception e) {
+			log("Error rounding seconds in coordinates: " + e.toString());
+			builder.append(degreesSplit[2]);
+		}
+
+		builder.append("''");
+	}
+
 	public static void hideKeyboard(Activity activity, int flag){
 
 		View v = activity.getCurrentFocus();
@@ -1825,6 +1880,7 @@ public class Util {
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
 		}
+
 	}
 
 	private static void log(String message) {

@@ -20,6 +20,8 @@ public final class CacheFolderManager {
 
     public static final String QR_FOLDER = "qrMEGA";
 
+    public static final String VOICE_CLIP_FOLDER = "voiceClipsMEGA";
+
     public static final String TEMPORAL_FOLDER = "tempMEGA";
 
     public static final String CHAT_TEMPORAL_FOLDER = "chatTempMEGA";
@@ -37,8 +39,7 @@ public final class CacheFolderManager {
         File cacheFolder;
         if (folderName.equals(CHAT_TEMPORAL_FOLDER)) {
             cacheFolder = new File(context.getFilesDir(), folderName);
-        }
-        else {
+        } else {
             cacheFolder = new File(context.getCacheDir(), folderName);
         }
 
@@ -58,6 +59,7 @@ public final class CacheFolderManager {
         createCacheFolder(context, PREVIEW_FOLDER);
         createCacheFolder(context, AVATAR_FOLDER);
         createCacheFolder(context, QR_FOLDER);
+        createCacheFolder(context, VOICE_CLIP_FOLDER);
         removeOldTempFolders(context);
     }
 
@@ -97,6 +99,10 @@ public final class CacheFolderManager {
 
     public static File buildAvatarFile(Context context, String fileName) {
         return getCacheFile(context, AVATAR_FOLDER, fileName);
+    }
+
+    public static File buildVoiceClipFile(Context context, String fileName) {
+        return getCacheFile(context, VOICE_CLIP_FOLDER, fileName);
     }
 
     public static File buildTempFile(Context context, String fileName) {
