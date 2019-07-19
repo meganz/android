@@ -54,19 +54,14 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     private boolean microphoneGranted;
     private boolean contactsGranted;
 
-    int[] mImages;
-    String[] mTitles;
-    String[] mSubtitles;
+    private int[] mImages;
+    private String[] mTitles;
+    private String[] mSubtitles;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
     }
 
     @Override
