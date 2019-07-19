@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:MEGA="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_search"
+        android:orderInCategory="100"
+        android:title="@string/action_search"
+        MEGA:actionViewClass="android.support.v7.widget.SearchView"
+        MEGA:showAsAction="always|collapseActionView" />
+
+    <item
+        android:id="@+id/action_refresh"
+        android:orderInCategory="100"
+        android:title="@string/action_refresh"
+        android:icon="@drawable/ic_w_refresh"
+        MEGA:showAsAction="always" />
+</menu>

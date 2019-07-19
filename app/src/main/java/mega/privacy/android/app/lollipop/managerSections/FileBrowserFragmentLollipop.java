@@ -744,13 +744,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	
 	public void setOverviewLayout() {
 		log("setOverviewLayout");
+
+
 		//Check transfers in progress
 		pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 		totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 		
 		totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
 		totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
-		
+
 		if (pendingTransfers > 0) {
 			log("Transfers in progress");
 			transfersOverViewLayout.setVisibility(View.VISIBLE);
