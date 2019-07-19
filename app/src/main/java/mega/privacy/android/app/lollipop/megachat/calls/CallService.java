@@ -53,6 +53,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     private Notification.Builder mBuilder;
     private NotificationCompat.Builder mBuilderCompat;
     private NotificationManager mNotificationManager;
+    private NotificationCompat.Builder mBuilderCompatO;
 
     private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
     private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
@@ -100,18 +101,67 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-
         if (call.getChatid() == chatId) {
-            if (call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
-                log("Destroy call Service");
-                stopForeground(true);
-                mNotificationManager.cancel(Constants.NOTIFICATION_CALL_IN_PROGRESS);
-                stopSelf();
+            if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
+                int callStatus = call.getStatus();
+                log("onChatCallUpdate:STATUS: " + callStatus);
+
+                switch (callStatus) {
+                    case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+                    case MegaChatCall.CALL_STATUS_RING_IN:
+                    case MegaChatCall.CALL_STATUS_JOINING:
+                    case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
+                        updateNotificationContent(call);
+                        break;
+                    }
+                    case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
+                    case MegaChatCall.CALL_STATUS_DESTROYED: {
+                        stopForeground(true);
+                        mNotificationManager.cancel(Constants.NOTIFICATION_CALL_IN_PROGRESS);
+                        stopSelf();
+                        break;
+                    }
+                    default:
+                        break;
+                }
             }
         }
     }
 
-    public void showCallInProgressNotification() {
+    private void updateNotificationContent(MegaChatCall call) {
+        log("updateNotification");
+        Notification notif;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (call == null) {
+                mBuilderCompatO.setContentText(getString(R.string.action_notification_call_in_progress));
+            } else {
+                if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+                    mBuilderCompatO.setContentText(getString(R.string.title_notification_outgoing_call));
+                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+                    mBuilderCompatO.setContentText(getString(R.string.title_notification_incoming_call));
+                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+                    mBuilderCompatO.setContentText(getString(R.string.title_notification_call_in_progress));
+                }
+            }
+            notif = mBuilderCompatO.build();
+        } else {
+            if (call == null) {
+                mBuilderCompat.setContentText(getString(R.string.action_notification_call_in_progress));
+            } else {
+                if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+                    mBuilderCompat.setContentText(getString(R.string.title_notification_outgoing_call));
+                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+                    mBuilderCompat.setContentText(getString(R.string.title_notification_incoming_call));
+                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+                    mBuilderCompat.setContentText(getString(R.string.title_notification_call_in_progress));
+                }
+            }
+            notif = mBuilderCompat.build();
+        }
+        startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
+    }
+
+    private void showCallInProgressNotification() {
         log("showCallInProgressNotification");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -125,7 +175,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             intent.putExtra(Constants.CHAT_ID, chatId);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+            mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
 
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
@@ -135,9 +185,9 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
                     .setOngoing(false)
                     .setColor(ContextCompat.getColor(this, R.color.mega));
 
-            String title = null;
-            String email = null;
-            long userHandle = -1;
+            String title;
+            String email;
+            long userHandle;
             MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
             if (chat != null) {
                 title = chat.getTitle();
@@ -161,15 +211,15 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
                 }
 
                 mBuilderCompatO.setContentTitle(title);
-                mBuilderCompatO.setContentText(getString(R.string.title_notification_call_in_progress));
+                MegaChatCall call = megaChatApi.getChatCall(chatId);
+                updateNotificationContent(call);
+
             } else {
                 mBuilderCompatO.setContentTitle(getString(R.string.title_notification_call_in_progress));
                 mBuilderCompatO.setContentText(getString(R.string.action_notification_call_in_progress));
+                Notification notif = mBuilderCompatO.build();
+                startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
             }
-
-            Notification notif = mBuilderCompatO.build();
-
-            startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
 
         } else {
 
@@ -191,9 +241,9 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
                 mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
             }
 
-            String title = null;
-            String email = null;
-            long userHandle = -1;
+            String title;
+            String email;
+            long userHandle;
             MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
             if (chat != null) {
                 title = chat.getTitle();
@@ -217,16 +267,15 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
                 }
 
                 mBuilderCompat.setContentTitle(title);
-                mBuilderCompat.setContentText(getString(R.string.title_notification_call_in_progress));
+                MegaChatCall call = megaChatApi.getChatCall(chatId);
+                updateNotificationContent(call);
+
             } else {
                 mBuilderCompat.setContentTitle(getString(R.string.title_notification_call_in_progress));
                 mBuilderCompat.setContentText(getString(R.string.action_notification_call_in_progress));
+                Notification notif = mBuilderCompat.build();
+                startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
             }
-
-            Notification notif = mBuilderCompat.build();
-//        mNotificationManager.notify(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
-
-            startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
         }
     }
 
