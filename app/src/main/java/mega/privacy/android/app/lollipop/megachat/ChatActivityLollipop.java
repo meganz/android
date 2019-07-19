@@ -1967,51 +1967,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return super.onOptionsItemSelected(item);
     }
 
-//    private void startCall() {
-//        log("startCall ");
-//        if (megaChatApi == null) return;
-//        MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
-//
-//        if (callInThisChat != null) {
-//            log("There is a call in this chat");
-//
-//            if (ChatUtil.participatingInACall(megaChatApi)) {
-//                long chatIdCallInProgress = ChatUtil.getChatCallInProgress(megaChatApi);
-//                if (chatIdCallInProgress == chatRoom.getChatId()) {
-//                    log("I'm participating in the call of this chat");
-//                    ChatUtil.returnCall(this, megaChatApi);
-//                    return;
-//                }
-//
-//                log("I'm participating in another call from another chat");
-//                showConfirmationToJoinCall(chatRoom);
-//                return;
-//            }
-//
-//            if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-//                log("The call in this chat is Ring in");
-//                ((MegaApplication) getApplication()).setSpeakerStatus(chatRoom.getChatId(), false);
-//                MegaApplication.setShowPinScreen(false);
-//                Intent intent = new Intent(this, ChatCallActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                intent.putExtra(Constants.CHAT_ID, idChat);
-//                startActivity(intent);
-//                return;
-//            }
-//
-//            if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-//                log("The call in this chat is In progress, but I do not participate");
-//                ((MegaApplication) getApplication()).setSpeakerStatus(chatRoom.getChatId(), startVideo);
-//                megaChatApi.startChatCall(idChat, startVideo, this);
-//            }
-//            return;
-//        }
-//
-//        if (!ChatUtil.participatingInACall(megaChatApi)) {
-//            log("There is not a call in this chat and I am not in another call");
-//            MegaApplication.setCallLayoutStatus(idChat, false);
-//            ((MegaApplication) getApplication()).setSpeakerStatus(chatRoom.getChatId(), startVideo);
-//            megaChatApi.startChatCall(idChat, startVideo, this);
     /*
      *Prepare recording
      */

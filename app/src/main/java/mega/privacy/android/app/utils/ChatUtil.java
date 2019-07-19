@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.SystemClock;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
+import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -148,14 +148,6 @@ public class ChatUtil {
         return actionBarHeight;
     }
 
-    public static void log(String origin, String message) {
-        MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] " + origin + ": " + message, origin);
-    }
-
-    private static void log(String message) {
-        log("Util", message);
-    }
-
     public static void showShareChatLinkDialog(final Context context, MegaChatRoom chat, final String chatLink) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         LayoutInflater inflater = null;
@@ -237,7 +229,7 @@ public class ChatUtil {
         }
     }
 
-    static void dismissShareChatLinkDialog(Context context, AlertDialog shareLinkDialog) {
+    private static void dismissShareChatLinkDialog(Context context, AlertDialog shareLinkDialog) {
         try {
             shareLinkDialog.dismiss();
             if (context instanceof ChatActivityLollipop) {
@@ -286,6 +278,9 @@ public class ChatUtil {
         }
         chronometer.stop();
         chronometer.setVisibility(View.GONE);
+    }
+
+
     /**
      * Locks the device window in landscape mode.
      */
@@ -350,6 +345,11 @@ public class ChatUtil {
 
         finalTime = finalTime + minutesString + ":" + secondsString;
         return finalTime;
+    }
+
+
+    public static void log(String origin, String message) {
+        MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] " + origin + ": " + message, origin);
     }
 
     private static void log(String message) {
