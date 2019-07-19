@@ -2339,12 +2339,6 @@ public class Util {
 		}
 	}
 
-	public static boolean isTablet(Context context) {
-		return (context.getResources().getConfiguration().screenLayout
-				& Configuration.SCREENLAYOUT_SIZE_MASK)
-				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
-	}
-
 	public static boolean checkPermissionGranted(String permission, Context context) {
 		try {
 			return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
