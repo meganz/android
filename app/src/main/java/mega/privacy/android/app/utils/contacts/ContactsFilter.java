@@ -19,11 +19,7 @@ public class ContactsFilter {
             Iterator<T> iterator = list.iterator();
             while (iterator.hasNext()) {
                 T t = iterator.next();
-                boolean hasSameEamil = user.getEmail().equals(t.getEmail());
-                boolean isContact = user.getVisibility() == MegaUser.VISIBILITY_VISIBLE;
-                boolean isBlocked = user.getVisibility() == MegaUser.VISIBILITY_BLOCKED;
-
-                if (hasSameEamil && (isContact || isBlocked)) {
+                if (isContact(user, t.getEmail())) {
                     log("filter out: " + t);
                     iterator.remove();
                 }
@@ -39,16 +35,24 @@ public class ContactsFilter {
             Iterator<T> iterator = list.iterator();
             while (iterator.hasNext()) {
                 T t = iterator.next();
-                boolean hasSameEmail = request.getTargetEmail().equals(t.getEmail());
-                boolean isAccepted = request.getStatus() == MegaContactRequest.STATUS_ACCEPTED;
-                boolean isPending = request.getStatus() == MegaContactRequest.STATUS_UNRESOLVED;
-
-                if (hasSameEmail && (isAccepted || isPending)) {
+                if (isPending(request,t.getEmail())) {
                     log("filter out: " + t);
                     iterator.remove();
                 }
             }
+        }
+        return list;
+    }
 
+    public static <T extends ContactWithEmail> ArrayList<T> filterOutMyself(MegaApiJava api, ArrayList<T> list) {
+        log("filter out myself");
+        Iterator<T> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            T t = iterator.next();
+            if (isMySelf(api, t.getEmail())) {
+                log("filter out: " + t);
+                iterator.remove();
+            }
         }
         return list;
     }
@@ -74,45 +78,39 @@ public class ContactsFilter {
         }
     }
 
-    public static ArrayList<String> getContact(MegaApiJava api, ArrayList<String> emails) {
-        ArrayList<String> contacts = new ArrayList<>();
-        for (MegaUser user : api.getContacts()) {
-            log("contact visibility: " + user.getVisibility() + " -> " + user.getEmail());
-            Iterator<String> iterator = emails.iterator();
-            while (iterator.hasNext()) {
-                String email = iterator.next();
-                boolean hasSameEamil = user.getEmail().equals(email);
-                boolean isContact = user.getVisibility() == MegaUser.VISIBILITY_VISIBLE;
-
-                if (hasSameEamil && isContact) {
-                    iterator.remove();
-                    contacts.add(email);
-                    break;
-                }
-            }
-        }
-        return contacts;
+    private static boolean isContact(MegaUser user, String email) {
+        boolean hasSameEamil = user.getEmail().equals(email);
+        boolean isContact = user.getVisibility() == MegaUser.VISIBILITY_VISIBLE;
+        return hasSameEamil && isContact;
     }
 
-    public static ArrayList<String> getPendingRequest(MegaApiJava api, ArrayList<String> emails) {
-        ArrayList<String> pendings = new ArrayList<>();
-        for (MegaContactRequest request : api.getOutgoingContactRequests()) {
-            log("contact request: " + request.getStatus() + " -> " + request.getTargetEmail());
-            Iterator<String> iterator = emails.iterator();
-            while (iterator.hasNext()) {
-                String email = iterator.next();
-                boolean hasSameEmail = request.getTargetEmail().equals(email);
-                boolean isAccepted = request.getStatus() == MegaContactRequest.STATUS_ACCEPTED;
-                boolean isPending = request.getStatus() == MegaContactRequest.STATUS_UNRESOLVED;
+    private static boolean isPending(MegaContactRequest request, String email) {
+        boolean hasSameEmail = request.getTargetEmail().equals(email);
+        boolean isAccepted = request.getStatus() == MegaContactRequest.STATUS_ACCEPTED;
+        boolean isPending = request.getStatus() == MegaContactRequest.STATUS_UNRESOLVED;
+        return hasSameEmail && (isAccepted || isPending);
+    }
 
-                if (hasSameEmail && (isAccepted || isPending)) {
-                    iterator.remove();
-                    pendings.add(email);
-                    break;
-                }
+    public static boolean isEmailInContacts(MegaApiJava api, String email) {
+        for (MegaUser user : api.getContacts()) {
+            if (isContact(user, email)) {
+                return true;
             }
         }
-        return pendings;
+        return false;
+    }
+
+    public static boolean isEmailInPending(MegaApiJava api, String email) {
+        for (MegaContactRequest request : api.getOutgoingContactRequests()) {
+            if (isPending(request, email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isMySelf(MegaApiJava api, String email) {
+        return api.getMyUser().getEmail().equals(email);
     }
 
     private static void log(String message) {

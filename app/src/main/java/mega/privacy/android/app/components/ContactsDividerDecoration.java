@@ -20,11 +20,15 @@ public class ContactsDividerDecoration extends SimpleDividerItemDecoration {
         int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
-            if (child.getTag() instanceof RecyclerView.ViewHolder) {
-                int position = ((RecyclerView.ViewHolder) child.getTag()).getAdapterPosition();
-                int type = parent.getAdapter().getItemViewType(position);
-                if (type != TYPE_MEGA_CONTACT_HEADER && type != TYPE_PHONE_CONTACT_HEADER) {
-                    drawDivider(c, parent, parent.getChildAt(i));
+            Object tag = child.getTag();
+            if (tag instanceof RecyclerView.ViewHolder) {
+                int position = ((RecyclerView.ViewHolder) tag).getAdapterPosition();
+                RecyclerView.Adapter adapter = parent.getAdapter();
+                if(adapter != null) {
+                    int type = adapter.getItemViewType(position);
+                    if (type != TYPE_MEGA_CONTACT_HEADER && type != TYPE_PHONE_CONTACT_HEADER) {
+                        drawDivider(c, parent, parent.getChildAt(i));
+                    }
                 }
             }
         }

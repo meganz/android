@@ -171,6 +171,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_GET_REGISTERED_CONTACTS) {
+            requestInProgress = false;
             if (e.getErrorCode() == MegaError.API_OK) {
                 //when request is successful, update the timestamp.
                 updateLastSyncTimestamp();
@@ -183,10 +184,6 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     contact = new MegaContact();
                     MegaStringList list = table.get(i);
                     contact.id = list.get(1);
-                    if (api.getMyUserHandle().equals(contact.id)) {
-                        log("it's myself");
-                        continue;
-                    }
                     contact.normalizedPhoneNumber = list.get(0);
                     contact.handle = getUserHandler(list.get(1));
                     //the normalized phone number is the key
@@ -213,7 +210,6 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     updater.onException(e.getErrorCode(), request.getRequestString());
                 }
             }
-            requestInProgress = false;
         } else if (request.getType() == MegaRequest.TYPE_GET_USER_EMAIL) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 String email = request.getEmail();
@@ -259,16 +255,17 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     }
 
     private ArrayList<MegaContact> filterOut(MegaApiJava api, ArrayList<MegaContact> list) {
-        ArrayList<MegaContact> contacts = ContactsFilter.filterOutContacts(api, list);
-        ArrayList<MegaContact> returnList = ContactsFilter.filterOutPendingContacts(api, contacts);
-        Collections.sort(returnList, new Comparator<MegaContact>() {
+        list = ContactsFilter.filterOutContacts(api, list);
+        list = ContactsFilter.filterOutPendingContacts(api, list);
+        list = ContactsFilter.filterOutMyself(api, list);
+        Collections.sort(list, new Comparator<MegaContact>() {
 
             @Override
             public int compare(MegaContact o1, MegaContact o2) {
                 return o1.localName.compareTo(o2.localName);
             }
         });
-        return returnList;
+        return list;
     }
 
     private MegaContact getCurrentContactIndex() {
@@ -283,6 +280,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     }
 
     public void getMegaContacts(MegaApiAndroid api, List<ContactsUtil.LocalContact> localContacts, long period) {
+        if(api.getRootNode() == null) {
+            log("haven't logged in, return");
+            return;
+        }
         if (requestInProgress) {
             return;
         }

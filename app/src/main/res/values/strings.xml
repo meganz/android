@@ -2187,7 +2187,6 @@
     <string name="action_open_chat_link" context="Menu item">Open chat link</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
-    <string name="invite_not_sent_already_sent_short" context="The short version of message shown when a contact request has not been sent because the invitation has been sent before">The invitation to %s has been sent before.</string>
 
     <string name="save_qr_cloud_drive" context="Label shown to indicate the QR is saving in Cloud Drive">Saving %s in Cloud Drive&#8230;</string>
 

@@ -1862,6 +1862,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		//sync local contacts to see who's on mega.
 		if (Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, this)) {
+		    log("sync mega contacts");
 			MegaContactGetter getter = new MegaContactGetter(this);
 			getter.getMegaContacts(megaApi, getter.getLocalContacts(), MegaContactGetter.WEEK);
 		}

@@ -549,6 +549,14 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
             if (TextUtils.isEmpty(s)) {
                 Util.hideKeyboard(this, 0);
             } else {
+                String result = checkInputEmail(s);
+                if (result != null) {
+                    typeContactEditText.getText().clear();
+                    Util.hideKeyboard(this, 0);
+                    showSnackbar(result);
+                    return true;
+                }
+
                 boolean isEmailValid = isValidEmail(processedStrong);
                 boolean isPhoneValid = isValidPhone(processedStrong);
                 if (isEmailValid) {
@@ -583,6 +591,20 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         return false;
     }
 
+    private String checkInputEmail(String email) {
+        String result = null;
+        if (ContactsFilter.isMySelf(megaApi, email)) {
+            result = getString(R.string.error_own_email_as_contact);
+        }
+        if (ContactsFilter.isEmailInContacts(megaApi, email)) {
+            result = getString(R.string.context_contact_already_exists, email);
+        }
+        if (ContactsFilter.isEmailInPending(megaApi, email)) {
+            result = getString(R.string.invite_not_sent_already_sent, email);
+        }
+        return result;
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -592,6 +614,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
                 break;
             }
             case R.id.fab_button_next: {
+                enableFabButton(false);
                 log("invite Contacts");
                 inviteContacts(addedContacts);
                 Util.hideKeyboard(this, 0);
@@ -742,7 +765,8 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
             phoneContacts.addAll(localContactToContactInfo(rawLocalContacts));
             ContactsFilter.filterOutContacts(megaApi, phoneContacts);
             ContactsFilter.filterOutPendingContacts(megaApi, phoneContacts);
-
+            ContactsFilter.filterOutMegaUsers(megaContactToContactInfo(dbH.getMegaContacts()), phoneContacts);
+            ContactsFilter.filterOutMyself(megaApi, phoneContacts);
             filteredContacts.addAll(phoneContacts);
 
             //keep all contacts for records
@@ -935,7 +959,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
     private int numberToSend;
     private int numberSent;
-    private StringBuilder message = new StringBuilder(64);
+    private int numberNotSent;
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
@@ -950,32 +974,30 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT) {
-            numberSent++;
             log("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
-            if (message.length() > 0) {
-                message.append("\n");
-            }
             if (e.getErrorCode() == MegaError.API_OK) {
+                numberSent++;
                 log("OK INVITE CONTACT: " + request.getEmail());
-                if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
-                    message.append(getString(R.string.context_contact_request_sent, request.getEmail()));
-                }
             } else {
-                log("Code: " + e.getErrorString());
-                if (e.getErrorCode() == MegaError.API_EEXIST) {
-                    message.append(getString(R.string.context_contact_already_exists, request.getEmail()));
-                } else if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode() == MegaError.API_EARGS) {
-                    message.append(getString(R.string.error_own_email_as_contact));
-                } else {
-                    message.append(getString(R.string.general_error));
-                }
+                numberNotSent++;
                 log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
             }
-            if (numberSent == numberToSend) {
-                showSnackbar(message.toString());
+            if (numberSent + numberNotSent == numberToSend) {
+                enableFabButton(true);
+                if (numberToSend == 1) {
+                    if (numberSent == 1) {
+                        showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
+                    }
+                } else {
+                    if (numberNotSent > 0) {
+                        showSnackbar(getString(R.string.number_no_invite_contact_request, numberSent, numberNotSent));
+                    } else {
+                        showSnackbar(getString(R.string.number_correctly_invite_contact_request, numberToSend));
+                    }
+                }
                 numberSent = 0;
                 numberToSend = 0;
-                message = new StringBuilder(64);
+                numberNotSent = 0;
                 Util.hideKeyboard(InviteContactActivity.this, 0);
                 new Handler().postDelayed(new Runnable() {
 
@@ -996,38 +1018,10 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void inviteEmailContacts(ArrayList<String> emails) {
-        ArrayList<String> contacts = ContactsFilter.getContact(megaApi, emails);
-        if (contacts.size() > 0) {
-            for (int i = 0; i < contacts.size(); i++) {
-                message.append(getString(R.string.context_contact_already_exists, contacts.get(i)));
-                if (i != contacts.size() - 1) {
-                    message.append("\n");
-                }
-            }
-        }
-
-        ArrayList<String> pendings = ContactsFilter.getPendingRequest(megaApi, emails);
-        if (pendings.size() > 0) {
-            if (message.length() > 0) {
-                message.append("\n");
-            }
-            for (int i = 0; i < pendings.size(); i++) {
-                message.append(getString(R.string.invite_not_sent_already_sent_short, pendings.get(i)));
-                if (i != pendings.size() - 1) {
-                    message.append("\n");
-                }
-            }
-        }
-
         numberToSend = emails.size();
-        if (numberToSend > 0) {
-            for (String email : emails) {
-                log("setResultEmailContacts: " + email);
-                megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, this);
-            }
-        } else {
-            showSnackbar(message.toString());
-            message = new StringBuilder(64);
+        for (String email : emails) {
+            log("setResultEmailContacts: " + email);
+            megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, this);
         }
     }
 
@@ -1079,8 +1073,6 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void fillUpLists() {
-        // remove duplicated data from phone contacts.
-        ContactsFilter.filterOutMegaUsers(megaContactToContactInfo(dbH.getMegaContacts()), phoneContacts);
         filteredContacts.addAll(megaContacts);
         filteredContacts.addAll(phoneContacts);
         totalContacts.addAll(filteredContacts);
