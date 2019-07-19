@@ -2378,11 +2378,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 }
                 nC.downloadTo(currentDocument, parentPath, uri.toString());
             } else if (type == Constants.FROM_CHAT) {
-                ArrayList<String> serializedNodes = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES);
-                ArrayList<MegaNode> megaNodes = ChatController.unSerializeNodes(serializedNodes);
-                if (megaNodes.size() > 0) {
-                    chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-                }
+                chatC.prepareForDownload(intent, parentPath);
             }
             else {
                 String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);

@@ -1324,11 +1324,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            ArrayList<String> serializedNodes = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES);
-            ArrayList<MegaNode> megaNodes = ChatController.unSerializeNodes(serializedNodes);
-            if (megaNodes.size() > 0) {
-                chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-            }
+            chatC.prepareForDownload(intent, parentPath);
 		}
 	}
 

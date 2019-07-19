@@ -1547,7 +1547,7 @@ public class ChatController {
         return serializedNodes;
     }
 
-    public static ArrayList<MegaNode> unSerializeNodes(ArrayList<String> serializedNodes) {
+    private ArrayList<MegaNode> unSerializeNodes(ArrayList<String> serializedNodes) {
         ArrayList<MegaNode> nodeList = new ArrayList<>();
         if(serializedNodes != null) {
             for(String nodeString : serializedNodes) {
@@ -1555,6 +1555,14 @@ public class ChatController {
             }
         }
         return nodeList;
+    }
+
+    public void prepareForDownload(Intent intent, String parentPath) {
+        ArrayList<String> serializedNodes = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES);
+        ArrayList<MegaNode> megaNodes = unSerializeNodes(serializedNodes);
+        if (megaNodes.size() > 0) {
+            checkSizeBeforeDownload(parentPath, megaNodes);
+        }
     }
 
     private void prepareForDownloadVersions(final ArrayList<MegaNode> nodeList){
