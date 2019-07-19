@@ -7922,13 +7922,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void showCallInProgressLayout(String text, boolean chrono, MegaChatCall call) {
         log("showCallInProgressLayout");
+        callInProgressText.setText(text);
         ChatUtil.activateChrono(chrono, callInProgressChrono, call);
 
         if (callInProgressLayout.getVisibility() == View.VISIBLE) return;
         callInProgressLayout.setVisibility(View.VISIBLE);
         callInProgressLayout.setOnClickListener(this);
-        callInProgressText.setText(text);
-
     }
 
     private void hideCallInProgressLayout(MegaChatCall call) {
@@ -8009,7 +8008,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 } else {
                     textLayout = getString(R.string.join_call_layout);
                 }
-
                 showCallInProgressLayout(textLayout, false, call);
                 return;
 
@@ -8042,7 +8040,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
             log("showCallLayout: IN_PROGRESS");
-
             showCallInProgressLayout(getString(R.string.call_in_progress_layout), true, call);
             if (isGroup()) {
                 log("showCallLayout: IN_PROGRESS - Group");
