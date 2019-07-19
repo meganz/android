@@ -69,15 +69,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        if (!Util.isTablet(getActivity())) {
-            log("allow all screens after this permission fragment");
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
@@ -366,10 +357,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-        if (!Util.isTablet(getActivity())) {
-            log("only allow portrait when the device is mobile");
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
     }
 
     private static void log(String log) {
