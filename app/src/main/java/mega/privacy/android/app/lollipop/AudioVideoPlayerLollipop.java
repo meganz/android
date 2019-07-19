@@ -364,6 +364,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             fileName = savedInstanceState.getString("fileName");
             handle = savedInstanceState.getLong("handle");
             uri = Uri.parse(savedInstanceState.getString("uri"));
+            log("savedInstanceState uri: "+uri);
+
             renamed = savedInstanceState.getBoolean("renamed");
             loop = savedInstanceState.getBoolean("loop");
             currentPosition = savedInstanceState.getInt("currentPosition");
@@ -377,6 +379,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             placeholderCount = savedInstanceState.getInt("placeholder", 0);
         }
         else {
+            log("savedInstanceState null");
+
             isDeleteDialogShow = false;
             onPlaylist = false;
             currentTime = 0;

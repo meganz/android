@@ -134,6 +134,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private static int counterNotNowRichLinkWarning = -1;
 	private static boolean enabledRichLinks = false;
 
+	private static boolean enabledGeoLocation = false;
+
 	private static int disableFileVersions = -1;
 
 	private static boolean recentChatVisible = false;
@@ -577,6 +579,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		
 //		new MegaTest(getMegaApi()).start();
 	}
+
 
 	public void askForFullAccountInfo(){
 		log("askForFullAccountInfo");
@@ -1361,7 +1364,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		if (event.getType() == MegaEvent.EVENT_STORAGE) {
 			log("Storage status changed");
-			int state = event.getNumber();
+			int state = (int) event.getNumber();
 			if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
 				api.getAccountDetails(null);
 			}
@@ -1394,6 +1397,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	@Override
 	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
 		if(config.isPending()==false){
+			log("Launch local broadcast");
 			Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE);
 			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 		}
@@ -1876,6 +1880,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	public static void setShowRichLinkWarning(boolean showRichLinkWarning) {
 		MegaApplication.showRichLinkWarning = showRichLinkWarning;
+	}
+
+	public static boolean isEnabledGeoLocation() {
+		return enabledGeoLocation;
+	}
+
+	public static void setEnabledGeoLocation(boolean enabledGeoLocation) {
+		MegaApplication.enabledGeoLocation = enabledGeoLocation;
 	}
 
 	public static int getCounterNotNowRichLinkWarning() {
