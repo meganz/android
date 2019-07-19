@@ -20,7 +20,7 @@
             android:layout_height="match_parent">
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar_maps"
+                android:id="@+id/toolbar_chat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
@@ -348,7 +348,7 @@
                 android:id="@+id/message_container_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/toolbar_maps"
+                android:layout_below="@id/toolbar_chat"
                 android:background="@color/background_chat"
                 android:layout_above="@id/writing_container_layout_chat_layout"
                 android:orientation="vertical">
@@ -486,7 +486,7 @@
             <include layout="@layout/item_call_in_progress_layout"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_below="@id/toolbar_maps"/>
+                android:layout_below="@id/toolbar_chat"/>
 
             <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
