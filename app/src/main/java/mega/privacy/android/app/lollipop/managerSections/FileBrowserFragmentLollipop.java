@@ -1592,10 +1592,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
         }
 
 		if (headerItemDecoration == null) {
-		    log("There is no headerItemDecoration, create a new one");
+			log("create new decoration");
 			headerItemDecoration = new NewHeaderItemDecoration(context);
 		} else {
-		    log("There is previous existing headerItemDecoration, remove the old one to hard refresh ");
+		    log("Remove old decoration");
 		    recyclerView.removeItemDecoration(headerItemDecoration);
         }
 		headerItemDecoration.setType(type);

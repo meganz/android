@@ -198,10 +198,10 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
             sections.put(folderCount, getString(R.string.general_files));
         }
 		if (headerItemDecoration == null) {
-			log("There is no headerItemDecoration, create a new one");
+			log("create new decoration");
 			headerItemDecoration = new NewHeaderItemDecoration(context);
 		} else {
-			log("There is previous existing headerItemDecoration, remove the old one to hard refresh ");
+			log("remove old decoration");
 			recyclerView.removeItemDecoration(headerItemDecoration);
 		}
 		headerItemDecoration.setType(type);

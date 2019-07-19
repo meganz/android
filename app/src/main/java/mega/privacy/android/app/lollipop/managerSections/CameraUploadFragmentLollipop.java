@@ -979,12 +979,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, Constants.CAMERA_UPLOAD_ADAPTER);
 			} else {
 				if (context != adapterList.getContext()) {
-					log("sometimes after rotation, the attached activity is not the same as previous activity, we need to update the context, and hardfresh the action mode");
+					log("attached activity changed");
 					adapterList.setContext(context);
 					actionMode = null;
 				}
 				if (listView != adapterList.getListFragment()) {
-					log("sometimes after rotation, the attached listView is not the same as previous listView, we need to update the listView to enable the toggle");
+					log("attached ListView changed");
 					adapterList.setListFragment(listView);
 				}
 				adapterList.setNodes(nodesArray, nodes);
@@ -1272,7 +1272,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
 
 				if (adapterGrid.getContext() != context) {
-					log("sometimes after rotation, the attached activity is not the same as previous activity, we need to update the context");
+					log("attached activity changed");
 					adapterGrid.setContext(context);
 				}
 

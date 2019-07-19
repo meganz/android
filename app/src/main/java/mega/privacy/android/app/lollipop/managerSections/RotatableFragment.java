@@ -11,6 +11,9 @@ import mega.privacy.android.app.utils.Util;
 
 public abstract class RotatableFragment extends Fragment {
 
+    private final static String SELECTED_ITEMS = "selectedItems";
+    private final static String FOLDER_COUNT = "folderCount";
+    private final static String LAST_PLACE_HOLDER_COUNT = "lastPlaceHolderCount";
     protected abstract RotatableAdapter getAdapter();
 
     public abstract void activateActionMode();
@@ -29,26 +32,25 @@ public abstract class RotatableFragment extends Fragment {
 
     private void reDoTheSelectionAfterRotation() {
         String className = this.getClass().getName();
-        log(className, "re select the items which are selected before rotation");
+        log(className, "reselect items");
         RotatableAdapter adapter = getAdapter();
         if (adapter != null) {
             int folderCount = adapter.getFolderCount();
-            log(className, "There are" + folderCount + "folders");
+            log(className, "folders: " + folderCount);
             int currentPlaceHolderCount = adapter.getPlaceholderCount();
-            log(className, "There are" + currentPlaceHolderCount + "folder place holder in current screen");
+            log(className, "place holder: " + currentPlaceHolderCount);
             if (selectedItems != null && selectedItems.size() > 0) {
                 activateActionMode();
                 for (int selectedItem : selectedItems) {
-                    if (((ManagerActivityLollipop)getActivity()).isList) {
-                        log(className, "Do the list selection. The selectedItem is " + selectedItem);
+                    if (((ManagerActivityLollipop) getActivity()).isList) {
+                        log(className, "selectedItem:" + selectedItem);
                         multipleItemClick(selectedItem);
-                    }
-                    else {
+                    } else {
                         if (selectedItem < folderCount) {
-                            log(className, "Do the list folder selection. The selectedItem is " + selectedItem);
+                            log(className, "list folder, selectedItem: " + selectedItem);
                             multipleItemClick(selectedItem);
                         } else {
-                            log(className, "Do the list file selection. The selectedItem is " + selectedItem + "the lastPlaceHolderCount is " + lastPlaceHolderCount + ". The currentPlaceHolderCount is " + currentPlaceHolderCount);
+                            log(className, "file selection, selectedItem: " + selectedItem + "lastPlaceHolderCount:" + lastPlaceHolderCount + ". currentPlaceHolderCount: " + currentPlaceHolderCount);
                             multipleItemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount));
                         }
                     }
@@ -63,9 +65,9 @@ public abstract class RotatableFragment extends Fragment {
         super.onSaveInstanceState(outState);
         RotatableAdapter currentAdapter = getAdapter();
         ArrayList<Integer> selectedItems = (ArrayList<Integer>) (currentAdapter.getSelectedItems());
-        outState.putSerializable("selectedItems", selectedItems);
-        outState.putInt("folderCount", currentAdapter.getFolderCount());
-        outState.putInt("lastPlaceHolderCount", currentAdapter.getPlaceholderCount());
+        outState.putSerializable(SELECTED_ITEMS, selectedItems);
+        outState.putInt(FOLDER_COUNT, currentAdapter.getFolderCount());
+        outState.putInt(LAST_PLACE_HOLDER_COUNT, currentAdapter.getPlaceholderCount());
         selectedItems = null;
         lastPlaceHolderCount = -1;
     }
@@ -73,9 +75,9 @@ public abstract class RotatableFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null ) {
-            selectedItems = (ArrayList<Integer>) savedInstanceState.getSerializable("selectedItems");
-            lastPlaceHolderCount = savedInstanceState.getInt("lastPlaceHolderCount") ;
+        if (savedInstanceState != null) {
+            selectedItems = (ArrayList<Integer>) savedInstanceState.getSerializable(SELECTED_ITEMS);
+            lastPlaceHolderCount = savedInstanceState.getInt(LAST_PLACE_HOLDER_COUNT);
         }
     }
 
