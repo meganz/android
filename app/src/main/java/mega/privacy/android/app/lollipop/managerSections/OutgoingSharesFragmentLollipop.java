@@ -322,7 +322,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 					log("Send files to chat");
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
-					nC.selectChatsToSendNodes(nodesSelected);
+					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
 					clearSelections();
 					hideMultipleSelect();
 					break;

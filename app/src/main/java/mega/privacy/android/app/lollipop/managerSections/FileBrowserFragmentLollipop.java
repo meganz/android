@@ -296,7 +296,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 					log("Send files to chat");
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
-					nC.selectChatsToSendNodes(nodesSelected);
+					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
 					clearSelections();
 					hideMultipleSelect();
 					break;
@@ -752,13 +752,15 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 
 	public void setOverviewLayout() {
 		log("setOverviewLayout");
+
+
 		//Check transfers in progress
 		pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 		totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 		
 		totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
 		totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
-		
+
 		if (pendingTransfers > 0) {
 			log("Transfers in progress");
 			transfersOverViewLayout.setVisibility(View.VISIBLE);
@@ -976,7 +978,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 							Uri mediaFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 							if(mediaFileUri==null){
 								log("itemClick:ERROR:NULLmediaFileUri");
-								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 							}
 							else{
 								mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
@@ -986,7 +988,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 							Uri mediaFileUri = Uri.fromFile(mediaFile);
 							if(mediaFileUri==null){
 								log("itemClick:ERROR:NULLmediaFileUri");
-								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 							}
 							else{
 								mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
@@ -1025,12 +1027,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 							}
 							else{
 								log("itemClick:ERROR:httpServerGetLocalLink");
-								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 							}
 						}
 						else{
 							log("itemClick:ERROR:httpServerGetLocalLink");
-							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 						}
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
