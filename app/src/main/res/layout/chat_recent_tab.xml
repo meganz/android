@@ -74,7 +74,7 @@
                         android:layout_marginLeft="72dp"
                         android:layout_marginRight="16dp"
                         android:layout_marginBottom="16dp"
-                        android:text="Allow MEGA automatically upload new and updated contacts as you add them to your phone"
+                        android:text="@string/allow_acces_contact_subtitle"
                         android:textSize="14sp"/>
                     <Button
                         android:id="@+id/dismiss_button"

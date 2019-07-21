@@ -2317,7 +2317,7 @@
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable access to contacts</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Allow MEGA automatically upload new and updated contacts as you add them to your phone</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Allow MEGA to automatically upload your new and updates contacts as you add them on your phone.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
     <string name="general_enable_access" context="General enable access">Enable access</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
@@ -2382,12 +2382,12 @@
     </plurals>
 
     <plurals name="quantity_of_local_contact" context="How many local contacts have been on MEGA">
-        <item context="Singular of local contact. 1 contact" quantity="one">%d Contact on MEGA</item>
-        <item context="Plural of local contact. 2 contacts" quantity="other">%d Contacts on MEGA</item>
+        <item context="Singular of local contact. 1 contact" quantity="one">%d Contact found on MEGA</item>
+        <item context="Plural of local contact. 2 contacts" quantity="other">%d Contacts found on MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">You don\'t have contact on MEGA, invite them now!</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who\'s already on MEGA</string>
-    <string name="get_registered_contacts" context="Getting registered contacts">Querying who\'s already on MEGA&#8230;</string>
+    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">You don\'t have any contact on MEGA, invite them now!</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
+    <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
 
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
@@ -2478,7 +2478,7 @@
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">To create a chat link you must name the group.</string>
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
 
-    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi, Have encrypted conversations on Mega with me and get 50GB free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi! Have secure conversations on MEGA with me and get up to 50GB free storage. %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">No chat link available.</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chat link deleted successfully.</string>
