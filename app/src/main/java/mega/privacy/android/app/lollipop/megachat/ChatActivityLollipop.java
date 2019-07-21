@@ -2062,62 +2062,59 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT) {
             isForwardingMessage = false;
-            if (resultCode == RESULT_OK) {
-                if(!Util.isOnline(this)) {
-                    removeProgressDialog();
+            if (resultCode != RESULT_OK) return;
+            if (!Util.isOnline(this)) {
+                removeProgressDialog();
 
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-                    return;
-                }
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+                return;
+            }
 
-                showProgressForwarding();
+            showProgressForwarding();
 
-                long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
-                log("Send "+idMessages.length+" messages");
+            long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
+            log("Send " + idMessages.length + " messages");
 
-                long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-                log("Send to "+chatHandles.length+" chats");
+            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+            log("Send to " + chatHandles.length + " chats");
 
-                long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+            long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
 
-                if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
-                    if (contactHandles != null && contactHandles.length > 0) {
-                        ArrayList<MegaUser> users = new ArrayList<>();
-                        ArrayList<MegaChatRoom> chats =  new ArrayList<>();
+            if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
+                if (contactHandles != null && contactHandles.length > 0) {
+                    ArrayList<MegaUser> users = new ArrayList<>();
+                    ArrayList<MegaChatRoom> chats = new ArrayList<>();
 
-                        for (int i=0; i<contactHandles.length; i++) {
-                            MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
-                            if (user != null) {
-                                users.add(user);
-                            }
-                        }
-
-                        for (int i=0; i<chatHandles.length; i++) {
-                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
-                            if (chatRoom != null) {
-                                chats.add(chatRoom);
-                            }
-                        }
-
-                        CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, idMessages, this, CreateChatToPerformActionListener.SEND_MESSAGES, idChat);
-
-                        for (MegaUser user : users) {
-                            MegaChatPeerList peers = MegaChatPeerList.createInstance();
-                            peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-                            megaChatApi.createChat(false, peers, listener);
+                    for (int i = 0; i < contactHandles.length; i++) {
+                        MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
+                        if (user != null) {
+                            users.add(user);
                         }
                     }
-                    else {
-                        int countChat = chatHandles.length;
-                        log("Selected: " + countChat + " chats to send");
 
-                        MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, idChat);
-                        forwardChatProcessor.forward(chatRoom);
+                    for (int i = 0; i < chatHandles.length; i++) {
+                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+                        if (chatRoom != null) {
+                            chats.add(chatRoom);
+                        }
                     }
+
+                    CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, idMessages, this, CreateChatToPerformActionListener.SEND_MESSAGES, idChat);
+
+                    for (MegaUser user : users) {
+                        MegaChatPeerList peers = MegaChatPeerList.createInstance();
+                        peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+                        megaChatApi.createChat(false, peers, listener);
+                    }
+                } else {
+                    int countChat = chatHandles.length;
+                    log("Selected: " + countChat + " chats to send");
+
+                    MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, idChat);
+                    forwardChatProcessor.forward(chatRoom);
                 }
-                else {
-                    log("Error on sending to chat");
-                }
+            } else {
+                log("Error on sending to chat");
             }
         }
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
@@ -6555,13 +6552,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER && CHAT_FOLDER.equals(request.getName())) {
-            if (e.getErrorCode() == MegaError.API_OK){
-                log("create My Chat Files folder successfully and copy the reserved nodes");
-                forwardMessages(this.preservedMessagesSelected);
-                this.preservedMessagesSelected = null;
-            }
-            else{
-                log("Cannot create My Chat Files"+e.getErrorCode()+" "+e.getErrorString());
+            if (e.getErrorCode() == MegaError.API_OK) {
+                log("create My Chat Files, copy reserved nodes");
+                forwardMessages(preservedMessagesSelected);
+                preservedMessagesSelected = null;
+            } else {
+                log("not create My Chat Files" + e.getErrorCode() + " " + e.getErrorString());
             }
         }
     }

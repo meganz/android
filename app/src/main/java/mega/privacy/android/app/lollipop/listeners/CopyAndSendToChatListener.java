@@ -105,12 +105,12 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
             if (e.getErrorCode() == MegaError.API_OK){
                 log("create My Chat Files folder successfully and copy the reserved nodes");
                 parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-                if (this.preservedNotOwnerNode != null) {
+                if (preservedNotOwnerNode != null) {
                     for (MegaNode node : preservedNotOwnerNode) {
                         copyNode(node);
                     }
                 }
-                this.preservedNotOwnerNode = null;
+                preservedNotOwnerNode = null;
             }
             else{
                 log("Cannot create My Chat Files"+e.getErrorCode()+" "+e.getErrorString());
