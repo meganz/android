@@ -16,9 +16,16 @@
             android:scaleType="centerCrop"
             android:background="@android:color/transparent"
             android:adjustViewBounds="true" />
+        <ImageView
+            android:id="@+id/thumbnail_selected_stroke"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="@drawable/file_storage_image_selected"
+            android:adjustViewBounds="true" />
 
         <ImageView
-            android:id="@+id/thumbnail_selected"
+            android:id="@+id/thumbnail_selected_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -26,13 +33,6 @@
             android:layout_marginTop="8dp"
             android:layout_alignParentLeft="true"
             android:src="@drawable/media_select_ic"/>
-
-        <!--<RelativeLayout-->
-            <!--android:id="@+id/thumbnail_unselected"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:background="@color/transparency_white">-->
-        <!--</RelativeLayout>-->
 
     </RelativeLayout>
 

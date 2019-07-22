@@ -163,7 +163,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@Override
 	public void onDestroy(){
-		log("****onDestroy");
+		log("onDestroy");
         releaseLocks();
 
 		if(megaApi != null) {
@@ -423,7 +423,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	 * No more intents in the queue
 	 */
 	private void onQueueComplete() {
-        log("****onQueueComplete");
+        log("onQueueComplete");
         releaseLocks();
         if (isOverquota != 0) {
             if (totalFileUploads > 0) {
@@ -515,8 +515,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
      * Show complete success notification
      */
     private void showFileUploadCompleteNotification() {
-        log("****showFileUploadCompleteNotification");
-
+        log("showFileUploadCompleteNotification");
         if (isOverquota == 0) {
             String notificationTitle, size;
             int quantity = totalFileUploadsCompletedSuccessfully == 0 ? 1 : totalFileUploadsCompletedSuccessfully;
@@ -541,8 +540,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     }
 
     private void showFolderUploadCompleteNotification() {
-        log("****showFolderUploadCompleteNotification");
-
+        log("showFolderUploadCompleteNotification");
         if (isOverquota == 0) {
             String notificationTitle = getResources().getQuantityString(R.plurals.folder_upload_service_final_notification,totalFolderUploadsCompletedSuccessfully,totalFolderUploadsCompletedSuccessfully);
             String notificationSubTitle;
@@ -661,7 +659,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 
         String message = getMessageForProgressNotification(inProgress,isFolderTransfer);
-        String logMessage = isFolderTransfer ? "****updateProgressNotificationForFolderUpload: " : "****updateProgressNotificationForFileUpload: ";
+        String logMessage = isFolderTransfer ? "updateProgressNotificationForFolderUpload: " : "updateProgressNotificationForFileUpload: ";
         log(logMessage + progressPercent + " " + message);
         String actionString = isOverquota == 0 ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
         String info = Util.getProgressSize(UploadService.this,inProgress,total);
@@ -749,10 +747,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
 	@Override
-	public void onTransferFinish(final MegaApiJava api,final MegaTransfer transfer,MegaError error) {
-		log("****onTransferFinish: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
-		log("transfer.getPath:" + transfer.getPath());
-
+	public void onTransferFinish(final MegaApiJava api, final MegaTransfer transfer, MegaError error) {
+		log("onTransferFinish: path " + transfer.getPath() + " size " + transfer.getTransferredBytes());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 
             if(isTransferBelongsToFolderTransfer(transfer)){
@@ -1006,8 +1002,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		log("****onTransferUpdate");
-
+		log("onTransferUpdate");
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
 
             if(isTransferBelongsToFolderTransfer(transfer)){
