@@ -3044,7 +3044,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			return;
 		}
 
-		fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+		fileNameTextView.setText(node.getName());
 		supportInvalidateOptionsMenu();
 
 	}
