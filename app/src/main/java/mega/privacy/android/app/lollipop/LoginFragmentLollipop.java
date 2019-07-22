@@ -878,6 +878,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("Credentials NOT null");
             if ((intentReceived != null) && (action != null)){
                 if (action.equals(Constants.ACTION_REFRESH)){
+                    MegaApplication.setLoggingIn(true);
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startLoginInProcess();
                     return v;
@@ -2134,6 +2135,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
                                     intent = new Intent(context, FolderLinkActivityLollipop.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                                     intent.setData(uriData);
                                 }
                                 else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
@@ -3027,6 +3029,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     public int onBackPressed() {
         log("onBackPressed");
+        //refresh, point to staging server, enable chat. block the back button
+        if (Constants.ACTION_REFRESH.equals(action) || Constants.ACTION_REFRESH_STAGING.equals(action) || Constants.ACTION_ENABLE_CHAT.equals(action)){
+            return -1;
+        }
         //login is in process
         boolean onLoginPage = loginLogin.getVisibility() == View.VISIBLE;
         boolean on2faPage = loginVerificationLayout.getVisibility() == View.VISIBLE;
