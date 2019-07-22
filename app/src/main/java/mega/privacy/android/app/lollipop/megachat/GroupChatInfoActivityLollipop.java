@@ -1064,7 +1064,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setSelectAllOnFocus(true);
         input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        input.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
+        input.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
