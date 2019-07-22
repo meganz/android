@@ -171,6 +171,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private final String offLineDIR = mega.privacy.android.app.utils.Util.offlineDIR;
     private final String oldMKFile = mega.privacy.android.app.utils.Util.oldMKFile;
+    public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
 
     static AudioVideoPlayerLollipop audioVideoPlayerLollipop;
 
@@ -363,6 +364,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             fileName = savedInstanceState.getString("fileName");
             handle = savedInstanceState.getLong("handle");
             uri = Uri.parse(savedInstanceState.getString("uri"));
+            log("savedInstanceState uri: "+uri);
+
             renamed = savedInstanceState.getBoolean("renamed");
             loop = savedInstanceState.getBoolean("loop");
             currentPosition = savedInstanceState.getInt("currentPosition");
@@ -376,6 +379,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             placeholderCount = savedInstanceState.getInt("placeholder", 0);
         }
         else {
+            log("savedInstanceState null");
+
             isDeleteDialogShow = false;
             onPlaylist = false;
             currentTime = 0;
@@ -384,7 +389,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             fileName = getIntent().getStringExtra("FILENAME");
             currentPosition = intent.getIntExtra("position", 0);
             placeholderCount = intent.getIntExtra("placeholder", 0);
-            playWhenReady = true;
+            playWhenReady = intent.getBooleanExtra(PLAY_WHEN_READY,true);
         }
         if (!renamed) {
             uri = intent.getData();
@@ -3533,6 +3538,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     protected void onPause() {
         super.onPause();
+        //pause either video or audio as per UX advise
+        if (player != null && player.getPlayWhenReady()) {
+            player.setPlayWhenReady(false);
+        }
         log("onPause");
     }
 

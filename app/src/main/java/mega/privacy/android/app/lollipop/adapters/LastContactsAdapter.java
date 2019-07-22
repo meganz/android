@@ -37,6 +37,9 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapter.ViewHolder> {
     
     /**
@@ -127,14 +130,9 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         String email = contact.getEmail();
         holder.contactMail = email;
         UserAvatarListener listener = new UserAvatarListener(context,holder);
-        File avatar;
-        if (context.getExternalCacheDir() != null) {
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(),email + ".jpg");
-        } else {
-            avatar = new File(context.getCacheDir().getAbsolutePath(),email + ".jpg");
-        }
+        File avatar = buildAvatarFile(context, email + ".jpg");
         Bitmap bitmap;
-        if (avatar.exists()) {
+        if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
@@ -142,28 +140,16 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(),bOpts);
                 if (bitmap == null) {
                     avatar.delete();
-                    if (context.getExternalCacheDir() != null) {
-                        megaApi.getUserAvatar(contact,context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-                    } else {
-                        megaApi.getUserAvatar(contact,context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-                    }
+                    megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
                 } else {
                     holder.contactInitialLetter.setVisibility(View.GONE);
                     holder.avatarImage.setImageBitmap(bitmap);
                 }
             } else {
-                if (context.getExternalCacheDir() != null) {
-                    megaApi.getUserAvatar(contact,context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-                } else {
-                    megaApi.getUserAvatar(contact,context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-                }
+                megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
             }
         } else {
-            if (context.getExternalCacheDir() != null) {
-                megaApi.getUserAvatar(contact,context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-            } else {
-                megaApi.getUserAvatar(contact,context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-            }
+            megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
         }
         
     }
