@@ -96,6 +96,7 @@ import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
+import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -168,7 +169,7 @@ import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 import static mega.privacy.android.app.utils.Util.context;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener {
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<AndroidMegaChatMessage> {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -390,11 +391,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private ActionMode actionMode;
 
-    private MegaNode myChatFilesNode;
     // Data being stored when My Chat Files folder does not exist
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
+
+    @Override
+    public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
+        this.preservedMessagesSelected = preservedData;
+    }
+
+    @Override
+    public void handleStoredData() {
+        forwardMessages(preservedMessagesSelected);
+        preservedMessagesSelected = null;
+    }
 
     private class UserTyping {
         MegaChatParticipant participantTyping;
@@ -2531,7 +2542,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             return;
         }
 
-        if (isMyChatFilesExisit(messagesSelected)) {
+        if (ChatUtil.existsMyChatFiles(messagesSelected, megaApi, this, this)) {
             stopReproductions();
             chatC.prepareAndroidMessagesToForward(messagesSelected, idChat);
             isForwardingMessage = true;
@@ -7335,8 +7346,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER && CHAT_FOLDER.equals(request.getName())) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("create My Chat Files, copy reserved nodes");
-                forwardMessages(preservedMessagesSelected);
-                preservedMessagesSelected = null;
+                handleStoredData();
             } else {
                 log("not create My Chat Files" + e.getErrorCode() + " " + e.getErrorString());
             }
@@ -8391,15 +8401,5 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void setShareLinkDialogDismissed (boolean dismissed) {
         isShareLinkDialogDismissed = dismissed;
-    }
-
-    private boolean isMyChatFilesExisit(ArrayList<AndroidMegaChatMessage> messagesSelected) {
-        myChatFilesNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-        if (myChatFilesNode == null) {
-            megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
-            this.preservedMessagesSelected = messagesSelected;
-            return false;
-        }
-        return true;
     }
 }
