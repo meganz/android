@@ -846,12 +846,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 			}
 
-			if (((ManagerActivityLollipop)context).getIsSearchEnabled()) {
-				showEmptySearchResults();
-			}
-			else{
-				showEmptyResults();
-			}
+			showEmptyView();
 
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
@@ -1041,11 +1036,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 			}
 
-            if (((ManagerActivityLollipop)context).getIsSearchEnabled()) {
-                showEmptySearchResults();
-            } else {
-                showEmptyResults();
-            }
+			showEmptyView();
 
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
@@ -1263,6 +1254,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			fastScroller.setRecyclerView(listView);
 			visibilityFastScroller();
 			return v;
+		}
+	}
+
+	private void showEmptyView() {
+		if (((ManagerActivityLollipop) context).getIsSearchEnabled()) {
+			showEmptySearchResults();
+		} else {
+			showEmptyResults();
 		}
 	}
 	
