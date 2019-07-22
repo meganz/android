@@ -34,6 +34,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
     private int counter = 0;
     private MegaNode parentNode;
     private ArrayList<MegaNode> nodesCopied = new ArrayList<>();
+    // The list to preserve node is not owned by user
     private ArrayList<MegaNode> preservedNotOwnerNode;
 
     public CopyAndSendToChatListener(Context context) {
