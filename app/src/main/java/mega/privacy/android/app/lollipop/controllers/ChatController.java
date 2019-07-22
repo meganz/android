@@ -47,6 +47,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -63,6 +64,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatController {
@@ -274,29 +277,42 @@ public class ChatController {
         }
     }
 
-    public void deleteMessage(MegaChatMessage message, long chatId){
+    public void deleteMessage(MegaChatMessage message, long chatId) {
         log("deleteMessage");
         MegaChatMessage messageToDelete;
-        if(message!=null){
-
-            if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                log("Delete node attachment message");
-                megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
-            }else{
-                log("Delete normal message- STATUS = "+message.getStatus());
-                if(message.getStatus() == MegaChatMessage.STATUS_SENDING){
-                    messageToDelete = megaChatApi.deleteMessage(chatId, message.getTempId());
-                }else{
-                    messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
-                }
-                if(messageToDelete==null){
-                    log("The message cannot be deleted");
-                }else{
-                    log("The message has been deleted");
-                    ((ChatActivityLollipop) context).updatingRemovedMessage(message);
-                }
+        if (message == null) return;
+        if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
+            log("deleteMessage:Delete node attachment message or voice clip message");
+            if (message.getType() == MegaChatMessage.TYPE_VOICE_CLIP && message.getMegaNodeList() != null && message.getMegaNodeList().size() > 0 && message.getMegaNodeList().get(0) != null) {
+                deleteOwnVoiceClip(context, message.getMegaNodeList().get(0).getName());
             }
+            megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
+            return;
         }
+
+        log("Delete normal message");
+        if(message.getStatus() == MegaChatMessage.STATUS_SENDING){
+            messageToDelete = megaChatApi.deleteMessage(chatId, message.getTempId());
+        }else{
+            messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
+        }
+
+        if (messageToDelete == null) {
+            log("The message cannot be deleted");
+        }else{
+            log("The message has been deleted");
+            ((ChatActivityLollipop) context).updatingRemovedMessage(message);
+        }
+    }
+
+    /*
+     * Delete a voice note from local storage
+     */
+    public static void deleteOwnVoiceClip(Context mContext, String nameFile) {
+        log("deleteOwnVoiceClip");
+        File localFile = buildVoiceClipFile(mContext, nameFile);
+        if (!isFileAvailable(localFile)) return;
+        localFile.delete();
     }
 
     public void alterParticipantsPermissions(long chatid, long uh, int privilege){
@@ -1497,8 +1513,40 @@ public class ChatController {
         }
     }
 
-    public void prepareForDownloadLollipop(final ArrayList<MegaNode> nodeList){
-        log("prepareForDownload: "+nodeList.size()+" files to download");
+    private void filePathDefault(String path, final ArrayList<MegaNode> nodeList){
+        log("filePathDefault");
+        File defaultPathF = new File(path);
+        defaultPathF.mkdirs();
+        checkSizeBeforeDownload(path, nodeList);
+    }
+
+    public void prepareForChatDownload(ArrayList<MegaNodeList> list){
+        log("prepareForChatDownload 1");
+        ArrayList<MegaNode> nodeList =  new ArrayList<>();
+        MegaNodeList megaNodeList;
+        for (int i= 0; i<list.size(); i++){
+            megaNodeList = list.get(i);
+            for (int j=0; j<megaNodeList.size(); j++){
+                nodeList.add(megaNodeList.get(j));
+            }
+        }
+        prepareForDownloadVersions(nodeList);
+    }
+
+    public void prepareForChatDownload(MegaNodeList list){
+        ArrayList<MegaNode> nodeList = MegaApiJava.nodeListToArray(list);
+        prepareForDownloadVersions(nodeList);
+    }
+
+    public void prepareForChatDownload(MegaNode node){
+        log("prepareForChatDownload - node ");
+        ArrayList<MegaNode> nodeList = new ArrayList<>();
+        nodeList.add(node);
+        prepareForDownloadVersions(nodeList);
+    }
+
+    private void prepareForDownloadVersions(final ArrayList<MegaNode> nodeList){
+        log("prepareForDownloadLollipop: "+nodeList.size()+" files to download, ");
         long size = 0;
         long[] hashes = new long[nodeList.size()];
         for (int i=0;i<nodeList.size();i++){
@@ -1520,9 +1568,16 @@ public class ChatController {
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        boolean askMe = Util.askMe(context);
+        if(!nodeList.isEmpty() && ChatUtil.isVoiceClip(nodeList.get(0).getName())){
+            File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
+            checkSizeBeforeDownload(vcFile.getParentFile().getPath(), nodeList);
+            return;
+        }
+
         String downloadLocationDefaultPath = Util.getDownloadLocation(context);
 
+
+        boolean askMe = Util.askMe(context);
         if (askMe){
             log("askMe");
             File[] fs = context.getExternalFilesDirs(null);
@@ -1582,70 +1637,13 @@ public class ChatController {
         }
         else{
             log("NOT askMe");
-            File defaultPathF = new File(downloadLocationDefaultPath);
-            defaultPathF.mkdirs();
-            checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList);
+            filePathDefault(downloadLocationDefaultPath,nodeList);
         }
-    }
-
-    public void prepareForChatDownload(ArrayList<MegaNodeList> list){
-        ArrayList<MegaNode> nodeList =  new ArrayList<>();
-        MegaNodeList megaNodeList;
-        for (int i= 0; i<list.size(); i++){
-            megaNodeList = list.get(i);
-            for (int j=0; j<megaNodeList.size(); j++){
-                nodeList.add(megaNodeList.get(j));
-            }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            prepareForDownloadLollipop(nodeList);
-        }
-        else{
-            prepareForDownloadPreLollipop(nodeList);
-        }
-    }
-
-    public void prepareForChatDownload(MegaNodeList list){
-        ArrayList<MegaNode> nodeList = MegaApiJava.nodeListToArray(list);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            prepareForDownloadLollipop(nodeList);
-        }
-        else{
-            prepareForDownloadPreLollipop(nodeList);
-        }
-    }
-
-    public void prepareForChatDownload(MegaNode node){
-        ArrayList<MegaNode> nodeList = new ArrayList<>();
-        nodeList.add(node);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            prepareForDownloadLollipop(nodeList);
-        }
-        else{
-            prepareForDownloadPreLollipop(nodeList);
-        }
-    }
-
-    public void prepareForDownloadPreLollipop(ArrayList<MegaNode> nodeList){
-        log("prepareForDownloadPreLollipop: "+nodeList.size()+" files to download");
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-        }
-
-        boolean advancedDevices=false;
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
-
-        File defaultPathF = new File(downloadLocationDefaultPath);
-        defaultPathF.mkdirs();
-        checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList);
     }
 
     public void checkSizeBeforeDownload(String parentPath, ArrayList<MegaNode> nodeList){
         //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
-        log("checkSizeBeforeDownload - parentPath: "+parentPath+ " size: "+nodeList.size());
+        log("checkSizeBeforeDownload -  size: "+nodeList.size());
 
         final String parentPathC = parentPath;
         long sizeTemp=0;
@@ -1664,11 +1662,10 @@ public class ChatController {
 
         //Check if there is available space
         double availableFreeSpace = Double.MAX_VALUE;
-        try{
+        try {
             StatFs stat = new StatFs(parentPath);
-            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-        }
-        catch(Exception ex){}
+            availableFreeSpace = stat.getAvailableBytes();
+        } catch (Exception ex) { }
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
         if(availableFreeSpace < sizeC) {
@@ -1680,6 +1677,12 @@ public class ChatController {
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
+
+        if(ChatUtil.isVoiceClip(nodeList.get(0).getName())){
+            download(parentPath, nodeList);
+            return;
+        }
+
 
         String ask=dbH.getAttributes().getAskSizeDownload();
 
@@ -1719,7 +1722,7 @@ public class ChatController {
     }
 
     public void download(String parentPath, ArrayList<MegaNode> nodeList){
-        log("download-----------");
+        log("download() ");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -1728,9 +1731,12 @@ public class ChatController {
                     ActivityCompat.requestPermissions(((ManagerActivityLollipop) context),
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             Constants.REQUEST_WRITE_STORAGE);
-                }
-                else if (context instanceof ChatFullScreenImageViewer){
+                }else if (context instanceof ChatFullScreenImageViewer){
                     ActivityCompat.requestPermissions(((ChatFullScreenImageViewer) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }else if (context instanceof ChatActivityLollipop){
+                    ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             Constants.REQUEST_WRITE_STORAGE);
                 }
@@ -1758,20 +1764,18 @@ public class ChatController {
                     tempNode = authorizeNodeIfPreview(tempNode, ((NodeAttachmentHistoryActivity) context).getChatRoom());
                 }
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-                    log("ISFILE");
+                    log("IsFile");
                     String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
                     MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
                     if(localPath != null){
                         log("localPath != null");
-                        
                         try {
-                            log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
+                            log("download:Call to copyFile: localPath: ");
                             Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
                             
                             if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
-//								MegaNode videoNode = megaApi.getNodeByHandle(tempNode.getNodeHandle());
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){
                                         log("The video has not thumb");
@@ -1793,6 +1797,8 @@ public class ChatController {
                             return;
                         }
 
+                        if(ChatUtil.isVoiceClip(nodeList.get(0).getName())) return;
+
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
                             log("MimeTypeList ZIP");
                             File zipFile = new File(localPath);
@@ -1806,7 +1812,7 @@ public class ChatController {
 
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
-                            log("Video/Audio file");
+                            log("download:Video/Audio file");
                             if (context instanceof AudioVideoPlayerLollipop){
                                 ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                             }
@@ -1891,6 +1897,7 @@ public class ChatController {
                         }
                         else {
                             log("MimeTypeList other file");
+
                             if(context instanceof ChatFullScreenImageViewer){
                                 ((ChatFullScreenImageViewer) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                             }
@@ -1931,23 +1938,20 @@ public class ChatController {
                         return;
                     }//localPath found
                     else{
-                        log("localPath is NULL");
+                        log("download:localPath is NULL");
                     }
                 }
             }
 
             for (int i=0; i<nodeList.size();i++) {
-                log("hashes.length more than 1");
                 MegaNode nodeToDownload = nodeList.get(i);
                 if(nodeToDownload != null){
-                    log("node NOT null");
+                    log("download:node NOT null is going to donwload");
                     Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
                     dlFiles.put(nodeToDownload, parentPath);
 
                     for (MegaNode document : dlFiles.keySet()) {
                         String path = dlFiles.get(document);
-                        log("path of the file: "+path);
-                        log("start service");
                         Intent service = new Intent(context, DownloadService.class);
                         if (context instanceof ChatActivityLollipop) {
                             nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((ChatActivityLollipop) context).getChatRoom());
@@ -1956,14 +1960,21 @@ public class ChatController {
                             nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((NodeAttachmentHistoryActivity) context).getChatRoom());
                         }
                         String serializeString = nodeToDownload.serialize();
+
+                        if(ChatUtil.isVoiceClip(nodeList.get(0).getName())){
+                            service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
+                            service.putExtra(Constants.EXTRA_TRANSFER_TYPE, Constants.EXTRA_VOICE_CLIP );
+                        }else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+                            service.putExtra("fromMV", true);
+                        }
+
                         log("serializeString: "+serializeString);
                         service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
                         service.putExtra(DownloadService.EXTRA_PATH, path);
                         service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
-                        if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
-                            service.putExtra("fromMV", true);
-                        }
                         context.startService(service);
+
+
                     }
                 }
                 else {
@@ -2050,7 +2061,7 @@ public class ChatController {
         for(int i=0; i<messagesSelected.size();i++){
             idMessages[i] = messagesSelected.get(i).getMsgId();
 
-            if(messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+            if((messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(messagesSelected.get(i).getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
                 if(messagesSelected.get(i).getUserHandle()!=megaChatApi.getMyUserHandle()){
                     //Node has to be imported
                     messagesToImport.add(messagesSelected.get(i));
