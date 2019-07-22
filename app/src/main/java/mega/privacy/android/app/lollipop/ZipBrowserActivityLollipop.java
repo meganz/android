@@ -704,7 +704,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		log("onBackPressed, currentPath: "+currentPath);
 		
 		if(depth<3){
-			super.callToSuperBack = true;
 			super.onBackPressed();
 		} 
 		else if (depth==3&&(!folderzipped)){

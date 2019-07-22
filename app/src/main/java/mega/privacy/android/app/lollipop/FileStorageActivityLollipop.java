@@ -950,12 +950,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		// Finish activity if at the root
 		if (path.equals(root)) {
-			super.callToSuperBack = true;
 			super.onBackPressed();
 		// Go one level higher otherwise
 		} else {

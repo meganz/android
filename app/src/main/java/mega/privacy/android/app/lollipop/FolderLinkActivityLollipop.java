@@ -203,6 +203,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 
 					onFileClick(handleList);
+					clearSelections();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -559,7 +560,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		fileLinkDownloadButton.setLayoutParams(downloadTextParams);
 
 		fileLinkImportButton = (TextView) findViewById(R.id.folder_link_file_link_button_import);
-		fileLinkImportButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
+		fileLinkImportButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		fileLinkImportButton.setOnClickListener(this);
 		//Left and Right margin
 		LinearLayout.LayoutParams importTextParams = (LinearLayout.LayoutParams)fileLinkImportButton.getLayoutParams();
@@ -785,7 +786,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
-		boolean askMe = true;
+		boolean askMe = Util.askMe(this);
 		String downloadLocationDefaultPath = "";
 		prefs = dbH.getPreferences();		
 		if (prefs != null){
@@ -898,7 +899,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
-		boolean askMe = true;
+		boolean askMe = Util.askMe(this);
 		String downloadLocationDefaultPath = Util.getDownloadLocation(this);
 			
 		if (askMe){
@@ -1157,7 +1158,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			statusDialog.setMessage(getString(R.string.general_importing));
 			statusDialog.show();
 
-			if(adapterList.isMultipleSelect()){
+			if(adapterList != null && adapterList.isMultipleSelect()){
 				log("is multiple select");
 				List<MegaNode> nodes = adapterList.getSelectedNodes();
 				if(nodes.size() != 0){
@@ -2016,8 +2017,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		if (fileLinkFolderLink){
 			fileLinkFragmentContainer.setVisibility(View.GONE);
@@ -2100,7 +2100,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		}
 
-		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 
@@ -2162,8 +2161,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						handleList.add(documents.get(i).getHandle());
 					}
 					onFileClick(handleList);
-
-				}else{
+					clearSelections();
+				} else {
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 						if (!hasStoragePermission) {

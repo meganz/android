@@ -22,6 +22,7 @@ import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.View;
 
 /**
  * A ViewPager subclass enabling infinte scrolling of the viewPager elements
@@ -45,6 +46,8 @@ import android.util.AttributeSet;
 public class LoopViewPager extends ViewPager {
 
     private static final boolean DEFAULT_BOUNDARY_CASHING = false;
+
+    private int mMaxHeight = 0;
 
     OnPageChangeListener mOuterPageChangeListener;
     private LoopPagerAdapterWrapper mAdapter;
@@ -79,6 +82,19 @@ public class LoopViewPager extends ViewPager {
         if (mAdapter != null) {
             mAdapter.setBoundaryCaching(flag);
         }
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            child.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+            int h = child.getMeasuredHeight();
+            if (h > mMaxHeight) mMaxHeight = h;
+        }
+
+        if (mMaxHeight != 0) heightMeasureSpec = MeasureSpec.makeMeasureSpec(mMaxHeight, MeasureSpec.EXACTLY);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override

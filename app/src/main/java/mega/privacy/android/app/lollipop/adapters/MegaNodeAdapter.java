@@ -123,7 +123,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public View separator;
         public ImageView imageViewVideoIcon;
         public TextView videoDuration;
-        public RelativeLayout videoInfoLayout;
+        public RelativeLayout videoInfoLayout, bottomContainer;
         public ImageButton imageButtonThreeDots;
 
         public View folderLayout;
@@ -541,6 +541,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderGrid.videoDuration = (TextView)v.findViewById(R.id.file_grid_title_video_duration);
             holderGrid.videoInfoLayout = (RelativeLayout)v.findViewById(R.id.item_file_videoinfo_layout);
             holderGrid.fileGridSelected = (ImageView)v.findViewById(R.id.file_grid_selected);
+            holderGrid.bottomContainer = v.findViewById(R.id.grid_bottom_container);
+            holderGrid.bottomContainer.setTag(holderGrid);
+            holderGrid.bottomContainer.setOnClickListener(this);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(70,outMetrics));
@@ -1276,6 +1279,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             return;
         }
         switch (v.getId()) {
+            case R.id.grid_bottom_container:
             case R.id.file_list_three_dots_layout:
             case R.id.file_grid_three_dots: {
                 threeDotsClicked(currentPosition,n);

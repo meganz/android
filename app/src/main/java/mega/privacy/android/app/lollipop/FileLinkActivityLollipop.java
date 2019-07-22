@@ -221,7 +221,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		downloadButton.setVisibility(View.INVISIBLE);
 
 		importButton = (TextView) findViewById(R.id.file_link_button_import);
-		importButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
+		importButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		importButton.setOnClickListener(this);
 		importButton.setVisibility(View.GONE);
 
@@ -759,11 +759,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					mediaIntent.setDataAndType(parsedUri, mimeType);
 				} else {
 					log("showFile:ERROR:httpServerGetLocalLink");
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 				}
 			} else {
 				log("showFile:ERROR:httpServerGetLocalLink");
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 			}
 
 			mediaIntent.putExtra("HANDLE", document.getHandle());
@@ -819,12 +819,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					}
 					else{
 						log("showFile:ERROR:httpServerGetLocalLink");
-						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 					}
 				}
 				else{
 					log("showFile:ERROR:httpServerGetLocalLink");
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 				}
 			}
 			else {
@@ -843,14 +843,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			log("none");
 		}
 	}
-
-	@Override
-	public void onBackPressed() {
-		log("onBackPressed");
-		super.callToSuperBack = true;
-		super.onBackPressed();
-	}
-	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 

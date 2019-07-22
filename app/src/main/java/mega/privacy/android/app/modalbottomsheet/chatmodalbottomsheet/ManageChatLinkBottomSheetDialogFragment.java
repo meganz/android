@@ -17,6 +17,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 
@@ -92,7 +93,7 @@ public class ManageChatLinkBottomSheetDialogFragment extends BottomSheetDialogFr
             }
 
             case R.id.manage_chat_link_delete_layout: {
-                ((GroupChatInfoActivityLollipop) context).showConfirmationRemoveChatLink();
+                ChatUtil.showConfirmationRemoveChatLink(context);
                 break;
             }
         }
