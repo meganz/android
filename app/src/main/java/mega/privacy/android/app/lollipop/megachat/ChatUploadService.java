@@ -346,7 +346,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
 			}
 		}
-	}
 
 	void initUpload (ArrayList<PendingMessageSingle> pendingMsgs, String type) {
 		log("initUpload");
