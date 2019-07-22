@@ -432,6 +432,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				log("intent==null");
 			}*/	
 			startActivity(loginIntent);
+			finish();
 			return;
 		}
 		else{
@@ -521,7 +522,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (ret == MegaChatApi.INIT_NO_CACHE)
 						{
 							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-							megaChatApi.enableGroupChatCalls(true);
 
 						}
 						else if (ret == MegaChatApi.INIT_ERROR)
@@ -544,7 +544,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						else{
 							log("onCreate: Chat correctly initialized");
-							megaChatApi.enableGroupChatCalls(true);
 						}
 					}
 				}
@@ -848,10 +847,19 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (mTabsAdapterExplorer == null){
 							tabLayoutExplorer.setVisibility(View.VISIBLE);
 							viewPagerExplorer.setVisibility(View.VISIBLE);
-							mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
+                            if (Util.isChatEnabled()) {
+                                mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
+                            }
+                            else {
+                            	isChatFirst = false;
+                                mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
+                            }
 							viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 							tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
+							if (!Util.isChatEnabled() && mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2) {
+                                tabLayoutExplorer.removeTabAt(2);
+                            }
 						}
 					}
 					else{
@@ -1542,8 +1550,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed: "+tabShown);
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		String cFTag;
 		if(tabShown==CLOUD_TAB){
@@ -1623,7 +1630,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else{
-			super.callToSuperBack = true;
 			super.onBackPressed();
 		}
 
@@ -2600,7 +2606,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	public void setToolbarSubtitle(String s) {
-		aB.setSubtitle(s);
+		if(aB != null) {
+			aB.setSubtitle(s);
+		}
 	}
 	
 	@Override
@@ -3486,6 +3494,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	ChatExplorerFragment getChatExplorerFragment () {
+
+		if (!Util.isChatEnabled()) {
+			return null;
+		}
+
 		String chatTag1;
 		if (importFileF) {
 			chatTag1  ="chatExplorer";

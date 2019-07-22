@@ -345,7 +345,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		long nodeHandle = -1;
 
 		if (savedInstanceState != null){
-			nodeHandle = savedInstanceState.getLong("nodeHandle", -1);
+			nodeHandle = savedInstanceState.getLong(Constants.EXTRA_NODE_HANDLE, -1);
 		}
 
 	    Bundle extras = getIntent().getExtras();
@@ -616,13 +616,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			MegaNode n = nodeVersions.get(position);
 			showOptionsPanel(n, position);
 		}
-	}
-
-	@Override
-	public void onBackPressed() {
-		log("onBackPressed");
-		super.callToSuperBack = true;
-		super.onBackPressed();
 	}
 	
 	private void updateActionModeTitle() {
@@ -1011,7 +1004,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	public void onSaveInstanceState(Bundle outState) {
 		log("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
-		outState.putLong("nodeHandle", node.getHandle());
+		outState.putLong(Constants.EXTRA_NODE_HANDLE, node.getHandle());
 	}
 }
 

@@ -535,7 +535,6 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Vstúpiť</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Po 10 neúspešných pokusoch budú vaše lokálne súbory zmazané a vy budete odhlásený.</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Nesprávny kód</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Neplatný PIN kód, prosím skúste to znovu. Zostáva vám %2d pokusov.</string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN kódy sa nezhodujú</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Zadajte váš PIN kód</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Znovu zadajte váš PIN kód</string>

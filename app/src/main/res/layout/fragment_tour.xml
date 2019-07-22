@@ -2,7 +2,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:id="@+id/tour_fragment_base_container">
 
     <RelativeLayout
         android:id="@+id/tour_fragment_container"
@@ -18,7 +19,7 @@
             <mega.privacy.android.app.components.LoopViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
-                android:layout_height="434dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="top|center_horizontal"/>
 
             <LinearLayout
