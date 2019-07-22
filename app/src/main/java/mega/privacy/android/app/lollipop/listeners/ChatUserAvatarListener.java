@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.listeners;
 
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 
 import java.io.File;
 
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
@@ -17,6 +15,9 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
@@ -36,11 +37,10 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         log("onRequestFinish(): "+e.getErrorCode());
-        if (e.getErrorCode() == MegaError.API_OK){
 
+        if (e.getErrorCode() == MegaError.API_OK){
             Bitmap bitmap;
             String email;
-
             if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
                 MegaListChatLollipopAdapter.ViewHolderNormalChatList viewHolder = (MegaListChatLollipopAdapter.ViewHolderNormalChatList) holder;
                 if(viewHolder !=null && viewHolder.getContactMail()!=null && request.getEmail()!=null){
@@ -86,21 +86,6 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                     log("Adapter cannot be updated - null");
                 }
             }
-            else if (holder instanceof GroupCallAdapter.ViewHolderGroupCall) {
-                GroupCallAdapter.ViewHolderGroupCall viewHolder = (GroupCallAdapter.ViewHolderGroupCall) holder;
-                if(viewHolder !=null && viewHolder.getEmail()!=null && request.getEmail()!=null){
-                    email = viewHolder.getEmail();
-                    if (email.compareTo(request.getEmail()) == 0){
-                        bitmap = getBitmap(email);
-                        if (bitmap != null) {
-                            viewHolder.setAvatarImage(bitmap);
-                        }
-                    }
-                }
-                else{
-                    log("Adapter cannot be updated - null");
-                }
-            }
         }
     }
 
@@ -115,16 +100,9 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
     }
 
     private Bitmap getBitmap(String email) {
-        File avatar;
+        File avatar = buildAvatarFile(context, email + ".jpg");
         Bitmap bitmap;
-
-        if (context.getExternalCacheDir() != null){
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-        }
-        else{
-            avatar = new File(context.getCacheDir().getAbsolutePath(), email + ".jpg");
-        }
-        if (avatar.exists()){
+        if (isFileAvailable(avatar)){
             if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;

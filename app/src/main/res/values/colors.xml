@@ -61,6 +61,8 @@
     <color name="filter_icon">#8d8d94</color>
     <color name="upgrade_white">#b9ffffff</color>
     <color name="delete_account">#ff333a</color>
+    <color name="ic_mic_read_message">#9e9e9e</color>
+    <color name="ic_mic_unread_message">#00bfa5</color>
 
     <color name="name_my_account">#de000000</color>
     <color name="mail_my_account">#8a000000</color>
@@ -183,4 +185,12 @@
     <!-- DIALOGS -->
     <color name="dialog_title">#FF333333</color>
     <color name="dialog_text">#FF666666</color>
+
+    <color name="permissions_image_adapter">#FFEEEEEE</color>
+
+    <color name="statusbar_tour_1">#FFCC6B6B</color>
+    <color name="statusbar_tour_2">#FF42A6BF</color>
+    <color name="statusbar_tour_3">#FFCC7300</color>
+    <color name="statusbar_tour_4">#FF00948C</color>
+
 </resources>

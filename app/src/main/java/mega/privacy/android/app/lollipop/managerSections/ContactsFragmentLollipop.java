@@ -53,6 +53,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -73,6 +74,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public class ContactsFragmentLollipop extends Fragment implements MegaRequestListenerInterface, View.OnClickListener{
 
@@ -221,13 +224,15 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				avatarImage.buildDrawingCache(true);
 				Bitmap avatarBitmap = avatarImage.getDrawingCache(true);
 
-				ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
-				avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
-				byte[] avatarByteArray = avatarOutputStream.toByteArray();
-				outState.putByteArray("avatar", avatarByteArray);
-				outState.putBoolean("contentAvatar", contentAvatar);
+				if (avatarBitmap != null) {
+					ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
+					avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
+					byte[] avatarByteArray = avatarOutputStream.toByteArray();
+					outState.putByteArray("avatar", avatarByteArray);
+					outState.putBoolean("contentAvatar", contentAvatar);
+				}
 			}
-			if (!contentAvatar){
+			if (!contentAvatar && initialLetterInvite != null){
 				outState.putString("initialLetter", initialLetterInvite.getText().toString());
 			}
 		}
@@ -335,24 +340,13 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			File avatar = null;
 			if(context!=null){
 				log("context is not null");
-
-				if (context.getExternalCacheDir() != null){
-					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-				}
-				else{
-					avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-				}
+                avatar = buildAvatarFile(context, myEmail + ".jpg");
 			}
 			else{
 				log("context is null!!!");
 				if(getActivity()!=null){
 					log("getActivity is not null");
-					if (getActivity().getExternalCacheDir() != null){
-						avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-					}
-					else{
-						avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-					}
+                    avatar = buildAvatarFile(getActivity(), myEmail + ".jpg");
 				}
 				else{
 					log("getActivity is ALSOOO null");
@@ -360,7 +354,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 			}
 
-			if(avatar!=null){
+			if(isFileAvailable(avatar)){
 				setProfileAvatar(avatar);
 			}
 			else{
@@ -508,7 +502,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 		});
 
-		((ManagerActivityLollipop) context).handleInviteContact = 0;
+		((ManagerActivityLollipop) context).deleteInviteContactHandle();
 	}
 
 	public void showAlertDialog (int title, int text, final boolean success) {
@@ -571,7 +565,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			case R.id.view_contact: {
 				inviteShown = false;
-				((ManagerActivityLollipop) context).handleInviteContact = 0;
 				if (inviteAlertDialog != null){
 					inviteAlertDialog.dismiss();
 				}
@@ -620,15 +613,16 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 						log("Selected contact NULL");
 						break;
 					}
-					if(users.size()  == 1){
-						((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
-					}else{
-						for(int i=0;i<users.size();i++){
-							contactHandles.add(users.get(i).getHandle());
-						}
-
-						((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
+					ArrayList<String> contactsNewGroup = new ArrayList<>();
+					for(int i=0;i<users.size();i++){
+						contactsNewGroup.add(users.get(i).getEmail());
 					}
+
+					Intent intent = new Intent(context, AddContactActivityLollipop.class);
+					intent.putStringArrayListExtra("contactsNewGroup", contactsNewGroup);
+					intent.putExtra("newGroup", true);
+					intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+					((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT);
 
 					clearSelections();
 					hideMultipleSelect();

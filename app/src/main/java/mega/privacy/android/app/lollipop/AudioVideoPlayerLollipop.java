@@ -171,6 +171,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private final String offLineDIR = mega.privacy.android.app.utils.Util.offlineDIR;
     private final String oldMKFile = mega.privacy.android.app.utils.Util.oldMKFile;
+    public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
 
     static AudioVideoPlayerLollipop audioVideoPlayerLollipop;
 
@@ -323,8 +324,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     boolean isZip = false;
     GetMediaFilesTask getMediaFilesTask;
 
-    boolean sendToChat = false;
-
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -365,6 +364,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             fileName = savedInstanceState.getString("fileName");
             handle = savedInstanceState.getLong("handle");
             uri = Uri.parse(savedInstanceState.getString("uri"));
+            log("savedInstanceState uri: "+uri);
+
             renamed = savedInstanceState.getBoolean("renamed");
             loop = savedInstanceState.getBoolean("loop");
             currentPosition = savedInstanceState.getInt("currentPosition");
@@ -378,6 +379,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             placeholderCount = savedInstanceState.getInt("placeholder", 0);
         }
         else {
+            log("savedInstanceState null");
+
             isDeleteDialogShow = false;
             onPlaylist = false;
             currentTime = 0;
@@ -386,7 +389,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             fileName = getIntent().getStringExtra("FILENAME");
             currentPosition = intent.getIntExtra("position", 0);
             placeholderCount = intent.getIntExtra("placeholder", 0);
-            playWhenReady = true;
+            playWhenReady = intent.getBooleanExtra(PLAY_WHEN_READY,true);
         }
         if (!renamed) {
             uri = intent.getData();
@@ -637,7 +640,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if (msgId != -1 && chatId != -1){
                         msgChat = megaChatApi.getMessage(chatId, msgId);
                         if (msgChat != null){
-                            nodeChat = msgChat.getMegaNodeList().get(0);
+                            nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
                             if (isDeleteDialogShow) {
                                 showConfirmationDeleteNode(chatId, msgChat);
                             }
@@ -973,6 +976,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             else{
                 ArrayList<MegaNode> nodes = null;
                 if (adapterType == Constants.FOLDER_LINK_ADAPTER) {
+                    if(megaApiFolder == null){
+                        MegaApplication app = (MegaApplication)getApplication();
+                        megaApiFolder = app.getMegaApiFolder();
+                    }
                     if (parentNodeHandle == -1) {
                         parentNode = megaApiFolder.getRootNode();
                     }
@@ -2162,50 +2169,36 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
 
-                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle())) {
-                        if (msgChat.isDeletable()){
-                            chatRemoveMenuItem.setVisible(true);
-                        }
-                        else {
-                            chatRemoveMenuItem.setVisible(false);
-                        }
+                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle()) && msgChat.isDeletable()) {
+                        chatRemoveMenuItem.setVisible(true);
                     }
                     else {
-                        log("The message is not mine");
+                        chatRemoveMenuItem.setVisible(false);
+                    }
+                }
+                else if (nodeChat != null){
+                    downloadMenuItem.setVisible(true);
+                    if (chatC.isInAnonymousMode()) {
+                        importMenuItem.setVisible(false);
+                        saveForOfflineMenuItem.setVisible(false);
+                    }
+                    else {
+                        importMenuItem.setVisible(true);
+                        saveForOfflineMenuItem.setVisible(true);
+                    }
+
+                    if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle() && msgChat.isDeletable()) {
+                        chatRemoveMenuItem.setVisible(true);
+                    }
+                    else {
                         chatRemoveMenuItem.setVisible(false);
                     }
                 }
                 else {
-                    if (nodeChat != null){
-                        downloadMenuItem.setVisible(true);
-                        importMenuItem.setVisible(true);
-                        saveForOfflineMenuItem.setVisible(true);
-
-                        if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle()) {
-                            if((megaApi.getNodeByHandle(nodeChat.getHandle()))==null){
-                                log("The node is not mine");
-                                chatRemoveMenuItem.setVisible(false);
-                            }
-                            else{
-                                if(msgChat.isDeletable()){
-                                    chatRemoveMenuItem.setVisible(true);
-                                }
-                                else{
-                                    chatRemoveMenuItem.setVisible(false);
-                                }
-                            }
-                        }
-                        else {
-                            log("The message is not mine");
-                            chatRemoveMenuItem.setVisible(false);
-                        }
-                    }
-                    else {
-                        downloadMenuItem.setVisible(false);
-                        importMenuItem.setVisible(false);
-                        saveForOfflineMenuItem.setVisible(false);
-                        chatRemoveMenuItem.setVisible(false);
-                    }
+                    downloadMenuItem.setVisible(false);
+                    importMenuItem.setVisible(false);
+                    saveForOfflineMenuItem.setVisible(false);
+                    chatRemoveMenuItem.setVisible(false);
                 }
             }
             else if (adapterType == Constants.FILE_LINK_ADAPTER) {
@@ -2480,14 +2473,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if(nC ==null){
                     nC = new NodeController(this, isFolderLink);
                 }
-                if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
-                    MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
-                    if (attachNode != null) {
-                        nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
-                    }
-                }
-                else {
-                    nC.selectChatsToSendNodes(longArray);
+
+                MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+                if (attachNode != null) {
+                    nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
                 }
 
                 break;
@@ -2565,7 +2554,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     chatC = new ChatController(this);
                 }
                 if (msgChat != null){
-                    chatC.saveForOffline(msgChat.getMegaNodeList());
+                    chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId));
                 }
                 break;
             }
@@ -3340,8 +3329,25 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
                 nC.downloadTo(currentDocument, parentPath, uri.toString());
             }
+            else if (adapterType == Constants.FROM_CHAT) {
+                long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+                if (hashes != null) {
+                    ArrayList<MegaNode> megaNodes = new ArrayList<>();
+                    for (int i=0; i<hashes.length; i++) {
+                        MegaNode node = megaApi.getNodeByHandle(hashes[i]);
+                        if (node != null) {
+                            megaNodes.add(node);
+                        }
+                        else {
+                            log("Node NULL, not added");
+                        }
+                    }
+                    if (megaNodes.size() > 0) {
+                        chatC.checkSizeBeforeDownload(parentPath, megaNodes);
+                    }
+                }
+            }
             else {
-
                 String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
                 long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
                 long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
@@ -3532,6 +3538,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     protected void onPause() {
         super.onPause();
+        //pause either video or audio as per UX advise
+        if (player != null && player.getPlayWhenReady()) {
+            player.setPlayWhenReady(false);
+        }
         log("onPause");
     }
 
@@ -3815,11 +3825,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void onBackPressed() {
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         if (!onPlaylist){
-            super.callToSuperBack = true;
             super.onBackPressed();
             if (megaApi != null) {
                 megaApi.removeTransferListener(this);
@@ -4156,17 +4164,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
-                        && adapterType == Constants.INCOMING_SHARES_ADAPTER) {
-                    log("Incoming node copied to Send to chat");
-                    MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
-                    if (attachNode != null) {
-                        nC.selectChatsToSendNode(attachNode);
-                    }
-                }
-                else {
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
-                }
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
                 log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -4185,7 +4183,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             else{
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
             }
-            sendToChat = false;
             log("copy nodes request finished");
         }
     }
@@ -4391,6 +4388,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         else {
                             n = megaApi.getNodeByHandle(mediaHandles.get(i));
                         }
+                        //either authorizeNode or getNodeByHandle can return null, so need to check
+                        if(n == null){
+                            continue;
+                        }
                         mSource = null;
                         boolean isOnMegaDownloads = false;
                         localPath = mega.privacy.android.app.utils.Util.getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
@@ -4547,9 +4548,5 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public boolean isCreatingPlaylist () {
         return creatingPlaylist;
-    }
-
-    public void setSendToChat (boolean sendToChat) {
-        this.sendToChat = sendToChat;
     }
 }

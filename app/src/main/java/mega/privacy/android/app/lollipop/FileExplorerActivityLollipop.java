@@ -63,8 +63,8 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
-import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -266,7 +266,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			log("Create chat request finish.");
-			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
 			log("Attach file request finish.");
@@ -432,6 +432,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				log("intent==null");
 			}*/	
 			startActivity(loginIntent);
+			finish();
 			return;
 		}
 		else{
@@ -514,13 +515,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					int ret = megaChatApi.getInitState();
 
-					if(ret==0||ret==MegaChatApi.INIT_ERROR){
+					if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
 						ret = megaChatApi.init(gSession);
 						log("onCreate: result of init ---> "+ret);
 						chatSettings = dbH.getChatSettings();
 						if (ret == MegaChatApi.INIT_NO_CACHE)
 						{
 							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+
 						}
 						else if (ret == MegaChatApi.INIT_ERROR)
 						{
@@ -542,7 +544,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						else{
 							log("onCreate: Chat correctly initialized");
-							megaChatApi.enableGroupChatCalls(true);
 						}
 					}
 				}
@@ -846,10 +847,19 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (mTabsAdapterExplorer == null){
 							tabLayoutExplorer.setVisibility(View.VISIBLE);
 							viewPagerExplorer.setVisibility(View.VISIBLE);
-							mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
+                            if (Util.isChatEnabled()) {
+                                mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
+                            }
+                            else {
+                            	isChatFirst = false;
+                                mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
+                            }
 							viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 							tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
+							if (!Util.isChatEnabled() && mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2) {
+                                tabLayoutExplorer.removeTabAt(2);
+                            }
 						}
 					}
 					else{
@@ -1540,8 +1550,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed: "+tabShown);
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		String cFTag;
 		if(tabShown==CLOUD_TAB){
@@ -1621,7 +1630,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else{
-			super.callToSuperBack = true;
 			super.onBackPressed();
 		}
 
@@ -2085,7 +2093,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			finishActivity();
 		}
 		else{
-			showSnackbar(getString(R.string.email_verification_text_error));
+			showSnackbar(getString(R.string.general_text_error));
 		}
 	}
 
@@ -2598,7 +2606,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	public void setToolbarSubtitle(String s) {
-		aB.setSubtitle(s);
+		if(aB != null) {
+			aB.setSubtitle(s);
+		}
 	}
 	
 	@Override
@@ -2665,6 +2675,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 				else{
+					log("Create GROUP chat");
 					MegaChatPeerList peers = MegaChatPeerList.createInstance();
 					for (int i=0; i<contactsData.size(); i++){
 						MegaUser user = megaApi.getContact(contactsData.get(i));
@@ -2673,20 +2684,34 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 					}
 					log("create group chat with participants: "+peers.size());
+
 					final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
-					if(chatTitle!=null){
-						CreateGroupChatWithTitle listener = new CreateGroupChatWithTitle(this, chatTitle);
-						megaChatApi.createChat(true, peers, listener);
+					final boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
+					if (isEKR) {
+						megaChatApi.createChat(true, peers, chatTitle, this);
 					}
-					else{
-						megaChatApi.createChat(true, peers, this);
+					else {
+						final boolean chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
+
+						if(chatLink){
+							if(chatTitle!=null && !chatTitle.isEmpty()){
+								CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
+								megaChatApi.createPublicChat(peers, chatTitle, listener);
+							}
+							else{
+								Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
+							}
+						}
+						else{
+							megaChatApi.createPublicChat(peers, chatTitle, this);
+						}
 					}
 				}
 			}
 		}
 	}
 
-	public void onRequestFinishCreateChat(int errorCode, long chatHandle){
+	public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean publicLink){
 		log("onRequestFinishCreateChat");
 
 		if(errorCode==MegaChatError.ERROR_OK){
@@ -3469,6 +3494,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	ChatExplorerFragment getChatExplorerFragment () {
+
+		if (!Util.isChatEnabled()) {
+			return null;
+		}
+
 		String chatTag1;
 		if (importFileF) {
 			chatTag1  ="chatExplorer";

@@ -1,135 +1,156 @@
 package mega.privacy.android.app.lollipop.listeners;
 
-import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.io.File;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
-import mega.privacy.android.app.lollipop.megachat.calls.InfoPeerGroupCall;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
-public class CallNonContactNameListener implements MegaChatRequestListenerInterface {
+public class CallNonContactNameListener implements MegaChatRequestListenerInterface, MegaRequestListenerInterface {
 
     Context context;
-    ArrayList<InfoPeerGroupCall> peers;
-    boolean isUserHandle;
     DatabaseHandler dbH;
-    String firstName;
-    String lastName;
     String mail;
     long peerId;
-    boolean receivedFirstName = false;
-    boolean receivedLastName = false;
-    boolean receivedEmail = false;
-    MegaApiAndroid megaApi;
+    boolean isAvatar;
+    String name;
+    int position;
+    RecyclerView.ViewHolder holder;
+    RecyclerView.Adapter adapter;
 
-    public CallNonContactNameListener(Context context, long peerId) {
+    public CallNonContactNameListener(Context context, long peerId, boolean isAvatar, String name) {
+        log("CallNonContactNameListener");
+
         this.context = context;
-        this.isUserHandle = true;
         this.peerId = peerId;
+        this.isAvatar = isAvatar;
+        this.name = name;
+        this.holder = null;
+        this.adapter = null;
+        this.position = -1;
         dbH = DatabaseHandler.getDbHandler(context);
-
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
     }
 
-    public CallNonContactNameListener(Context context) {
+    public CallNonContactNameListener(Context context, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter, long peerId, String fullName, int position) {
+        log("CallNonContactNameListener");
+
         this.context = context;
+        this.peerId = peerId;
+        this.name = fullName;
+        this.isAvatar = false;
         dbH = DatabaseHandler.getDbHandler(context);
-
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if(adapter instanceof GroupCallAdapter){
+            this.holder = (GroupCallAdapter.ViewHolderGroupCall) holder;
+            this.adapter = (GroupCallAdapter) adapter;
+            this.position = position;
+        }else{
+            this.holder = null;
+            this.adapter = null;
+            this.position = -1;
         }
     }
 
-    private static void log(String log) {
-        Util.log("CallNonContactNameListener", log);
-    }
 
     @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
+    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) { }
 
     @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
+    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) { }
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish()");
+        if(request.getType()==MegaChatRequest.TYPE_GET_EMAIL){
+            if (e.getErrorCode() == MegaError.API_OK){
+                log("onRequestFinish:TYPE_GET_EMAIL OK");
 
-        if (e.getErrorCode() == MegaError.API_OK){
-            if(request.getType()==MegaChatRequest.TYPE_GET_FIRSTNAME){
-                firstName = request.getText();
-                receivedFirstName = true;
-                if(firstName!=null){
-                    if(!firstName.trim().isEmpty()){
-                        dbH.setNonContactFirstName(firstName, request.getUserHandle()+"");
-                    }
-                }
-                log("onRequestFinish(): firstName = "+firstName);
-
-                updateName(firstName);
-
-            }else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
-                log("->Last name received");
-                lastName = request.getText();
-                receivedLastName = true;
-                if(lastName!=null){
-                    if(!lastName.trim().isEmpty()){
-                        dbH.setNonContactFirstName(lastName, request.getUserHandle()+"");
-                    }
-                }
-                log("onRequestFinish(): lastName = "+lastName);
-
-                updateName(lastName);
-
-            }else if(request.getType()==MegaChatRequest.TYPE_GET_EMAIL){
                 mail = request.getText();
-                receivedEmail = true;
                 if(mail!=null){
                     if(!mail.trim().isEmpty()){
                         dbH.setNonContactEmail(mail, request.getUserHandle()+"");
                     }
                 }
-                log("onRequestFinish(): mail = "+mail);
-
-                updateName(mail);
+                if((holder!=null)&&(holder instanceof GroupCallAdapter.ViewHolderGroupCall)){
+                    log("onRequestFinish:GroupCallAdapter:setProfile");
+                    ((GroupCallAdapter) adapter).setProfile(peerId, name, mail, (GroupCallAdapter.ViewHolderGroupCall)holder, position);
+                }else{
+                    if(isAvatar){
+                        log("onRequestFinish:PeerSelected:setProfilePeerSelected");
+                        ((ChatCallActivity)context).setProfilePeerSelected(peerId, name, mail);
+                    }else{
+                        log("onRequestFinish:GetName:updateNonContactName");
+                        ((ChatCallActivity)context).updateNonContactName(peerId, mail);
+                    }
+                }
+            }else{
+                log("ERROR: TYPE_GET_EMAIL: "+request.getRequestString());
             }
         }
-        else{
-            log("ERROR: requesting: "+request.getRequestString());
+
         }
-    }
 
-    public void updateName(String name){
-         if(receivedFirstName&&receivedLastName&&receivedEmail){
-             ((ChatCallActivity)context).updateNonContactName(this.peerId, name);
-            receivedFirstName = false;
-            receivedLastName = false;
-            receivedEmail = false;
-         }
+    @Override
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {}
 
+
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+        log("onRequestStart()");
     }
 
     @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestFinish(): "+e.getErrorCode());
+        if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
 
+            if (e.getErrorCode() != MegaError.API_OK) {
+                log("onRequestFinish:TYPE_GET_ATTR_USER: OK");
+                if((holder!=null) && (holder instanceof GroupCallAdapter.ViewHolderGroupCall)){
+                    File avatar = buildAvatarFile(context, request.getEmail() + ".jpg");
+                    Bitmap bitmap = null;
+                    if (isFileAvailable(avatar)){
+                        if (avatar.length() > 0){
+                            BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                            bOpts.inPurgeable = true;
+                            bOpts.inInputShareable = true;
+                            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                            if (bitmap == null) {
+                                avatar.delete();
+                            }else{
+                                log("onRequestFinish:GroupCallAdapter:setImageView ");
+                                ((GroupCallAdapter.ViewHolderGroupCall) holder).setImageView(bitmap);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) { }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) { }
+
+    private static void log(String log) {
+        Util.log("CallNonContactNameListener", log);
     }
 }

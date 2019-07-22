@@ -100,6 +100,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     String firstNameTemp = null;
     String lastNameTemp = null;
 
+    static boolean isBackFromLoginPage;
+    static boolean isFetchingNodes;
+
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -198,7 +201,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
-
+        isBackFromLoginPage = false;
         showFragment(visibleFragment);
     }
 
@@ -215,7 +218,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 switch (visibleFragment) {
                     case Constants.LOGIN_FRAGMENT: {
                         if (loginFragment != null && loginFragment.isAdded()) {
-                            loginFragment.returnToLogin();
+//                            loginFragment.returnToLogin();
+                            onBackPressed();
                         }
                         break;
                     }
@@ -245,33 +249,18 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 log("showLoginFragment");
                 if (loginFragment == null) {
                     loginFragment = new LoginFragmentLollipop();
-                    if ((passwdTemp != null) && (emailTemp != null)) {
-                        loginFragment.setEmailTemp(emailTemp);
-                        loginFragment.setPasswdTemp(passwdTemp);
-//						emailTemp = null;
-//						passwdTemp = null;
-//						nameTemp = null;
-                    }
-                } else {
-                    if ((passwdTemp != null) && (emailTemp != null)) {
-                        loginFragment.setEmailTemp(emailTemp);
-                        loginFragment.setPasswdTemp(passwdTemp);
-//						emailTemp = null;
-//						passwdTemp = null;
-//						nameTemp = null;
-                    }
+                }
+                if ((passwdTemp != null) && (emailTemp != null)) {
+                    loginFragment.setEmailTemp(emailTemp);
+                    loginFragment.setPasswdTemp(passwdTemp);
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-                }
+                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+
 //				getFragmentManager()
 //						.beginTransaction()
 //						.attach(loginFragment)
@@ -325,13 +314,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, tourFragment);
                 ft.commitNowAllowingStateLoss();
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-                }
                 break;
             }
             case Constants.CONFIRM_EMAIL_FRAGMENT: {
@@ -571,8 +553,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         int valueReturn = -1;
 
@@ -604,7 +585,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
 
         if (valueReturn == 0) {
-            super.callToSuperBack = true;
             super.onBackPressed();
         }
     }

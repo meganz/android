@@ -7,10 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -27,16 +24,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 /**
  * Created by mega on 28/11/17.
@@ -85,15 +83,15 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
 
         holder = new ViewHolderChips(v);
         holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
+        holder.itemLayout.setOnClickListener(this);
 
         holder.textViewName = (TextView) v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
 
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
-        holder.deleteIcon.setOnClickListener(this);
 
-        holder.deleteIcon.setTag(holder);
+        holder.itemLayout.setTag(holder);
 
         v.setTag(holder);
 
@@ -152,7 +150,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
                 return;
             }
             switch (view.getId()) {
-                case R.id.delete_icon_chip: {
+                case R.id.item_layout_chip: {
                     ((AddContactActivityLollipop) context).deleteContact(currentPosition);
                     break;
                 }
@@ -210,14 +208,9 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
             return createDefaultAvatar(contact.getFullName(), contact);
         }
 
-        if (context.getExternalCacheDir() != null){
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), mail + ".jpg");
-        }
-        else{
-            avatar = new File(context.getCacheDir().getAbsolutePath(), mail + ".jpg");
-        }
+        avatar = buildAvatarFile(context, mail + ".jpg");
         Bitmap bitmap = null;
-        if (avatar.exists()){
+        if (isFileAvailable(avatar)){
             if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;

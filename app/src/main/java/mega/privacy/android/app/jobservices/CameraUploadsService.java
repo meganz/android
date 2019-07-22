@@ -1198,7 +1198,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
 
                                             int ret = megaChatApi.getInitState();
 
-                                            if (ret == 0 || ret == MegaChatApi.INIT_ERROR) {
+                                            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
                                                 ret = megaChatApi.init(gSession);
                                                 log("shouldRun: result of init ---> " + ret);
                                                 chatSettings = dbH.getChatSettings();
@@ -1219,7 +1219,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                                     megaChatApi.logout(cameraUploadsService);
                                                 } else {
                                                     log("shouldRun: Chat correctly initialized");
-                                                    megaChatApi.enableGroupChatCalls(true);
                                                 }
                                             }
                                         }
@@ -1464,7 +1463,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         String previousIP = app.getLocalIpAddress();
-        String currentIP = Util.getLocalIpAddress();
+        String currentIP = Util.getLocalIpAddress(getApplicationContext());
         if (previousIP == null || (previousIP.length() == 0) || (previousIP.compareTo("127.0.0.1") == 0)) {
             app.setLocalIpAddress(currentIP);
         }
