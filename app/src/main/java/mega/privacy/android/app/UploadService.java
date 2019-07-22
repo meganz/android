@@ -439,7 +439,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             //Delete recursively all files and folder
             if (f.exists()) {
                 if (f.isDirectory()) {
-                    if (f.list().length <= 0) {
+                    if (f.list() != null && f.list().length <= 0) {
                         f.delete();
                     }
                 }
