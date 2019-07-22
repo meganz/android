@@ -1,8 +1,6 @@
 package mega.privacy.android.app.interfaces;
 
-import java.util.ArrayList;
-
-public interface MyChatFilesExisitListener<T extends Object> {
-    void storedUnhandledData(ArrayList<T> preservedData);
+public interface MyChatFilesExisitListener<T> {
+    void storedUnhandledData(T preservedData);
     void handleStoredData();
 }

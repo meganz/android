@@ -39,6 +39,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoDownsampling;
+import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
@@ -67,7 +68,7 @@ import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
-public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MyChatFilesExisitListener<Intent> {
 
 	static final float DOWNSCALE_IMAGES_PX = 2000000f;
 
@@ -244,15 +245,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
-
-		parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
-		if (parentNode != null) {
-			log("The destination "+Constants.CHAT_FOLDER+ " already exists");
+		if (ChatUtil.existsMyChatFiles(intent, megaApi, this, this)) {
+			log(Constants.CHAT_FOLDER + " already exists");
+			parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
 			handleIntentIfFolderExist(intent);
 		} else {
-			log("The destination "+Constants.CHAT_FOLDER+ " does not exist, we need to create the folder then upload files");
-			megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
-			preservedIntent = intent;
+			log(Constants.CHAT_FOLDER + " does not exist, create the folder then upload files");
 		}
 	}
 
@@ -1477,11 +1475,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER && CHAT_FOLDER.equals(request.getName())) {
 			if (e.getErrorCode() == MegaError.API_OK) {
 				log("Create folder successfully, continue on pending chat upload");
-				if (parentNode == null) {
-					parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
-				}
-				handleIntentIfFolderExist(preservedIntent);
-				preservedIntent = null;
+				handleStoredData();
 			} else {
 				//cannot create chat folder
 				log("Chat folder NOT exists and cannot be created --> STOP service");
@@ -1663,5 +1657,20 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 		}
+	}
+
+	@Override
+	public void storedUnhandledData(Intent preservedData) {
+		preservedIntent = preservedData;
+	}
+
+	@Override
+	public void handleStoredData() {
+		log("Create folder successfully, continue on pending chat upload");
+		if (parentNode == null) {
+			parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+		}
+		handleIntentIfFolderExist(preservedIntent);
+		preservedIntent = null;
 	}
 }

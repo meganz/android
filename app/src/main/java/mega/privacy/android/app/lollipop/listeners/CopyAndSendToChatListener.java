@@ -24,7 +24,7 @@ import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
  * Created by mega on 19/09/18.
  */
 
-public class CopyAndSendToChatListener implements MegaRequestListenerInterface, MyChatFilesExisitListener<MegaNode> {
+public class CopyAndSendToChatListener implements MegaRequestListenerInterface, MyChatFilesExisitListener<ArrayList<MegaNode>> {
 
     private Context context;
 

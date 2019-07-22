@@ -318,7 +318,11 @@ public class ChatUtil {
         return finalTime;
     }
 
-    public static boolean existsMyChatFiles(ArrayList preservedData, MegaApiAndroid megaApi, MegaRequestListenerInterface requestListener, MyChatFilesExisitListener listener) {
+    /**
+     * To detect whether My Chat Files folder exist or not.
+     * If no, store the passed data and process after the folder is created
+     */
+    public static <T> boolean existsMyChatFiles(T preservedData, MegaApiAndroid megaApi, MegaRequestListenerInterface requestListener, MyChatFilesExisitListener listener) {
         MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
         if (parentNode == null) {
             megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), requestListener);
