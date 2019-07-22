@@ -127,7 +127,8 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
                     Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                     Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
                     if (defaultSound == null) {
-                        log("None Mode could not be fetched as default sound in some devices such as Huawei's devices, set Silent as title");
+//                        None Mode could not be fetched as default sound in some devices such as Huawei's devices, set Silent as title
+                        log("defaultSound == null");
                         chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
                     }
                     else {
