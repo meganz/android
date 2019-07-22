@@ -3709,7 +3709,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				case CAMERA_UPLOADS: {
 					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
-					setToolbarTitle();
 				}
 				case NOTIFICATIONS: {
 					notificFragment = (NotificationsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
@@ -4656,8 +4655,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					setFirstNavigationLevel(true);
+					aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				}
-				aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				break;
 			}
 			case MEDIA_UPLOADS:{
@@ -13657,6 +13656,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if((searchByDate) != null && (searchDate!=null)){
 						ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
 						cuFL.setNodes(nodesSearch);
+						if (nodesSearch.size() == 0) {
+							cuFL.showEmptySearchResults();
+						}
 						isSearchEnabled = true;
 					}else{
 						cuFL.setNodes(nodes);
