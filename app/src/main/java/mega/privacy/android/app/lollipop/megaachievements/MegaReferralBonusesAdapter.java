@@ -37,6 +37,9 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 
 public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferralBonusesAdapter.ViewHolderReferralBonuses>{
 
@@ -72,15 +75,9 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 				boolean avatarExists = false;
 
 				if (holder.contactMail.compareTo(request.getEmail()) == 0){
-					File avatar = null;
-					if (context.getExternalCacheDir() != null){
-						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-					}
-					else{
-						avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-					}
+					File avatar = buildAvatarFile(context,holder.contactMail + ".jpg");
 					Bitmap bitmap = null;
-					if (avatar.exists()){
+					if (isFileAvailable(avatar)){
 						if (avatar.length() > 0){
 							BitmapFactory.Options bOpts = new BitmapFactory.Options();
 							bOpts.inPurgeable = true;
@@ -224,15 +221,9 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 
 		UserAvatarListenerList listener = new UserAvatarListenerList(context, ((ViewHolderReferralBonusesList)holder), this);
 
-		File avatar = null;
-		if (context.getExternalCacheDir() != null){
-			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-		}
-		else{
-			avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-		}
-		Bitmap bitmap = null;
-		if (avatar.exists()){
+		File avatar = buildAvatarFile(context,holder.contactMail + ".jpg");
+        Bitmap bitmap = null;
+        if (isFileAvailable(avatar)){
 			if (avatar.length() > 0){
 				BitmapFactory.Options bOpts = new BitmapFactory.Options();
 				bOpts.inPurgeable = true;
@@ -240,13 +231,8 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 				if (bitmap == null) {
 					avatar.delete();
-					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-					}
-					else{
-						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-					}
-				}
+                    megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
+                }
 				else{
 					log("Do not ask for user avatar - its in cache: "+avatar.getAbsolutePath());
 					holder.contactInitialLetter.setVisibility(View.GONE);
@@ -254,21 +240,11 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 				}
 			}
 			else{
-				if (context.getExternalCacheDir() != null){
-					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-				}
-				else{
-					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-				}
+                megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
 			}
 		}
 		else{
-			if (context.getExternalCacheDir() != null){
-				megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-			}
-			else{
-				megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-			}
+            megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
 		}
 
 

@@ -719,7 +719,6 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Gönder</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">10 başarısız denemeden sonra bütün yerel dosyalar silinecek ve hesaptan çıkış yapılacaktır</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Yanlış kod</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Hatalı PIN kodu, lütfen tekrar deneyin. %2d hakkınız kaldı</string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Kodları eşleşmiyor</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">PIN Kodunu girin</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">PIN Kodunu tekrar girin</string>
@@ -875,7 +874,6 @@
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Eposta doğrulaması</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Devam etmek için epostanızı kontrol edin</string>
-    <string name="email_verification_text_error" context="Text of the alert dialog to inform the user when an error occurs when cancelling the account">Bir hata oluştu, lütfen tekrar deneyin.</string>
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Bu eylemi gerçekleştirebilmek için giriş yapmanız gerekiyor.</string>
@@ -1824,7 +1822,6 @@
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Çıkış yapmak üzeresiniz, lütfen hatırladığınızdan emin olmak için parolanızı test edin.\nParolanızı kaybederseniz, MEGA verilerinize erişimi kaybedersiniz.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Panoya kopyala</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Kurtarma Anahtarını Dışa Aktar</string>
-    <string name="option_logout_anyway" context="Option that permits user logout">Yine de çıkış yap</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Kurtarma Anahtarı</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Dosya Sistemine Kaydet</string>
     <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Panoya kopyalandı</string>
@@ -1969,8 +1966,6 @@
 
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Geçersiz mesaj biçimi</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Geçersiz mesaj imzası</string>
-
-    <string name="add_to_cloud_import" context="Menu option">Bulut Sürücüye ekle</string>
 
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">Medya akışı oluşturulurken hata oluştu</string>
 

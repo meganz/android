@@ -40,6 +40,7 @@ public class Constants {
 	public static int REQUEST_CODE_FILE_INFO = 1027;
 	public static int REQUEST_CODE_REFRESH_STAGING = 1028;
 	public static int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
+	public final static int REQUEST_CODE_SEND_LOCATION = 1030;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
@@ -53,6 +54,11 @@ public class Constants {
 	public static String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
 	public static String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
+
+	public static final String EXTRA_NODE_HANDLE = "NODE_HANDLE";
+	public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
+	public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
+	public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
 
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
@@ -129,7 +135,17 @@ public class Constants {
 
 	public static final int WRITE_LOG = 10;
 
-	public static final int PRO_LITE = 4;
+	public static final int RECORD_VOICE_CLIP = 11;
+    public static final int REQUEST_STORAGE_VOICE_CLIP = 12;
+    public static final int REQUEST_CAMERA_TAKE_PICTURE = 13;
+    public static final int REQUEST_WRITE_STORAGE_TAKE_PICTURE = 14;
+	public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
+
+	public static final int TYPE_START_RECORD = 1;
+	public static final int TYPE_END_RECORD = 2;
+	public static final int TYPE_ERROR_RECORD = 3;
+
+    public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
 	public static final int PRO_I = 1;
 	public static final int PRO_II = 2;
@@ -154,6 +170,8 @@ public class Constants {
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLDER";
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
 	public static String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
+    public static String ACTION_CHILD_UPLOADED_OK = "ACTION_CHILD_UPLOADED_OK";
+    public static String ACTION_CHILD_UPLOADED_FAILED = "ACTION_CHILD_UPLOADED_FAILED";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
 	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
@@ -207,6 +225,7 @@ public class Constants {
 	public static String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
 	public static String BROADCAST_ACTION_INTENT_UPDATE_ORDER = "INTENT_UPDATE_ORDER";
 	public static String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
+	public static String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -241,6 +260,8 @@ public class Constants {
 	final public static int CONTACT_TYPE_DEVICE = 1;
 	final public static int CONTACT_TYPE_BOTH = 2;
 
+	final public static int TYPE_VOICE_CLIP = 3;
+
 	public static int SELECT_RINGTONE = 2000;
 	public static int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE+1;
 
@@ -267,6 +288,9 @@ public class Constants {
 	public static int NOTIFICATION_CHAT_UPLOAD = 15;
     public static int NOTIFICATION_UPLOAD_FOLDER = 16;
     public static int NOTIFICATION_UPLOAD_FINAL_FOLDER = 17;
+
+	public static int SUCCESSFUL_VOICE_CLIP_TRANSFER = 1;
+	public static int ERROR_VOICE_CLIP_TRANSFER = 2;
 
 	public static String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
 	public static String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";
@@ -338,4 +362,12 @@ public class Constants {
 	public static final int SNACKBAR_TYPE = 0;
 	public static final int MESSAGE_SNACKBAR_TYPE = 1;
 	public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
+
+	public static final int FILE_LINK = 200;
+	public static final int FOLDER_LINK = 201;
+	public static final int CHAT_LINK = 202;
+	public static final int CONTACT_LINK = 203;
+	public static final int ERROR_LINK = -1;
+
+	public static final String CONTACT_HANDLE = "contactHandle";
 }

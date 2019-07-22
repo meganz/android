@@ -337,7 +337,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
-			optionButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
+			optionButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		}
 		else if (isMultiselect()) {
 			optionButton.setText(getString(R.string.context_send));

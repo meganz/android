@@ -419,6 +419,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);
 			startActivity(loginIntent);
+			finish();
 			return;
 		}
 		else{
@@ -507,7 +508,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						if (ret == MegaChatApi.INIT_NO_CACHE)
 						{
 							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-							megaChatApi.enableGroupChatCalls(true);
 
 						}
 						else if (ret == MegaChatApi.INIT_ERROR)
@@ -530,7 +530,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						}
 						else{
 							log("onCreate: Chat correctly initialized");
-							megaChatApi.enableGroupChatCalls(true);
 						}
 					}
 				}
@@ -2348,7 +2347,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void setToolbarSubtitle(String s) {
-		aB.setSubtitle(s);
+		if(aB != null) {
+			aB.setSubtitle(s);
+		}
 	}
 	
 	@Override
