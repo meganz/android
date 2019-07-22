@@ -5750,7 +5750,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 //Create adapter
                 if (adapter == null) {
-                    adapter = new MegaChatLollipopAdapter(this, chatRoom, messages,messagesPlaying,  listView);
+                    adapter = new MegaChatLollipopAdapter(this, chatRoom, messages,messagesPlaying, removedMessages,  listView);
                     adapter.setHasStableIds(true);
                     listView.setAdapter(adapter);
                 } else {
