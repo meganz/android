@@ -43,6 +43,9 @@ import nz.mega.sdk.MegaRequest;
 
 public class GetLinkFragmentLollipop extends Fragment implements View.OnClickListener, DatePickerDialog.OnDateSetListener, android.widget.CompoundButton.OnCheckedChangeListener {
 
+    private final static float ALPHA_VIEW_DISABLED = 0.5f;
+    private final static float ALPHA_VIEW_ENABLED = 1.0f;
+
     Context context;
 
     float scaleH, scaleW;
@@ -322,6 +325,9 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 linkWithoutKeyCheck.setChecked(true);
 				linkDecryptionKeyCheck.setChecked(false);
 				linkWithKeyCheck.setChecked(false);
+
+                expiryDateLayout.setAlpha(ALPHA_VIEW_ENABLED);
+                passwordProtectionLayout.setAlpha(ALPHA_VIEW_ENABLED);
 				
 				//disable expiry/password options for decryption key option
                 if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
@@ -348,6 +354,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 switchButtonExpiry.setEnabled(false);
                 switchButtonProtection.setEnabled(false);
                 switchButtonExpiry.setChecked(false);
+                expiryDateLayout.setAlpha(ALPHA_VIEW_DISABLED);
+                passwordProtectionLayout.setAlpha(ALPHA_VIEW_DISABLED);
                 linkWithoutKeyCheck.setChecked(false);
 				linkDecryptionKeyCheck.setChecked(true);
 				linkWithKeyCheck.setChecked(false);
@@ -370,6 +378,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 linkWithoutKeyCheck.setChecked(false);
 				linkDecryptionKeyCheck.setChecked(false);
 				linkWithKeyCheck.setChecked(true);
+                expiryDateLayout.setAlpha(ALPHA_VIEW_ENABLED);
+                passwordProtectionLayout.setAlpha(ALPHA_VIEW_ENABLED);
 				linkText.setText(link);
                 if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
                     switchButtonExpiry.setEnabled(true);
@@ -594,12 +604,12 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
     }
     
     private void disableCheckedTextView(){
-        linkWithoutKeyCheck.setTextColor(getContext().getColor(R.color.disabled_radio_button_label));
-        linkDecryptionKeyCheck.setTextColor(getContext().getColor(R.color.disabled_radio_button_label));
+        linkWithoutKeyCheck.setAlpha(ALPHA_VIEW_DISABLED);
+        linkDecryptionKeyCheck.setAlpha(ALPHA_VIEW_DISABLED);
     }
     
     private void enableCheckedTextView(){
-        linkWithoutKeyCheck.setTextColor(getContext().getColor(R.color.name_my_account));
-        linkDecryptionKeyCheck.setTextColor(getContext().getColor(R.color.name_my_account));
+        linkWithoutKeyCheck.setAlpha(ALPHA_VIEW_ENABLED);
+        linkDecryptionKeyCheck.setAlpha(ALPHA_VIEW_ENABLED);
     }
 }
