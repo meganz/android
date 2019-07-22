@@ -238,8 +238,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			megaApi.removeGlobalListener(this);
 		}
 
-
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate);
 
 		super.onDestroy();
 	}
@@ -920,6 +920,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		fullScreenImageViewer = this;
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdate, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1697,13 +1698,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
         }
 	}
 
-
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null){
 				screenPosition = intent.getIntArrayExtra("screenPosition");
 				draggableView.setScreenPosition(screenPosition);
+			}
+		}
+	};
+
+	private BroadcastReceiver receiverUpdate = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null) {
+				finish();
 			}
 		}
 	};
@@ -2972,28 +2981,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	@Override
-	protected void onResume() {
+	protected void onResume(){
 		log("onResume");
 		super.onResume();
-
-		if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.FILE_LINK_ADAPTER && adapterType != Constants.ZIP_ADAPTER) {
-			if (imageHandles.get(positionG) != -1) {
+		if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.FILE_LINK_ADAPTER && adapterType != Constants.ZIP_ADAPTER){
+			if (imageHandles.get(positionG) != -1){
 				log("node updated");
 				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-				if (node == null) {
-					finish();
-				} else {
-					MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
-					while (megaApi.getParentNode(parent) != null) {
-						parent = megaApi.getParentNode(parent);
-					}
-					if (parent.getHandle() == megaApi.getRubbishNode().getHandle() && adapterType != Constants.SEARCH_ADAPTER && adapterType != Constants.RUBBISH_BIN_ADAPTER) {
-						finish();
-					}
-				}
 			}
 
-			if (node == null) {
+			if (node == null){
 				finish();
 			}
 		}

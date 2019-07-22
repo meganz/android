@@ -25,6 +25,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
@@ -2559,6 +2560,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
 				    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
+                    Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 					finish();
 				}
 				else{
@@ -2569,7 +2572,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-				    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
+                    Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 					finish();
 				}
 				else{
