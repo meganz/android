@@ -351,7 +351,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 								int ret = megaChatApi.getInitState();
 
-								if(ret==0||ret==MegaChatApi.INIT_ERROR){
+								if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
 									ret = megaChatApi.init(gSession);
 									log("shouldRun: result of init ---> "+ret);
 									chatSettings = dbH.getChatSettings();
@@ -377,7 +377,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 									}
 									else{
 										log("shouldRun: Chat correctly initialized");
-										megaChatApi.enableGroupChatCalls(true);
 									}
 								}
 							}

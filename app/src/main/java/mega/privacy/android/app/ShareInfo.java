@@ -3,17 +3,13 @@ package mega.privacy.android.app;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -41,6 +37,7 @@ import mega.privacy.android.app.utils.Util;
 public class ShareInfo {
 
 	public String title = null;
+	private long lastModified;
 	public InputStream inputStream = null;
 	public long size = -1;
 	private File file = null;
@@ -78,6 +75,10 @@ public class ShareInfo {
 	public long getSize() {
 		return size;
 	}
+
+	public long getLastModified() {
+	    return lastModified;
+    }
 	
 	/*
 	 * Process incoming Intent and get list of ShareInfo objects
@@ -238,7 +239,10 @@ public class ShareInfo {
 		inputStream = null;
 		try {
 			inputStream = context.getContentResolver().openInputStream(uri);
-		} catch (Exception e) {
+		} catch (FileNotFoundException fileNotFound) {
+		    log("FileNotFoundException, can't find uri: " + uri);
+		    return;
+        } catch (Exception e) {
 			log("inputStream EXCEPTION!");
 			log(""+e);
 			String path = uri.getPath();
@@ -304,44 +308,23 @@ public class ShareInfo {
 				return;
 			}
 
-			if (context.getExternalCacheDir() != null){
-				if (title != null){
-					if (title.contains("../") || title.contains(("..%2F"))){
-						log("External path traversal: " + title);
-						return;
-					}
-					log("External No path traversal: " + title);
-					if (context instanceof PdfViewerActivityLollipop){
-						log("context of PdfViewerActivityLollipop");
-						if (!title.endsWith(".pdf")){
-							title += ".pdf";
-						}
-					}
-					file = new File(context.getExternalCacheDir(), title);
-				}
-				else{
-					return;
-				}
-			}
-			else{
-				if (title != null){
-					if (title.contains("../") || title.contains(("..%2F"))){
-						log("Internal path traversal: " + title);
-						return;
-					}
-					log("Internal No path traversal: " + title);
-					if (context instanceof PdfViewerActivityLollipop){
-						log("context of PdfViewerActivityLollipop");
-						if (!title.endsWith(".pdf")){
-							title += ".pdf";
-						}
-					}
-					file = new File(context.getCacheDir(), title);
-				}
-				else{
-					return;
-				}
-			}
+            if (title == null) {
+                log("title is null, return!");
+                return;
+            }
+            if (title.contains("../") || title.contains(("..%2F"))) {
+                log("Internal path traversal: " + title);
+                return;
+            }
+            log("Internal No path traversal: " + title);
+            if (context instanceof PdfViewerActivityLollipop) {
+                log("context of PdfViewerActivityLollipop");
+                if (!title.endsWith(".pdf")) {
+                    title += ".pdf";
+                }
+            }
+            file = new File(context.getCacheDir(), title);
+
 			log("Start copy to: "+file.getAbsolutePath());
 
 			try {
@@ -423,7 +406,7 @@ public class ShareInfo {
 		Cursor cursor = null;
 		try {
 			cursor = client.query(uri, null, null, null, null);
-		} catch (RemoteException e1) {
+		} catch (Exception e1) {
 			log("cursor EXCEPTION!!!");
 		}
 		if(cursor!=null){
@@ -451,6 +434,10 @@ public class ShareInfo {
 				}
 			}
 		}
+		int lastModifiedIndex = cursor.getColumnIndex("last_modified");
+		if(lastModifiedIndex != -1) {
+		    this.lastModified = cursor.getLong(lastModifiedIndex);
+        }
 
 		if (size == -1 || inputStream == null) {
 			log("Keep going");

@@ -252,7 +252,7 @@ public class ContactController {
 
         if(context instanceof ManagerActivityLollipop){
             if (!Util.isOnline(context)){
-                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -279,7 +279,7 @@ public class ContactController {
 
         if(context instanceof ManagerActivityLollipop){
             if (!Util.isOnline(context)){
-                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -299,7 +299,7 @@ public class ContactController {
         }
         else if(context instanceof ChatActivityLollipop){
             if (!Util.isOnline(context)){
-                ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 

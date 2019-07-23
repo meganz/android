@@ -5,14 +5,11 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -22,16 +19,11 @@ import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -66,7 +58,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-public class FileContactListActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
+public class FileContactListActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, MegaGlobalListenerInterface {
 
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
@@ -84,7 +76,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	RelativeLayout contactLayout;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
-	GestureDetectorCompat detector;
 	ImageView emptyImage;
 	TextView emptyText;
 	FloatingActionButton fab;
@@ -123,19 +114,15 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	MenuItem unSelectMenuItem;
 
 	Handler handler;
+	DisplayMetrics outMetrics;
 
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-	    public void onLongPress(MotionEvent e) {
-			log("onLongPress -- RecyclerViewOnGestureListener");
-			// handle long press
-			if (!adapter.isMultipleSelect()){
-				adapter.setMultipleSelect(true);
-
-				actionMode = startSupportActionMode(new ActionBarCallBack());
-			}
-			super.onLongPress(e);
-	    }
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			actionMode = startSupportActionMode(new ActionBarCallBack());
+		}
 	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -278,6 +265,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
 			fab.setVisibility(View.GONE);
 			Util.changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 1);
+			checkScroll();
 			return true;
 		}
 		
@@ -287,7 +275,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
-			Util.changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 0);
+			Util.changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 3);
+			checkScroll();
 		}
 
 		@Override
@@ -376,11 +365,13 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		megaApi.addGlobalListener(this);
 
 		handler = new Handler();
+
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
 		
 		listContacts = new ArrayList<MegaShare>();
 		
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
 	    
@@ -388,13 +379,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		if (extras != null){
 			nodeHandle = extras.getLong("name");
 			node=megaApi.getNodeByHandle(nodeHandle);
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-			}
 			
 			setContentView(R.layout.activity_file_contact_list);
 			
@@ -402,10 +386,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			tB = (Toolbar) findViewById(R.id.toolbar_file_contact_list);
 			setSupportActionBar(tB);
 			aB = getSupportActionBar();
-//			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			aB.setDisplayHomeAsUpEnabled(true);
 			aB.setDisplayShowHomeEnabled(true);
-			aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
+			aB.setTitle(node.getName().toUpperCase());
+			aB.setSubtitle(R.string.file_properties_shared_folder_select_contact);
 
 			coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout_file_contact_list);
 			container = (RelativeLayout) findViewById(R.id.file_contact_list);
@@ -413,7 +397,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			nameView = (TextView) findViewById(R.id.node_name);
 			createdView = (TextView) findViewById(R.id.node_last_update);
 			contactLayout = (RelativeLayout) findViewById(R.id.file_contact_list_layout);
-			contactLayout.setOnClickListener(this);
+			contactLayout.setVisibility(View.GONE);
+			findViewById(R.id.separator_file_contact_list).setVisibility(View.GONE);
+//			contactLayout.setOnClickListener(this);
 
 			fab = (FloatingActionButton) findViewById(R.id.floating_button_file_contact_list);
 			fab.setOnClickListener(this);
@@ -433,8 +419,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				log("Size of pending out shares: "+tempListContacts);
 				listContacts.addAll(megaApi.getPendingOutShares(node));
 			}
-
-			detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) findViewById(R.id.file_contact_list_view_browser);
 			listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
@@ -442,8 +426,14 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 			mLayoutManager = new LinearLayoutManager(this);
 			listView.setLayoutManager(mLayoutManager);
-			listView.addOnItemTouchListener(this);
-			listView.setItemAnimator(new DefaultItemAnimator()); 			
+			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 			
 			emptyImage = (ImageView) findViewById(R.id.file_contact_list_empty_image);
 			emptyText = (TextView) findViewById(R.id.file_contact_list_empty_text);
@@ -490,6 +480,26 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			listView.setAdapter(adapter);
 		}
 	}
+
+	public void checkScroll() {
+		if (listView != null) {
+			if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
+				changeActionBarElevation(true);
+			}
+			else if ((adapter != null && !adapter.isMultipleSelect())) {
+				changeActionBarElevation(false);
+			}
+		}
+	}
+
+	public void changeActionBarElevation(boolean whitElevation){
+		if (whitElevation) {
+			aB.setElevation(Util.px2dp(4, outMetrics));
+		}
+		else {
+			aB.setElevation(0);
+		}
+	}
 	
 	
 	public void showOptionsPanel(MegaShare sShare){
@@ -518,13 +528,19 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.activity_folder_contact_list_without_share_action, menu);
+	    inflater.inflate(R.menu.activity_folder_contact_list, menu);
+
+	    menu.findItem(R.id.action_delete_version_history).setVisible(false);
 	    
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
 		
 		selectMenuItem.setVisible(true);
 		unSelectMenuItem.setVisible(false);
+
+		addSharingContact = menu.findItem(R.id.action_folder_contacts_list_share_folder);
+		addSharingContact.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_share_white, R.color.black));
+		addSharingContact.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -538,14 +554,29 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		    	return true;
 		    }
 		    case R.id.action_select:{
-		    	
 		    	selectAll();
 		    	return true;
 		    }
+			case R.id.action_folder_contacts_list_share_folder: {
+				shareOption();
+				return true;
+			}
 		    default:{
 	            return super.onOptionsItemSelected(item);
 	        }
 	    }
+	}
+
+	void shareOption() {
+		removeShare = false;
+		changeShare = false;
+
+		Intent intent = new Intent();
+		intent.setClass(this, AddContactActivityLollipop.class);
+		intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
+		intent.putExtra("MULTISELECT", 0);
+		intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
 	}
 
 	// Clear all selected items
@@ -689,8 +720,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
@@ -698,7 +728,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		}
 		else{
 			if (parentHandleStack.isEmpty()){
-				super.callToSuperBack = true;
 				super.onBackPressed();
 			}
 			else{
@@ -761,24 +790,16 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	public void onClick(View v) {
 
 		switch (v.getId()){		
-			case R.id.file_contact_list_layout:{
-				Intent i = new Intent(this, ManagerActivityLollipop.class);
-				i.setAction(Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER);
-				i.putExtra("parentHandle", node.getHandle());
-				startActivity(i);
-				finish();
-				break;
-			}
+//			case R.id.file_contact_list_layout:{
+//				Intent i = new Intent(this, ManagerActivityLollipop.class);
+//				i.setAction(Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER);
+//				i.putExtra("parentHandle", node.getHandle());
+//				startActivity(i);
+//				finish();
+//				break;
+//			}
 			case R.id.floating_button_file_contact_list:{
-				removeShare = false;
-				changeShare = false;
-
-				Intent intent = new Intent();
-				intent.setClass(this, AddContactActivityLollipop.class);
-				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
-				intent.putExtra("MULTISELECT", 0);
-				intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
+				shareOption();
 				break;
 			}
 		}
@@ -1218,68 +1239,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		
 	}
 
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	public void showSnackbar(String s){
-		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(coordinatorLayout, s, Snackbar.LENGTH_LONG);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
+		showSnackbar(contactLayout, s);
 	}
 
 	public MegaUser getSelectedContact() {

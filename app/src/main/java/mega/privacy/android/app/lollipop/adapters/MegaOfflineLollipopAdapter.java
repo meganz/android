@@ -115,7 +115,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		public View folderLayout;
 		public View fileLayout;
 		public ImageView imageViewIcon;
-		public RelativeLayout thumbLayoutForFile;
+		public RelativeLayout thumbLayoutForFile, bottomContainer;
 		public ImageButton imageButtonThreeDotsForFile;
 		public TextView textViewFileNameForFile;
 		public ImageView fileGridSelected;
@@ -514,6 +514,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			
 			holder.imageViewIcon = (ImageView)v.findViewById(R.id.offline_grid_icon);
 			holder.thumbLayoutForFile = (RelativeLayout)v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
+			holder.bottomContainer = v.findViewById(R.id.offline_grid_bottom_container);
+            holder.bottomContainer.setOnClickListener(this);
+            holder.bottomContainer.setTag(holder);
 			holder.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
 			holder.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
 			holder.fileGridSelected = (ImageView)v.findViewById(R.id.file_grid_selected);
@@ -1018,7 +1021,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				dimens[3] = imageView.getHeight();
 				fragment.itemClick(currentPosition, dimens, imageView);
 				break;
-			}			
+			}
+            case R.id.offline_grid_bottom_container:
 			case R.id.offline_list_three_dots_layout:
             case R.id.file_grid_three_dots_for_file:
 			case R.id.offline_grid_three_dots:{

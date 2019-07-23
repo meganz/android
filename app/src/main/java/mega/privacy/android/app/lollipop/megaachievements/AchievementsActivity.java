@@ -1,14 +1,14 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +16,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -64,6 +63,8 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     ArrayList<String> pendingContacts;
     boolean pendingAttaches = false;
 
+    DisplayMetrics outMetrics;
+
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
 		super.onCreate(savedInstanceState);
@@ -96,6 +97,10 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                 return;
             }
         }
+
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
 
         setContentView(R.layout.activity_achievements);
 
@@ -173,11 +178,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
         if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
 
-            View view = getCurrentFocus();
-            if (view != null) {
-                InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-            }
+            Util.hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS);
 
             aB.setTitle(getString(R.string.achievements_title));
             if(achievementsFragment==null){
@@ -228,11 +229,9 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     @Override
     public void onBackPressed() {
         log("onBackPressedLollipop");
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
-            super.callToSuperBack = true;
             super.onBackPressed();
         }
         else{
@@ -279,7 +278,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                 }
             }
             else{
-                Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_error), Snackbar.LENGTH_LONG).show();
+                showSnackbar(getString(R.string.cancel_subscription_error));
             }
         }
         else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
@@ -309,11 +308,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
     public void inviteFriends(ArrayList<String> mails){
         log("inviteFriends");
-        View view = getCurrentFocus();
-        if (view != null) {
-            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
+        Util.hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS);
 
         showFragment(Constants.ACHIEVEMENTS_FRAGMENT, -1);
 
@@ -376,11 +371,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     }
 
     public void showSnackbar(String s){
-        log("showSnackbar");
-        Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+        showSnackbar(fragmentContainer, s);
     }
 
     @Override

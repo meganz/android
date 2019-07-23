@@ -5,6 +5,7 @@ import android.content.Context;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -18,9 +19,11 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
+
 
 //Listener for  multi forward
 public class MultipleForwardChatProcessor implements MegaChatRequestListenerInterface {
@@ -34,7 +37,10 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
+    ChatController cC;
+
     public MultipleForwardChatProcessor(Context context, long[] chatHandles, long[] idMessages, long idChat) {
+
         super();
         this.context = context;
 
@@ -49,6 +55,8 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
+
+        cC = new ChatController(context);
     }
 
     int counter = 0;
@@ -60,8 +68,57 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         Util.log("MultipleForwardChatProcessor", log);
     }
 
-    public void forward(){
+    private void checkTypeVoiceClip(MegaChatMessage msg, int value){
+        MegaNodeList nodeList = msg.getMegaNodeList();
+        if(nodeList == null) return;
 
+        if(msg.getUserHandle() == megaChatApi.getMyUserHandle()){
+            for (int j = 0; j < nodeList.size(); j++) {
+                MegaNode temp = nodeList.get(j);
+                attachVoiceClip(chatHandles[value], temp);
+            }
+        }else{
+            for (int j = 0; j < nodeList.size(); j++) {
+                MegaNode temp = nodeList.get(j);
+                String name = temp.getName();
+                MegaNode chatFolder = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
+                if(chatFolder==null){
+                    log("Error no chat folder - return");
+                    return;
+                }
+                MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
+                attachVoiceClip(chatHandles[value], nodeToAttach);
+            }
+        }
+
+    }
+
+    private void checkTypeMeta(MegaChatMessage msg, int value){
+
+        MegaChatContainsMeta meta = msg.getContainsMeta();
+        String text = "";
+        if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
+            text = meta.getRichPreview().getText();
+            if(chatHandles[0]==idChat){
+                ((ChatActivityLollipop) context).sendMessage(text);
+            }else{
+                megaChatApi.sendMessage(chatHandles[value], text);
+            }
+        }else if (meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
+            String image = meta.getGeolocation().getImage();
+            float latitude = meta.getGeolocation().getLatitude();
+            float longitude = meta.getGeolocation().getLongitude();
+
+            if(chatHandles[0]==idChat){
+                ((ChatActivityLollipop) context).sendLocationMessage(longitude, latitude, image);
+            }else{
+                megaChatApi.sendGeolocation(chatHandles[value], longitude, latitude, image);
+            }
+        }
+        checkTotalMessages();
+    }
+
+    public void forward(MegaChatRoom chatRoom){
         if(chatHandles.length==1){
             log("Forward to one chat");
             for(int i=0;i<idMessages.length;i++){
@@ -94,7 +151,6 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                             break;
                         }
                         case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-
                             if(messageToForward.getUserHandle()!=megaChatApi.getMyUserHandle()){
                                 MegaNodeList nodeList = messageToForward.getMegaNodeList();
                                 if(nodeList != null) {
@@ -108,6 +164,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                         }
                                         MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
                                         if(nodeToAttach!=null){
+                                            nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
                                             if(chatHandles[0]==idChat){
                                                 megaChatApi.attachNode(chatHandles[0], nodeToAttach.getHandle(), this);
                                             }
@@ -137,20 +194,15 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                             }
 
                             break;
-                        }case MegaChatMessage.TYPE_CONTAINS_META:{
-                            MegaChatContainsMeta meta = messageToForward.getContainsMeta();
-                            String text = "";
-                            if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
-                                text = meta.getRichPreview().getText();
-                            }else{
-                            }
-                            if(chatHandles[0]==idChat){
-                                ((ChatActivityLollipop) context).sendMessage(text);
-                            }
-                            else{
-                                megaChatApi.sendMessage(chatHandles[0], text);
-                            }
-                            checkTotalMessages();
+                        }
+
+                        case MegaChatMessage.TYPE_VOICE_CLIP:{
+                            log("Forward to one chat TYPE_VOICE_CLIP");
+                            checkTypeVoiceClip(messageToForward, 0);
+                            break;
+                        }
+                        case MegaChatMessage.TYPE_CONTAINS_META:{
+                            checkTypeMeta(messageToForward, 0);
                             break;
                         }
                     }
@@ -194,7 +246,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                 break;
                             }
                             case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-
+                                log("Forward to many chats - TYPE_NODE_ATTACHMENT");
                                 if(messageToForward.getUserHandle()!=megaChatApi.getMyUserHandle()){
                                     MegaNodeList nodeList = messageToForward.getMegaNodeList();
                                     if(nodeList != null) {
@@ -208,6 +260,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                             }
                                             MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
                                             if(nodeToAttach!=null){
+                                                nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
                                                 if(chatHandles[k]==idChat){
                                                     megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), this);
                                                 }
@@ -238,20 +291,14 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                 }
 
                                 break;
-                            }case MegaChatMessage.TYPE_CONTAINS_META:{
-                                MegaChatContainsMeta meta = messageToForward.getContainsMeta();
-                                String text = "";
-                                if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
-                                    text = meta.getRichPreview().getText();
-                                }else{
-                                }
-                                if(chatHandles[k]==idChat){
-                                    ((ChatActivityLollipop) context).sendMessage(text);
-                                }
-                                else{
-                                    megaChatApi.sendMessage(chatHandles[k], text);
-                                }
-                                checkTotalMessages();
+                            }case MegaChatMessage.TYPE_VOICE_CLIP:{
+                                log("Forward to many chats - TYPE_VOICE_CLIP");
+                                checkTypeVoiceClip(messageToForward, k);
+                                break;
+                            }
+                            case MegaChatMessage.TYPE_CONTAINS_META:{
+                                log("Forward to many chats - TYPE_CONTAINS_META");
+                                checkTypeMeta(messageToForward, k);
                                 break;
                             }
                         }
@@ -264,6 +311,11 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         }
 
 
+    }
+
+    private void attachVoiceClip(long chatHandle, MegaNode megaNode){
+        if(megaNode == null) return;
+        megaChatApi.attachVoiceMessage(chatHandle, megaNode.getHandle(), this);
     }
 
     @Override
@@ -334,11 +386,11 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                     //No messages forwarded
                     int totalErrors = error+errorNotAvailable;
                     if(totalErrors==errorNotAvailable){
-                        ((ChatActivityLollipop) context).showSnackbar(context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors));
+                        ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors), -1);
                     }
                     else{
                         String text = context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, totalErrors, totalErrors);
-                        ((ChatActivityLollipop) context).showSnackbar(text);
+                        ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, text, -1);
                     }
 
                     ((ChatActivityLollipop) context).removeProgressDialog();
@@ -359,7 +411,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                         text = context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, totalErrors, totalErrors);
                     }
 
-                    ((NodeAttachmentHistoryActivity) context).showSnackbar(text);
+                    ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, text);
 
 //                    if(chatHandles.length==1){
 //                        ((NodeAttachmentHistoryActivity) context).openChatAfterForward(chatHandles[0], text);
@@ -372,11 +424,11 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                     //No messages forwarded
                     int totalErrors = error+errorNotAvailable;
                     if(totalErrors==errorNotAvailable){
-                        ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors));
+                        ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors));
                     }
                     else{
                         String text = context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, totalErrors, totalErrors);
-                        ((NodeAttachmentHistoryActivity) context).showSnackbar(text);
+                        ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, text);
                     }
                 }
                 ((NodeAttachmentHistoryActivity) context).removeProgressDialog();

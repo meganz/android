@@ -53,10 +53,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -72,6 +74,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public class ContactsFragmentLollipop extends Fragment implements MegaRequestListenerInterface, View.OnClickListener{
 
@@ -220,13 +224,15 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				avatarImage.buildDrawingCache(true);
 				Bitmap avatarBitmap = avatarImage.getDrawingCache(true);
 
-				ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
-				avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
-				byte[] avatarByteArray = avatarOutputStream.toByteArray();
-				outState.putByteArray("avatar", avatarByteArray);
-				outState.putBoolean("contentAvatar", contentAvatar);
+				if (avatarBitmap != null) {
+					ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
+					avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
+					byte[] avatarByteArray = avatarOutputStream.toByteArray();
+					outState.putByteArray("avatar", avatarByteArray);
+					outState.putBoolean("contentAvatar", contentAvatar);
+				}
 			}
-			if (!contentAvatar){
+			if (!contentAvatar && initialLetterInvite != null){
 				outState.putString("initialLetter", initialLetterInvite.getText().toString());
 			}
 		}
@@ -334,24 +340,13 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			File avatar = null;
 			if(context!=null){
 				log("context is not null");
-
-				if (context.getExternalCacheDir() != null){
-					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-				}
-				else{
-					avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-				}
+                avatar = buildAvatarFile(context, myEmail + ".jpg");
 			}
 			else{
 				log("context is null!!!");
 				if(getActivity()!=null){
 					log("getActivity is not null");
-					if (getActivity().getExternalCacheDir() != null){
-						avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-					}
-					else{
-						avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-					}
+                    avatar = buildAvatarFile(getActivity(), myEmail + ".jpg");
 				}
 				else{
 					log("getActivity is ALSOOO null");
@@ -359,7 +354,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 			}
 
-			if(avatar!=null){
+			if(isFileAvailable(avatar)){
 				setProfileAvatar(avatar);
 			}
 			else{
@@ -507,7 +502,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 		});
 
-		((ManagerActivityLollipop) context).handleInviteContact = 0;
+		((ManagerActivityLollipop) context).deleteInviteContactHandle();
 	}
 
 	public void showAlertDialog (int title, int text, final boolean success) {
@@ -570,7 +565,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			case R.id.view_contact: {
 				inviteShown = false;
-				((ManagerActivityLollipop) context).handleInviteContact = 0;
 				if (inviteAlertDialog != null){
 					inviteAlertDialog.dismiss();
 				}
@@ -619,15 +613,16 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 						log("Selected contact NULL");
 						break;
 					}
-					if(users.size()  == 1){
-						((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
-					}else{
-						for(int i=0;i<users.size();i++){
-							contactHandles.add(users.get(i).getHandle());
-						}
-
-						((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
+					ArrayList<String> contactsNewGroup = new ArrayList<>();
+					for(int i=0;i<users.size();i++){
+						contactsNewGroup.add(users.get(i).getEmail());
 					}
+
+					Intent intent = new Intent(context, AddContactActivityLollipop.class);
+					intent.putStringArrayListExtra("contactsNewGroup", contactsNewGroup);
+					intent.putExtra("newGroup", true);
+					intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+					((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT);
 
 					clearSelections();
 					hideMultipleSelect();
@@ -648,7 +643,15 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					hideMultipleSelect();
 					actionMode.invalidate();
 					break;
-				}				
+				}
+				case R.id.cab_menu_send_to_chat:{
+					ChatController cC = new ChatController(context);
+					cC.selectChatsToAttachContacts(users);
+
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 			}
 			return false;
 		}
@@ -658,8 +661,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.contact_fragment_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
-			MenuItem startChatItem = menu.findItem(R.id.cab_menu_start_conversation);
-			startChatItem.setIcon(Util.mutateIconSecondary(context, R.drawable.ic_chat, R.color.white));
             ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
@@ -679,6 +680,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaUser> selected = adapter.getSelectedUsers();
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+			menu.findItem(R.id.cab_menu_send_file).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
 			if (selected.size() != 0) {
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
@@ -689,11 +691,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 					menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+					menu.findItem(R.id.cab_menu_start_conversation).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_chat, R.color.white));
 					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+					menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
+					menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(getContext(), R.drawable.ic_share_contact, R.color.white));
+					menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
 				else {
 					menu.findItem(R.id.cab_menu_send_file).setVisible(false);
 					menu.findItem(R.id.cab_menu_start_conversation).setVisible(false);
+					menu.findItem(R.id.cab_menu_send_to_chat).setVisible(false);
 				}
 
 				if(selected.size()==adapter.getItemCount()){
@@ -711,7 +719,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);	
 			}
-			
 			menu.findItem(R.id.cab_menu_help).setVisible(false);
 			menu.findItem(R.id.cab_menu_upgrade_account).setVisible(false);
 			//menu.findItem(R.id.cab_menu_settings).setVisible(false);
@@ -904,7 +911,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 				}
 
-				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+				String textToShow = String.format(context.getString(R.string.context_empty_contacts)).toUpperCase();
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -992,7 +999,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 				}
-				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+				String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -1158,7 +1165,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}else{
 				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 			}
-			String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+			String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
 			try{
 				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 				textToShow = textToShow.replace("[/A]", "</font>");

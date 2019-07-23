@@ -565,7 +565,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
+					String textToShow = getString(R.string.context_empty_offline);
 					try {
 						textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
@@ -642,7 +642,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
+					String textToShow = getString(R.string.context_empty_offline);
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -772,7 +772,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				}
 
-				String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
+				String textToShow = getString(R.string.context_empty_offline);
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -1182,7 +1182,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
+					String textToShow = getString(R.string.context_empty_offline);
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -1286,7 +1286,7 @@ public class OfflineFragmentLollipop extends Fragment{
 								startActivity(mediaIntent);
 							}
 							else {
-								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -1617,7 +1617,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				}
-				String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
+				String textToShow = getString(R.string.context_empty_offline);
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -1698,7 +1698,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			}else{
 				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 			}
-			String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
+			String textToShow = getString(R.string.context_empty_offline);
 			try{
 				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 				textToShow = textToShow.replace("[/A]", "</font>");

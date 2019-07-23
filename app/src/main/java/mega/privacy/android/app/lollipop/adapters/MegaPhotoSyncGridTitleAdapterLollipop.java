@@ -1319,7 +1319,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
                                 context.startActivity(mediaIntent);
                             } else {
-                                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.intent_not_available), -1);
                                 ArrayList<Long> handleList = new ArrayList<Long>();
                                 handleList.add(n.getHandle());
                                 NodeController nC = new NodeController(context);

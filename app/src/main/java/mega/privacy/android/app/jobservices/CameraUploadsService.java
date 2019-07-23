@@ -66,9 +66,9 @@ import nz.mega.sdk.MegaUserAlert;
 
 public class CameraUploadsService extends JobService implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface {
 
-    public static String PHOTO_SYNC = "PhotoSync";
-    public static String CAMERA_UPLOADS = "Camera Uploads";
-    public static String SECONDARY_UPLOADS = "Media Uploads";
+    private static String PHOTO_SYNC = "PhotoSync";
+    private static String CAMERA_UPLOADS = "Camera Uploads";
+    private static String SECONDARY_UPLOADS = "Media Uploads";
 
     private NotificationCompat.Builder mBuilder;
     NotificationManager mNotificationManager;
@@ -1198,7 +1198,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
 
                                             int ret = megaChatApi.getInitState();
 
-                                            if (ret == 0 || ret == MegaChatApi.INIT_ERROR) {
+                                            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
                                                 ret = megaChatApi.init(gSession);
                                                 log("shouldRun: result of init ---> " + ret);
                                                 chatSettings = dbH.getChatSettings();
@@ -1219,7 +1219,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                                     megaChatApi.logout(cameraUploadsService);
                                                 } else {
                                                     log("shouldRun: Chat correctly initialized");
-                                                    megaChatApi.enableGroupChatCalls(true);
                                                 }
                                             }
                                         }
@@ -1294,7 +1293,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     megaApi.renameNode(nl.get(i), CAMERA_UPLOADS, this);
                 }
             }
-
+            
             log("If not Camera Uploads nor Photosync");
             if (cameraUploadHandle == -1){
                 log("must create the folder");
@@ -1318,7 +1317,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         megaApi.renameNode(nl.get(i), CAMERA_UPLOADS, this);
                     }
                 }
-
+                
                 if (cameraUploadHandle == -1){
                     log("If not Camera Uploads nor Photosync--- must create the folder");
                     megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
@@ -1343,7 +1342,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                 dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                             }
                         }
-
+                        
                         //If not "Media Uploads"
                         if (secondaryUploadHandle == -1){
                             log("must create the secondary folder");
@@ -1364,7 +1363,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                     dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                                 }
                             }
-
+                            
                             //If not "Media Uploads"
                             if (secondaryUploadHandle == -1){
                                 log("must create the folder");
@@ -1387,7 +1386,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                             dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                         }
                     }
-
+                    
                     //If not "Media Uploads"
                     if (secondaryUploadHandle == -1){
                         log("must create the folder");
@@ -1403,7 +1402,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                     }
                 }
-
+                
                 //If not "Media Uploads"
                 if (secondaryUploadHandle == -1){
                     log("must create the folder");
@@ -1421,7 +1420,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
 
     private void initService(){
         log("initService()");
-
+        
         totalUploaded = -1;
         totalSizeToUpload = 0;
         totalToUpload = 0;
@@ -1464,7 +1463,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         String previousIP = app.getLocalIpAddress();
-        String currentIP = Util.getLocalIpAddress();
+        String currentIP = Util.getLocalIpAddress(getApplicationContext());
         if (previousIP == null || (previousIP.length() == 0) || (previousIP.compareTo("127.0.0.1") == 0)) {
             app.setLocalIpAddress(currentIP);
         }
@@ -1685,7 +1684,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     log("CamSync Folder UPDATED DB");
                     dbH.setCamSyncHandle(request.getNodeHandle());
                 }
-                else{
+                else if(name.contains(SECONDARY_UPLOADS)){
                     //Update in database
                     log("Secondary Folder UPDATED DB");
                     dbH.setSecondaryFolderHandle(request.getNodeHandle());

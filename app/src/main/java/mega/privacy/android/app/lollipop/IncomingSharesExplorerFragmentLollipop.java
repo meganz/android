@@ -205,7 +205,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
-			optionButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
+			optionButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
@@ -246,7 +246,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}else{
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 				}
-				String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+				String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -587,7 +587,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}else{
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 				}
-				String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+				String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -744,7 +744,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					}else{
 						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+					String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");

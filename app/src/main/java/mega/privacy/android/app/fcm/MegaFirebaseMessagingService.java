@@ -19,7 +19,6 @@ package mega.privacy.android.app.fcm;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -110,7 +109,9 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         log("From: " + remoteMessage.getFrom());
 
         remoteMessageType = remoteMessage.getData().get("type");
-
+    
+        log("getOriginalPriority is " + remoteMessage.getOriginalPriority() + " getPriority is " + remoteMessage.getPriority());
+    
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             log("Message data payload: " + remoteMessage.getData());
@@ -212,9 +213,31 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 }
                 else if(remoteMessageType.equals("2")){
                     log("CHAT notification");
+    
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                        boolean isIdle = pm.isDeviceIdleMode();
+                        log("isActivityVisible: " + app.isActivityVisible());
+                        log("isIdle: " + isIdle);
+                        wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingMessageCallLock:");
+                        wl.acquire();
+                        wl.release();
+                        if((!app.isActivityVisible() && megaApi.getRootNode() == null )|| isIdle) {
+                            log("launch foreground service!");
+                            Intent intent = new Intent(this,IncomingMessageService.class);
+                            intent.putExtra("remoteMessage", remoteMessage);
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                                startForegroundService(intent);
+                            }else{
+                                startService(intent);
+                            }
+                            return;
+                        }
+                    }
 
                     if(app.isActivityVisible()){
                         log("App on foreground --> return");
+                        retryPendingConnections();
                         return;
                     }
 
@@ -321,12 +344,13 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                 int ret = megaChatApi.getInitState();
 
-                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
                     ret = megaChatApi.init(gSession);
                     log("result of init ---> " + ret);
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE) {
                         log("condition ret == MegaChatApi.INIT_NO_CACHE");
+
                     } else if (ret == MegaChatApi.INIT_ERROR) {
                         log("condition ret == MegaChatApi.INIT_ERROR");
                         if (chatSettings == null) {
@@ -339,9 +363,9 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             dbH.setEnabledChat(false + "");
                         }
                         megaChatApi.logout(this);
+
                     } else {
                         log("Chat correctly initialized");
-                        megaChatApi.enableGroupChatCalls(true);
                     }
                 }
             }

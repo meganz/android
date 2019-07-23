@@ -845,22 +845,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			} else {
 				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 			}
-			String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
 
-			try{
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
-			}
-			catch (Exception e){}
-			Spanned result = null;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-			} else {
-				result = Html.fromHtml(textToShow);
-			}
-			emptyTextViewFirst.setText(result);
+			showEmptyView();
 
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
@@ -1050,22 +1036,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 			}
 
-			String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
-
-			try{
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
-			}
-			catch (Exception e){}
-			Spanned result = null;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-			} else {
-				result = Html.fromHtml(textToShow);
-			}
-			emptyTextViewFirst.setText(result);
+			showEmptyView();
 
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
@@ -1283,6 +1254,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			fastScroller.setRecyclerView(listView);
 			visibilityFastScroller();
 			return v;
+		}
+	}
+
+	private void showEmptyView() {
+		if (((ManagerActivityLollipop) context).getIsSearchEnabled()) {
+			showEmptySearchResults();
+		} else {
+			showEmptyResults();
 		}
 	}
 	
@@ -1632,15 +1611,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			case R.id.relative_layout_file_list_browser_camera_upload_on_off:{
 				if(type==TYPE_CAMERA){
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+						boolean hasStoragePermission = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 						if (!hasStoragePermission) {
 							ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 									new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 									Constants.REQUEST_WRITE_STORAGE);
 						}
 
-						boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-						if (!hasCameraPermission){
+						if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA)){
 							ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 									new String[]{Manifest.permission.CAMERA},
 									Constants.REQUEST_CAMERA);
@@ -1662,15 +1640,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			case R.id.cam_sync_button_ok:{
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					boolean hasStoragePermission = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 								Constants.REQUEST_WRITE_STORAGE);
 					}
-					
-					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-	        		if (!hasCameraPermission){
+
+	        		if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA)){
 	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.CAMERA},
 								Constants.REQUEST_CAMERA);
@@ -1832,7 +1809,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
 									context.startActivity(mediaIntent);
 								} else {
-									((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+									((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.intent_not_available), -1);
 									adapterList.notifyDataSetChanged();
 									ArrayList<Long> handleList = new ArrayList<Long>();
 									handleList.add(psHMegaNode.getHandle());
@@ -2342,6 +2319,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				monthPics.clear();
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+				showEmptyResults();
 				listView.setVisibility(View.GONE);
 			}
 			else{
@@ -2357,7 +2335,31 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 	}
-	
+
+	public void showEmptySearchResults() {
+		emptyTextView.setVisibility(View.VISIBLE);
+		emptyTextViewFirst.setText(getText(R.string.no_results_found));
+	}
+
+	private void showEmptyResults() {
+		String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
+
+		try{
+			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[/A]", "</font>");
+			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[/B]", "</font>");
+		}
+		catch (Exception e){}
+		Spanned result = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textToShow);
+		}
+		emptyTextViewFirst.setText(result);
+	}
+
 	public void notifyDataSetChanged(){
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){

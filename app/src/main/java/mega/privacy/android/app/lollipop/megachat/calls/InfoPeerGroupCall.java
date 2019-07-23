@@ -7,7 +7,9 @@ import android.view.SurfaceView;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 
 public class InfoPeerGroupCall {
-    Long handle;
+
+    long peerId;
+    long clientId;
     String name;
     boolean videoOn;
     boolean audioOn;
@@ -15,9 +17,10 @@ public class InfoPeerGroupCall {
     GroupCallListener listener = null;
     boolean goodQuality = true;
 
-public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audioOn, boolean greenLayer, boolean goodQuality, GroupCallListener listener) {
+public InfoPeerGroupCall(long peerId, long clientId, String name, boolean videoOn, boolean audioOn, boolean greenLayer, boolean goodQuality, GroupCallListener listener) {
 
-    this.handle = handle;
+    this.peerId = peerId;
+    this.clientId = clientId;
     this.name = name;
     this.videoOn = videoOn;
     this.audioOn = audioOn;
@@ -26,12 +29,20 @@ public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audi
     this.goodQuality = goodQuality;
 }
 
-    public Long getHandle() {
-        return handle;
+    public long getPeerId() {
+        return peerId;
     }
 
-    public void setHandle(Long handle) {
-        this.handle = handle;
+    public void setPeerId(Long peerId) {
+        this.peerId = peerId;
+    }
+
+    public long getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
     }
 
     public String getName() {

@@ -8,6 +8,7 @@
 
 ### Android Studio files ###
 *.iml
+.idea/assetWizardSettings.xml
 
 # User-specific stuff:
 .idea/workspace.xml
