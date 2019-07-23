@@ -2450,7 +2450,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 Uri newUri = uri;
                 if (uri.toString().contains(CacheFolderManager.VOICE_CLIP_FOLDER)) {
                     MegaNode file = megaApi.getNodeByHandle(handle);
-                    String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
                     if (localPath == null) break;
                     File voiceClipFile = new File(localPath);
                     newUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", voiceClipFile);
