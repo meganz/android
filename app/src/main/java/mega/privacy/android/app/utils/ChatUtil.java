@@ -21,6 +21,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -30,6 +31,9 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 
 public class ChatUtil {
 
@@ -341,6 +345,20 @@ public class ChatUtil {
 
         finalTime = finalTime + minutesString + ":" + secondsString;
         return finalTime;
+    }
+
+    /**
+     * To detect whether My Chat Files folder exist or not.
+     * If no, store the passed data and process after the folder is created
+     */
+    public static <T> boolean existsMyChatFiles(T preservedData, MegaApiAndroid megaApi, MegaRequestListenerInterface requestListener, MyChatFilesExisitListener listener) {
+        MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
+        if (parentNode == null) {
+            megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), requestListener);
+            listener.storedUnhandledData(preservedData);
+            return false;
+        }
+        return true;
     }
 
     private static void log(String message) {
