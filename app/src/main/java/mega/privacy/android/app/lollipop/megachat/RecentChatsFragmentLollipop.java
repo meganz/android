@@ -301,16 +301,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             log("setChats:chats size: " + chats.size());
 
                             //Order by last interaction
-                            Collections.sort(chats, new Comparator<MegaChatListItem>() {
-
-                                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                                    long timestamp1 = c1.getLastTimestamp();
-                                    long timestamp2 = c2.getLastTimestamp();
-
-                                    long result = timestamp2 - timestamp1;
-                                    return (int) result;
-                                }
-                            });
+                            sortChats(chats);
 
                             if (adapterList == null) {
                                 log("adapterList is NULL");
@@ -352,16 +343,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         log("chats no: " + chats.size());
 
                         //Order by last interaction
-                        Collections.sort(chats, new Comparator<MegaChatListItem>() {
-
-                            public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                                long timestamp1 = c1.getLastTimestamp();
-                                long timestamp2 = c2.getLastTimestamp();
-
-                                long result = timestamp2 - timestamp1;
-                                return (int) result;
-                            }
-                        });
+                        sortChats(chats);
 
                         if (listView == null) {
                             log("setChats: INIT_OFFLINE_SESSION: listView is null");
@@ -398,6 +380,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 }
             }
         }
+    }
+
+    private void sortChats(ArrayList<MegaChatListItem> chatsToSort) {
+        Collections.sort(chatsToSort, new Comparator<MegaChatListItem>() {
+
+            public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                long timestamp1 = c1.getLastTimestamp();
+                long timestamp2 = c2.getLastTimestamp();
+
+                long result = timestamp2 - timestamp1;
+                return (int) result;
+            }
+        });
     }
 
     public void showCallLayout() {
@@ -1447,9 +1442,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         showCallLayout();
 
         if (context instanceof ManagerActivityLollipop) {
-            String searchQuery = ((ManagerActivityLollipop) context).searchQuery;
-            if (searchQuery != null && ((ManagerActivityLollipop) context).searchExpand) {
-                filterChats(searchQuery);
+            if (((ManagerActivityLollipop) context).isSearchOpen()) {
+                filterChats(((ManagerActivityLollipop) context).searchQuery);
             }
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }
@@ -1787,16 +1781,29 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     class FilterChatsTask extends AsyncTask<String, Void, Void> {
 
         ArrayList<MegaChatListItem> filteredChats;
+        int archivedSize = 0;
 
         @Override
         protected Void doInBackground(String... strings) {
-            if (chats != null && !chats.isEmpty()) {
+            ArrayList<MegaChatListItem> chatsToSearch = new ArrayList<>();
+            chatsToSearch.addAll(chats);
+
+            if (context instanceof ManagerActivityLollipop) {
+                ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
+                if (archivedChats != null && !archivedChats.isEmpty()) {
+                    archivedSize = archivedChats.size();
+                    sortChats(archivedChats);
+                    chatsToSearch.addAll(archivedChats);
+                }
+            }
+
+            if (chatsToSearch != null && !chatsToSearch.isEmpty()) {
                 if (filteredChats == null) {
                     filteredChats = new ArrayList<>();
                 } else {
                     filteredChats.clear();
                 }
-                for (MegaChatListItem chat : chats) {
+                for (MegaChatListItem chat : chatsToSearch) {
                     if (chat.getTitle().toLowerCase().contains(strings[0].toLowerCase())) {
                         filteredChats.add(chat);
                     }
@@ -1812,7 +1819,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
             adapterList.setChats(filteredChats);
 
-            if (adapterList.getItemCount() == 0) {
+
+            if (shouldShowEmptyState()) {
                 log("adapterList.getItemCount() == 0");
                 listView.setVisibility(View.GONE);
                 emptyLayout.setVisibility(View.VISIBLE);
@@ -1840,6 +1848,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 listView.setVisibility(View.VISIBLE);
                 emptyLayout.setVisibility(View.GONE);
             }
+        }
+
+        private boolean shouldShowEmptyState() {
+            if (context instanceof ManagerActivityLollipop) {
+                if ((adapterList.getItemCount() == 0 && archivedSize == 0) || (adapterList.getItemCount() == 1 && archivedSize > 0))
+                    return true;
+            } else if (context instanceof ArchivedChatsActivity) {
+                if (adapterList.getItemCount() == 0)
+                    return true;
+            }
+            return false;
         }
     }
 }

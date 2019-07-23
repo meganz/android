@@ -18716,6 +18716,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         }
     }
 
+	public boolean isSearchOpen() {
+		return true ? searchQuery != null && searchExpand : false;
+	}
+
     public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
 		this.accountFragmentPreUpgradeAccount = accountFragment;
 	}
