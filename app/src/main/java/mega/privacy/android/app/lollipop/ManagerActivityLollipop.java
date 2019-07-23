@@ -9533,9 +9533,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (drawerItem == DrawerItem.CHAT){
-
 			if (!Util.isOnline(this)){
-				showOfflineMode();
+				super.onBackPressed();
+				return;
 			}
 			else{
 				if(megaApi!=null && megaApi.getRootNode()!=null){
