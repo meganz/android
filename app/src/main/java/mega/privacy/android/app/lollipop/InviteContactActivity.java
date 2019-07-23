@@ -732,7 +732,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     private void getMegaContact() {
         //clear cache
         isGettingMegaContact = true;
-        megaContactGetter.getMegaContacts(megaApi, rawLocalContacts, MegaContactGetter.DAY);
+        megaContactGetter.getMegaContacts(megaApi, MegaContactGetter.DAY);
     }
 
     private void onGetContactCompleted() {
@@ -1006,7 +1006,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
                         setResult(Activity.RESULT_OK);
                         finish();
                     }
-                }, 1000);
+                }, 2000);
             }
         }
 
@@ -1046,6 +1046,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
                 refreshAddedContactsView();
             }
         }
+        setTitleAB();
     }
 
     private int isUserEnteredContactExistInList(InvitationContactInfo userEnteredInfo) {

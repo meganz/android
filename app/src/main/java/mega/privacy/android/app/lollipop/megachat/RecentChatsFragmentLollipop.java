@@ -239,7 +239,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void noContacts() {
         invitationContainer.setVisibility(View.GONE);
         inviteTitle.setText(R.string.no_local_contacts_on_mega);
-        inviteTitle.setClickable(false);
+        inviteTitle.setClickable(true);
         collapseBtn.setVisibility(View.INVISIBLE);
         moreContactsTitle.setVisibility(View.VISIBLE);
     }
@@ -848,14 +848,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             case R.id.invite_title:
             case R.id.dismiss_button:
             case R.id.collapse_btn:
-                if (invitationContainer.getVisibility() == View.VISIBLE) {
-                    invitationContainer.setVisibility(View.GONE);
-                    collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
-                    isExpand = false;
+                if(moreContactsTitle.getVisibility() == View.VISIBLE) {
+                    startActivityForResult(new Intent(context, InviteContactActivity.class), Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 } else {
-                    invitationContainer.setVisibility(View.VISIBLE);
-                    collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
-                    isExpand = true;
+                    if (invitationContainer.getVisibility() == View.VISIBLE) {
+                        invitationContainer.setVisibility(View.GONE);
+                        collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
+                        isExpand = false;
+                    } else {
+                        invitationContainer.setVisibility(View.VISIBLE);
+                        collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
+                        isExpand = true;
+                    }
                 }
                 break;
             case R.id.allow_button:
@@ -1456,8 +1460,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             if(context instanceof ManagerActivityLollipop){
                 if(item.isArchived()){
                     log("New archived element:remove from list");
-                    if (adapterList.getItemCount()!=0){
-
+                    if (adapterList == null || adapterList.getItemCount()==0){
+                        setChats();
+                    } else {
                         long chatHandleToRemove = item.getChatId();
                         int indexToRemove = -1;
                         ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
@@ -2131,7 +2136,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             case Constants.REQUEST_READ_CONTACTS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     log("REQUEST_READ_CONTACTS");
-                    showPermissionGrantedView();
                     grantedContactPermission = true;
                 } else {
                     log("read contacts permission denied!");
@@ -2152,7 +2156,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     private void loadMegaContacts() {
-        contactGetter.getMegaContacts(megaApi, contactGetter.getLocalContacts(), MegaContactGetter.DAY);
+        contactGetter.getMegaContacts(megaApi, MegaContactGetter.DAY);
     }
 
     private static void log(String log) {

@@ -279,18 +279,15 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         return megaContacts.get(currentContactIndex);
     }
 
-    public void getMegaContacts(MegaApiAndroid api, List<ContactsUtil.LocalContact> localContacts, long period) {
+    public void getMegaContacts(MegaApiAndroid api, long period) {
         if(api.getRootNode() == null) {
             log("haven't logged in, return");
             return;
         }
-        if (requestInProgress) {
-            return;
-        }
-        if (System.currentTimeMillis() - lastSyncTimestamp > period) {
+        if (System.currentTimeMillis() - lastSyncTimestamp > period && !requestInProgress) {
             requestInProgress = true;
             log("getMegaContacts request from server");
-            api.getRegisteredContacts(getRequestParameter(localContacts), this);
+            api.getRegisteredContacts(getRequestParameter(getLocalContacts()), this);
         } else {
             log("getMegaContacts load from database");
             if (updater != null) {

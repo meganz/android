@@ -123,7 +123,11 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
     @Override
     public int getItemViewType(int position) {
-        return contactData.get(position).getType();
+        InvitationContactInfo item = getItem(position);
+        if(item != null) {
+            return item.getType();
+        }
+        return -1;
     }
 
     public InvitationContactInfo getItem(int position) {

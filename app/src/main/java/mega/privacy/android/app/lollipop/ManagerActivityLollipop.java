@@ -1864,7 +1864,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, this)) {
 		    log("sync mega contacts");
 			MegaContactGetter getter = new MegaContactGetter(this);
-			getter.getMegaContacts(megaApi, getter.getLocalContacts(), MegaContactGetter.WEEK);
+			getter.getMegaContacts(megaApi, MegaContactGetter.WEEK);
 		}
 
 		Display display = getWindowManager().getDefaultDisplay();

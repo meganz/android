@@ -18,7 +18,7 @@
             android:orientation="vertical">
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="56dp"
                 android:orientation="horizontal">
                 <ImageView
                     android:id="@+id/collapse_btn"
@@ -35,7 +35,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center_vertical"
                     android:layout_marginLeft="32dp"
-                    android:layout_marginRight="22dp"
+                    android:layout_marginRight="52dp"
                     android:layout_toRightOf="@+id/collapse_btn"
                     android:fontFamily="Roboto"
                     android:textSize="14sp"
