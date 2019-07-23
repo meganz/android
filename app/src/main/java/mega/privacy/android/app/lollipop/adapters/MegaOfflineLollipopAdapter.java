@@ -380,12 +380,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 	@Override
 	public int getPlaceholderCount() {
-    	return placeholderCount;
+		return placeholderCount;
 	}
 
 	@Override
 	public List<Integer> getSelectedItems() {
-    	if (selectedItems != null) {
+		if (selectedItems != null) {
 			log("getSelectedItems");
 			List<Integer> items = new ArrayList<Integer>(selectedItems.size());
 			for (int i = 0; i < selectedItems.size(); i++) {
@@ -393,7 +393,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 			return items;
 		} else {
-    		return null;
+			return null;
 		}
 	}	
 	

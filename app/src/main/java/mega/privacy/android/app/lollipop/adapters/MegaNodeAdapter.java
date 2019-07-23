@@ -321,9 +321,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     @Override
     public List<Integer> getSelectedItems() {
-        if (selectedItems !=null) {
+        if (selectedItems != null) {
             List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-            for (int i = 0;i < selectedItems.size();i++) {
+            for (int i = 0; i < selectedItems.size(); i++) {
                 items.add(selectedItems.keyAt(i));
             }
             return items;
@@ -363,8 +363,18 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         return nodes;
     }
 
+    /*
+     * The method to return how many folders in this adapter
+     */
     @Override
     public int getFolderCount() {
+        return getFolderCount(nodes);
+    }
+
+    /*
+     * The method to calculate how many nodes are folders in array list
+     */
+    public int getFolderCount(ArrayList<MegaNode> nodes) {
         int folderCount = 0;
         for (MegaNode node : nodes) {
             if (node == null) {
@@ -385,15 +395,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * @return Nodes list with placeholder.
      */
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
-        int folderCount = 0;
-        for (MegaNode node : nodes) {
-            if (node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-        }
+        int folderCount = getFolderCount(nodes);
         int spanCount = 2;
         if (listFragment instanceof NewGridRecyclerView) {
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();

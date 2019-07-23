@@ -4,6 +4,8 @@ import java.util.List;
 
 public interface RotatableAdapter {
     List<Integer> getSelectedItems();
+
     int getFolderCount();
+
     int getPlaceholderCount();
 }

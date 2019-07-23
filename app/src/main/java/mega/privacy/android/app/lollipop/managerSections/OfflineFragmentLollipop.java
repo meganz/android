@@ -1393,7 +1393,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	@Override
 	public void multipleItemClick(int position) {
-		if(position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
+		if (position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
 			position -= placeholderCount;
 		}
 		adapter.toggleSelection(position);

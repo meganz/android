@@ -1314,14 +1314,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	private void reDoTheSelectionAfterRotation() {
-		if (((ManagerActivityLollipop)context).isListCameraUploads()) {
+		if (((ManagerActivityLollipop) context).isListCameraUploads()) {
 			if (adapterList != null && adapterList.getSelectedDocuments().size() > 0) {
 				log("There is previous selected items, we need to redo the selection");
 				activateActionMode();
 				updateActionModeTitle();
 			}
-		}
-		else {
+		} else {
 			if (adapterGrid != null && adapterGrid.getSelectedDocuments().size() > 0) {
 				log("There is previous selected items, we need to redo the selection");
 				adapterGrid.refreshActionModeTitle();
