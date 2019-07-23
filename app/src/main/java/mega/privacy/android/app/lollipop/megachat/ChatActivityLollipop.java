@@ -156,7 +156,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.EDITING_MESSAGE;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.LATITUDE;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.LONGITUDE;
@@ -165,6 +164,7 @@ import static mega.privacy.android.app.lollipop.megachat.MapsActivity.SNAPSHOT;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.getAddresses;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 import static mega.privacy.android.app.utils.Util.context;
 import static mega.privacy.android.app.utils.Util.toCDATA;
@@ -3562,7 +3562,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void activateActionMode(){
-        log("activateActionMode");
         if (!adapter.isMultipleSelect()){
             adapter.setMultipleSelect(true);
             actionMode = startSupportActionMode(new ActionBarCallBack());
@@ -4058,7 +4057,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * Disable selection
      */
     public void hideMultipleSelect() {
-        log("hideMultipleSelect");
         adapter.setMultipleSelect(false);
         if (actionMode != null) {
             actionMode.finish();
@@ -4083,7 +4081,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void itemClick(int positionInAdapter, int [] screenPosition) {
-        log("itemClick : position: "+positionInAdapter);
+        log("temClick : position: "+positionInAdapter);
         int positionInMessages = positionInAdapter-1;
 
         if(positionInMessages < messages.size()){
@@ -4997,8 +4995,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
-        log("onMessageLoaded!------------------------");
-
+        log("onMessageLoaded");
         if(msg!=null){
             log("STATUS: "+msg.getStatus());
             log("TEMP ID: "+msg.getTempId());
@@ -5288,7 +5285,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageReceived(MegaChatApiJava api, MegaChatMessage msg) {
-        log("onMessageReceived!");
+        log("onMessageReceived");
         log("------------------------------------------"+api.getChatConnectionState(idChat));
         log("STATUS: "+msg.getStatus());
         log("TEMP ID: "+msg.getTempId());
@@ -5405,10 +5402,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
-        log("onMessageUpdate!: "+ msg.getMsgId());
+        log("onMessageUpdate");
 
         int resultModify = -1;
         if(msg.isDeleted()){
+            log("onMessageUpdate:msg.isDeleted()");
+
             if(adapter!=null){
                 adapter.stopPlaying(msg.getMsgId());
             }
@@ -5602,8 +5601,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         }
+        log("deleteMessage: indexToChange (in array) = "+indexToChange);
 
         if(indexToChange!=-1) {
+
             messages.remove(indexToChange);
             log("Removed index: " + indexToChange + " positionNewMessagesLayout: "+ positionNewMessagesLayout +" messages size: " + messages.size());
 //                adapter.notifyDataSetChanged();
@@ -5621,6 +5622,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             if(!messages.isEmpty()){
+
                 //Update infoToShow of the next message also
                 if (indexToChange == 0) {
                     messages.get(indexToChange).setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
@@ -5630,28 +5632,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         setShowAvatar(indexToChange+1);
                     }
                 }else{
-
                     //Not first element
                     if(indexToChange==messages.size()){
                         log("The last message removed, do not check more messages");
                         setShowAvatar(indexToChange-1);
-                        return;
+                    }else{
+                        adjustInfoToShow(indexToChange);
+                        setShowAvatar(indexToChange);
+                        setShowAvatar(indexToChange-1);
                     }
-
-                    adjustInfoToShow(indexToChange);
-                    setShowAvatar(indexToChange);
-                    setShowAvatar(indexToChange-1);
                 }
             }
 
+//            if(adapter.isItemChecked(indexToChange+1)){
+//                adapter.toggleSelection(indexToChange+1);
+//                updateActionModeTitle();
+//            }
 
             adapter.removeMessage(indexToChange+1, messages);
-            if(adapter!=null){
-                if(adapter.isMultipleSelect()){
-                    clearSelections();
-                    hideMultipleSelect();
+
+            ArrayList<AndroidMegaChatMessage> selectedMessages = adapter.getSelectedMessages();
+            for(AndroidMegaChatMessage message:selectedMessages){
+                if(msg.getMsgId() == message.getMessage().getMsgId()){
                 }
             }
+
+            if(adapter.isItemChecked(indexToChange+1)){
+                adapter.toggleSelection(indexToChange+1);
+                updateActionModeTitle();
+            }
+
+//            if (adapter != null && adapter.isMultipleSelect() ) {
+//                clearSelections();
+//                hideMultipleSelect();
+//            }
         }else{
             log("index to change not found");
         }
