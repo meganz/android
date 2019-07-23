@@ -8,8 +8,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 237
-        versionName "3.6.2 (237)"
+        versionCode 249
+        versionName "3.6.4 (249)"
         multiDexEnabled true
     }
 
@@ -80,6 +80,10 @@ dependencies {
     implementation 'com.android.support:support-emoji-appcompat:27.1.1'
     implementation 'com.android.support:support-emoji-bundled:27.1.1'
     implementation 'com.android.support:preference-v7:27.1.1'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
+    implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'net.opacapp:multiline-collapsingtoolbar:27.1.1'
 }
 

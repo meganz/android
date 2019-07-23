@@ -284,4 +284,26 @@
         <item name="android:layout">@layout/my_category_preference</item>
     </style>
 
+    <style name="CardViewTheme" parent="CardView">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="cardCornerRadius">4dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cardBackgroundColor">@android:color/white</item>
+        <item name="cardPreventCornerOverlap">false</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="contentPadding">0dp</item>
+    </style>
+
+    <style name="MySeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressBackgroundTint">@color/status_bar_login</item>
+        <item name="android:progressTint">@android:color/white</item>
+        <item name="android:colorControlActivated">@android:color/white</item>
+    </style>
+
+    <style name="ContactSeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressBackgroundTint">@color/status_bar_login</item>
+        <item name="android:progressTint">@color/accentColor</item>
+        <item name="android:colorControlActivated">@color/accentColor</item>
+    </style>
 </resources>
