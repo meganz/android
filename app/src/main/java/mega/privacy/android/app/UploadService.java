@@ -1,5 +1,6 @@
 package mega.privacy.android.app;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -458,8 +459,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mNotificationManager.cancel(notificationIdForFolderUpload);
         stopSelf();
         log("after stopSelf");
-        //Delete recursively all files and folder-??????
-        deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
+
+        if (Util.isPermissionGranted(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			//Delete recursively all files and folder-??????
+			deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
+        }
+
 	}
 
     private void notifyNotification(String notificationTitle,String size,int notificationId,String channelId,String channelName) {

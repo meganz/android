@@ -775,11 +775,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 //			dbH = new DatabaseHandler(getApplicationContext());
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
-		
-		boolean askMe = true;
+
+		boolean askMe = Util.askMe(this);
 		prefs = dbH.getPreferences();
 		downloadLocationDefaultPath = getDownloadLocation(this);
-			
+
 		if (askMe){
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				File[] fs = getExternalFilesDirs(null);
@@ -876,10 +876,10 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 //			dbH = new DatabaseHandler(getApplicationContext());
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
-		
-		boolean askMe = true;
+
+		boolean askMe = Util.askMe(this);
 		String downloadLocationDefaultPath = getDownloadLocation(this);
-			
+
 		if (askMe){
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

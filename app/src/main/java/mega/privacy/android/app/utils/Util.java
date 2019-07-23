@@ -1882,6 +1882,10 @@ public class Util {
 		}
 
 	}
+	
+	public static boolean isPermissionGranted(Context context, String permission){
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    }
 
 	private static void log(String message) {
 		log("Util", message);

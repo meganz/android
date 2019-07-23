@@ -633,7 +633,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public long comesFromNotificationHandle = -1;
 	public long comesFromNotificationHandleSaved = -1;
 	public int comesFromNotificationDeepBrowserTreeIncoming = -1;
-	private boolean isCreatingChatFolder = false;
 
 	RelativeLayout myAccountHeader;
 	ImageView contactStatus;
@@ -3703,7 +3702,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				case CAMERA_UPLOADS: {
 					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
-					setToolbarTitle();
 				}
 				case NOTIFICATIONS: {
 					notificFragment = (NotificationsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
@@ -4650,8 +4648,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					setFirstNavigationLevel(true);
+					aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				}
-				aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				break;
 			}
 			case MEDIA_UPLOADS:{
@@ -5041,7 +5039,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		setToolbarTitle();
-        createMyChatFolder();
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -5451,7 +5448,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("Exception NotificationManager - remove all notifications");
 		}
 
-        createMyChatFolder();
 		setToolbarTitle();
 
 		tabLayoutShares.setVisibility(View.GONE);
@@ -6228,7 +6224,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
-                createMyChatFolder();
 				searchQuery = "";
 				searchExpand = true;
 				if (drawerItem != DrawerItem.CHAT) {
@@ -9529,9 +9524,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (drawerItem == DrawerItem.CHAT){
-
 			if (!Util.isOnline(this)){
-				showOfflineMode();
+				super.onBackPressed();
+				return;
 			}
 			else{
 				if(megaApi!=null && megaApi.getRootNode()!=null){
@@ -13637,6 +13632,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if((searchByDate) != null && (searchDate!=null)){
 						ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
 						cuFL.setNodes(nodesSearch);
+						if (nodesSearch.size() == 0) {
+							cuFL.showEmptySearchResults();
+						}
 						isSearchEnabled = true;
 					}else{
 						cuFL.setNodes(nodes);
@@ -16348,10 +16346,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				statusDialog.dismiss();
 			}
 			catch (Exception ex) {}
-            if(isCreatingChatFolder && CHAT_FOLDER.equals(request.getName())){
-                isCreatingChatFolder = false;
-                return;
-            }
             if (e.getErrorCode() == MegaError.API_OK){
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -18714,15 +18708,4 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
         }
     }
-
-	private void createMyChatFolder() {
-		if (Util.isChatEnabled()) {
-			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-			if (parentNode == null && !isCreatingChatFolder) {
-				log("Create folder: " + CHAT_FOLDER);
-				isCreatingChatFolder = true;
-				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
-			}
-		}
-	}
 }
