@@ -232,7 +232,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Mi nube</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Subidas multimedia</string>
-    <string name="section_inbox" context="title of the screen that show the inbox">Buzón de entrada</string>
+    <string name="section_inbox" context="title of the screen that show the inbox">Bandeja de entrada</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Sin conexión</string>
     <string name="section_saved_for_offline_new" context="title of the screen that shows the files saved for offline in the device">Sin conexión</string>
     <!--
@@ -564,7 +564,7 @@
     <!--
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
     -->
-    <string name="my_account_used_space" context="Headline for the amount of storage space is used">Espacio utilizado</string>
+    <string name="my_account_used_space" context="Headline for the amount of storage space is used">Espacio Usado</string>
     <string name="my_account_change_password" context="menu item">Cambiar contraseña</string>
     <!--
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
@@ -676,7 +676,7 @@
 
     <string name="settings_camera_upload_on" context="settings option">Activar las Subidas de la cámara</string>
     <string name="settings_camera_upload_turn_on" context="settings option">Activar las Subidas de la cámara</string>
-    <string name="settings_camera_upload_off" context="settings option">Desactivar Subidas de la cámara</string>
+    <string name="settings_camera_upload_off" context="settings option">Desactivar las Subidas de la cámara</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Como subir</string>
 
     <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Activar subida multimedia secundaria</string>
@@ -854,7 +854,7 @@
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Tus datos sólo se pueden leer a través de una cadena de operaciones de descifrado que comienza con tu clave maestra de cifrado, que almacenamos encriptada con tu contraseña. Esto significa que si pierdes tu contraseña, la Clave de recuperación ya no se podrá desencriptar y no podrás descifrar sus datos.</string>
     <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Si exportas la Clave de recuperación y la guardas en un lugar seguro podrás cambiar la contraseña sin perder tus datos.</string>
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Un atacante externo no puede acceder a tu cuenta solo con tu clave. Para restablecer la contraseña necesitaría tanto la clave como el acceso a tu correo electrónico.</string>
-    <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copia la Clave de recuperación en el portapapeles o guárdala como archivo de texto</string>
+    <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copia la Clave de recuperación al portapapeles o guárdala como archivo de texto</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Guardar</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Clave de recuperación copiada</string>
@@ -965,7 +965,7 @@
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Gestionar enlace</string>
 
-    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">La contraseña actual que has puesto es incorrecta.</string>
+    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">La contraseña actual facilitada es incorrecta.</string>
 
     <string name="number_correctly_reinvite_contact_request" context="success message when reinviting multiple contacts">Se han reinvitado %d contactos correctamente.</string>
 
@@ -2484,8 +2484,8 @@
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDIENTE)</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Mantén pulsado para grabar, suelta para enviar.</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">Desliza para cancelar</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">Este clip de voz no está disponible</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice message">Desliza para cancelar</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Este clip de voz no está disponible</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d archivo descargado anteriormente.&#160;</item>
@@ -2496,4 +2496,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d archivo pendiente.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d archivos pendientes.</item>
 	</plurals>
+
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">No es posible grabar mensajes de voz mientras hay una llamada en curso.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 </resources>

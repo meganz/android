@@ -9,7 +9,7 @@
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">di</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Si</string>
     <string name="general_no" context="Answer for confirmation dialog.">No</string>
-    <string name="general_cancel" context="Answer for confirmation dialog.">Annulla</string>
+    <string name="general_cancel" context="Answer for confirmation dialog.">Cancella</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Sposta nella cartella</string>
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Copia nella cartella</string>
     <!--
@@ -22,10 +22,10 @@
     <!-- This string is commented in FileStorageActivityLollipop.java
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     -->
-    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Scarica</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Download</string>
     <string name="general_add" context="button">Aggiungi</string>
     <string name="general_move" context="button">Sposta</string>
-    <string name="general_remove" context="button">Elimina</string>
+    <string name="general_remove" context="button">Rimuovi</string>
     <string name="general_share" context="button">Condividi</string>
     <!--
     <string name="general_confirm" context="button">Confirm</string>
@@ -43,7 +43,7 @@
     <string name="general_loading" context="state previous to import a file">Caricamento</string>
     <string name="general_importing" context="state while importing the file">Importazione in corso</string>
     <string name="general_forwarding" context="state while importing the file">Inoltro in corso</string>
-    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importa</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Carica</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Archivio</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Quota di trasferimento</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Abbonati</string>
@@ -164,12 +164,12 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s verrà scaricato.</string>
     <string name="alert_no_app" context="Alert text before download">Non hai applicazioni che possano aprire il file %s Continuare lo stesso il download?</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">Non mostrare più</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Non visualizzare più</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Sei sicuro di voler annullare il processo di login corrente?</string>
 
-    <string name="login_text" context="Login button">Login</string>
-    <string name="email_text" context="email label">Email</string>
+    <string name="login_text" context="Login button">Accesso</string>
+    <string name="email_text" context="email label">E-mail</string>
     <string name="password_text" context="password label">Password</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Conferma password</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
@@ -213,9 +213,9 @@
     <string name="create_account_no_terms" context="warning dialog">Per continuare devi accettare i nostri Termini di Servizio</string>
     <string name="error_enter_username" context="Warning dialog">Per favore, inserisci il tuo nome</string>
     <string name="error_enter_userlastname" context="Warning dialog">Per favore, inserisci il tuo cognome.</string>
-    <string name="error_short_password" context="when creating the account">Password troppo corta</string>
+    <string name="error_short_password" context="when creating the account">La password è troppo corta</string>
     <string name="error_passwords_dont_match" context="when creating the account">Le password non combaciano</string>
-    <string name="error_email_registered" contect="when creating the account">Questo indirizzo e-Mail è già utilizzato in Mega.</string>
+    <string name="error_email_registered" contect="when creating the account">Questo indirizzo e-mail è già registrato ad un account MEGA.</string>
 
     <!--
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Confirmation required</string>
@@ -232,7 +232,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Caricamenti dei media</string>
-    <string name="section_inbox" context="title of the screen that show the inbox">In arrivo</string>
+    <string name="section_inbox" context="title of the screen that show the inbox">In entrata</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Salvato in locale</string>
     <string name="section_saved_for_offline_new" context="title of the screen that shows the files saved for offline in the device">Offline</string>
     <!--
@@ -247,7 +247,7 @@
     <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]Nessuna[/B] [A]richiesta ricevuta[/A][B].[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Trasferimenti</string>
 
-    <string name="section_account" context="button to the settings of the user\'s account">Account</string>
+    <string name="section_account" context="button to the settings of the user\'s account">Il mio account</string>
     <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Caricamenti dalla fotocamera</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
@@ -352,7 +352,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Apri</string>
     <string name="context_renaming" context="while renaming a file or folder">Rinominazione</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Preparazione del file in corso</string>
-    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Scarica</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
 
     <!--
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Download folder</string>
@@ -393,7 +393,7 @@
     <!--
     <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     -->
-    <string name="context_remove" context="Menu option to delete one or multiple selected items.">Elimina</string>
+    <string name="context_remove" context="Menu option to delete one or multiple selected items.">Rimuovi</string>
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Rimuovi da uso offline</string>
     <string name="context_share_folder" context="menu item">Condividi cartella</string>
     <string name="context_send_file" context="menu item">Invia file a chat</string>
@@ -674,9 +674,9 @@
         <item context="import from phone option">Importa dal dispositivo</item>
     </string-array>
 
-    <string name="settings_camera_upload_on" context="settings option">Attiva i caricamenti dalla fotocamera</string>
+    <string name="settings_camera_upload_on" context="settings option">Attiva Camera Uploads</string>
     <string name="settings_camera_upload_turn_on" context="settings option">Attiva i caricamenti dalla fotocamera</string>
-    <string name="settings_camera_upload_off" context="settings option">Disattiva i caricamenti dalla fotocamera</string>
+    <string name="settings_camera_upload_off" context="settings option">Disabilita Camera Uploads</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Come caricare</string>
 
     <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Attiva i caricamenti dei media secondari</string>
@@ -737,9 +737,9 @@
     <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-inserisci il tuo nuovo PIN</string>
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">Tutti i tuoi dati locali verranno eliminati e verrà effettuato il tuo log out tra %1d secondi</string>
 
-    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Info</string>
-    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Privacy Policy</string>
-    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">termini di servizio</string>
+    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Riguardo</string>
+    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Informativa sulla privacy</string>
+    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Termini del Servizio</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versione</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Versione MEGA SDK</string>
@@ -809,7 +809,7 @@
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Indirizzo 2 (opzionale)</string>
     <string name="city_cc" context="Hint text of the city edittext for billing purposes">Città</string>
     <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Stato / Provincia</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Nazione</string>
+    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Paese</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Codice postale</string>
 
     <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Inserisci i dettagli di pagamento:</string>
@@ -1000,7 +1000,7 @@
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Il file collegato a questo link è stato rimosso a causa di una violazione dei Termini di Servizio.</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">In attesa della conferma dell\'email</string>
-    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Controlla la tua e-Mail e clicca sul link per conferma il tuo account.</string>
+    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Per favore controlla la tua e-mail e clicca il link per confermare il tuo account.</string>
 
     <plurals name="general_num_items">
         <item context="Singular of items which contains a folder. 1 item" quantity="one">oggetto</item>
@@ -1434,7 +1434,7 @@
     </plurals>
 
     <string name="general_view" context="Menu option">Vedi file</string>
-    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importa</string>
+    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Carica</string>
     <string name="save_for_offline" context="Menu option">Salva per l\'Offline</string>
 
     <string name="general_view_contacts" context="Menu option">Vedi contatti</string>
@@ -1846,9 +1846,9 @@
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Copia negli appunti</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Esporta Chiave di Recupero</string>
     <string name="proceed_to_logout" context="Option that permits user logout">Procedi al logout</string>
-    <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Chiave di Recupero</string>
+    <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Clave Maestra</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Salva nel File System</string>
-    <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Copiato negli appunti</string>
+    <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Copiato nella clipboard</string>
 
     <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">Salta all\'ultimo</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">Nuovi messaggi</string>
@@ -1874,7 +1874,7 @@
     <string name="context_loop_video" context="menu option to loop video or audio file">Loop</string>
 
     <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Opzioni di sicurezza</string>
-    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Chiave di Recupero</string>
+    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Clave Maestra</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Esportare la Chiave di Recupero e tenerla in un posto sicuro ti permette di reimpostare la password senza perdite di dati.</string>
 
     <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">Non è possibile raggiungere MEGA. Per favore, controlla la tua connessione o riprova più tardi.</string>
@@ -1937,7 +1937,7 @@
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">Sii sicuro di fare una copia di questo seed in un posto sicuro nel caso in cui tu perda il tuo dispositivo.</string>
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Per favore, inserisci il codice di 6 cifre generato dalla tua app di autenticazione.</string>
     <string name="general_verify" context="Text button">Verifica</string>
-    <string name="general_next" context="Text button">Avanti</string>
+    <string name="general_next" context="Text button">Successivo</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Un errore è stato riscontrato durante la generazione del seed o del QRcode, per favore riprova.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Autenticazione a due fattori attivata</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">La prossima volta che effettuerai l\'accesso al tuo account ti verrà chiesto di inserire il codice di 6 cifre che ti è stato fornito dalla app di autenticazione.</string>
@@ -2239,7 +2239,7 @@
     <string name="billing_period_title" context="title of billing period">Periodo di fatturazione</string>
     <string name="billed_monthly_text" context="option of billing period, monthly">[A]Fatturato mensilmente[/A] %s /mese</string>
     <string name="billed_yearly_text" context="option of billing period, yearly">[A]Fatturato annualmente[/A] %s /anno</string>
-    <string name="button_cancel" context="dialog option cancel in alert dialog">Annulla</string>
+    <string name="button_cancel" context="dialog option cancel in alert dialog">Cancella</string>
     <string name="button_continue" context="dialog option continue in alert dialog">Continua</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Wallet[/A] (abbonamento)</string>
@@ -2484,8 +2484,8 @@
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (IN ATTESA)</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Clicca e mantieni per registrare, rilascia per inviare.</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">Scorri per annullare</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">Questo messaggio vocale non è disponibile</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Scorri per annullare</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">Questo messaggio vocale non è disponibile</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file già scaricato.&#160;</item>
@@ -2496,4 +2496,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file in attesa.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d file in attesa.</item>
 	</plurals>
+
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Non è possibile registrare messaggi vocali mentre c\'è una chiamata in corso.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 </resources>
