@@ -2368,6 +2368,10 @@ public class Util {
 		}
 
 	}
+	
+	public static boolean isPermissionGranted(Context context, String permission){
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    }
 
 	public static String getVideoDuration (int duration) {
 		if (duration > 0) {
