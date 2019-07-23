@@ -351,9 +351,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                     return;
                 }
                 
-                switchButtonExpiry.setEnabled(false);
                 switchButtonProtection.setEnabled(false);
-                switchButtonExpiry.setChecked(false);
                 expiryDateLayout.setAlpha(ALPHA_VIEW_DISABLED);
                 passwordProtectionLayout.setAlpha(ALPHA_VIEW_DISABLED);
                 linkWithoutKeyCheck.setChecked(false);
