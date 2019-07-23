@@ -2926,7 +2926,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		while (it.hasNext()){
 			MegaNode n = it.next();
 			if (n != null){
-				if (n.getHandle() == imageHandles.get(positionG)){
+				if (positionG < imageHandles.size() && n.getHandle() == imageHandles.get(positionG)){
 					thisNode = true;
 				}
 			}
@@ -2937,7 +2937,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			return;
 		}
 
-		if (imageHandles.get(positionG) != -1){
+		if (positionG < imageHandles.size() && imageHandles.get(positionG) != -1){
 			log("node updated");
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 		}
@@ -2946,7 +2946,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			return;
 		}
 
-		fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+		fileNameTextView.setText(node.getName());
 		supportInvalidateOptionsMenu();
 
 	}

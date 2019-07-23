@@ -1470,7 +1470,7 @@
     <string name="alert_user_is_not_contact">The user is not a contact</string>
 
     <string name="camera_uploads_cellular_connection">Use cellular connection</string>
-    <string name="camera_uploads_upload_videos">Upload videos</string>
+    <string name="camera_uploads_upload_videos">Upload Videos</string>
 
     <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Profile picture updated</string>
     <string name="error_changing_user_avatar_image_not_available" context="Message when an error ocurred when changing an user avatar">Error. Selected image does not exist</string>
@@ -2485,8 +2485,8 @@
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">Slide to cancel</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">This voice clip is not available</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
@@ -2497,7 +2497,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
 	</plurals>
-    
+
     <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%s and %d more</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
@@ -2510,4 +2510,6 @@
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">me</string>
 
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 </resources>
