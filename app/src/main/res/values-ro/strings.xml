@@ -24,7 +24,7 @@
     -->
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Descarcă</string>
     <string name="general_add" context="button">Adaugă</string>
-    <string name="general_move" context="button">Mutare</string>
+    <string name="general_move" context="button">Mută</string>
     <string name="general_remove" context="button">Elimină</string>
     <string name="general_share" context="button">Partajează</string>
     <!--
@@ -215,7 +215,7 @@
     <string name="error_enter_userlastname" context="Warning dialog">Te rugăm să introduci numele.</string>
     <string name="error_short_password" context="when creating the account">Parola este prea scurtă</string>
     <string name="error_passwords_dont_match" context="when creating the account">Parolele nu se potrivesc</string>
-    <string name="error_email_registered" contect="when creating the account">Această adresă de e-mail a înregistrat deja un cont cu MEGA</string>
+    <string name="error_email_registered" contect="when creating the account">Această adresă de e-mail este deja atribuită unui cont pe MEGA.</string>
 
     <!--
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Confirmation required</string>
@@ -360,7 +360,7 @@
     <!--
     <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Import folder</string>
     -->
-    <string name="context_move" context="Item menu option upon right click on one or multiple files.">Mutare</string>
+    <string name="context_move" context="Item menu option upon right click on one or multiple files.">Mută</string>
     <string name="context_moving" context="while moving a file or folder">Se mută</string>
     <!--
     <string name="context_sharing" context="while sharing a folder">Sharing folder</string>
@@ -389,7 +389,7 @@
     <!--<string name="context_send_link" context="get the link and send it">Send link</string>-->
 
     <string name="context_send" context="get the link and send it">Trimite</string>
-    <string name="context_send_file_inbox" context="send the file to inbox">Trimite contactului</string>
+    <string name="context_send_file_inbox" context="send the file to inbox">Trimite unui contact</string>
     <!--
     <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     -->
@@ -580,7 +580,7 @@
 
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Se schimbă parola</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Parola actuală</string>
-    <string name="my_account_change_password_newPassword1" context="when changing the password">Parola nouă</string>
+    <string name="my_account_change_password_newPassword1" context="when changing the password">Parolă nouă</string>
     <string name="my_account_change_password_newPassword2" context="when changing the password">Confirmă parola nouă</string>
     <!--
     <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Incorrect current password or the new passwords you provided do not match. Please try again</string>
@@ -738,7 +738,7 @@
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">Toate datele tale locale vor fi șterse și vei fi deconectat în %1d secunde</string>
 
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Despre</string>
-    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Politica de confidențialitate</string>
+    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Politică de confidențialitate</string>
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Termenii de utilizare a serviciului</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versiunea aplicației</string>
@@ -746,18 +746,18 @@
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Versiunea SDK MEGAchat</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">Vezi codul sursă</string>
 
-    <string name="january">Ianuarie</string>
-    <string name="february">Februarie</string>
-    <string name="march">Martie</string>
-    <string name="april">Aprilie</string>
-    <string name="may">Mai</string>
-    <string name="june">Iunie</string>
-    <string name="july">Iulie</string>
-    <string name="august">August</string>
-    <string name="september">Septembrie</string>
-    <string name="october">Octombrie</string>
-    <string name="november">Noiembrie</string>
-    <string name="december">Decembrie</string>
+    <string name="january">ianuarie</string>
+    <string name="february">februarie</string>
+    <string name="march">martie</string>
+    <string name="april">aprilie</string>
+    <string name="may">mai</string>
+    <string name="june">iunie</string>
+    <string name="july">iulie</string>
+    <string name="august">august</string>
+    <string name="september">septembrie</string>
+    <string name="october">octombrie</string>
+    <string name="november">noiembrie</string>
+    <string name="december">decembrie</string>
 
     <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">Răsfoitor ZIP</string>
 
@@ -1451,7 +1451,7 @@
     <string name="confirm_email_misspelled_email_sent" context="Text shown after the confirmation email has been sent to the new email address">E-mail trimis</string>
 
     <string name="copyright_alert_title" context="text_copyright_alert_title">Avertisment privind drepturile de autor pentru toți utilizatorii</string>
-    <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGA respectă drepturile de autor ale celorlalți și impune utilizatorilor serviciului de stocare în cloud MEGA să se conformeze cu legile drepturilor de autor.</string>
+    <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGA respectă drepturile de autor ale celorlalți și impune utilizatorilor serviciului de stocare în cloud MEGA să se conformeze cu legislațiile privind drepturile de autor.</string>
     <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">Ai interdicția strică de a folosi serviciul de stocare în cloud MEGA pentru încălcarea drepturilor de autor. Nu poți încărca, descărca, stoca, partaja, afișa, distribui, trimite e-mail, oferi link, transmite sau altfel pune la dispoziție fișiere, date sau conținut care încalcă orice drept de autor sau alte drepturi de proprietate ale unei persoane sau entități.</string>
     <string name="copyright_alert_agree_button" context="text of the Agree button">De acord</string>
     <string name="copyright_alert_disagree_button" context="text of the Disagree button">Dezacord</string>
@@ -1790,8 +1790,8 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calitatea media a chatului</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of origin quality multimedia file to upload.">Original quality</item>
-        <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
+        <item context="the options of origin quality multimedia file to upload.">Calitate originală</item>
+        <item context="the options of medium quality multimedia file to  upload.">Calitate medie</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Apel ratat</string>
@@ -2484,8 +2484,8 @@
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (ÎN AȘTEPTARE)</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Atinge și ține pentru a înregistra, eliberează pentru a trimite</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">Glisează pentru a anula</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">Acest clip vocal nu este disponibil</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Glisează pentru a anula</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">Acest clip vocal nu este disponibil</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d fișier descărcat deja.&#160;</item>
@@ -2496,4 +2496,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d fișier în așteptare.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d fișiere în așteptare.</item>
 	</plurals>
+
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Nu este posibilă înregistrarea mesajelor vocale în timp ce există un apel în desfășurare.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 </resources>
