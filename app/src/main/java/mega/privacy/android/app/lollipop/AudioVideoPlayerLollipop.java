@@ -532,6 +532,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         nextButton = (ImageButton) findViewById(R.id.exo_next);
         nextButton.setOnTouchListener(this);
         playList = (ImageButton) findViewById(R.id.exo_play_list);
+        playList.setVisibility(View.GONE);
         playList.setOnClickListener(this);
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
         fragmentContainer.setVisibility(View.GONE);
@@ -728,7 +729,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             getMediaFilesTask.execute();
         }
         else {
-            playList.setVisibility(View.GONE);
             createPlayer();
         }
 
@@ -1054,11 +1054,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         @Override
         protected void onPostExecute(Void aVoid) {
             if (size > 1) {
-                playList.setVisibility(View.GONE);
                 createPlaylistProgressBar.setVisibility(View.VISIBLE);
-            }
-            else {
-                playList.setVisibility(View.GONE);
             }
 
             mediaSourcePlaylist.clear();
@@ -1119,7 +1115,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (isPlayList && size > 1) {
                 createPlayListTask = new CreatePlayListTask();
                 createPlayListTask.execute();
-                playList.setVisibility(View.GONE);
                 createPlaylistProgressBar.setVisibility(View.VISIBLE);
             }
             else {
@@ -4267,6 +4262,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.exo_play_list:{
+//                Ignore click before instantiate playlist if something was wrong obtaining the files
+                if ((adapterType == Constants.OFFLINE_ADAPTER && (getMediaOffList() == null || getMediaOffList().isEmpty()))
+                        || (adapterType == Constants.ZIP_ADAPTER && (getZipMediaFiles() == null || getZipMediaFiles().isEmpty()))
+                        || (getMediaHandles() == null || getMediaHandles().isEmpty())){
+                    break;
+                }
                 handler.removeCallbacks(runnableActionStatusBar);
                 instantiatePlaylist();
                 break;
