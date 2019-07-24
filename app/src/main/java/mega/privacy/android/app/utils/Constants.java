@@ -62,22 +62,23 @@ public class Constants {
 
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
-	final public static int MULTIPLE_SEND_RUBBISH = MULTIPLE_MOVE+1;
+	final public static int MULTIPLE_SEND_RUBBISH = 1;
 	//one file to many contacts
-	final public static int MULTIPLE_CONTACTS_SEND_INBOX = MULTIPLE_SEND_RUBBISH+1;
+	final public static int MULTIPLE_CONTACTS_SEND_INBOX = 2;
 	//many files to one contacts
-	final public static int MULTIPLE_FILES_SEND_INBOX = MULTIPLE_CONTACTS_SEND_INBOX+1;
-	final public static int MULTIPLE_COPY = MULTIPLE_FILES_SEND_INBOX+1;
-	final public static int MULTIPLE_REMOVE_SHARING_CONTACTS = MULTIPLE_COPY+1;
+	final public static int MULTIPLE_FILES_SEND_INBOX = 3;
+	final public static int MULTIPLE_COPY = 4;
+	final public static int MULTIPLE_REMOVE_SHARING_CONTACTS = 5;
 	//one folder to many contacts
-	final public static int MULTIPLE_CONTACTS_SHARE = MULTIPLE_REMOVE_SHARING_CONTACTS+1;
+	final public static int MULTIPLE_CONTACTS_SHARE = 6;
 	//one contact, many files
-	final public static int MULTIPLE_FILE_SHARE = MULTIPLE_CONTACTS_SHARE+1;
-	final public static int MULTIPLE_LEAVE_SHARE = MULTIPLE_FILE_SHARE+1;
+	final public static int MULTIPLE_FILE_SHARE = 7;
+	final public static int MULTIPLE_LEAVE_SHARE = 8;
 
-	final public static int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = MULTIPLE_LEAVE_SHARE+1;
-	final public static int MULTIPLE_CHAT_IMPORT = MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER+1;
-	final public static int MULTIPLE_FORWARD_MESSAGES = MULTIPLE_CHAT_IMPORT+1;
+	final public static int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = 9;
+	final public static int MULTIPLE_CHAT_IMPORT = 10;
+	final public static int MULTIPLE_FORWARD_MESSAGES = 11;
+    final public static int MULTIPLE_CHANGE_PERMISSION = 12;
 
 	final public static int MULTIPLE_RESTORED_FROM_RUBBISH = MULTIPLE_FORWARD_MESSAGES+1;
 
