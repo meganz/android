@@ -67,6 +67,10 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.utils.ThumbnailUtils.createThumbnail;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.THUMBNAIL_FOLDER;
+import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 
 /*
  * Service to create thumbnails
@@ -206,7 +210,7 @@ public class ThumbnailUtilsLollipop {
 			log("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
-			
+
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
@@ -788,21 +792,11 @@ public class ThumbnailUtilsLollipop {
 	 * Get thumbnail folder
 	 */	
 	public static File getThumbFolder(Context context) {
-		if (thumbDir == null) {
-			if (context.getExternalCacheDir() != null){
-				thumbDir = new File (context.getExternalCacheDir(), "thumbnailsMEGA");
-			}
-			else{
-				thumbDir = context.getDir("thumbnailsMEGA", 0);
-			}
-		}
-
-		if (thumbDir != null){
-			thumbDir.mkdirs();
-		}
-
-		log("getThumbFolder(): thumbDir= " + thumbDir);
-		return thumbDir;
+        if(!isFileAvailable(thumbDir)) {
+            thumbDir = getCacheFolder(context, THUMBNAIL_FOLDER);
+        }
+        log("getThumbFolder(): thumbDir= " + thumbDir);
+        return thumbDir;
 	}
 	
 	public static Bitmap getThumbnailFromCache(MegaNode node){
@@ -815,6 +809,14 @@ public class ThumbnailUtilsLollipop {
 	
 	public static Bitmap getThumbnailFromCache(String path){
 		return thumbnailCachePath.get(path);
+	}
+	
+	public static void setThumbnailCache(long handle, Bitmap bitmap){
+		thumbnailCache.put(handle, bitmap);
+	}
+	
+	public static void setThumbnailCache(String path, Bitmap bitmap){
+		thumbnailCachePath.put(path, bitmap);
 	}
 	
 	public static Bitmap getThumbnailFromFolder(MegaNode node, Context context){
@@ -1439,7 +1441,7 @@ public class ThumbnailUtilsLollipop {
 		new AttachThumbnailToFileStorageExplorerTask(context, megaApi, adapter, position).execute(document);
 
 	}
-	
+
 	public static void createThumbnailProviderLollipop(Context context, MegaNode document, ViewHolderLollipopProvider holder, MegaApiAndroid megaApi, MegaProviderLollipopAdapter adapter){
 		
 		if (!MimeTypeList.typeForName(document.getName()).isImage()) {

@@ -30,6 +30,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static nz.mega.sdk.AndroidGfxProcessor.fixExifOrientation;
 import static nz.mega.sdk.AndroidGfxProcessor.isVideoFile;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.THUMBNAIL_FOLDER;
+import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 
 /*
  * Service to create thumbnails
@@ -178,18 +182,9 @@ public class ThumbnailUtils {
 	 * Get thumbnail folder
 	 */	
 	public static File getThumbFolder(Context context) {
-		if (thumbDir == null) {
-			if (context.getExternalCacheDir() != null){
-				thumbDir = new File (context.getExternalCacheDir(), "thumbnailsMEGA");
-			}
-			else{
-				thumbDir = context.getDir("thumbnailsMEGA", 0);
-			}
-		}
-
-		if (thumbDir != null){
-			thumbDir.mkdirs();
-		}
+        if(!isFileAvailable(thumbDir)) {
+            thumbDir = getCacheFolder(context, THUMBNAIL_FOLDER);
+        }
 		log("getThumbFolder(): thumbDir= " + thumbDir);
 		return thumbDir;
 	}
