@@ -13471,7 +13471,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
-			log("REQUEST_CODE_GET");
 			if (intent == null) {
 				log("Return.....");
 				return;
@@ -13483,16 +13482,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.upload_prepare));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+			ProgressDialogUtil.showProcessFileDialog(this,intent);
 		}
 		else if (requestCode == Constants.CHOOSE_PICTURE_PROFILE_CODE && resultCode == RESULT_OK) {
 
@@ -14411,6 +14401,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("EXTRA_FOLDER_PATH:" + folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+				uploadServiceIntent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, paths.size());
 				startService(uploadServiceIntent);
 			}
 		}
@@ -15111,7 +15102,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			catch(Exception ex){}
 		}
-
+		ProgressDialogUtil.dissmisDialog();
 		long parentHandle = -1;
 		MegaNode parentNode = null;
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -15187,6 +15178,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
 		}
 		else {
+			Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
 			for (ShareInfo info : infos) {
 				if(info.isContact){
 					requestContactsPermissions(info, parentNode);

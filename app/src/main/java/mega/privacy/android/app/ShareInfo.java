@@ -407,7 +407,7 @@ public class ShareInfo {
 		Cursor cursor = null;
 		try {
 			cursor = client.query(uri, null, null, null, null);
-		} catch (RemoteException e1) {
+		} catch (Exception e1) {
 			log("cursor EXCEPTION!!!");
 		}
 		if(cursor!=null){
