@@ -1234,7 +1234,9 @@ public class Util {
 		
 		return speedString;
 	}
-	
+
+
+
 	public static String getPhotoSyncName (long timeStamp, String fileName){
         DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
         return sdf.format(new Date(timeStamp)) + fileName.substring(fileName.lastIndexOf('.'));
