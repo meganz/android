@@ -4045,7 +4045,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void updateActionModeTitle() {
         try {
-            actionMode.setTitle(adapter.getSelectedItemCount()+"");
+            actionMode.setTitle(adapter.getSelectedMessages().size()+"");
             actionMode.invalidate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -5603,70 +5603,51 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         log("deleteMessage: indexToChange (in array) = "+indexToChange);
 
-        if(indexToChange!=-1) {
-
+        if (indexToChange != -1) {
             messages.remove(indexToChange);
-            log("Removed index: " + indexToChange + " positionNewMessagesLayout: "+ positionNewMessagesLayout +" messages size: " + messages.size());
-//                adapter.notifyDataSetChanged();
-            if(positionNewMessagesLayout<=indexToChange){
-                if(generalUnreadCount==1 || generalUnreadCount==-1){
+            log("Removed index: " + indexToChange + " positionNewMessagesLayout: " + positionNewMessagesLayout + " messages size: " + messages.size());
+            if (positionNewMessagesLayout <= indexToChange) {
+                if (generalUnreadCount == 1 || generalUnreadCount == -1) {
                     log("Reset generalUnread:Position where new messages layout is show: " + positionNewMessagesLayout);
                     generalUnreadCount = 0;
                     lastIdMsgSeen = -1;
-                }
-                else{
+                } else {
                     log("Decrease generalUnread:Position where new messages layout is show: " + positionNewMessagesLayout);
                     generalUnreadCount--;
                 }
                 adapter.notifyItemChanged(positionNewMessagesLayout);
             }
 
-            if(!messages.isEmpty()){
-
+            if (!messages.isEmpty()) {
                 //Update infoToShow of the next message also
                 if (indexToChange == 0) {
                     messages.get(indexToChange).setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
                     //Check if there is more messages and update the following one
-                    if(messages.size()>1){
-                        adjustInfoToShow(indexToChange+1);
-                        setShowAvatar(indexToChange+1);
+                    if (messages.size() > 1) {
+                        adjustInfoToShow(indexToChange + 1);
+                        setShowAvatar(indexToChange + 1);
                     }
-                }else{
+                } else {
+
                     //Not first element
-                    if(indexToChange==messages.size()){
+                    if (indexToChange == messages.size()) {
                         log("The last message removed, do not check more messages");
-                        setShowAvatar(indexToChange-1);
-                    }else{
+                        setShowAvatar(indexToChange - 1);
+                    }else {
                         adjustInfoToShow(indexToChange);
                         setShowAvatar(indexToChange);
-                        setShowAvatar(indexToChange-1);
+                        setShowAvatar(indexToChange - 1);
                     }
                 }
             }
 
-//            if(adapter.isItemChecked(indexToChange+1)){
-//                adapter.toggleSelection(indexToChange+1);
-//                updateActionModeTitle();
-//            }
 
-            adapter.removeMessage(indexToChange+1, messages);
-
-            ArrayList<AndroidMegaChatMessage> selectedMessages = adapter.getSelectedMessages();
-            for(AndroidMegaChatMessage message:selectedMessages){
-                if(msg.getMsgId() == message.getMessage().getMsgId()){
-                }
+            adapter.removeMessage(indexToChange + 1, messages);
+            if (adapter != null && adapter.isMultipleSelect()) {
+                clearSelections();
+                hideMultipleSelect();
             }
-
-            if(adapter.isItemChecked(indexToChange+1)){
-                adapter.toggleSelection(indexToChange+1);
-                updateActionModeTitle();
-            }
-
-//            if (adapter != null && adapter.isMultipleSelect() ) {
-//                clearSelections();
-//                hideMultipleSelect();
-//            }
-        }else{
+        } else {
             log("index to change not found");
         }
     }
