@@ -65,10 +65,8 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Display;
@@ -202,8 +200,8 @@ import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.ProgressDialogUtil;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -246,7 +244,6 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
-import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -425,6 +422,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public boolean turnOnNotifications = false;
 
+	private DrawerItem searchDrawerItem = null;
 	static DrawerItem drawerItem = null;
 	DrawerItem drawerItemPreUpgradeAccount = null;
 	int accountFragmentPreUpgradeAccount = -1;
@@ -1645,6 +1643,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
+		outState.putSerializable("searchDrawerItem", searchDrawerItem);
 		outState.putBoolean("firstLogin", firstLogin);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
@@ -1767,6 +1766,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			searchDate = savedInstanceState.getLongArray("searchDate");
 			firstLogin = savedInstanceState.getBoolean("firstLogin");
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
+			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable("searchDrawerItem");
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
 			log("savedInstanceState -> indexShares: "+indexShares);
 			indexContacts = savedInstanceState.getInt("indexContacts", 0);
@@ -6243,6 +6243,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
+				log("onMenuItemActionExpand");
 				searchQuery = "";
 				searchExpand = true;
 				if (drawerItem != DrawerItem.CHAT) {
@@ -6250,7 +6251,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					firstNavigationLevel = true;
 					parentHandleSearch = -1;
 					levelsSearch = -1;
-					drawerItem = DrawerItem.SEARCH;
+					setSearchDrawerItem();
 					selectDrawerItemLollipop(drawerItem);
 				}
 				return true;
@@ -6264,6 +6265,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					backToDrawerItem(bottomNavigationCurrentItem);
 					textSubmitted = true;
 					changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
+					searchDrawerItem = null;
 				}
 				else {
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
@@ -6597,11 +6599,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				addMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				unSelectMenuItem.setVisible(false);
+				searchMenuItem.setVisible(false);
 				if(!firstLogin){
-					searchMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 				}else{
-					searchMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
 				}
 				changePass.setVisible(false);
@@ -6693,8 +6694,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				helpMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
-
-				searchMenuItem.setVisible(true);
+				searchMenuItem.setVisible(false);
 				if (isListCameraUploads){
 					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
@@ -18750,4 +18750,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
         }
     }
+
+    private void setSearchDrawerItem() {
+		if (drawerItem != DrawerItem.SEARCH) {
+			searchDrawerItem = drawerItem;
+			drawerItem = DrawerItem.SEARCH;
+		}
+	}
+
+	public boolean isSearchQuery() {
+		if (searchQuery != null && !searchQuery.isEmpty()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isAutomaticSearchAllowed() {
+		if (isSearchQuery() && searchQuery.length() >= 3) {
+			return true;
+		}
+
+		return false;
+	}
+
+    public DrawerItem getSearchDrawerItem(){
+		return searchDrawerItem;
+	}
 }
