@@ -58,6 +58,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -69,7 +70,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.FileUtils.*;
 
 
-public class InboxFragmentLollipop extends Fragment{
+public class InboxFragmentLollipop extends RotatableFragment{
 
 	public static ImageView imageDrag;
 
@@ -108,12 +109,22 @@ public class InboxFragmentLollipop extends Fragment{
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
+	}
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
 	}
 
 	public void updateScrollPosition(int position) {
@@ -174,11 +185,15 @@ public class InboxFragmentLollipop extends Fragment{
         }
 
 		if (headerItemDecoration == null) {
+			log("create new decoration");
 			headerItemDecoration = new NewHeaderItemDecoration(context);
-			recyclerView.addItemDecoration(headerItemDecoration);
+		} else {
+			log("Remove old decoration");
+			recyclerView.removeItemDecoration(headerItemDecoration);
 		}
 		headerItemDecoration.setType(type);
 		headerItemDecoration.setKeys(sections);
+		recyclerView.addItemDecoration(headerItemDecoration);
     }
 
 	public ImageView getImageDrag(int position) {
@@ -931,7 +946,8 @@ public class InboxFragmentLollipop extends Fragment{
 		}
     }
 
-	private void updateActionModeTitle() {
+    @Override
+	protected void updateActionModeTitle() {
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}

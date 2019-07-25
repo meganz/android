@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
@@ -65,6 +64,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -76,7 +76,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 
-public class OfflineFragmentLollipop extends Fragment{
+public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public static ImageView imageDrag;
 	public static final String REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list";
@@ -123,6 +123,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 	};
 
+	private int lastPlaceHolderCount;
+
 	@Override
 	public void onResume(){
 		super.onResume();
@@ -134,6 +136,11 @@ public class OfflineFragmentLollipop extends Fragment{
 	public void onPause(){
 		super.onPause();
 		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+	}
+
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
 	}
 
 	public void activateActionMode(){
@@ -1279,7 +1286,15 @@ public class OfflineFragmentLollipop extends Fragment{
 			}
 		}
     }
-    
+
+	@Override
+	public void multipleItemClick(int position) {
+		if (position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
+			position -= placeholderCount;
+		}
+		adapter.toggleSelection(position);
+	}
+
     public void openFile (File currentFile){
 		log("openFile");
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
@@ -1333,8 +1348,9 @@ public class OfflineFragmentLollipop extends Fragment{
 //			}
 		}
 	}
-	
-	private void updateActionModeTitle() {
+
+	@Override
+	protected void updateActionModeTitle() {
 		log("updateActionModeTitle");
 		if (actionMode == null || getActivity() == null) {
 			return;

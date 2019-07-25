@@ -51,7 +51,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
 
-public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener {
+public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener, RotatableAdapter {
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -373,13 +373,28 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		return selectedItems.size();
 	}
 
+	@Override
+	public int getFolderCount() {
+		return folderCount;
+	}
+
+	@Override
+	public int getPlaceholderCount() {
+		return placeholderCount;
+	}
+
+	@Override
 	public List<Integer> getSelectedItems() {
-		log("getSelectedItems");
-		List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-		for (int i = 0; i < selectedItems.size(); i++) {
-			items.add(selectedItems.keyAt(i));
+		if (selectedItems != null) {
+			log("getSelectedItems");
+			List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+			for (int i = 0; i < selectedItems.size(); i++) {
+				items.add(selectedItems.keyAt(i));
+			}
+			return items;
+		} else {
+			return null;
 		}
-		return items;
 	}	
 	
 	/*
@@ -954,7 +969,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	@Override
 	public int getItemCount() {
 		log("getItemCount");
-		return mOffList.size() - placeholderCount;
+		return mOffList.size();
 	}
 
 	public int getItemCountWithoutRK(){

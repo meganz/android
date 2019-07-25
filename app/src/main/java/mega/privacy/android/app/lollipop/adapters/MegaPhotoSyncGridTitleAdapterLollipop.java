@@ -1039,6 +1039,16 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         notifyDataSetChanged();
     }
 
+    public void setContext(Context context) {
+        log("context has been updated, the action mode needs to be cleaned");
+        this.context = context;
+        actionMode = null;
+    }
+
+    public Context getContext() {
+        return this.context;
+    }
+
     public void setPhotoSyncHandle(long photoSyncHandle){
         this.photosyncHandle = photoSyncHandle;
         notifyDataSetChanged();
@@ -1555,6 +1565,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
     }
 
+    private void newActionMode() {
+        log("force create new action mode");
+        actionMode = ((AppCompatActivity) context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
+    }
+
     private void updateActionModeTitle() {
 
         log("updateActionModeTitle");
@@ -1716,5 +1731,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     
     private static void log(String log) {
         Util.log("MegaPhotoSyncGridTitleAdapterLollipop", log);
+    }
+
+    public void refreshActionModeTitle() {
+        newActionMode();
+        updateActionModeTitle();
+        notifyDataSetChanged();
     }
 }
