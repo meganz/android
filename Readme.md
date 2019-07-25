@@ -15,12 +15,18 @@ This document will guide you to build the application on a Linux machine with An
 
 ### Build & Run the application
 
-* Get the source code
+* Get the source code.
 
 ```
 git clone --recursive https://github.com/meganz/android.git
 ```
 
-* Configure the variable `NDK_ROOT` to point to your Android NDK installation path at `jni/build.sh`.
+* Install in your system the Android NDK 14 and Android NDK 16.
 
-* Open the project with Android Studio, let it build the project and hit _*Run*_
+* Configure the variable `NDK_ROOT32` to point to your Android NDK 14 installation path and the variable `NDK_ROOT64` to point to your Android NDK 16 installation path at `jni/build.sh`.
+
+* Download the folder https://mega.nz/#F!BzwF0Qba!-KXBHgwonRUnSptmVJr4qg and put it in the path `$PROJECT/app/src/main/jni/megachat/webrtc/`.
+
+* Go to `$PROJECT/app/src/main/jni/` and execute: `./build.sh clean` and `./build.sh all`.
+
+* Open the project with Android Studio, let it build the project and hit _*Run*_.

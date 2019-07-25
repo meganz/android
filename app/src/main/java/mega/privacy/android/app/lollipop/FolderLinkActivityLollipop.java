@@ -786,7 +786,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
-		boolean askMe = true;
+		boolean askMe = Util.askMe(this);
 		String downloadLocationDefaultPath = "";
 		prefs = dbH.getPreferences();		
 		if (prefs != null){
@@ -899,7 +899,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
-		boolean askMe = true;
+		boolean askMe = Util.askMe(this);
 		String downloadLocationDefaultPath = Util.getDownloadLocation(this);
 			
 		if (askMe){
@@ -1158,7 +1158,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			statusDialog.setMessage(getString(R.string.general_importing));
 			statusDialog.show();
 
-			if(adapterList.isMultipleSelect()){
+			if(adapterList != null && adapterList.isMultipleSelect()){
 				log("is multiple select");
 				List<MegaNode> nodes = adapterList.getSelectedNodes();
 				if(nodes.size() != 0){

@@ -252,9 +252,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN, "+ KEY_PREFERRED_VIEW_LIST+ "	BOOLEAN, "+KEY_PREFERRED_VIEW_LIST_CAMERA+ " BOOLEAN, " +
         		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT, " +
 				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT," +
-				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN," + KEY_UPLOAD_VIDEO_QUALITY + " TEXT," +
+				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN," + KEY_AUTO_PLAY + " BOOLEAN," + KEY_UPLOAD_VIDEO_QUALITY + " TEXT," +
                 KEY_CONVERSION_ON_CHARGING + " BOOLEAN," + KEY_CHARGING_ON_SIZE + " TEXT," + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT," +  KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT," +
-                KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"  + KEY_AUTO_PLAY + " BOOLEAN" + ")";
+                KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT" + ")";
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -362,7 +362,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        db.insert(TABLE_CREDENTIALS, null, valuesCredentials);
 //
 //        ContentValues valuesPref = new ContentValues();
-//        valuesPref.put(KEY_FIRST_LOGIN, encrypt(prefs.getFirstTime()));
+//        valuesPref.put(KEY_FIRST_LO30GIN, encrypt(prefs.getFirstTime()));
 //        valuesPref.put(KEY_CAM_SYNC_WIFI, encrypt(prefs.getCamSyncWifi()));
 //        valuesPref.put(KEY_CAM_SYNC_ENABLED, encrypt(prefs.getCamSyncEnabled()));
 //        valuesPref.put(KEY_CAM_SYNC_HANDLE, encrypt(prefs.getCamSyncHandle()));
@@ -1265,13 +1265,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String preferredSortOthers = decrypt(cursor.getString(28));
 			String firstTimeChat = decrypt(cursor.getString(29));
 			String smallGridCamera = decrypt(cursor.getString(30));
-			String uploadVideoQuality = decrypt(cursor.getString(31));
-			String conversionOnCharging = decrypt(cursor.getString(32));
-			String chargingOnSize = decrypt(cursor.getString(33));
-			String shouldClearCameraSyncRecords = decrypt(cursor.getString(34));
-			String camVideoSyncTimeStamp = decrypt(cursor.getString(35));
-			String secVideoSyncTimeStamp = decrypt(cursor.getString(36));
-            String isAutoPlayEnabled = decrypt(cursor.getString(37));
+			String isAutoPlayEnabled = decrypt(cursor.getString(31));
+			String uploadVideoQuality = decrypt(cursor.getString(32));
+			String conversionOnCharging = decrypt(cursor.getString(33));
+			String chargingOnSize = decrypt(cursor.getString(34));
+			String shouldClearCameraSyncRecords = decrypt(cursor.getString(35));
+			String camVideoSyncTimeStamp = decrypt(cursor.getString(36));
+			String secVideoSyncTimeStamp = decrypt(cursor.getString(37));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,

@@ -913,7 +913,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                                                 chatSettings = dbH.getChatSettings();
                                                 if (ret == MegaChatApi.INIT_NO_CACHE) {
                                                     log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-                                                    megaChatApi.enableGroupChatCalls(true);
 
                                                 } else if (ret == MegaChatApi.INIT_ERROR) {
                                                     log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
@@ -929,7 +928,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                                                     megaChatApi.logout(CameraUploadsService.this);
                                                 } else {
                                                     log("shouldRun: Chat correctly initialized");
-                                                    megaChatApi.enableGroupChatCalls(true);
                                                 }
                                             }
                                         }

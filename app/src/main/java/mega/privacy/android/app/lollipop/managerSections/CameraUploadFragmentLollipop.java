@@ -858,22 +858,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			} else {
 				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 			}
-			String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
 
-			try{
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
-			}
-			catch (Exception e){}
-			Spanned result = null;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-			} else {
-				result = Html.fromHtml(textToShow);
-			}
-			emptyTextViewFirst.setText(result);
+			showEmptyView();
 
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
@@ -991,6 +977,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterList == null) {
 				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, Constants.CAMERA_UPLOAD_ADAPTER);
 			} else {
+				if (context != adapterList.getContext()) {
+					log("attached activity changed");
+					adapterList.setContext(context);
+					actionMode = null;
+				}
+				if (listView != adapterList.getListFragment()) {
+					log("attached ListView changed");
+					adapterList.setListFragment(listView);
+				}
 				adapterList.setNodes(nodesArray, nodes);
 			}
 
@@ -1063,22 +1058,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 			}
 
-			String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
-
-			try{
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
-			}
-			catch (Exception e){}
-			Spanned result = null;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-			} else {
-				result = Html.fromHtml(textToShow);
-			}
-			emptyTextViewFirst.setText(result);
+			showEmptyView();
 
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
@@ -1274,6 +1254,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterGrid.setHasStableIds(true);
 			} else {
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
+
+				if (adapterGrid.getContext() != context) {
+					log("attached activity changed");
+					adapterGrid.setContext(context);
+				}
+
 				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
 				adapterGrid.setNodes(monthPics, nodes, itemInformationList.size(), countTitles, itemInformationList);
 			}
@@ -1298,7 +1284,44 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			return v;
 		}
 	}
-	
+
+	private void showEmptyView() {
+		if (((ManagerActivityLollipop) context).getIsSearchEnabled()) {
+			showEmptySearchResults();
+		} else {
+			showEmptyResults();
+		}
+	}
+
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		setRetainInstance(true);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		reDoTheSelectionAfterRotation();
+	}
+
+	private void reDoTheSelectionAfterRotation() {
+		if (((ManagerActivityLollipop) context).isListCameraUploads()) {
+			if (adapterList != null && adapterList.getSelectedDocuments().size() > 0) {
+				log("There is previous selected items, we need to redo the selection");
+				activateActionMode();
+				updateActionModeTitle();
+			}
+		} else {
+			if (adapterGrid != null && adapterGrid.getSelectedDocuments().size() > 0) {
+				log("There is previous selected items, we need to redo the selection");
+				adapterGrid.refreshActionModeTitle();
+			}
+		}
+
+	}
+
 	public void selectAll(){
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
@@ -1849,7 +1872,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 	}
-	
+
 	private void updateActionModeTitle() {
 
 		log("updateActionModeTitle");
@@ -2251,6 +2274,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				monthPics.clear();
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+				showEmptyResults();
 				listView.setVisibility(View.GONE);
 			}
 			else{
@@ -2266,7 +2290,31 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 	}
-	
+
+	public void showEmptySearchResults() {
+		emptyTextView.setVisibility(View.VISIBLE);
+		emptyTextViewFirst.setText(getText(R.string.no_results_found));
+	}
+
+	private void showEmptyResults() {
+		String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
+
+		try{
+			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[/A]", "</font>");
+			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[/B]", "</font>");
+		}
+		catch (Exception e){}
+		Spanned result = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textToShow);
+		}
+		emptyTextViewFirst.setText(result);
+	}
+
 	public void notifyDataSetChanged(){
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
