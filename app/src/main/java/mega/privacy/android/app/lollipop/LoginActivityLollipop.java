@@ -360,6 +360,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
     }
 
+    public Intent getIntentReceived() {
+        return intentReceived;
+    }
+
     public void showAlertIncorrectRK() {
         log("showAlertIncorrectRK");
         final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);

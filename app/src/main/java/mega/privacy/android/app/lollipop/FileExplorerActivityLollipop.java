@@ -105,6 +105,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public final static int INCOMING_FRAGMENT = 1;
 	public final static int CHAT_FRAGMENT = 3;
 	public final static int IMPORT_FRAGMENT = 4;
+    public static final String EXTRA_SHARE_INFOS = "share_infos";
+    public static final String EXTRA_SHARE_ACTION = "share_action";
+    public static final String EXTRA_SHARE_TYPE = "share_type";
 
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -232,6 +235,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	SearchView searchView;
 
+	private boolean needLogin;
+
 	FileExplorerActivityLollipop fileExplorerActivityLollipop;
 
 	private String querySearch = "";
@@ -312,12 +317,33 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		@Override
 		protected List<ShareInfo> doInBackground(Intent... params) {
 			log("OwnFilePrepareTask: doInBackground");
-			return ShareInfo.processIntent(params[0], context);
+			Intent intent = params[0];
+            List<ShareInfo> shareInfos = (List<ShareInfo>) intent.getSerializableExtra(EXTRA_SHARE_INFOS);
+            if(shareInfos != null) {
+                intent.removeExtra(EXTRA_SHARE_INFOS);
+                return  shareInfos;
+            }
+			return ShareInfo.processIntent(intent, context);
 		}
 
 		@Override
 		protected void onPostExecute(List<ShareInfo> info) {
 			filePreparedInfos = info;
+			if(needLogin) {
+                Intent loginIntent = new Intent(FileExplorerActivityLollipop.this, LoginActivityLollipop.class);
+                loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+//                loginIntent.putExtra(EXTRA_SHARE_INTENT, getIntent());
+                loginIntent.putExtra(EXTRA_SHARE_ACTION, getIntent().getAction());
+                loginIntent.putExtra(EXTRA_SHARE_TYPE, getIntent().getType());
+                loginIntent.putExtra(EXTRA_SHARE_INFOS,new ArrayList<>(info));
+                // close previous login page
+                loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);
+                needLogin = false;
+                startActivity(loginIntent);
+                finish();
+                return;
+            }
 			if (action != null && getIntent() != null) {
 				getIntent().setAction(action);
 			}
@@ -404,36 +430,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    float density  = getResources().getDisplayMetrics().density;
 		
 		if (credentials == null){
-
 			log("User credentials NULL");
-//			megaApi.localLogout();
-//			AccountController aC = new AccountController(this);
-//			aC.logout(this, megaApi, megaChatApi, false);
-			
-			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-			loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);
-			/*if (intent != null){
-				if(intent.getExtras() != null)
-				{
-					Bundle bundle = intent.getExtras();
-					Uri uri = (Uri)bundle.get(Intent.EXTRA_STREAM);
-					log("URI in bundle: "+uri);
-					loginIntent.putExtras(intent.getExtras());
-				}
-				
-				if(intent.getData() != null)
-				{
-					log("URI: "+intent.getData());
-					loginIntent.setData(intent.getData());
-				}
-			}
-			else{
-				log("intent==null");
-			}*/	
-			startActivity(loginIntent);
-			finish();
-			return;
+            needLogin = true;
+            OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
+            ownFilePrepareTask.execute(getIntent());
+            createAndShowProgressDialog(false, R.string.upload_prepare);
+            return;
 		}
 		else{
 			log("User has credentials");

@@ -46,7 +46,11 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
@@ -259,9 +263,48 @@ public class ChatExplorerFragment extends Fragment {
             addedItemsSaved = new ArrayList<>();
         }
 
-        this.setChats();
+        int connectionState = megaChatApi.getConnectionState();
+        log("connection state: " + connectionState);
+        //need to reconnect to load the chat rooms list room properly.
+        if(connectionState == MegaChatApi.DISCONNECTED) {
+            megaChatApi.connect(new MegaChatRequestListenerInterface() {
+
+                @Override
+                public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+                    showConnecting();
+                }
+
+                @Override
+                public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+                }
+
+                @Override
+                public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+                    if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+                        emptyTextView.setVisibility(View.GONE);
+                        log("Connected to chat!");
+                        setChats();
+                    } else {
+                        log("ERROR WHEN CONNECTING " + e.getErrorString());
+                    }
+                }
+
+                @Override
+                public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
+                }
+            });
+        } else {
+            setChats();
+        }
 
         return v;
+    }
+
+    private void showConnecting() {
+        String textToShow = String.format(context.getString(R.string.chat_connecting));
+        emptyTextView.setText(textToShow);
     }
 
     void setFirstLayoutVisibility (int visibility) {
