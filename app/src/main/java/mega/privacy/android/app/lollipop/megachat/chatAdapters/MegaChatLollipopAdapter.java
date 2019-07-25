@@ -51,8 +51,6 @@ import com.shockwave.pdfium.PdfiumCore;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -101,7 +99,6 @@ import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
-import static mega.privacy.android.app.utils.Util.isLocalTemp;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
@@ -7432,7 +7429,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
 
     public void setMultipleSelect(boolean multipleSelect) {
-        log("setMultipleSelect - "+multipleSelect);
+        log("setMultipleSelect");
         if (this.multipleSelect != multipleSelect) {
             this.multipleSelect = multipleSelect;
             notifyDataSetChanged();
@@ -7446,14 +7443,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("toggleSelection");
 
         if (selectedItems.get(pos, false)) {
-            log("toggleSelection:delete pos: " + pos);
+            log("delete pos: " + pos);
             selectedItems.delete(pos);
         } else {
-            log("toggleSelection:put pos: " + pos);
+            log("put pos: " + pos);
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
-        if (selectedItems.size() <= 0){
+        if (selectedItems.size() == 0){
             ((ChatActivityLollipop) context).hideMultipleSelect();
         }
     }
@@ -7493,7 +7490,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        notifyDataSetChanged();
     }
 
-    public boolean isItemChecked(int position) {
+    private boolean isItemChecked(int position) {
         return selectedItems.get(position);
     }
 
@@ -7586,9 +7583,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.messages = messages;
 
         notifyItemRemoved(position);
-        if (position == messages.size()) {
-        } else {
-            int itemCount = messages.size()  - position;
+        if (position != messages.size()) {
+            int itemCount = messages.size() - position;
             notifyItemRangeChanged(position, itemCount);
         }
     }
@@ -8479,7 +8475,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private void checkItem (View v, ViewHolderMessageChat holder, int[] screenPosition, int[] dimens) {
 
-        log("checkItem");
         ImageView imageView = null;
 
         int position = holder.getCurrentPosition();

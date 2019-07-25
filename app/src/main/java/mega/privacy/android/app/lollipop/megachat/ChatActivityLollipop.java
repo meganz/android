@@ -4081,7 +4081,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void itemClick(int positionInAdapter, int [] screenPosition) {
-        log("temClick : position: "+positionInAdapter);
+        log("itemClick : position: "+positionInAdapter);
         int positionInMessages = positionInAdapter-1;
 
         if(positionInMessages < messages.size()){
@@ -5402,12 +5402,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
-        log("onMessageUpdate");
-
+        log("onMessageUpdate: msgID "+ msg.getMsgId());
         int resultModify = -1;
         if(msg.isDeleted()){
-            log("onMessageUpdate:msg.isDeleted()");
-
             if(adapter!=null){
                 adapter.stopPlaying(msg.getMsgId());
             }
@@ -5601,7 +5598,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         }
-        log("deleteMessage: indexToChange (in array) = "+indexToChange);
 
         if (indexToChange != -1) {
             messages.remove(indexToChange);
