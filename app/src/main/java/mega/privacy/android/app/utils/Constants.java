@@ -9,6 +9,7 @@ public class Constants {
     public static final String PIN_ALPHANUMERIC = "alphanumeric";
 
     public static final int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
+
     public static final int REQUEST_CODE_GET = 1000;
     public static final int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
     public static final int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
