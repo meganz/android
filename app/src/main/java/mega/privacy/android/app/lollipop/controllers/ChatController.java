@@ -70,11 +70,12 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatController {
 
-    Context context;
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-    DatabaseHandler dbH;
-    MegaPreferences prefs = null;
+    private Context context;
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
+    private DatabaseHandler dbH;
+    private MegaPreferences prefs = null;
+    private ArrayList<MegaNode> unfinishedNodeList;
 
     public ChatController(Context context){
         log("ChatController created");
@@ -1541,6 +1542,15 @@ public class ChatController {
 
     private void prepareForDownloadVersions(final ArrayList<MegaNode> nodeList){
         log("prepareForDownloadLollipop: "+nodeList.size()+" files to download, ");
+
+        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+        if (!hasStoragePermission) {
+            unfinishedNodeList = nodeList;
+            askForPermission();
+            return;
+        }
+
+
         long size = 0;
         long[] hashes = new long[nodeList.size()];
         for (int i=0;i<nodeList.size();i++){
@@ -2150,6 +2160,21 @@ public class ChatController {
         }
 
         return false;
+    }
+
+    private void askForPermission() {
+      if (context instanceof Activity) {
+          ActivityCompat.requestPermissions(((Activity) context),
+                  new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                  Constants.REQUEST_WRITE_STORAGE);
+      }
+    }
+
+    public void resumeAuthorizedDownload() {
+        if (unfinishedNodeList != null) {
+            prepareForDownloadVersions(unfinishedNodeList);
+            unfinishedNodeList = null;
+        }
     }
 
     public static void log(String message) {

@@ -2415,6 +2415,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
+            case Constants.REQUEST_WRITE_STORAGE: {
+                //After storage authorization, resume unfinished download
+                chatC.resumeAuthorizedDownload();
+                break;
+            }
             case Constants.REQUEST_CAMERA:
             case Constants.RECORD_AUDIO:{
                 log("REQUEST_CAMERA || RECORD_AUDIO");
