@@ -894,7 +894,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     public void onEvent(MegaApiJava api, MegaEvent event) {
         log("onEvent");
         if(event.getType()==MegaEvent.EVENT_ACCOUNT_BLOCKED){
-            int whyAmIBlocked = event.getNumber();
+            int whyAmIBlocked = (int) event.getNumber();
             if(whyAmIBlocked ==200){
                 accountBlocked = getString(R.string.account_suspended_multiple_breaches_ToS);
             }

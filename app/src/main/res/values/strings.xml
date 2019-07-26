@@ -257,7 +257,7 @@
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
 
     <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares</string>
-	<string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Incoming shares with</string>
+    <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Incoming shares with</string>
     <!--
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
     -->
@@ -297,25 +297,25 @@
     <string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
     <string name="contact_invite" context="positive button on dialog to invite a contact">Invite</string>
     <string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>
-	<string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
-	<string name="contact_decline" context="option to decline a contact invitation">Decline</string>
-	<string name="contact_accept" context="option to accept a contact invitation">Accept</string>
-	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>	
-	<!--
+    <string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
+    <string name="contact_decline" context="option to decline a contact invitation">Decline</string>
+    <string name="contact_accept" context="option to accept a contact invitation">Accept</string>
+    <string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
+    <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below</string>	
-	<!--
+    <string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below</string>
+    <!--
     <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
 	-->
-	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
-	
-	<string name="error_not_enough_free_space" context="Error message">Not enough free space on your device</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
 
-	<string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
-	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
-	
-	<!--
+    <string name="error_not_enough_free_space" context="Error message">Not enough free space on your device</string>
+
+    <string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
+    <string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
+
+    <!--
     <string name="download_failed" context="Error message">Download failed</string>
     -->
     <!--
@@ -327,7 +327,7 @@
     <!--
 	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
 	-->
-	<string name="download_preparing_files" context="message before the download or upload start ">Preparing files</string>
+    <string name="download_preparing_files" context="message before the download or upload start ">Preparing files</string>
     <string name="download_began" context="message when the download starts">Download has started</string>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -489,7 +489,7 @@
     <string name="rubbish_bin_emptied" context="success message when emptying the RB">Rubbish Bin emptied successfully</string>
     <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. The Rubbish Bin has not been emptied</string>
 
-    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help you change your mind</string>
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help change your mind.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Type feedback here</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Send</string>
     <!--
@@ -499,9 +499,9 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Your subscription has not been cancelled. Please provide a reason for your cancellation</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">The folder is now private</string>
-    <!--
+
     <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">New folder</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Add contact</string>
@@ -655,7 +655,7 @@
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
 
-	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
+    <string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>
@@ -886,7 +886,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copy the Recovery Key to clipboard or save it as text file</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Save</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied to the clipboard</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
 
     <string name="change_pass" context="Button to change the password">Change</string>
 
@@ -1105,6 +1105,9 @@
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts removed successfully from the shared folder</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;and %d contacts were not successfully removed</string>
 
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">&#160;and %d contacts permissions were not successfully changed</string>
+
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Loading contacts from the phone&#8230;</string>
 
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d invite requests sent successfully.</string>
@@ -1297,13 +1300,13 @@
     </plurals>
 
     <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing&#8230;[/A]</string>
-	<string name="label_more" context="button label more">More</string>
-	<string name="label_close" context="button label Close">Close</string>
+    <string name="label_more" context="button label more">More</string>
+    <string name="label_close" context="button label Close">Close</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
-	<string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Storage</string>
-	<string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Transfer quota</string>
-	<string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Transfer quota</string>
+    <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Storage</string>
+    <string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Transfer quota</string>
+    <string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Transfer quota</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Plan</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Storage space</string>
@@ -1498,7 +1501,7 @@
     <string name="alert_user_is_not_contact">The user is not a contact</string>
 
     <string name="camera_uploads_cellular_connection">Use cellular connection</string>
-    <string name="camera_uploads_upload_videos">Upload videos</string>
+    <string name="camera_uploads_upload_videos">Upload Videos</string>
 
     <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Profile picture updated</string>
     <string name="error_changing_user_avatar_image_not_available" context="Message when an error ocurred when changing an user avatar">Error. Selected image does not exist</string>
@@ -1870,7 +1873,7 @@
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">Test password</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Test your password</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Password accepted</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password!\nBackup your Recovery Key as soon as possible!</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">Recovery Key exported</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">The Recovery Key has been exported into the Offline section as MEGARecoveryKey.txt.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">You are about to logout, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
@@ -1912,7 +1915,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Servers are too busy. Please wait.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">This process is taking longer than expected. Please wait.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit ">Too many requests. Please wait.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Canceling login process. Please wait.</string>
+    <string name="login_in_progress" context="message when previous login is being canceled">Canceling login process. Please wait&#8230;</string>
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
 
@@ -2086,7 +2089,7 @@
     <string name="text_confirmation_dialog_delete_versions" context="Text of the dialog to delete all the file versions of the account">You are about to delete the version histories of all files. Any file version shared to you from a contact will need to be deleted by them.\n\nPlease note that the current files will not be deleted.</string>
 
     <string name="success_delete_versions" context="success message when deleting all the versions of the account">File versions deleted successfully</string>
-    <string name="error_delete_versions" context="error message when deleting all the versions of the account">An error occurred while trying to delete all old versions of your files, please try again later.</string>
+    <string name="error_delete_versions" context="error message when deleting all the versions of the account">An error occurred while trying to delete all previous versions of your files, please try again later.</string>
 
     <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">File Versioning</string>
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
@@ -2131,7 +2134,7 @@
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Send to&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Upload to&#8230;</string>
 
-	<string name="contact_info_button_more" context="More button in contact info page">More</string>
+    <string name="contact_info_button_more" context="More button in contact info page">More</string>
 
     <plurals name="plural_select_file" context="Section title to select a file to perform an action">
         <item context="one file" quantity="one">Choose File</item>
@@ -2155,7 +2158,7 @@
 
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Chat activity</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">You may have new messages</string>
-	<string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
+    <string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
 
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Rubbish Bin Clearing Scheduler</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">The Rubbish Bin is cleared for you automatically.</string>
@@ -2379,7 +2382,17 @@
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Incoming call&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">Calling&#8230;</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">Message contains invalid metadata</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">Message contains invalid metadata</string>
+
+    <string name="title_activity_maps" context="Title of the activity that sends a location">Send Location</string>
+    <string name="current_location_label" context="Label layout on maps activity that permits send current location">Send your current location</string>
+    <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">Send your current location: [A]%1$s[/A]</string>
+    <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Nearby places</string>
+    <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">This location will be opened using a third party maps provider outside the end-to-end encrypted MEGA platform.</string>
+    <string name="title_marker_maps" context="Title of the location marker set by the user">Send This Location</string>
+    <string name="no_places_found" context="Label shown when after a maps search and no places were found">No places were found</string>
+    <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">The GPS is disabled</string>
+    <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">Would you like to open the location settings?</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2387,6 +2400,9 @@
         <item context="version item" quantity="one">Message forwarded</item>
         <item context="version items" quantity="other">Messages forwarded</item>
     </plurals>
+
+    <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Pinned Location</string>
+    <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">From File System</string>
 
     <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d file was not sent to %d chats</item>
@@ -2411,11 +2427,11 @@
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Error. The file has not been sent to any of the selected chats</string>
     <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]No[/A] [B]Items[/B]</string>
 
-    <string name="delete_versions" context="Action delete all file versions">Delete old versions</string>
-    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete old versions?</string>
+    <string name="delete_versions" context="Action delete all file versions">Delete previous versions</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete previous versions?</string>
     <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Please note that the current file will not be deleted.</string>
-    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Old versions deleted.</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Old versions not deleted.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Previous versions deleted.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Previous versions not deleted.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
         <item context="version item" quantity="one">%d version deleted successfully</item>
@@ -2434,7 +2450,7 @@
     <string name="title_tour_two" cotext="Title of second tour screen">Encrypted chat</string>
     <string name="content_tour_two" cotext="Content of second tour screen">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
     <string name="title_tour_three" cotext="Title of third tour screen">Create your Network</string>
-    <string name="content_tour_three" cotext="Content of third tour screen">Add contacts, create a network, colaborate, make voice and video calls without ever leaving MEGA</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA</string>
     <string name="title_tour_four" cotext="Title of fourth tour screen">Your Photos in the Cloud</string>
     <string name="content_tour_four" cotext="Content of fourth tour screen">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
 
@@ -2443,7 +2459,7 @@
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">You have entered the wrong password, please try again.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password you have entered is not valid.</string>
 
-    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">It is not possible to open the file. It is an unknown file or has not been possible to unzip successfully.</string>
+    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">It is not possible to open the file. It is an unknown file type or it has not been possible to unzip the file successfully.</string>
 
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play media files while there is a call in progress.</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing Call</string>
@@ -2470,7 +2486,7 @@
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s muted this call</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
 
-    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">Already downloaded. Copied to selected path.</string>
+    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
@@ -2501,6 +2517,10 @@
     <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
 
+    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
+
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
@@ -2516,250 +2536,6 @@
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text for scenario 1 &amp; 2 for non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="sms_add_phone_number_dialog_btn_add" context="Add phone number">ADD</string>
     <string name="sms_add_phone_number_dialog_btn_not_now" context="Add phone number">NOT NOW</string>
-
-	<string name="country_af" context="country name that will be displayed in country code picker along with its dial code">Afghanistan</string>
-	<string name="country_al" context="country name that will be displayed in country code picker along with its dial code">Albania</string>
-	<string name="country_dz" context="country name that will be displayed in country code picker along with its dial code">Algeria</string>
-	<string name="country_as" context="country name that will be displayed in country code picker along with its dial code">AmericanSamoa</string>
-	<string name="country_ad" context="country name that will be displayed in country code picker along with its dial code">Andorra</string>
-	<string name="country_ao" context="country name that will be displayed in country code picker along with its dial code">Angola</string>
-	<string name="country_ai" context="country name that will be displayed in country code picker along with its dial code">Anguilla</string>
-	<string name="country_ag" context="country name that will be displayed in country code picker along with its dial code">Antigua and Barbuda</string>
-	<string name="country_ar" context="country name that will be displayed in country code picker along with its dial code">Argentina</string>
-	<string name="country_am" context="country name that will be displayed in country code picker along with its dial code">Armenia</string>
-	<string name="country_aw" context="country name that will be displayed in country code picker along with its dial code">Aruba</string>
-	<string name="country_au" context="country name that will be displayed in country code picker along with its dial code">Australia</string>
-	<string name="country_at" context="country name that will be displayed in country code picker along with its dial code">Austria</string>
-	<string name="country_az" context="country name that will be displayed in country code picker along with its dial code">Azerbaijan</string>
-	<string name="country_bs" context="country name that will be displayed in country code picker along with its dial code">Bahamas</string>
-	<string name="country_bh" context="country name that will be displayed in country code picker along with its dial code">Bahrain</string>
-	<string name="country_bd" context="country name that will be displayed in country code picker along with its dial code">Bangladesh</string>
-	<string name="country_bb" context="country name that will be displayed in country code picker along with its dial code">Barbados</string>
-	<string name="country_by" context="country name that will be displayed in country code picker along with its dial code">Belarus</string>
-	<string name="country_be" context="country name that will be displayed in country code picker along with its dial code">Belgium</string>
-	<string name="country_bz" context="country name that will be displayed in country code picker along with its dial code">Belize</string>
-	<string name="country_bj" context="country name that will be displayed in country code picker along with its dial code">Benin</string>
-	<string name="country_bm" context="country name that will be displayed in country code picker along with its dial code">Bermuda</string>
-	<string name="country_bt" context="country name that will be displayed in country code picker along with its dial code">Bhutan</string>
-	<string name="country_ba" context="country name that will be displayed in country code picker along with its dial code">Bosnia and Herzegovina</string>
-	<string name="country_bw" context="country name that will be displayed in country code picker along with its dial code">Botswana</string>
-	<string name="country_br" context="country name that will be displayed in country code picker along with its dial code">Brazil</string>
-	<string name="country_io" context="country name that will be displayed in country code picker along with its dial code">British Indian Ocean Territory</string>
-	<string name="country_bg" context="country name that will be displayed in country code picker along with its dial code">Bulgaria</string>
-	<string name="country_bf" context="country name that will be displayed in country code picker along with its dial code">Burkina Faso</string>
-	<string name="country_bi" context="country name that will be displayed in country code picker along with its dial code">Burundi</string>
-	<string name="country_kh" context="country name that will be displayed in country code picker along with its dial code">Cambodia</string>
-	<string name="country_cm" context="country name that will be displayed in country code picker along with its dial code">Cameroon</string>
-	<string name="country_ca" context="country name that will be displayed in country code picker along with its dial code">Canada</string>
-	<string name="country_cv" context="country name that will be displayed in country code picker along with its dial code">Cape Verde</string>
-	<string name="country_ky" context="country name that will be displayed in country code picker along with its dial code">Cayman Islands</string>
-	<string name="country_cf" context="country name that will be displayed in country code picker along with its dial code">Central African Republic</string>
-	<string name="country_td" context="country name that will be displayed in country code picker along with its dial code">Chad</string>
-	<string name="country_cl" context="country name that will be displayed in country code picker along with its dial code">Chile</string>
-	<string name="country_cn" context="country name that will be displayed in country code picker along with its dial code">China</string>
-	<string name="country_cx" context="country name that will be displayed in country code picker along with its dial code">Christmas Island</string>
-	<string name="country_co" context="country name that will be displayed in country code picker along with its dial code">Colombia</string>
-	<string name="country_km" context="country name that will be displayed in country code picker along with its dial code">Comoros</string>
-	<string name="country_cg" context="country name that will be displayed in country code picker along with its dial code">Congo</string>
-	<string name="country_ck" context="country name that will be displayed in country code picker along with its dial code">Cook Islands</string>
-	<string name="country_cr" context="country name that will be displayed in country code picker along with its dial code">Costa Rica</string>
-	<string name="country_hr" context="country name that will be displayed in country code picker along with its dial code">Croatia</string>
-	<string name="country_cu" context="country name that will be displayed in country code picker along with its dial code">Cuba</string>
-	<string name="country_cy" context="country name that will be displayed in country code picker along with its dial code">Cyprus</string>
-	<string name="country_cz" context="country name that will be displayed in country code picker along with its dial code">Czech Republic</string>
-	<string name="country_dk" context="country name that will be displayed in country code picker along with its dial code">Denmark</string>
-	<string name="country_dj" context="country name that will be displayed in country code picker along with its dial code">Djibouti</string>
-	<string name="country_dm" context="country name that will be displayed in country code picker along with its dial code">Dominica</string>
-	<string name="country_do" context="country name that will be displayed in country code picker along with its dial code">Dominican Republic</string>
-	<string name="country_ec" context="country name that will be displayed in country code picker along with its dial code">Ecuador</string>
-	<string name="country_eg" context="country name that will be displayed in country code picker along with its dial code">Egypt</string>
-	<string name="country_sv" context="country name that will be displayed in country code picker along with its dial code">El Salvador</string>
-	<string name="country_gq" context="country name that will be displayed in country code picker along with its dial code">Equatorial Guinea</string>
-	<string name="country_er" context="country name that will be displayed in country code picker along with its dial code">Eritrea</string>
-	<string name="country_ee" context="country name that will be displayed in country code picker along with its dial code">Estonia</string>
-	<string name="country_et" context="country name that will be displayed in country code picker along with its dial code">Ethiopia</string>
-	<string name="country_fo" context="country name that will be displayed in country code picker along with its dial code">Faroe Islands</string>
-	<string name="country_fj" context="country name that will be displayed in country code picker along with its dial code">Fiji</string>
-	<string name="country_fi" context="country name that will be displayed in country code picker along with its dial code">Finland</string>
-	<string name="country_fr" context="country name that will be displayed in country code picker along with its dial code">France</string>
-	<string name="country_gf" context="country name that will be displayed in country code picker along with its dial code">French Guiana</string>
-	<string name="country_pf" context="country name that will be displayed in country code picker along with its dial code">French Polynesia</string>
-	<string name="country_ga" context="country name that will be displayed in country code picker along with its dial code">Gabon</string>
-	<string name="country_gm" context="country name that will be displayed in country code picker along with its dial code">Gambia</string>
-	<string name="country_ge" context="country name that will be displayed in country code picker along with its dial code">Georgia</string>
-	<string name="country_de" context="country name that will be displayed in country code picker along with its dial code">Germany</string>
-	<string name="country_gh" context="country name that will be displayed in country code picker along with its dial code">Ghana</string>
-	<string name="country_gi" context="country name that will be displayed in country code picker along with its dial code">Gibraltar</string>
-	<string name="country_gr" context="country name that will be displayed in country code picker along with its dial code">Greece</string>
-	<string name="country_gl" context="country name that will be displayed in country code picker along with its dial code">Greenland</string>
-	<string name="country_gd" context="country name that will be displayed in country code picker along with its dial code">Grenada</string>
-	<string name="country_gp" context="country name that will be displayed in country code picker along with its dial code">Guadeloupe</string>
-	<string name="country_gu" context="country name that will be displayed in country code picker along with its dial code">Guam</string>
-	<string name="country_gt" context="country name that will be displayed in country code picker along with its dial code">Guatemala</string>
-	<string name="country_gn" context="country name that will be displayed in country code picker along with its dial code">Guinea</string>
-	<string name="country_gw" context="country name that will be displayed in country code picker along with its dial code">Guinea-Bissau</string>
-	<string name="country_gy" context="country name that will be displayed in country code picker along with its dial code">Guyana</string>
-	<string name="country_ht" context="country name that will be displayed in country code picker along with its dial code">Haiti</string>
-	<string name="country_hn" context="country name that will be displayed in country code picker along with its dial code">Honduras</string>
-	<string name="country_hu" context="country name that will be displayed in country code picker along with its dial code">Hungary</string>
-	<string name="country_is" context="country name that will be displayed in country code picker along with its dial code">Iceland</string>
-	<string name="country_in" context="country name that will be displayed in country code picker along with its dial code">India</string>
-	<string name="country_id" context="country name that will be displayed in country code picker along with its dial code">Indonesia</string>
-	<string name="country_iq" context="country name that will be displayed in country code picker along with its dial code">Iraq</string>
-	<string name="country_ie" context="country name that will be displayed in country code picker along with its dial code">Ireland</string>
-	<string name="country_il" context="country name that will be displayed in country code picker along with its dial code">Israel</string>
-	<string name="country_it" context="country name that will be displayed in country code picker along with its dial code">Italy</string>
-	<string name="country_jm" context="country name that will be displayed in country code picker along with its dial code">Jamaica</string>
-	<string name="country_jp" context="country name that will be displayed in country code picker along with its dial code">Japan</string>
-	<string name="country_jo" context="country name that will be displayed in country code picker along with its dial code">Jordan</string>
-	<string name="country_kz" context="country name that will be displayed in country code picker along with its dial code">Kazakhstan</string>
-	<string name="country_ke" context="country name that will be displayed in country code picker along with its dial code">Kenya</string>
-	<string name="country_ki" context="country name that will be displayed in country code picker along with its dial code">Kiribati</string>
-	<string name="country_kw" context="country name that will be displayed in country code picker along with its dial code">Kuwait</string>
-	<string name="country_kg" context="country name that will be displayed in country code picker along with its dial code">Kyrgyzstan</string>
-	<string name="country_lv" context="country name that will be displayed in country code picker along with its dial code">Latvia</string>
-	<string name="country_lb" context="country name that will be displayed in country code picker along with its dial code">Lebanon</string>
-	<string name="country_ls" context="country name that will be displayed in country code picker along with its dial code">Lesotho</string>
-	<string name="country_lr" context="country name that will be displayed in country code picker along with its dial code">Liberia</string>
-	<string name="country_li" context="country name that will be displayed in country code picker along with its dial code">Liechtenstein</string>
-	<string name="country_lt" context="country name that will be displayed in country code picker along with its dial code">Lithuania</string>
-	<string name="country_lu" context="country name that will be displayed in country code picker along with its dial code">Luxembourg</string>
-	<string name="country_mg" context="country name that will be displayed in country code picker along with its dial code">Madagascar</string>
-	<string name="country_mw" context="country name that will be displayed in country code picker along with its dial code">Malawi</string>
-	<string name="country_my" context="country name that will be displayed in country code picker along with its dial code">Malaysia</string>
-	<string name="country_mv" context="country name that will be displayed in country code picker along with its dial code">Maldives</string>
-	<string name="country_ml" context="country name that will be displayed in country code picker along with its dial code">Mali</string>
-	<string name="country_mt" context="country name that will be displayed in country code picker along with its dial code">Malta</string>
-	<string name="country_mh" context="country name that will be displayed in country code picker along with its dial code">Marshall Islands</string>
-	<string name="country_mq" context="country name that will be displayed in country code picker along with its dial code">Martinique</string>
-	<string name="country_mr" context="country name that will be displayed in country code picker along with its dial code">Mauritania</string>
-	<string name="country_mu" context="country name that will be displayed in country code picker along with its dial code">Mauritius</string>
-	<string name="country_yt" context="country name that will be displayed in country code picker along with its dial code">Mayotte</string>
-	<string name="country_mx" context="country name that will be displayed in country code picker along with its dial code">Mexico</string>
-	<string name="country_mc" context="country name that will be displayed in country code picker along with its dial code">Monaco</string>
-	<string name="country_mn" context="country name that will be displayed in country code picker along with its dial code">Mongolia</string>
-	<string name="country_me" context="country name that will be displayed in country code picker along with its dial code">Montenegro</string>
-	<string name="country_ms" context="country name that will be displayed in country code picker along with its dial code">Montserrat</string>
-	<string name="country_ma" context="country name that will be displayed in country code picker along with its dial code">Morocco</string>
-	<string name="country_mm" context="country name that will be displayed in country code picker along with its dial code">Myanmar</string>
-	<string name="country_na" context="country name that will be displayed in country code picker along with its dial code">Namibia</string>
-	<string name="country_nr" context="country name that will be displayed in country code picker along with its dial code">Nauru</string>
-	<string name="country_np" context="country name that will be displayed in country code picker along with its dial code">Nepal</string>
-	<string name="country_nl" context="country name that will be displayed in country code picker along with its dial code">Netherlands</string>
-	<string name="country_an" context="country name that will be displayed in country code picker along with its dial code">Netherlands Antilles</string>
-	<string name="country_nc" context="country name that will be displayed in country code picker along with its dial code">New Caledonia</string>
-	<string name="country_nz" context="country name that will be displayed in country code picker along with its dial code">New Zealand</string>
-	<string name="country_ni" context="country name that will be displayed in country code picker along with its dial code">Nicaragua</string>
-	<string name="country_ne" context="country name that will be displayed in country code picker along with its dial code">Niger</string>
-	<string name="country_ng" context="country name that will be displayed in country code picker along with its dial code">Nigeria</string>
-	<string name="country_nu" context="country name that will be displayed in country code picker along with its dial code">Niue</string>
-	<string name="country_nf" context="country name that will be displayed in country code picker along with its dial code">Norfolk Island</string>
-	<string name="country_mp" context="country name that will be displayed in country code picker along with its dial code">Northern Mariana Islands</string>
-	<string name="country_no" context="country name that will be displayed in country code picker along with its dial code">Norway</string>
-	<string name="country_om" context="country name that will be displayed in country code picker along with its dial code">Oman</string>
-	<string name="country_pk" context="country name that will be displayed in country code picker along with its dial code">Pakistan</string>
-	<string name="country_pw" context="country name that will be displayed in country code picker along with its dial code">Palau</string>
-	<string name="country_pa" context="country name that will be displayed in country code picker along with its dial code">Panama</string>
-	<string name="country_pg" context="country name that will be displayed in country code picker along with its dial code">Papua New Guinea</string>
-	<string name="country_py" context="country name that will be displayed in country code picker along with its dial code">Paraguay</string>
-	<string name="country_pe" context="country name that will be displayed in country code picker along with its dial code">Peru</string>
-	<string name="country_ph" context="country name that will be displayed in country code picker along with its dial code">Philippines</string>
-	<string name="country_pl" context="country name that will be displayed in country code picker along with its dial code">Poland</string>
-	<string name="country_pt" context="country name that will be displayed in country code picker along with its dial code">Portugal</string>
-	<string name="country_pr" context="country name that will be displayed in country code picker along with its dial code">Puerto Rico</string>
-	<string name="country_qa" context="country name that will be displayed in country code picker along with its dial code">Qatar</string>
-	<string name="country_ro" context="country name that will be displayed in country code picker along with its dial code">Romania</string>
-	<string name="country_rw" context="country name that will be displayed in country code picker along with its dial code">Rwanda</string>
-	<string name="country_ws" context="country name that will be displayed in country code picker along with its dial code">Samoa</string>
-	<string name="country_sm" context="country name that will be displayed in country code picker along with its dial code">San Marino</string>
-	<string name="country_sa" context="country name that will be displayed in country code picker along with its dial code">Saudi Arabia</string>
-	<string name="country_sn" context="country name that will be displayed in country code picker along with its dial code">Senegal</string>
-	<string name="country_rs" context="country name that will be displayed in country code picker along with its dial code">Serbia</string>
-	<string name="country_sc" context="country name that will be displayed in country code picker along with its dial code">Seychelles</string>
-	<string name="country_sl" context="country name that will be displayed in country code picker along with its dial code">Sierra Leone</string>
-	<string name="country_sg" context="country name that will be displayed in country code picker along with its dial code">Singapore</string>
-	<string name="country_sk" context="country name that will be displayed in country code picker along with its dial code">Slovakia</string>
-	<string name="country_si" context="country name that will be displayed in country code picker along with its dial code">Slovenia</string>
-	<string name="country_sb" context="country name that will be displayed in country code picker along with its dial code">Solomon Islands</string>
-	<string name="country_za" context="country name that will be displayed in country code picker along with its dial code">South Africa</string>
-	<string name="country_gs" context="country name that will be displayed in country code picker along with its dial code">South Georgia and the South Sandwich Islands</string>
-	<string name="country_es" context="country name that will be displayed in country code picker along with its dial code">Spain</string>
-	<string name="country_lk" context="country name that will be displayed in country code picker along with its dial code">Sri Lanka</string>
-	<string name="country_sd" context="country name that will be displayed in country code picker along with its dial code">Sudan</string>
-	<string name="country_sr" context="country name that will be displayed in country code picker along with its dial code">Suriname</string>
-	<string name="country_sz" context="country name that will be displayed in country code picker along with its dial code">Swaziland</string>
-	<string name="country_se" context="country name that will be displayed in country code picker along with its dial code">Sweden</string>
-	<string name="country_ch" context="country name that will be displayed in country code picker along with its dial code">Switzerland</string>
-	<string name="country_tj" context="country name that will be displayed in country code picker along with its dial code">Tajikistan</string>
-	<string name="country_th" context="country name that will be displayed in country code picker along with its dial code">Thailand</string>
-	<string name="country_tg" context="country name that will be displayed in country code picker along with its dial code">Togo</string>
-	<string name="country_tk" context="country name that will be displayed in country code picker along with its dial code">Tokelau</string>
-	<string name="country_to" context="country name that will be displayed in country code picker along with its dial code">Tonga</string>
-	<string name="country_tt" context="country name that will be displayed in country code picker along with its dial code">Trinidad and Tobago</string>
-	<string name="country_tn" context="country name that will be displayed in country code picker along with its dial code">Tunisia</string>
-	<string name="country_tr" context="country name that will be displayed in country code picker along with its dial code">Turkey</string>
-	<string name="country_tm" context="country name that will be displayed in country code picker along with its dial code">Turkmenistan</string>
-	<string name="country_tc" context="country name that will be displayed in country code picker along with its dial code">Turks and Caicos Islands</string>
-	<string name="country_tv" context="country name that will be displayed in country code picker along with its dial code">Tuvalu</string>
-	<string name="country_ug" context="country name that will be displayed in country code picker along with its dial code">Uganda</string>
-	<string name="country_ua" context="country name that will be displayed in country code picker along with its dial code">Ukraine</string>
-	<string name="country_ae" context="country name that will be displayed in country code picker along with its dial code">United Arab Emirates</string>
-	<string name="country_gb" context="country name that will be displayed in country code picker along with its dial code">United Kingdom</string>
-	<string name="country_us" context="country name that will be displayed in country code picker along with its dial code">United States</string>
-	<string name="country_uy" context="country name that will be displayed in country code picker along with its dial code">Uruguay</string>
-	<string name="country_uz" context="country name that will be displayed in country code picker along with its dial code">Uzbekistan</string>
-	<string name="country_vu" context="country name that will be displayed in country code picker along with its dial code">Vanuatu</string>
-	<string name="country_wf" context="country name that will be displayed in country code picker along with its dial code">Wallis and Futuna</string>
-	<string name="country_ye" context="country name that will be displayed in country code picker along with its dial code">Yemen</string>
-	<string name="country_zm" context="country name that will be displayed in country code picker along with its dial code">Zambia</string>
-	<string name="country_zw" context="country name that will be displayed in country code picker along with its dial code">Zimbabwe</string>
-	<string name="country_ax" context="country name that will be displayed in country code picker along with its dial code">land Islands</string>
-	<string name="country_aq" context="country name that will be displayed in country code picker along with its dial code">Antarctica</string>
-	<string name="country_bo" context="country name that will be displayed in country code picker along with its dial code">Bolivia, Plurinational State of</string>
-	<string name="country_bn" context="country name that will be displayed in country code picker along with its dial code">Brunei Darussalam</string>
-	<string name="country_cc" context="country name that will be displayed in country code picker along with its dial code">Cocos (Keeling) Islands</string>
-	<string name="country_cd" context="country name that will be displayed in country code picker along with its dial code">Congo, The Democratic Republic of the</string>
-	<string name="country_ci" context="country name that will be displayed in country code picker along with its dial code">Cote d\'Ivoire</string>
-	<string name="country_fk" context="country name that will be displayed in country code picker along with its dial code">Falkland Islands (Malvinas)</string>
-	<string name="country_gg" context="country name that will be displayed in country code picker along with its dial code">Guernsey</string>
-	<string name="country_va" context="country name that will be displayed in country code picker along with its dial code">Holy See (Vatican City State)</string>
-	<string name="country_hk" context="country name that will be displayed in country code picker along with its dial code">Hong Kong</string>
-	<string name="country_ir" context="country name that will be displayed in country code picker along with its dial code">Iran, Islamic Republic of</string>
-	<string name="country_im" context="country name that will be displayed in country code picker along with its dial code">Isle of Man</string>
-	<string name="country_je" context="country name that will be displayed in country code picker along with its dial code">Jersey</string>
-	<string name="country_kp" context="country name that will be displayed in country code picker along with its dial code">Korea, Democratic People\'s Republic of</string>
-	<string name="country_kr" context="country name that will be displayed in country code picker along with its dial code">Korea, Republic of</string>
-	<string name="country_la" context="country name that will be displayed in country code picker along with its dial code">Lao People\'s Democratic Republic</string>
-	<string name="country_ly" context="country name that will be displayed in country code picker along with its dial code">Libyan Arab Jamahiriya</string>
-	<string name="country_mo" context="country name that will be displayed in country code picker along with its dial code">Macao</string>
-	<string name="country_mk" context="country name that will be displayed in country code picker along with its dial code">Macedonia, The Former Yugoslav Republic of</string>
-	<string name="country_fm" context="country name that will be displayed in country code picker along with its dial code">Micronesia, Federated States of</string>
-	<string name="country_md" context="country name that will be displayed in country code picker along with its dial code">Moldova, Republic of</string>
-	<string name="country_mz" context="country name that will be displayed in country code picker along with its dial code">Mozambique</string>
-	<string name="country_ps" context="country name that will be displayed in country code picker along with its dial code">Palestinian Territory</string>
-	<string name="country_pn" context="country name that will be displayed in country code picker along with its dial code">Pitcairn</string>
-	<string name="country_re" context="country name that will be displayed in country code picker along with its dial code">Réunion</string>
-	<string name="country_ru" context="country name that will be displayed in country code picker along with its dial code">Russia</string>
-	<string name="country_bl" context="country name that will be displayed in country code picker along with its dial code">Saint Barthélemy</string>
-	<string name="country_sh" context="country name that will be displayed in country code picker along with its dial code">Saint Helena, Ascension and Tristan Da Cunha</string>
-	<string name="country_kn" context="country name that will be displayed in country code picker along with its dial code">Saint Kitts and Nevis</string>
-	<string name="country_lc" context="country name that will be displayed in country code picker along with its dial code">Saint Lucia</string>
-	<string name="country_mf" context="country name that will be displayed in country code picker along with its dial code">Saint Martin</string>
-	<string name="country_pm" context="country name that will be displayed in country code picker along with its dial code">Saint Pierre and Miquelon</string>
-	<string name="country_vc" context="country name that will be displayed in country code picker along with its dial code">Saint Vincent and the Grenadines</string>
-	<string name="country_st" context="country name that will be displayed in country code picker along with its dial code">Sao Tome and Principe</string>
-	<string name="country_so" context="country name that will be displayed in country code picker along with its dial code">Somalia</string>
-	<string name="country_sj" context="country name that will be displayed in country code picker along with its dial code">Svalbard and Jan Mayen</string>
-	<string name="country_sy" context="country name that will be displayed in country code picker along with its dial code">Syrian Arab Republic</string>
-	<string name="country_tw" context="country name that will be displayed in country code picker along with its dial code">Taiwan</string>
-	<string name="country_tz" context="country name that will be displayed in country code picker along with its dial code">Tanzania, United Republic of</string>
-	<string name="country_tl" context="country name that will be displayed in country code picker along with its dial code">Timor-Leste</string>
-	<string name="country_ve" context="country name that will be displayed in country code picker along with its dial code">Venezuela, Bolivarian Republic of</string>
-	<string name="country_vn" context="country name that will be displayed in country code picker along with its dial code">Vietnam</string>
-	<string name="country_vg" context="country name that will be displayed in country code picker along with its dial code">Virgin Islands, British</string>
-	<string name="country_vi" context="country name that will be displayed in country code picker along with its dial code">Virgin Islands, U.S.</string>
-
-
-
-
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 </resources>

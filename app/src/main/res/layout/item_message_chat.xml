@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
     android:id="@+id/message_chat_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -139,7 +140,7 @@
                         android:id="@+id/url_own_message_text_rl"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/background_text_rich_link" >
+                        android:background="@drawable/dark_background_text_rich_link" >
 
                         <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/url_own_message_text"
@@ -385,6 +386,24 @@
 
                 </RelativeLayout>
 
+                <!--triangle icon rich link-->
+                <RelativeLayout
+                    android:id="@+id/error_uploading_rich_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingRight="4dp"
+                    android:layout_toLeftOf="@+id/url_own_message_layout"
+                    android:background="@android:color/transparent">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_gravity="center"
+                        android:background="@null"
+                        android:src="@drawable/ic_input_warning"/>
+                </RelativeLayout>
+
                 <!--forward rich links-->
                 <RelativeLayout
                     android:id="@+id/forward_own_rich_links"
@@ -406,6 +425,262 @@
                         android:src="@drawable/ic_w_forward"/>
                 </RelativeLayout>
                 <!--End Rich links-->
+
+                <!-- Send a voice clip-->
+                <RelativeLayout
+                    android:id="@+id/content_own_message_voice_clip_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent">
+
+                    <RelativeLayout
+                        android:id="@+id/content_own_message_voice_clip_layout"
+                        android:layout_width="230dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/dark_rounded_chat_own_message"
+                        android:layout_marginRight="16dp"
+                        android:layout_alignParentRight="true">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:background="@null"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/content_own_message_voice_clip_play_pause"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="16dp"
+                                android:src="@drawable/ic_play_grey"
+                                android:background="@null"
+                                android:visibility="gone"/>
+
+                            <ImageView
+                                android:id="@+id/content_own_message_voice_clip_not_available"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="16dp"
+                                android:src="@drawable/ic_clear_white"
+                                android:tint="@color/grey_achievements_invite_friends"
+                                android:background="@null"
+                                android:visibility="gone"/>
+
+                            <!-- Progress bar-->
+                            <RelativeLayout
+                                android:id="@+id/uploading_own_progressbar_voiceclip"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="16dp"
+                                android:visibility="gone"
+                                android:background="@android:color/transparent">
+                                <ProgressBar
+                                    android:indeterminate="true"
+                                    android:indeterminateTintMode="src_atop"
+                                    android:indeterminateTint="@color/small_letter_upgrade_account"
+                                    android:layout_centerInParent="true"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+                            </RelativeLayout>
+
+                            <SeekBar
+                                android:id="@+id/content_own_message_voice_clip_seekBar"
+                                android:layout_width="145dp"
+                                android:layout_height="wrap_content"
+                                android:theme="@style/MySeekBar"
+                                android:thumbTint="@color/white"
+                                android:max="200"
+                                android:focusable="false"
+                                android:progress="0"
+                                android:background="@null"
+                                android:layout_gravity="center_vertical"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/content_own_message_voice_clip_duration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="00:00"
+                                android:textAlignment="center"
+                                android:background="@null"
+                                android:textColor="@android:color/white"
+                                android:layout_gravity="center_vertical"
+                                android:textSize="13sp"/>
+                        </LinearLayout>
+                    </RelativeLayout>
+
+                    <!--triangle icon voice clip-->
+                    <RelativeLayout
+                        android:id="@+id/error_uploading_voice_clip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@id/content_own_message_voice_clip_layout"
+                        android:gravity="right"
+                        android:paddingRight="4dp"
+                        android:background="@android:color/transparent">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_gravity="center"
+                            android:background="@null"
+                            android:src="@drawable/ic_input_warning"/>
+                    </RelativeLayout>
+
+                </RelativeLayout>
+                <!-- End voice clip-->
+
+                <!-- Send a location-->
+                <RelativeLayout
+                    android:id="@+id/own_main_item_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent">
+
+                    <RelativeLayout
+                        android:id="@+id/own_main_item_location_rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
+                        android:background="@drawable/own_background_location_message">
+
+                        <!--Preview of location-->
+                        <mega.privacy.android.app.components.RoundedImageView
+                            android:id="@+id/own_rounded_imageview_location"
+                            android:layout_width="256dp"
+                            android:layout_height="140dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginLeft="1dp"
+                            android:layout_marginRight="1dp"
+                            android:scaleType="centerCrop"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:background="@android:color/transparent" />
+
+                        <RelativeLayout
+                            android:id="@+id/own_separator_imageview_location"
+                            android:layout_width="256dp"
+                            android:layout_height="12dp"
+                            android:layout_marginTop="-12dp"
+                            android:layout_marginLeft="1dp"
+                            android:layout_marginRight="1dp"
+                            android:background="@color/white"
+                            android:layout_below="@id/own_rounded_imageview_location"/>
+
+                        <RelativeLayout
+                            android:id="@+id/own_pinned_location_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="72dp"
+                            android:background="@android:color/transparent"
+                            android:layout_below="@id/own_rounded_imageview_location"
+                            android:layout_marginTop="-12dp"
+                            android:layout_marginRight="12dp"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginBottom="1dp">
+
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true">
+                                <TextView
+                                    android:id="@+id/own_title_pinned_location"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/title_geolocation_message"
+                                    android:textSize="16dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:textColor="@color/name_my_account"/>
+
+                                <TextView
+                                    android:id="@+id/own_info_pinned_location"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/own_title_pinned_location"
+                                    android:textSize="14dp"
+                                    android:textColor="@color/name_my_account"/>
+
+                            </RelativeLayout>
+
+                        </RelativeLayout>
+
+                        <!--Transparent coat location message-->
+                        <RelativeLayout
+                            android:id="@+id/transparent_coating_location"
+                            android:layout_width="256dp"
+                            android:layout_height="128dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginLeft="1dp"
+                            android:layout_marginRight="1dp"
+                            android:background="@drawable/shape_location_chat_transparent">
+
+                            <!-- Progress bar location message-->
+                            <RelativeLayout
+                                android:id="@+id/uploadingProgressBarLocation"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentRight="true"
+                                android:background="@android:color/transparent">
+
+                                <ProgressBar
+                                    android:id="@+id/uploadingProgressBarLocation_im"
+                                    android:indeterminate="true"
+                                    android:paddingRight="5dp"
+                                    android:paddingBottom="5dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+                            </RelativeLayout>
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- triangle icon location message-->
+                    <RelativeLayout
+                        android:id="@+id/error_uploading_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="4dp"
+                        android:layout_toLeftOf="@+id/own_main_item_location_rl"
+                        android:background="@android:color/transparent">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_gravity="center"
+                            android:background="@null"
+                            android:src="@drawable/ic_input_warning"/>
+                    </RelativeLayout>
+
+                    <!--forward icon location message-->
+                    <RelativeLayout
+                        android:id="@+id/forward_own_location"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/forward_circle"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="8dp"
+                        android:layout_toLeftOf="@+id/own_main_item_location_rl">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_gravity="center"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitXY"
+                            android:background="@null"
+                            android:layout_margin="5dp"
+                            android:src="@drawable/ic_w_forward"/>
+                    </RelativeLayout>
+
+                </RelativeLayout>
+                <!-- End location-->
 
                 <!-- own elements portrait -->
                 <RelativeLayout
@@ -721,7 +996,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/own_triangle_icon_file"
+                    android:id="@+id/error_uploading_file"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -840,7 +1115,7 @@
                 <!--End RelativeLayout send contact-->
 
                 <RelativeLayout
-                    android:id="@+id/own_triangle_icon_contact"
+                    android:id="@+id/error_uploading_contact"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -970,7 +1245,7 @@
                         android:visibility="gone"/>
 
                     <mega.privacy.android.app.components.twemoji.EmojiTextView
-                    android:id="@+id/contact_management_message_text"
+                        android:id="@+id/contact_management_message_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
@@ -1216,6 +1491,182 @@
                         android:src="@drawable/ic_w_forward"/>
                 </RelativeLayout>
                 <!--end contact's rich links-->
+
+                <!--Received a voice clip-->
+                <RelativeLayout
+                    android:id="@+id/content_contact_message_voice_clip_layout"
+                    android:layout_width="230dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/rounded_text_view_chat_contact_message"
+                    android:gravity="left"
+                    android:layout_alignParentLeft="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:id="@+id/content_contact_message_voice_clip_play_pause"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:background="@null"
+                            android:visibility="gone"/>
+
+
+                        <ImageView
+                            android:id="@+id/content_contact_message_voice_clip_not_available"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:src="@drawable/ic_clear_white"
+                            android:tint="@color/grey_achievements_invite_friends"
+                            android:background="@null"
+                            android:visibility="gone"/>
+
+                        <!-- Progress bar-->
+                        <RelativeLayout
+                            android:id="@+id/uploading_contact_progressbar_voiceclip"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:visibility="gone"
+                            android:background="@android:color/transparent">
+                            <ProgressBar
+                                android:indeterminate="true"
+                                android:indeterminateTintMode="src_atop"
+                                android:indeterminateTint="@color/small_letter_upgrade_account"
+                                android:layout_centerInParent="true"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </RelativeLayout>
+                        <SeekBar
+                            android:id="@+id/content_contact_message_voice_clip_seekBar"
+                            android:layout_width="145dp"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/ContactSeekBar"
+                            android:thumbTint="@color/accentColor"
+                            android:max="200"
+                            android:progress="0"
+                            android:background="@null"
+                            android:layout_gravity="center_vertical"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                        <TextView
+                            android:id="@+id/content_contact_message_voice_clip_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            android:textAlignment="center"
+                            android:background="@null"
+                            android:textColor="@android:color/black"
+                            android:layout_gravity="center_vertical"
+                            android:textSize="13sp"/>
+                    </LinearLayout>
+                </RelativeLayout>
+                <!-- End voice clip-->
+
+                <!-- Received a location-->
+                <RelativeLayout
+                    android:id="@+id/contact_main_item_location_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent">
+
+                    <RelativeLayout
+                        android:id="@+id/contact_main_item_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:background="@drawable/contact_background_location_message">
+
+                        <!--Preview of location-->
+                        <mega.privacy.android.app.components.RoundedImageView
+                            android:id="@+id/contact_rounded_imageview_location"
+                            android:layout_width="256dp"
+                            android:layout_height="140dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginLeft="1dp"
+                            android:layout_marginRight="1dp"
+                            android:scaleType="centerCrop"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:background="@android:color/transparent" />
+
+                        <RelativeLayout
+                            android:id="@+id/contact_separator_imageview_location"
+                            android:layout_width="256dp"
+                            android:layout_height="12dp"
+                            android:layout_marginTop="-12dp"
+                            android:layout_marginLeft="1dp"
+                            android:layout_marginRight="1dp"
+                            android:background="@color/white"
+                            android:layout_below="@id/contact_rounded_imageview_location"/>
+
+                        <RelativeLayout
+                            android:id="@+id/contact_pinned_location_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="72dp"
+                            android:background="@android:color/transparent"
+                            android:layout_below="@id/contact_rounded_imageview_location"
+                            android:layout_marginTop="-12dp"
+                            android:layout_marginRight="12dp"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginBottom="1dp">
+
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true">
+                                <TextView
+                                    android:id="@+id/contact_title_pinned_location"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pinned Location"
+                                    android:textSize="16dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:textColor="@color/name_my_account"/>
+
+                                <TextView
+                                    android:id="@+id/contact_info_pinned_location"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/contact_title_pinned_location"
+                                    android:textSize="14dp"
+                                    android:textColor="@color/name_my_account"/>
+
+                            </RelativeLayout>
+
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!--forward icon location message-->
+                    <RelativeLayout
+                        android:id="@+id/forward_contact_location"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/forward_circle"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="8dp"
+                        android:layout_toRightOf="@id/contact_main_item_location">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_gravity="center"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitXY"
+                            android:background="@null"
+                            android:layout_margin="5dp"
+                            android:src="@drawable/ic_w_forward"/>
+                    </RelativeLayout>
+                </RelativeLayout>
+                <!-- End location-->
 
                 <!-- node attachment message-->
                 <RelativeLayout

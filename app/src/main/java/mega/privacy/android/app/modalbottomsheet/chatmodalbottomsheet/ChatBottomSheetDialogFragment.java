@@ -302,11 +302,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
                     optionMuteChatText.setText(getString(R.string.general_unmute));
                 }
-                else{
-                    optionInfoChat.setVisibility(View.GONE);
-                    separatorInfo.setVisibility(View.GONE);
-                    optionClearHistory.setVisibility(View.GONE);
-                }
             }
             else{
                 MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(chat.getPeerHandle());
@@ -314,10 +309,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     titleMailContactChatPanel.setText(chatRoom.getPeerEmail(0));
                     addAvatarChatPanel(chatRoom.getPeerEmail(0), chat);
                 }
-
-                optionInfoChat.setVisibility(View.GONE);
-                separatorInfo.setVisibility(View.GONE);
-                optionClearHistory.setVisibility(View.GONE);
             }
 
             if(chat.isArchived()){
@@ -475,7 +466,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 if(chat==null){
                     log("Selected chat NULL");
                 }
-                log("Leave chat with: "+chat.getTitle());
+                log("Leave chat - Chat ID: " + chat.getChatId());
                 ((ManagerActivityLollipop)context).showConfirmationLeaveChat(chat);
                 break;
             }
@@ -484,7 +475,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 if(chat==null){
                     log("Selected chat NULL");
                 }
-                log("Clear chat with: "+chat.getTitle());
+                log("Clear chat - Chat ID: " + chat.getChatId());
                 ((ManagerActivityLollipop)context).showConfirmationClearChat(chat);
 
                 break;
