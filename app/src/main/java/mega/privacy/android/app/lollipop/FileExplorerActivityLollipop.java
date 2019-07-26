@@ -63,8 +63,8 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
-import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -320,7 +320,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			Intent intent = params[0];
             List<ShareInfo> shareInfos = (List<ShareInfo>) intent.getSerializableExtra(EXTRA_SHARE_INFOS);
             if(shareInfos != null) {
-                intent.removeExtra(EXTRA_SHARE_INFOS);
                 return  shareInfos;
             }
 			return ShareInfo.processIntent(intent, context);
@@ -332,7 +331,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if(needLogin) {
                 Intent loginIntent = new Intent(FileExplorerActivityLollipop.this, LoginActivityLollipop.class);
                 loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-//                loginIntent.putExtra(EXTRA_SHARE_INTENT, getIntent());
                 loginIntent.putExtra(EXTRA_SHARE_ACTION, getIntent().getAction());
                 loginIntent.putExtra(EXTRA_SHARE_TYPE, getIntent().getType());
                 loginIntent.putExtra(EXTRA_SHARE_INFOS,new ArrayList<>(info));
