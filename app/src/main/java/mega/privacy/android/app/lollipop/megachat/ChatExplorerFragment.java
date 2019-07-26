@@ -281,7 +281,7 @@ public class ChatExplorerFragment extends Fragment {
 
 //        Maybe the contact is not my contact already
         if (user == null) {
-            log("Chat "+chat.getTitle()+" with PeerHandle: "+handle+" is NULL");
+            log("Chat ID " + chat.getChatId() + " with PeerHandle: " + handle + " is NULL");
             return null;
         }
 

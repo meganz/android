@@ -26,6 +26,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -137,7 +138,7 @@ public class Util {
 	public static String chatTempDIR = "MEGA/MEGA Temp/Chat";
 	public static String oldMKFile = "/MEGA/MEGAMasterKey.txt";
 	public static String rKFile = "/MEGA/MEGARecoveryKey.txt";
-	
+
 	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
 	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
 	public static String base64EncodedPublicKey_3 = "55k9FIh3vDXXTHJn4oM9JwFwbcZf1zmVLyes5ld7+G15SZ7QmCchqfY4N/a/qVcGFsfwqm";
@@ -928,41 +929,38 @@ public class Util {
 	    }
 	}
 	
-	public static String getLocalFile(Context context, String fileName, long fileSize,
-			String destDir)
-	{
+	public static String getLocalFile(Context context, String fileName, long fileSize, String destDir) {
 		Cursor cursor = null;
 		try 
 		{
 			if(MimeTypeList.typeForName(fileName).isImage())
 			{
+				log("is Image");
 				final String[] projection = { MediaStore.Images.Media.DATA };
 				final String selection = MediaStore.Images.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Images.Media.SIZE + " = ?";
 				final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
 				
-		        cursor = context.getContentResolver().query(
-		                        Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
-		                        selectionArgs, null);
+		        cursor = context.getContentResolver().query(Images.Media.EXTERNAL_CONTENT_URI, projection, selection, selectionArgs, null);
 				if (cursor != null && cursor.moveToFirst()) {
 			        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 			        String path =  cursor.getString(dataColumn);
 			        cursor.close();
 			        cursor = null;
 			        if(new File(path).exists()){
-			        	return path;
+						return path;
 			        }
 				}
 				if(cursor != null) cursor.close();
 			
-				cursor = context.getContentResolver().query(
-	                    Images.Media.INTERNAL_CONTENT_URI, projection, selection,
-	                    selectionArgs, null);
+				cursor = context.getContentResolver().query(Images.Media.INTERNAL_CONTENT_URI, projection, selection, selectionArgs, null);
 				if (cursor != null && cursor.moveToFirst()) {
 			        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 			        String path =  cursor.getString(dataColumn);
 			        cursor.close();
 			        cursor = null;
-			        if(new File(path).exists()) return path;
+			        if (new File(path).exists()) {
+						return path;
+					}
 				}
 				if(cursor != null) cursor.close();
 			}
@@ -997,31 +995,32 @@ public class Util {
 				if(cursor != null) cursor.close();
 			}
 			else if (MimeTypeList.typeForName(fileName).isAudio()) {
+				log("isAUdio");
 				final String[] projection = { MediaStore.Audio.Media.DATA };
 				final String selection = MediaStore.Audio.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Audio.Media.SIZE + " = ?";
 				final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
 
-				cursor = context.getContentResolver().query(
-						Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
-						selectionArgs, null);
+				cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, selectionArgs, null);
 				if (cursor != null && cursor.moveToFirst()) {
 					int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
 					String path =  cursor.getString(dataColumn);
 					cursor.close();
 					cursor = null;
-					if(new File(path).exists()) return path;
+					if(new File(path).exists()){
+						return path;
+					}
 				}
 				if(cursor != null) cursor.close();
 
-				cursor = context.getContentResolver().query(
-						Video.Media.INTERNAL_CONTENT_URI, projection, selection,
-						selectionArgs, null);
+				cursor = context.getContentResolver().query(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, projection, selection, selectionArgs, null);
 				if (cursor != null && cursor.moveToFirst()) {
 					int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
 					String path =  cursor.getString(dataColumn);
 					cursor.close();
 					cursor = null;
-					if(new File(path).exists()) return path;
+					if(new File(path).exists()) {
+						return path;
+					}
 				}
 				if(cursor != null) cursor.close();
 			}
@@ -1031,11 +1030,12 @@ public class Util {
 		}
 		
 		//Not found, searching in the download folder
-		if(destDir != null)
-		{
+		if(destDir != null){
 			File file = new File(destDir, fileName);
-			if(file.exists() && (file.length() == fileSize))
+			if(file.exists() && file.length() == fileSize){
 				return file.getAbsolutePath();
+			}
+
 		}
 		return null;
 	}
@@ -1191,7 +1191,9 @@ public class Util {
 		
 		return speedString;
 	}
-	
+
+
+
 	public static String getPhotoSyncName (long timeStamp, String fileName){
 		String photoSyncName = null;
 		
@@ -2322,6 +2324,58 @@ public class Util {
         return normalizePhoneNumber(phoneNumber, countryCode.toUpperCase());
     }
 
+	/**
+	 * This method formats the coordinates of a location in degrees, minutes and seconds
+	 * and returns a string with it
+	 *
+	 * @param latitude latitude of the location to format
+	 * @param longitude longitude of the location to format
+	 * @return string with the location formatted in degrees, minutes and seconds
+	 */
+	public static String convertToDegrees(float latitude, float longitude) {
+        StringBuilder builder = new StringBuilder();
+
+		formatCoordinate(builder, latitude);
+        if (latitude < 0) {
+            builder.append("S ");
+        } else {
+            builder.append("N ");
+        }
+
+		formatCoordinate(builder, longitude);
+        if (longitude < 0) {
+            builder.append("W");
+        } else {
+            builder.append("E");
+        }
+
+        return builder.toString();
+    }
+
+	/**
+	 * This method formats a coordinate in degrees, minutes and seconds
+	 *
+	 * @param builder StringBuilder where the string formatted it's going to be built
+	 * @param coordinate coordinate to format
+	 */
+	private static void formatCoordinate (StringBuilder builder, float coordinate) {
+		String degrees = Location.convert(Math.abs(coordinate), Location.FORMAT_SECONDS);
+		String[] degreesSplit = degrees.split(":");
+		builder.append(degreesSplit[0]);
+		builder.append("°");
+		builder.append(degreesSplit[1]);
+		builder.append("'");
+
+		try {
+			builder.append(Math.round(Float.parseFloat(degreesSplit[2].replace(",", "."))));
+		} catch (Exception e) {
+			log("Error rounding seconds in coordinates: " + e.toString());
+			builder.append(degreesSplit[2]);
+		}
+
+		builder.append("''");
+	}
+
 	public static void hideKeyboard(Activity activity, int flag){
 
 		View v = activity.getCurrentFocus();
@@ -2337,15 +2391,31 @@ public class Util {
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
 		}
+
 	}
 
+	public static boolean isPermissionGranted(Context context, String permission){
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
 	public static boolean checkPermissionGranted(String permission, Context context) {
-		try {
-			return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
-		} catch (IllegalArgumentException ex) {
-			log("IllegalArgument Exception is thrown");
-			return false;
-		}
+        try {
+            return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+        } catch (IllegalArgumentException ex) {
+            log("IllegalArgument Exception is thrown");
+            return false;
+        }
+    }
+
+	/**
+	 * This method detects whether the android device is tablet
+	 *
+	 * @param context the passed Activity to be detected
+	 */
+	public static boolean isTablet(Context context) {
+		return (context.getResources().getConfiguration().screenLayout
+				& Configuration.SCREENLAYOUT_SIZE_MASK)
+				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
 	}
 
 	private static void log(String message) {
