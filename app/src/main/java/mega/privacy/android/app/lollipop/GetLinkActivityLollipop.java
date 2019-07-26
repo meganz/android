@@ -515,7 +515,15 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (e.getErrorCode() == MegaError.API_OK) {
 			log("link: " + request.getLink());
-			selectedNode = megaApi.getNodeByHandle(request.getNodeHandle());
+			
+			//for megaApi.encryptLinkWithPassword() case, request.getNodeHandle() returns -1 and cause selectedNode set to null
+			long handle = request.getNodeHandle();
+			if(handle == -1){
+			    handle = selectedNode.getHandle();
+            }
+            
+            //refresh node
+			selectedNode = megaApi.getNodeByHandle(handle);
 			if(getLinkFragment!=null){
 				if(getLinkFragment.isAdded()){
 					getLinkFragment.requestFinish(request, e);

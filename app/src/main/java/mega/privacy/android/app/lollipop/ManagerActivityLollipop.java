@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -636,7 +637,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public long comesFromNotificationHandle = -1;
 	public long comesFromNotificationHandleSaved = -1;
 	public int comesFromNotificationDeepBrowserTreeIncoming = -1;
-	private boolean isCreatingChatFolder = false;
 
 	RelativeLayout myAccountHeader;
 	ImageView contactStatus;
@@ -3055,6 +3055,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	void askForAccess () {
+    	//If mobile device, only portrait mode is allowed
+		if (!Util.isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			log("mobile only portrait mode");
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+
     	boolean writeStorageGranted = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		boolean readStorageGranted = checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
     	boolean cameraGranted = checkPermission(Manifest.permission.CAMERA);
@@ -3092,6 +3098,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void destroyPermissionsFragment () {
+		//In mobile, allow all orientation after permission screen
+		if (!Util.isTablet(this)) {
+			log("mobile, all orientation");
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+		}
+
 		turnOnNotifications = false;
 
 		tB.setVisibility(View.VISIBLE);
@@ -3709,7 +3721,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				case CAMERA_UPLOADS: {
 					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
-					setToolbarTitle();
 				}
 				case NOTIFICATIONS: {
 					notificFragment = (NotificationsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
@@ -4656,8 +4667,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					setFirstNavigationLevel(true);
+					aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				}
-				aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				break;
 			}
 			case MEDIA_UPLOADS:{
@@ -5047,7 +5058,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		setToolbarTitle();
-        createMyChatFolder();
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -5457,7 +5467,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("Exception NotificationManager - remove all notifications");
 		}
 
-        createMyChatFolder();
 		setToolbarTitle();
 
 		tabLayoutShares.setVisibility(View.GONE);
@@ -5808,11 +5817,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
     			drawerItem = DrawerItem.SEARCH;
-    			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-    			if (sFLol != null) {
-    				getSupportFragmentManager().beginTransaction().remove(sFLol).commitNowAllowingStateLoss();
+				sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
+				if (sFLol == null) {
+					sFLol = SearchFragmentLollipop.newInstance();
 				}
-				sFLol = SearchFragmentLollipop.newInstance();
 
 				tabLayoutContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -6234,7 +6242,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
-                createMyChatFolder();
 				searchQuery = "";
 				searchExpand = true;
 				if (drawerItem != DrawerItem.CHAT) {
@@ -9538,9 +9545,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (drawerItem == DrawerItem.CHAT){
-
 			if (!Util.isOnline(this)){
-				showOfflineMode();
+				super.onBackPressed();
+				return;
 			}
 			else{
 				if(megaApi!=null && megaApi.getRootNode()!=null){
@@ -13657,6 +13664,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if((searchByDate) != null && (searchDate!=null)){
 						ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
 						cuFL.setNodes(nodesSearch);
+						if (nodesSearch.size() == 0) {
+							cuFL.showEmptySearchResults();
+						}
 						isSearchEnabled = true;
 					}else{
 						cuFL.setNodes(nodes);
@@ -16377,10 +16387,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				statusDialog.dismiss();
 			}
 			catch (Exception ex) {}
-            if(isCreatingChatFolder && CHAT_FOLDER.equals(request.getName())){
-                isCreatingChatFolder = false;
-                return;
-            }
             if (e.getErrorCode() == MegaError.API_OK){
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -18743,15 +18749,4 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
         }
     }
-
-	private void createMyChatFolder() {
-		if (Util.isChatEnabled()) {
-			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-			if (parentNode == null && !isCreatingChatFolder) {
-				log("Create folder: " + CHAT_FOLDER);
-				isCreatingChatFolder = true;
-				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
-			}
-		}
-	}
 }

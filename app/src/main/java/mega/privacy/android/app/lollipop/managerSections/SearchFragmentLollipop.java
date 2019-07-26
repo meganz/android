@@ -61,6 +61,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -72,7 +73,7 @@ import nz.mega.sdk.MegaShare;
 
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
-public class SearchFragmentLollipop extends Fragment{
+public class SearchFragmentLollipop extends RotatableFragment{
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
@@ -117,12 +118,22 @@ public class SearchFragmentLollipop extends Fragment{
 
 	public NewHeaderItemDecoration headerItemDecoration;
 
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
+	}
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
 	}
 
 	public void updateScrollPosition(int position) {
@@ -538,11 +549,15 @@ public class SearchFragmentLollipop extends Fragment{
             sections.put(folderCount, getString(R.string.general_files));
         }
 		if (headerItemDecoration == null) {
+			log("create new decoration");
 			headerItemDecoration = new NewHeaderItemDecoration(context);
-			recyclerView.addItemDecoration(headerItemDecoration);
+		} else {
+			log("remove old decoration");
+			recyclerView.removeItemDecoration(headerItemDecoration);
 		}
 		headerItemDecoration.setType(type);
 		headerItemDecoration.setKeys(sections);
+		recyclerView.addItemDecoration(headerItemDecoration);
     }
 	
 	@Override
@@ -1087,8 +1102,9 @@ public class SearchFragmentLollipop extends Fragment{
 			adapter.clearSelections();
 		}
 	}
-	
-	private void updateActionModeTitle() {
+
+	@Override
+	protected void updateActionModeTitle() {
 		if (actionMode == null || context == null) {
 			return;
 		}

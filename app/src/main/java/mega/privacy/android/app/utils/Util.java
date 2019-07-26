@@ -2360,6 +2360,21 @@ public class Util {
 		}
 
 	}
+	
+	public static boolean isPermissionGranted(Context context, String permission){
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+	/**
+	 * This method detects whether the android device is tablet
+	 *
+	 * @param context the passed Activity to be detected
+	 */
+	public static boolean isTablet(Context context) {
+		return (context.getResources().getConfiguration().screenLayout
+				& Configuration.SCREENLAYOUT_SIZE_MASK)
+				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
+	}
 
 	private static void log(String message) {
 		log("Util", message);
