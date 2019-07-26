@@ -70,6 +70,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.SortUtil.sortByMailDescending;
+
 
 public class IncomingSharesFragmentLollipop extends Fragment{
 
@@ -1256,12 +1258,9 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	public void findNodes(){
 		log("findNodes");
 		nodes=megaApi.getInShares();
-		for(int i=0;i<nodes.size();i++){
-			log("NODE: "+nodes.get(i).getName());
-		}
 
 		if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByMailDescending();
+			sortByMailDescending(nodes);
 		}
 		addSectionTitle(nodes,adapter.getAdapterType() );
 		adapter.setNodes(nodes);
@@ -1335,7 +1334,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 		if(((ManagerActivityLollipop)context).parentHandleIncoming==-1){
 			if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
-				sortByMailDescending();
+				sortByMailDescending(nodes);
 			}
 			else{
 				nodes=megaApi.getInShares();
@@ -1566,31 +1565,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 		}
 		adapter.setNodes(nodes);
-	}
-	
-	public void sortByMailDescending(){
-		log("sortByNameDescending");
-		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
-		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
-
-		for (int i=0;i<nodes.size();i++){
-			if(nodes.get(i) == null) {
-				continue;
-			}
-			if (nodes.get(i).isFolder()){
-				folderNodes.add(nodes.get(i));
-			}
-			else{
-				fileNodes.add(nodes.get(i));
-			}
-		}
-
-		Collections.reverse(folderNodes);
-		Collections.reverse(fileNodes);
-
-		nodes.clear();
-		nodes.addAll(folderNodes);
-		nodes.addAll(fileNodes);
 	}
 
 	public int getItemCount(){

@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +68,9 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
+
+import static mega.privacy.android.app.utils.SortUtil.sortByNameAscending;
+import static mega.privacy.android.app.utils.SortUtil.sortByNameDescending;
 
 
 public class OutgoingSharesFragmentLollipop extends Fragment{
@@ -1070,15 +1072,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				}	
 			}
 		}
-
-		if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
-		addSectionTitle(nodes,adapter.getAdapterType());
-		adapter.setNodes(nodes);
+		orderNodes();
 	}
 
 	@Override
@@ -1514,129 +1508,17 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	public void setNodes(ArrayList<MegaNode> nodes){
 		log("setNodes");
 		this.nodes = nodes;
-		if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
+		orderNodes();
 	}
-	
-	public void sortByNameDescending(){
-		
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
-		
-		
-		for(int k = 0; k < nodes.size() ; k++) {
-			MegaNode node = nodes.get(k);
-			if(node == null) {
-				continue;
-			}
-			if(node.isFolder()){
-				foldersOrder.add(node.getName());
-			}
-			else{
-				filesOrder.add(node.getName());
-			}
-		}
-		
-	
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(foldersOrder);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(filesOrder);
 
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = foldersOrder.get(k);
-				if(nodes.get(j) == null) {
-					continue;
-				}
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));
-				}				
-			}
-			
+	private void orderNodes() {
+		if (((ManagerActivityLollipop) context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
+			sortByNameDescending(this.nodes);
+		} else {
+			sortByNameAscending(this.nodes);
 		}
-		
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = filesOrder.get(k);
-				if(nodes.get(j) == null) {
-					continue;
-				}
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));					
-				}				
-			}
-			
-		}
-		
-		nodes.clear();
-		nodes.addAll(tempOffline);
-		addSectionTitle(nodes,adapter.getAdapterType());
-		adapter.setNodes(nodes);
-	}
-	
-	public void sortByNameAscending(){
-		log("sortByNameAscending");
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
-				
-		for(int k = 0; k < nodes.size() ; k++) {
-			MegaNode node = nodes.get(k);
-			if(node == null) {
-				continue;
-			}
-			if(node == null) {
-				continue;
-			}
-			if(node.isFolder()){
-				foldersOrder.add(node.getName());
-			}
-			else{
-				filesOrder.add(node.getName());
-			}
-		}		
-	
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
 
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = foldersOrder.get(k);
-				if(nodes.get(j) == null) {
-					continue;
-				}
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));
-				}				
-			}			
-		}
-		
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = filesOrder.get(k);
-				if(nodes.get(j) == null) {
-					continue;
-				}
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));
-				}				
-			}
-			
-		}
-		
-		nodes.clear();
-		nodes.addAll(tempOffline);
-		addSectionTitle(nodes,adapter.getAdapterType());
+		addSectionTitle(nodes, adapter.getAdapterType());
 		adapter.setNodes(nodes);
 	}
 			

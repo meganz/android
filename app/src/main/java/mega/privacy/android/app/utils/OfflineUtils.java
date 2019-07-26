@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -308,6 +309,28 @@ public class OfflineUtils {
             }
             log("findIncomingParentHandle B: "+nodeToFind.getHandle());
             return result;
+        }
+    }
+
+    private void searchOfflineFiles (File parent, final String query, ArrayList<File> filteredFiles) {
+        if (parent == null) return;
+
+        File[] listFiles = parent.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.contains(query);
+            }
+        });
+
+        for (File file : listFiles) {
+            filteredFiles.add(file);
+        }
+
+        File[] list = parent.listFiles();
+        for (File file : list) {
+            if (file.isDirectory()) {
+                searchOfflineFiles(file, query, filteredFiles);
+            }
         }
     }
 

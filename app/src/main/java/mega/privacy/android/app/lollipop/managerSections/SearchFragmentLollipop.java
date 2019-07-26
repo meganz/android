@@ -66,10 +66,12 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.SortUtil.*;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
 public class SearchFragmentLollipop extends Fragment{
@@ -98,7 +100,7 @@ public class SearchFragmentLollipop extends Fragment{
 
     private MenuItem trashIcon;
 
-	ArrayList<MegaNode> nodes;
+	ArrayList<MegaNode> nodes = new ArrayList<>();
 
 	private ActionMode actionMode;
 	
@@ -656,51 +658,118 @@ public class SearchFragmentLollipop extends Fragment{
 
 	private void getSearchNodes() {
 		String query = ((ManagerActivityLollipop) context).searchQuery;
+		if (query == null || query.isEmpty()) {
+			nodes.clear();
+			return;
+		}
+
+		MegaNode parent = null;
+		long parentHandle = -1;
+		int order = ((ManagerActivityLollipop) context).orderCloud;
 
 		if (((ManagerActivityLollipop) context).parentHandleSearch == -1) {
-			if (((ManagerActivityLollipop) context).isSearchQuery()) {
-				MegaNode parent;
-				switch (((ManagerActivityLollipop) context).getSearchDrawerItem()) {
-					case CLOUD_DRIVE: {
-						parent = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleBrowser);
-						nodes = megaApi.search(parent, query, true, ((ManagerActivityLollipop) context).orderCloud);
-						break;
-					}
-					case SHARED_ITEMS: {
-						if (((ManagerActivityLollipop) context).getTabItemShares() == 0) {
-							if (((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming() == -1) {
-
-							} else {
-
-							}
-						} else if (((ManagerActivityLollipop) context).getTabItemShares() == 1) {
-							if (((ManagerActivityLollipop) context).getDeepBrowserTreeOutgoing() == -1) {
-
-							} else {
-
-							}
-						}
-						break;
-					}
-					case SAVED_FOR_OFFLINE: {
-						break;
-					}
-					case RUBBISH_BIN: {
-						break;
-					}
-					case INBOX: {
-						break;
-					}
+			switch (((ManagerActivityLollipop) context).getSearchDrawerItem()) {
+				case CLOUD_DRIVE: {
+					parent = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleBrowser);
+					break;
 				}
-				nodes = megaApi.search(((ManagerActivityLollipop) context).searchQuery, ORDER_DEFAULT_ASC);
-				log("Nodes found = " + nodes.size());
+				case SHARED_ITEMS: {
+					if (((ManagerActivityLollipop) context).getTabItemShares() == 0) {
+						if (((ManagerActivityLollipop) context).parentHandleIncoming == -1) {
+							nodes = filterInShares(query);
+							return;
+						} else {
+							parent = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleIncoming);
+
+						}
+					} else if (((ManagerActivityLollipop) context).getTabItemShares() == 1) {
+						if (((ManagerActivityLollipop) context).parentHandleOutgoing == -1) {
+							nodes = filterOutShares(query);
+							return;
+						} else {
+							parent = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleOutgoing);
+						}
+					}
+					break;
+				}
+				case SAVED_FOR_OFFLINE: {
+					break;
+				}
+				case RUBBISH_BIN: {
+				    parentHandle = ((ManagerActivityLollipop) context).parentHandleRubbish;
+				    if (parentHandle == -1) {
+				        parent = megaApi.getRubbishNode();
+                    } else {
+                        parent = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleRubbish);
+                    }
+					break;
+				}
+				case INBOX: {
+				    parentHandle = ((ManagerActivityLollipop) context).parentHandleInbox;
+				    if (parentHandle == -1) {
+				        parent = megaApi.getInboxNode();
+                    } else {
+                        parent = megaApi.getNodeByHandle(parentHandle);
+                    }
+					break;
+				}
 			}
 		} else {
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleSearch);
-			if (parentNode != null) {
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop) context).orderCloud);
+			parent = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleSearch);
+		}
+
+		if (parent != null) {
+			nodes = megaApi.search(parent, query, true, order);
+		}
+		log("Nodes found = " + nodes.size());
+	}
+
+	private ArrayList<MegaNode> filterInShares(String query) {
+		ArrayList<MegaNode> inShares = megaApi.getInShares();
+		ArrayList<MegaNode> filteredInShares = new ArrayList<>();
+
+		for (MegaNode inShare : inShares) {
+			if (shouldNodeBeFilter(inShare, query)) {
+				filteredInShares.add(inShare);
 			}
 		}
+
+		if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByMailDescending(filteredInShares);
+		}
+
+		return filteredInShares;
+	}
+
+	private ArrayList<MegaNode> filterOutShares(String query) {
+		ArrayList<MegaShare> outShares = megaApi.getOutShares();
+		ArrayList<MegaNode> filteredOutShares = new ArrayList<>();
+
+		for (MegaShare outShare : outShares) {
+			MegaNode node = megaApi.getNodeByHandle(outShare.getNodeHandle());
+			if (node == null) continue;
+
+			if (shouldNodeBeFilter(node, query)) {
+				filteredOutShares.add(node);
+			}
+		}
+
+		if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByNameDescending(filteredOutShares);
+		}
+		else{
+			sortByNameAscending(filteredOutShares);
+		}
+
+		return filteredOutShares;
+	}
+
+	private boolean shouldNodeBeFilter(MegaNode node, String query) {
+		if (node.getName().toLowerCase().contains(query.toLowerCase())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override

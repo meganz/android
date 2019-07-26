@@ -18758,22 +18758,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public boolean isSearchQuery() {
-		if (searchQuery != null && !searchQuery.isEmpty()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	public boolean isAutomaticSearchAllowed() {
-		if (isSearchQuery() && searchQuery.length() >= 3) {
-			return true;
-		}
-
-		return false;
-	}
-
     public DrawerItem getSearchDrawerItem(){
 		return searchDrawerItem;
 	}
