@@ -705,7 +705,6 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Zadat</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Vaše místní soubory budou odstraněni a budete odhlášeni po 10 nezdařených pokusech.</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Nesprávný kód</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Špatný kód PIN, zkuste to znovu. Zbývá vám %2d pokusů.</string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Kódy PIN nesouhlasí</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Zadejte svůj kód PIN</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Zadejte znovu svůj kód PIN</string>

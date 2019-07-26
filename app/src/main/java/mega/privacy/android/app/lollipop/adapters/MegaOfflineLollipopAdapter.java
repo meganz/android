@@ -48,7 +48,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 
 
-public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener {
+public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener, RotatableAdapter {
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -115,7 +115,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		public View folderLayout;
 		public View fileLayout;
 		public ImageView imageViewIcon;
-		public RelativeLayout thumbLayoutForFile;
+		public RelativeLayout thumbLayoutForFile, bottomContainer;
 		public ImageButton imageButtonThreeDotsForFile;
 		public TextView textViewFileNameForFile;
 		public ImageView fileGridSelected;
@@ -373,13 +373,28 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		return selectedItems.size();
 	}
 
+	@Override
+	public int getFolderCount() {
+		return folderCount;
+	}
+
+	@Override
+	public int getPlaceholderCount() {
+		return placeholderCount;
+	}
+
+	@Override
 	public List<Integer> getSelectedItems() {
-		log("getSelectedItems");
-		List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-		for (int i = 0; i < selectedItems.size(); i++) {
-			items.add(selectedItems.keyAt(i));
+		if (selectedItems != null) {
+			log("getSelectedItems");
+			List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+			for (int i = 0; i < selectedItems.size(); i++) {
+				items.add(selectedItems.keyAt(i));
+			}
+			return items;
+		} else {
+			return null;
 		}
-		return items;
 	}	
 	
 	/*
@@ -518,6 +533,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			
 			holder.imageViewIcon = (ImageView)v.findViewById(R.id.offline_grid_icon);
 			holder.thumbLayoutForFile = (RelativeLayout)v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
+			holder.bottomContainer = v.findViewById(R.id.offline_grid_bottom_container);
+            holder.bottomContainer.setOnClickListener(this);
+            holder.bottomContainer.setTag(holder);
 			holder.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
 			holder.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
 			holder.fileGridSelected = (ImageView)v.findViewById(R.id.file_grid_selected);
@@ -1015,7 +1033,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	@Override
 	public int getItemCount() {
 		log("getItemCount");
-		return mOffList.size() - placeholderCount;
+		return mOffList.size();
 	}
 
 	public int getItemCountWithoutRK(){
@@ -1114,7 +1132,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				dimens[3] = imageView.getHeight();
 				fragment.itemClick(currentPosition, dimens, imageView);
 				break;
-			}			
+			}
+            case R.id.offline_grid_bottom_container:
 			case R.id.offline_list_three_dots_layout:
             case R.id.file_grid_three_dots_for_file:
 			case R.id.offline_grid_three_dots:{
