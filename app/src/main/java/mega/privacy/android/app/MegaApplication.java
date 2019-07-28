@@ -4,6 +4,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -28,6 +32,7 @@ import android.support.v4.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
+
 import org.webrtc.AndroidVideoTrackSourceObserver;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
@@ -144,6 +149,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	MegaChatApiAndroid megaChatApi = null;
 
 	private NetworkStateReceiver networkStateReceiver;
+	private BroadcastReceiver logoutReceiver;
 
 	@Override
 	public void networkAvailable() {
@@ -415,7 +421,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
-		
+
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		boolean staging = false;
@@ -516,7 +522,17 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
-//		if(Util.isChatEnabled()){}
+		logoutReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context,Intent intent) {
+                if (intent != null) {
+                    if (intent.getAction() == Constants.ACTION_LOG_OUT) {
+                        storageState = MegaApiJava.STORAGE_STATE_GREEN; //Default value
+                    }
+                }
+            }
+        };
+		LocalBroadcastManager.getInstance(this).registerReceiver(logoutReceiver, new IntentFilter(Constants.ACTION_LOG_OUT));
 		EmojiManager.install(new TwitterEmojiProvider());
 
 		final EmojiCompat.Config config;
@@ -1923,8 +1939,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public int getStorageState() {
 	    return storageState;
 	}
-    
+
     public void setStorageState(int state) {
 	    this.storageState = state;
 	}
+
+    @Override
+    public void unregisterReceiver(BroadcastReceiver receiver) {
+        super.unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
+    }
 }
