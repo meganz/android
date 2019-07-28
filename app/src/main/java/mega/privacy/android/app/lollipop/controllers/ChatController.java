@@ -1572,7 +1572,7 @@ public class ChatController {
         boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         if (!hasStoragePermission) {
             unfinishedNodeList = nodeList;
-            askForPermission();
+            askForWriteStoragePermission();
             return;
         }
 
@@ -2174,12 +2174,12 @@ public class ChatController {
         return false;
     }
 
-    private void askForPermission() {
-      if (context instanceof Activity) {
-          ActivityCompat.requestPermissions(((Activity) context),
-                  new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                  Constants.REQUEST_WRITE_STORAGE);
-      }
+    private void askForWriteStoragePermission() {
+        if (context instanceof Activity) {
+            ActivityCompat.requestPermissions(((Activity) context),
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    Constants.REQUEST_WRITE_STORAGE);
+        }
     }
 
     public void resumeAuthorizedDownload() {
