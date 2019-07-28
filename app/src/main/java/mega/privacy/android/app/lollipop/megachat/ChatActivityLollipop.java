@@ -2410,14 +2410,31 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
 
+    private boolean cheakPermissionWriteStorage() {
+        log("checkPermissionsReadStorage");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
+
+        boolean hasWriteStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+        if (!hasWriteStoragePermission) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+            return false;
+        }
+
+        return true;
+    }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         log("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case Constants.REQUEST_WRITE_STORAGE: {
+                log("REQUEST_WRITE_STORAGE");
                 //After storage authorization, resume unfinished download
-                chatC.resumeAuthorizedDownload();
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && cheakPermissionWriteStorage()) {
+                    chatC.resumeAuthorizedDownload();
+                }
                 break;
             }
             case Constants.REQUEST_CAMERA:
