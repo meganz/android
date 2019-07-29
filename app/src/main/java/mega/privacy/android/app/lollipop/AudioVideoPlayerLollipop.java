@@ -334,6 +334,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
     };
 
+    private BroadcastReceiver receiverUpdate = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                finish();
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -344,6 +353,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         audioVideoPlayerLollipop = this;
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdate, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         downloadLocationDefaultPath = mega.privacy.android.app.utils.Util.getDownloadLocation(this);
 
@@ -3574,6 +3584,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate);
 
         super.onDestroy();
     }
@@ -3848,6 +3859,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
 
             LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate);
+
             setImageDragVisibility(View.VISIBLE);
         }
         else {
