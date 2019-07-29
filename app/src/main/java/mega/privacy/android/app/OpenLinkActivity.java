@@ -33,20 +33,17 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
 
-	MegaApplication app;
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
-	DatabaseHandler dbH = null;
+	private MegaApplication app;
+	private MegaApiAndroid megaApi;
+	private MegaChatApiAndroid megaChatApi;
+	private DatabaseHandler dbH = null;
 
-	String urlConfirmationLink = null;
+	private String urlConfirmationLink = null;
 
-	static OpenLinkActivity openLinkActivity = null;
-
-	RelativeLayout relativeContainer;
-	TextView processingText;
-	TextView errorText;
-	ProgressBar progressBar;
-	RelativeLayout containerOkButton;
+	private TextView processingText;
+	private TextView errorText;
+	private ProgressBar progressBar;
+	private RelativeLayout containerOkButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -60,16 +57,13 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		String url = intent.getDataString();
 		log("Original url: " + url);
 
-		openLinkActivity = this;
-
 		setContentView(R.layout.activity_open_link);
 
-		relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_open_link);
-		processingText = (TextView) findViewById(R.id.open_link_text);
-		errorText = (TextView) findViewById(R.id.open_link_error);
+		processingText = findViewById(R.id.open_link_text);
+		errorText = findViewById(R.id.open_link_error);
 		errorText.setVisibility(View.GONE);
-		progressBar = (ProgressBar) findViewById(R.id.open_link_bar);
-		containerOkButton = (RelativeLayout) findViewById(R.id.container_accept_button);
+		progressBar = findViewById(R.id.open_link_bar);
+		containerOkButton = findViewById(R.id.container_accept_button);
 		containerOkButton.setVisibility(View.GONE);
 		containerOkButton.setOnClickListener(this);
 		
@@ -98,6 +92,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		// Revert password change link
 		if (matchRegexs(url, Constants.REVERT_CHANGE_PASSWORD_LINK_REGEXS)) {
+			log("open revert password change link");
+
 			Intent openBlogIntent = new Intent(this, WebViewActivityLollipop.class);
 			openBlogIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			openBlogIntent.setData(Uri.parse(url));
@@ -122,10 +118,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		// Confirmation link
 		if (url != null && (url.matches("^https://mega\\.co\\.nz/#confirm.+$") || url.matches("^https://mega\\.nz/#confirm.+$"))) {
 			log("confirmation url");
-//			megaApi.localLogout();
 			urlConfirmationLink = url;
 
-//			megaApi.querySignupLink(url, this);
 			AccountController aC = new AccountController(this);
 			MegaApplication.setUrlConfirmationLink(urlConfirmationLink);
 
@@ -210,16 +204,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			if (dbH != null) {
 				if (dbH.getCredentials() != null) {
 					log("Logged IN");
-//					AlertDialog.Builder builder;
-//					builder = new AlertDialog.Builder(this);
-//					builder.setMessage(R.string.log_out_warning);
-//					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-//							new DialogInterface.OnClickListener() {
-//								public void onClick(DialogInterface dialog, int whichButton) {
-//									finish();
-//								}
-//							});
-//					builder.show();
 					setError(getString(R.string.log_out_warning));
 				}
 				else{
@@ -249,16 +233,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					finish();
 				} else {
 					log("Not logged");
-//					AlertDialog.Builder builder;
-//					builder = new AlertDialog.Builder(this);
-//					builder.setMessage(R.string.alert_not_logged_in);
-//					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-//							new DialogInterface.OnClickListener() {
-//								public void onClick(DialogInterface dialog, int whichButton) {
-//									finish();
-//								}
-//							});
-//					builder.show();
 					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
@@ -281,19 +255,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					finish();
 				} else {
 					log("Not logged");
-//					AlertDialog.Builder builder;
-//					builder = new AlertDialog.Builder(this);
-//					builder.setMessage(R.string.alert_not_logged_in);
-//					builder.setPositiveButton(getString(R.string.cam_sync_ok),	new DialogInterface.OnClickListener() {
-//								public void onClick(DialogInterface dialog, int whichButton) {
-//									Intent intent = new Intent(openLinkActivity, LoginActivityLollipop.class);
-//									intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-//									intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//									startActivity(intent);
-//									finish();
-//								}
-//							});
-//					builder.show();
 					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
@@ -325,16 +286,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					}
 				} else {
 					log("Not logged");
-//					AlertDialog.Builder builder;
-//					builder = new AlertDialog.Builder(this);
-//					builder.setMessage(R.string.alert_not_logged_in);
-//					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-//							new DialogInterface.OnClickListener() {
-//								public void onClick(DialogInterface dialog, int whichButton) {
-//									finish();
-//								}
-//							});
-//					builder.show();
 					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
@@ -438,16 +389,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					}
 				} else {
 					log("Not logged");
-//					AlertDialog.Builder builder;
-//					builder = new AlertDialog.Builder(this);
-//					builder.setMessage(R.string.alert_not_logged_in);
-//					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-//							new DialogInterface.OnClickListener() {
-//								public void onClick(DialogInterface dialog, int whichButton) {
-//									finish();
-//								}
-//							});
-//					builder.show();
 					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
