@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -157,6 +158,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	MegaChatApiAndroid megaChatApi = null;
 
 	private NetworkStateReceiver networkStateReceiver;
+	private BroadcastReceiver logoutReceiver;
 
 	/*A/V Calls*/
 	private AudioManager audioManager;
@@ -554,7 +556,17 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
-//		if(Util.isChatEnabled()){}
+		logoutReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context,Intent intent) {
+                if (intent != null) {
+                    if (intent.getAction() == Constants.ACTION_LOG_OUT) {
+                        storageState = MegaApiJava.STORAGE_STATE_GREEN; //Default value
+                    }
+                }
+            }
+        };
+		LocalBroadcastManager.getInstance(this).registerReceiver(logoutReceiver, new IntentFilter(Constants.ACTION_LOG_OUT));
 		EmojiManager.install(new TwitterEmojiProvider());
 
 		final EmojiCompat.Config config;
@@ -2132,4 +2144,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	}
 
 	public int getStorageState() { return storageState; }
+    
+    @Override
+    public void unregisterReceiver(BroadcastReceiver receiver) {
+        super.unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
+    }
 }

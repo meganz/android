@@ -964,6 +964,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterList == null) {
 				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, Constants.CAMERA_UPLOAD_ADAPTER);
 			} else {
+				if (context != adapterList.getContext()) {
+					log("attached activity changed");
+					adapterList.setContext(context);
+					actionMode = null;
+				}
+				if (listView != adapterList.getListFragment()) {
+					log("attached ListView changed");
+					adapterList.setListFragment(listView);
+				}
 				adapterList.setNodes(nodesArray, nodes);
 			}
 
@@ -1232,6 +1241,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterGrid.setHasStableIds(true);
 			} else {
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
+
+				if (adapterGrid.getContext() != context) {
+					log("attached activity changed");
+					adapterGrid.setContext(context);
+				}
+
 				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
 				adapterGrid.setNodes(monthPics, nodes, itemInformationList.size(), countTitles, itemInformationList);
 			}
@@ -1264,7 +1279,36 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			showEmptyResults();
 		}
 	}
-	
+
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		setRetainInstance(true);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		reDoTheSelectionAfterRotation();
+	}
+
+	private void reDoTheSelectionAfterRotation() {
+		if (((ManagerActivityLollipop) context).isListCameraUploads()) {
+			if (adapterList != null && adapterList.getSelectedDocuments().size() > 0) {
+				log("There is previous selected items, we need to redo the selection");
+				activateActionMode();
+				updateActionModeTitle();
+			}
+		} else {
+			if (adapterGrid != null && adapterGrid.getSelectedDocuments().size() > 0) {
+				log("There is previous selected items, we need to redo the selection");
+				adapterGrid.refreshActionModeTitle();
+			}
+		}
+
+	}
+
 	public void selectAll(){
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
@@ -1917,7 +1961,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 	}
-	
+
 	private void updateActionModeTitle() {
 
 		log("updateActionModeTitle");
