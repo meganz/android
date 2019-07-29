@@ -2346,95 +2346,58 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public boolean checkPermissionsVoiceClip() {
+    private boolean checkPermissions(String permission, int requestCode) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+
+        boolean hasPermission = (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED);
+
+        if (!hasPermission) {
+            ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean checkPermissionsVoiceClip() {
         log("checkPermissionsVoiceClip()");
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
-
-        boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
-        if (!hasRecordAudioPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_VOICE_CLIP);
-            return false;
-        }
-
-        return true;
+        return checkPermissions(Manifest.permission.RECORD_AUDIO, Constants.RECORD_VOICE_CLIP);
     }
 
-    public boolean checkPermissionsCall(){
+    private boolean checkPermissionsCall() {
         log("checkPermissionsCall");
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)  return true;
-
-        boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-        if (!hasCameraPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
-            return false;
-        }
-
-        boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
-        if (!hasRecordAudioPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
-            return false;
-        }
-
-        return true;
+        return checkPermissions(Manifest.permission.CAMERA, Constants.REQUEST_CAMERA)
+                && checkPermissions(Manifest.permission.RECORD_AUDIO, Constants.RECORD_AUDIO);
     }
 
-    public boolean checkPermissionsTakePicture(){
+    private boolean checkPermissionsTakePicture() {
         log("checkPermissionsTakePicture");
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)  return true;
-
-        boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-        if (!hasCameraPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA_TAKE_PICTURE);
-            return false;
-        }
-
-        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-        if (!hasStoragePermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE_TAKE_PICTURE);
-            return false;
-        }
-
-        return true;
+        return checkPermissions(Manifest.permission.CAMERA, Constants.REQUEST_CAMERA_TAKE_PICTURE)
+                && checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, Constants.REQUEST_WRITE_STORAGE_TAKE_PICTURE);
     }
 
     private boolean checkPermissionsReadStorage() {
         log("checkPermissionsReadStorage");
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
-
-        boolean hasReadStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-        if (!hasReadStoragePermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Constants.REQUEST_READ_STORAGE);
-            return false;
-        }
-
-        return true;
-
+        return checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Constants.REQUEST_READ_STORAGE);
     }
 
     private boolean checkPermissionWriteStorage(int code) {
         log("checkPermissionsWriteStorage :" + code);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
-
-        boolean hasWriteStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-        if (!hasWriteStoragePermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, code);
-            return false;
-        }
-
-        return true;
+        return checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, code);
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         log("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) return;
         switch (requestCode) {
             case Constants.REQUEST_WRITE_STORAGE: {
                 log("REQUEST_WRITE_STORAGE");
                 //After storage authorization, resume unfinished download
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionWriteStorage(Constants.REQUEST_WRITE_STORAGE)) {
+                if (checkPermissionWriteStorage(Constants.REQUEST_WRITE_STORAGE)) {
                     ArrayList<MegaNodeList> list = new ArrayList<>();
                     for (int i = 0; i < preservedMessagesSelected.size(); i++) {
                         MegaNodeList megaNodeList = preservedMessagesSelected.get(i).getMessage().getMegaNodeList();
@@ -2448,7 +2411,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case Constants.REQUEST_WRITE_STORAGE_OFFLINE: {
                 log("REQUEST_WRITE_STORAGE");
                 //After storage authorization, resume unfinished offline download
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionWriteStorage(Constants.REQUEST_WRITE_STORAGE_OFFLINE)) {
+                if (checkPermissionWriteStorage(Constants.REQUEST_WRITE_STORAGE_OFFLINE)) {
                     chatC.saveForOfflineWithAndroidMessages(preservedMessagesSelected, chatRoom);
                     preservedMessagesSelected = null;
                 }
@@ -2457,7 +2420,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case Constants.REQUEST_CAMERA:
             case Constants.RECORD_AUDIO:{
                 log("REQUEST_CAMERA || RECORD_AUDIO");
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsCall()) {
+                if (checkPermissionsCall()) {
                     startCall();
                 }
                 break;
@@ -2465,7 +2428,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case Constants.REQUEST_CAMERA_TAKE_PICTURE:
             case Constants.REQUEST_WRITE_STORAGE_TAKE_PICTURE:{
                 log("REQUEST_CAMERA_TAKE_PICTURE || REQUEST_WRITE_STORAGE_TAKE_PICTURE");
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsTakePicture()) {
+                if (checkPermissionsTakePicture()) {
                     takePicture();
                 }
                 break;
@@ -2473,21 +2436,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case Constants.RECORD_VOICE_CLIP:
             case Constants.REQUEST_STORAGE_VOICE_CLIP:{
                 log("RECORD_VOICE_CLIP || REQUEST_STORAGE_VOICE_CLIP");
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsVoiceClip()) {
+                if (checkPermissionsVoiceClip()) {
                    cancelRecording();
                 }
                 break;
             }
             case Constants.REQUEST_READ_STORAGE:{
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsReadStorage()) {
+                if (checkPermissionsReadStorage()) {
                     this.attachFromFileStorage();
                 }
                 break;
             }
             case Constants.LOCATION_PERMISSION_REQUEST_CODE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                    Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                     intent.putExtra(EDITING_MESSAGE, editingMessage);
                     if (messageToEdit != null) {
                         intent.putExtra(MSG_ID, messageToEdit.getMsgId());
