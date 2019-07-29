@@ -1606,6 +1606,28 @@ public class NodeController {
         megaApi.removeVersions((ManagerActivityLollipop) context);
     }
 
+    private void removeNotOfflineElements(String pathNavigation) {
+        ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
+
+        log("Number of elements: " + mOffList.size());
+
+        for (int i = 0; i < mOffList.size(); i++) {
+            MegaOffline checkOffline = mOffList.get(i);
+            File offlineFile = getOfflineFile(context, checkOffline);
+
+            if (!isFileAvailable(offlineFile)) {
+                log("Path to remove B: " + (mOffList.get(i).getPath() + mOffList.get(i).getName()));
+                mOffList.remove(i);
+                i--;
+            }
+
+        }
+
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).updateOfflineView(null);
+        }
+    }
+
     public void deleteOffline(MegaOffline selectedNode, String pathNavigation){
         log("deleteOffline");
         if (selectedNode == null){
@@ -1613,27 +1635,7 @@ public class NodeController {
             File file= buildExternalStorageFile(rKFile);
             if(isFileAvailable(file)){
                 file.delete();
-
-                ArrayList<MegaOffline> mOffList=dbH.findByPath(pathNavigation);
-
-                log("Number of elements: "+mOffList.size());
-
-                for(int i=0; i<mOffList.size();i++){
-
-                    MegaOffline checkOffline = mOffList.get(i);
-                    File offlineFile = getOfflineFile(context, checkOffline);
-
-                    if(!isFileAvailable(offlineFile)){
-                        log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-                        mOffList.remove(i);
-                        i--;
-                    }
-
-                }
-
-                if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop)context).updateOfflineView(null);
-                }
+                removeNotOfflineElements(pathNavigation);
             }
         }
         else {
@@ -1651,25 +1653,7 @@ public class NodeController {
                         }
                     }
 
-                    ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
-
-                    log("Number of elements: " + mOffList.size());
-
-                    for (int i = 0; i < mOffList.size(); i++) {
-
-                        MegaOffline checkOffline = mOffList.get(i);
-                        File offlineFile = getOfflineFile(context, checkOffline);
-
-                        if(!isFileAvailable(offlineFile)){
-                            log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-                            mOffList.remove(i);
-                            i--;
-                        }
-                    }
-
-                    if (context instanceof ManagerActivityLollipop) {
-                        ((ManagerActivityLollipop) context).updateOfflineView(null);
-                    }
+                    removeNotOfflineElements(pathNavigation);
                 }
             } else {
                 log("deleteOffline node");
@@ -1686,14 +1670,7 @@ public class NodeController {
                     deleteChildrenDB(mOffListChildren);
                 }
 
-                log("Remove the node physically");
-                try {
-                    File offlineFile = getOfflineFile(context, selectedNode);
-                    log("Delete in phone: " + selectedNode.getName());
-                    deleteFolderAndSubfolders(context, offlineFile);
-                } catch (Exception e) {
-                    log("EXCEPTION: deleteOffline - adapter");
-                }
+                removeNodePhysically(selectedNode);
 
                 dbH.removeById(selectedNode.getId());
 
@@ -1711,6 +1688,16 @@ public class NodeController {
                     ((ManagerActivityLollipop) context).updateOfflineView(null);
                 }
             }
+        }
+    }
+
+    private void removeNodePhysically(MegaOffline megaOffline) {
+        log("Remove the node physically");
+        try {
+            File offlineFile = getOfflineFile(context, megaOffline);
+            deleteFolderAndSubfolders(context, offlineFile);
+        } catch (Exception e) {
+            log("EXCEPTION: deleteOffline - adapter");
         }
     }
 
@@ -1746,14 +1733,7 @@ public class NodeController {
 
             dbH.removeById(parentToDelete.getId());
 
-            try{
-                File offlineFile = getOfflineFile(context, parentToDelete);
-                log("Delete in phone: "+parentToDelete.getName());
-                deleteFolderAndSubfolders(context, offlineFile);
-            }
-            catch(Exception e){
-                log("EXCEPTION: deleteOffline - adapter");
-            };
+            removeNodePhysically(parentToDelete);
 
             int parentId = parentToDelete.getParentId();
             if(parentId==-1){

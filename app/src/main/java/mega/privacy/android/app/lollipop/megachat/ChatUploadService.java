@@ -568,7 +568,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		log("after stopSelf");
 
 		try{
-			//Delete recursively all files and folder-??????
 			deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
 		}
 		catch (Exception e){
@@ -576,27 +575,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		try{
-			//Delete recursively all files and folder-??????
 			deleteCacheFolderIfEmpty(getApplicationContext(), CHAT_TEMPORAL_FOLDER);
 		}
 		catch (Exception e){
 			log("EXCEPTION: pathVideoDownsampling not deleted");
-		}
-
-		try{
-			File f = getExternalFilesDir(null);
-//			File f = new File(pathSelfie);
-			//Delete recursively all files and folder
-			if (f.exists()) {
-				if (f.isDirectory()) {
-					if(f.list().length<=0){
-						f.delete();
-					}
-				}
-			}
-		}
-		catch (Exception e){
-			log("EXCEPTION: pathSelfie not deleted");
 		}
 	}
 

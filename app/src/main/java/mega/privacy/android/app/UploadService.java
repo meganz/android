@@ -461,7 +461,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         log("after stopSelf");
 
         if (Util.isPermissionGranted(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			//Delete recursively all files and folder-??????
 			deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
         }
 
@@ -777,7 +776,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 releaseLocks();
 				UploadService.this.cancel();
 				log("after cancel");
-				//Delete recursively all files and folder-??????
 				deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
 
 			} else {

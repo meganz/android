@@ -267,9 +267,9 @@ public class MegaApiUtils {
 
         if (path == null) {
             return File.separator;
-        } else {
-            return File.separator + path;
         }
+
+        return File.separator + path;
     }
 
     public static ArrayList<MegaUser> getLastContactedUsers(Context context) {

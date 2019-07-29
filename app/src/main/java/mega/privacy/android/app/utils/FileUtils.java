@@ -295,27 +295,20 @@ public class FileUtils {
         if(extension!=null){
             return true;
         }
-        else{
-            return false;
-        }
+
+        return false;
     }
 
     public static String getDownloadLocation (Context context) {
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         MegaPreferences prefs = dbH.getPreferences();
 
-        if (prefs != null){
-            log("prefs != null");
-            if (prefs.getStorageAskAlways() != null){
-                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-                    log("askMe==false");
-                    if (prefs.getStorageDownloadLocation() != null){
-                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                            return prefs.getStorageDownloadLocation();
-                        }
-                    }
-                }
-            }
+        if (prefs != null
+                && prefs.getStorageAskAlways() != null
+                && !Boolean.parseBoolean(prefs.getStorageAskAlways())
+                && prefs.getStorageDownloadLocation() != null
+                && prefs.getStorageDownloadLocation().compareTo("") != 0){
+            return prefs.getStorageDownloadLocation();
         }
         return downloadDIR;
     }

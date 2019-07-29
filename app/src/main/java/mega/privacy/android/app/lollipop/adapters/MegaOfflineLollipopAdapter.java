@@ -301,7 +301,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 	}
 
-	boolean isRKSavedForOffline (MegaOffline currentNode) {
+	private boolean isRKSavedForOffline (MegaOffline currentNode) {
 		if(currentNode.getHandle().equals("0") && isFileAvailable(buildExternalStorageFile(rKFile))){
 			return true;
 		}
@@ -438,28 +438,15 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	public void setNodes(ArrayList<MegaOffline> mOffList){
 		log("setNodes");
 		String pathNav = fragment.getPathNavigation();
-		if(pathNav!=null){		
-			if (pathNav.equals("/")){
-				if (mOffList != null){
-					if(!mOffList.isEmpty()) {
-						log("List not empty");
-						MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-						if(!(lastItem.getHandle().equals("0"))){
-							log("Export in: "+getExternalStoragePath(rKFile));
-							if(isFileAvailable(buildExternalStorageFile(rKFile))){
-								MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(rKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
-								mOffList.add(masterKeyFile);
-							}
-						}	
-					}
-					else{
-						log("Export in: "+getExternalStoragePath(rKFile));
-						if(isFileAvailable(buildExternalStorageFile(rKFile))){
-							MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(rKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
-							mOffList.add(masterKeyFile);
-						}
-					}
-				}						
+		if (pathNav != null && pathNav.equals("/") && mOffList != null) {
+			if (!mOffList.isEmpty()) {
+				log("List not empty");
+				MegaOffline lastItem = mOffList.get(mOffList.size() - 1);
+				if (!(lastItem.getHandle().equals("0"))) {
+					addMasterKeyAsOffline(mOffList);
+				}
+			} else {
+				addMasterKeyAsOffline(mOffList);
 			}
 		}		
 		
@@ -467,6 +454,14 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		((OfflineFragmentLollipop) fragment).addSectionTitle(this.mOffList);
 		positionClicked = -1;	
 		notifyDataSetChanged();
+	}
+
+	private void addMasterKeyAsOffline(ArrayList<MegaOffline> mOffList) {
+		log("Export in: " + getExternalStoragePath(rKFile));
+		if (isFileAvailable(buildExternalStorageFile(rKFile))) {
+			MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(rKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
+			mOffList.add(masterKeyFile);
+		}
 	}
 	
 	@Override

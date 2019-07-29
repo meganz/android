@@ -13960,7 +13960,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("TAKE_PHOTO_CODE");
 			if(resultCode == Activity.RESULT_OK){
 				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
-				if (!isFileAvailable(imgFile)) return;
+				if (!isFileAvailable(imgFile)) {
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
+					return;
+				}
 
 				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
 				log("Taken picture Name: "+name);
@@ -13980,7 +13983,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				String myEmail =  megaApi.getMyUser().getEmail();
 				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
-				if (!isFileAvailable(imgFile)) return;
+				if (!isFileAvailable(imgFile)) {
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
+					return;
+				}
 
                 File qrFile = buildQrFile(this,myEmail + "QRcode.jpg");
                 File newFile = buildAvatarFile(this,myEmail + "Temp.jpg");

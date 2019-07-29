@@ -263,9 +263,9 @@ public class OfflineUtils {
         String path = context.getFilesDir().getAbsolutePath() + File.separator;
         if (offlineNode.isFolder()) {
             return new File(getOfflinePath(path, offlineNode) + File.separator + offlineNode.getName());
-        } else {
-            return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
         }
+
+        return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
     }
 
     private static String getOfflinePath(String path, MegaOffline offlineNode) {
@@ -284,9 +284,9 @@ public class OfflineUtils {
         }
         if (offlineNode.getPath().equals(File.separator)) {
             return path;
-        } else {
-            return path + offlineNode.getPath();
         }
+
+        return path + offlineNode.getPath();
     }
 
     public static File getOfflineParentFile(Context context, int from, MegaNode node, MegaApiAndroid megaApi) {
@@ -316,9 +316,9 @@ public class OfflineUtils {
         if (isFileAvailable(offline)) {
             size = getDirSize(offline);
             return getSizeString(size);
-        } else {
-            return getSizeString(0);
         }
+
+        return getSizeString(0);
     }
 
     public static void clearOffline(Context context) {
@@ -377,17 +377,17 @@ public class OfflineUtils {
     private static String isFileOrFolder(MegaNode node) {
         if (node.isFile()) {
             return DB_FILE;
-        } else {
-            return DB_FOLDER;
         }
+
+        return DB_FOLDER;
     }
 
     private static int comesFromInbox(boolean fromInbox) {
         if (fromInbox) {
             return MegaOffline.INBOX;
-        } else {
-            return MegaOffline.OTHER;
         }
+
+        return MegaOffline.OTHER;
     }
 
     private static void insertDB(Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, ArrayList<MegaNode> nodesToDB, boolean fromInbox) {
