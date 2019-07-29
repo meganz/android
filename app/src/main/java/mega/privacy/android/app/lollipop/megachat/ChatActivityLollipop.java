@@ -395,6 +395,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
+    // The ArrayList to preserve selected message if the permission is not granted
+    ArrayList<AndroidMegaChatMessage> unprocessedMessagesSelected;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -2410,13 +2412,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
 
-    private boolean cheakPermissionWriteStorage() {
-        log("checkPermissionsReadStorage");
+    private boolean checkPermissionWriteStorage(int code) {
+        log("checkPermissionsWriteStorage :" + code);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
 
         boolean hasWriteStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         if (!hasWriteStoragePermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, code);
             return false;
         }
 
@@ -2432,8 +2434,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case Constants.REQUEST_WRITE_STORAGE: {
                 log("REQUEST_WRITE_STORAGE");
                 //After storage authorization, resume unfinished download
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && cheakPermissionWriteStorage()) {
-                    chatC.resumeAuthorizedDownload();
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionWriteStorage(Constants.REQUEST_WRITE_STORAGE)) {
+                    ArrayList<MegaNodeList> list = new ArrayList<>();
+                    for (int i = 0; i < preservedMessagesSelected.size(); i++) {
+                        MegaNodeList megaNodeList = preservedMessagesSelected.get(i).getMessage().getMegaNodeList();
+                        list.add(megaNodeList);
+                    }
+                    chatC.prepareForChatDownload(list);
+                    preservedMessagesSelected = null;
+                }
+                break;
+            }
+            case Constants.REQUEST_WRITE_STORAGE_OFFLINE: {
+                log("REQUEST_WRITE_STORAGE");
+                //After storage authorization, resume unfinished offline download
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionWriteStorage(Constants.REQUEST_WRITE_STORAGE_OFFLINE)) {
+                    chatC.saveForOfflineWithAndroidMessages(preservedMessagesSelected, chatRoom);
+                    preservedMessagesSelected = null;
                 }
                 break;
             }
@@ -3640,12 +3657,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     showConfirmationDeleteMessages(messagesSelected, chatRoom);
                     break;
                 }
-                case R.id.chat_cab_menu_download:{
+                case R.id.chat_cab_menu_download: {
                     log("chat_cab_menu_download ");
                     clearSelections();
                     hideMultipleSelect();
+                    if (!checkPermissionWriteStorage(Constants.REQUEST_WRITE_STORAGE)) {
+                        preservedMessagesSelected = messagesSelected;
+                        return false;
+                    }
                     ArrayList<MegaNodeList> list = new ArrayList<>();
-                    for(int i = 0; i<messagesSelected.size();i++){
+                    for (int i = 0; i < messagesSelected.size(); i++) {
                         MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
                         list.add(megaNodeList);
                     }
@@ -3661,6 +3682,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 case R.id.chat_cab_menu_offline:{
                     clearSelections();
                     hideMultipleSelect();
+                    if (!checkPermissionWriteStorage(Constants.REQUEST_WRITE_STORAGE_OFFLINE)) {
+                        preservedMessagesSelected = messagesSelected;
+                        return false;
+                    }
                     chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom);
                     break;
                 }

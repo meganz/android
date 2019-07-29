@@ -1569,14 +1569,6 @@ public class ChatController {
     private void prepareForDownloadVersions(final ArrayList<MegaNode> nodeList){
         log("prepareForDownloadLollipop: "+nodeList.size()+" files to download, ");
 
-        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-        if (!hasStoragePermission) {
-            unfinishedNodeList = nodeList;
-            askForWriteStoragePermission();
-            return;
-        }
-
-
         long size = 0;
         for (int i = 0; i < nodeList.size(); i++) {
             size += nodeList.get(i).getSize();
@@ -2172,21 +2164,6 @@ public class ChatController {
         }
 
         return false;
-    }
-
-    private void askForWriteStoragePermission() {
-        if (context instanceof Activity) {
-            ActivityCompat.requestPermissions(((Activity) context),
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    Constants.REQUEST_WRITE_STORAGE);
-        }
-    }
-
-    public void resumeAuthorizedDownload() {
-        if (unfinishedNodeList != null) {
-            prepareForDownloadVersions(unfinishedNodeList);
-            unfinishedNodeList = null;
-        }
     }
 
     public static void log(String message) {
