@@ -2558,30 +2558,23 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			catch (Exception ex) {}
 
 			if (moveToRubbish){
-				if (e.getErrorCode() == MegaError.API_OK){
-				    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
-                    Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN);
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-					finish();
-				}
-				else{
-				    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
-				if (e.getErrorCode() == MegaError.API_OK){
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
-                    Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN);
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-					finish();
-				}
-				else{
-				    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-				}
 				log("move nodes request finished");
 			}
+
+            if (e.getErrorCode() == MegaError.API_OK){
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
+                Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                finish();
+            }
+            else{
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
+            }
+
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			if (versionsToRemove > 0) {
