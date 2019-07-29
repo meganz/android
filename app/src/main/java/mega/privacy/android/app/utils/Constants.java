@@ -370,4 +370,11 @@ public class Constants {
 	public static final int ERROR_LINK = -1;
 
 	public static final String CONTACT_HANDLE = "contactHandle";
+
+	public static final String[] REVERT_CHANGE_PASSWORD_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#pwr.+$",
+			"^https://mega\\.co\\.nz/pwr.+$",
+			"^https://mega\\.nz/#pwr.+$",
+			"^https://mega\\.nz/pwr.+$"
+	};
 }

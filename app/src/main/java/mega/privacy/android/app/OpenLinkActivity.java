@@ -95,7 +95,17 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 		
 		log("url " + url);
-		
+
+		// Revert password change link
+		if (matchRegexs(url, Constants.REVERT_CHANGE_PASSWORD_LINK_REGEXS)) {
+			Intent openBlogIntent = new Intent(this, WebViewActivityLollipop.class);
+			openBlogIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openBlogIntent.setData(Uri.parse(url));
+			startActivity(openBlogIntent);
+			finish();
+			return;
+		}
+
 		// File link
 		if (url != null && (url.matches("^https://mega\\.co\\.nz/#!.+$") || url.matches("^https://mega\\.nz/#!.+$"))) {
 			log("open link url");
@@ -360,16 +370,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					}
 				} else {
 					log("Not logged");
-//					AlertDialog.Builder builder;
-//					builder = new AlertDialog.Builder(this);
-//					builder.setMessage(R.string.alert_not_logged_in);
-//					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-//							new DialogInterface.OnClickListener() {
-//								public void onClick(DialogInterface dialog, int whichButton) {
-//									finish();
-//								}
-//							});
-//					builder.show();
 					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
@@ -749,6 +749,18 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		errorText.setText(string);
 		errorText.setVisibility(View.VISIBLE);
 		containerOkButton.setVisibility(View.VISIBLE);
+	}
+
+	private boolean matchRegexs(String url, String[] regexs) {
+		if (url == null) {
+			return false;
+		}
+		for (String regex : regexs) {
+			if (url.matches(regex)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
