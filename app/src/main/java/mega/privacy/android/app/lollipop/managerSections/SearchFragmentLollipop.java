@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -118,6 +119,10 @@ public class SearchFragmentLollipop extends Fragment{
     private int placeholderCount;
 
 	public NewHeaderItemDecoration headerItemDecoration;
+
+	private SearchNodesTask searchNodesTask;
+	private RelativeLayout contentLayout;
+	private ProgressBar searchProgressBar;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -536,8 +541,8 @@ public class SearchFragmentLollipop extends Fragment{
             }
         } else {
             placeholderCount = 0;
-            sections.put(0, getString(R.string.general_folders));
-            sections.put(folderCount, getString(R.string.general_files));
+            sections.put(0, context.getString(R.string.general_folders));
+            sections.put(folderCount, context.getString(R.string.general_files));
         }
 		if (headerItemDecoration == null) {
 			headerItemDecoration = new NewHeaderItemDecoration(context);
@@ -565,7 +570,6 @@ public class SearchFragmentLollipop extends Fragment{
 	    density  = getResources().getDisplayMetrics().density;
 
 		((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH);
-		getSearchNodes();
 
 		View v;
 		if (((ManagerActivityLollipop)context).isList){
@@ -651,14 +655,57 @@ public class SearchFragmentLollipop extends Fragment{
 		recyclerView.setAdapter(adapter);
 		fastScroller.setRecyclerView(recyclerView);
 
-		setNodes(nodes);
+		contentLayout = v.findViewById(R.id.content_layout);
+		searchProgressBar = v.findViewById(R.id.progressbar);
 
 		return v;
 	}
 
+	private class SearchNodesTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... voids) {
+			getSearchNodes();
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			setProgressView(false);
+			setNodes();
+		}
+	}
+
+	public void newSearchNodesTask() {
+		setProgressView(true);
+		cancelPreviousAsyncTask();
+		searchNodesTask = new SearchNodesTask();
+		searchNodesTask.execute();
+	}
+
+	public void cancelPreviousAsyncTask() {
+		if (searchNodesTask != null) {
+			searchNodesTask.cancel(true);
+		}
+	}
+
+	private void setProgressView(boolean inProgress) {
+		if (inProgress) {
+			contentLayout.setEnabled(false);
+			contentLayout.setAlpha(0.4f);
+			searchProgressBar.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.GONE);
+		} else {
+			contentLayout.setEnabled(true);
+			contentLayout.setAlpha(1);
+			searchProgressBar.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.VISIBLE);
+		}
+	}
+
 	private void getSearchNodes() {
 		String query = ((ManagerActivityLollipop) context).searchQuery;
-		if (query == null || query.isEmpty()) {
+		if (query == null) {
 			nodes.clear();
 			return;
 		}
@@ -666,9 +713,11 @@ public class SearchFragmentLollipop extends Fragment{
 		MegaNode parent = null;
 		long parentHandle = -1;
 		int order = ((ManagerActivityLollipop) context).orderCloud;
+		final ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getSearchDrawerItem();
+		if (drawerItem == null) return;
 
 		if (((ManagerActivityLollipop) context).parentHandleSearch == -1) {
-			switch (((ManagerActivityLollipop) context).getSearchDrawerItem()) {
+			switch (drawerItem) {
 				case CLOUD_DRIVE: {
 					parent = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleBrowser);
 					break;
@@ -680,7 +729,6 @@ public class SearchFragmentLollipop extends Fragment{
 							return;
 						} else {
 							parent = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleIncoming);
-
 						}
 					} else if (((ManagerActivityLollipop) context).getTabItemShares() == 1) {
 						if (((ManagerActivityLollipop) context).parentHandleOutgoing == -1) {
@@ -719,7 +767,11 @@ public class SearchFragmentLollipop extends Fragment{
 		}
 
 		if (parent != null) {
-			nodes = megaApi.search(parent, query, true, order);
+			if (query.isEmpty()) {
+				nodes = megaApi.getChildren(parent);
+			} else {
+				nodes = megaApi.search(parent, query, true, order);
+			}
 		}
 		log("Nodes found = " + nodes.size());
 	}
@@ -1262,6 +1314,7 @@ public class SearchFragmentLollipop extends Fragment{
 	public int onBackPressed(){
 		log("onBackPressed");
 
+		cancelPreviousAsyncTask();
 		if (((ManagerActivityLollipop)context).levelsSearch > 0){
 			log("levels > 0");
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch));
@@ -1330,7 +1383,7 @@ public class SearchFragmentLollipop extends Fragment{
 			log("searchQuery: "+((ManagerActivityLollipop)context).searchQuery);
 			((ManagerActivityLollipop)context).setParentHandleSearch(-1);
 			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery,ORDER_DEFAULT_ASC);
-			setNodes(nodes);
+			setNodes();
 			visibilityFastScroller();
 
 			if(nodes!=null){
@@ -1376,8 +1429,7 @@ public class SearchFragmentLollipop extends Fragment{
 
 	public void refresh(){
 		log("refresh ");
-		getSearchNodes();
-		setNodes(nodes);
+		newSearchNodesTask();
 
 		if(adapter != null){
 			adapter.notifyDataSetChanged();
@@ -1406,12 +1458,11 @@ public class SearchFragmentLollipop extends Fragment{
 	    return null;
 	}
 	
-	public void setNodes(ArrayList<MegaNode> nodes){
+	public void setNodes(){
 		log("setNodes");
         if(nodes == null) {
             return;
         }
-		this.nodes = nodes;
 		if (adapter != null){
             addSectionTitle(nodes,adapter.getAdapterType());
 			adapter.setNodes(nodes);

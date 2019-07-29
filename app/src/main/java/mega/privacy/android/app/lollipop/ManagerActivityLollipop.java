@@ -4329,6 +4329,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
 
+		sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
+		if (sFLol != null) {
+			sFLol.cancelPreviousAsyncTask();
+		}
+
     	super.onDestroy();
 	}
 
@@ -6298,17 +6303,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
+				log("onQueryTextChange");
 				if (drawerItem != DrawerItem.CHAT) {
+					sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
 					if (textSubmitted) {
-						sFLol.setAllowedMultiselect(true);
+						if (sFLol != null) {
+							sFLol.setAllowedMultiselect(true);
+						}
 						textSubmitted = false;
 					}
 					else {
 						if (!textsearchQuery) {
 							searchQuery = newText;
 						}
-						refreshFragment(FragmentTag.SEARCH.getTag());
-
+						if (sFLol != null) {
+							sFLol.newSearchNodesTask();
+						}
 					}
 				}
 				else {
