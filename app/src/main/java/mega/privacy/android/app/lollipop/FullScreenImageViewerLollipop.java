@@ -239,7 +239,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
 
 		super.onDestroy();
 	}
@@ -920,7 +920,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		fullScreenImageViewer = this;
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdate, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1708,7 +1708,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 	};
 
-	private BroadcastReceiver receiverUpdate = new BroadcastReceiver() {
+	private BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null) {
