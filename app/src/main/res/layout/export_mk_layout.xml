@@ -70,14 +70,30 @@
                 android:textSize="10sp"
                 android:layout_below="@id/third_par_export_MK_layout"/>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/MK_buttons_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
                 android:gravity="left"
                 android:orientation="horizontal"
-                android:layout_below="@id/action_export_MK_layout">
+                android:layout_below="@id/action_export_MK_layout"
+                android:layout_margin="20dp">
+
+                <Button
+                    android:id="@+id/print_MK_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:textColor="@color/white"
+                    android:text="@string/context_option_print"
+                    android:background="@color/accentColor"
+                    android:elevation="@dimen/elevation_upgrade_low"
+                    android:stateListAnimator="@anim/button_upgrade_elevation"
+                    android:tint="@android:color/white"
+                    android:layout_alignParentLeft="true"/>
 
                 <Button
                     android:id="@+id/copy_MK_button"
@@ -91,7 +107,8 @@
                     android:background="@color/accentColor"
                     android:elevation="@dimen/elevation_upgrade_low"
                     android:stateListAnimator="@anim/button_upgrade_elevation"
-                    android:tint="@android:color/white" />
+                    android:tint="@android:color/white"
+                    android:layout_centerHorizontal="true"/>
 
                 <Button
                     android:id="@+id/save_MK_button"
@@ -105,8 +122,9 @@
                     android:background="@color/accentColor"
                     android:elevation="@dimen/elevation_upgrade_low"
                     android:stateListAnimator="@anim/button_upgrade_elevation"
-                    android:tint="@android:color/white" />
-            </LinearLayout>
+                    android:tint="@android:color/white"
+                    android:layout_alignParentRight="true"/>
+            </RelativeLayout>
 
         </RelativeLayout>
 

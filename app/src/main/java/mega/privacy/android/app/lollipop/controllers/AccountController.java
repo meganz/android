@@ -18,8 +18,8 @@ import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.print.PrintHelper;
 import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
@@ -140,6 +140,25 @@ public class AccountController implements View.OnClickListener{
             qrFile.delete();
         }
         megaApi.setAvatar(null,(ManagerActivityLollipop)context);
+    }
+
+
+    public void printRK(){
+        Bitmap rKBitmap = null;
+        rKBitmap = createRkBitmap();
+
+        if (rKBitmap != null){
+            PrintHelper printHelper = new PrintHelper(context);
+            printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
+            printHelper.printBitmap("rKPrint", rKBitmap, new PrintHelper.OnPrintFinishCallback() {
+                @Override
+                public void onFinish() {
+                    if (context instanceof TestPasswordActivity) {
+                        ((TestPasswordActivity) context).passwordReminderSucceeded();
+                    }
+                }
+            });
+        }
     }
 
     public void exportMK(String path){

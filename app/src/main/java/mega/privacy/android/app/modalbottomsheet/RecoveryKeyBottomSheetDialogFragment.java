@@ -66,33 +66,14 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
             case R.id.recovery_key_print_layout:{
                 log("Option print rK");
-                printRK();
+                AccountController aC = new AccountController(getContext());
+                aC.printRK();
                 break;
             }
         }
 
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-    public void printRK(){
-        Bitmap rKBitmap = null;
-        AccountController aC = new AccountController(getContext());
-        rKBitmap = aC.createRkBitmap();
-
-        if (rKBitmap != null){
-            PrintHelper printHelper = new PrintHelper(getActivity());
-            final Context context = getContext();
-            printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
-            printHelper.printBitmap("rKPrint", rKBitmap, new PrintHelper.OnPrintFinishCallback() {
-                @Override
-                public void onFinish() {
-                    if (context instanceof TestPasswordActivity) {
-                        ((TestPasswordActivity) context).passwordReminderSucceeded();
-                    }
-                }
-            });
-        }
     }
 
     @Override

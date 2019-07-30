@@ -26,20 +26,21 @@ import nz.mega.sdk.MegaApiAndroid;
 
 public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickListener{
 
-    DatabaseHandler dbH;
-    MegaApiAndroid megaApi;
-    Context context;
+    private DatabaseHandler dbH;
+    private MegaApiAndroid megaApi;
+    private Context context;
 
-    RelativeLayout exportMKLayout;
-    LinearLayout exportMKButtonsLayout;
-    TextView titleExportMK;
-    TextView subTitleExportMK;
-    TextView firstParExportMK;
-    TextView secondParExportMK;
-    TextView thirdParExportMK;
-    TextView actionExportMK;
-    Button copyMK;
-    Button saveMK;
+    private RelativeLayout exportMKLayout;
+    private RelativeLayout exportMKButtonsLayout;
+    private TextView titleExportMK;
+    private TextView subTitleExportMK;
+    private TextView firstParExportMK;
+    private TextView secondParExportMK;
+    private TextView thirdParExportMK;
+    private TextView actionExportMK;
+    private Button printMK;
+    private Button copyMK;
+    private Button saveMK;
 
     DisplayMetrics outMetrics;
 
@@ -79,7 +80,7 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
         exportMKButtonsParams.setMargins(0, 0, 0, Util.scaleHeightPx(10, outMetrics));
         exportMKLayout.setLayoutParams(exportMKButtonsParams);
 
-        exportMKButtonsLayout = (LinearLayout) v.findViewById(R.id.MK_buttons_layout);
+        exportMKButtonsLayout =  v.findViewById(R.id.MK_buttons_layout);
 
         titleExportMK = (TextView) v.findViewById(R.id.title_export_MK_layout);
         RelativeLayout.LayoutParams titleExportMKParams = (RelativeLayout.LayoutParams)titleExportMK.getLayoutParams();
@@ -111,22 +112,17 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
         actionExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
         actionExportMK.setLayoutParams(actionExportMKParams);
 
+        printMK = v.findViewById(R.id.print_MK_button);
+        printMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+        printMK.setOnClickListener(this);
+
         copyMK = (Button) v.findViewById(R.id.copy_MK_button);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            copyMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-        }
-        LinearLayout.LayoutParams copyMKParams = (LinearLayout.LayoutParams)copyMK.getLayoutParams();
-        copyMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
-        copyMK.setLayoutParams(copyMKParams);
+        copyMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+
         copyMK.setOnClickListener(this);
 
         saveMK = (Button) v.findViewById(R.id.save_MK_button);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            saveMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-        }
-        LinearLayout.LayoutParams saveMKParams = (LinearLayout.LayoutParams)saveMK.getLayoutParams();
-        saveMKParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
-        saveMK.setLayoutParams(saveMKParams);
+        saveMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
         saveMK.setOnClickListener(this);
 
         return v;
@@ -153,6 +149,13 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            case R.id.print_MK_button:{
+                log("Copy Master Key button");
+                ((ManagerActivityLollipop)context).hideMKLayout();
+                AccountController aC = new AccountController(context);
+                aC.printRK();
+                break;
+            }
             case R.id.copy_MK_button:{
                 log("Copy Master Key button");
                 ((ManagerActivityLollipop)context).hideMKLayout();
