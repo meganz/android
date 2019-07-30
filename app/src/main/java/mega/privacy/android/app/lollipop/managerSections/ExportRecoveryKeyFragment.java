@@ -31,7 +31,6 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
     private Context context;
 
     private RelativeLayout exportMKLayout;
-    private RelativeLayout exportMKButtonsLayout;
     private TextView titleExportMK;
     private TextView subTitleExportMK;
     private TextView firstParExportMK;
@@ -80,36 +79,34 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
         exportMKButtonsParams.setMargins(0, 0, 0, Util.scaleHeightPx(10, outMetrics));
         exportMKLayout.setLayoutParams(exportMKButtonsParams);
 
-        exportMKButtonsLayout =  v.findViewById(R.id.MK_buttons_layout);
-
         titleExportMK = (TextView) v.findViewById(R.id.title_export_MK_layout);
         RelativeLayout.LayoutParams titleExportMKParams = (RelativeLayout.LayoutParams)titleExportMK.getLayoutParams();
-        titleExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(50, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        titleExportMKParams.setMargins(Util.px2dp(24, outMetrics), Util.scaleHeightPx(50, outMetrics), Util.px2dp(24, outMetrics), 0);
         titleExportMK.setLayoutParams(titleExportMKParams);
 
         subTitleExportMK = (TextView) v.findViewById(R.id.subtitle_export_MK_layout);
         RelativeLayout.LayoutParams subTitleExportMKParams = (RelativeLayout.LayoutParams)subTitleExportMK.getLayoutParams();
-        subTitleExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(24, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        subTitleExportMKParams.setMargins(Util.px2dp(24, outMetrics), Util.scaleHeightPx(24, outMetrics), Util.px2dp(24, outMetrics), 0);
         subTitleExportMK.setLayoutParams(subTitleExportMKParams);
 
         firstParExportMK = (TextView) v.findViewById(R.id.first_par_export_MK_layout);
         RelativeLayout.LayoutParams firstParExportMKParams = (RelativeLayout.LayoutParams)firstParExportMK.getLayoutParams();
-        firstParExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        firstParExportMKParams.setMargins(Util.px2dp(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.px2dp(24, outMetrics), 0);
         firstParExportMK.setLayoutParams(firstParExportMKParams);
 
         secondParExportMK = (TextView) v.findViewById(R.id.second_par_export_MK_layout);
         RelativeLayout.LayoutParams secondParExportMKParams = (RelativeLayout.LayoutParams)secondParExportMK.getLayoutParams();
-        secondParExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        secondParExportMKParams.setMargins(Util.px2dp(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.px2dp(24, outMetrics), 0);
         secondParExportMK.setLayoutParams(secondParExportMKParams);
 
         thirdParExportMK = (TextView) v.findViewById(R.id.third_par_export_MK_layout);
         RelativeLayout.LayoutParams thirdParExportMKParams = (RelativeLayout.LayoutParams)thirdParExportMK.getLayoutParams();
-        thirdParExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(24, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        thirdParExportMKParams.setMargins(Util.px2dp(24, outMetrics), Util.scaleHeightPx(24, outMetrics), Util.px2dp(24, outMetrics), 0);
         thirdParExportMK.setLayoutParams(thirdParExportMKParams);
 
         actionExportMK = (TextView) v.findViewById(R.id.action_export_MK_layout);
         RelativeLayout.LayoutParams actionExportMKParams = (RelativeLayout.LayoutParams)actionExportMK.getLayoutParams();
-        actionExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        actionExportMKParams.setMargins(Util.px2dp(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.px2dp(24, outMetrics), 0);
         actionExportMK.setLayoutParams(actionExportMKParams);
 
         printMK = v.findViewById(R.id.print_MK_button);

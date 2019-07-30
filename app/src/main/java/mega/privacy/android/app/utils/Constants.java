@@ -373,4 +373,6 @@ public class Constants {
 	public static final int ERROR_LINK = -1;
 
 	public static final String CONTACT_HANDLE = "contactHandle";
+
+	public static final String MK_LAYOUT_VISIBLE = "mkLayoutVisible";
 }
