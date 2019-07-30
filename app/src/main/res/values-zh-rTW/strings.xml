@@ -90,14 +90,14 @@
     -->
 
     <string name="action_logout" context="Button where the user can sign off or logout">登出</string>
-    <string name="action_add" context="Menu item">上載</string>
+    <string name="action_add" context="Menu item">上傳</string>
     <string name="action_create_folder" context="Menu item">創建新資料夾</string>
     <string name="action_open_link" context="Menu item">打開連接</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     -->
 
-    <string name="action_settings" context="Menu item">設置</string>
+    <string name="action_settings" context="Menu item">設定</string>
     <string name="action_search" context="Search button">搜尋</string>
     <string name="action_play" context="Search button">播放</string>
     <string name="action_pause" context="Search button">暫停</string>
@@ -164,12 +164,12 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">即將下載%s。</string>
     <string name="alert_no_app" context="Alert text before download">您沒有可開啟%s檔案的應用程式。您要繼續下載嗎？</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">請不要再顯示</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">請別再顯示</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">您確定要取消目前的登入嗎？</string>
 
     <string name="login_text" context="Login button">登入</string>
-    <string name="email_text" context="email label">電郵</string>
+    <string name="email_text" context="email label">電子郵件</string>
     <string name="password_text" context="password label">密碼</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">確認密碼</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
@@ -232,7 +232,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">雲端硬碟</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">媒體上傳</string>
-    <string name="section_inbox" context="title of the screen that show the inbox">收件箱</string>
+    <string name="section_inbox" context="title of the screen that show the inbox">收件夾</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">離線儲存</string>
     <string name="section_saved_for_offline_new" context="title of the screen that shows the files saved for offline in the device">離線</string>
     <!--
@@ -240,14 +240,14 @@
     -->
     <string name="section_shared_items" context="title of the screen that shows all the shared items">已分享的資料夾</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">垃圾桶</string>
-    <string name="section_contacts" context="Title of the contact list">聯繫人</string>
+    <string name="section_contacts" context="Title of the contact list">聯絡人</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">聯絡人 [A](%1$d)[/A]</string>
     <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B]沒有 [/B][A]已發送的連絡人邀請[/A][B]。[/B]</string>
     <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]沒有 [/B][A]已收到的邀請[/A][B]。[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">傳輸</string>
 
-    <string name="section_account" context="button to the settings of the user\'s account">我的帳戶</string>
+    <string name="section_account" context="button to the settings of the user\'s account">我的帳號</string>
     <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">相機上傳</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
@@ -265,7 +265,7 @@
     <!--
     <string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
     -->
-    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">空檔案夾</string>
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">文件夾中沒有文件</string>
 
     <string name="choose_account_fragment" context="Title of the fragment Choose Account">選擇帳戶</string>
 
@@ -286,7 +286,7 @@
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
-    <string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">公開鏈接</string>
+    <string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">公開連結</string>
 
     <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">權限</string>
     <string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">共享權限</string>
@@ -349,7 +349,7 @@
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">此連結將不再是公開狀態。</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重命名</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">打開連接</string>
-    <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">打開</string>
+    <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">開啟</string>
     <string name="context_renaming" context="while renaming a file or folder">重新命名中</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">準備檔案中</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">下載</string>
@@ -365,8 +365,8 @@
     <!--
     <string name="context_sharing" context="while sharing a folder">Sharing folder</string>
     -->
-    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">複制</string>
-    <string name="context_upload" context="Item menu option upon right click on one or multiple files.">上載</string>
+    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">複製</string>
+    <string name="context_upload" context="Item menu option upon right click on one or multiple files.">上傳</string>
     <string name="context_copying" context="while copying a file or folder">正在複製</string>
     <!--
     <string name="context_creating_link" context="status text">Creating link</string>
@@ -395,7 +395,7 @@
     -->
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">移除</string>
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">從離線模式中移除</string>
-    <string name="context_share_folder" context="menu item">分享檔案夾</string>
+    <string name="context_share_folder" context="menu item">共享資料夾</string>
     <string name="context_send_file" context="menu item">發送檔案至聊天中</string>
     <string name="context_send_contact" context="menu item">分享聯絡人至聊天中</string>
     <string name="context_view_shared_folders" context="open a shared folder">查看共享資料夾</string>
@@ -498,9 +498,9 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">您的訂閱還未被取消。請告訴我們您取消的理由。</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">該資料夾現在是私人的</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">共享已移除</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">新資料夾</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">新增聯絡人</string>
@@ -509,7 +509,7 @@
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
     -->
 
-    <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">解密密鑰</string>
+    <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">解密金鑰</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">請輸入此連結的解密密鑰</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">圖像</string>
@@ -539,7 +539,7 @@
     <string name="upload_prepare" context="Status text at the beginning of an upload">檔案處理中</string>
     <plurals name="upload_prepare" context="Status text at the beginning of an upload">
         <item context="Status text at the beginning of an upload for 1 file" quantity="one">檔案處理中</item>
-        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">檔案處理中</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">資料暫時缺失，請稍後再試。</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">無法開啟選擇的檔案</string>
@@ -564,7 +564,7 @@
     <!--
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
     -->
-    <string name="my_account_used_space" context="Headline for the amount of storage space is used">已使用空間</string>
+    <string name="my_account_used_space" context="Headline for the amount of storage space is used">已用空間</string>
     <string name="my_account_change_password" context="menu item">更改密碼</string>
     <!--
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
@@ -642,6 +642,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">正在上傳媒體資料夾中的檔案</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -649,6 +651,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">儲存空間</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN 鎖定</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">影片壓縮非常耗電，如果要壓縮的影片大於%s，MEGA會提醒您為裝置充電。</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">進階</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">清除快取</string>
@@ -676,7 +679,7 @@
 
     <string name="settings_camera_upload_on" context="settings option">啟用相機上傳</string>
     <string name="settings_camera_upload_turn_on" context="settings option">開啟相機上傳</string>
-    <string name="settings_camera_upload_off" context="settings option">禁用相機上傳</string>
+    <string name="settings_camera_upload_off" context="settings option">停用相機上傳</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">如何上傳</string>
 
     <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">啟用第二媒體上傳功能</string>
@@ -698,6 +701,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">只在充電狀態下</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">以設備中檔案的名稱保存</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">本地相機資料夾</string>
@@ -727,8 +731,8 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">10次輸入失敗後，您的本機檔案將被刪除且您將被強制登出</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">密碼錯誤</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">錯誤的PIN碼，請重新再試。您還有%2d次的嘗試機會</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">錯誤的PIN碼，請重新再試。 你還剩1次的嘗試機會</item>
+        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">錯誤的PIN碼，請重新再試。您還剩%2d次的嘗試機會</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN碼不正確</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">請輸入您的PIN碼</string>
@@ -993,11 +997,13 @@
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">嘗試登入失敗的次數太多，請稍候一個小時後再試。</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">此帳戶尚未被驗證啟用。請至你的信箱收信確認。</string>
 
-    <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn't exist">檔案夾鏈接失效</string>
-    <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">因違反ToS/AUP而導致檔案夾鏈接被刪除。</string>
+    <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn't exist">資料夾連結無法使用</string>
+    <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">該資料夾連結因違反ToS/AUP使用條款已被移除。</string>
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">這不是有效的檔案連接</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">因已違反服務條款/可接受的使用政策，該檔案連結已被刪除。</string>
+
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">此URL已損毀或不完整。您嘗試造訪的連結不存在。</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">等待確認電子郵件地址中</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">請查閱您的電郵，然後點擊電郵上的連結以確認您的帳戶。</string>
@@ -1012,7 +1018,7 @@
     <string name="general_error_invalid_decryption_key" context="Error message shown after login into a folder link with an invalid decryption key">您提供的資料夾連結解密密鑰無效。</string>
 
     <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">我的憑證</string>
-    <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">受限制</string>
+    <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">有限制的</string>
 
     <string name="section_chat" context="Item of the navigation title for the chat section">交談</string>
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">聊天 [A](%1$d)[/A]</string>
@@ -1075,6 +1081,9 @@
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">已從共享資料夾中成功移除%d個聯絡人</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">未能成功刪除&#160;和%d個聯絡人</string>
+
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">從手機載入聯絡人資料中&#8230;</string>
 
@@ -1146,7 +1155,7 @@
 
     <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">確定要把%s從這個聊天對話中移除？</string>
 
-    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">僅讀</string>
+    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">僅能閱讀</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1338,6 +1347,7 @@
         <item context="Plural" quantity="other">%2$d 個檔案中的第 %1$d 個檔案</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">正在完成流程中&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">查看</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">停止所有傳輸</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">繼續所有傳輸</string>
@@ -1502,7 +1512,7 @@
     <string name="file_properties_shared_folder_public_link_name">連結</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">全權訪問</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">僅讀</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">僅能閱讀</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">讀取與編輯</string>
 
     <string name="attachment_uploading_state_uploading">正在上傳&#8230;</string>
@@ -1576,7 +1586,7 @@
     <string name="setting_title_use_https_only" context="title of the advanced setting to choose the use of https">不使用HTTP</string>
     <string name="setting_subtitle_use_https_only" context="subtitle of the advanced setting to choose the use of https">僅於您的傳輸未啟動時，才啟用此選項。正常情況下，HTTP已可為所有傳輸加密，且成果令人滿意。</string>
 
-    <string name="title_achievement_invite_friends" context="title of screen to invite friends and get an achievement">如何運作</string>
+    <string name="title_achievement_invite_friends" context="title of screen to invite friends and get an achievement">如何使用</string>
     <string name="first_paragraph_achievement_invite_friends" context="first paragraph of screen to invite friends and get an achievement">邀請你的朋友創建一個免費的MEGA帳戶，並安裝我們的手機應用程序吧！對於每筆成功的註冊和應用程式安裝，您都會收到免費儲存空間和傳輸配額的獎勵喔。</string>
     <string name="second_paragraph_achievement_invite_friends" context="second paragraph of screen to invite friends and get an achievement">如果受邀人使用過MEGA，您恐怕就無法獲得介紹獎勵了，而我們也不會發送相關通知給您。小提醒，受邀的聯絡人必須在其設備上安裝MEGA手機應用程式或MEGA桌面應用程式喔。</string>
 
@@ -1598,7 +1608,7 @@
     <string name="expiration_date_for_achievements" context="info paragraph about the completed achievement registration">獎勵將在%1$d天內到期</string>
 
     <plurals name="context_share_folders">
-        <item context="menu item" quantity="one">分享檔案夾</item>
+        <item context="menu item" quantity="one">共享資料夾</item>
         <item context="menu items" quantity="other">分享資料夾</item>
     </plurals>
 
@@ -1736,13 +1746,13 @@
     <string name="processing_link" context="Message shown when a link is being processing">連結處理中&#8230;</string>
 
     <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">您的密碼太容易被猜到了。請使用更長的密碼。結合大小寫字母，或添加特殊字符。請避免使用名字或字典中的單詞。</string>
-    <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">您的密碼強度正好，但是我們建議您進一步加強您的密碼。</string>
-    <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">此密碼可以承受典型的暴力攻擊。請確保您能記住它。</string>
-    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">此密碼可承受最先進的暴力攻擊。請確保您能記住它。</string>
+    <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">您的密碼已足以繼續，但仍建議可再加強密碼強度。</string>
+    <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">這個密碼將可承受最典型的暴力破解攻擊。請確保您會好好記牢。</string>
+    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">這個密碼將可承受最典型的暴力破解攻擊。請確保您會好好記牢。</string>
     <string name="pass_very_weak" context="Password very weak">非常弱</string>
     <string name="pass_weak" context="Password weak">弱</string>
     <string name="pass_medium" context="Password medium">中等</string>
-    <string name="pass_good" context="Password good">良好</string>
+    <string name="pass_good" context="Password good">好</string>
     <string name="pass_strong" context="Password strong">強</string>
 
     <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">正在通話中</string>
@@ -1788,7 +1798,8 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">上傳檔案至聊天</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">聊天媒體品質</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">影片品質</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">原始品質</item>
         <item context="the options of medium quality multimedia file to  upload.">中等品質</item>
@@ -1846,7 +1857,7 @@
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">複製到剪貼簿</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">匯出還原金鑰</string>
     <string name="proceed_to_logout" context="Option that permits user logout">執行登出</string>
-    <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">萬能密鑰</string>
+    <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">還原金鑰</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">存於檔案系統</string>
     <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">已複製到剪貼簿</string>
 
@@ -1874,7 +1885,7 @@
     <string name="context_loop_video" context="menu option to loop video or audio file">迴圈</string>
 
     <string name="settings_security_options_title" context="Title of the category Security options on Settings section">安全選項</string>
-    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">萬能密鑰</string>
+    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">還原金鑰</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">正在匯出您的還原金鑰，請妥善保管。您的還原金鑰可以使您不會因為重新設定密碼而遺失過去上傳的資料。</string>
 
     <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">無法連上MEGA。請檢查您的網路連線或於稍後重試。</string>
@@ -1937,7 +1948,7 @@
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">請務必將此種子備份於安全的地方，以防您的裝置遺失。</string>
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">請輸入您的驗證程式所生成的6位碼。</string>
     <string name="general_verify" context="Text button">確認</string>
-    <string name="general_next" context="Text button">下一步</string>
+    <string name="general_next" context="Text button">次一</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">生成種子或QR碼時出錯，請再試一次。</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">已啟用兩階段驗證</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">下次登入您的帳戶時，系統會要求您輸入驗證程式提供的6位碼。</string>
@@ -2131,9 +2142,13 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">最短期間為7天。</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">最短期間為7天，最長期間為30天。</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">刪除較舊的檔案，早於</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d天</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">請通知我，如果大小大於</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">如果要壓縮的影片大於</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">欲停用垃圾桶清理排程或設定更長的保留期限，您需要訂閱一個PRO計劃。</string>
 
@@ -2255,6 +2270,15 @@
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">顯示最後上線時間&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">允許您的聯絡人查看您上次在MEGA上活動是什麼時候。</string>
+
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">沒有足夠的儲存空間</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">沒有足夠的儲存空間執行影片壓縮。</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">因要壓縮的影片總大小超過%s，請將您的裝置接上電源來繼續</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
+	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">選擇的資料夾無效</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d 個檔案</item>
@@ -2458,13 +2482,13 @@
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">輸入聊天連結</string>
 
-    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
-    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
-    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
-    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">貼上連結</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">無效的檔案或資料夾連結</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">請輸入有效的檔案或資料夾連結</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">請輸入有效的聊天連結</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">您已貼上一個聊天連結</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">您已貼上一個連絡人連結</string>
+    <string name="action_open_contact_link" context="Menu item">打開連絡人連結</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">人們可以使用此連結加入您的群組。</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">新的聊天連結</string>
@@ -2484,7 +2508,7 @@
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">點擊並按住以錄製，發佈即送出。</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">滑動以取消</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">此語音檔無法使用</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">此語音訊息無法使用</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">已下載%d個檔案。&#160;</item>
@@ -2497,5 +2521,5 @@
 	</plurals>
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">通話進行中無法錄製語音留言。</string>
-    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">嘗試上傳語音訊息時發生一個錯誤。</string>
 </resources>

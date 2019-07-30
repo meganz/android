@@ -9,7 +9,7 @@
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">trong tổng</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Có</string>
     <string name="general_no" context="Answer for confirmation dialog.">Không</string>
-    <string name="general_cancel" context="Answer for confirmation dialog.">Hủy bỏ</string>
+    <string name="general_cancel" context="Answer for confirmation dialog.">Hủy</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Chuyển đến</string>
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Sao chép tới</string>
     <!--
@@ -22,7 +22,7 @@
     <!-- This string is commented in FileStorageActivityLollipop.java
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     -->
-    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Tải về</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Tải xuống</string>
     <string name="general_add" context="button">Thêm</string>
     <string name="general_move" context="button">Di chuyển</string>
     <string name="general_remove" context="button">Xóa</string>
@@ -43,7 +43,7 @@
     <string name="general_loading" context="state previous to import a file">Đang tải</string>
     <string name="general_importing" context="state while importing the file">Đang chuyển nhập</string>
     <string name="general_forwarding" context="state while importing the file">Đang chuyển đi</string>
-    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Lấy nội dung</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Chuyển nhập</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Lưu trữ</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Lượng băng thông</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Đăng ký</string>
@@ -239,8 +239,8 @@
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Thư mục được chia sẻ</string>
-    <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Thùng Rác</string>
-    <string name="section_contacts" context="Title of the contact list">Danh bạ</string>
+    <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Thùng rác</string>
+    <string name="section_contacts" context="Title of the contact list">Danh Bạ</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Danh bạ [A](%1$d)[/A]</string>
     <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B]Chưa có [/B][A]yêu cầu[/A][B] nào được gửi đi.[/B]</string>
@@ -279,7 +279,7 @@
     <!--
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
-    <string name="file_properties_info_size_file" context="Refers to the size of a file.">Kích thước</string>
+    <string name="file_properties_info_size_file" context="Refers to the size of a file.">Kích cỡ</string>
     <string name="file_properties_info_modified" context="when was the file modified">Chỉnh sửa lần cuối</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Ngày Tạo</string>
     <string name="file_properties_info_created" context="when the file was created">Ngày tạo</string>
@@ -288,7 +288,7 @@
     -->
     <string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Đường liên kết công khai</string>
 
-    <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Quyền sử dụng</string>
+    <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Cấp phép</string>
     <string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Quyền Hạn Được Chia Sẻ</string>
     <string name="file_properties_shared_folder_change_permissions" context="menu item">Chỉnh lại quyền hạn</string>
     <string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">Được chia sẻ với</string>
@@ -352,7 +352,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Mở</string>
     <string name="context_renaming" context="while renaming a file or folder">Đang đổi tên</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Đang chuẩn bị tệp tin</string>
-    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Tải về</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Tải xuống</string>
 
     <!--
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Download folder</string>
@@ -376,7 +376,7 @@
     -->
     <string name="context_move_to_trash" context="menu item">Chuyển vào Thùng Rác</string>
     <string name="context_delete_from_mega" context="menu item">Loại bỏ khỏi MEGA</string>
-    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Tên Thư mục</string>
+    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Tên thư mục</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Email của người muốn thêm</string>
     <string name="context_creating_folder" context="status dialog when performing the action">Đang tạo thư mục</string>
     <!--
@@ -498,9 +498,9 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Quá trình hủy bỏ hạng tài khoản PRO và ngưng trả phí chưa thể tiếp tục vì quý khách chưa điền lý do</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">Thư mục hiện ở chế độ riêng tư</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Đã xóa chia sẻ</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Thư mục mới</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Thêm liên lạc</string>
@@ -642,6 +642,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Đang tải lên hình ảnh từ các thư mục chứa media</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -649,6 +651,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Lưu trữ</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Khóa bằng PIN</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression is very power consuming, MEGA will remind you to charge your device if the videos to be compressed are larger than %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Nâng Cao</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Dọn Bộ Nhớ Tạm</string>
@@ -698,6 +701,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Chỉ được tải lúc sạc pin</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Giữ nguyên tên tệp tin như trên điện thoại</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Thư mục chứa ảnh Camera trong máy</string>
@@ -797,12 +801,12 @@
     <string name="sortby_date_newest" context="sort files by date newest first">Mới nhất</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Cũ nhất</string>
 
-    <string name="sortby_size" context="category in sort by action">Kích thước</string>
+    <string name="sortby_size" context="category in sort by action">Kích cỡ</string>
     <string name="sortby_size_largest_first" context="sort files by size largest first">Lớn nhất</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">Nhỏ nhất</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">mỗi tháng</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">mỗi năm</string>
+    <string name="per_month" context="in payments, for example: 4.99€ per month">hàng tháng</string>
+    <string name="per_year" context="in payments, for example: 49.99€ per year">hàng năm</string>
 
     <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Xin nhập thông tin thanh toán:</string>
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Địa chỉ 1</string>
@@ -999,8 +1003,10 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Đường liên kết này không còn tồn tại</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Đường liên kết đã bị xóa bỏ do vi phạm Điều khoản S/dụng và D/vụ.</string>
 
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">Đường liên kết URL vừa nhập không đúng hoặc bị viết sai. Không thể sử dụng để truy cập được.</string>
+
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Đang chờ xác nhận địa chỉ email</string>
-    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Xin kiểm tra email và click vào liên kết để xác nhận tài khoản.</string>
+    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Hãy kiểm tra hộp thư của bạn và xác nhận tài khoản của bạn.</string>
 
     <plurals name="general_num_items">
         <item context="Singular of items which contains a folder. 1 item" quantity="one">mục</item>
@@ -1075,6 +1081,9 @@
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d tên liên lạc đã được xoá bỏ khỏi thư mục chia sẻ</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;và %d tên liên lạc chưa được xoá đi thành công</string>
+
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Đang tải danh bạ từ điện thoại&#8230;</string>
 
@@ -1178,7 +1187,7 @@
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Tin nhắn không gửi được. Chạm để hiện lựa chọn</string>
 
-    <string name="chat_status_title" context="settings of the chat to choose the status">Tình trạng</string>
+    <string name="chat_status_title" context="settings of the chat to choose the status">Trạng thái</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1338,6 +1347,7 @@
         <item context="Plural" quantity="other">%1$d trong tổng %2$d tệp</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Tiến trình đang được hoàn tất&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Xem</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Dừng tất cả truyền tải</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Tiếp tục tất cả các truyền tải</string>
@@ -1434,7 +1444,7 @@
     </plurals>
 
     <string name="general_view" context="Menu option">Xem tệp tin</string>
-    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Lấy nội dung</string>
+    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Chuyển nhập</string>
     <string name="save_for_offline" context="Menu option">Lưu để dùng ngoại tuyến</string>
 
     <string name="general_view_contacts" context="Menu option">Xem danh bạ</string>
@@ -1489,7 +1499,7 @@
     <string name="no_files_selected_warning">Chưa có tệp tin nào được chọn</string>
 
     <string name="attachment_upload_panel_from_cloud">Lấy từ Ổ Mây</string>
-    <string name="attachment_upload_panel_contact">Liên lạc</string>
+    <string name="attachment_upload_panel_contact">Danh bạ</string>
     <string name="attachment_upload_panel_photo">Lấy từ trong điện thoại</string>
 
     <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Xoá Bỏ Tài Khoản</string>
@@ -1788,7 +1798,8 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Đăng tải lên chát</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chất lượng phim ảnh tải lên cuộc chát</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Chất Lượng Video</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Chất lượng nguyên gốc</item>
         <item context="the options of medium quality multimedia file to  upload.">Chất lượng trung bình</item>
@@ -2131,9 +2142,13 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Thời gian chờ tối thiểu là 7 ngày.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Chu kỳ chờ tối thiểu là 7 ngày và tối đa là 30 ngày.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Dọn dữ liệu tồn đọng hơn</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d ngày</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Nhắc cho tôi biết khi kích thước của tệp tin lớn hơn</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Nếu videos cần nén có kích thước lớn hơn</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Để tắt Lịch Dọn Dẹp Thùng Rác hay gia hạn chờ thời gian tự dọn dẹp được lâu hơn, tài khoản cần phải nâng cấp lên hạng PRO.</string>
 
@@ -2239,7 +2254,7 @@
     <string name="billing_period_title" context="title of billing period">Chu kỳ thanh toán</string>
     <string name="billed_monthly_text" context="option of billing period, monthly">[A]Thanh toán hằng tháng[/A] %s /tháng</string>
     <string name="billed_yearly_text" context="option of billing period, yearly">[A]Thanh toán hằng năm[/A] %s /năm</string>
-    <string name="button_cancel" context="dialog option cancel in alert dialog">Hủy bỏ</string>
+    <string name="button_cancel" context="dialog option cancel in alert dialog">Hủy</string>
     <string name="button_continue" context="dialog option continue in alert dialog">Tiếp tục</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (thuê bao đình kỳ)</string>
@@ -2255,6 +2270,15 @@
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Hiện "Lần thấy cuối&#8230;"</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Cho phép các tên trong liên lạc biết được lần thấy cuối bạn ở MEGA.</string>
+
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video compression.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">Tổng kích thước của các videos muốn chuyển đổi vượt hơn mức là $size MB, xin cắm vào thiết bị mong muốn để tiếp tục.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
+	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Thư mục vừa chọn không hợp lệ</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d tệp</item>
@@ -2460,8 +2484,8 @@
 
     <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
     <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
     <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
     <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
     <string name="action_open_contact_link" context="Menu item">Open contact link</string>
@@ -2484,7 +2508,7 @@
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Trượt để hủy bỏ</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">This voice clip is not available</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d tệp tin đã được tải xuống rồi.&#160;</item>

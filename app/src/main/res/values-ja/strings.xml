@@ -9,7 +9,7 @@
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">/</string>
     <string name="general_yes" context="Answer for confirmation dialog.">はい</string>
     <string name="general_no" context="Answer for confirmation dialog.">いいえ</string>
-    <string name="general_cancel" context="Answer for confirmation dialog.">キャンセル</string>
+    <string name="general_cancel" context="Answer for confirmation dialog.">キャンセルする</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">移動先</string>
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">コピー先</string>
     <!--
@@ -110,8 +110,8 @@
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">選択をクリアする</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">サムネールで見る</string>
     <string name="action_list" context="Menu item to change from grid view to list view">リスト一覧</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">リカバリーキーをバックアップ</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">リカバリーキーを削除</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">回復キーをバックアップ</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">回復キーを削除</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">定期契約キャンセル</string>
     <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">回復キーファイルは削除されました</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">定期契約はキャンセルされました。</string>
@@ -230,9 +230,9 @@
     <string name="cancel_transfer_confirmation">この転送を削除しますか？　</string>
     <string name="cancel_all_transfer_confirmation">すべての転送を削除しますか？　</string>
 
-    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">クラウドドライブ</string>
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">クラウド・ドライブ</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">メディアのアップロード</string>
-    <string name="section_inbox" context="title of the screen that show the inbox">受信トレイ</string>
+    <string name="section_inbox" context="title of the screen that show the inbox">受信</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">オフラインで保存</string>
     <string name="section_saved_for_offline_new" context="title of the screen that shows the files saved for offline in the device">オフライン</string>
     <!--
@@ -240,14 +240,14 @@
     -->
     <string name="section_shared_items" context="title of the screen that shows all the shared items">共有フォルダ</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">ゴミ箱</string>
-    <string name="section_contacts" context="Title of the contact list">連絡先</string>
+    <string name="section_contacts" context="Title of the contact list">知り合い</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">連絡先 [A](%1$d)[/A]</string>
     <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B][/B][A]送信した要求[/A]はありません[B]。[/B]</string>
     <string name="received_requests_empty" context="the user has not received any contact request from other users">[B][/B][A]受信した要求[/A]はありません[B]。[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">転送</string>
 
-    <string name="section_account" context="button to the settings of the user\'s account">アカウントを設定する</string>
+    <string name="section_account" context="button to the settings of the user\'s account">アカウント設定</string>
     <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">カメラアップロード</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
@@ -347,7 +347,7 @@
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">共有を削除</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">リンクを外す</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">このリンクは公開されなくなりました。</string>
-    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">改称</string>
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">名前を変更</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">リンク開設</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">開く</string>
     <string name="context_renaming" context="while renaming a file or folder">名前を変更中</string>
@@ -365,7 +365,7 @@
     <!--
     <string name="context_sharing" context="while sharing a folder">Sharing folder</string>
     -->
-    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">コピー</string>
+    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">コピー実行</string>
     <string name="context_upload" context="Item menu option upon right click on one or multiple files.">アップロード</string>
     <string name="context_copying" context="while copying a file or folder">コピー中</string>
     <!--
@@ -498,12 +498,12 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">あなたのサブスクリプションはキャンセルされていません。キャンセルの理由をご入力ください</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">このフォルダはプライベートになりました。</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">共有は解除されました。</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">新しいフォルダ</string>
-    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">連絡先の追加</string>
+    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">知り合いの追加</string>
     <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">連絡先と共有を追加</string>
     <!--
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
@@ -539,7 +539,7 @@
     <string name="upload_prepare" context="Status text at the beginning of an upload">ファイルを処理しています</string>
     <plurals name="upload_prepare" context="Status text at the beginning of an upload">
         <item context="Status text at the beginning of an upload for 1 file" quantity="one">ファイルを処理しています</item>
-        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">ファイルの処理中</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">容量不足です。後でもう一度トライして下さい。</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">選択したファイルを開くことができません</string>
@@ -581,7 +581,7 @@
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">パスワード変更中</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">現在のパスワード</string>
     <string name="my_account_change_password_newPassword1" context="when changing the password">新しいパスワード</string>
-    <string name="my_account_change_password_newPassword2" context="when changing the password">新しいパスワードを確認する</string>
+    <string name="my_account_change_password_newPassword2" context="when changing the password">新しいパスワードの確認</string>
     <!--
     <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Incorrect current password or the new passwords you provided do not match. Please try again</string>
     -->
@@ -642,6 +642,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">メディアフォルダのファイルをアップロード</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -649,6 +651,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">ストレージ</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN ロック</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">動画圧縮は非常に電力を消費します。そのためMEGAは、圧縮される動画が%sよりも大きい場合、あなたの端末を充電するように通知いたします。</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">高度設定</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">キャッシュ消去</string>
@@ -674,9 +677,9 @@
         <item context="import from phone option">端末からインポート</item>
     </string-array>
 
-    <string name="settings_camera_upload_on" context="settings option">写真アップロード有効</string>
-    <string name="settings_camera_upload_turn_on" context="settings option">カメラ・アップロードをオンにする</string>
-    <string name="settings_camera_upload_off" context="settings option">写真アップロードを無効にする</string>
+    <string name="settings_camera_upload_on" context="settings option">カメラアップロードを有効にする</string>
+    <string name="settings_camera_upload_turn_on" context="settings option">カメラアップロードをオンにする</string>
+    <string name="settings_camera_upload_off" context="settings option">カメラアップロードを無効にする</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">アップロードの方法</string>
 
     <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">セカンダリメディアのアップロードを有効にする</string>
@@ -698,6 +701,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">チャージ中のみ</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">ファイル名はデバイスと同じにする</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">ローカルカメラフォルダ</string>
@@ -727,7 +731,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">試行が10回失敗後、あなたのローカルファイルが削除され、あなたはログアウトされます。</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">コードの間違い</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PINコードが間違っています。もう一度お試しください。残りの試行回数は1回です</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">PINコードが間違っています。もう一度お試しください。残りの試行回数は%2d回です</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PINコードは一致しない</string>
@@ -737,7 +741,7 @@
     <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">PINコードを再入力してください</string>
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">ローカルデータがすべて削除され、あなたは%1d秒後にログアウトされます</string>
 
-    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">説明</string>
+    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">概要</string>
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">プライバシーポリシー</string>
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">利用規約</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
@@ -807,7 +811,7 @@
     <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">請求書送付に関する詳細を入力:</string>
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">アドレス1</string>
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">住所２（オプション）</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">都市</string>
+    <string name="city_cc" context="Hint text of the city edittext for billing purposes">市</string>
     <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">州/県</string>
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">国</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">郵便番号</string>
@@ -830,8 +834,8 @@
     -->
 
     <string name="pin_lock_type" context="title to choose the type of PIN code">PINコード・タイプ</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">4桁PINコード</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">6桁PINコード</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">4桁のPIN</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">6桁のPIN</string>
     <string name="AN_pin_lock" context="PIN alphanumeric">英数PINコード</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">ロギングが有効にしました。</string>
@@ -848,15 +852,15 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">プロライト・アカウント</string>
 
-    <string name="backup_title" context="Title of the screen to backup the master key">リカバリーキーをバックアップ</string>
-    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">あなたのパスワードがあなたのリカバリーキーの暗号を解きます。</string>
+    <string name="backup_title" context="Title of the screen to backup the master key">あなたの回復キーをバックアップ</string>
+    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">あなたのパスワードはあなたの回復キーのロックを解除します</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">あなたのデータは、マスター暗号化キーで始まる一連の復号操作でしか読み取れません。復元キーはあなたのパスワードで暗号化して保存しております。これは、パスワードを紛失した場合、あなたのマスターキーを復号できなくなり、あなたのデータを復号できなくなることを意味します。</string>
-    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">親鍵を安全な場所にエキスポートしておけば、データを失わずにパスワードを変更できます。</string>
+    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">回復キーをエクスポートして安全な場所に保管すると、データを失うことなく新しいパスワードを設定できます。</string>
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">外部攻撃者があなたの鍵を手に入れてもあなたのアカウントにはアクセスできません。パスワードをリセットするには親鍵とあなたのメールへのアクセスとの両方が必要です。</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">回復キーをクリップボードにコピーするかテキストファイルとして保存します</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">保存する</string>
+    <string name="save_action" context="Action of the button to save the master key as a text file">保存</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">回復キーは正常にコピーされました</string>
 
     <string name="change_pass" context="Button to change the password">変更する</string>
@@ -872,7 +876,7 @@
     <string name="forgot_pass_second_paragraph_logged_in" context="Second paragraph of the screen when the password has been forgotten and the user is still logged in">If you don\&apos;t, you can still export your recovery key now in this MEGA session. Please, go back and backup your recovery key.</string>
     -->
 
-    <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">リカバリーキー・バックアップがおありですか</string>
+    <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">回復キーのバックアップはありますか？　</string>
 
     <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">了解。では&#8230;</string>
     <string name="edit_text_insert_mail" context="Hint of the text where the user can write his e-mail">メールはこちら</string>
@@ -944,7 +948,7 @@
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">アバターを削除</string>
 
     <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">指定したキーがこのアカウントと一致しません。正しい回復キーを使用して、もう一度やり直してください。</string>
-    <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">リカバリーキー無効</string>
+    <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">回復キーが無効です</string>
 
     <string name="option_full_link" context="Alert Dialog to get link">キーを含むリンク</string>
 
@@ -965,7 +969,7 @@
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">リンク管理</string>
 
-    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">現在のパスワードは間違っています。</string>
+    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">入力された現在のパスワードは間違えてます。</string>
 
     <string name="number_correctly_reinvite_contact_request" context="success message when reinviting multiple contacts">%d件の再招待要求が正常に送信されました。</string>
 
@@ -999,8 +1003,10 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">ファイルリンクがありません</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">ファイルリングはToS/AUP違反により削除されました。</string>
 
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">このURLは破損しているか変形しています。アクセスしようとしているリンクは存在しません。</string>
+
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">メールの確認を待っています</string>
-    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">メールを確認し、そこに貼ってあるリンク先をクリックすると、あなたのアカウントに入ることが出来ます</string>
+    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">メールを確認し、そこにあるリンクをクリックすると、あなたのアカウントにアクセス出来ます。</string>
 
     <plurals name="general_num_items">
         <item context="Singular of items which contains a folder. 1 item" quantity="one">項目</item>
@@ -1076,6 +1082,9 @@
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d件の連絡先が共有フォルダから正確に削除されました</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;また、%d件の連絡先は正常に削除されませんでした</string>
 
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
+
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">携帯電話からの連絡先を読み込み中&#8230;</string>
 
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d件の招待要求が正常に送信されました。</string>
@@ -1146,7 +1155,7 @@
 
     <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">このチャットから%sさんを削除しますか？　</string>
 
-    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">読み取り専用</string>
+    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">読み込みだけ</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1283,7 +1292,7 @@
     <string name="available_space" context="Label in section the storage tab in My Account Section">使用可能</string>
     <string name="not_available" context="Label in section the storage tab in My Account Section when no info info is received">利用できません</string>
 
-    <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">支払い請求周期ではありません</string>
+    <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">請求周期なし</string>
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]/%2$s[/A]</string>
 
@@ -1338,6 +1347,7 @@
         <item context="Plural" quantity="other">%1$d/%2$dファイル</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">プロセスは終了しています&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">表示</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">全転送を一時停止</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">すべての転送を再開</string>
@@ -1452,7 +1462,7 @@
 
     <string name="copyright_alert_title" context="text_copyright_alert_title">お客様への警告</string>
     <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGAは他人の著作権を尊重し、MEGAクラウドサービスのユーザーが著作権に関する法律に従うことを義務づけています</string>
-    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">著作権を侵害するためにMEGAクラウドサービスを利用することは厳しく禁じれています。どんな個人または団体の著作権やその他の所有権をも侵害するようなファイル、データ、またはコンテンツをアップロード、ダウンロード、保存、共有、表示、ストリーム、配布、メール、リンク、送信等するのは許されません。</string>
+    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">MEGAクラウドサービスを使用して著作権を侵害することは厳しく禁止されています。あなたは、個人または団体の著作権またはその他の財産権を侵害するファイル、データ、またはコンテンツをアップロード、ダウンロード、保存、共有、表示、ストリーム配信、配布、メールで送信、リンク、送信、またはその他の方法で利用可能にすることはできません。</string>
     <string name="copyright_alert_agree_button" context="text of the Agree button">同意する</string>
     <string name="copyright_alert_disagree_button" context="text of the Disagree button">同意しない</string>
 
@@ -1489,7 +1499,7 @@
     <string name="no_files_selected_warning">ファイルが選択されていません</string>
 
     <string name="attachment_upload_panel_from_cloud">クラウドドライブから</string>
-    <string name="attachment_upload_panel_contact">コンタクト</string>
+    <string name="attachment_upload_panel_contact">知り合い</string>
     <string name="attachment_upload_panel_photo">端末から</string>
 
     <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">アカウントをキャンセル</string>
@@ -1502,7 +1512,7 @@
     <string name="file_properties_shared_folder_public_link_name">リンク</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">フルアクセス</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">読み取り専用</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">読み込みだけ</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">読み込みと書き込み</string>
 
     <string name="attachment_uploading_state_uploading">アップロードしているのは&#8230;</string>
@@ -1788,7 +1798,8 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">チャットのアップロード</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">チャットメディアの品質</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">動画の品質</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">元の品質</item>
         <item context="the options of medium quality multimedia file to  upload.">中程度の品質</item>
@@ -1844,7 +1855,7 @@
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">回復キーはMEGARecoveryKey.txtとしてオフラインセクションにエクスポートされました。\n注：ログアウトすると削除されますので、安全な場所に保管してください。</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">ログアウトしようとしています。確実にパスワードを覚えるために、パスワードをテストしてください。\nパスワードを失った場合、MEGAのデータにアクセスできなくなります。</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">クリップボードにコピー</string>
-    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">リカバリーキーをエクスポート</string>
+    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">回復キーをエクスポート</string>
     <string name="proceed_to_logout" context="Option that permits user logout">ログアウトに進みます</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">リカバリーキー</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">ファイルシステムに保存する</string>
@@ -1875,7 +1886,7 @@
 
     <string name="settings_security_options_title" context="Title of the category Security options on Settings section">セキュリティオプション</string>
     <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">リカバリーキー</string>
-    <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">親鍵を安全な場所にエキスポートしておけば、データを失わずにパスワードを変更できます。</string>
+    <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">回復キーをエクスポートして安全な場所に保管すると、データを失うことなく新しいパスワードを設定できます。</string>
 
     <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">MEGAに到達できません。接続を確認するか、後でもう一度お試しください。</string>
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">サーバーがビジー状態です。お待ちください。</string>
@@ -1937,11 +1948,11 @@
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">端末を失くした場合に備えて、このシードを安全な場所に確実にバックアップしてください。</string>
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">オーセンティケータアプリで生成された6桁のコードをご入力ください。</string>
     <string name="general_verify" context="Text button">確認する</string>
-    <string name="general_next" context="Text button">次</string>
+    <string name="general_next" context="Text button">次へ</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">シードまたはQRコードの生成中にエラーが発生しました。もう一度お試しください。</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">二要素認証が有効になりました</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">次回アカウントにログインすると、オーセンティケータアプリで提供される6桁のコードを入力するよう求められます。</string>
-    <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>リカバリーキーをバックアップ</b></string>
+    <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>あなたの回復キーをバックアップ</b></string>
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">コードが無効です</string>
     <string name="lost_your_authenticator_device" context="When a user tries to login with Two-Factor Authentication and lost his device, button that permits get information about how login">オーセンティケータ端末を紛失しましたか？　</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">ログインの確認</string>
@@ -2131,13 +2142,17 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">最小期間は7日間です。</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">最小期間は7日間で、あなたの最大期間は30日間です。</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">ファイル失効日は</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d日</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">以下のサイズを超えたら通知を受けます：</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">圧縮する動画が以下より大きい場合：</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">ごみ箱クリアスケジューラを無効にするか、より長い保存期間を設定するには、PROプランのご契約をしていただく必要がございます。</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">日間</string>
+    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">日</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">チャットリンクを取得</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">チャットリンクの管理</string>
 
@@ -2239,7 +2254,7 @@
     <string name="billing_period_title" context="title of billing period">お支払い請求期間</string>
     <string name="billed_monthly_text" context="option of billing period, monthly">[A]毎月払い[/A] %s /月</string>
     <string name="billed_yearly_text" context="option of billing period, yearly">[A]年間払い[/A] %s /年</string>
-    <string name="button_cancel" context="dialog option cancel in alert dialog">キャンセル</string>
+    <string name="button_cancel" context="dialog option cancel in alert dialog">キャンセルする</string>
     <string name="button_continue" context="dialog option continue in alert dialog">続ける</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A]（サブスクリプション）</string>
@@ -2255,6 +2270,15 @@
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">最終ログインを表示&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">あなたの連絡先がMEGAであなたが最後に活動していた時間を見れるようにします。</string>
+
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">ストレージ容量が足りません</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">動画圧縮を実行するためのストレージ容量が足りません。</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">圧縮する動画の合計サイズが%sを超えています。続行するには端末をプラグで接続してください。</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
+	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">無効なフォルダが選択されました</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">ファイル%dこ</item>
@@ -2458,13 +2482,13 @@
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">チャットリンクを入力</string>
 
-    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
-    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
-    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
-    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">リンクを貼り付ける</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">ファイルまたはフォルダリンクが無効です</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">有効なファイルまたはフォルダのリンクをご入力ください</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">有効なチャットリンクをご入力ください</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">チャットリンクを貼り付けました。</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">連絡先リンクを貼り付けました。</string>
+    <string name="action_open_contact_link" context="Menu item">連絡先リンクを開く</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">このリンクを使用すると、人々はあなたのグループに参加できます。</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">新しいチャットリンク</string>
@@ -2484,7 +2508,7 @@
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">長押しすると録音し、離すと送信します。</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">スライドしてキャンセル</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">このボイスクリップは利用できません</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">このボイスメッセージは利用できません</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d個のファイルがすでにダウンロードされました。&#160;</item>
@@ -2497,5 +2521,5 @@
 	</plurals>
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">通話中にボイスメッセージの録音はできません。</string>
-    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">ボイスメッセージをアップロードしようとしたときにエラーが発生しました。</string>
 </resources>
