@@ -999,6 +999,8 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">File link unavailable</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">The file link has been removed because of a ToS/AUP violation.</string>
 
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">This URL is corrupt or deformed. The link you are trying to access does not exist.</string>
+
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Awaiting email confirmation</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Please check your email and click the link to confirm your account.</string>
 
