@@ -138,7 +138,7 @@ public class Util {
 	public static String advancesDevicesDIR = "MEGA/MEGA Temp";
 	public static String chatTempDIR = "MEGA/MEGA Temp/Chat";
 	public static String oldMKFile = "/MEGA/MEGAMasterKey.txt";
-	public static String rKFile = "/MEGA/MEGARecoveryKey.txt";
+	public static String rKFile = "MEGARecoveryKey.txt";
 
 	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
 	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";

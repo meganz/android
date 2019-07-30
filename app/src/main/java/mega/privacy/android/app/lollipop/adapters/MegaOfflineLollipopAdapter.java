@@ -298,17 +298,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 	}
 
-	boolean isRKSavedForOffline (MegaOffline currentNode) {
-		if(currentNode.getHandle().equals("0")){
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-			File file= new File(path);
-			if(file.exists()){
-				return true;
-			}
-		}
-    	return false;
-	}
-
     public void toggleSelection(int pos) {
 		log("toggleSelection");
         //Otherwise out of bounds exception happens.
@@ -318,22 +307,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
         if (a && b && c) {
             pos += placeholderCount;
         }
-        //Check if it's the Master Key file
-		if (isRKSavedForOffline((MegaOffline)getItem(pos))) {
-			notifyItemChanged(pos);
-			return;
-		}
 
         startAnimation(pos, putOrDeletePosition(pos));
 	}
 
 	public void toggleAllSelection(int pos) {
-		//Check if it's the Master Key file
-		if (isRKSavedForOffline((MegaOffline)getItem(pos))) {
-			notifyItemChanged(pos);
-			return;
-		}
-
 		startAnimation(pos, putOrDeletePosition(pos));
 	}
     
@@ -437,36 +415,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	
 	public void setNodes(ArrayList<MegaOffline> mOffList){
 		log("setNodes");
-		String pathNav = fragment.getPathNavigation();
-		if(pathNav!=null){		
-			if (pathNav.equals("/")){
-				if (mOffList != null){
-					if(!mOffList.isEmpty()) {
-						log("List not empty");
-						MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-						if(!(lastItem.getHandle().equals("0"))){
-							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-							log("Export in: "+path);
-							File file= new File(path);
-							if(file.exists()){
-								MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
-								mOffList.add(masterKeyFile);
-							}
-						}	
-					}
-					else{
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-						log("Export in: "+path);
-						File file= new File(path);
-						if(file.exists()){
-							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
-							mOffList.add(masterKeyFile);
-						}
-					}
-				}						
-			}
-		}		
-		
+
 		this.mOffList = insertPlaceHolderNode(mOffList);
 		((OfflineFragmentLollipop) fragment).addSectionTitle(this.mOffList);
 		positionClicked = -1;	
@@ -480,9 +429,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
 		
 	    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    
@@ -633,29 +579,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.itemLayout.setVisibility(View.INVISIBLE);
 			return;
 		}
-//		if(currentNode.getHandle().equals("0")){
-//			//The node is the MasterKey File
-//			holder.textViewFileName.setText(currentNode.getName());
-//
-//			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-//			File file= new File(path);
-//			long nodeSize;
-//			if(file.exists()){
-//				nodeSize = file.length();
-//				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-//			}
-//			holder.iconView.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
-//			holder.iconView.setVisibility(View.VISIBLE);
-//			holder.imageView.setVisibility(View.GONE);
-//			holder.imageButtonThreeDots.setTag(holder);
-//			holder.imageButtonThreeDots.setOnClickListener(this);
-//
-//			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
-//			holder.separator.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-//
-////			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-//			return;
-//		}
 
 		String path=null;
 		
@@ -725,22 +648,18 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		holder.imageView.setVisibility(View.GONE);
 		holder.iconView.setVisibility(View.VISIBLE);
 
-		if (currentFile.isFile() || currentNode.getHandle().equals("0")){
+		if (currentFile.isFile()){
 			holder.itemLayout.setVisibility(View.VISIBLE);
 			holder.folderLayout.setVisibility(View.GONE);
 			holder.fileLayout.setVisibility(View.VISIBLE);
 
 			holder.itemLayout.setVisibility(View.VISIBLE);
 			holder.folderLayout.setVisibility(View.GONE);
-//			holder.imageViewThumb.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
-//			holder.imageViewThumb.setVisibility(View.GONE);
 			holder.fileLayout.setVisibility(View.VISIBLE);
 			holder.textViewFileName.setVisibility(View.VISIBLE);
 			holder.textViewFileSize.setVisibility(View.GONE);
 			
 			holder.textViewFileNameForFile.setText(currentNode.getName());
-//			long nodeSize = currentNode.getSize();
-//			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			
 			holder.thumbLayoutForFile.setBackgroundColor(Color.TRANSPARENT);
 			
@@ -815,25 +734,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				
 		MegaOffline currentNode = (MegaOffline) getItem(position);
 		
-		if(currentNode.getHandle().equals("0")){
-			//The node is the MasterKey File
-			holder.textViewFileName.setText(currentNode.getName());
-			
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-			File file= new File(path);
-			long nodeSize;
-			if(file.exists()){
-				nodeSize = file.length();
-				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-			}			
-			holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
-			holder.threeDotsLayout.setVisibility(View.VISIBLE);
-			holder.threeDotsLayout.setTag(holder);
-			holder.threeDotsLayout.setOnClickListener(this);
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			return;
-		}
-		
 		String path=null;
 		
 		if(currentNode.getOrigin()==MegaOffline.INCOMING){
@@ -905,12 +805,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 			else {
 				if(this.isItemChecked(position)){
-					//MegaOffline nodeTemp = (MegaOffline) getItem(position);
-//					if(isRecoveryKey(nodeTemp)){
-//						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-//					}else{
-//						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-//					}
 					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -1035,25 +929,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		log("getItemCount");
 		return mOffList.size();
 	}
-
-	public int getItemCountWithoutRK(){
-		log("getItemCountWithoutRK");
-
-		ArrayList<MegaOffline> mOffListWithoutRK = new ArrayList<>();
-		for(MegaOffline item: mOffList){
-			if(item == null) {
-				continue;
-			}
-			if(item.getHandle().equals("0")){
-				//isRecoveryKey
-
-			}else{
-				//isnotRecoveryKey
-				mOffListWithoutRK.add(item);
-			}
-		}
-		return mOffListWithoutRK.size();
-	}
 	
 	@Override
 	public int getItemViewType(int position) {
@@ -1157,11 +1032,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		ViewHolderOffline holder = (ViewHolderOffline) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
 
-		MegaOffline item = mOffList.get(currentPosition);
-		if(!(item.getHandle().equals("0"))){
-			fragment.activateActionMode();
-			fragment.itemClick(currentPosition, null, null);
-		}
+		fragment.activateActionMode();
+		fragment.itemClick(currentPosition, null, null);
 
 		return true;
 	}

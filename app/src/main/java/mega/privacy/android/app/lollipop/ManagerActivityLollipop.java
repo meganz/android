@@ -591,7 +591,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem changePass;
 	private MenuItem exportMK;
-	private MenuItem removeMK;
 	private MenuItem takePicture;
 	private MenuItem searchByDate;
 	private MenuItem cancelSubscription;
@@ -3628,9 +3627,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					String parentPath = intent.getStringExtra("parentPath");
 					if (parentPath != null){
 						log("path to download: "+parentPath);
-						boolean fromOffline = getIntent().getBooleanExtra("fromOffline", false);
 						AccountController ac = new AccountController(this);
-						ac.exportMK(parentPath, fromOffline);
+						ac.exportMK(parentPath);
 					}
 				}
 				else  if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
@@ -6390,8 +6388,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		exportMK = menu.findItem(R.id.action_menu_export_MK);
 		exportMK.setVisible(false);
-		removeMK = menu.findItem(R.id.action_menu_remove_MK);
-		removeMK.setVisible(false);
 
 		killAllSessions = menu.findItem(R.id.action_menu_kill_all_sessions);
 		killAllSessions.setVisible(false);
@@ -6560,7 +6556,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 
 				oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-				if(oFLol != null && oFLol.getItemCountWithoutRK()>0){
+				if(oFLol != null && oFLol.getItemCount()>0){
 					sortByMenuItem.setVisible(true);
 					selectMenuItem.setVisible(true);
 				}
@@ -7225,20 +7221,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					int index = viewPagerMyAccount.getCurrentItem();
 					if(index==0){
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-						log("Exists MK in: "+path);
-						File file= new File(path);
-						if(file.exists()){
-							removeMK.setVisible(true);
-							exportMK.setVisible(false);
-						}
-						else{
-							removeMK.setVisible(false);
-							exportMK.setVisible(true);
-						}
+						exportMK.setVisible(true);
 					}
 					else{
-						removeMK.setVisible(false);
 						exportMK.setVisible(false);
 					}
 
@@ -7258,7 +7243,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					forgotPassMenuItem.setVisible(false);
 
 					cancelSubscription.setVisible(false);
-					removeMK.setVisible(false);
 					exportMK.setVisible(false);
 				}
 			}
@@ -9232,11 +9216,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        case R.id.action_menu_change_pass:{
 	        	Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
 				startActivity(intent);
-				return true;
-	        }
-	        case R.id.action_menu_remove_MK:{
-				log("remove MK option selected");
-				showConfirmationRemoveMK();
 				return true;
 	        }
 	        case R.id.action_menu_export_MK:{
@@ -13152,71 +13131,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				break;
 			}
-//			case R.id.top_control_bar:{
-//				if (nDALol != null){
-//					nDALol.setPositionClicked(-1);
-//				}
-//				drawerItem = DrawerItem.ACCOUNT;
-//				titleAB = drawerItem.getTitle(this);
-//
-//				selectDrawerItemLollipop(drawerItem);
-//
-//				break;
-//			}
-//			case R.id.bottom_control_bar:{
-//				if (nDALol != null){
-//					nDALol.setPositionClicked(-1);
-//				}
-//				drawerItem = DrawerItem.ACCOUNT;
-//				titleAB = drawerItem.getTitle(this);
-//
-//				selectDrawerItemLollipop(drawerItem);
-//
-//				break;
-//			}
 		}
-	}
-
-	void showBottomSheetRecoveryKey(){
-		RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
-		recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
 	}
 
 	void exportRecoveryKey (){
 		AccountController aC = new AccountController(this);
-		aC.exportMK(null, false);
-	}
-
-	public void showConfirmationRemoveMK(){
-		log("showConfirmationRemoveMK");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
-			}
-		}
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						AccountController aC = new AccountController(managerActivity);
-						aC.removeMK();
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-		builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+		aC.saveRkToFileSystem();
 	}
 
 	public void showConfirmationCloseAllSessions(){
@@ -14181,21 +14101,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String[] split = Util.rKFile.split("/");
-				String path = parentPath+"/"+split[split.length-1];
+				String path = parentPath + File.separator + Util.rKFile;
 				log("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
-				ac.exportMK(path, false);
-			}
-		}
-		else if (requestCode == Constants.REQUEST_SAVE_MK_FROM_OFFLINE && resultCode == RESULT_OK){
-			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			if (parentPath != null){
-				String[] split = Util.rKFile.split("/");
-				String path = parentPath+"/"+split[split.length-1];
-				log("REQUEST_SAVE_MK_FROM_OFFLINE:path to download: "+path);
-				AccountController ac = new AccountController(this);
-				ac.exportMK(path, true);
+				ac.exportMK(path);
 			}
 		}
 		else if(requestCode == Constants.REQUEST_CODE_FILE_INFO && resultCode == RESULT_OK){

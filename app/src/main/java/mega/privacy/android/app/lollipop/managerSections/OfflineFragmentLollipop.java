@@ -398,7 +398,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					menu.findItem(R.id.cab_menu_download).setVisible(false);
 					menu.findItem(R.id.cab_menu_share).setVisible(false);
 
-					if(selected.size() == adapter.getItemCountWithoutRK()){
+					if(selected.size() == adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
 					}else{
@@ -425,7 +425,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					menu.findItem(R.id.cab_menu_delete).setVisible(true);
 					menu.findItem(R.id.cab_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					if(selected.size()==adapter.getItemCountWithoutRK()){
+					if(selected.size()==adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
 					}else{
@@ -816,15 +816,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
-		
-		//Remove MK before sorting
-		if(mOffList.size()>0){
-			MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-			if(lastItem.getHandle().equals("0")){
-				mOffList.remove(mOffList.size()-1);
-			}
-		}		
-		else{
+
+		if(mOffList.size()<=0){
 			return;
 		}
 		
@@ -877,15 +870,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
-		
-		//Remove MK before sorting
-		if(mOffList.size()>0){
-			MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-			if(lastItem.getHandle().equals("0")){
-				mOffList.remove(mOffList.size()-1);
-			}
-		}		
-		else{
+
+		if(mOffList.size()<=0){
 			return;
 		}
 				
@@ -1023,14 +1009,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 		}
 		
-		//Check if the file MarterKey is exported
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-		log("Export in: "+path);
-		File file= new File(path);
-		if(file.exists()){
-			numFiles++;
-		}
-		
 		if (numFolders > 0) {
 			info = numFolders
 					+ " "
@@ -1074,28 +1052,17 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 		if (adapter.isMultipleSelect()){
 			log("multiselect");
-			MegaOffline item = mOffList.get(position);
-			if(!(item.getHandle().equals("0"))){
-				adapter.toggleSelection(position);
-				List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
-				if (selectedNodes.size() > 0){
-					updateActionModeTitle();
 
-				}
+			adapter.toggleSelection(position);
+			List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
+			if (selectedNodes.size() > 0){
+				updateActionModeTitle();
+
 			}
 		}
 		else{
 			MegaOffline currentNode = mOffList.get(position);
-			File currentFile=null;
-			
-			if(currentNode.getHandle().equals("0")){
-				log("click on Master Key");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-				openFile(new File(path));
-//				viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
-//				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
-				return;
-			}
+			File currentFile;
 						
 			if(currentNode.getOrigin()==MegaOffline.INCOMING){
 				String handleString = currentNode.getHandleIncoming();
@@ -1435,7 +1402,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 		}
     }
-	
+
 	/*
 	 * Clear all selected items
 	 */
@@ -1824,14 +1791,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		log("getItemCount");
 		if(adapter != null){
 			return adapter.getItemCount();
-		}
-		return 0;
-	}
-
-	public int getItemCountWithoutRK(){
-		log("getItemCountWithoutRK");
-		if(adapter != null){
-			return adapter.getItemCountWithoutRK();
 		}
 		return 0;
 	}

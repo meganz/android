@@ -133,7 +133,6 @@ public class Constants {
 
 	public static final int REQUEST_DOWNLOAD_FOLDER = 7;
 
-	public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
 	public static final int REQUEST_READ_WRITE_STORAGE = 9;
     public static final int REQUEST_CAMERA_UPLOAD = 10;
     public static final int REQUEST_CAMERA_ON_OFF = 11;

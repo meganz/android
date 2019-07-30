@@ -51,6 +51,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -1262,11 +1263,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
                 log("parentPath no NULL");
-                String[] split = Util.rKFile.split("/");
-                parentPath = parentPath+"/"+split[split.length-1];
+                parentPath = parentPath + File.separator + Util.rKFile;
                 Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
                 newIntent.putExtra("parentPath", parentPath);
-                newIntent.putExtra("fromOffline", true);
                 newIntent.setAction(Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);
                 startActivity(newIntent);
             }

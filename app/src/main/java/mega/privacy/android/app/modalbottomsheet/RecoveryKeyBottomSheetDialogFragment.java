@@ -35,7 +35,6 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
     public LinearLayout optionCopyToClipboard;
     public LinearLayout optionSaveToFileSystem;
     public LinearLayout optionPrint;
-    public LinearLayout optionOffline;
 
     MegaApiAndroid megaApi;
 
@@ -62,17 +61,12 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
             case R.id.recovery_key_saveTo_fileSystem_layout:{
                 log("option save to File System");
                 AccountController aC = new AccountController(getContext());
-                aC.saveRkToFileSystem(false);
+                aC.saveRkToFileSystem();
                 break;
             }
             case R.id.recovery_key_print_layout:{
                 log("Option print rK");
                 printRK();
-                break;
-            }
-            case R.id.recovery_key_offline_layout: {
-                AccountController aC = new AccountController(getContext());
-                aC.exportMK(null, false);
                 break;
             }
         }
@@ -121,38 +115,14 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionPrint = (LinearLayout) contentView.findViewById(R.id.recovery_key_print_layout);
         optionCopyToClipboard= (LinearLayout) contentView.findViewById(R.id.recovery_key_copytoclipboard_layout);
         optionSaveToFileSystem = (LinearLayout) contentView.findViewById(R.id.recovery_key_saveTo_fileSystem_layout);
-        optionOffline = (LinearLayout) contentView.findViewById(R.id.recovery_key_offline_layout);
 
         optionPrint.setOnClickListener(this);
         optionCopyToClipboard.setOnClickListener(this);
         optionSaveToFileSystem.setOnClickListener(this);
-        optionOffline.setOnClickListener(this);
 
-        if (getContext() instanceof TestPasswordActivity && !((TestPasswordActivity) getContext()).isLogout()) {
-            optionOffline.setVisibility(View.VISIBLE);
-        }
-        else {
-            contentView.findViewById(R.id.separator_offline).setVisibility(View.GONE);
-            optionOffline.setVisibility(View.GONE);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-            optionPrint.setVisibility(View.VISIBLE);
-        }
-        else {
-            optionPrint.setVisibility(View.GONE);
-        }
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//
-//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-//        }
-//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//        }
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, getContext(), 48));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }

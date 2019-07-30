@@ -164,7 +164,7 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
                 log("Save Master Key button");
                 ((ManagerActivityLollipop)context).hideMKLayout();
                 AccountController aC = new AccountController(context);
-                aC.exportMK(null, false);
+                aC.saveRkToFileSystem();
                 break;
             }
         }

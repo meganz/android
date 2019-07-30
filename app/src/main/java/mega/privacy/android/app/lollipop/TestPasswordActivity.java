@@ -27,6 +27,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -339,10 +341,9 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
                 log("parentPath no NULL");
-                String[] split = Util.rKFile.split("/");
-                parentPath = parentPath+"/"+split[split.length-1];
+                parentPath = parentPath + File.separator + Util.rKFile;
                 AccountController ac = new AccountController(this);
-                ac.exportMK(parentPath, false);
+                ac.exportMK(parentPath);
             }
         }
     }
