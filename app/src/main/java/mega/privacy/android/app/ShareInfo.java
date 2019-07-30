@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.provider.MediaStore;
 
 import java.io.BufferedOutputStream;

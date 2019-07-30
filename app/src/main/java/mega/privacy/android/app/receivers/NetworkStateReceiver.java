@@ -5,17 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 
 public class NetworkStateReceiver extends BroadcastReceiver {
 
@@ -84,17 +84,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             }
 
             connected = true;
-            handler.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    log("Now I start the service");
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                        c.startService(new Intent(c, CameraSyncService.class));
-                    }
-                    handler.removeCallbacksAndMessages(null);
-                }
-            }, 2 * 1000);
+            scheduleCameraUploadJob(c);
         } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
             log("Network state: DISCONNECTED");
             mApplication.setLocalIpAddress(null);

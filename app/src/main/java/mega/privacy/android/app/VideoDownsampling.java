@@ -1,7 +1,6 @@
 package mega.privacy.android.app;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -19,6 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 
 public class VideoDownsampling {
 
@@ -39,11 +39,16 @@ public class VideoDownsampling {
     private int mWidth = 1280;
     private int mHeight = 720;
 
+    private static final int MEDIUM_WIDTH = 1280;
+    private static final int MEDIUM_HEIGHT = 720;
+
     static Context context;
 
     static ConcurrentLinkedQueue<VideoUpload> queue;
 
-    private class VideoUpload{
+    private boolean isRunning = true;
+
+    protected class VideoUpload{
         String original;
         String outFile;
         long idPendingMessage;
@@ -62,6 +67,14 @@ public class VideoDownsampling {
     public VideoDownsampling(Context context) {
         this.context = context;
         queue = new ConcurrentLinkedQueue<VideoUpload>();
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public void setRunning(boolean running) {
+        isRunning = running;
     }
 
     public void changeResolution(File f, String inputFile, long idMessage) throws Throwable {
@@ -89,12 +102,15 @@ public class VideoDownsampling {
 
             try {
                 while(!queue.isEmpty()){
-                    mChanger.prepareAndChangeResolution();
+                    VideoUpload toProcess = queue.poll();
+                    mChanger.prepareAndChangeResolution(toProcess);
                 }
             } catch (Throwable th) {
                 mThrowable = th;
                 if(out!=null){
-                    ((ChatUploadService)context).finishDownsampling(out, false, video.idPendingMessage);
+                    if(context instanceof ChatUploadService) {
+                        ((ChatUploadService)context).finishDownsampling(out, false, video.idPendingMessage);
+                    }
                 }
             }
         }
@@ -110,12 +126,9 @@ public class VideoDownsampling {
         }
     }
 
-    private void prepareAndChangeResolution() throws Exception {
+    protected void prepareAndChangeResolution(VideoUpload video) throws Exception {
         log("prepareAndChangeResolution");
         Exception exception = null;
-
-        VideoUpload video = queue.poll();
-
         String mInputFile = video.original;
 
         String mOutputFile = video.outFile;
@@ -141,25 +154,7 @@ public class VideoDownsampling {
             int videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor);
             MediaFormat inputFormat = videoExtractor.getTrackFormat(videoInputTrack);
 
-            MediaMetadataRetriever m = new MediaMetadataRetriever();
-            m.setDataSource(mInputFile);
-            Bitmap thumbnail = m.getFrameAtTime();
-            int inputWidth = thumbnail.getWidth(), inputHeight = thumbnail.getHeight();
-
-            if(inputWidth>inputHeight){
-                if(mWidth<mHeight){
-                    int w = mWidth;
-                    mWidth=mHeight;
-                    mHeight=w;
-                }
-            }
-            else{
-                if(mWidth>mHeight){
-                    int w = mWidth;
-                    mWidth=mHeight;
-                    mHeight=w;
-                }
-            }
+            resetWidthAndHeight(mInputFile);
 
             MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE, mWidth, mHeight);
             outputVideoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, OUTPUT_VIDEO_COLOR_FORMAT);
@@ -179,8 +174,8 @@ public class VideoDownsampling {
             int audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor);
             MediaFormat inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack);
             MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(MediaFormat.KEY_MIME),
-                            inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
-                            inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
+                    inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
+                    inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
             outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE);
             outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE);
 
@@ -271,7 +266,23 @@ public class VideoDownsampling {
             throw exception;
         }
         else{
-            ((ChatUploadService)context).finishDownsampling(mOutputFile, true, video.idPendingMessage);
+            if(context instanceof ChatUploadService) {
+                ((ChatUploadService)context).finishDownsampling(mOutputFile, true, video.idPendingMessage);
+            }
+        }
+    }
+
+    private void resetWidthAndHeight(String mInputFile) {
+        MediaMetadataRetriever m = new MediaMetadataRetriever();
+        m.setDataSource(mInputFile);
+
+        int rotation = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
+        if (rotation == 90 || rotation == 270) {
+            mWidth = MEDIUM_HEIGHT;
+            mHeight = MEDIUM_WIDTH;
+        } else {
+            mWidth = MEDIUM_WIDTH;
+            mHeight = MEDIUM_HEIGHT;
         }
     }
 
@@ -381,7 +392,7 @@ public class VideoDownsampling {
 
         int pendingAudioDecoderOutputBufferIndex = -1;
         boolean muxing = false;
-        while ((!videoEncoderDone) || (!audioEncoderDone)) {
+        while ((!videoEncoderDone || !audioEncoderDone) && isRunning) {
             while (!videoExtractorDone && (encoderOutputVideoFormat == null || muxing)) {
                 int decoderInputBufferIndex = videoDecoder.dequeueInputBuffer(TIMEOUT_USEC);
                 if (decoderInputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
@@ -566,7 +577,12 @@ public class VideoDownsampling {
 //            log("The percentage complete is: " + video.percentage + " (" + video.sizeRead + "/" + video.sizeInputFile +")");
             if(video.percentage%5==0){
 //                log("Percentage: "+mOutputFile + "  " + video.percentage + " (" + video.sizeInputFile + "/" + video.sizeInputFile +")");
-                ((ChatUploadService)context).updateProgressDownsampling(video.percentage, mOutputFile);
+                if(context instanceof  ChatUploadService) {
+                    ((ChatUploadService)context).updateProgressDownsampling(video.percentage, mOutputFile);
+                }
+            }
+            if(context instanceof VideoCompressionCallback) {
+                ((VideoCompressionCallback) context).onCompressUpdateProgress(video.percentage);
             }
         }
         video.percentage = 100;

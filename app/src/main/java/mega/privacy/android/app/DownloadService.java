@@ -67,6 +67,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
 
 /*
  * Background service to download files
@@ -134,9 +135,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	MegaNode offlineNode;
 
 	boolean isLoggingIn = false;
-    private long lastUpdated;
+	private long lastUpdated;
 
-    @SuppressLint("NewApi")
+	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
 		super.onCreate();
@@ -1200,6 +1201,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	 */
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
+
 		int pendingTransfers = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
         int totalTransfers = megaApi.getTotalDownloads() + megaApiFolder.getTotalDownloads();
 
@@ -1225,15 +1227,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		if(update){
-            //refresh UI every 1 seconds to avoid too much workload on main thread
-            if(!isOverquota) {
-                long now = System.currentTimeMillis();
-                if (now - lastUpdated > 1000) {
-                    lastUpdated = now;
-                } else {
-                    return;
-                }
-            }
+			//refresh UI every 1 seconds to avoid too much workload on main thread
+			if(!isOverquota) {
+				long now = System.currentTimeMillis();
+				if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS) {
+					lastUpdated = now;
+				} else {
+					return;
+				}
+			}
 			int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
 			log("updateProgressNotification: "+progressPercent);
 
