@@ -5476,10 +5476,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
 
-                if (adapter != null && adapter.isMultipleSelect()) {
-                    clearSelections();
-                    hideMultipleSelect();
-                }
+                disableMultiselection();
 
                 if(msg.isDeleted()){
                     log("Message deleted!!");
@@ -5548,6 +5545,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("onMessageUpdate: resultModify: "+resultModify);
             }
         }
+    }
+
+    private void disableMultiselection(){
+        if(adapter == null || !adapter.isMultipleSelect()) return;
+        clearSelections();
+        hideMultipleSelect();
     }
 
     @Override
@@ -5645,10 +5648,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
 
             adapter.removeMessage(indexToChange + 1, messages);
-            if (adapter != null && adapter.isMultipleSelect()) {
-                clearSelections();
-                hideMultipleSelect();
-            }
+            disableMultiselection();
         } else {
             log("index to change not found");
         }
@@ -6848,12 +6848,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
             removeProgressDialog();
 
-            if(adapter!=null){
-                if(adapter.isMultipleSelect()){
-                    clearSelections();
-                    hideMultipleSelect();
-                }
-            }
+            disableMultiselection();
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("File sent correctly");
@@ -7506,12 +7501,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(chatHandle==idChat){
             log("Chat already opened");
 
-            if(adapter!=null){
-                if(adapter.isMultipleSelect()){
-                    clearSelections();
-                    hideMultipleSelect();
-                }
-            }
+            disableMultiselection();
 
             if(text!=null){
                 showSnackbar(Constants.SNACKBAR_TYPE, text, -1);
@@ -7532,10 +7522,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 finish();
             }
             else{
-                if(adapter.isMultipleSelect()){
-                    clearSelections();
-                    hideMultipleSelect();
-                }
+                disableMultiselection();
                 if(text!=null){
                     showSnackbar(Constants.SNACKBAR_TYPE, text, -1);
                 }
@@ -8386,19 +8373,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
     }
-
-
-    public void hideFileStorageSection(){
-        log("hideFileStorageSEctocioon");
-        if (fileStorageF != null) {
-            fileStorageF.clearSelections();
-            fileStorageF.hideMultipleSelect();
-        }
-        fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
-    }
-
-
 
     public void setShareLinkDialogDismissed (boolean dismissed) {
         isShareLinkDialogDismissed = dismissed;
