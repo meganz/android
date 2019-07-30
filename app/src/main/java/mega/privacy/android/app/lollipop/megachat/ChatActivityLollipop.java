@@ -5475,6 +5475,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 clearHistory(androidMsg);
             }
             else{
+
+                if (adapter != null && adapter.isMultipleSelect()) {
+                    clearSelections();
+                    hideMultipleSelect();
+                }
+
                 if(msg.isDeleted()){
                     log("Message deleted!!");
                 }
