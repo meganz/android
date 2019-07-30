@@ -371,13 +371,6 @@ public class Constants {
 
 	public static final String CONTACT_HANDLE = "contactHandle";
 
-	public static final String[] REVERT_CHANGE_PASSWORD_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#pwr.+$",
-			"^https://mega\\.co\\.nz/pwr.+$",
-			"^https://mega\\.nz/#pwr.+$",
-			"^https://mega\\.nz/pwr.+$"
-	};
-
 	public static final String[] FILE_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#!.+$",
 			"^https://mega\\.nz/#!.+$"
@@ -436,45 +429,6 @@ public class Constants {
 	public static final String[] PENDING_CONTACTS_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#fm/ipc",
 			"^https://mega\\.nz/#fm/ipc"
-	};
-
-	public static final String[] BLOG_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#blog",
-			"^https://mega\\.nz/#blog",
-			"^https://mega\\.nz/blog",
-			"^https://mega\\.co\\.nz/#blog.+$",
-			"^https://mega\\.nz/#blog.+$",
-			"^https://mega\\.nz/blog.+$"
-	};
-
-	public static final String[] HELP_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#help",
-			"^https://mega\\.nz/#help",
-			"^https://mega\\.nz/help"
-	};
-
-	public static final String[] SYNC_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#sync",
-			"^https://mega\\.nz/#sync",
-			"^https://mega\\.nz/sync"
-	};
-
-	public static final String[] TERMS_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#terms",
-			"^https://mega\\.nz/#terms",
-			"^https://mega\\.nz/terms"
-	};
-
-	public static final String[] PRIVACY_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#privacy",
-			"^https://mega\\.nz/#privacy",
-			"^https://mega\\.nz/privacy"
-	};
-
-	public static final String[] GDPR_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#gdpr",
-			"^https://mega\\.nz/#gdpr",
-			"^https://mega\\.nz/gdpr"
 	};
 
 	public static final String[] HANDLE_LINK_REGEXS = {

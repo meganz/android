@@ -90,18 +90,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		log("url " + url);
 
-		// Revert password change link
-		if (matchRegexs(url, Constants.REVERT_CHANGE_PASSWORD_LINK_REGEXS)) {
-			log("open revert password change link");
-
-			Intent openBlogIntent = new Intent(this, WebViewActivityLollipop.class);
-			openBlogIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openBlogIntent.setData(Uri.parse(url));
-			startActivity(openBlogIntent);
-			finish();
-			return;
-		}
-
 		// File link
 		if (matchRegexs(url, Constants.FILE_LINK_REGEXS)) {
 			log("open link url");
@@ -395,72 +383,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			return;
 		}
 
-		if (matchRegexs(url, Constants.BLOG_LINK_REGEXS)) {
-			log("blog link url");
-
-			Intent openBlogIntent = new Intent(this, WebViewActivityLollipop.class);
-			openBlogIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openBlogIntent.setData(Uri.parse(url));
-			startActivity(openBlogIntent);
-			finish();
-			return;
-		}
-
-		if (matchRegexs(url, Constants.HELP_LINK_REGEXS)) {
-			log("help link url");
-
-			Intent openHelpIntent = new Intent(this, WebViewActivityLollipop.class);
-			openHelpIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openHelpIntent.setData(Uri.parse(url));
-			startActivity(openHelpIntent);
-			finish();
-			return;
-		}
-
-		if (matchRegexs(url, Constants.SYNC_LINK_REGEXS)) {
-			log("sync link url");
-
-			Intent openSyncIntent = new Intent(this, WebViewActivityLollipop.class);
-			openSyncIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openSyncIntent.setData(Uri.parse(url));
-			startActivity(openSyncIntent);
-			finish();
-			return;
-		}
-
-		if (matchRegexs(url, Constants.TERMS_LINK_REGEXS)) {
-			log("terms link url");
-
-			Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
-			openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openTermsIntent.setData(Uri.parse(url));
-			startActivity(openTermsIntent);
-			finish();
-			return;
-		}
-
-		if (matchRegexs(url, Constants.PRIVACY_LINK_REGEXS)) {
-			log("privacy link url");
-
-			Intent openPrivacyIntent = new Intent(this, WebViewActivityLollipop.class);
-			openPrivacyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openPrivacyIntent.setData(Uri.parse(url));
-			startActivity(openPrivacyIntent);
-			finish();
-			return;
-		}
-
-		if (matchRegexs(url, Constants.GDPR_LINK_REGEXS)) {
-			log("gdpr link url");
-
-			Intent openGdprIntent = new Intent(this, WebViewActivityLollipop.class);
-			openGdprIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openGdprIntent.setData(Uri.parse(url));
-			startActivity(openGdprIntent);
-			finish();
-			return;
-		}
-
 		if (matchRegexs(url, Constants.HANDLE_LINK_REGEXS)) {
 			log("handle link url");
 
@@ -500,11 +422,12 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			return;
 		}
 
-		log("wrong url: " + url);
-
-		Intent errorIntent = new Intent(this, ManagerActivityLollipop.class);
-		errorIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		startActivity(errorIntent);
+		// Browser open the link which does not require app to handle
+		log("Browser open link: " + url);
+		Intent openBlogIntent = new Intent(this, WebViewActivityLollipop.class);
+		openBlogIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		openBlogIntent.setData(Uri.parse(url));
+		startActivity(openBlogIntent);
 		finish();
 	}
 
@@ -545,7 +468,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 						else{
 							log("Not logged with the correct account");
 							log(e.getErrorString() + "___" + e.getErrorCode());
-//							Util.showAlert(this, getString(R.string.error_not_logged_with_correct_account), getString(R.string.general_error_word));
 							setError(getString(R.string.error_not_logged_with_correct_account));
 						}
 					}
@@ -571,7 +493,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 						else{
 							log("LINK is null");
 							log(e.getErrorString() + "___" + e.getErrorCode());
-//							Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 							setError(getString(R.string.general_text_error));
 						}
 					}
