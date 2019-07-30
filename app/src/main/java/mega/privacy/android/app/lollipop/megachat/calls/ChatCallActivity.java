@@ -96,6 +96,7 @@ import nz.mega.sdk.MegaUser;
 import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.showErrorAlertDialogGroupCall;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.context;
 
@@ -1473,7 +1474,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                 if (e.getErrorCode() == MegaChatError.ERROR_TOOMANY) {
 
-                    Util.showErrorAlertDialogGroupCall(getString(R.string.call_error_too_many_participants), true, this);
+                    showErrorAlertDialogGroupCall(getString(R.string.call_error_too_many_participants), true, this);
                 } else {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         super.finishAndRemoveTask();

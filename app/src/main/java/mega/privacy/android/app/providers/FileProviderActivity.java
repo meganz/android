@@ -62,7 +62,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.BaseActivity;
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -74,6 +73,7 @@ import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLol
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1738,12 +1738,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if (dbH.getPreferences() != null){
 					dbH.clearPreferences();
 					dbH.setFirstTime(false);
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-						Intent stopIntent = null;
-						stopIntent = new Intent(this, CameraSyncService.class);
-						stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-						startService(stopIntent);
-					}
+                    JobUtil.stopRunningCameraUploadService(this);
 				}
 			}
 			else{

@@ -7,22 +7,27 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
+import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
@@ -251,6 +256,13 @@ public class FileUtils {
         return file.getAbsolutePath().contains(tmp.getParent());
     }
 
+    /*
+     * Check is file belongs to the app and temporary
+     */
+    public static boolean isLocalTemp(Context context, File file) {
+        return isLocal(context, file) && file.getAbsolutePath().endsWith(".tmp");
+    }
+
     public static void copyFile(File source, File dest) throws IOException{
         log("copyFile");
 
@@ -361,6 +373,92 @@ public class FileUtils {
         } else {
             return context.getFilesDir();
         }
+    }
+
+    /**
+     * Find the local path of a video node.
+     *
+     * @param node MegaNode in cloud drive which should be a video.
+     * @return Corresponding local path of the node.
+     */
+    public static String findVideoLocalPath (Context context, MegaNode node) {
+        String path = queryByNameAndSize(context, MediaStore.Video.Media.INTERNAL_CONTENT_URI,node);
+        if(path == null) {
+            path = queryByNameAndSize(context, MediaStore.Video.Media.EXTERNAL_CONTENT_URI,node);
+        }
+
+        if(path == null) {
+            path = queryByNameOrSize(context, MediaStore.Video.Media.INTERNAL_CONTENT_URI,node);
+            if(path == null) {
+                path = queryByNameOrSize(context, MediaStore.Video.Media.EXTERNAL_CONTENT_URI,node);
+            }
+        }
+        // if needed, can add file system scanning here.
+        return path;
+    }
+
+    private static String queryByNameOrSize(Context context, Uri uri,MegaNode node) {
+        String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? OR " + MediaStore.Video.Media.SIZE + " = ?";
+        return query(context, uri,selection,node);
+    }
+
+    private static String queryByNameAndSize(Context context, Uri uri,MegaNode node) {
+        String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Video.Media.SIZE + " = ?";
+        return query(context, uri,selection,node);
+    }
+
+    @Nullable
+    private static String query(Context context, Uri uri,String selection,MegaNode node) {
+        String fileName = node.getName();
+        long fileSize = node.getSize();
+        String[] selectionArgs = { fileName, String.valueOf(fileSize) };
+        Cursor cursor = context.getContentResolver().query(uri,new String[] { MediaStore.Video.Media.DATA },selection,selectionArgs,null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            String path = cursor.getString(dataColumn);
+            cursor.close();
+            File localFile = new File(path);
+            if (localFile.exists()) {
+                return path;
+            }
+        }
+        return null;
+    }
+
+    public static void purgeDirectory(File dir) {
+        log("removing cache files ");
+        if(!dir.exists()){
+            return;
+        }
+
+        try{
+            for (File file: dir.listFiles()) {
+                log("removing " + file.getAbsolutePath());
+                if (file.isDirectory()) {
+                    purgeDirectory(file);
+                }
+                file.delete();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean appendStringToFile(final String appendContents, final File file) {
+        boolean result = false;
+        try {
+            if (file != null && file.canWrite()) {
+                file.createNewFile(); // ok if returns false, overwrite
+                Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
+                out.write(appendContents);
+                out.close();
+                result = true;
+            }
+        } catch (IOException e) {
+            log("Error appending string data to file ");
+            e.printStackTrace();
+        }
+        return result;
     }
 
     public static void log(String message) {

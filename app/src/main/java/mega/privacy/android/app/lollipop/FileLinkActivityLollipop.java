@@ -534,6 +534,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			else{
 				log("ERROR: " + e.getErrorCode());
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setCancelable(false);
 				if(e.getErrorCode() == MegaError.API_EBLOCKED){
 					dialogBuilder.setMessage(getString(R.string.file_link_unavaible_ToS_violation));
 					dialogBuilder.setTitle(getString(R.string.general_error_file_not_found));
@@ -548,7 +549,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					else{
 						//Link no valido
 						dialogBuilder.setTitle(getString(R.string.general_error_word));
-						dialogBuilder.setMessage(getString(R.string.general_error_file_not_found));
+						dialogBuilder.setMessage(getString(R.string.link_broken));
 					}
 				}
 				else if(e.getErrorCode() == MegaError.API_ETOOMANY){

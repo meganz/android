@@ -3,7 +3,6 @@ package mega.privacy.android.app.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -13,7 +12,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -30,10 +28,12 @@ import android.location.Location;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
+
+import android.support.v4.app.ActivityCompat;
+
 import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -52,11 +52,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.text.DateFormat;
@@ -101,8 +97,9 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
 public class Util {
-	
-	public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 300;
+
+    public static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd HH.mm.ss";
+    public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 1000;
 	
 	public static float dpWidthAbs = 360;
 	public static float dpHeightAbs = 592;
@@ -131,72 +128,17 @@ public class Util {
 	public static Context context;
 
 	public static HashMap<String, String> countryCodeDisplay;
-	
-	/*
-	 * Create progress dialog helper
-	 */
-	public static ProgressDialog createProgress(Context context, String message) {
-		ProgressDialog progress = new ProgressDialog(context);
-		progress.setMessage(message);
-		progress.setCancelable(false);
-		progress.setCanceledOnTouchOutside(false);
-		return progress;
-	}
-	
-	/*
-	 * Create progress dialog with resId
-	 */
-	public static ProgressDialog createProgress(Context context, int stringResId) {
-		return createProgress(context, context.getString(stringResId));
-	}
-	
-	public static void showErrorAlertDialogFinish(MegaError error, Activity activity) {
-		showErrorAlertDialog(error.getErrorString(), true, activity);
-	}
 
-	public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity){
-		if(activity == null){
-			return;
-		}
+    public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
+        String nodeFingerprint = node.getFingerprint();
+        String nodeOriginalFingerprint = node.getOriginalFingerprint();
 
-		try{
-			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
-			dialogBuilder.setPositiveButton(
-					activity.getString(android.R.string.ok),
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-							if (finish) {
-								if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-									activity.finishAndRemoveTask();
-								}else{
-									activity.finish();
-								}
-							}
-						}
-					});
-			dialogBuilder.setOnCancelListener(new OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					if (finish) {
-						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							activity.finishAndRemoveTask();
-						}else{
-							activity.finish();
-						}
-					}
-				}
-			});
-
-
-			AlertDialog dialog = dialogBuilder.create();
-			dialog.show();
-			brandAlertDialog(dialog);
-		}catch(Exception ex){
-			Util.showToast(activity, message);
-		}
-	}
+        String fileFingerprint = megaApi.getFingerprint(localPath);
+        if (fileFingerprint != null) {
+            return fileFingerprint.equals(nodeFingerprint) || fileFingerprint.equals(nodeOriginalFingerprint);
+        }
+        return false;
+    }
 
 	/*
 	 * Build error dialog
@@ -291,9 +233,9 @@ public class Util {
         }
         return src;
     }
-	
+
 	public static String getExternalCardPath() {
-		
+
         String secStore = System.getenv("SECONDARY_STORAGE");
         if (secStore == null){
         	return null;
@@ -515,7 +457,7 @@ public class Util {
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
 	}
-	
+
 	static public boolean isOnline(Context context) {
 	    if(context == null) return true;
 		
@@ -640,22 +582,6 @@ public class Util {
 //			}
 //		}
 	}
-
-	public static boolean appendStringToFile(final String appendContents, final File file) {
-		boolean result = false;
-		try {
-			if (file != null && file.canWrite()) {
-				file.createNewFile(); // ok if returns false, overwrite
-				Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
-				out.write(appendContents);
-				out.close();
-				result = true;
-			}
-		} catch (IOException e) {
-			//   Log.e(Constants.LOG_TAG, "Error appending string data to file " + e.getMessage(), e);
-		}
-		return result;
-	}
 	
 	public static void brandAlertDialog(AlertDialog dialog) {
 	    try {
@@ -745,114 +671,18 @@ public class Util {
 	}
 
 
-	
-	public static String getPhotoSyncName (long timeStamp, String fileName){
-		String photoSyncName = null;
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(timeStamp);
-		
-		String extension = "";
-		String[] s = fileName.split("\\.");
-		if (s != null){
-			if (s.length > 0){
-				extension = s[s.length-1];
-			}
-		}
-				
-		String year;
-		String month;
-		String day;
-		String hour;
-		String minute;
-		String second;
-		
-		year = cal.get(Calendar.YEAR) + "";
-		month = (cal.get(Calendar.MONTH)+1) + "";
-		if ((cal.get(Calendar.MONTH) + 1) < 10){
-			month = "0" + month;
-		}
-		
-		day = cal.get(Calendar.DAY_OF_MONTH) + "";
-		if (cal.get(Calendar.DAY_OF_MONTH) < 10){
-			day = "0" + day;
-		}
-		
-		hour = cal.get(Calendar.HOUR_OF_DAY) + "";
-		if (cal.get(Calendar.HOUR_OF_DAY) < 10){
-			hour = "0" + hour;
-		}
-		
-		minute = cal.get(Calendar.MINUTE) + "";
-		if (cal.get(Calendar.MINUTE) < 10){
-			minute = "0" + minute;
-		}
-		
-		second = cal.get(Calendar.SECOND) + "";
-		if (cal.get(Calendar.SECOND) < 10){
-			second = "0" + second;
-		}
 
-		photoSyncName = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + "." + extension;
-		
-		return photoSyncName;
+	public static String getPhotoSyncName (long timeStamp, String fileName){
+        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
+        return sdf.format(new Date(timeStamp)) + fileName.substring(fileName.lastIndexOf('.'));
 	}
 	
 	public static String getPhotoSyncNameWithIndex (long timeStamp, String fileName, int photoIndex){
-		
-		if (photoIndex == 0){
-			return getPhotoSyncName(timeStamp, fileName);
-		}
-		
-		String photoSyncName = null;
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(timeStamp);
-		
-		String extension = "";
-		String[] s = fileName.split("\\.");
-		if (s != null){
-			if (s.length > 0){
-				extension = s[s.length-1];
-			}
-		}
-				
-		String year;
-		String month;
-		String day;
-		String hour;
-		String minute;
-		String second;
-		
-		year = cal.get(Calendar.YEAR) + "";
-		month = (cal.get(Calendar.MONTH)+1) + "";
-		if ((cal.get(Calendar.MONTH) + 1) < 10){
-			month = "0" + month;
-		}
-		
-		day = cal.get(Calendar.DAY_OF_MONTH) + "";
-		if (cal.get(Calendar.DAY_OF_MONTH) < 10){
-			day = "0" + day;
-		}
-		
-		hour = cal.get(Calendar.HOUR_OF_DAY) + "";
-		if (cal.get(Calendar.HOUR_OF_DAY) < 10){
-			hour = "0" + hour;
-		}
-		
-		minute = cal.get(Calendar.MINUTE) + "";
-		if (cal.get(Calendar.MINUTE) < 10){
-			minute = "0" + minute;
-		}
-		
-		second = cal.get(Calendar.SECOND) + "";
-		if (cal.get(Calendar.SECOND) < 10){
-			second = "0" + second;
-		}
-
-		photoSyncName = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + "_" + photoIndex + "." + extension;
-		
-		return photoSyncName;
+        if(photoIndex == 0) {
+            return getPhotoSyncName(timeStamp, fileName);
+        }
+        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
+        return sdf.format(new Date(timeStamp)) + "_" + photoIndex + fileName.substring(fileName.lastIndexOf('.'));
 	}
 	
 	public static int getNumberOfNodes (MegaNode parent, MegaApiAndroid megaApi){
@@ -1882,7 +1712,7 @@ public class Util {
 		}
 
 	}
-	
+
 	public static boolean isPermissionGranted(Context context, String permission){
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
@@ -1901,4 +1731,27 @@ public class Util {
 	private static void log(String message) {
 		log("Util", message);
 	}
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static void showKeyboardDelayed(final View view) {
+        log("showKeyboardDelayed");
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }, 50);
+    }
 }

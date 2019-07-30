@@ -118,7 +118,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -139,6 +138,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -198,6 +198,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -244,6 +245,8 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
+import static mega.privacy.android.app.utils.Util.showSnackBar;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -775,6 +778,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 	};
+
+	private BroadcastReceiver cameraUploadLauncherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context,Intent intent) {
+            try {
+                log("cameraUploadLauncherReceiver: start service here");
+                JobUtil.startCameraUploadService(ManagerActivityLollipop.this);
+            } catch (Exception e) {
+                log("cameraUploadLauncherReceiver: Exception: " + e.getMessage() + "_" + e.getStackTrace());
+            }
+        }
+    };
 
 	private BroadcastReceiver receiverUpdatePosition = new BroadcastReceiver() {
 		@Override
@@ -1532,6 +1547,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 					onGetReadWritePermission();
 				}
+				break;
 			}
 	        case Constants.REQUEST_WRITE_STORAGE:{
 				log("REQUEST_WRITE_STORAGE PERMISSIONS");
@@ -1605,6 +1621,55 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 	        	break;
 	        }
+
+            case Constants.REQUEST_CAMERA_UPLOAD:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
+                    if(sttFLol != null){
+                        sttFLol.enableCameraUpload();
+                    }
+                } else {
+                    showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+                }
+
+                break;
+            }
+
+            case Constants.REQUEST_CAMERA_ON_OFF: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    cuFL = (CameraUploadFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                    if (cuFL != null) {
+                        cuFL.cameraOnOff();
+                    }
+                } else {
+                    showSnackBar(this,Constants.SNACKBAR_TYPE,getString(R.string.on_refuse_storage_permission),-1);
+                }
+                break;
+            }
+
+            case Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME:{
+                if(permissions.length == 0) {
+                    return;
+                }
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                    if(cuFL != null){
+                        cuFL.cameraOnOffFirstTime();
+                    }
+                } else {
+                    if(!ActivityCompat.shouldShowRequestPermissionRationale(this,permissions[0])){
+                        cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                        if(cuFL != null){
+                            cuFL.onStoragePermissionRefused();
+                        }
+                    } else {
+                        showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+                    }
+                }
+
+                break;
+            }
+
 			case PermissionsFragment.PERMISSIONS_FRAGMENT: {
 				pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
 				if (pF != null) {
@@ -1829,8 +1894,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			localBroadcastManager.registerReceiver(networkReceiver,
 					new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 		}
+        registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
-		nC = new NodeController(this);
+
+        nC = new NodeController(this);
 		cC = new ContactController(this);
 		aC = new AccountController(this);
 
@@ -1890,11 +1957,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    			openLink = true;
 		    		}
 		    		else if (newIntent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-						Intent cancelTourIntent = new Intent(this, LoginActivityLollipop.class);
-						cancelTourIntent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
-						cancelTourIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		    			cancelTourIntent.setAction(newIntent.getAction());
-		    			startActivity(cancelTourIntent);
+                        stopRunningCameraUploadService(getApplicationContext());
 		    			finish();
 		    			return;
 		    		}
@@ -2336,11 +2399,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						return;
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(getIntent().getAction());
-						startActivity(intent);
+                        stopRunningCameraUploadService(getApplicationContext());
 						finish();
 						return;
 					}
@@ -3481,51 +3540,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					String path = intent.getStringExtra("IMAGE_PATH");
 					log("onPostResume: Path of the avatar: "+path);
 					megaApi.setAvatar(path, this);
-				}
-    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-    				log("onPostResume: ACTION_CANCEL_CAM_SYNC");
-					String title = getString(R.string.cam_sync_syncing);
-					String text = getString(R.string.cam_sync_cancel_sync);
+				} else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+                    log("onPostResume: ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+                    String text = getString(R.string.cam_sync_cancel_sync);
 
-					Intent tempIntent = null;
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-						tempIntent = new Intent(this, CameraSyncService.class);
-						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-					}
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(text);
 
-					final Intent cancelIntent = tempIntent;
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//					builder.setTitle(title);
-					builder.setMessage(text);
-					builder.setPositiveButton(getString(R.string.cam_sync_stop),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-										startService(cancelIntent);
-									}
-									else {
-										if (megaApi != null) {
-											megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
-										}
-
-										if (dbH == null){
-											dbH = DatabaseHandler.getDbHandler(managerActivity);
-										}
-
-										dbH.setCamSyncEnabled(false);
-									}
-
-									Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
-									intent.setAction(SettingsFragmentLollipop.ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
-									intent.putExtra(SettingsFragmentLollipop.CAMERA_UPLOADS_STATUS, false);
-									LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-								}
-					});
-					builder.setNegativeButton(getString(R.string.general_cancel), null);
-					final AlertDialog dialog = builder.create();
-					try {
-						dialog.show();
-					} catch (Exception ex) { }
+                    builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    stopRunningCameraUploadService(ManagerActivityLollipop.this);
+                                    dbH.setCamSyncEnabled(false);
+                                }
+                            });
+                    builder.setNegativeButton(getString(R.string.general_cancel), null);
+                    final AlertDialog dialog = builder.create();
+                    try {
+                        dialog.show();
+                    } catch (Exception ex) {
+                        log(ex.toString());
+                    }
 				}
     			else if (intent.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
     				log("onPostResume: intent show transfers");
@@ -4322,6 +4357,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
+		unregisterReceiver(cameraUploadLauncherReceiver);
 
     	super.onDestroy();
 	}
@@ -13416,7 +13452,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
-			log("REQUEST_CODE_GET");
 			if (intent == null) {
 				log("Return.....");
 				return;
@@ -14352,7 +14387,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				uploadServiceIntent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, paths.size());
-
 				startService(uploadServiceIntent);
 			}
 		}
@@ -14668,6 +14702,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 */
 	private void checkStorageStatus(int newStorageState, boolean onCreate) {
         Intent intent = new Intent(this,UploadService.class);
+        MegaApplication app = (MegaApplication)getApplication();
         switch (newStorageState) {
             case MegaApiJava.STORAGE_STATE_GREEN:
                 log("STORAGE STATE GREEN");
@@ -14690,6 +14725,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						showProPanel();
 					}
 				}
+				storageState = newStorageState;
+                JobUtil.startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
@@ -14711,6 +14748,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				} else if (newStorageState > storageState) {
 					showStorageAlmostFullDialog();
 				}
+				storageState = newStorageState;
+                JobUtil.startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
@@ -14727,6 +14766,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 		}
 
+		app.setStorageState(storageState);
 		storageState = newStorageState;
 	}
 
@@ -15047,7 +15087,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			catch(Exception ex){}
 		}
-        ProgressDialogUtil.dissmisDialog();
+		ProgressDialogUtil.dissmisDialog();
 		long parentHandle = -1;
 		MegaNode parentNode = null;
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -15116,11 +15156,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
 		}
 		else {
-            Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
-            for (ShareInfo info : infos) {
-                if(info.isContact){
-                    requestContactsPermissions(info, parentNode);
-                }
+			Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
+			for (ShareInfo info : infos) {
+				if(info.isContact){
+					requestContactsPermissions(info, parentNode);
+				}
 				else{
 					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_began), -1);
 					Intent intent = new Intent(this, UploadService.class);
@@ -17192,7 +17232,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Pressed button positive to cancel transfer");
 						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-
+                        JobUtil.stopRunningCameraUploadService(ManagerActivityLollipop.this);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -17259,6 +17299,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
+
+		//workaround - can not get folder transfer children detail except using global listener
+        if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
+            Intent intent = new Intent(this,UploadService.class);
+            if (e.getErrorCode() == MegaError.API_OK) {
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_OK);
+                startService(intent);
+            }else{
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_FAILED);
+                startService(intent);
+            }
+        }
 
         //workaround - can not get folder transfer children detail except using global listener
         if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
@@ -18584,7 +18636,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}else{
-			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
+			if(n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)){
 				if (prefs != null){
 					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
 				}
