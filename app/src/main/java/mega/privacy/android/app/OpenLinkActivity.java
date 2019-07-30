@@ -424,10 +424,9 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		// Browser open the link which does not require app to handle
 		log("Browser open link: " + url);
-		Intent openBlogIntent = new Intent(this, WebViewActivityLollipop.class);
-		openBlogIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		openBlogIntent.setData(Uri.parse(url));
-		startActivity(openBlogIntent);
+		Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
+		openIntent.setData(Uri.parse(url));
+		startActivity(openIntent);
 		finish();
 	}
 
