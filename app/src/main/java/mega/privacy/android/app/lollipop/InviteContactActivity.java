@@ -117,6 +117,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     private List<ContactsUtil.LocalContact> rawLocalContacts;
     private String contactLink;
     private DatabaseHandler dbH;
+    private ArrayList<String> contactsEmailsSelected, contactsPhoneSelected;
 
     //work around for android bug - https://issuetracker.google.com/issues/37007605#c10
     class LinearLayoutManagerWrapper extends LinearLayoutManager {
@@ -159,6 +160,8 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         filteredContacts = new ArrayList<>();
         totalContacts = new ArrayList<>();
         megaContacts = new ArrayList<>();
+        contactsEmailsSelected = new ArrayList<>();
+        contactsPhoneSelected = new ArrayList<>();
 
         megaContactGetter = new MegaContactGetter(context);
         megaContactGetter.setMegaContactUpdater(InviteContactActivity.this);
@@ -919,8 +922,9 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         log("inviteContacts");
 
         // Email/phone contacts to be invited
-        ArrayList<String> contactsEmailsSelected = new ArrayList<>();
-        ArrayList<String> contactsPhoneSelected = new ArrayList<>();
+
+        contactsEmailsSelected = new ArrayList<>();
+        contactsPhoneSelected = new ArrayList<>();
 
         if (addedContacts != null) {
             for (InvitationContactInfo contact : addedContacts) {
@@ -933,13 +937,13 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
             }
         }
 
-        if (contactsPhoneSelected.size() > 0) {
-            invitePhoneContacts(contactsPhoneSelected);
-        }
-
         if (contactsEmailsSelected.size() > 0) {
+            //phone contact will be invited once email done
             inviteEmailContacts(contactsEmailsSelected);
-        } else {
+        }else if(contactsPhoneSelected.size() > 0){
+            invitePhoneContacts(contactsPhoneSelected);
+            finish();
+        }else {
             finish();
         }
     }
@@ -983,7 +987,6 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
                 log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
             }
             if (numberSent + numberNotSent == numberToSend) {
-                enableFabButton(true);
                 if (numberToSend == 1) {
                     if (numberSent == 1) {
                         showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
@@ -1003,13 +1006,15 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
                     @Override
                     public void run() {
+                        if (contactsPhoneSelected.size() > 0) {
+                            invitePhoneContacts(contactsPhoneSelected);
+                        }
                         setResult(Activity.RESULT_OK);
                         finish();
                     }
                 }, 2000);
             }
         }
-
     }
 
     @Override
