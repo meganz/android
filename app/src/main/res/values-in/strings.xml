@@ -2308,7 +2308,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Aktifkan kamera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Untuk memindai dokumen, ambil gambar dan buat panggilan video memungkinkan akses ke kamera Anda.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Aktifkan panggilan</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Untuk membuat panggilan terenkripsi memungkinkan akses ke mikrofon Anda.</string>
     <string name="general_enable_access" context="General enable access">Aktifkan akses</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>

@@ -2308,7 +2308,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">カメラを有効にする</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">あなたのカメラへのアクセスを許可して、ドキュメントのスキャン、写真の撮影、ビデオ通話を行います。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">通話を有効にする</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">あなたのマイクへのアクセスを許可して、暗号化通話を行います。</string>
     <string name="general_enable_access" context="General enable access">アクセスを有効にする</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">共有ファイル</string>

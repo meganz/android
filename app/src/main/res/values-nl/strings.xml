@@ -2308,7 +2308,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Camera inschakelen</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Bied toegang tot uw camera om documenten te scannen, foto\'s te nemen en video-oproepen te maken.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Oproepen inschakelen</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Bied toegang tot uw microfoon om gecodeerde oproepen te maken.</string>
     <string name="general_enable_access" context="General enable access">Toegang inschakelen</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Gedeelde Bestanden</string>

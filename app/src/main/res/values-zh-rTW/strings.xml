@@ -2308,7 +2308,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">啟用相機</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">允許存取相機以掃描文件、拍照與進行視訊通話。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">啟用通話</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">允許存取麥克風以進行加密通話。</string>
     <string name="general_enable_access" context="General enable access">啟用存取權限</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">共享檔案</string>

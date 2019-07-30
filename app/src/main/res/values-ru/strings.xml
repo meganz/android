@@ -2308,7 +2308,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Разрешить доступ к камере</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Разрешите доступ к камере для сканирования документов, фотографирования и видеозвонков.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Разрешить звонки</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Разрешите доступ к микрофону для зашифрованных звонков.</string>
     <string name="general_enable_access" context="General enable access">Открыть доступ</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Общие файлы</string>

@@ -2282,7 +2282,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Kamerayı etkinleştir</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Belgeleri taramak, fotoğraf çekmek ve video görüşmeleri yapmak için kameranıza erişim izni verir.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Çağrıları etkinleştir</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Şifreli arama yapmak için mikrofonunuza erişim izni verin.</string>
     <string name="general_enable_access" context="General enable access">Erişimi etkinleştir</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Paylaşılan Dosyalar</string>

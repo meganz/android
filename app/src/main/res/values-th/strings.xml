@@ -2308,7 +2308,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">เปิดใช้งานกล้อง</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">อนุญาตให้เข้าถึงกล้องของคุณเพื่อสแกนเอกสาร ถ่ายภาพและสนทนาทางวิดีโอ</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">เปิดใช้งานการโทร</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">อนุญาตให้เข้าถึงไมโครโฟนของคุณ เพื่อให้โทรแบบเข้ารหัสได้</string>
     <string name="general_enable_access" context="General enable access">เปิดใช้งานการเข้าถึง</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">ไฟล์ที่ใช้ร่วมกัน</string>
