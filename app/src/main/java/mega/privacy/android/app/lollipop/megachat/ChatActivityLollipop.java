@@ -8038,7 +8038,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 long callerHandle = call.getCaller();
                 String textLayout;
-                if (callerHandle != -1) {
+                if (callerHandle != -1 && getPeerFullName(callerHandle) != null) {
                     textLayout = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
                 } else {
                     textLayout = getString(R.string.join_call_layout);
