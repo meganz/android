@@ -1848,20 +1848,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 	}
 
-
-	public void checkAudioManager() {
-		if (audioManager != null) return;
-		audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-	}
-
-	public void setAudioManagerValues(int streamType, int direction, int flags) {
-		log("setAudioManagerValues");
-		checkAudioManager();
-		if (audioManager == null) return;
-
-		audioManager.adjustStreamVolume(streamType, direction, flags);
-		if (streamType == AudioManager.STREAM_RING) {
+	public void audioManagerStatus(MegaChatCall call) {
+		int callStatus = call.getStatus();
+		if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+			log("audioManagerStatus:REQUEST_SENT");
+			outgoingCallSound();
+			setAudioManagerValues(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME, AudioManager.FLAG_VIBRATE);
+		} else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+			log("audioManagerStatus:RING_IN");
 			updateRingingStatus();
 		}
 	}
@@ -1882,35 +1876,27 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		thePlayer.start();
 	}
 
-	private void startIncomingCallVibration() {
-		if (vibrator != null) return;
-		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-		if (vibrator == null || !vibrator.hasVibrator()) return;
-		log("startIncomingCallVibration");
-		long[] pattern = {0, 1000, 500, 500, 1000};
-		vibrator.vibrate(pattern, 0);
+	public void checkAudioManager() {
+		if (audioManager != null) return;
+		audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 	}
 
-	private void stopIncomingCallVibration() {
-		if (vibrator == null || !vibrator.hasVibrator()) return;
-		log("stopIncomingCallVibration");
-		vibrator.cancel();
-	}
-
-	private void incomingCallSound() {
-		if (ringtone != null && ringerTimer != null) return;
-		log("incomingCallSound");
-		ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
-		ringerTimer = new Timer();
-		MyRingerTask myRingerTask = new MyRingerTask();
-		ringerTimer.schedule(myRingerTask, 0, 500);
+	public void setAudioManagerValues(int streamType, int direction, int flags) {
+		log("setAudioManagerValues");
+		checkAudioManager();
+		if (audioManager == null) return;
+		audioManager.adjustStreamVolume(streamType, direction, flags);
+		if (streamType == AudioManager.STREAM_RING) {
+			updateRingingStatus();
+		}
 	}
 
 	private void updateRingingStatus() {
-		incomingCallSound();
+		log("updateRingingStatus");
 		checkAudioManager();
 		if (audioManager == null) return;
 
+		incomingCallSound();
 		if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT) {
 			stopIncomingCallVibration();
 			return;
@@ -1925,31 +1911,32 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		startIncomingCallVibration();
 	}
 
-	public void audioManagerStatus(MegaChatCall call) {
-		log("audioManagerStatus");
-		int callStatus = call.getStatus();
-		if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-			log("audioManagerStatus:REQUEST_SENT");
-			outgoingCallSound();
-			setAudioManagerValues(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME, AudioManager.FLAG_VIBRATE);
-		} else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-			log("audioManagerStatus:RING_IN");
-			updateRingingStatus();
-		}
+	private void incomingCallSound() {
+		if (ringtone != null && ringerTimer != null) return;
+		log("incomingCallSound");
+		ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+		ringerTimer = new Timer();
+		MyRingerTask myRingerTask = new MyRingerTask();
+		ringerTimer.schedule(myRingerTask, 0, 500);
 	}
 
-	private class MyRingerTask extends TimerTask {
-		@Override
-		public void run() {
-			if (ringtone != null && !ringtone.isPlaying()) {
-				ringtone.play();
-			}
-		}
+	private void stopIncomingCallVibration() {
+		if (vibrator == null || !vibrator.hasVibrator()) return;
+		log("stopIncomingCallVibration");
+		vibrator.cancel();
+	}
+
+	private void startIncomingCallVibration() {
+		if (vibrator != null) return;
+		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+		if (vibrator == null || !vibrator.hasVibrator()) return;
+		log("startIncomingCallVibration");
+		long[] pattern = {0, 1000, 500, 500, 1000};
+		vibrator.vibrate(pattern, 0);
 	}
 
 	private void stopAudioSignals() {
 		log("stopAudioSignals");
-
 		try {
 			if (thePlayer != null) {
 				thePlayer.stop();
@@ -1986,6 +1973,15 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		vibrator = null;
 		ringtone = null;
 		ringerTimer = null;
+	}
+
+	private class MyRingerTask extends TimerTask {
+		@Override
+		public void run() {
+			if (ringtone != null && !ringtone.isPlaying()) {
+				ringtone.play();
+			}
+		}
 	}
 
 
