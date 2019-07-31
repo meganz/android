@@ -9,6 +9,8 @@ public class Constants {
     public static final String PIN_ALPHANUMERIC = "alphanumeric";
 
     public static final int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
+    public static final int PHOTOS_UPLOAD_JOB_ID = 10096;
+    public static final int BOOT_JOB_ID = 10097;
 
     public static final int REQUEST_CODE_GET = 1000;
     public static final int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
@@ -133,8 +135,10 @@ public class Constants {
 
     public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
     public static final int REQUEST_READ_WRITE_STORAGE = 9;
-
-    public static final int WRITE_LOG = 10;
+    public static final int REQUEST_CAMERA_UPLOAD = 10;
+    public static final int REQUEST_CAMERA_ON_OFF = 11;
+    public static final int REQUEST_CAMERA_ON_OFF_FIRST_TIME = 12;
+	public static final int WRITE_LOG = 13;
 
     public static final int RECORD_VOICE_CLIP = 11;
     public static final int REQUEST_STORAGE_VOICE_CLIP = 12;
@@ -195,6 +199,7 @@ public class Constants {
     public static final String ACTION_SHOW_SETTINGS = "ACTION_SHOW_SETTINGS";
     public static final String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
     public static final String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
+    public static final String ACTION_LOG_OUT = "ACTION_LOG_OUT";
 
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
     public static final String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
