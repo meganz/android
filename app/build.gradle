@@ -69,7 +69,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:16.0.5'
     implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.vdurmont:emoji-java:4.0.0'
-    implementation 'com.google.android.exoplayer:exoplayer:2.6.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.8.0'
     implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation "com.squareup.picasso:picasso:2.5.2"

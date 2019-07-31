@@ -1136,7 +1136,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
             player.addListener(new Player.EventListener() {
                 @Override
-                public void onTimelineChanged(Timeline timeline, Object manifest) {
+                public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
                     log("playerListener: onTimelineChanged");
                     updateContainers();
                     enableNextButton();
