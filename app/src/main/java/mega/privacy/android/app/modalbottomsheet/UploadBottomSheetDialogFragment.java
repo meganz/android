@@ -217,7 +217,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         intent.setClass(context,FileStorageActivityLollipop.class);
         if (fromSDCard) {
             File[] fs = context.getExternalFilesDirs(null);
-            String sdRoot = Util.getSDCardRoot(fs[1]);
+            String sdRoot = Util.getSDCardRoot(fs[1].getAbsolutePath());
             intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
         }
 

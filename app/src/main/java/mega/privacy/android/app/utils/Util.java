@@ -241,11 +241,10 @@ public class Util {
 		}
 	}
 
-    public static String getSDCardRoot(File sd) {
-        String s = sd.getPath();
+    public static String getSDCardRoot(String path) {
         int i = 0,x = 0;
-        for(; x < s.toCharArray().length;x++) {
-            char c = s.toCharArray()[x];
+        for(; x < path.toCharArray().length;x++) {
+            char c = path.toCharArray()[x];
             if(c == '/') {
                 i++;
             }
@@ -253,7 +252,7 @@ public class Util {
                 break;
             }
         }
-        return s.substring(0,x);
+        return path.substring(0,x);
     }
 
 	public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity){

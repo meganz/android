@@ -26,7 +26,7 @@ public class SDCardOperator {
 
     private String sdCardRoot;
 
-    private DocumentFile root;
+    private DocumentFile targetRoot;
 
     private DatabaseHandler dbh;
 
@@ -63,6 +63,18 @@ public class SDCardOperator {
         return sdCardRoot;
     }
 
+    public boolean isSDCardPath(String path) {
+        return path.contains(sdCardRoot);
+    }
+
+    public boolean canWriteWithFile() {
+        return new File(sdCardRoot).canWrite();
+    }
+
+    public boolean canWriteWithDocumentFile() {
+        return false;
+    }
+
     public void move(DocumentFile target, File source) throws IOException {
         String parent = source.getParent();
         if (downloadRoot.equals(parent)) {
@@ -75,7 +87,7 @@ public class SDCardOperator {
         }
     }
 
-    public static void buildFileStructure(DocumentFile parent, MegaApiJava api, MegaNode node) {
+    public void buildFileStructure(DocumentFile parent, MegaApiJava api, MegaNode node) {
         TL.log("buildFileStructure", "@#@", node.getName());
         if (node.isFolder()) {
             parent = createFolder(parent, node.getName());
@@ -108,7 +120,7 @@ public class SDCardOperator {
     }
 
 
-    public static DocumentFile createFolder(DocumentFile parent, String name) {
+    public DocumentFile createFolder(DocumentFile parent, String name) {
         DocumentFile folder = parent.findFile(name);
         if (folder != null) {
             return folder;
@@ -149,7 +161,7 @@ public class SDCardOperator {
         }
     }
 
-    public static List<String> getSubFolders(String root, String parent) {
+    public List<String> getSubFolders(String root, String parent) {
         if (parent.length() < root.length()) {
             throw new IllegalArgumentException("no subfolders!");
         }

@@ -16,6 +16,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -30,6 +32,7 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.preference.SwitchPreferenceCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +48,6 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.components.dragger.ReturnOriginViewAnimator;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -61,6 +63,7 @@ import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -264,6 +267,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	boolean autoAccept = true;
 	
 	DatabaseHandler dbH;
+	private SDCardOperator sdCardOperator;
 	
 	MegaPreferences prefs;
 	ChatSettings chatSettings;
@@ -308,8 +312,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
 		chatSettings = dbH.getChatSettings();
-		
-		super.onCreate(savedInstanceState);
+        try {
+            sdCardOperator = new SDCardOperator(context);
+        } catch (SDCardOperator.SDCardException e) {
+            e.printStackTrace();
+        }
+        super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -1417,6 +1425,11 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            try {
+                sdCardOperator = new SDCardOperator(context);
+            } catch (SDCardOperator.SDCardException e) {
+                e.printStackTrace();
+            }
             log("read and write to external storage have granted.");
             if (requestCode == STORAGE_DOWNLOAD_LOCATION_INTERNAL_SD_CARD) {
                 toSelectFolder();
@@ -1427,6 +1440,35 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         } else {
             Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.no_read_and_write_permissions), -1);
         }
+    }
+
+    private void requestSDCardPermission(String sdCardRoot) {
+        Intent intent = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            StorageManager sm = context.getSystemService(StorageManager.class);
+            if(sm != null) {
+                StorageVolume volume = sm.getStorageVolume(new File(sdCardRoot));
+                if (volume != null) {
+                    intent = volume.createAccessIntent(null);
+                }
+            }
+        }
+
+        if (intent == null) {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        }
+        startActivityForResult(intent, Constants.REQUEST_CODE_TREE);
+    }
+
+    private void onCannotWriteOnSDCard() {
+        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.donot_support_write_on_sdcard), -1);
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                toSelectFolder();
+            }
+        }, 2000);
     }
 
     private void toSelectFolder() {
@@ -1468,32 +1510,29 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                     }
                     case 1: {
                         log("get External Files");
-                        File[] fs = context.getExternalFilesDirs(null);
-                        if (fs.length > 1) {
-                            log("more than one");
-                            if (fs[1] != null) {
-                                log("external not NULL");
-                                String sdRoot = Util.getSDCardRoot(fs[1]);
-                                //some devices don't allow app to write on SD card, for example, HUAWE LDN-LX2(OS 8.0).
-                                if (new File(sdRoot).canWrite()) {
-                                    toSelectFolder(sdRoot);
+                        if (sdCardOperator != null) {
+                            String sdCardRoot = sdCardOperator.getSDCardRoot();
+                            if(sdCardOperator.canWriteWithFile()) {
+                                toSelectFolder(sdCardRoot);
+                            } else {
+                                if (prefs == null) {
+                                    prefs = dbH.getPreferences();
+                                }
+                                String uriString = prefs.getUriExternalSDCard();
+                                if (TextUtils.isEmpty(uriString)) {
+                                    requestSDCardPermission(sdCardRoot);
                                 } else {
-                                    log("device doesn't allow to access SD card except this folder.");
-                                    //fix the default download location on the folder which always has the write permission.
-                                    Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.donot_support_write_on_sdcard), -1);
-                                    String path = fs[1].getAbsolutePath();
-                                    dbH.setStorageDownloadLocation(path);
-                                    if (downloadLocation != null) {
-                                        downloadLocation.setSummary(path);
-                                    }
-                                    if (downloadLocationPreference != null) {
-                                        downloadLocationPreference.setSummary(path);
+                                    Uri uri = Uri.parse(uriString);
+                                    DocumentFile root = DocumentFile.fromTreeUri(context, uri);
+                                    if (root.canWrite()) {
+                                        toSelectFolder(sdCardRoot);
+                                    } else {
+                                        requestSDCardPermission(sdCardRoot);
                                     }
                                 }
-                            } else {
-                                log("external NULL -- intent to FileStorageActivityLollipop");
-                                toSelectFolder();
                             }
+                        } else {
+                            onCannotWriteOnSDCard();
                         }
                         break;
                     }
@@ -2361,6 +2400,25 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				log("Set PIN ERROR");
 			}
 		}
+        else if (requestCode == Constants.REQUEST_CODE_TREE && resultCode == Activity.RESULT_OK){
+            if (intent == null){
+                log("intent NULL");
+                return;
+            }
+            Uri treeUri = intent.getData();
+            if(treeUri != null) {
+                DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
+                if(pickedDir.canWrite()) {
+                    log("sd card root uri is " + treeUri);
+                    if(sdCardOperator != null) {
+                        dbH.setUriExternalSDCard(treeUri.toString());
+                        toSelectFolder(sdCardOperator.getSDCardRoot());
+                    } else {
+                        onCannotWriteOnSDCard();
+                    }
+                }
+            }
+        }
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_CANCELED && intent != null){
 			log("REQUEST_DOWNLOAD_FOLDER - canceled");
 		}

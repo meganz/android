@@ -299,13 +299,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		newFolderMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
 		
 		if (mode == Mode.PICK_FOLDER) {
-			boolean writable = path.canWrite();
-			button.setEnabled(writable);
-			if (writable) {				
-				newFolderMenuItem.setVisible(true);
-			} else {
-				newFolderMenuItem.setVisible(false);
-			}
+            newFolderMenuItem.setVisible(true);
 		}
 		else{
 			newFolderMenuItem.setVisible(false);
@@ -320,13 +314,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if (mode == Mode.PICK_FOLDER) {
 			menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-			boolean writable = path.canWrite();
-			button.setEnabled(writable);
-			if (writable) {				
-				newFolderMenuItem.setVisible(true);
-			} else {
-				newFolderMenuItem.setVisible(false);
-			}
+            newFolderMenuItem.setVisible(true);
 		}else{
 			newFolderMenuItem.setVisible(false);
 			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
@@ -568,11 +556,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		contentText.setText(Util.makeBold(path.getAbsolutePath(), path.getName()));
 //		windowTitle.setText(Util.makeBold(path.getAbsolutePath(), path.getName()));
 		invalidateOptionsMenu();
-		if (mode == Mode.PICK_FOLDER) {
-			boolean writable = newPath.canWrite();
-			button.setEnabled(writable);
-		}
-		else if (mode == Mode.PICK_FILE) {
+        if (mode == Mode.PICK_FILE) {
 			clearSelections();
 		}
 	}

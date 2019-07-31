@@ -1660,7 +1660,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Advanced options</string>
     <string name="no_read_and_write_permissions" context="Message to show when users deny to permit the permissions to read and write on external storage">No read and write on external storage permissions granted</string>
-    <string name="donot_support_write_on_sdcard" context="Some devices don't allow MEGA to write on SD card except one certain directory(package storage space)">Your device only allows MEGA to access this directory on your SD card as the default download location.</string>
+    <string name="donot_support_write_on_sdcard" context="Some devices don't allow MEGA to write on SD card">Your device only allows MEGA to access the internal storage.</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">No contact permissions granted</string>
 

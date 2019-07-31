@@ -24,7 +24,6 @@ public class Constants {
 	public static int WRITE_SD_CARD_REQUEST_CODE = 1011;
 	public static int REQUEST_CODE_SELECT_FILE = 1012;
 	public static int SET_PIN = 1013;
-	public static int REQUEST_CODE_TREE = 1014;
 	public static int TAKE_PICTURE_PROFILE_CODE = 1015;
 	public static int CHOOSE_PICTURE_PROFILE_CODE = 1016;
 	public static int REQUEST_INVITE_CONTACT_FROM_DEVICE = 1017;
@@ -40,7 +39,7 @@ public class Constants {
 	public static int REQUEST_CODE_FILE_INFO = 1027;
 	public static int REQUEST_CODE_REFRESH_STAGING = 1028;
 	public static int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
-
+    public static int REQUEST_CODE_TREE = REQUEST_CODE_DELETE_VERSIONS_HISTORY + 1;
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
