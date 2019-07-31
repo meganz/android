@@ -8,6 +8,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
 
@@ -34,15 +35,17 @@ public class WebViewActivityLollipop extends Activity {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                progressDialog.show();
                 view.loadUrl(url);
-
                 return true;
             }
 
             @Override
             public void onPageFinished(WebView view, final String url) {
-                progressDialog.dismiss();
+                // Blog pages currently not support mobile website, which would trigger redirecting to mega.nz
+                // We could remove this condition after blog page support mobile web page
+                if (!Util.matchRegexs(url, Constants.MEGA_BLOG_LINK_REGEXS)) {
+                    progressDialog.dismiss();
+                }
             }
         });
 

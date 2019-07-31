@@ -444,4 +444,20 @@ public class Constants {
 			"^https://mega\\.co\\.nz/megadrop/.+$",
 			"^https://mega\\.nz/megadrop/.+$"
 	};
+
+	public static final String[] MEGA_BLOG_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#blog",
+			"^https://mega\\.nz/#blog",
+			"^https://mega\\.nz/blog",
+			"^https://mega\\.co\\.nz/#blog.+$",
+			"^https://mega\\.nz/#blog.+$",
+			"^https://mega\\.nz/blog.+$"
+	};
+
+	public static final String[] REVERT_CHANGE_PASSWORD_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#pwr.+$",
+			"^https://mega\\.co\\.nz/pwr.+$",
+			"^https://mega\\.nz/#pwr.+$",
+			"^https://mega\\.nz/pwr.+$"
+	};
 }

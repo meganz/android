@@ -30,6 +30,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.Util.matchRegexs;
+
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
 
@@ -383,6 +385,15 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			return;
 		}
 
+		if (matchRegexs(url, Constants.REVERT_CHANGE_PASSWORD_LINK_REGEXS)) {
+			log("Open revert password change link: " + url);
+			Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
+			openIntent.setData(Uri.parse(url));
+			startActivity(openIntent);
+			finish();
+			return;
+		}
+
 		if (matchRegexs(url, Constants.HANDLE_LINK_REGEXS)) {
 			log("handle link url");
 
@@ -594,18 +605,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		errorText.setText(string);
 		errorText.setVisibility(View.VISIBLE);
 		containerOkButton.setVisibility(View.VISIBLE);
-	}
-
-	private boolean matchRegexs(String url, String[] regexs) {
-		if (url == null) {
-			return false;
-		}
-		for (String regex : regexs) {
-			if (url.matches(regex)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override
