@@ -50,8 +50,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
+import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
@@ -65,7 +67,7 @@ import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 
-public class RecentChatsFragmentLollipop extends Fragment implements View.OnClickListener {
+public class RecentChatsFragmentLollipop extends RotatableFragment implements View.OnClickListener {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
@@ -120,12 +122,22 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         Util.log("RecentChatsFragmentLollipop", log);
     }
 
+    @Override
+    protected RotatableAdapter getAdapter() {
+        return adapterList;
+    }
+
     public void activateActionMode() {
         log("activateActionMode");
         if (!adapterList.isMultipleSelect()) {
             adapterList.setMultipleSelect(true);
             actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
         }
+    }
+
+    @Override
+    public void multipleItemClick(int position) {
+        adapterList.toggleSelection(position);
     }
 
     @Override
@@ -707,7 +719,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
-    private void updateActionModeTitle() {
+    @Override
+    protected void updateActionModeTitle() {
         if (actionMode == null || getActivity() == null) {
             return;
         }

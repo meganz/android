@@ -46,6 +46,7 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
@@ -73,7 +74,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 
-public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
+public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
 	public static final int ITEM_VIEW_TYPE_NORMAL = 0;
 	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 1;
@@ -232,6 +233,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 				((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				((ViewHolderNormalChatList)holder).contactStateIcon.setVisibility(View.VISIBLE);
+
+				if (outMetrics == null) {
+					Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+					outMetrics = new DisplayMetrics ();
+					display.getMetrics(outMetrics);
+				}
 
 				((ViewHolderNormalChatList)holder).contactStateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
 				((ViewHolderNormalChatList)holder).contactStateIcon.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
@@ -874,11 +881,26 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 
 	public List<Integer> getSelectedItems() {
-		List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-		for (int i = 0; i < selectedItems.size(); i++) {
-			items.add(selectedItems.keyAt(i));
+		if (selectedItems != null) {
+			log("get SelectedItems");
+			List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+			for (int i = 0; i < selectedItems.size(); i++) {
+				items.add(selectedItems.keyAt(i));
+			}
+			return items;
+		} else {
+			return null;
 		}
-		return items;
+	}
+
+	@Override
+	public int getFolderCount() {
+		return 0;
+	}
+
+	@Override
+	public int getPlaceholderCount() {
+		return 0;
 	}
 
 	/*

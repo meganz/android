@@ -57,7 +57,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
+public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -135,6 +135,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView fileGridSelected;
     }
 
+    @Override
     public int getPlaceholderCount() {
         return placeholderCount;
     }
@@ -318,12 +319,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         return selectedItems.size();
     }
 
+    @Override
     public List<Integer> getSelectedItems() {
-        List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-        for (int i = 0;i < selectedItems.size();i++) {
-            items.add(selectedItems.keyAt(i));
+        if (selectedItems != null) {
+            List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+            for (int i = 0; i < selectedItems.size(); i++) {
+                items.add(selectedItems.keyAt(i));
+            }
+            return items;
+        } else {
+            return null;
         }
-        return items;
     }
 
     /*
@@ -357,14 +363,18 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         return nodes;
     }
 
-    /**
-     * In grid view.
-     * For folder count is odd. Insert null element as placeholder.
-     *
-     * @param nodes Origin nodes to show.
-     * @return Nodes list with placeholder.
+    /*
+     * The method to return how many folders in this adapter
      */
-    private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
+    @Override
+    public int getFolderCount() {
+        return getFolderCount(nodes);
+    }
+
+    /*
+     * The method to calculate how many nodes are folders in array list
+     */
+    public int getFolderCount(ArrayList<MegaNode> nodes) {
         int folderCount = 0;
         for (MegaNode node : nodes) {
             if (node == null) {
@@ -374,6 +384,18 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 folderCount++;
             }
         }
+        return folderCount;
+    }
+
+    /**
+     * In grid view.
+     * For folder count is odd. Insert null element as placeholder.
+     *
+     * @param nodes Origin nodes to show.
+     * @return Nodes list with placeholder.
+     */
+    private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
+        int folderCount = getFolderCount(nodes);
         int spanCount = 2;
         if (listFragment instanceof NewGridRecyclerView) {
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
