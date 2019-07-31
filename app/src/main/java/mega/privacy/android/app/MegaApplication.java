@@ -35,7 +35,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import org.webrtc.AndroidVideoTrackSourceObserver;
@@ -58,7 +57,6 @@ import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -101,6 +99,8 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static mega.privacy.android.app.utils.Util.toCDATA;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
+
 
 
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
@@ -434,27 +434,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-			long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
-
-			JobScheduler mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-
-			JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1, new ComponentName(this, CameraUploadsService.class));
-			//			jobInfoBuilder.setMinimumLatency(15000);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-				jobInfoBuilder.setPeriodic(schedulerInterval);
-			}
-
-			if (mJobScheduler != null) {
-				int result = mJobScheduler.schedule(jobInfoBuilder.build());
-				if (result == JobScheduler.RESULT_SUCCESS) {
-					log("CameraUploadsService: Job scheduled SUCCESS");
-				} else {
-					log("CameraUploadsService: Job scheduled FAILED");
-				}
-			}
-		}
+        scheduleCameraUploadJob(getApplicationContext());
 
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
@@ -2143,8 +2123,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		hashMapCallLayout.put(chatId, callLayoutStatus);
 	}
 
-	public int getStorageState() { return storageState; }
-    
+	public int getStorageState() {
+	    return storageState;
+	}
+
+    public void setStorageState(int state) {
+	    this.storageState = state;
+	}
+
     @Override
     public void unregisterReceiver(BroadcastReceiver receiver) {
         super.unregisterReceiver(receiver);
