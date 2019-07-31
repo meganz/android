@@ -14,6 +14,7 @@ import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -78,6 +79,10 @@ import static mega.privacy.android.app.utils.Util.context;
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
     private static final String OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "overquotanotification";
+    private static final String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
+    private static final String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
+    private static final String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
+    private static final int LOW_BATTERY_LEVEL = 20;
     public static String PHOTO_SYNC = "PhotoSync";
     public static String CAMERA_UPLOADS = "Camera Uploads";
     public static String SECONDARY_UPLOADS = "Media Uploads";
@@ -86,9 +91,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static String ACTION_LOGOUT = "LOGOUT_SYNC";
     public static String ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER = "PHOTOS_VIDEOS_NEW_FOLDER";
     public static String CU_CACHE_FOLDER = "cu";
-    private String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
-    private String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
-    private String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
     public static int PAGE_SIZE = 200;
     public static int PAGE_SIZE_VIDEO = 10;
     public static boolean isServiceRunning = false;
@@ -166,7 +168,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private String tempRoot;
     private Context mContext;
     private VideoCompressor mVideoCompressor;
-    
+
     private BroadcastReceiver chargingStopReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context,Intent intent) {
@@ -176,10 +178,28 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
         }
     };
+
+    private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+
+            log("device batter level is " + level);
+            if(level < LOW_BATTERY_LEVEL && !Util.isCharging(CameraUploadsService.this)){
+                stopped = true;
+                if(megaApi != null){
+                    megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,CameraUploadsService.this);
+                }
+                cancelNotification();
+                finish();
+            }
+        }
+    };
     
     @Override
     public void onCreate() {
         registerReceiver(chargingStopReceiver,new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
+        registerReceiver(batteryInfoReceiver,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
     @Override
@@ -192,6 +212,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         if(chargingStopReceiver != null) {
             unregisterReceiver(chargingStopReceiver);
+        }
+        if(batteryInfoReceiver != null){
+            unregisterReceiver(batteryInfoReceiver);
         }
     }
     
