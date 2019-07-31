@@ -3,9 +3,11 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -23,6 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -233,6 +236,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     boolean notChangePage = false;
     MegaNode currentDocument;
 
+    private BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                finish();
+            }
+        }
+    };
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -240,6 +252,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         super.onCreate(savedInstanceState);
 
         pdfViewerActivityLollipop = this;
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         final Intent intent = getIntent();
         if (intent == null){
@@ -2890,6 +2904,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
 
         super.onDestroy();
     }
