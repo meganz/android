@@ -34,6 +34,7 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -1484,6 +1485,13 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (isOverQuota) {
             return;
         }
+
+        if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
+            String size = Util.getSizeString(transfer.getTotalBytes());
+            AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
+            dbH.setCompletedTransfer(completedTransfer);
+        }
+
         if (e.getErrorCode() == MegaError.API_OK) {
             log("Image Sync OK: " + transfer.getFileName() + " IMAGESYNCFILE: " + path);
             MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
