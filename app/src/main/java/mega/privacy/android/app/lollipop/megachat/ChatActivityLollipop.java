@@ -3262,7 +3262,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 break;
             }
-            case R.id.toolbar_maps:{
+            case R.id.toolbar_chat:{
                 log("onClick:toolbar_chat");
                 if(recordView.isRecordingNow()) break;
 
