@@ -11335,19 +11335,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void takePictureAndUpload() {
 		fromTakePicture = Constants.TAKE_PICTURE_OPTION;
-		if (checkPermission(Manifest.permission.CAMERA)) {
-			ActivityCompat.requestPermissions(this,
-					new String[]{Manifest.permission.CAMERA},
-					Constants.REQUEST_CAMERA);
+		if (!Util.checkPermission(Manifest.permission.CAMERA, this)) {
+			Util.requestPermission(this, Manifest.permission.CAMERA, Constants.REQUEST_CAMERA);
 			return;
 		}
-		if (checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			ActivityCompat.requestPermissions(this,
-					new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-					Constants.REQUEST_WRITE_STORAGE);
+		if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
+			Util.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, Constants.REQUEST_WRITE_STORAGE);
 			return;
 		}
-		takePicture();
+		Util.takePicture(this);
 	}
 
 	@Override
@@ -14009,6 +14005,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				try {
 					sttFLol.update2FAVisibility();
 				}catch (Exception e){}
+			}
+		}
+		else if (requestCode == Constants.TAKE_PHOTO_CODE) {
+			log("TAKE_PHOTO_CODE");
+			if (resultCode == Activity.RESULT_OK) {
+				long parentHandleUpload = -1;
+
+				if (drawerItem == DrawerItem.SHARED_ITEMS) {
+					switch (viewPagerShares.getCurrentItem()) {
+						case 0: {
+							parentHandleUpload = parentHandleIncoming;
+							break;
+						}
+						case 1: {
+							parentHandleUpload = parentHandleOutgoing;
+							break;
+						}
+					}
+				} else {
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+					if (fbFLol != null && parentHandleBrowser != -1) {
+						parentHandleUpload = parentHandleBrowser;
+					}
+				}
+				UploadUtil.uploadTakePicture(this, parentHandleUpload, megaApi);
+			} else {
+				log("TAKE_PHOTO_CODE--->ERROR!");
 			}
 		}
 		else if (requestCode == Constants.TAKE_PICTURE_PROFILE_CODE){
