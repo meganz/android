@@ -289,6 +289,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public void clearSelections() {
         log("clearSelections");
+        if(nodes == null){
+            return;
+        }
         for (int i = 0;i < nodes.size();i++) {
             if (isItemChecked(i)) {
                 //Exlude placeholder.
