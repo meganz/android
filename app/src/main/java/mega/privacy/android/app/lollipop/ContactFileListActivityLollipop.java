@@ -60,6 +60,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
@@ -84,7 +85,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 
-public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight {
+public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight, UploadBottomSheetDialogActionListener {
 
 	FrameLayout fragmentContainer;
     
@@ -185,7 +186,36 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		return true;
 	}
 
-	public void showNewFolderDialog(){
+    @Override
+    public void uploadFromDevice() {
+	    Util.uploadFromDevice(this);
+    }
+
+    @Override
+    public void uploadFromSystem() {
+	    Util.uploadFromSystem(this);
+    }
+
+    @Override
+    public void takePictureAndUpload() {
+
+        if (!Util.checkPermission(Manifest.permission.CAMERA, this)) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    Constants.REQUEST_CAMERA);
+            return;
+        }
+        if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    Constants.REQUEST_WRITE_STORAGE);
+            return;
+        }
+        Util.takePicture(this);
+    }
+
+    @Override
+    public void showNewFolderDialog(){
 		log("showNewFolderDialog");
 
 		LinearLayout layout = new LinearLayout(this);
