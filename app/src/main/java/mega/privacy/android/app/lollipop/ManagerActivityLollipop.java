@@ -11324,23 +11324,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void uploadFromDevice() {
-		Util.uploadFromDevice(this);
+		UploadUtil.chooseFromDevice(this);
 	}
 
 	@Override
 	public void uploadFromSystem() {
-		Util.uploadFromSystem(this);
+		UploadUtil.uploadFromSystem(this);
 	}
 
 	@Override
 	public void takePictureAndUpload() {
 		fromTakePicture = Constants.TAKE_PICTURE_OPTION;
-		if (!Util.checkPermission(Manifest.permission.CAMERA, this)) {
-			Util.requestPermission(this, Manifest.permission.CAMERA, Constants.REQUEST_CAMERA);
+		if (!Util.hasPermissions(this, Manifest.permission.CAMERA)) {
+			Util.requestPermission(this, Constants.REQUEST_CAMERA, Manifest.permission.CAMERA);
 			return;
 		}
-		if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
-			Util.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, Constants.REQUEST_WRITE_STORAGE);
+		if (!Util.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			Util.requestPermission(this, Constants.REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			return;
 		}
 		Util.takePicture(this);
@@ -11480,7 +11480,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			@Override
 			public void onClick(View v) {
 				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
+				 if (value.length() == 0) {
 					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
@@ -12673,18 +12673,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
-	public void showUploadPanel(){
+	public void showUploadPanel() {
 		log("showUploadPanel");
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-						Constants.REQUEST_READ_WRITE_STORAGE);
-			}else{
-				onGetReadWritePermission();
-			}
-		}else{
+		if (!Util.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			Util.requestPermission(this, Constants.REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+		} else {
 			onGetReadWritePermission();
 		}
 	}

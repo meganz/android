@@ -19,15 +19,8 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
 
     private Context context;
     private UploadBottomSheetDialogActionListener listener;
-
     private BottomSheetBehavior mBehavior;
-    private LinearLayout items_layout;
-
     private LinearLayout mainLinearLayout;
-    private LinearLayout optionFromDevice;
-    private LinearLayout optionFromSystem;
-    private LinearLayout optionTakePicture;
-    private LinearLayout optionCreateFolder;
 
     @Override
     public void setupDialog(final Dialog dialog, int style) {
@@ -42,12 +35,12 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_upload, null);
 
         mainLinearLayout = contentView.findViewById(R.id.upload_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.items_layout);
+        LinearLayout items_layout = contentView.findViewById(R.id.items_layout);
 
-        optionFromDevice = contentView.findViewById(R.id.upload_from_device_layout);
-        optionFromSystem = contentView.findViewById(R.id.upload_from_system_layout);
-        optionTakePicture = contentView.findViewById(R.id.take_picture_layout);
-        optionCreateFolder = contentView.findViewById(R.id.new_folder_layout);
+        LinearLayout optionFromDevice = contentView.findViewById(R.id.upload_from_device_layout);
+        LinearLayout optionFromSystem = contentView.findViewById(R.id.upload_from_system_layout);
+        LinearLayout optionTakePicture = contentView.findViewById(R.id.take_picture_layout);
+        LinearLayout optionCreateFolder = contentView.findViewById(R.id.new_folder_layout);
 
         optionFromDevice.setOnClickListener(this);
         optionFromSystem.setOnClickListener(this);

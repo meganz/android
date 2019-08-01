@@ -188,23 +188,23 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
     @Override
     public void uploadFromDevice() {
-	    Util.uploadFromDevice(this);
+	    UploadUtil.chooseFromDevice(this);
     }
 
     @Override
     public void uploadFromSystem() {
-	    Util.uploadFromSystem(this);
+	    UploadUtil.uploadFromSystem(this);
     }
 
     @Override
     public void takePictureAndUpload() {
 
-        if (!Util.checkPermission(Manifest.permission.CAMERA, this)) {
-            Util.requestPermission(this, Manifest.permission.CAMERA, Constants.REQUEST_CAMERA);
+        if (!Util.hasPermissions(this, Manifest.permission.CAMERA)) {
+            Util.requestPermission(this, Constants.REQUEST_CAMERA, Manifest.permission.CAMERA);
             return;
         }
-        if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
-            Util.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, Constants.REQUEST_WRITE_STORAGE);
+        if (!Util.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            Util.requestPermission(this, Constants.REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
             return;
         }
         Util.takePicture(this);
@@ -598,9 +598,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	public void showUploadPanel() {
 		log("showUploadPanel");
-		if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
-			Util.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-					Constants.REQUEST_READ_WRITE_STORAGE);
+		if (!Util.hasPermissions( this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			Util.requestPermission(this, Constants.REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
 		} else {
 			onGetReadWritePermission();
 		}
@@ -633,11 +632,12 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 		switch (requestCode) {
 			case Constants.REQUEST_CAMERA: {
-				if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
-					Util.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, Constants.REQUEST_WRITE_STORAGE);
+				if (!Util.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+					Util.requestPermission(this, Constants.REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 				} else {
 					takePictureAndUpload();
 				}
+				break;
 			}
 			case Constants.REQUEST_READ_WRITE_STORAGE: {
 				log("REQUEST_READ_WRITE_STORAGE");
