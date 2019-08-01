@@ -136,7 +136,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
                 mBuilderCompatO.setContentText(getString(R.string.action_notification_call_in_progress));
             } else {
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-                    mBuilderCompatO.setContentText(getString(R.string.title_notification_outgoing_call));
+                    mBuilderCompatO.setContentText(getString(R.string.outgoing_call_starting));
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     mBuilderCompatO.setContentText(getString(R.string.title_notification_incoming_call));
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
@@ -149,7 +149,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
                 mBuilderCompat.setContentText(getString(R.string.action_notification_call_in_progress));
             } else {
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-                    mBuilderCompat.setContentText(getString(R.string.title_notification_outgoing_call));
+                    mBuilderCompat.setContentText(getString(R.string.outgoing_call_starting));
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     mBuilderCompat.setContentText(getString(R.string.title_notification_incoming_call));
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {

@@ -2325,15 +2325,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             log("updateSubTitle:REQUEST_SENT");
             subtitleToobar.setVisibility(View.VISIBLE);
             ChatUtil.activateChrono(false, callInProgressChrono, callChat);
-            if (chat.isGroup()) {
-                subtitleToobar.setText(getString(R.string.outgoing_call_starting));
-                return;
-            }
-            if (callChat.hasVideoInitialCall()) {
-                subtitleToobar.setText(getString(R.string.outgoing_video_call_starting).toLowerCase());
-                return;
-            }
-            subtitleToobar.setText(getString(R.string.outgoing_audio_call_starting).toLowerCase());
+            subtitleToobar.setText(getString(R.string.outgoing_call_starting));
             return;
         }
 

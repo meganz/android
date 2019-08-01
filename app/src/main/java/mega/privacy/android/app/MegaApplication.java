@@ -163,7 +163,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	/*A/V Calls*/
 	private AudioManager audioManager;
 	private MediaPlayer thePlayer;
-	private Ringtone ringtone = null;
+	private Ringtone ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
 	private Vibrator vibrator = null;
 	private Timer ringerTimer = null;
 
@@ -1911,11 +1911,16 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		startIncomingCallVibration();
 	}
 
+
 	private void incomingCallSound() {
-		if (ringtone != null && ringerTimer != null) return;
 		log("incomingCallSound");
+
+		stopRingtone();
 		ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+
+		cancelRingerTimer();
 		ringerTimer = new Timer();
+
 		MyRingerTask myRingerTask = new MyRingerTask();
 		ringerTimer.schedule(myRingerTask, 0, 500);
 	}
@@ -1923,7 +1928,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private void stopIncomingCallVibration() {
 		if (vibrator == null || !vibrator.hasVibrator()) return;
 		log("stopIncomingCallVibration");
-		vibrator.cancel();
+		cancelVibrator();
 	}
 
 	private void startIncomingCallVibration() {
@@ -1937,42 +1942,58 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	private void stopAudioSignals() {
 		log("stopAudioSignals");
+		stopThePlayer();
+		stopRingtone();
+		cancelRingerTimer();
+		cancelVibrator();
+	}
+
+	private void stopThePlayer() {
 		try {
 			if (thePlayer != null) {
 				thePlayer.stop();
+				thePlayer.reset();
 				thePlayer.release();
+				thePlayer = null;
 			}
 		} catch (Exception e) {
 			log("Exception stopping player");
 		}
+	}
+
+	private void stopRingtone() {
 		try {
 			if (ringtone != null) {
 				ringtone.stop();
+				ringtone = null;
 			}
 		} catch (Exception e) {
 			log("Exception stopping ringtone");
 
 		}
+	}
+
+	private void cancelRingerTimer() {
 		try {
 			if (ringerTimer != null) {
 				ringerTimer.cancel();
+				ringerTimer = null;
 			}
 		} catch (Exception e) {
-			log("Exception stopping ringing time");
+			log("Exception canceling ringing time");
 
 		}
+	}
+
+	private void cancelVibrator() {
 		try {
 			if (vibrator != null && vibrator.hasVibrator()) {
 				vibrator.cancel();
+				vibrator = null;
 			}
 		} catch (Exception e) {
-			log("Exception stopping vibrator");
-
+			log("Exception canceling vibrator");
 		}
-		thePlayer = null;
-		vibrator = null;
-		ringtone = null;
-		ringerTimer = null;
 	}
 
 	private class MyRingerTask extends TimerTask {
@@ -1983,7 +2004,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			}
 		}
 	}
-
 
 	public void checkQueuedCalls() {
 		log("checkQueuedCalls");
