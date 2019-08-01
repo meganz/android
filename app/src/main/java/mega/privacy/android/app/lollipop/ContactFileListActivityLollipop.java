@@ -202,15 +202,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
     public void takePictureAndUpload() {
 
         if (!Util.checkPermission(Manifest.permission.CAMERA, this)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA},
-                    Constants.REQUEST_CAMERA);
+            Util.requestPermission(this, Manifest.permission.CAMERA, Constants.REQUEST_CAMERA);
             return;
         }
         if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    Constants.REQUEST_WRITE_STORAGE);
+            Util.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, Constants.REQUEST_WRITE_STORAGE);
             return;
         }
         Util.takePicture(this);
@@ -602,26 +598,20 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 	}
 
-    public void showUploadPanel(){
-        log("showUploadPanel");
+	public void showUploadPanel() {
+		log("showUploadPanel");
+		if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
+			Util.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+					Constants.REQUEST_READ_WRITE_STORAGE);
+		} else {
+			onGetReadWritePermission();
+		}
+	}
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                        Constants.REQUEST_READ_WRITE_STORAGE);
-            }else{
-                onGetReadWritePermission();
-            }
-        }else{
-            onGetReadWritePermission();
-        }
-    }
-
-    private void onGetReadWritePermission(){
-        UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-    }
+	private void onGetReadWritePermission() {
+		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+	}
 
 	@Override
 	protected void onResume() {
@@ -663,31 +653,28 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 	}
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        log("onRequestPermissionsResult");
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		log("onRequestPermissionsResult");
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		if (grantResults.length <= 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+			return;
+		}
+		switch (requestCode) {
 			case Constants.REQUEST_CAMERA: {
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
-						ActivityCompat.requestPermissions(this,
-								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								Constants.REQUEST_WRITE_STORAGE);
-					} else {
-						takePictureAndUpload();
-					}
+				if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
+					Util.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, Constants.REQUEST_WRITE_STORAGE);
+				} else {
+					takePictureAndUpload();
 				}
 			}
 			case Constants.REQUEST_READ_WRITE_STORAGE: {
 				log("REQUEST_READ_WRITE_STORAGE");
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					onGetReadWritePermission();
-				}
+				onGetReadWritePermission();
 				break;
 			}
-        }
-    }
+		}
+	}
 
 	@Override
 	protected void onNewIntent(Intent intent){

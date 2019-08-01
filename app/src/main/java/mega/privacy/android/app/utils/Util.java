@@ -2531,4 +2531,16 @@ public class Util {
 			return false;
 		}
 	}
+
+	public static void requestPermission(Activity activity, String permission, int requestCode) {
+		ActivityCompat.requestPermissions(activity,
+				new String[]{permission},
+				requestCode);
+	}
+
+	public static void requestPermissions(Activity activity, String[] permissions, int requestCode) {
+		ActivityCompat.requestPermissions(activity,
+				permissions,
+				requestCode);
+	}
 }
