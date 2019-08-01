@@ -1439,11 +1439,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			int countChat = chatHandles.length;
 			log("Selected: "+countChat+" chats to send");
 
-			for(int i=0;i<chatHandles.length;i++){
-
+			for (long chatHandle : chatHandles) {
 				MegaHandleList handleList = MegaHandleList.createInstance();
 				handleList.addMegaHandle(user.getHandle());
-				megaChatApi.attachContacts(chatHandles[i], handleList);
+				megaChatApi.attachContacts(chatHandle, handleList);
 			}
 
 			if(countChat==1){
