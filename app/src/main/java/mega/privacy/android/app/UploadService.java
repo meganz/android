@@ -1,5 +1,6 @@
 package mega.privacy.android.app;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -35,7 +36,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.CameraUploadImageProcessor;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -66,8 +66,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_LAST_MODIFIED = "MEGA_FILE_LAST_MODIFIED";
 	public static String EXTRA_NAME_EDITED = "MEGA_FILE_NAME_EDITED";
 	public static String EXTRA_SIZE = "MEGA_SIZE";
-	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
+	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
 
 	public static final int CHECK_FILE_TO_UPLOAD_UPLOAD = 1000;
 	public static final int CHECK_FILE_TO_UPLOAD_COPY = 1001;
@@ -163,7 +163,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@Override
 	public void onDestroy(){
-		log("****onDestroy");
+		log("onDestroy");
         releaseLocks();
 
 		if(megaApi != null) {
@@ -180,7 +180,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
 	@Override
-	public int onStartCommand(final Intent intent,int flags,int startId) {
+	public int onStartCommand(Intent intent, int flags, int startId) {
 		log("onStartCommand");
 		canceled = false;
 
@@ -288,7 +288,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
 						log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
 						log("Return - file already uploaded");
-				        uploadedFileCount++;
 						return;
 
 					}
@@ -423,7 +422,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	 * No more intents in the queue
 	 */
 	private void onQueueComplete() {
-        log("****onQueueComplete");
+        log("onQueueComplete");
         releaseLocks();
         if (isOverquota != 0) {
             if (totalFileUploads > 0) {
@@ -458,13 +457,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mNotificationManager.cancel(notificationIdForFolderUpload);
         stopSelf();
         log("after stopSelf");
-        String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-        File f = new File(pathSelfie);
-        //Delete recursively all files and folder
-        if (f.exists()) {
-            if (f.isDirectory()) {
-                if (f.list().length <= 0) {
-                    f.delete();
+        if (Util.isPermissionGranted(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+            File f = new File(pathSelfie);
+            //Delete recursively all files and folder
+            if (f.exists()) {
+                if (f.isDirectory()) {
+                    if (f.list() != null && f.list().length <= 0) {
+                        f.delete();
+                    }
                 }
             }
         }
@@ -515,8 +516,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
      * Show complete success notification
      */
     private void showFileUploadCompleteNotification() {
-        log("****showFileUploadCompleteNotification");
-
+        log("showFileUploadCompleteNotification");
         if (isOverquota == 0) {
             String notificationTitle, size;
             int quantity = totalFileUploadsCompletedSuccessfully == 0 ? 1 : totalFileUploadsCompletedSuccessfully;
@@ -541,8 +541,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     }
 
     private void showFolderUploadCompleteNotification() {
-        log("****showFolderUploadCompleteNotification");
-
+        log("showFolderUploadCompleteNotification");
         if (isOverquota == 0) {
             String notificationTitle = getResources().getQuantityString(R.plurals.folder_upload_service_final_notification,totalFolderUploadsCompletedSuccessfully,totalFolderUploadsCompletedSuccessfully);
             String notificationSubTitle;
@@ -661,7 +660,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 
         String message = getMessageForProgressNotification(inProgress,isFolderTransfer);
-        String logMessage = isFolderTransfer ? "****updateProgressNotificationForFolderUpload: " : "****updateProgressNotificationForFileUpload: ";
+        String logMessage = isFolderTransfer ? "updateProgressNotificationForFolderUpload: " : "updateProgressNotificationForFileUpload: ";
         log(logMessage + progressPercent + " " + message);
         String actionString = isOverquota == 0 ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
         String info = Util.getProgressSize(UploadService.this,inProgress,total);
@@ -749,10 +748,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
 	@Override
-	public void onTransferFinish(final MegaApiJava api,final MegaTransfer transfer,MegaError error) {
-		log("****onTransferFinish: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
-		log("transfer.getPath:" + transfer.getPath());
-
+	public void onTransferFinish(final MegaApiJava api, final MegaTransfer transfer, MegaError error) {
+		log("onTransferFinish: path " + transfer.getPath() + " size " + transfer.getTransferredBytes());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 
             if(isTransferBelongsToFolderTransfer(transfer)){
@@ -805,22 +802,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						log("Is video!!!");
 
 						File previewDir = PreviewUtils.getPreviewFolder(this);
-						final File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 						File thumbDir = ThumbnailUtils.getThumbFolder(this);
-						final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-//						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-//						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-                        threadPool.execute(new Runnable() {
+						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
-                            @Override
-                            public void run() {
-                                File img = new File(transfer.getPath());
-                                if(!preview.exists()) {
-                                    CameraUploadImageProcessor.createVideoPreview(UploadService.this,img, preview);
-                                }
-                                CameraUploadImageProcessor.createVideoThumbnail(UploadService.this,api,transfer.getPath(),thumb);
-                            }
-                        });
 						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
 						if (node != null) {
@@ -868,28 +855,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							else{
 								log("No location info");
 							}
-                            retriever.release();
-                        }
-                    } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
+						}
+					} else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
 						log("Is image!!!");
 
 						File previewDir = PreviewUtils.getPreviewFolder(this);
-						final File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 						File thumbDir = ThumbnailUtils.getThumbFolder(this);
-						final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-//						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-//						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-                        threadPool.execute(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                File img = new File(transfer.getPath());
-                                if(!preview.exists()) {
-                                    CameraUploadImageProcessor.createImagePreview(img, preview);
-                                }
-                                CameraUploadImageProcessor.createImageThumbnail(UploadService.this,api,transfer.getPath(),thumb);
-                            }
-                        });
+						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
 						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 						if (node != null) {
@@ -1006,8 +981,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		log("****onTransferUpdate");
-
+		log("onTransferUpdate");
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
 
             if(isTransferBelongsToFolderTransfer(transfer)){
@@ -1015,7 +989,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             }
 
 			String appData = transfer.getAppData();
-            log("appData: " + appData);
+
 			if(appData!=null){
 				return;
 			}

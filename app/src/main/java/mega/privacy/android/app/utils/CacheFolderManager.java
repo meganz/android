@@ -14,9 +14,11 @@ public final class CacheFolderManager {
 
     public static final String QR_FOLDER = "qrMEGA";
 
-    public static File getCacheFolder(Context context,String folderName) {
+    public static final String VOICE_CLIP_FOLDER = "voiceClipsMEGA";
+
+    public static File getCacheFolder(Context context, String folderName) {
         log("create cache folder: " + folderName);
-        File cacheFolder = new File(context.getCacheDir(),folderName);
+        File cacheFolder = new File(context.getCacheDir(), folderName);
         if (cacheFolder.exists()) {
             return cacheFolder;
         } else {
@@ -29,32 +31,39 @@ public final class CacheFolderManager {
     }
 
     public static void createCacheFolders(Context context) {
-        File thumbDir = getCacheFolder(context,THUMBNAIL_FOLDER);
+        File thumbDir = getCacheFolder(context, THUMBNAIL_FOLDER);
         if (isFileAvailable(thumbDir)) {
             log("thumbnailsMEGA folder created: " + thumbDir.getAbsolutePath());
         } else {
             log("create thumbnailsMEGA failed");
         }
 
-        File previewDir = getCacheFolder(context,PREVIEW_FOLDER);
+        File previewDir = getCacheFolder(context, PREVIEW_FOLDER);
         if (isFileAvailable(previewDir)) {
             log("previewsMEGA folder created: " + previewDir.getAbsolutePath());
         } else {
             log("create previewsMEGA failed");
         }
 
-        File avatarDir = getCacheFolder(context,AVATAR_FOLDER);
+        File avatarDir = getCacheFolder(context, AVATAR_FOLDER);
         if (isFileAvailable(avatarDir)) {
             log("avatarsMEGA folder created: " + avatarDir.getAbsolutePath());
         } else {
             log("create avatarsMEGA failed");
         }
 
-        File qrDir = getCacheFolder(context,QR_FOLDER);
+        File qrDir = getCacheFolder(context, QR_FOLDER);
         if (isFileAvailable(qrDir)) {
             log("qrMEGA folder created: " + qrDir.getAbsolutePath());
         } else {
             log("create qrMEGA failed");
+        }
+
+        File voiceClipDir = getCacheFolder(context, VOICE_CLIP_FOLDER);
+        if (isFileAvailable(voiceClipDir)) {
+            log("voiceClipsMEGA folder created: " + voiceClipDir.getAbsolutePath());
+        } else {
+            log("create voiceClipsMEGA failed");
         }
     }
 
@@ -71,22 +80,26 @@ public final class CacheFolderManager {
         }.start();
     }
 
-    public static File buildQrFile(Context context,String fileName) {
-        return getCacheFile(context,QR_FOLDER,fileName);
+    public static File buildVoiceClipFile(Context context, String fileName) {
+        return getCacheFile(context, VOICE_CLIP_FOLDER, fileName);
     }
 
-    public static File buildPreviewFile(Context context,String fileName) {
-        return getCacheFile(context,PREVIEW_FOLDER,fileName);
+    public static File buildQrFile(Context context, String fileName) {
+        return getCacheFile(context,QR_FOLDER, fileName);
     }
 
-    public static File buildAvatarFile(Context context,String fileName) {
-        return getCacheFile(context,AVATAR_FOLDER,fileName);
+    public static File buildPreviewFile(Context context, String fileName) {
+        return getCacheFile(context,PREVIEW_FOLDER, fileName);
     }
 
-    private static File getCacheFile(Context context,String folderName,String fileName) {
-        File parent = getCacheFolder(context,folderName);
+    public static File buildAvatarFile(Context context, String fileName) {
+        return getCacheFile(context,AVATAR_FOLDER, fileName);
+    }
+
+    private static File getCacheFile(Context context, String folderName, String fileName) {
+        File parent = getCacheFolder(context, folderName);
         if (parent != null) {
-            return new File(parent,fileName);
+            return new File(parent, fileName);
         }
         return null;
     }

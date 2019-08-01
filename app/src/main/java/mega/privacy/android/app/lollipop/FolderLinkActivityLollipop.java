@@ -786,7 +786,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
-		boolean askMe = true;
+		boolean askMe = Util.askMe(this);
 		String downloadLocationDefaultPath = "";
 		prefs = dbH.getPreferences();		
 		if (prefs != null){
@@ -899,7 +899,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
-		boolean askMe = true;
+		boolean askMe = Util.askMe(this);
 		String downloadLocationDefaultPath = Util.getDownloadLocation(this);
 			
 		if (askMe){
@@ -1244,8 +1244,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						try{
 							log("API_EARGS - show alert dialog");
 							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-							builder.setMessage(getString(R.string.general_error_folder_not_found));
+							builder.setMessage(getString(R.string.link_broken));
 							builder.setTitle(getString(R.string.general_error_word));
+							builder.setCancelable(false);
 
 							builder.setPositiveButton(getString(android.R.string.ok),new DialogInterface.OnClickListener() {
 								@Override
@@ -1541,8 +1542,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 					}
-
-
+					builder.setCancelable(false);
 					builder.setPositiveButton(
 							getString(android.R.string.ok),
 							new DialogInterface.OnClickListener() {

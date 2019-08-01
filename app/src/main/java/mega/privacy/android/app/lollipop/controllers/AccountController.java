@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -36,6 +36,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
@@ -43,12 +44,15 @@ import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+
+import static mega.privacy.android.app.utils.Constants.ACTION_LOG_OUT;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
@@ -548,12 +552,7 @@ public class AccountController implements View.OnClickListener{
         if (dbH.getPreferences() != null){
             dbH.clearPreferences();
             dbH.setFirstTime(false);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                Intent stopIntent = null;
-                stopIntent = new Intent(context, CameraSyncService.class);
-                stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-                context.startService(stopIntent);
-            }
+            JobUtil.stopRunningCameraUploadService(context);
         }
         dbH.clearOffline();
 
@@ -568,6 +567,8 @@ public class AccountController implements View.OnClickListener{
         dbH.clearPendingMessage();
 
         dbH.clearAttributes();
+
+        dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 
         dbH.clearChatSettings();
         dbH.setEnabledChat(true + "");
@@ -597,6 +598,10 @@ public class AccountController implements View.OnClickListener{
         }
 
         localLogoutApp(context);
+
+        Intent intent = new Intent();
+        intent.setAction(ACTION_LOG_OUT);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     static public void logoutConfirmed(Context context){

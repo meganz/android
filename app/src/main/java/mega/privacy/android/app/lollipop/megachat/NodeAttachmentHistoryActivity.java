@@ -788,10 +788,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						log("show node attachment panel");
 						showNodeAttachmentBottomSheet(m, position);
 					}
-
-
 				}
-
 			}
 		}else{
 			log("DO NOTHING: Position ("+position+") is more than size in messages (size: "+messages.size()+")");
