@@ -204,6 +204,7 @@ import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.ProgressDialogUtil;
+import mega.privacy.android.app.utils.UploadUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -14012,23 +14013,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
 			log("TAKE_PHOTO_CODE");
-			if(resultCode == Activity.RESULT_OK){
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
+			if (resultCode == Activity.RESULT_OK) {
+				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
 				File imgFile = new File(filePath);
 
 				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-				log("Taken picture Name: "+name);
-				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/"+name;
-				log("----NEW Name: "+newPath);
+				log("Taken picture Name: " + name);
+				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/" + name;
+				log("----NEW Name: " + newPath);
 				File newFile = new File(newPath);
 				imgFile.renameTo(newFile);
 
-				uploadTakePicture(newPath);
-			}
-			else{
+				long parentHandleUpload = -1;
+
+				if (drawerItem == DrawerItem.SHARED_ITEMS) {
+					switch (viewPagerShares.getCurrentItem()) {
+						case 0: {
+							parentHandleUpload = parentHandleIncoming;
+							break;
+						}
+						case 1: {
+							parentHandleUpload = parentHandleOutgoing;
+							break;
+						}
+					}
+				} else {
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+					if (fbFLol != null && parentHandleBrowser != -1) {
+						parentHandleUpload = parentHandleBrowser;
+					}
+				}
+				UploadUtil.uploadFile(this, newPath, parentHandleUpload, megaApi);
+			} else {
 				log("TAKE_PHOTO_CODE--->ERROR!");
 			}
-
 	    }
 		else if (requestCode == Constants.TAKE_PICTURE_PROFILE_CODE){
 			log("TAKE_PICTURE_PROFILE_CODE");
@@ -18183,41 +18201,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		catch (Exception ex) {}
 	}
-
-	public void uploadTakePicture(String imagePath){
-		log("uploadTakePicture");
-
-		MegaNode parentNode = null;
-
-		fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-		if (fbFLol != null) {
-			if (parentHandleBrowser != -1) {
-				parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-			}
-		}
-
-		if(parentNode==null){
-			parentNode = megaApi.getRootNode();
-		}
-
-		Intent intent = new Intent(this, UploadService.class);
-		File selfie = new File(imagePath);
-		intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
-		intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
-		intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-		intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
-		startService(intent);
-	}
-
-//	public void showFileChooser(String imagePath){
-//
-//		log("showFileChooser: "+imagePath);
-//		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-//		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
-//		intent.putExtra("IMAGE_PATH", imagePath);
-//		startActivity(intent);
-//		//finish();
-//	}
 
 	public void changeStatusBarColor(int option) {
 		log("changeStatusBarColor");
