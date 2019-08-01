@@ -20,7 +20,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
@@ -64,7 +63,6 @@ import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
@@ -620,34 +618,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		Intent intent = getIntent(); 
 
-		if (intent != null) { 
-			if (intent.getAction() != null){ 
-//				if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPLORE_ZIP)){  
-//
-//					String pathZip=intent.getExtras().getString(ManagerActivityLollipop.EXTRA_PATH_ZIP);    				
-//
-//					log("Path: "+pathZip);
-//
-//					//Lanzar nueva activity ZipBrowserActivity
-//
-//					Intent intentZip = new Intent(this, ZipBrowserActivityLollipop.class);    				
-//					intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, pathZip);
-//					startActivity(intentZip);
-//
-//
-//				}
-//				else if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_PDF)){ 
-//					String pathPdf=intent.getExtras().getString(ManagerActivityLollipop.EXTRA_PATH_PDF);
-//
-//					File pdfFile = new File(pathPdf);
-//
-//					Intent intentPdf = new Intent();
-//					intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-//					intentPdf.setClass(this, OpenPDFActivity.class);
-//					intentPdf.setAction("android.intent.action.VIEW");
-//					this.startActivity(intentPdf);
-//				}
-			}
+		if (intent != null) {
 			intent.setAction(null);
 			setIntent(null);
 		}
@@ -683,26 +654,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		setIntent(intent); 
 	}
 
-//	public void selectContactFragment(int currentFragment){
-//		log("selectContactFragment: "+currentFragment);
-//		switch(currentFragment){
-//			case CONTACT_PROPERTIES:{
-//				if (cpF == null){
-//					cpF = new ContactPropertiesFragmentLollipop();
-//				}
-//				cpF.setUserEmail(userEmail);
-//				coordinatorLayout.setFitsSystemWindows(false);
-//				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
-//
-//				break;
-//			}
-//			case CONTACT_FILE_LIST:{
-//
-//				break;
-//			}
-//		}
-//	}
-
 	public void showConfirmationLeaveIncomingShare (final MegaNode n){
 		log("showConfirmationLeaveIncomingShare");
 
@@ -723,7 +674,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		};
 
 		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -749,7 +699,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		};
 
 		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -881,13 +830,10 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
-//	    layout.setLayoutParams(params);
 
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
-//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-//		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
 		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
@@ -1439,7 +1385,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 			if (handleList.size() > 0){
 				android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
 				if (handleList.size() > 1){
 					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
 				}
