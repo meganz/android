@@ -15,7 +15,6 @@ import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -70,6 +69,7 @@ import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.UploadUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1315,17 +1315,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
 			log("TAKE_PHOTO_CODE");
 			if(resultCode == Activity.RESULT_OK){
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
-				File imgFile = new File(filePath);
-
-				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-				log("Taken picture Name: "+name);
-				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/"+name;
-				log("----NEW Name: "+newPath);
-				File newFile = new File(newPath);
-				imgFile.renameTo(newFile);
-
-				uploadTakePicture(newPath);
+				long parentHandle = cflF.getParentHandle();
+				UploadUtil.uploadTakePicture(this, parentHandle, megaApi);
 			}
 			else{
 				log("TAKE_PHOTO_CODE--->ERROR!");
@@ -1855,25 +1846,5 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		});
 		downloadConfirmationDialog = builder.create();
 		downloadConfirmationDialog.show();
-	}
-
-	public void uploadTakePicture(String imagePath){
-		log("uploadTakePicture");
-
-		long parentHandle = cflF.getParentHandle();
-
-		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-
-		if(parentNode==null){
-			parentNode = megaApi.getRootNode();
-		}
-
-		Intent intent = new Intent(this, UploadService.class);
-		File selfie = new File(imagePath);
-		intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
-		intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
-		intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-		intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
-		startService(intent);
 	}
 }

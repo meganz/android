@@ -14011,47 +14011,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}catch (Exception e){}
 			}
 		}
-		else if (requestCode == Constants.TAKE_PHOTO_CODE){
-			log("TAKE_PHOTO_CODE");
-			if (resultCode == Activity.RESULT_OK) {
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
-				File imgFile = new File(filePath);
-
-				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-				log("Taken picture Name: " + name);
-				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/" + name;
-				log("----NEW Name: " + newPath);
-				File newFile = new File(newPath);
-				imgFile.renameTo(newFile);
-
-				long parentHandleUpload = -1;
-
-				if (drawerItem == DrawerItem.SHARED_ITEMS) {
-					switch (viewPagerShares.getCurrentItem()) {
-						case 0: {
-							parentHandleUpload = parentHandleIncoming;
-							break;
-						}
-						case 1: {
-							parentHandleUpload = parentHandleOutgoing;
-							break;
-						}
-					}
-				} else {
-					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-					if (fbFLol != null && parentHandleBrowser != -1) {
-						parentHandleUpload = parentHandleBrowser;
-					}
-				}
-				UploadUtil.uploadFile(this, newPath, parentHandleUpload, megaApi);
-			} else {
-				log("TAKE_PHOTO_CODE--->ERROR!");
-			}
-	    }
 		else if (requestCode == Constants.TAKE_PICTURE_PROFILE_CODE){
 			log("TAKE_PICTURE_PROFILE_CODE");
 			if(resultCode == Activity.RESULT_OK){
-
 				String myEmail =  megaApi.getMyUser().getEmail();
 				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";
 				File imgFile = new File(filePath);
