@@ -1,20 +1,15 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import java.io.File;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
@@ -72,58 +67,20 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
     @Override
     public void onClick(View v) {
 
-        switch(v.getId()){
+        switch (v.getId()) {
 
-            case R.id.upload_from_device_layout:{
+            case R.id.upload_from_device_layout: {
                 log("click upload from device");
                 listener.uploadFromDevice();
                 dismissAllowingStateLoss();
                 break;
             }
-            case R.id.upload_from_system_layout:{
+            case R.id.upload_from_system_layout: {
                 log("click upload from_system");
-                final File[] fs = context.getExternalFilesDirs(null);
-                //has SD card
-                if (fs.length > 1) {
-                    Dialog localCameraDialog;
-                    String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-                    AlertDialog.Builder b=new AlertDialog.Builder(context);
-
-                    b.setTitle(getResources().getString(R.string.upload_to_filesystem_from));
-                    b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch(which){
-                                case 0:{
-                                    pickFileFromFileSystem(false);
-                                    break;
-                                }
-                                case 1: {
-                                    if (fs[1] != null) {
-                                        pickFileFromFileSystem(true);
-                                    } else {
-                                        pickFileFromFileSystem(false);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    });
-                    b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-                    localCameraDialog = b.create();
-                    localCameraDialog.show();
-                } else {
-                    pickFileFromFileSystem(false);
-                }
+                listener.uploadFromSystem();
                 break;
             }
-            case R.id.scan_document_layout:{
+            case R.id.scan_document_layout: {
                 break;
             }
             case R.id.take_picture_layout: {

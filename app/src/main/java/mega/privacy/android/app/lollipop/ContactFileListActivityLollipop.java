@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -64,6 +65,7 @@ import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
@@ -280,11 +282,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 		});
 
-//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(ContextCompat.getColor(contactPropertiesMainActivity, R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_folder_name));
-//		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
@@ -602,20 +602,26 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 	}
 
-	public void showUploadPanel() {
-		log("showUploadPanel");
+    public void showUploadPanel(){
+        log("showUploadPanel");
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
-			}
-		}
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                        Constants.REQUEST_READ_WRITE_STORAGE);
+            }else{
+                onGetReadWritePermission();
+            }
+        }else{
+            onGetReadWritePermission();
+        }
+    }
 
-		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-	}
+    private void onGetReadWritePermission(){
+        UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    }
 
 	@Override
 	protected void onResume() {
@@ -656,6 +662,32 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			setIntent(null);
 		}
 	}
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        log("onRequestPermissionsResult");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+			case Constants.REQUEST_CAMERA: {
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					if (!Util.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this)) {
+						ActivityCompat.requestPermissions(this,
+								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+								Constants.REQUEST_WRITE_STORAGE);
+					} else {
+						takePictureAndUpload();
+					}
+				}
+			}
+			case Constants.REQUEST_READ_WRITE_STORAGE: {
+				log("REQUEST_READ_WRITE_STORAGE");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					onGetReadWritePermission();
+				}
+				break;
+			}
+        }
+    }
 
 	@Override
 	protected void onNewIntent(Intent intent){
@@ -1250,8 +1282,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
 				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
 			}
-		}		
-
+		}
 		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 
 			String folderPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
@@ -1293,6 +1324,26 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				startService(uploadServiceIntent);
 				i++;
 			}
+		}
+		else if (requestCode == Constants.TAKE_PHOTO_CODE){
+			log("TAKE_PHOTO_CODE");
+			if(resultCode == Activity.RESULT_OK){
+				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
+				File imgFile = new File(filePath);
+
+				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
+				log("Taken picture Name: "+name);
+				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/"+name;
+				log("----NEW Name: "+newPath);
+				File newFile = new File(newPath);
+				imgFile.renameTo(newFile);
+
+				uploadTakePicture(newPath);
+			}
+			else{
+				log("TAKE_PHOTO_CODE--->ERROR!");
+			}
+
 		}
 	}
 
@@ -1817,5 +1868,25 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		});
 		downloadConfirmationDialog = builder.create();
 		downloadConfirmationDialog.show();
+	}
+
+	public void uploadTakePicture(String imagePath){
+		log("uploadTakePicture");
+
+		long parentHandle = cflF.getParentHandle();
+
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+
+		if(parentNode==null){
+			parentNode = megaApi.getRootNode();
+		}
+
+		Intent intent = new Intent(this, UploadService.class);
+		File selfie = new File(imagePath);
+		intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
+		intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
+		intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+		intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
+		startService(intent);
 	}
 }

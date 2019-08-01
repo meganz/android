@@ -67,7 +67,6 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Display;
@@ -247,7 +246,6 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
-import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
 
@@ -11356,12 +11354,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("showNewFolderDialogKitLollipop");
 
 		LinearLayout layout = new LinearLayout(this);
-	    layout.setOrientation(LinearLayout.VERTICAL);
-	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
-	    final EditText input = new EditText(this);
-	    layout.addView(input, params);
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
@@ -11385,9 +11383,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
 		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
@@ -11409,7 +11407,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
+				if (error_layout.getVisibility() == View.VISIBLE) {
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
 					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
@@ -11417,15 +11415,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		});
 
-//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_folder_name));
-//		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
@@ -11434,15 +11430,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
 
-					}else{
-						boolean result=matches(regex, value);
-						if(result){
+					} else {
+						boolean result = matches(regex, value);
+						if (result) {
 							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
 							error_layout.setVisibility(View.VISIBLE);
 							input.requestFocus();
 
-						}else{
+						} else {
 							createFolder(value);
 							newFolderDialog.dismiss();
 						}
@@ -11452,7 +11448,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return false;
 			}
 		});
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -11483,11 +11479,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
-		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
+		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
 					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
@@ -11495,21 +11489,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
 
-				}else{
-					boolean result=matches(regex, value);
-					if(result){
+				} else {
+					boolean result = matches(regex, value);
+					if (result) {
 						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
 
-					}else{
+					} else {
 						createFolder(value);
 						newFolderDialog.dismiss();
 					}
 				}
-
-
 			}
 		});
 	}
@@ -18749,29 +18741,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public boolean checkPermission (String permission) {
-		switch (permission) {
-			case Manifest.permission.WRITE_EXTERNAL_STORAGE: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-			}
-			case Manifest.permission.READ_EXTERNAL_STORAGE: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-			}
-			case Manifest.permission.CAMERA: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
-			}
-			case Manifest.permission.RECORD_AUDIO: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
-			}
-			//case Manifest.permission.WRITE_CALL_LOG: {
-			//	return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED;
-			//}
-			case Manifest.permission.READ_CONTACTS: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
-			}
-			default: {
-				return false;
-			}
+	public boolean checkPermission(String permission) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			return true;
+		}
+
+		try {
+			return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+		} catch (IllegalArgumentException ex) {
+			log("IllegalArgument Exception is thrown");
+			return false;
 		}
 	}
 
