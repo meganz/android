@@ -26,7 +26,6 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
     private LinearLayout mainLinearLayout;
     private LinearLayout optionFromDevice;
     private LinearLayout optionFromSystem;
-    private LinearLayout optionScanDocument;
     private LinearLayout optionTakePicture;
     private LinearLayout optionCreateFolder;
 
@@ -47,13 +46,11 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
 
         optionFromDevice = contentView.findViewById(R.id.upload_from_device_layout);
         optionFromSystem = contentView.findViewById(R.id.upload_from_system_layout);
-        optionScanDocument = contentView.findViewById(R.id.scan_document_layout);
         optionTakePicture = contentView.findViewById(R.id.take_picture_layout);
         optionCreateFolder = contentView.findViewById(R.id.new_folder_layout);
 
         optionFromDevice.setOnClickListener(this);
         optionFromSystem.setOnClickListener(this);
-        optionScanDocument.setOnClickListener(this);
         optionTakePicture.setOnClickListener(this);
         optionCreateFolder.setOnClickListener(this);
 
@@ -80,14 +77,14 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
                 listener.uploadFromSystem();
                 break;
             }
-            case R.id.scan_document_layout: {
-                break;
-            }
+
             case R.id.take_picture_layout: {
+                log("Click take picture");
                 listener.takePictureAndUpload();
                 break;
             }
             case R.id.new_folder_layout: {
+                log("Click create new folder");
                 listener.showNewFolderDialog();
                 break;
             }
