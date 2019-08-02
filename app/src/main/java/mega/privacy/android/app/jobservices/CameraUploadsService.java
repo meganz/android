@@ -190,7 +190,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if(level < LOW_BATTERY_LEVEL && !Util.isCharging(CameraUploadsService.this)){
                 stopped = true;
                 if(megaApi != null){
-                    megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,CameraUploadsService.this);
+                    for(MegaTransfer transfer : cuTransfers) {
+                        megaApi.cancelTransfer(transfer);
+                    }
                 }
                 cancelNotification();
                 finish();
