@@ -158,6 +158,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private MegaNode cameraUploadNode = null;
     private int totalUploaded;
     private int totalToUpload;
+    private List<MegaTransfer> cuTransfers = new ArrayList<>();
     
     private long currentTimeStamp = 0;
     private long secondaryTimeStamp = 0;
@@ -256,7 +257,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     intent.getAction().equals(ACTION_LOGOUT)) {
                 log("onStartCommand intent action is " + intent.getAction());
                 stopped = true;
-                megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
+                for(MegaTransfer transfer : cuTransfers) {
+                    megaApi.cancelTransfer(transfer);
+                }
                 finish();
                 return START_NOT_STICKY;
             }
@@ -727,8 +730,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private void onQueueComplete() {
         log("onQueueComplete");
         log("Stopping foreground!");
-        
-        megaApi.resetTotalUploads();
+
+        if(megaApi.getNumPendingUploads() == 0) {
+            megaApi.resetTotalUploads();
+        }
         totalUploaded = 0;
         totalToUpload = 0;
         
@@ -1269,7 +1274,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (mVideoCompressor != null) {
             mVideoCompressor.stop();
         }
-        
+        cuTransfers.clear();
         canceled = true;
         running = false;
         stopForeground(true);
@@ -1395,7 +1400,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (e.getErrorCode() == MegaError.API_OK) {
                 //clear pause state and reset
                 megaApi.pauseTransfers(false,this);
-                megaApi.resetTotalUploads();
+                if(megaApi.getNumPendingUploads() == 0) {
+                    megaApi.resetTotalUploads();
+                }
             } else {
                 finish();
             }
@@ -1430,6 +1437,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Override
     public void onTransferStart(MegaApiJava api,MegaTransfer transfer) {
         log("onTransferStart: " + transfer.getFileName());
+        cuTransfers.add(transfer);
     }
     
     @Override
@@ -1471,7 +1479,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         log("Image sync finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
         log("transfer.getPath:" + transfer.getPath());
         log("transfer.getNodeHandle:" + transfer.getNodeHandle());
-        
+
         try {
             transferFinished(api,transfer,e);
         } catch (Throwable th) {
@@ -1665,7 +1673,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         log("startVideoCompression");
         
         List<SyncRecord> fullList = dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS);
-        megaApi.resetTotalUploads();
+        if(megaApi.getNumPendingUploads() == 0) {
+            megaApi.resetTotalUploads();
+        }
         totalUploaded = 0;
         totalToUpload = 0;
         
