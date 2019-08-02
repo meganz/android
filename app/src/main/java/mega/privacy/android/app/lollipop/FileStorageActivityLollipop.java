@@ -69,6 +69,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.Util;
 
 
@@ -1132,12 +1133,31 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 */
 	private void createFolder(String value) {
 		log(value + " Of value");
-		File newFolder = new File(path, value);
-		newFolder.mkdir();
-		newFolder.setReadable(true, false);
-		newFolder.setExecutable(true, false);
-		setFiles(path);
-	}
+        SDCardOperator sdCardOperator = null;
+        try {
+            sdCardOperator = new SDCardOperator(this);
+        } catch (SDCardOperator.SDCardException e) {
+            e.printStackTrace();
+        }
+
+		if(sdCardOperator != null) {
+		    if(sdCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
+                sdCardOperator.createFolder(sdCardOperator.getParent(path.getAbsolutePath()),value);
+            } else {
+                createFolderWithFile(value);
+            }
+        } else {
+		    createFolderWithFile(value);
+        }
+        setFiles(path);
+    }
+
+    private void createFolderWithFile(String value) {
+        File newFolder = new File(path, value);
+        newFolder.mkdir();
+        newFolder.setReadable(true, false);
+        newFolder.setExecutable(true, false);
+    }
 
 	public static boolean matches(String regex, CharSequence input) {
 		Pattern p = Pattern.compile(regex);

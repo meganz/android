@@ -51,6 +51,8 @@ import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollip
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -66,6 +68,7 @@ public class NodeController {
     MegaPreferences prefs = null;
 
     boolean isFolderLink = false;
+    private SDCardOperator sdCardOperator;
 
     public NodeController(Context context){
         log("NodeController created");
@@ -75,6 +78,11 @@ public class NodeController {
         }
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
+        }
+        try {
+            sdCardOperator = new SDCardOperator(context);
+        } catch (SDCardOperator.SDCardException e) {
+            e.printStackTrace();
         }
     }
 
@@ -92,6 +100,11 @@ public class NodeController {
         }
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
+        }
+        try {
+            sdCardOperator = new SDCardOperator(context);
+        } catch (SDCardOperator.SDCardException e) {
+            e.printStackTrace();
         }
     }
 
@@ -765,6 +778,15 @@ public class NodeController {
             }
         }
 
+        boolean downloadToSDCard = false;
+        String downloadRoot = null;
+        if(sdCardOperator != null) {
+            if(sdCardOperator.isSDCardPath(parentPath) && !new File(parentPath).canWrite()) {
+                downloadToSDCard = true;
+                downloadRoot = sdCardOperator.getDownloadRoot();
+            }
+        }
+
         if (hashes == null){
             log("hashes is null");
             if(url != null) {
@@ -797,7 +819,11 @@ public class NodeController {
                         log("localPath != null");
                         try {
                             log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
-                            Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+                            if(downloadToSDCard) {
+                                sdCardOperator.moveFile(sdCardOperator.getParent(parentPath),new File(localPath));
+                            } else {
+                                Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+                            }
 
                             if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
@@ -971,10 +997,16 @@ public class NodeController {
                 MegaNode node = megaApi.getNodeByHandle(hash);
                 if(node != null){
                     log("node NOT null");
-                    Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+                    Map<MegaNode, String> dlFiles = new HashMap();
                     if (node.getType() == MegaNode.TYPE_FOLDER) {
                         log("MegaNode.TYPE_FOLDER");
-                        getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
+                        if (downloadToSDCard) {
+                            long b = System.currentTimeMillis();
+                            sdCardOperator.buildFileStructure(dlFiles,parentPath,megaApi,node);
+                            TL.log(this, "@#@", System.currentTimeMillis() - b);
+                        } else {
+                            getDlList(dlFiles, node, new File(parentPath, node.getName()));
+                        }
                     } else {
                         log("MegaNode.TYPE_FILE");
                         dlFiles.put(node, parentPath);
@@ -1007,8 +1039,15 @@ public class NodeController {
                             Intent service = new Intent(context, DownloadService.class);
                             service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
                             service.putExtra(DownloadService.EXTRA_URL, url);
+                            if(downloadToSDCard) {
+                                service.putExtra(DownloadService.EXTRA_PATH, downloadRoot);
+                                service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
+                                service.putExtra(DownloadService.EXTRA_TARGET_ROOT, path);
+                            } else {
+                                service.putExtra(DownloadService.EXTRA_PATH, path);
+                            }
+                            service.putExtra(DownloadService.EXTRA_URL, url);
                             service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-                            service.putExtra(DownloadService.EXTRA_PATH, path);
                             service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
                             if(highPriority){
                                 service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);

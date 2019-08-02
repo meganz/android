@@ -48,6 +48,8 @@ import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipo
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -76,6 +78,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_SIZE = "DOCUMENT_SIZE";
 	public static String EXTRA_HASH = "DOCUMENT_HASH";
 	public static String EXTRA_URL = "DOCUMENT_URL";
+	public static String EXTRA_DOWNLOAD_TO_SDCARD = "download_to_sdcard";
+	public static String EXTRA_TARGET_ROOT = "download_root";
 	public static String EXTRA_PATH = "SAVE_PATH";
 	public static String EXTRA_FOLDER_LINK = "FOLDER_LINK";
 	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
@@ -113,6 +117,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	File currentFile;
 	File currentDir;
+	private Map<Long,String> targetPaths = new HashMap<>();
 	MegaNode currentDocument;
 
 	DatabaseHandler dbH = null;
@@ -222,6 +227,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         String url = intent.getStringExtra(EXTRA_URL);
         boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
+        if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
+            targetPaths.put(hash, intent.getStringExtra(EXTRA_TARGET_ROOT));
+        }
 		Uri contentUri = null;
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
             contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
@@ -1474,30 +1482,46 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				updateProgressNotification();
 			}
 
-			if (canceled) {
+            String path = transfer.getPath();
+            if (canceled) {
 				if((lock != null) && (lock.isHeld()))
 					try{ lock.release(); } catch(Exception ex) {}
 				if((wl != null) && (wl.isHeld()))
 					try{ wl.release(); } catch(Exception ex) {}
 
 				log("Download cancelled: " + transfer.getFileName());
-				File file = new File(transfer.getPath());
+				File file = new File(path);
 				file.delete();
 				DownloadService.this.cancel();
 			}
 			else{
 				if (error.getErrorCode() == MegaError.API_OK) {
 					log("Download OK: " + transfer.getFileName());
-					log("DOWNLOADFILE: " + transfer.getPath());
+					log("DOWNLOADFILE: " + path);
+                    String targetPath = targetPaths.get(transfer.getNodeHandle());
+                    if (targetPath != null) {
+                        try {
+                            SDCardOperator sdCardOperator = new SDCardOperator(this);
+                            File source = new File(path);
+                            path = sdCardOperator.move(targetPath,source);
+                            TL.log(this, "@#@", "new path is: " + path);
+                            File newFile = new File(path);
+                            if(newFile.exists() && newFile.length() > 0) {
+                                source.delete();
 
-					//To update thumbnails for videos
-					if(Util.isVideoFile(transfer.getPath())){
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    //To update thumbnails for videos
+                    if(Util.isVideoFile(path)){
 						log("Is video!!!");
 						MegaNode videoNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 						if (videoNode != null){
 							if(!videoNode.hasThumbnail()){
 								log("The video has not thumb");
-								ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+								ThumbnailUtilsLollipop.createThumbnailVideo(this, path, megaApi, transfer.getNodeHandle());
 							}
 						}
 						else{
@@ -1508,7 +1532,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						log("NOT video!");
 					}
 
-					File resultFile = new File(transfer.getPath());
+					File resultFile = new File(path);
 					File treeParent = resultFile.getParentFile();
 					while(treeParent != null)
 					{
@@ -1519,7 +1543,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					resultFile.setReadable(true, false);
 					resultFile.setExecutable(true, false);
 
-					String filePath = transfer.getPath();
+					String filePath = path;
 					File f = new File(filePath);
 					try {
 						Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -1554,13 +1578,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						alterDocument(tranfersUri, node.getName());
 					}
 
-					if(transfer.getPath().contains(Util.offlineDIR)){
+					if(path.contains(Util.offlineDIR)){
 						log("YESSSS it is Offline file");
 						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 						offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
 						if(offlineNode!=null){
-							saveOffline(offlineNode, transfer.getPath());
+							saveOffline(offlineNode, path);
 						}
 						else{
 							saveOfflineChatFile(transfer);
@@ -1579,11 +1603,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
-						File file = new File(transfer.getPath());
+						File file = new File(path);
 						file.delete();
 					}
 					else{
-						File file = new File(transfer.getPath());
+						File file = new File(path);
 						file.delete();
 					}
 				}

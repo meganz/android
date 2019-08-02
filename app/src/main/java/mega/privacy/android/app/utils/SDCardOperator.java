@@ -13,8 +13,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaPreferences;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
@@ -26,7 +28,7 @@ public class SDCardOperator {
 
     private String sdCardRoot;
 
-    private DocumentFile targetRoot;
+    private DocumentFile sdCardRootDocument;
 
     private DatabaseHandler dbh;
 
@@ -53,6 +55,22 @@ public class SDCardOperator {
         }
         dbh = DatabaseHandler.getDbHandler(context);
         sdCardRoot = Util.getSDCardRoot(downloadRoot);
+
+        MegaPreferences prefs = dbh.getPreferences();
+        if(prefs != null) {
+            String uriString = prefs.getUriExternalSDCard();
+            if (TextUtils.isEmpty(uriString)) {
+                //TODO
+            } else {
+                rootUri = Uri.parse(uriString);
+                sdCardRootDocument = DocumentFile.fromTreeUri(context, rootUri);
+                if (!sdCardRootDocument.canWrite()) {
+                    //TODO
+                }
+            }
+        } else {
+            throw new SDCardException("SDCardOperator initialization exception!");
+        }
     }
 
     public String getDownloadRoot() {
@@ -75,26 +93,25 @@ public class SDCardOperator {
         return false;
     }
 
-    public void move(DocumentFile target, File source) throws IOException {
-        String parent = source.getParent();
-        if (downloadRoot.equals(parent)) {
-            moveFile(target, source);
-        } else {
-            for (String folder : getSubFolders(downloadRoot, parent)) {
-                target = createFolder(target, folder);
-            }
-            moveFile(target, source);
-        }
+    public String move(String targetPath, File source) throws IOException {
+        DocumentFile targetFile = getParent(targetPath);
+        moveFile(targetFile, source);
+        return targetPath + File.separator + source.getName();
     }
 
-    public void buildFileStructure(DocumentFile parent, MegaApiJava api, MegaNode node) {
-        TL.log("buildFileStructure", "@#@", node.getName());
+    public void buildFileStructure(Map<MegaNode,String> dlList, String parent, MegaApiJava api, MegaNode node) {
         if (node.isFolder()) {
-            parent = createFolder(parent, node.getName());
+            createFolder(getParent(parent), node.getName());
+            parent += (File.separator + node.getName());
             ArrayList<MegaNode> children = api.getChildren(node);
             if (children != null) {
                 for (int i = 0; i < children.size(); i++) {
-                    buildFileStructure(parent, api, children.get(i));
+                    MegaNode child = children.get(i);
+                    if(child.isFolder()) {
+                        buildFileStructure(dlList,parent, api, child);
+                    } else {
+                        dlList.put(child, parent);
+                    }
                 }
             }
         }
@@ -102,19 +119,23 @@ public class SDCardOperator {
 
     public String getUriString() {
         String uri = dbh.getPreferences().getUriExternalSDCard();
-        if(!TextUtils.isEmpty(uri)) {
+        if (!TextUtils.isEmpty(uri)) {
             DocumentFile root = DocumentFile.fromTreeUri(context, Uri.parse(uri));
-            if(root.canWrite()) {
+            if (root.canWrite()) {
                 return uri;
             }
         }
         return null;
     }
 
-    public DocumentFile getParent(String rootUriString, String parentPath) {
-        DocumentFile root = DocumentFile.fromTreeUri(context, Uri.parse(rootUriString));
-        for (String folder : getSubFolders(sdCardRoot,parentPath)) {
-            root = root.findFile(folder);
+    public DocumentFile getParent(String parentPath) {
+        DocumentFile root = sdCardRootDocument;
+        for (String folder : getSubFolders(sdCardRoot, parentPath)) {
+            if(root.findFile(folder) == null) {
+                root = root.createDirectory(folder);
+            } else {
+                root = root.findFile(folder);
+            }
         }
         return root;
     }
@@ -139,6 +160,7 @@ public class SDCardOperator {
             log("delete temp file.");
             df.delete();
         }
+        //TODO alreay exists
         Uri uri = parent.createFile(null, name).getUri();
         OutputStream os = null;
         InputStream is = null;
