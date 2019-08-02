@@ -23,6 +23,9 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 
 public class MegaApiUtils {
 
@@ -315,15 +318,8 @@ public class MegaApiUtils {
                 }
 
                 if(!included){
-                    File avatar = null;
-                    if (context.getExternalCacheDir() != null){
-                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), users.get(i).getEmail() + ".jpg");
-                    }
-                    else{
-                        avatar = new File(context.getCacheDir().getAbsolutePath(), users.get(i).getEmail() + ".jpg");
-                    }
-
-                    if (avatar.exists()) {
+                    File avatar = buildAvatarFile(context, users.get(i).getEmail() + ".jpg");
+                    if (isFileAvailable(avatar)) {
                         if (avatar.length() > 0) {
                             lastContacted.add(users.get(i));
                         }

@@ -542,7 +542,6 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">הכנס</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">הקבצים המקומיים שלך יימחקו ואתה תנותק לאחר 10 ניסיונות כושלים.</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">קוד שגוי</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">קוד סודי שגוי, אנא נסה שוב. נשארו לך %2d ניסיונות.</string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">קוד סודי לא תואם </string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">הכנס קוד סודי</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">הכנס שוב את הקוד הסודי שלך</string>

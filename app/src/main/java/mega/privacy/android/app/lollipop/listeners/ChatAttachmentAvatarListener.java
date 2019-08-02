@@ -8,12 +8,14 @@ import android.graphics.BitmapFactory;
 import java.io.File;
 
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public class ChatAttachmentAvatarListener implements MegaRequestListenerInterface {
 
@@ -48,15 +50,9 @@ public class ChatAttachmentAvatarListener implements MegaRequestListenerInterfac
             }
 
             if (mail.compareTo(request.getEmail()) == 0){
-                File avatar = null;
-                if (context.getExternalCacheDir() != null){
-                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), mail + ".jpg");
-                }
-                else{
-                    avatar = new File(context.getCacheDir().getAbsolutePath(), mail + ".jpg");
-                }
+                File avatar = buildAvatarFile(context, mail + ".jpg");
                 Bitmap bitmap = null;
-                if (avatar.exists()){
+                if (isFileAvailable(avatar)){
                     if (avatar.length() > 0){
                         BitmapFactory.Options bOpts = new BitmapFactory.Options();
                         bOpts.inPurgeable = true;

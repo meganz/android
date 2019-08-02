@@ -699,7 +699,6 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Влез</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Вашите локални файлове ще бъдат изтрити и ще излезете от системата след 10 неуспешни опита.</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Грешен код</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Грешен ПИН код, моля опитайте отново. Остават ви %2d опита.</string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">ПИН кодовете не съвпадат</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Въведете своя Пин Код</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Въведете отново ПИН Код</string>

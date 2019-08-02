@@ -1,7 +1,3 @@
-/*
- * Created by Yuan Gao on 27/07/18.
- * Copyright (c) 2018 mega.co.nz
- */
 package mega.privacy.android.app;
 
 import android.os.Environment;

@@ -528,7 +528,6 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Retur</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Dina lokala data kommer att raderas och du loggas ut efter 10 misslyckade försök. </string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Felaktig kod</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Fel PIN-kod, försök igen, %2d försök återstår. </string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN-Kod stämmer ej </string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Ange din PIN-kod</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Ange din PIN-kod igen</string>

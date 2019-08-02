@@ -13,6 +13,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public class ChatParticipantAvatarListener implements MegaRequestListenerInterface {
 
     Context context;
@@ -38,15 +41,9 @@ public class ChatParticipantAvatarListener implements MegaRequestListenerInterfa
 
             if (holder.contactMail != null) {
                 if (holder.contactMail.compareTo(request.getEmail()) == 0){
-                    File avatar = null;
-                    if (context.getExternalCacheDir() != null){
-                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-                    }
-                    else{
-                        avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-                    }
+                    File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
                     Bitmap bitmap = null;
-                    if (avatar.exists()){
+                    if (isFileAvailable(avatar)){
                         if (avatar.length() > 0){
                             BitmapFactory.Options bOpts = new BitmapFactory.Options();
                             bOpts.inPurgeable = true;
@@ -64,15 +61,9 @@ public class ChatParticipantAvatarListener implements MegaRequestListenerInterfa
             }
             else{
                 if (holder.userHandle.compareTo(request.getEmail()) == 0){
-                    File avatar = null;
-                    if (context.getExternalCacheDir() != null){
-                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.userHandle + ".jpg");
-                    }
-                    else{
-                        avatar = new File(context.getCacheDir().getAbsolutePath(), holder.userHandle + ".jpg");
-                    }
+                    File avatar = buildAvatarFile(context, holder.userHandle + ".jpg");
                     Bitmap bitmap = null;
-                    if (avatar.exists()){
+                    if (isFileAvailable(avatar)){
                         if (avatar.length() > 0){
                             BitmapFactory.Options bOpts = new BitmapFactory.Options();
                             bOpts.inPurgeable = true;

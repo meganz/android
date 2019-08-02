@@ -3,19 +3,20 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.View;
 
 import java.io.File;
 
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public class UserAvatarListener implements MegaRequestListenerInterface {
     
@@ -39,14 +40,9 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
         if (e.getErrorCode() == MegaError.API_OK) {
             if (holder.contactMail.compareTo(request.getEmail()) == 0) {
-                File avatar = null;
-                if (context.getExternalCacheDir() != null) {
-                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(),holder.contactMail + ".jpg");
-                } else {
-                    avatar = new File(context.getCacheDir().getAbsolutePath(),holder.contactMail + ".jpg");
-                }
+                File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
                 Bitmap bitmap = null;
-                if (avatar.exists()) {
+                if (isFileAvailable(avatar)) {
                     if (avatar.length() > 0) {
                         BitmapFactory.Options bOpts = new BitmapFactory.Options();
                         bOpts.inPurgeable = true;

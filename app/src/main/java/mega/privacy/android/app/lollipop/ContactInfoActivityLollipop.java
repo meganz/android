@@ -80,7 +80,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -90,7 +89,6 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -113,6 +111,8 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_COPY_FOLDER;
 import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_MOVE_FOLDER;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.context;
 
 
@@ -1065,47 +1065,32 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	public void setAvatar() {
 		log("setAvatar");
-		File avatar = null;
-		if (getExternalCacheDir() != null) {
-			avatar = new File(getExternalCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
-		} else {
-			avatar = new File(getCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
-		}
-
-		if (avatar != null) {
+		File avatar = buildAvatarFile(this,user.getEmail() + ".jpg");
+		if (isFileAvailable(avatar)) {
 			setProfileAvatar(avatar);
 		}
 	}
 
 	public void setOfflineAvatar(String email) {
 		log("setOfflineAvatar");
-		File avatar = null;
-		if (getExternalCacheDir() != null) {
-			avatar = new File(getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-		} else {
-			avatar = new File(getCacheDir().getAbsolutePath(), email + ".jpg");
-		}
+		File avatar = buildAvatarFile(this, email + ".jpg");
 
-		if (avatar != null) {
-			Bitmap imBitmap = null;
-			if (avatar.exists()) {
-				if (avatar.length() > 0) {
-					BitmapFactory.Options bOpts = new BitmapFactory.Options();
-					bOpts.inPurgeable = true;
-					bOpts.inInputShareable = true;
-					imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-					if (imBitmap != null) {
-						contactPropertiesImage.setImageBitmap(imBitmap);
-						imageGradient.setVisibility(View.VISIBLE);
+        if (isFileAvailable(avatar)) {
+            Bitmap imBitmap = null;
+            if (avatar.length() > 0) {
+                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(),bOpts);
+                if (imBitmap != null) {
+                    contactPropertiesImage.setImageBitmap(imBitmap);
+                    imageGradient.setVisibility(View.VISIBLE);
 
-						if (imBitmap != null && !imBitmap.isRecycled()) {
-							int colorBackground = getDominantColor1(imBitmap);
-							imageLayout.setBackgroundColor(colorBackground);
-						}
-					}
-				}
-			}
-		}
+                    if (imBitmap != null && !imBitmap.isRecycled()) {
+                        int colorBackground = getDominantColor1(imBitmap);
+                        imageLayout.setBackgroundColor(colorBackground);
+                    }
+                }
+            }
+        }
 	}
 
 	public void setProfileAvatar(File avatar) {
@@ -1114,17 +1099,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		if (avatar.exists()) {
 			if (avatar.length() > 0) {
 				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
 				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 				if (imBitmap == null) {
 					avatar.delete();
-					if (getExternalCacheDir() != null) {
-						megaApi.getUserAvatar(user, getExternalCacheDir().getAbsolutePath() + "/" + user.getEmail(), this);
-					} else {
-						megaApi.getUserAvatar(user, getCacheDir().getAbsolutePath() + "/" + user.getEmail(), this);
-					}
-				} else {
+                    megaApi.getUserAvatar(user,buildAvatarFile(this, user.getEmail()).getAbsolutePath(), this);
+                } else {
 					contactPropertiesImage.setImageBitmap(imBitmap);
 					imageGradient.setVisibility(View.VISIBLE);
 
@@ -1574,18 +1553,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			log("MegaRequest.TYPE_GET_ATTR_USER");
 			if (e.getErrorCode() == MegaError.API_OK) {
-				File avatar = null;
-				if (getExternalCacheDir() != null) {
-					avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				} else {
-					avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
+				File avatar = buildAvatarFile(this, request.getEmail() + ".jpg");
 				Bitmap imBitmap = null;
-				if (avatar.exists()) {
+				if (isFileAvailable(avatar)) {
 					if (avatar.length() > 0) {
 						BitmapFactory.Options bOpts = new BitmapFactory.Options();
-						bOpts.inPurgeable = true;
-						bOpts.inInputShareable = true;
 						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 						if (imBitmap == null) {
 							avatar.delete();

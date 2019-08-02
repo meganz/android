@@ -15,6 +15,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public class UserAvatarListenerShare implements MegaRequestListenerInterface {
 
     Context context;
@@ -35,15 +38,9 @@ public class UserAvatarListenerShare implements MegaRequestListenerInterface {
         if (e.getErrorCode() == MegaError.API_OK){
 
             if (holder.mail.compareTo(request.getEmail()) == 0){
-                File avatar = null;
-                if (context.getExternalCacheDir() != null){
-                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.mail + ".jpg");
-                }
-                else{
-                    avatar = new File(context.getCacheDir().getAbsolutePath(), holder.mail + ".jpg");
-                }
+                File avatar = buildAvatarFile(context, holder.mail + ".jpg");
                 Bitmap bitmap = null;
-                if (avatar.exists()){
+                if (isFileAvailable(avatar)) {
                     if (avatar.length() > 0){
                         BitmapFactory.Options bOpts = new BitmapFactory.Options();
                         bOpts.inPurgeable = true;

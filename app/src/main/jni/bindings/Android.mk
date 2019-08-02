@@ -8,7 +8,7 @@ LOCAL_MODULE := mega
 LOCAL_CFLAGS := -fdata-sections -ffunction-sections -DDEBUG
 LOCAL_SRC_FILES := $(LOCAL_PATH)/megasdk.cpp $(LOCAL_PATH)/megachat.cpp
 LOCAL_LDLIBS := -lm -lz -llog -lGLESv2 -lOpenSLES -latomic
-LOCAL_LDFLAGS :=  -Wl,-dead_strip,-gc-sections 
+LOCAL_LDFLAGS :=  -Wl,-gc-sections
 LOCAL_STATIC_LIBRARIES := megasdk megachat
 
 ifeq ($(DISABLE_WEBRTC),false)
