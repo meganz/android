@@ -475,6 +475,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     static public void localLogoutApp(Context context){
+
         log("localLogoutApp");
 
         try {
@@ -577,8 +578,12 @@ public class AccountController implements View.OnClickListener{
     static public void logout(Context context, MegaApiAndroid megaApi) {
         log("logout");
 
+        MegaApplication application = (MegaApplication) ((Activity)context).getApplication();
+        //Clear num verions after logout
+        application.getMyAccountInfo().setNumVersions(-1);
+
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = application.getMegaApi();
         }
 
         if (context instanceof ManagerActivityLollipop){
