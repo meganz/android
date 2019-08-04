@@ -820,7 +820,7 @@ public class NodeController {
                         try {
                             log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
                             if(downloadToSDCard) {
-                                sdCardOperator.moveFile(sdCardOperator.getParent(parentPath),new File(localPath));
+                                sdCardOperator.moveFile(parentPath,new File(localPath));
                             } else {
                                 Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
                             }

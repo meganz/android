@@ -1142,7 +1142,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		if(sdCardOperator != null) {
 		    if(sdCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
-                sdCardOperator.createFolder(sdCardOperator.getParent(path.getAbsolutePath()),value);
+                sdCardOperator.createFolder(path.getAbsolutePath(),value);
             } else {
                 createFolderWithFile(value);
             }
