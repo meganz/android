@@ -1063,23 +1063,32 @@ public class Util {
         return path;
     }
 
-    @Nullable
-    private static String query(Uri uri,String selection,MegaNode node) {
-        String fileName = node.getName();
-        long fileSize = node.getSize();
-        String[] selectionArgs = { fileName, String.valueOf(fileSize) };
-        Cursor cursor = context.getContentResolver().query(uri,new String[] { MediaStore.Video.Media.DATA },selection,selectionArgs,null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-            String path = cursor.getString(dataColumn);
-            cursor.close();
-            File localFile = new File(path);
-            if (localFile.exists()) {
-                return path;
-            }
-        }
-        return null;
-    }
+	@Nullable
+	private static String query(Uri uri, String selection, MegaNode node) {
+		String fileName = node.getName();
+		long fileSize = node.getSize();
+		String[] selectionArgs = {fileName, String.valueOf(fileSize)};
+		Cursor cursor = null;
+		try {
+			cursor = context.getContentResolver().query(uri, new String[]{MediaStore.Video.Media.DATA}, selection, selectionArgs, null);
+			if (cursor != null && cursor.moveToFirst()) {
+				int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+				String path = cursor.getString(dataColumn);
+				cursor.close();
+				File localFile = new File(path);
+				if (localFile.exists()) {
+					return path;
+				}
+			}
+		} catch (Exception ex) {
+			log("Exception is thrown, ex: " + ex.toString());
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+
+		return null;
+	}
 
     private static String queryByNameOrSize(Uri uri,MegaNode node) {
         String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? OR " + MediaStore.Video.Media.SIZE + " = ?";
