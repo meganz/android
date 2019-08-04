@@ -475,7 +475,6 @@ public class AccountController implements View.OnClickListener{
     }
 
     static public void localLogoutApp(Context context){
-
         log("localLogoutApp");
 
         try {
