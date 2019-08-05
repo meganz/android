@@ -331,21 +331,17 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             String path = isSecondary ? localPathSecondary : localPath;
             
             int dataColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATA);
-            int modifiedColumn = 0, addedColumn = 0;
+            int modifiedColumn = 0;
             if (cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED) != -1) {
                 modifiedColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
-            }
-            if (cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED) != -1) {
-                addedColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED);
             }
             
             while (cursorCamera.moveToNext()) {
                 
                 Media media = new Media();
                 media.filePath = cursorCamera.getString(dataColumn);
-                long addedTime = cursorCamera.getLong(addedColumn) * 1000;
                 long modifiedTime = cursorCamera.getLong(modifiedColumn) * 1000;
-                media.timestamp = addedTime > modifiedTime ? addedTime : modifiedTime;
+                media.timestamp = modifiedTime;
                 
                 log("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + path);
                 
@@ -466,8 +462,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             
             //Primary Media Folder
             Cursor cursorCamera;
-            String orderVideo = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
-            String orderImage = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE;
+            String orderVideo = MediaStore.MediaColumns.DATE_MODIFIED;
+            String orderImage = MediaStore.MediaColumns.DATE_MODIFIED;
+            if(!isLocalFolderOnSDCard(localPath)) {
+                orderVideo += " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
+                orderImage += " ASC LIMIT 0," + PAGE_SIZE;
+            }
             if (isVideo) {
                 cursorCamera = app.getContentResolver().query(uri,projection,selectionCameraVideo,selectionArgs,orderVideo);
             } else {
@@ -481,10 +481,16 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (secondaryEnabled) {
                 log("if(secondaryEnabled)");
                 Cursor cursorSecondary;
+                String orderVideoSecondary = MediaStore.MediaColumns.DATE_MODIFIED;
+                String orderImageSecondary = MediaStore.MediaColumns.DATE_MODIFIED;
+                if(!isLocalFolderOnSDCard(localPathSecondary)) {
+                    orderVideoSecondary += " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
+                    orderImageSecondary += " ASC LIMIT 0," + PAGE_SIZE;
+                }
                 if (isVideo) {
-                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondaryVideo,selectionArgs,orderVideo);
+                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondaryVideo,selectionArgs,orderVideoSecondary);
                 } else {
-                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondary,selectionArgs,orderImage);
+                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondary,selectionArgs,orderImageSecondary);
                 }
                 
                 if (cursorSecondary != null) {
@@ -1234,6 +1240,29 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             dbH.deleteAllSyncRecords(TYPE_ANY);
             dbH.saveShouldClearCamsyncRecords(false);
         }
+    }
+
+    private static String getSDCardRoot(String path) {
+        int i = 0,x = 0;
+        for(; x < path.toCharArray().length;x++) {
+            char c = path.toCharArray()[x];
+            if(c == '/') {
+                i++;
+            }
+            if(i == 3) {
+                break;
+            }
+        }
+        return path.substring(0,x);
+    }
+
+    private boolean isLocalFolderOnSDCard(String localPath) {
+        File[] fs = getExternalCacheDirs();
+        if (fs.length > 1 && fs[1] != null) {
+            String sdRoot = getSDCardRoot(fs[1].getAbsolutePath());
+            return localPath.startsWith(sdRoot);
+        }
+        return false;
     }
     
     private void handleException(Exception e) {
