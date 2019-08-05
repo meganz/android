@@ -39,6 +39,8 @@ import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.Spannable;
@@ -114,8 +116,9 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
 public class Util {
-	
-	public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 300;
+
+    public static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd HH.mm.ss";
+    public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 1000;
 	
 	public static float dpWidthAbs = 360;
 	public static float dpHeightAbs = 592;
@@ -209,6 +212,17 @@ public class Util {
 			return null;
 		}
 	}
+
+    public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
+        String nodeFingerprint = node.getFingerprint();
+        String nodeOriginalFingerprint = node.getOriginalFingerprint();
+
+        String fileFingerprint = megaApi.getFingerprint(localPath);
+        if (fileFingerprint != null) {
+            return fileFingerprint.equals(nodeFingerprint) || fileFingerprint.equals(nodeOriginalFingerprint);
+        }
+        return false;
+    }
 
 	public static File createTemporalURLFile(String name, String data){
 
@@ -636,7 +650,7 @@ public class Util {
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
 	}
-	
+
 	static public boolean isOnline(Context context) {
 	    if(context == null) return true;
 		
@@ -1026,7 +1040,57 @@ public class Util {
         File tmp = context.getDir("tmp", 0);
 		return file.getAbsolutePath().contains(tmp.getParent());
 	}
-	
+
+    /**
+     * Find the local path of a video node.
+     *
+     * @param node MegaNode in cloud drive which should be a video.
+     * @return Corresponding local path of the node.
+     */
+    public static String findVideoLocalPath (MegaNode node) {
+        String path = queryByNameAndSize(MediaStore.Video.Media.INTERNAL_CONTENT_URI,node);
+        if(path == null) {
+            path = queryByNameAndSize(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,node);
+        }
+
+        if(path == null) {
+            path = queryByNameOrSize(MediaStore.Video.Media.INTERNAL_CONTENT_URI,node);
+            if(path == null) {
+                path = queryByNameOrSize(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,node);
+            }
+        }
+        // if needed, can add file system scanning here.
+        return path;
+    }
+
+    @Nullable
+    private static String query(Uri uri,String selection,MegaNode node) {
+        String fileName = node.getName();
+        long fileSize = node.getSize();
+        String[] selectionArgs = { fileName, String.valueOf(fileSize) };
+        Cursor cursor = context.getContentResolver().query(uri,new String[] { MediaStore.Video.Media.DATA },selection,selectionArgs,null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            String path = cursor.getString(dataColumn);
+            cursor.close();
+            File localFile = new File(path);
+            if (localFile.exists()) {
+                return path;
+            }
+        }
+        return null;
+    }
+
+    private static String queryByNameOrSize(Uri uri,MegaNode node) {
+        String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? OR " + MediaStore.Video.Media.SIZE + " = ?";
+        return query(uri,selection,node);
+    }
+
+    private static String queryByNameAndSize(Uri uri,MegaNode node) {
+        String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Video.Media.SIZE + " = ?";
+        return query(uri,selection,node);
+    }
+
 	/*
 	 * Check is file belongs to the app and temporary
 	 */
@@ -1172,114 +1236,18 @@ public class Util {
 	}
 
 
-	
-	public static String getPhotoSyncName (long timeStamp, String fileName){
-		String photoSyncName = null;
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(timeStamp);
-		
-		String extension = "";
-		String[] s = fileName.split("\\.");
-		if (s != null){
-			if (s.length > 0){
-				extension = s[s.length-1];
-			}
-		}
-				
-		String year;
-		String month;
-		String day;
-		String hour;
-		String minute;
-		String second;
-		
-		year = cal.get(Calendar.YEAR) + "";
-		month = (cal.get(Calendar.MONTH)+1) + "";
-		if ((cal.get(Calendar.MONTH) + 1) < 10){
-			month = "0" + month;
-		}
-		
-		day = cal.get(Calendar.DAY_OF_MONTH) + "";
-		if (cal.get(Calendar.DAY_OF_MONTH) < 10){
-			day = "0" + day;
-		}
-		
-		hour = cal.get(Calendar.HOUR_OF_DAY) + "";
-		if (cal.get(Calendar.HOUR_OF_DAY) < 10){
-			hour = "0" + hour;
-		}
-		
-		minute = cal.get(Calendar.MINUTE) + "";
-		if (cal.get(Calendar.MINUTE) < 10){
-			minute = "0" + minute;
-		}
-		
-		second = cal.get(Calendar.SECOND) + "";
-		if (cal.get(Calendar.SECOND) < 10){
-			second = "0" + second;
-		}
 
-		photoSyncName = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + "." + extension;
-		
-		return photoSyncName;
+	public static String getPhotoSyncName (long timeStamp, String fileName){
+        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
+        return sdf.format(new Date(timeStamp)) + fileName.substring(fileName.lastIndexOf('.'));
 	}
 	
 	public static String getPhotoSyncNameWithIndex (long timeStamp, String fileName, int photoIndex){
-		
-		if (photoIndex == 0){
-			return getPhotoSyncName(timeStamp, fileName);
-		}
-		
-		String photoSyncName = null;
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(timeStamp);
-		
-		String extension = "";
-		String[] s = fileName.split("\\.");
-		if (s != null){
-			if (s.length > 0){
-				extension = s[s.length-1];
-			}
-		}
-				
-		String year;
-		String month;
-		String day;
-		String hour;
-		String minute;
-		String second;
-		
-		year = cal.get(Calendar.YEAR) + "";
-		month = (cal.get(Calendar.MONTH)+1) + "";
-		if ((cal.get(Calendar.MONTH) + 1) < 10){
-			month = "0" + month;
-		}
-		
-		day = cal.get(Calendar.DAY_OF_MONTH) + "";
-		if (cal.get(Calendar.DAY_OF_MONTH) < 10){
-			day = "0" + day;
-		}
-		
-		hour = cal.get(Calendar.HOUR_OF_DAY) + "";
-		if (cal.get(Calendar.HOUR_OF_DAY) < 10){
-			hour = "0" + hour;
-		}
-		
-		minute = cal.get(Calendar.MINUTE) + "";
-		if (cal.get(Calendar.MINUTE) < 10){
-			minute = "0" + minute;
-		}
-		
-		second = cal.get(Calendar.SECOND) + "";
-		if (cal.get(Calendar.SECOND) < 10){
-			second = "0" + second;
-		}
-
-		photoSyncName = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + "_" + photoIndex + "." + extension;
-		
-		return photoSyncName;
+        if(photoIndex == 0) {
+            return getPhotoSyncName(timeStamp, fileName);
+        }
+        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
+        return sdf.format(new Date(timeStamp)) + "_" + photoIndex + fileName.substring(fileName.lastIndexOf('.'));
 	}
 	
 	public static int getNumberOfNodes (MegaNode parent, MegaApiAndroid megaApi){
@@ -2368,7 +2336,7 @@ public class Util {
 		}
 
 	}
-	
+
 	public static boolean isPermissionGranted(Context context, String permission){
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
@@ -2381,9 +2349,9 @@ public class Util {
 
 			String timeString;
 			if (hours > 0) {
-				timeString = String.format("%d:%d:%02d",hours,minutes,seconds);
+				timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
 			} else {
-				timeString = String.format("%d:%02d",minutes,seconds);
+				timeString = String.format("%d:%02d", minutes, seconds);
 			}
 
 			log("The duration is: " + hours + " " + minutes + " " + seconds);
@@ -2392,7 +2360,83 @@ public class Util {
 		return null;
 	}
 
+	/**
+	 * This method detects whether the android device is tablet
+	 *
+	 * @param context the passed Activity to be detected
+	 */
+	public static boolean isTablet(Context context) {
+		return (context.getResources().getConfiguration().screenLayout
+				& Configuration.SCREENLAYOUT_SIZE_MASK)
+				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
+	}
+
+	/**
+	 * This method detects whether the url matches certain URL regular expressions
+	 * @param url the passed url to be detected
+	 * @param regexs the array of URL regular expressions
+	 */
+
+	public static boolean matchRegexs(String url, String[] regexs) {
+		if (url == null) {
+			return false;
+		}
+		for (String regex : regexs) {
+			if (url.matches(regex)) {
+				return true;
+			}
+		}
+		return false;
+
+	}
+
 	private static void log(String message) {
 		log("Util", message);
 	}
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static void showKeyboardDelayed(final View view) {
+        log("showKeyboardDelayed");
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }, 50);
+    }
+
+    public static boolean isDeviceSupportCompression(){
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+    }
+
+    public static void purgeDirectory(File dir) {
+	    log("removing cache files ");
+	    if(!dir.exists()){
+	        return;
+        }
+
+	    try{
+            for (File file: dir.listFiles()) {
+                log("removing " + file.getAbsolutePath());
+                if (file.isDirectory()) {
+                    purgeDirectory(file);
+                }
+                file.delete();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

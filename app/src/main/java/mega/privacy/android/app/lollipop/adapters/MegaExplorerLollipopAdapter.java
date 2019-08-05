@@ -24,7 +24,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
@@ -34,6 +33,7 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
@@ -854,7 +854,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				}
 			}
 		}else{
-			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
+			if(n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)){
 				if (prefs != null){
 					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
 				}
