@@ -39,6 +39,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoDownsampling;
+import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
@@ -62,10 +63,12 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
+
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
-public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MyChatFilesExisitListener<Intent> {
 
 	static final float DOWNSCALE_IMAGES_PX = 2000000f;
 
@@ -126,6 +129,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private int notificationId = Constants.NOTIFICATION_CHAT_UPLOAD;
 	private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID;
 	private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME;
+
+	//Intent being stored when My Chat Files folder does not exist
+	private Intent preservedIntent;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -239,52 +245,57 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
+		if (ChatUtil.existsMyChatFiles(intent, megaApi, this, this)) {
+			log(Constants.CHAT_FOLDER + " already exists");
+			parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+			handleIntentIfFolderExist(intent);
+		} else {
+			log(Constants.CHAT_FOLDER + " does not exist, create the folder then upload files");
+		}
+	}
 
-		parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
-		if(parentNode != null){
-			log("The destination "+Constants.CHAT_FOLDER+ " already exists");
+	private void handleIntentIfFolderExist(Intent intent) {
+		ArrayList<PendingMessageSingle> pendingMessageSingles = new ArrayList<>();
+		if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
+			HashMap<String, String> fileFingerprints = (HashMap<String, String>) intent.getSerializableExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS);
+			long[] idPendMsgs = intent.getLongArrayExtra(EXTRA_PEND_MSG_IDS);
+			long[] attachFiles = intent.getLongArrayExtra(EXTRA_ATTACH_FILES);
+			long[] idChats = intent.getLongArrayExtra(EXTRA_ATTACH_CHAT_IDS);
 
-			ArrayList<PendingMessageSingle> pendingMessageSingles = new ArrayList<>();
-			if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
-				HashMap<String, String> fileFingerprints = (HashMap<String, String>) intent.getSerializableExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS);
-				long[] idPendMsgs = intent.getLongArrayExtra(EXTRA_PEND_MSG_IDS);
-				long[] attachFiles = intent.getLongArrayExtra(EXTRA_ATTACH_FILES);
-				long[] idChats = intent.getLongArrayExtra(EXTRA_ATTACH_CHAT_IDS);
-
-				if (attachFiles!=null && attachFiles.length>0 && idChats!=null && idChats.length>0) {
-					for (int i=0; i<attachFiles.length; i++) {
-						for (int j=0; j<idChats.length; j++) {
-							requestSent++;
-							megaChatApi.attachNode(idChats[j], attachFiles[i], this);
-						}
+			if (attachFiles!=null && attachFiles.length>0 && idChats!=null && idChats.length>0) {
+				for (int i=0; i<attachFiles.length; i++) {
+					for (int j=0; j<idChats.length; j++) {
+						requestSent++;
+						megaChatApi.attachNode(idChats[j], attachFiles[i], this);
 					}
 				}
+			}
 
-				if (idPendMsgs!=null && idPendMsgs.length>0 && fileFingerprints!=null && !fileFingerprints.isEmpty()) {
-					for (Map.Entry<String, String> entry : fileFingerprints.entrySet()) {
-						if (entry != null) {
-							String fingerprint = entry.getKey();
-							String path = entry.getValue();
+			if (idPendMsgs!=null && idPendMsgs.length>0 && fileFingerprints!=null && !fileFingerprints.isEmpty()) {
+				for (Map.Entry<String, String> entry : fileFingerprints.entrySet()) {
+					if (entry != null) {
+						String fingerprint = entry.getKey();
+						String path = entry.getValue();
 
-							if (fingerprint == null || path == null) {
-								log("Error, fingerprint: "+ fingerprint+" path: "+path);
-								continue;
-							}
+						if (fingerprint == null || path == null) {
+							log("Error, fingerprint: "+ fingerprint+" path: "+path);
+							continue;
+						}
 
-							totalUploads++;
+						totalUploads++;
 
-							if(!wl.isHeld()){
-								wl.acquire();
-							}
+						if(!wl.isHeld()){
+							wl.acquire();
+						}
 
-							if(!lock.isHeld()){
-								lock.acquire();
-							}
-							pendingMessageSingles.clear();
-							for (int i = 0; i < idPendMsgs.length; i++) {
-								PendingMessageSingle pendingMsg = null;
-								if (idPendMsgs[i] != -1) {
-									pendingMsg = dbH.findPendingMessageById(idPendMsgs[i]);
+						if(!lock.isHeld()){
+							lock.acquire();
+						}
+						pendingMessageSingles.clear();
+						for (int i = 0; i < idPendMsgs.length; i++) {
+							PendingMessageSingle pendingMsg = null;
+							if (idPendMsgs[i] != -1) {
+								pendingMsg = dbH.findPendingMessageById(idPendMsgs[i]);
 //									One transfer for file --> onTransferFinish() attach to all selected chats
 									if (pendingMsg != null && pendingMsg.getChatId() != -1 && path.equals(pendingMsg.getFilePath()) && fingerprint.equals(pendingMsg.getFingerprint())) {
 										pendingMessageSingles.add(pendingMsg);
@@ -305,20 +316,20 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					pendingMsg = dbH.findPendingMessageById(idPendMsg);
 				}
 
-				if(pendingMsg!=null){
-					sendOriginalAttachments = DBUtil.isSendOriginalAttachments(this);
-					log("sendOriginalAttachments is "+sendOriginalAttachments);
+			if (pendingMsg!=null) {
+				sendOriginalAttachments = DBUtil.isSendOriginalAttachments(this);
+				log("sendOriginalAttachments is "+sendOriginalAttachments);
 
-					if(chatId!=-1){
-						log("The chat id is: "+chatId);
+				if(chatId!=-1){
+					log("The chat id is: "+chatId);
 
 						if((type==null)||(!type.equals(Constants.EXTRA_VOICE_CLIP))){
 							totalUploads++;
 						}
 
-						if(!wl.isHeld()){
-							wl.acquire();
-						}
+					if(!wl.isHeld()){
+						wl.acquire();
+					}
 
 						if(!lock.isHeld()){
 							lock.acquire();
@@ -333,15 +344,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
 			}
 		}
-		else{
-			log("Chat folder NOT exists --> STOP service");
-			isForeground = false;
-			stopForeground(true);
-			mNotificationManager.cancel(notificationId);
-			stopSelf();
-			log("after stopSelf");
-		}
-	}
 
 	void initUpload (ArrayList<PendingMessageSingle> pendingMsgs, String type) {
 		log("initUpload");
@@ -1470,7 +1472,22 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-		if (e.getErrorCode()==MegaError.API_OK){
+		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER && CHAT_FOLDER.equals(request.getName())) {
+			if (e.getErrorCode() == MegaError.API_OK) {
+				log("Create folder successfully, continue on pending chat upload");
+				handleStoredData();
+			} else {
+				//cannot create chat folder
+				log("Chat folder NOT exists and cannot be created --> STOP service");
+			    isForeground = false;
+			    stopForeground(true);
+			    mNotificationManager.cancel(notificationId);
+			    stopSelf();
+			    log("after stopSelf");
+			}
+		}
+
+		if (e.getErrorCode()==MegaError.API_OK) {
 			log("onRequestFinish OK");
 		}
 		else {
@@ -1640,5 +1657,20 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 		}
+	}
+
+	@Override
+	public void storedUnhandledData(Intent preservedData) {
+		preservedIntent = preservedData;
+	}
+
+	@Override
+	public void handleStoredData() {
+		log("Create folder successfully, continue on pending chat upload");
+		if (parentNode == null) {
+			parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+		}
+		handleIntentIfFolderExist(preservedIntent);
+		preservedIntent = null;
 	}
 }

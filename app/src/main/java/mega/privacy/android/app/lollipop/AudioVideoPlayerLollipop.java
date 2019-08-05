@@ -115,7 +115,6 @@ import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
-import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -124,6 +123,7 @@ import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2483,7 +2483,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             case R.id.full_video_viewer_share: {
                 log("Share option");
-                intentToSendFile(uri);
+                Uri newUri = uri;
+                if (uri.toString().contains(CacheFolderManager.VOICE_CLIP_FOLDER)) {
+                    MegaNode file = megaApi.getNodeByHandle(handle);
+                    String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                    if (localPath == null) break;
+                    File voiceClipFile = new File(localPath);
+                    newUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", voiceClipFile);
+                }
+
+                intentToSendFile(newUri);
                 break;
             }
             case R.id.full_video_viewer_properties: {

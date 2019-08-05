@@ -96,6 +96,7 @@ import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
+import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -155,6 +156,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.EDITING_MESSAGE;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.LATITUDE;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.LONGITUDE;
@@ -167,7 +169,7 @@ import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 import static mega.privacy.android.app.utils.Util.context;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener {
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<ArrayList<AndroidMegaChatMessage>> {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -388,6 +390,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean isShareLinkDialogDismissed = false;
 
     private ActionMode actionMode;
+
+    // Data being stored when My Chat Files folder does not exist
+    private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
+    // The flag to indicate whether forwarding message is on going
+    private boolean isForwardingMessage = false;
+
+    @Override
+    public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
+        this.preservedMessagesSelected = preservedData;
+    }
+
+    @Override
+    public void handleStoredData() {
+        forwardMessages(preservedMessagesSelected);
+        preservedMessagesSelected = null;
+    }
 
     private class UserTyping {
         MegaChatParticipant participantTyping;
@@ -2518,8 +2536,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected){
         log("forwardMessages");
-        stopReproductions();
-        chatC.prepareAndroidMessagesToForward(messagesSelected, idChat);
+        //Prevent trigger multiple forwarding messages screens in multiple clicks
+        if (isForwardingMessage) {
+            log("forwarding message is on going");
+            return;
+        }
+
+        if (ChatUtil.existsMyChatFiles(messagesSelected, megaApi, this, this)) {
+            stopReproductions();
+            chatC.prepareAndroidMessagesToForward(messagesSelected, idChat);
+            isForwardingMessage = true;
+        }
     }
 
     @Override
@@ -2618,8 +2645,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             statusDialog = temp;
         }
-        else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK) {
-            if(!Util.isOnline(this)) {
+        else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT) {
+            isForwardingMessage = false;
+            if (resultCode != RESULT_OK) return;
+            if (!Util.isOnline(this)) {
                 removeProgressDialog();
 
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
@@ -2629,26 +2658,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             showProgressForwarding();
 
             long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
-            log("Send "+idMessages.length+" messages");
+            log("Send " + idMessages.length + " messages");
 
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-            log("Send to "+chatHandles.length+" chats");
+            log("Send to " + chatHandles.length + " chats");
 
             long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
 
             if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
                 if (contactHandles != null && contactHandles.length > 0) {
                     ArrayList<MegaUser> users = new ArrayList<>();
-                    ArrayList<MegaChatRoom> chats =  new ArrayList<>();
+                    ArrayList<MegaChatRoom> chats = new ArrayList<>();
 
-                    for (int i=0; i<contactHandles.length; i++) {
+                    for (int i = 0; i < contactHandles.length; i++) {
                         MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
                         if (user != null) {
                             users.add(user);
                         }
                     }
 
-                    for (int i=0; i<chatHandles.length; i++) {
+                    for (int i = 0; i < chatHandles.length; i++) {
                         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
                         if (chatRoom != null) {
                             chats.add(chatRoom);
@@ -2662,16 +2691,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
                         megaChatApi.createChat(false, peers, listener);
                     }
-                }
-                else {
+                } else {
                     int countChat = chatHandles.length;
                     log("Selected: " + countChat + " chats to send");
 
                     MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, idChat);
                     forwardChatProcessor.forward(chatRoom);
                 }
-            }
-            else {
+            } else {
                 log("Error on sending to chat");
             }
         }
@@ -7314,6 +7341,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Attribute USER_ATTR_GEOLOCATION disabled");
                     MegaApplication.setEnabledGeoLocation(false);
                 }
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER && CHAT_FOLDER.equals(request.getName())) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                log("create My Chat Files, copy reserved nodes");
+                handleStoredData();
+            } else {
+                log("not create My Chat Files" + e.getErrorCode() + " " + e.getErrorString());
             }
         }
     }

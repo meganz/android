@@ -9,6 +9,8 @@ public class Constants {
 	public static String PIN_ALPHANUMERIC = "alphanumeric";
 
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
+    public static final int PHOTOS_UPLOAD_JOB_ID = 10096;
+    public static final int BOOT_JOB_ID = 10097;
 
 	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
@@ -62,22 +64,23 @@ public class Constants {
 
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
-	final public static int MULTIPLE_SEND_RUBBISH = MULTIPLE_MOVE+1;
+	final public static int MULTIPLE_SEND_RUBBISH = 1;
 	//one file to many contacts
-	final public static int MULTIPLE_CONTACTS_SEND_INBOX = MULTIPLE_SEND_RUBBISH+1;
+	final public static int MULTIPLE_CONTACTS_SEND_INBOX = 2;
 	//many files to one contacts
-	final public static int MULTIPLE_FILES_SEND_INBOX = MULTIPLE_CONTACTS_SEND_INBOX+1;
-	final public static int MULTIPLE_COPY = MULTIPLE_FILES_SEND_INBOX+1;
-	final public static int MULTIPLE_REMOVE_SHARING_CONTACTS = MULTIPLE_COPY+1;
+	final public static int MULTIPLE_FILES_SEND_INBOX = 3;
+	final public static int MULTIPLE_COPY = 4;
+	final public static int MULTIPLE_REMOVE_SHARING_CONTACTS = 5;
 	//one folder to many contacts
-	final public static int MULTIPLE_CONTACTS_SHARE = MULTIPLE_REMOVE_SHARING_CONTACTS+1;
+	final public static int MULTIPLE_CONTACTS_SHARE = 6;
 	//one contact, many files
-	final public static int MULTIPLE_FILE_SHARE = MULTIPLE_CONTACTS_SHARE+1;
-	final public static int MULTIPLE_LEAVE_SHARE = MULTIPLE_FILE_SHARE+1;
+	final public static int MULTIPLE_FILE_SHARE = 7;
+	final public static int MULTIPLE_LEAVE_SHARE = 8;
 
-	final public static int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = MULTIPLE_LEAVE_SHARE+1;
-	final public static int MULTIPLE_CHAT_IMPORT = MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER+1;
-	final public static int MULTIPLE_FORWARD_MESSAGES = MULTIPLE_CHAT_IMPORT+1;
+	final public static int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = 9;
+	final public static int MULTIPLE_CHAT_IMPORT = 10;
+	final public static int MULTIPLE_FORWARD_MESSAGES = 11;
+    final public static int MULTIPLE_CHANGE_PERMISSION = 12;
 
 	final public static int MULTIPLE_RESTORED_FROM_RUBBISH = MULTIPLE_FORWARD_MESSAGES+1;
 
@@ -132,8 +135,12 @@ public class Constants {
 
 	public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
 	public static final int REQUEST_READ_WRITE_STORAGE = 9;
+    public static final int REQUEST_CAMERA_UPLOAD = 10;
+    public static final int REQUEST_CAMERA_ON_OFF = 11;
+    public static final int REQUEST_CAMERA_ON_OFF_FIRST_TIME = 12;
 
-	public static final int WRITE_LOG = 10;
+
+	public static final int WRITE_LOG = 13;
 
 	public static final int RECORD_VOICE_CLIP = 11;
     public static final int REQUEST_STORAGE_VOICE_CLIP = 12;
@@ -145,7 +152,7 @@ public class Constants {
 	public static final int TYPE_END_RECORD = 2;
 	public static final int TYPE_ERROR_RECORD = 3;
 
-    public static final int PRO_LITE = 4;
+	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
 	public static final int PRO_I = 1;
 	public static final int PRO_II = 2;
@@ -170,7 +177,7 @@ public class Constants {
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLDER";
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
 	public static String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
-    public static String ACTION_CHILD_UPLOADED_OK = "ACTION_CHILD_UPLOADED_OK";
+	public static String ACTION_CHILD_UPLOADED_OK = "ACTION_CHILD_UPLOADED_OK";
     public static String ACTION_CHILD_UPLOADED_FAILED = "ACTION_CHILD_UPLOADED_FAILED";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
@@ -195,6 +202,7 @@ public class Constants {
 	public static String ACTION_SHOW_SETTINGS = "ACTION_SHOW_SETTINGS";
 	public static String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
 	public static String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
+    public static String ACTION_LOG_OUT = "ACTION_LOG_OUT";
 
 	public static String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
 	public static String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
@@ -275,13 +283,11 @@ public class Constants {
 	public static int NOTIFICATION_CAMERA_UPLOADS_FINAL = 6;
 	public static int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
 	public static int NOTIFICATION_GENERAL_PUSH_CHAT = 8;
-//	public static int NOTIFICATION_PUSH_CONTACT = 9;
 	public static int NOTIFICATION_SUMMARY_INCOMING_CONTACT = 9;
 	public static int NOTIFICATION_STREAMING_OVERQUOTA= 10;
 	public static int NOTIFICATION_CALL_IN_PROGRESS = 11;
 	public static int NOTIFICATION_MISSED_CALL = 12;
 	public static int NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT = 13;
-//	public static int NOTIFICATION_PRE_N_CHAT = 13;
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 	public static int NOTIFICATION_CHAT_UPLOAD = 15;
     public static int NOTIFICATION_UPLOAD_FOLDER = 16;
@@ -368,4 +374,94 @@ public class Constants {
 	public static final int ERROR_LINK = -1;
 
 	public static final String CONTACT_HANDLE = "contactHandle";
+
+	public static final String[] FILE_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#!.+$",
+			"^https://mega\\.nz/#!.+$"
+	};
+
+	public static final String[] CONFIRMATION_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#confirm.+$",
+			"^https://mega\\.nz/#confirm.+$"
+	};
+
+	public static final String[] FOLDER_DOWNLOAD_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#F!.+$",
+			"^https://mega\\.nz/#F!.+$"
+	};
+
+	public static final String[] CHAT_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/chat/.+$",
+			"^https://mega\\.nz/chat/.+$"
+	};
+
+	public static final String[] PASSWORD_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#P!.+$",
+			"^https://mega\\.nz/#P!.+$"
+	};
+
+	public static final String[] ACCOUNT_INVITATION_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#newsignup.+$",
+			"^https://mega\\.nz/#newsignup.+$"
+	};
+
+	public static final String[] EXPORT_MASTER_KEY_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#backup",
+			"^https://mega\\.nz/#backup"
+	};
+
+	public static final String[] NEW_MESSAGE_CHAT_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#fm/chat",
+			"^https://mega\\.nz/#fm/chat"
+	};
+
+	public static final String[] CANCEL_ACCOUNT_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#cancel.+$",
+			"^https://mega\\.nz/#cancel.+$"
+	};
+
+	public static final String[] VERIFY_CHANGE_MAIL_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#verify.+$",
+			"^https://mega\\.nz/#verify.+$"
+	};
+
+	public static final String[] RESET_PASSWORD_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#recover.+$",
+			"^https://mega\\.nz/#recover.+$"
+	};
+
+	public static final String[] PENDING_CONTACTS_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#fm/ipc",
+			"^https://mega\\.nz/#fm/ipc"
+	};
+
+	public static final String[] HANDLE_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#.+$",
+			"^https://mega\\.nz/#.+$"
+	};
+
+	public static final String[] CONTACT_LINK_REGEXS = {
+			"^https://mega\\.nz/C!.+$"
+	};
+
+	public static final String[] MEGA_DROP_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/megadrop/.+$",
+			"^https://mega\\.nz/megadrop/.+$"
+	};
+
+	public static final String[] MEGA_BLOG_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#blog",
+			"^https://mega\\.nz/#blog",
+			"^https://mega\\.nz/blog",
+			"^https://mega\\.co\\.nz/#blog.+$",
+			"^https://mega\\.nz/#blog.+$",
+			"^https://mega\\.nz/blog.+$"
+	};
+
+	public static final String[] REVERT_CHANGE_PASSWORD_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/#pwr.+$",
+			"^https://mega\\.co\\.nz/pwr.+$",
+			"^https://mega\\.nz/#pwr.+$",
+			"^https://mega\\.nz/pwr.+$"
+	};
 }

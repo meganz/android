@@ -6,8 +6,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,7 +20,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.provider.CallLog;
 import android.support.annotation.Nullable;
 import android.support.multidex.MultiDexApplication;
 import android.support.text.emoji.EmojiCompat;
@@ -32,8 +31,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.format.DateUtils;
 import android.util.Log;
+
 import org.webrtc.AndroidVideoTrackSourceObserver;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
@@ -52,7 +51,6 @@ import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -94,12 +92,14 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.Util.toCDATA;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
+
 
 
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.6.3_245";
+	static final public String USER_AGENT = "MEGAAndroid/3.6.4_249";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -149,6 +149,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	MegaChatApiAndroid megaChatApi = null;
 
 	private NetworkStateReceiver networkStateReceiver;
+	private BroadcastReceiver logoutReceiver;
 
 	@Override
 	public void networkAvailable() {
@@ -419,27 +420,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-			long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
-
-			JobScheduler mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-
-			JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1, new ComponentName(this, CameraUploadsService.class));
-			//			jobInfoBuilder.setMinimumLatency(15000);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-				jobInfoBuilder.setPeriodic(schedulerInterval);
-			}
-
-			if (mJobScheduler != null) {
-				int result = mJobScheduler.schedule(jobInfoBuilder.build());
-				if (result == JobScheduler.RESULT_SUCCESS) {
-					log("CameraUploadsService: Job scheduled SUCCESS");
-				} else {
-					log("CameraUploadsService: Job scheduled FAILED");
-				}
-			}
-		}
+        scheduleCameraUploadJob(getApplicationContext());
 
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
@@ -541,7 +522,17 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
-//		if(Util.isChatEnabled()){}
+		logoutReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context,Intent intent) {
+                if (intent != null) {
+                    if (intent.getAction() == Constants.ACTION_LOG_OUT) {
+                        storageState = MegaApiJava.STORAGE_STATE_GREEN; //Default value
+                    }
+                }
+            }
+        };
+		LocalBroadcastManager.getInstance(this).registerReceiver(logoutReceiver, new IntentFilter(Constants.ACTION_LOG_OUT));
 		EmojiManager.install(new TwitterEmojiProvider());
 
 		final EmojiCompat.Config config;
@@ -1945,5 +1936,17 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		MegaApplication.speakerStatus = speakerStatus;
 	}
 
-	public int getStorageState() { return storageState; }
+	public int getStorageState() {
+	    return storageState;
+	}
+
+    public void setStorageState(int state) {
+	    this.storageState = state;
+	}
+
+    @Override
+    public void unregisterReceiver(BroadcastReceiver receiver) {
+        super.unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
+    }
 }
