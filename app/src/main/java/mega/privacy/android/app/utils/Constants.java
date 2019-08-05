@@ -376,92 +376,92 @@ public class Constants {
 	public static final String CONTACT_HANDLE = "contactHandle";
 
 	public static final String[] FILE_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#!.+$",
-			"^https://mega\\.nz/#!.+$"
+			"^https://mega\\.co\\.nz/.*#!.+$",
+			"^https://mega\\.nz/.*#!.+$"
 	};
 
 	public static final String[] CONFIRMATION_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#confirm.+$",
-			"^https://mega\\.nz/#confirm.+$"
+			"^https://mega\\.co\\.nz/.*#confirm.+$",
+			"^https://mega\\.nz/.*#confirm.+$"
 	};
 
-	public static final String[] FOLDER_DOWNLOAD_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#F!.+$",
-			"^https://mega\\.nz/#F!.+$"
+	public static final String[] FOLDER_LINK_REGEXS = {
+			"^https://mega\\.co\\.nz/.*#F!.+$",
+			"^https://mega\\.nz/.*#F!.+$"
 	};
 
 	public static final String[] CHAT_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/chat/.+$",
-			"^https://mega\\.nz/chat/.+$"
+			"^https://mega\\.co\\.nz/.*chat/.+$",
+			"^https://mega\\.nz/.*chat/.+$"
 	};
 
 	public static final String[] PASSWORD_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#P!.+$",
-			"^https://mega\\.nz/#P!.+$"
+			"^https://mega\\.co\\.nz/.*#P!.+$",
+			"^https://mega\\.nz/.*#P!.+$"
 	};
 
 	public static final String[] ACCOUNT_INVITATION_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#newsignup.+$",
-			"^https://mega\\.nz/#newsignup.+$"
+			"^https://mega\\.co\\.nz/.*#newsignup.+$",
+			"^https://mega\\.nz/.*#newsignup.+$"
 	};
 
 	public static final String[] EXPORT_MASTER_KEY_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#backup",
-			"^https://mega\\.nz/#backup"
+			"^https://mega\\.co\\.nz/.*#backup",
+			"^https://mega\\.nz/.*#backup"
 	};
 
 	public static final String[] NEW_MESSAGE_CHAT_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#fm/chat",
-			"^https://mega\\.nz/#fm/chat"
+			"^https://mega\\.co\\.nz/.*#fm/chat",
+			"^https://mega\\.nz/.*#fm/chat"
 	};
 
 	public static final String[] CANCEL_ACCOUNT_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#cancel.+$",
-			"^https://mega\\.nz/#cancel.+$"
+			"^https://mega\\.co\\.nz/.*#cancel.+$",
+			"^https://mega\\.nz/.*#cancel.+$"
 	};
 
 	public static final String[] VERIFY_CHANGE_MAIL_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#verify.+$",
-			"^https://mega\\.nz/#verify.+$"
+			"^https://mega\\.co\\.nz/.*#verify.+$",
+			"^https://mega\\.nz/.*#verify.+$"
 	};
 
 	public static final String[] RESET_PASSWORD_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#recover.+$",
-			"^https://mega\\.nz/#recover.+$"
+			"^https://mega\\.co\\.nz/.*#recover.+$",
+			"^https://mega\\.nz/.*#recover.+$"
 	};
 
 	public static final String[] PENDING_CONTACTS_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#fm/ipc",
-			"^https://mega\\.nz/#fm/ipc"
+			"^https://mega\\.co\\.nz/.*#fm/ipc",
+			"^https://mega\\.nz/.*#fm/ipc"
 	};
 
 	public static final String[] HANDLE_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#.+$",
-			"^https://mega\\.nz/#.+$"
+			"^https://mega\\.co\\.nz/.*#.+$",
+			"^https://mega\\.nz/.*#.+$"
 	};
 
 	public static final String[] CONTACT_LINK_REGEXS = {
-			"^https://mega\\.nz/C!.+$"
+			"^https://mega\\.nz/.*C!.+$"
 	};
 
 	public static final String[] MEGA_DROP_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/megadrop/.+$",
-			"^https://mega\\.nz/megadrop/.+$"
+			"^https://mega\\.co\\.nz/.*megadrop/.+$",
+			"^https://mega\\.nz/.*megadrop/.+$"
 	};
 
 	public static final String[] MEGA_BLOG_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#blog",
-			"^https://mega\\.nz/#blog",
-			"^https://mega\\.nz/blog",
-			"^https://mega\\.co\\.nz/#blog.+$",
-			"^https://mega\\.nz/#blog.+$",
-			"^https://mega\\.nz/blog.+$"
+			"^https://mega\\.co\\.nz/.*#blog",
+			"^https://mega\\.nz/.*#blog",
+			"^https://mega\\.nz/.*blog",
+			"^https://mega\\.co\\.nz/.*#blog.+$",
+			"^https://mega\\.nz/.*#blog.+$",
+			"^https://mega\\.nz/.*blog.+$"
 	};
 
 	public static final String[] REVERT_CHANGE_PASSWORD_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#pwr.+$",
-			"^https://mega\\.co\\.nz/pwr.+$",
-			"^https://mega\\.nz/#pwr.+$",
-			"^https://mega\\.nz/pwr.+$"
+			"^https://mega\\.co\\.nz/.*#pwr.+$",
+			"^https://mega\\.co\\.nz/.*pwr.+$",
+			"^https://mega\\.nz/.*#pwr.+$",
+			"^https://mega\\.nz/.*pwr.+$"
 	};
 }

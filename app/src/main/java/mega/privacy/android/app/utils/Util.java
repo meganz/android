@@ -72,6 +72,7 @@ import java.io.Writer;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -2360,6 +2361,42 @@ public class Util {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * This method decodes a url and formats it before its treatment
+	 *
+	 * @param url the passed url to be decoded
+	 */
+	public static void decodeURL(String url) {
+		try {
+			url = URLDecoder.decode(url, "UTF-8");
+		} catch (Exception e) {
+			log("Exception decoding url: "+url);
+			e.printStackTrace();
+		}
+
+		url.replace(' ', '+');
+
+		if (url.startsWith("mega://")) {
+			url = url.replace("mega://", "https://mega.nz/");
+		} else if (url.startsWith("mega.")) {
+			url = url.replace("mega.", "https://mega.");
+		}
+
+		if (url.startsWith("https://www.mega.co.nz")) {
+			url = url.replace("https://www.mega.co.nz", "https://mega.co.nz");
+		}
+
+		if (url.startsWith("https://www.mega.nz")) {
+			url = url.replace("https://www.mega.nz", "https://mega.nz");
+		}
+
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length() - 1);
+		}
+
+		log("URL decoded: " + url);
 	}
 
 	private static void log(String message) {

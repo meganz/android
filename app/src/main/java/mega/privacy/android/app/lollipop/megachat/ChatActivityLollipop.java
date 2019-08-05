@@ -156,6 +156,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.EDITING_MESSAGE;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.LATITUDE;
@@ -4951,49 +4952,39 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public int checkMegaLink(MegaChatMessage msg){
+    public int checkMegaLink(MegaChatMessage msg) {
         log("checkMegaLink");
         //Check if it is a MEGA link
-        if(msg.getType()==MegaChatMessage.TYPE_NORMAL){
-            if(msg.getContent()!=null){
-                String link = AndroidMegaRichLinkMessage.extractMegaLink(msg.getContent());
+        if (msg.getType() != MegaChatMessage.TYPE_NORMAL || msg.getContent() == null) return -1;
 
-                if(AndroidMegaRichLinkMessage.isChatLink(link)){
+        String link = extractMegaLink(msg.getContent());
 
-                    log("isChatLink");
-                    ChatLinkInfoListener listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
-                    megaChatApi.checkChatLink(link, listener);
+        if (isChatLink(link)) {
+            log("isChatLink");
+            ChatLinkInfoListener listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
+            megaChatApi.checkChatLink(link, listener);
 
-                    return MEGA_CHAT_LINK;
-                }
-                else{
-                    boolean isFile = AndroidMegaRichLinkMessage.isFileLink(link);
-
-                    if(link!=null){
-                        log("The link was found");
-                        if(megaApi!=null && megaApi.getRootNode()!=null){
-                            ChatLinkInfoListener listener = null;
-                            if(isFile){
-                                log("isFileLink");
-                                listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
-                                megaApi.getPublicNode(link, listener);
-                                return MEGA_FILE_LINK;
-                            }
-                            else{
-                                log("isFolderLink");
-
-                                MegaApiAndroid megaApiFolder = getLocalMegaApiFolder();
-                                listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi, megaApiFolder);
-                                megaApiFolder.loginToFolder(link, listener);
-                                return MEGA_FOLDER_LINK;
-                            }
-
-                        }
-                    }
-                }
-            }
+            return MEGA_CHAT_LINK;
         }
-        return -1;
+
+        if (link == null || megaApi == null || megaApi.getRootNode() == null) return -1;
+
+        log("The link was found");
+
+        ChatLinkInfoListener listener = null;
+        if (isFileLink(link)) {
+            log("isFileLink");
+            listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
+            megaApi.getPublicNode(link, listener);
+            return MEGA_FILE_LINK;
+        } else {
+            log("isFolderLink");
+
+            MegaApiAndroid megaApiFolder = getLocalMegaApiFolder();
+            listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi, megaApiFolder);
+            megaApiFolder.loginToFolder(link, listener);
+            return MEGA_FOLDER_LINK;
+        }
     }
 
     @Override

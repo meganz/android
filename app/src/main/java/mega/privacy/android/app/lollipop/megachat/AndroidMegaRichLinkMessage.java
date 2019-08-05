@@ -4,14 +4,16 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.net.Uri;
 import android.util.Patterns;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.Util.decodeURL;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
 
 public class AndroidMegaRichLinkMessage {
 
@@ -105,29 +107,7 @@ public class AndroidMegaRichLinkMessage {
 
     public static String extractMegaLink(String urlIn) {
 
-        try {
-            urlIn = URLDecoder.decode(urlIn, "UTF-8");
-        }
-        catch (Exception e) {
-            log("Error decoding URL: " + urlIn);
-            log(e.toString());
-        }
-
-        urlIn.replace(' ', '+');
-        if(urlIn.startsWith("mega://")){
-            urlIn = urlIn.replace("mega://", "https://mega.co.nz/");
-        }
-        else  if(urlIn.startsWith("mega.")){
-            urlIn = urlIn.replace("mega.", "https://mega.");
-        }
-
-        if (urlIn.startsWith("https://www.mega.co.nz")){
-            urlIn = urlIn.replace("https://www.mega.co.nz", "https://mega.co.nz");
-        }
-
-        if (urlIn.startsWith("https://www.mega.nz")){
-            urlIn = urlIn.replace("https://www.mega.nz", "https://mega.nz");
-        }
+        decodeURL(urlIn);
 
         Matcher m = Patterns.WEB_URL.matcher(urlIn);
         while (m.find()) {
@@ -148,7 +128,7 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public static boolean isFolderLink(String url) {
-        if (url != null && (url.matches("^https://mega\\.co\\.nz/#F!.+$") || url.matches("^https://mega\\.nz/#F!.+$"))) {
+        if (matchRegexs(url, FOLDER_LINK_REGEXS)) {
             log("folder link found");
             return true;
         }
@@ -156,7 +136,7 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public static boolean isFileLink(String url) {
-        if (url != null && (url.matches("^https://mega\\.co\\.nz/#!.+$") || url.matches("^https://mega\\.nz/#!.+$"))) {
+        if (matchRegexs(url, FILE_LINK_REGEXS)) {
             log("IS file link found");
             return true;
         }
@@ -164,7 +144,7 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public static boolean isChatLink(String url) {
-        if (url != null && (url.matches("^https://mega\\.co\\.nz/chat/.+$") || url.matches("^https://mega\\.nz/chat/.+$"))) {
+        if (matchRegexs(url, CHAT_LINK_REGEXS)) {
             log("IS chat link found");
             return true;
         }
@@ -172,7 +152,7 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public static boolean isContactLink(String url) {
-        if (url != null && (url.matches("^https://mega\\.co\\.nz/C!.+$") || url.matches("^https://mega\\.nz/C!.+$"))) {
+        if (matchRegexs(url, CONTACT_LINK_REGEXS)) {
             log("IS contact link found");
             return true;
         }
