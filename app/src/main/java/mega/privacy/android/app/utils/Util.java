@@ -1728,6 +1728,24 @@ public class Util {
 				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
 	}
 
+	/**
+	 * This method detects whether the url matches certain URL regular expressions
+	 * @param url the passed url to be detected
+	 * @param regexs the array of URL regular expressions
+	 */
+
+	public static boolean matchRegexs(String url, String[] regexs) {
+		if (url == null) {
+			return false;
+		}
+		for (String regex : regexs) {
+			if (url.matches(regex)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private static void log(String message) {
 		log("Util", message);
 	}

@@ -47,7 +47,7 @@
 
 		<android.support.v7.preference.SwitchPreferenceCompat
 			android:key="settings_camera_upload_charging"
-			android:title="@string/settings_camera_upload_charging"
+			android:title="@string/settings_camera_upload_require_plug_in"
 			android:defaultValue="true"/>
 
 		<android.support.v7.preference.Preference
