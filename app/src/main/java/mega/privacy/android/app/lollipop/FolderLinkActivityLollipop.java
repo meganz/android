@@ -1629,7 +1629,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
-		if(adapterList.isMultipleSelect()){
+		if (adapterList != null && adapterList.isMultipleSelect()) {
 			adapterList.clearSelections();
 		}
 	}
