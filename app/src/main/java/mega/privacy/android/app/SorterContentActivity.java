@@ -34,31 +34,31 @@ public class SorterContentActivity extends BaseActivity {
 
         View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
 
-        TextView sortByNameTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_name_text);
+        TextView sortByNameTV = dialoglayout.findViewById(R.id.sortby_dialog_name_text);
         sortByNameTV.setText(context.getString(R.string.sortby_name));
 
-        TextView sortByDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_text);
+        TextView sortByDateTV = dialoglayout.findViewById(R.id.sortby_dialog_date_text);
         sortByDateTV.setText(context.getString(R.string.sortby_modification_date));
 
-        TextView sortBySizeTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_size_text);
+        TextView sortBySizeTV = dialoglayout.findViewById(R.id.sortby_dialog_size_text);
         sortBySizeTV.setText(context.getString(R.string.sortby_size));
 
-        final CheckedTextView ascendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
+        final CheckedTextView ascendingCheck = dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
         ascendingCheck.setText(context.getString(R.string.sortby_name_ascending));
 
-        final CheckedTextView descendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_descending_check);
+        final CheckedTextView descendingCheck = dialoglayout.findViewById(R.id.sortby_dialog_descending_check);
         descendingCheck.setText(context.getString(R.string.sortby_name_descending));
 
-        final CheckedTextView newestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_check);
+        final CheckedTextView newestCheck = dialoglayout.findViewById(R.id.sortby_dialog_newest_check);
         newestCheck.setText(context.getString(R.string.sortby_date_newest));
 
-        final CheckedTextView oldestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_check);
+        final CheckedTextView oldestCheck = dialoglayout.findViewById(R.id.sortby_dialog_oldest_check);
         oldestCheck.setText(context.getString(R.string.sortby_date_oldest));
 
-        final CheckedTextView largestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
+        final CheckedTextView largestCheck = dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
         largestCheck.setText(context.getString(R.string.sortby_size_largest_first));
 
-        final CheckedTextView smallestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
+        final CheckedTextView smallestCheck = dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
         smallestCheck.setText(context.getString(R.string.sortby_size_smallest_first));
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);

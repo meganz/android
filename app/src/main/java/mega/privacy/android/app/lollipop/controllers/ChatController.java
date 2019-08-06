@@ -2176,11 +2176,11 @@ public class ChatController {
                     megaChatApi.attachNode(idChat, node.getHandle(), (ChatActivityLollipop)context);
                 }
             }
+            return;
         }
-        else {
-            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChat);
-            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
-        }
+
+        CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChat);
+        copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
     }
 
     public static void log(String message) {

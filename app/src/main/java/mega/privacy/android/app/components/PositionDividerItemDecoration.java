@@ -12,9 +12,9 @@ import mega.privacy.android.app.R;
 
 public class PositionDividerItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDivider;
-    DisplayMetrics outMetrics;
-    Context context;
-    int position = -1;
+    private DisplayMetrics outMetrics;
+    private Context context;
+    private int position = -1;
 
     public PositionDividerItemDecoration(Context context, DisplayMetrics outMetrics) {
         mDivider = ContextCompat.getDrawable(context, R.drawable.line_divider);
@@ -54,7 +54,7 @@ public class PositionDividerItemDecoration extends RecyclerView.ItemDecoration {
         }
     }
 
-    boolean draw(int pos) {
+    private boolean draw(int pos) {
         if (pos == 0 || (position != -1 && position-1 == pos) || (position != -1 && position == pos)) {
             return false;
         }

@@ -55,55 +55,55 @@ public class ChatExplorerFragment extends Fragment {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
-    ChatExplorerFragment chatExplorerFragment;
+    private ChatExplorerFragment chatExplorerFragment;
 
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
 
-    DatabaseHandler dbH;
+    private DatabaseHandler dbH;
 
-    Context context;
-    ActionBar aB;
-    RecyclerView listView;
-    MegaListChatExplorerAdapter adapterList;
-    RelativeLayout mainRelativeLayout;
+    private Context context;
+    private ActionBar aB;
+    private RecyclerView listView;
+    private MegaListChatExplorerAdapter adapterList;
+    private RelativeLayout mainRelativeLayout;
 
-    LinearLayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager;
 
-    ArrayList<ChatExplorerListItem> recents;
-    ArrayList<MegaChatListItem> chats;
-    ArrayList<MegaChatListItem> archievedChats;
-    ArrayList<MegaContactAdapter> contacts;
-    ArrayList<ChatExplorerListItem> items;
-    ArrayList<ChatExplorerListItem> addedItems;
-    ArrayList<String> addedItemsSaved;
+    private ArrayList<ChatExplorerListItem> recents;
+    private ArrayList<MegaChatListItem> chats;
+    private ArrayList<MegaChatListItem> archievedChats;
+    private ArrayList<MegaContactAdapter> contacts;
+    private ArrayList<ChatExplorerListItem> items;
+    private ArrayList<ChatExplorerListItem> addedItems;
+    private ArrayList<String> addedItemsSaved;
 
-    int lastFirstVisiblePosition;
+    private int lastFirstVisiblePosition;
 
     //Empty screen
-    TextView emptyTextView;
-    LinearLayout emptyLayout;
-    TextView emptyTextViewInvite;
-    ImageView emptyImageView;
-    Button inviteButton;
-    RelativeLayout contentLayout;
-    ProgressBar progressBar;
+    private TextView emptyTextView;
+    private LinearLayout emptyLayout;
+    private TextView emptyTextViewInvite;
+    private ImageView emptyImageView;
+    private Button inviteButton;
+    private RelativeLayout contentLayout;
+    private ProgressBar progressBar;
 
-    boolean chatEnabled = true;
-    float density;
-    DisplayMetrics outMetrics;
-    Display display;
+    private boolean chatEnabled = true;
+    private float density;
+    private DisplayMetrics outMetrics;
+    private Display display;
 
-    AppBarLayout addLayout;
-    Button newGroupButton;
-    RecyclerView addedList;
-    MegaChipChatExplorerAdapter adapterAdded;
-    LinearLayoutManager addedLayoutManager;
+    private AppBarLayout addLayout;
+    private Button newGroupButton;
+    private RecyclerView addedList;
+    private MegaChipChatExplorerAdapter adapterAdded;
+    private LinearLayoutManager addedLayoutManager;
 
-    SearchTask searchTask;
+    private SearchTask searchTask;
 
-    PositionDividerItemDecoration positionDividerItemDecoration;
-    SimpleDividerItemDecoration simpleDividerItemDecoration;
+    private PositionDividerItemDecoration positionDividerItemDecoration;
+    private SimpleDividerItemDecoration simpleDividerItemDecoration;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -154,12 +154,12 @@ public class ChatExplorerFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
 
-        contentLayout = (RelativeLayout) v.findViewById(R.id.content_layout_chat_explorer);
-        progressBar = (ProgressBar) v.findViewById(R.id.progressbar_chat_explorer);
+        contentLayout = v.findViewById(R.id.content_layout_chat_explorer);
+        progressBar = v.findViewById(R.id.progressbar_chat_explorer);
 
-        addLayout = (AppBarLayout) v.findViewById(R.id.linear_layout_add);
-        addedList = (RecyclerView) v.findViewById(R.id.contact_adds_recycler_view);
-        newGroupButton = (Button) v.findViewById(R.id.new_group_button);
+        addLayout = v.findViewById(R.id.linear_layout_add);
+        addedList = v.findViewById(R.id.contact_adds_recycler_view);
+        newGroupButton = v.findViewById(R.id.new_group_button);
         if (context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop) {
             addLayout.setVisibility(View.VISIBLE);
             addedLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
@@ -180,7 +180,7 @@ public class ChatExplorerFragment extends Fragment {
             addLayout.setVisibility(View.GONE);
         }
 
-        listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
+        listView = v.findViewById(R.id.chat_recent_list_view);
 
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
@@ -215,10 +215,10 @@ public class ChatExplorerFragment extends Fragment {
             }
         });
 
-        emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);
-        emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_chat_recent_invite);
+        emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
+        emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
         emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
-        emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
+        emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
 
         String textToShow = String.format(context.getString(R.string.chat_explorer_empty));
         try{
@@ -244,11 +244,11 @@ public class ChatExplorerFragment extends Fragment {
         emptyTextViewParams2.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
-        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_recent);
+        emptyImageView = v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
 
-        mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
-        inviteButton = (Button) v.findViewById(R.id.invite_button);
+        mainRelativeLayout = v.findViewById(R.id.main_relative_layout);
+        inviteButton = v.findViewById(R.id.invite_button);
         inviteButton.setVisibility(View.GONE);
 
         if(megaChatApi.isSignalActivityRequired()){
@@ -267,7 +267,7 @@ public class ChatExplorerFragment extends Fragment {
         return v;
     }
 
-    void setFirstLayoutVisibility (int visibility) {
+    private void setFirstLayoutVisibility (int visibility) {
         newGroupButton.setVisibility(visibility);
         if (visibility == View.VISIBLE) {
             addedList.setVisibility(View.GONE);
@@ -277,7 +277,7 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    public MegaContactAdapter getContact(MegaChatListItem chat) {
+    private MegaContactAdapter getContact(MegaChatListItem chat) {
         long handle = chat.getPeerHandle();
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
         MegaUser user = megaApi.getContact(userHandleEncoded);
@@ -323,7 +323,7 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    void sortByAlphabetical ( ) {
+    private void sortByAlphabetical ( ) {
         Collections.sort(items, new Comparator<ChatExplorerListItem> (){
 
             public int compare(ChatExplorerListItem c1, ChatExplorerListItem c2) {
@@ -347,7 +347,7 @@ public class ChatExplorerFragment extends Fragment {
         new RecoverItemsTask().execute();
     }
 
-    void getVisibleMEGAContacts () {
+    private void getVisibleMEGAContacts () {
         ArrayList<MegaUser> contactsMEGA = megaApi.getContacts();
         for (int i=0;i<contactsMEGA.size();i++){
             log("contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
@@ -442,27 +442,6 @@ public class ChatExplorerFragment extends Fragment {
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
 
-    public String getParticipantFullName(MegaChatRoom chat, long i){
-        String participantFirstName = chat.getPeerFirstname(i);
-        String participantLastName = chat.getPeerLastname(i);
-
-        if(participantFirstName==null){
-            participantFirstName="";
-        }
-        if(participantLastName == null){
-            participantLastName="";
-        }
-
-        if (participantFirstName.trim().length() <= 0){
-            log("Participant1: "+participantFirstName);
-            return participantLastName;
-        }
-        else{
-            log("Participant2: "+participantLastName);
-            return participantFirstName + " " + participantLastName;
-        }
-    }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
@@ -504,13 +483,6 @@ public class ChatExplorerFragment extends Fragment {
         super.onResume();
     }
 
-    public int getItemCount(){
-        if(adapterList != null){
-            return adapterList.getItemCount();
-        }
-        return 0;
-    }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         log("onActivityCreated");
@@ -522,14 +494,7 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    public long getChatIdFrom(){
-        if(context instanceof  ChatExplorerActivity){
-            return ((ChatExplorerActivity)context).chatIdFrom;
-        }
-        return -1;
-    }
-
-    public long getMegaContactHandle (MegaContactAdapter contact) {
+    private long getMegaContactHandle (MegaContactAdapter contact) {
         long handle = -1;
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
@@ -599,7 +564,7 @@ public class ChatExplorerFragment extends Fragment {
         deleteItem(item);
     }
 
-    public void deleteItem(ChatExplorerListItem item) {
+    private void deleteItem(ChatExplorerListItem item) {
         if (item != null) {
             addedItems.remove(item);
             adapterAdded.setItems(addedItems);
@@ -629,7 +594,7 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    class RecoverItemsTask extends AsyncTask<Void, Void, Void> {
+    private class RecoverItemsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -857,7 +822,7 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    void setListVisibility () {
+    private void setListVisibility () {
         if (adapterList.getItemCount() == 0){
             log("adapterList.getItemCount() == 0");
             listView.setVisibility(View.GONE);
@@ -874,7 +839,7 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    class SearchTask extends AsyncTask<String, Void, Void> {
+    private class SearchTask extends AsyncTask<String, Void, Void> {
 
         ArrayList<ChatExplorerListItem> searchItems = new ArrayList<>();
         SparseBooleanArray searchSelectedItems = new SparseBooleanArray();

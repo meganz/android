@@ -177,11 +177,11 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
 			ViewHolderListExplorerLollipop holder = new ViewHolderListExplorerLollipop(v);
 
-			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_item_layout);
-			holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
-			holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
-			holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
-			holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
+			holder.itemLayout = v.findViewById(R.id.file_explorer_item_layout);
+			holder.imageView = v.findViewById(R.id.file_explorer_thumbnail);
+			holder.textViewFileName = v.findViewById(R.id.file_explorer_filename);
+			holder.textViewFileSize = v.findViewById(R.id.file_explorer_filesize);
+			holder.permissionsIcon = v.findViewById(R.id.file_explorer_permissions);
 
 			v.setTag(holder);
 			return holder;
@@ -191,20 +191,20 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer_grid, parent, false);
 			ViewHolderGridExplorerLollipop holder =  new ViewHolderGridExplorerLollipop(v);
 
-			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_layout);
-            holder.folderLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_folder_layout);
-            holder.thumbnailFolderLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_folder_thumbnail_layout);
-            holder.folderIcon = (ImageView) v.findViewById(R.id.file_explorer_grid_folder_icon);
-            holder.folderName= (TextView) v.findViewById(R.id.file_explorer_grid_folder_filename);
-            holder.fileLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_file_layout);
-            holder.thumbnailFileLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_file_thumbnail_layout);
-            holder.fileThumbnail = (ImageView) v.findViewById(R.id.file_explorer_grid_file_thumbnail);
-            holder.fileSelectedIcon = (ImageView) v.findViewById(R.id.file_explorer_grid_file_selected);
-            holder.fileIcon = (ImageView) v.findViewById(R.id.file_explorer_grid_file_icon);
-            holder.fileName= (TextView) v.findViewById(R.id.file_grid_filename_for_file);
-            holder.videoLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_file_videoinfo_layout);
-            holder.videoDuration= (TextView) v.findViewById(R.id.file_explorer_grid_file_title_video_duration);
-            holder.videoIcon = (ImageView) v.findViewById(R.id.file_explorer_grid_file_video_icon);
+			holder.itemLayout = v.findViewById(R.id.file_explorer_grid_layout);
+            holder.folderLayout = v.findViewById(R.id.file_explorer_grid_folder_layout);
+            holder.thumbnailFolderLayout = v.findViewById(R.id.file_explorer_grid_folder_thumbnail_layout);
+            holder.folderIcon = v.findViewById(R.id.file_explorer_grid_folder_icon);
+            holder.folderName= v.findViewById(R.id.file_explorer_grid_folder_filename);
+            holder.fileLayout = v.findViewById(R.id.file_explorer_grid_file_layout);
+            holder.thumbnailFileLayout = v.findViewById(R.id.file_explorer_grid_file_thumbnail_layout);
+            holder.fileThumbnail = v.findViewById(R.id.file_explorer_grid_file_thumbnail);
+            holder.fileSelectedIcon = v.findViewById(R.id.file_explorer_grid_file_selected);
+            holder.fileIcon = v.findViewById(R.id.file_explorer_grid_file_icon);
+            holder.fileName= v.findViewById(R.id.file_grid_filename_for_file);
+            holder.videoLayout = v.findViewById(R.id.file_explorer_grid_file_videoinfo_layout);
+            holder.videoDuration= v.findViewById(R.id.file_explorer_grid_file_title_video_duration);
+            holder.videoIcon = v.findViewById(R.id.file_explorer_grid_file_video_icon);
 
 			v.setTag(holder);
 			return holder;
@@ -233,7 +233,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         image.setLayoutParams(params);
     }
 
-    public void onBindViewHolderList(ViewHolderListExplorerLollipop holder, int position) {
+    private void onBindViewHolderList(ViewHolderListExplorerLollipop holder, int position) {
 	    log("onBindViewHolderList");
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -388,7 +388,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         }
     }
 
-    public void onBindViewHolderGrid(ViewHolderGridExplorerLollipop holder, int position) {
+    private void onBindViewHolderGrid(ViewHolderGridExplorerLollipop holder, int position) {
 	    log("onBindViewHolderGrid");
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -506,7 +506,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         }
     }
 
-    public void toggleAllSelection(int pos) {
+    private void toggleAllSelection(int pos) {
         log("toggleAllSelection: " + pos);
         startAnimation(pos, putOrDeletePostion(pos));
     }
@@ -516,7 +516,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         startAnimation(pos, putOrDeletePostion(pos));
     }
 
-	boolean putOrDeletePostion(int pos) {
+    private boolean putOrDeletePostion(int pos) {
         if (selectedItems.get(pos,false)) {
             log("delete pos: " + pos);
             selectedItems.delete(pos);
@@ -538,7 +538,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         }
     }
 
-    void startAnimation (final int pos, final boolean delete) {
+    private void startAnimation (final int pos, final boolean delete) {
 
         if (((FileExplorerActivityLollipop) context).isList()) {
             log("adapter type is LIST");
@@ -699,7 +699,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	/*
  * Get document at specified position
  */
-	public MegaNode getNodeAt(int position) {
+    private MegaNode getNodeAt(int position) {
 		try {
 			if (nodes != null) {
 				return nodes.get(position);
@@ -766,7 +766,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	}
 
 
-	public boolean isCameraUploads(MegaNode n){
+    private boolean isCameraUploads(MegaNode n){
 		log("isCameraUploads()");
 		String cameraSyncHandle = null;
 
@@ -854,7 +854,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		return true;
 	}
 
-	void clickItem(View v) {
+    private void clickItem(View v) {
 		ViewHolderExplorerLollipop holder = (ViewHolderExplorerLollipop) v.getTag();
 		if (holder == null) {
 			return;

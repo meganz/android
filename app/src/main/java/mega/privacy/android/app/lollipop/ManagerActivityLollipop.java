@@ -766,7 +766,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (intent != null) {
 				boolean cloudOrder = intent.getBooleanExtra("cloudOrder", true);
 				int order = intent.getIntExtra("order", MegaApiJava.ORDER_DEFAULT_ASC);
-				log("****** cloudOrder: "+cloudOrder+" order: "+order);
+				log("CloudOrder: "+cloudOrder+" new order: "+order);
 				if (cloudOrder) {
 					refreshCloudOrder(order);
 				}
@@ -7588,7 +7588,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	    return super.onCreateOptionsMenu(menu);
 	}
 
-	void setGridListIcon() {
+	private void setGridListIcon() {
 		if (isList){
 			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_thumbnail_view));

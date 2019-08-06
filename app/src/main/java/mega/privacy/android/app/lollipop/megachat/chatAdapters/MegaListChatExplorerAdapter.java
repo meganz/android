@@ -130,16 +130,16 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_explorer_list, parent, false);
         holder = new ViewHolderChatExplorerList(v);
 
-        holder.headerLayout = (RelativeLayout) v.findViewById(R.id.header_layout);
-        holder.headerText = (TextView) v.findViewById(R.id.label_text);
-        holder.itemContainer =(RelativeLayout) v.findViewById(R.id.item_container);
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.chat_explorer_list_item_layout);
-        holder.avatarImage = (RoundedImageView) v.findViewById(R.id.chat_explorer_list_avatar);
-        holder.initialLetter = (TextView) v.findViewById(R.id.chat_explorer_list_initial_letter);
-        holder.titleText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_title);
-        holder.stateIcon = (ImageView) v.findViewById(R.id.chat_explorer_list_contact_state);
-        holder.lastSeenStateText = (MarqueeTextView) v.findViewById(R.id.chat_explorer_list_last_seen_state);
-        holder.participantsText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_participants);
+        holder.headerLayout = v.findViewById(R.id.header_layout);
+        holder.headerText = v.findViewById(R.id.label_text);
+        holder.itemContainer = v.findViewById(R.id.item_container);
+        holder.itemLayout = v.findViewById(R.id.chat_explorer_list_item_layout);
+        holder.avatarImage = v.findViewById(R.id.chat_explorer_list_avatar);
+        holder.initialLetter = v.findViewById(R.id.chat_explorer_list_initial_letter);
+        holder.titleText = v.findViewById(R.id.chat_explorer_list_title);
+        holder.stateIcon = v.findViewById(R.id.chat_explorer_list_contact_state);
+        holder.lastSeenStateText = v.findViewById(R.id.chat_explorer_list_last_seen_state);
+        holder.participantsText = v.findViewById(R.id.chat_explorer_list_participants);
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             holder.titleText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));

@@ -14,10 +14,10 @@ import mega.privacy.android.app.utils.Util;
 
 public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
 
-    final int PAGE_COUNT = 3;
+    private final int PAGE_COUNT = 3;
     private Context context;
-    boolean chatFirst = false;
-    boolean tabRemoved = false;
+    private boolean chatFirst = false;
+    private boolean tabRemoved = false;
 
     public FileExplorerPagerAdapter(FragmentManager fm, Context context, boolean chatFirst) {
         super(fm);

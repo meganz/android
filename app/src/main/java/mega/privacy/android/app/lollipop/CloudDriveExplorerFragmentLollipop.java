@@ -53,52 +53,48 @@ import nz.mega.sdk.MegaNode;
 
 public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnClickListener{
 
-	Context context;
-	MegaApiAndroid megaApi;
-	ArrayList<MegaNode> nodes;
-	ArrayList<MegaNode> searchNodes = null;
-	DisplayMetrics metrics;
+	private Context context;
+	private MegaApiAndroid megaApi;
+	private ArrayList<MegaNode> nodes;
+	private ArrayList<MegaNode> searchNodes = null;
+	private DisplayMetrics metrics;
 
-	public long parentHandle = -1;
-	
-	MegaExplorerLollipopAdapter adapter;
+	private long parentHandle = -1;
+
+	private MegaExplorerLollipopAdapter adapter;
     private FastScroller fastScroller;
-	
-	int modeCloud;
-	boolean selectFile=false;
-	MegaPreferences prefs;
-	DatabaseHandler dbH;
-	public ActionMode actionMode;
-	
-//	public String name;
-	
-//	boolean first = false;
-//	private boolean folderSelected = false;
-	LinearLayout optionsBar;
-	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
 
-	ImageView emptyImageView;
-	LinearLayout emptyTextView;
-	TextView emptyTextViewFirst;
+	private int modeCloud;
+	private boolean selectFile=false;
+	private MegaPreferences prefs;
+	private DatabaseHandler dbH;
+	private  ActionMode actionMode;
 
-	TextView contentText;
-	Button optionButton;
-	Button cancelButton;
-	View separator;
+	private LinearLayout optionsBar;
+	private RecyclerView recyclerView;
+	private LinearLayoutManager mLayoutManager;
+	private CustomizedGridLayoutManager gridLayoutManager;
 
-	ArrayList<Long> nodeHandleMoveCopy;
+	private ImageView emptyImageView;
+	private LinearLayout emptyTextView;
+	private TextView emptyTextViewFirst;
 
-	Stack<Integer> lastPositionStack;
+	private TextView contentText;
+	private Button optionButton;
+	private Button cancelButton;
+	private View separator;
 
-	Handler handler;
+	private ArrayList<Long> nodeHandleMoveCopy;
 
-	int order;
+	private Stack<Integer> lastPositionStack;
 
-	public NewHeaderItemDecoration headerItemDecoration;
+	private Handler handler;
 
-	public void activateActionMode(){
+	private int order;
+
+	private NewHeaderItemDecoration headerItemDecoration;
+
+	private void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
@@ -166,7 +162,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}else{
 					if(modeCloud==FileExplorerActivityLollipop.SELECT){
 						if(selectFile){
-							if(((FileExplorerActivityLollipop)context).multiselect){
+							if(((FileExplorerActivityLollipop)context).isMultiselect()){
 								MegaNode node = megaApi.getNodeByHandle(parentHandle);
 								if(selected.size() == megaApi.getNumChildFiles(node)){
 									menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -249,25 +245,20 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
-		
-		float density  = getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(metrics, density);
-	    float scaleH = Util.getScaleH(metrics, density);
 
-		separator = (View) v.findViewById(R.id.separator);
+		separator = v.findViewById(R.id.separator);
 		
-		optionsBar = (LinearLayout) v.findViewById(R.id.options_explorer_layout);
-		optionButton = (Button) v.findViewById(R.id.action_text);
+		optionsBar = v.findViewById(R.id.options_explorer_layout);
+		optionButton = v.findViewById(R.id.action_text);
 		optionButton.setOnClickListener(this);
 
-		cancelButton = (Button) v.findViewById(R.id.cancel_text);
+		cancelButton = v.findViewById(R.id.cancel_text);
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
-        fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
-		if (((FileExplorerActivityLollipop) context).isList) {
-			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+        fastScroller = v.findViewById(R.id.fastscroll);
+		if (((FileExplorerActivityLollipop) context).isList()) {
+			recyclerView = v.findViewById(R.id.file_list_view_browser);
 			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 			mLayoutManager = new LinearLayoutManager(context);
@@ -287,12 +278,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			}
 		});
 		
-		contentText = (TextView) v.findViewById(R.id.content_text);
+		contentText = v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
 
-		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-		emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
-		emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
+		emptyImageView = v.findViewById(R.id.file_list_empty_image);
+		emptyTextView = v.findViewById(R.id.file_list_empty_text);
+		emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
@@ -367,7 +358,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if(modeCloud==FileExplorerActivityLollipop.SELECT){
 			if(selectFile)
 			{
-				if(((FileExplorerActivityLollipop)context).multiselect){
+				if(((FileExplorerActivityLollipop)context).isMultiselect()){
 					separator.setVisibility(View.VISIBLE);
 					optionsBar.setVisibility(View.VISIBLE);
 					optionButton.setText(getString(R.string.context_send));
@@ -501,7 +492,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		switch(v.getId()){
 			case R.id.action_text:{
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
-				if(((FileExplorerActivityLollipop)context).multiselect){
+				if(((FileExplorerActivityLollipop)context).isMultiselect()){
 					log("Send several files to chat");
 					if(adapter.getSelectedItemCount()>0){
 						long handles[] = adapter.getSelectedHandles();
@@ -595,14 +586,14 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 
 		if (clickNodes.get(position).isFolder()){
-			if(selectFile && ((FileExplorerActivityLollipop)context).multiselect && adapter.isMultipleSelect()){
+			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
 					hideMultipleSelect();
 			}
 
 			MegaNode n = clickNodes.get(position);
 
 			int lastFirstVisiblePosition = 0;
-			if (((FileExplorerActivityLollipop)context).isList) {
+			if (((FileExplorerActivityLollipop)context).isList()) {
 				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 			}
 			else {
@@ -623,7 +614,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					}
 					else
 					{
-						if(((FileExplorerActivityLollipop)context).multiselect){
+						if(((FileExplorerActivityLollipop)context).isMultiselect()){
 							separator.setVisibility(View.VISIBLE);
 							optionsBar.setVisibility(View.VISIBLE);
 							optionButton.setText(getString(R.string.context_send));
@@ -734,7 +725,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			if(selectFile)
 			{
 				MegaNode n = clickNodes.get(position);
-				if(((FileExplorerActivityLollipop)context).multiselect){
+				if(((FileExplorerActivityLollipop)context).isMultiselect()){
 					log("select file and allow multiselection");
 					int togglePosition = position;
 					if (!clickNodes.equals(nodes)) {
@@ -782,7 +773,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public int onBackPressed(){
 		log("onBackPressed");
 		if(selectFile) {
-			if(((FileExplorerActivityLollipop)context).multiselect){
+			if(((FileExplorerActivityLollipop)context).isMultiselect()){
 				if(adapter.isMultipleSelect()){
 					hideMultipleSelect();
 				}
@@ -804,7 +795,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					}
 					else
 					{
-						if(((FileExplorerActivityLollipop)context).multiselect){
+						if(((FileExplorerActivityLollipop)context).isMultiselect()){
 							separator.setVisibility(View.VISIBLE);
 							optionsBar.setVisibility(View.VISIBLE);
 							optionButton.setText(getString(R.string.context_send));
@@ -828,7 +819,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					}
 					else
 					{
-						if(((FileExplorerActivityLollipop)context).multiselect){
+						if(((FileExplorerActivityLollipop)context).isMultiselect()){
 							separator.setVisibility(View.VISIBLE);
 							optionsBar.setVisibility(View.VISIBLE);
 							optionButton.setText(getString(R.string.context_send));
@@ -906,10 +897,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	private static void log(String log) {
 		Util.log("CloudDriveExplorerFragmentLollipop", log);
 	}
-	
-	public long getParentHandle(){
-		log("getParentHandle");
-		return adapter.getParentHandle();
+
+	public long getParentHandle() {
+		return parentHandle;
 	}
 	
 	public void setParentHandle(long parentHandle){
@@ -986,7 +976,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 	}
 
-	public void selectAll(){
+	private void selectAll(){
 		log("selectAll");
 		if (adapter != null){
 			adapter.selectAll();
@@ -1075,7 +1065,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		return recyclerView;
 	}
 
-	public void activateButton(boolean show){
+	private void activateButton(boolean show){
 		optionButton.setEnabled(show);
 		if(show){
 			optionButton.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
@@ -1097,8 +1087,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		adapter.setNodes(nodes);
 	}
 
-	boolean isMultiselect() {
-		if (modeCloud==FileExplorerActivityLollipop.SELECT && selectFile && ((FileExplorerActivityLollipop) context).multiselect) {
+	private boolean isMultiselect() {
+		if (modeCloud==FileExplorerActivityLollipop.SELECT && selectFile && ((FileExplorerActivityLollipop) context).isMultiselect()) {
 			return true;
 		}
 		return false;
@@ -1190,4 +1180,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public FastScroller getFastScroller() {
 	    return fastScroller;
     }
+
+    public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
+		this.headerItemDecoration = headerItemDecoration;
+	}
 }
