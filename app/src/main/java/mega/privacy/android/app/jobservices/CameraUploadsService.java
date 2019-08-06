@@ -346,7 +346,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 media.filePath = cursorCamera.getString(dataColumn);
                 long modifiedTime = cursorCamera.getLong(modifiedColumn) * 1000;
                 media.timestamp = modifiedTime;
-                
+
                 log("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + path);
                 
                 //Check files of the Camera Uploads
@@ -405,14 +405,20 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             log("if (prefs != null)");
             if (prefs.getCamSyncTimeStamp() != null) {
                 currentTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
-                selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
-                log("SELECTION photo: " + selectionCamera);
+            } else {
+                currentTimeStamp = 0;
             }
+            selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+            log("SELECTION photo: " + selectionCamera);
+
             if (prefs.getCamVideoSyncTimeStamp() != null) {
                 currentVideoTimeStamp = Long.parseLong(prefs.getCamVideoSyncTimeStamp());
-                selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
-                log("SELECTION video: " + selectionCameraVideo);
+            } else {
+                currentVideoTimeStamp = 0;
             }
+            selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+            log("SELECTION video: " + selectionCameraVideo);
+
             if (secondaryEnabled) {
                 log("if(secondaryEnabled)");
                 if (prefs.getSecSyncTimeStamp() != null) {
