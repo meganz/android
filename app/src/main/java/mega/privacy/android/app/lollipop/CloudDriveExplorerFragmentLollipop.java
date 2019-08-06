@@ -399,9 +399,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			adapter.setSelectFile(selectFile);
 		}
 		adapter.setNodes(nodes);
-
 		adapter.setPositionClicked(-1);
-		
 		recyclerView.setAdapter(adapter);
 		fastScroller.setRecyclerView(recyclerView);
 		//If folder has no files

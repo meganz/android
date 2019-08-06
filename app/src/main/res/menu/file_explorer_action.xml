@@ -24,7 +24,7 @@
 
     <item
         android:id="@+id/cab_menu_grid_list"
-        android:orderInCategory="100"
+        android:orderInCategory="90"
         android:title="@string/action_grid"
         MEGA:showAsAction="always" />
 

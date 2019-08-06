@@ -254,26 +254,16 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.itemLayout.setBackgroundColor(Color.WHITE);
             holder.itemView.setOnLongClickListener(null);
 
-            if (disabledNodes != null){
-
-                if (disabledNodes.contains(node.getHandle())){
-                    log("Disabled!");
-                    holder.imageView.setAlpha(.4f);
-                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-                    holder.permissionsIcon.setAlpha(.2f);
-                    holder.itemView.setOnClickListener(null);
-                }
-                else{
-                    log("Full access");
-                    holder.imageView.setAlpha(1.0f);
-                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-                    holder.itemView.setOnClickListener(this);
-                    holder.permissionsIcon.setAlpha(.35f);
-                }
-            }
-            else{
+            if (disabledNodes != null && disabledNodes.contains(node.getHandle())) {
+                log("Disabled!");
+                holder.imageView.setAlpha(.4f);
+                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+                holder.permissionsIcon.setAlpha(.2f);
+                holder.itemView.setOnClickListener(null);
+            } else {
                 holder.imageView.setAlpha(1.0f);
                 holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                holder.permissionsIcon.setAlpha(.35f);
                 holder.itemView.setOnClickListener(this);
             }
 
@@ -359,24 +349,16 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 holder.itemView.setOnClickListener(this);
                 holder.itemView.setOnLongClickListener(this);
 
-                if (multipleSelect) {
-                    if(this.isItemChecked(position)){
-                        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-                        holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                        log("Do not show thumb");
-                        return;
-                    }
-                    else{
-                        holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                        holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    }
-                }
-                else{
+                if (isMultipleSelect() && isItemChecked(position)) {
+                    holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+                    holder.imageView.setImageResource(R.drawable.ic_select_folder);
+                    log("Do not show thumb");
+                    return;
+                } else {
                     holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
                 }
-            }
-            else{
+            } else{
                 holder.imageView.setAlpha(.4f);
                 holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
                 holder.itemView.setOnClickListener(null);
@@ -434,9 +416,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.itemLayout.setBackgroundColor(Color.WHITE);
             holder.itemView.setOnLongClickListener(null);
 
-            holder.folderName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-            holder.itemView.setOnClickListener(this);
-
             if(node.isInShare()){
                 holder.folderIcon.setImageResource(R.drawable.ic_folder_incoming_list);
             }
@@ -449,10 +428,19 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             else{
                 holder.folderIcon.setImageResource(R.drawable.ic_folder_list);
             }
+
+            if (disabledNodes != null && disabledNodes.contains(node.getHandle())) {
+                log("Disabled!");
+                holder.folderIcon.setAlpha(.4f);
+                holder.folderName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+                holder.itemView.setOnClickListener(null);
+            } else {
+                holder.folderIcon.setAlpha(1.0f);
+                holder.folderName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                holder.itemView.setOnClickListener(this);
+            }
         }
         else{
-            holder.itemView.setOnClickListener(this);
-            holder.itemView.setOnLongClickListener(this);
             holder.folderLayout.setVisibility(View.GONE);
             holder.fileLayout.setVisibility(View.VISIBLE);
             holder.fileName.setText(node.getName());
@@ -495,13 +483,25 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 holder.fileIcon.setVisibility(View.GONE);
             }
 
-            if (isMultipleSelect() && isItemChecked(position)) {
-                holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
-                holder.fileSelectedIcon.setImageResource(R.drawable.ic_select_folder);
+            if(selectFile){
+                holder.fileThumbnail.setAlpha(1.0f);
+                holder.fileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                holder.itemView.setOnClickListener(this);
+                holder.itemView.setOnLongClickListener(this);
 
-            } else {
-                holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
-                holder.fileSelectedIcon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
+                if (isMultipleSelect() && isItemChecked(position)) {
+                    holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
+                    holder.fileSelectedIcon.setImageResource(R.drawable.ic_select_folder);
+
+                } else {
+                    holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
+                    holder.fileSelectedIcon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
+                }
+            } else{
+                holder.fileThumbnail.setAlpha(.4f);
+                holder.fileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+                holder.itemView.setOnClickListener(null);
+                holder.itemView.setOnLongClickListener(null);
             }
         }
     }
@@ -721,31 +721,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		if(this.multipleSelect){
 			selectedItems = new SparseBooleanArray();
 		}
-	}
-
-	public boolean isEnabled(int position) {
-		if (nodes.size() == 0){
-			return false;
-		}
-		
-		MegaNode document = nodes.get(position);
-		if (document.isFile()){
-			if(selectFile){
-				return true;
-			}
-			else{
-				return false;
-			}
-		}
-		else{
-			if (disabledNodes != null) {
-				if (disabledNodes.contains(document.getHandle())){
-					return false;
-				}
-			}
-		}
-		
-		return true;
 	}
 
 	public int getPositionClicked (){

@@ -894,7 +894,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	    searchMenuItem.setVisible(false);
 		createFolderMenuItem.setVisible(false);
 		newChatMenuItem.setVisible(false);
-		gridListMenuItem.setVisible(false);
+		gridListMenuItem.setVisible(true);
 		sortByMenuItem.setVisible(false);
 
 		searchView = (SearchView) searchMenuItem.getActionView();
@@ -1005,6 +1005,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 			if(index==0){
 				if(isChatFirst){
+					gridListMenuItem.setVisible(false);
 					searchMenuItem.setVisible(true);
 					createFolderMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
@@ -1019,7 +1020,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					}
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
-						gridListMenuItem.setVisible(true);
 						sortByMenuItem.setVisible(true);
 						searchMenuItem.setVisible(true);
 					}
@@ -1074,7 +1074,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					}
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
-						gridListMenuItem.setVisible(true);
 						sortByMenuItem.setVisible(true);
 						searchMenuItem.setVisible(true);
 					}
@@ -1115,6 +1114,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					newChatMenuItem.setVisible(false);
 				}
 				else{
+					gridListMenuItem.setVisible(false);
 					searchMenuItem.setVisible(true);
 					createFolderMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
@@ -1159,8 +1159,13 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 							break;
 						}
 						case CHAT_FRAGMENT:{
+							gridListMenuItem.setVisible(false);
 							newChatMenuItem.setVisible(false);
 							searchMenuItem.setVisible(true);
+							break;
+						}
+						case IMPORT_FRAGMENT: {
+							gridListMenuItem.setVisible(false);
 							break;
 						}
 					}
@@ -3328,7 +3333,14 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	private void refreshView () {
-		cDriveExplorer =  (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
+		if (viewPagerExplorer != null && tabShown != NO_TABS) {
+			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
+			iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
+		} else {
+			cDriveExplorer =  getCloudExplorerFragment();
+			iSharesExplorer = getIncomingExplorerFragment();
+		}
+
 		if (cDriveExplorer != null) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.detach(cDriveExplorer);
@@ -3337,7 +3349,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			ft.commitAllowingStateLoss();
 		}
 
-		iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
 		if (iSharesExplorer != null) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.detach(iSharesExplorer);
@@ -3346,7 +3357,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			ft.commitAllowingStateLoss();
 		}
 
-		mTabsAdapterExplorer.notifyDataSetChanged();
+		if (viewPagerExplorer != null && tabShown != NO_TABS) {
+			mTabsAdapterExplorer.notifyDataSetChanged();
+		}
 	}
 
 	private void updateManagerView () {
