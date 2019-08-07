@@ -3556,6 +3556,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
                                     dbH.setCamSyncEnabled(false);
+									if(sttFLol != null){
+										sttFLol.disableCameraUpload();
+									}
                                 }
                             });
                     builder.setNegativeButton(getString(R.string.general_cancel), null);

@@ -1417,6 +1417,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                     dbH.setCameraUploadVideoQuality(MEDIUM);
                     prefs.setUploadVideoQuality(MEDIUM + "");
                     videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
+					resetVideoQualitySettings();
                     enableChargingSettings();
                     dbH.updateVideoState(SyncRecord.STATUS_TO_COMPRESS);
                     break;
@@ -3108,13 +3109,11 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
     }
 
     private void disableChargingSettings(){
-        if(isDeviceSupportCompression()) {
-            charging = false;
-            dbH.setConversionOnCharging(charging);
-            cameraUploadCharging.setChecked(charging);
-            cameraUploadCategory.removePreference(cameraUploadCharging);
-            disableVideoCompressionSizeSettings();
-        }
+		charging = false;
+		dbH.setConversionOnCharging(charging);
+		cameraUploadCharging.setChecked(charging);
+		cameraUploadCategory.removePreference(cameraUploadCharging);
+		disableVideoCompressionSizeSettings();
     }
 
     private void disableVideoCompressionSizeSettings(){
@@ -3130,6 +3129,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
 		dbH.setConversionOnCharging(true);
 		dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+		String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, DEFAULT_CONVENTION_QUEUE_SIZE + getResources().getString(R.string.label_file_size_mega_byte));
+		cameraUploadCharging.setSummary(chargingHelper);
 	}
 
 	private void enableVideoQualitySettings() {
@@ -3151,6 +3152,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	private void enableChargingSettings() {
+		prefs = dbH.getPreferences();
 		if (prefs.getConversionOnCharging() == null) {
 			dbH.setConversionOnCharging(true);
 			charging = true;
@@ -3166,6 +3168,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	private void enableVideoCompressionSizeSettings() {
+		prefs = dbH.getPreferences();
 		cameraUploadCategory.addPreference(cameraUploadVideoQueueSize);
 
 		//convention queue size
