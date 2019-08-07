@@ -59,6 +59,8 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
+
 public class FileContactListActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, MegaGlobalListenerInterface {
 
 	MegaApiAndroid megaApi;
@@ -120,6 +122,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	private AlertDialog.Builder dialogBuilder;
 	private FileContactMultipleRequestListener.RequestCompletedCallback requestCompletedCallback;
 
+	private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -471,11 +474,12 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	public void showOptionsPanel(MegaShare sShare){
 		log("showNodeOptionsPanel");
-		if(node!=null){
-			this.selectedShare = sShare;
-			FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (node == null || sShare == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedShare = sShare;
+		bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.FileProvider;
 import android.util.TypedValue;
 import android.view.View;
@@ -151,6 +152,14 @@ public class UtilsModalBottomSheet {
                 Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    public static boolean isBottomSheetDialogShown(BottomSheetDialogFragment bottomSheetDialogFragment) {
+        if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded()) {
+            return true;
+        }
+
+        return false;
     }
 
     private static void log(String log) {

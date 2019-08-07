@@ -40,6 +40,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
+
 /**
  * Created by mega on 3/04/18.
  */
@@ -83,6 +85,8 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     boolean testingPassword = false;
     boolean dismissPasswordReminder = false;
     int numRequests = 0;
+
+    private RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -387,7 +391,9 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             }
             case R.id.password_reminder_recoverykey_button:
             case R.id.test_password_backup_button: {
-                RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
+                if (isBottomSheetDialogShown(recoveryKeyBottomSheetDialogFragment)) break;
+
+                recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
                 recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
                 break;
             }

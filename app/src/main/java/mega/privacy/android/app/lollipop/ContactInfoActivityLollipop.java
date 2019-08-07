@@ -111,6 +111,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_COPY_FOLDER;
 import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_MOVE_FOLDER;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.context;
@@ -220,6 +221,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     NodeController nC;
     boolean moveToRubbish;
     long parentHandle;
+
+    private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
@@ -1923,11 +1926,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     
     public void showOptionsPanel(MegaNode node){
         log("showOptionsPanel");
-        if(node!=null){
-            this.selectedNode = node;
-            ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-        }
+
+        if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedNode = node;
+		bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
     
     public MegaNode getSelectedNode() {

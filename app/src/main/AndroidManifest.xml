@@ -400,6 +400,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Swipe.Back">
         </activity>
 

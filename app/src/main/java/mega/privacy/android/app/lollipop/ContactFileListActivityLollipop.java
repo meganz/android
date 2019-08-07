@@ -83,6 +83,8 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
+
 
 public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight {
 
@@ -141,6 +143,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	Toolbar tB;
 	ActionBar aB;
+
+	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -583,7 +587,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 		}
 
-		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
+		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
@@ -1575,11 +1581,12 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	public void showOptionsPanel(MegaNode node){
 		log("showOptionsPanel");
-		if(node!=null){
-			this.selectedNode = node;
-			ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedNode = node;
+        bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showSnackbar(int type, String s){

@@ -83,6 +83,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
+
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
 
@@ -168,6 +170,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     Toolbar toolbar;
     ActionBar aB;
+
+    private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -954,15 +958,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void showParticipantsPanel(MegaChatParticipant participant){
         log("showParticipantsPanel");
 
-        if(participant!=null){
-            this.selectedHandleParticipant = participant.getHandle();
-        }
-        else{
-            log("participant is NULL");
-            return;
-        }
+        if (participant == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
-        ParticipantBottomSheetDialogFragment bottomSheetDialogFragment = new ParticipantBottomSheetDialogFragment();
+        selectedHandleParticipant = participant.getHandle();
+        bottomSheetDialogFragment = new ParticipantBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 

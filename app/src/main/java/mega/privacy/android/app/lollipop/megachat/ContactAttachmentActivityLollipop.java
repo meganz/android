@@ -52,6 +52,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
+
 public class ContactAttachmentActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnClickListener {
 
 	MegaApiAndroid megaApi;
@@ -82,6 +84,8 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	MegaContactsAttachedLollipopAdapter adapter;
 
 	DisplayMetrics outMetrics;
+
+	private ContactAttachmentBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -272,11 +276,12 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	public void showOptionsPanel(String email){
 		log("showOptionsPanel");
-		if(email!=null){
-			this.selectedEmail = email;
-			ContactAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (email == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedEmail = email;
+		bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 	
 	@Override

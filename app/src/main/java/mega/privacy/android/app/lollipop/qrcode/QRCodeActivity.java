@@ -44,6 +44,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
 
 public class QRCodeActivity extends PinActivityLollipop implements MegaRequestListenerInterface{
@@ -78,6 +79,8 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     private boolean inviteContacts = false;
 
     DisplayMetrics outMetrics;
+
+    private QRCodeSaveBottomSheetDialogFragment qrCodeSaveBottomSheetDialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -245,7 +248,9 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 break;
             }
             case R.id.qr_code_save: {
-                QRCodeSaveBottomSheetDialogFragment qrCodeSaveBottomSheetDialogFragment = new QRCodeSaveBottomSheetDialogFragment();
+                if (isBottomSheetDialogShown(qrCodeSaveBottomSheetDialogFragment)) break;
+
+                qrCodeSaveBottomSheetDialogFragment = new QRCodeSaveBottomSheetDialogFragment();
                 qrCodeSaveBottomSheetDialogFragment.show(getSupportFragmentManager(), qrCodeSaveBottomSheetDialogFragment.getTag());
 
                 break;
