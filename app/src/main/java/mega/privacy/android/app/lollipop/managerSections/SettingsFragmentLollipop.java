@@ -2909,6 +2909,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				log("camSyncHandle is " + camSyncHandle);
 			}
 		}
+		megaCameraFolder.setSummary(camSyncMegaPath);
 	}
 
 	public void enableCameraUpload() {
