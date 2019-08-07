@@ -1139,10 +1139,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
         } catch (SDCardOperator.SDCardException e) {
             e.printStackTrace();
         }
-
 		if(sdCardOperator != null) {
 		    if(sdCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
-                sdCardOperator.createFolder(path.getAbsolutePath(),value);
+                if(prefs == null) {
+                    prefs = dbH.getPreferences();
+                }
+                try {
+                    sdCardOperator.initDocumentFileRoot(prefs);
+                    sdCardOperator.createFolder(path.getAbsolutePath(),value);
+                } catch (SDCardOperator.SDCardException e) {
+                    e.printStackTrace();
+                    Util.showErrorAlertDialog(getString(R.string.error_io_problem),true, this);
+                }
             } else {
                 createFolderWithFile(value);
             }

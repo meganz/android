@@ -1,8 +1,13 @@
 package mega.privacy.android.app.utils;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
+import android.support.v4.app.Fragment;
 import android.support.v4.provider.DocumentFile;
 import android.text.TextUtils;
 
@@ -15,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -29,8 +33,6 @@ public class SDCardOperator {
     private String sdCardRoot;
 
     private DocumentFile sdCardRootDocument;
-
-    private DatabaseHandler dbh;
 
     //32kb
     private static final int BUFFER_SIZE = 32 * 1024;
@@ -52,22 +54,18 @@ public class SDCardOperator {
             throw new SDCardException("No sd card installed!");
         }
         sdCardRoot = Util.getSDCardRoot(downloadRoot);
-        dbh = DatabaseHandler.getDbHandler(context);
+    }
 
-        MegaPreferences prefs = dbh.getPreferences();
-        if (prefs != null) {
-            String uriString = prefs.getUriExternalSDCard();
-            if (TextUtils.isEmpty(uriString)) {
-                throw new SDCardException("Permission required! No uri string.");
-            } else {
-                Uri rootUri = Uri.parse(uriString);
-                sdCardRootDocument = DocumentFile.fromTreeUri(context, rootUri);
-                if (!sdCardRootDocument.canWrite()) {
-                    throw new SDCardException("Permission required!");
-                }
-            }
+    public void initDocumentFileRoot(MegaPreferences prefs) throws SDCardException {
+        String uriString = prefs.getUriExternalSDCard();
+        if (TextUtils.isEmpty(uriString)) {
+            throw new SDCardException("Permission required! No uri string.");
         } else {
-            throw new SDCardException("Preferences has not been initialized!");
+            Uri rootUri = Uri.parse(uriString);
+            sdCardRootDocument = DocumentFile.fromTreeUri(context, rootUri);
+            if (!sdCardRootDocument.canWrite()) {
+                throw new SDCardException("Permission required!");
+            }
         }
     }
 
@@ -85,6 +83,10 @@ public class SDCardOperator {
 
     public boolean canWriteWithFile() {
         return new File(sdCardRoot).canWrite();
+    }
+
+    public boolean isSDCardAvailable() {
+        return sdCardRootDocument != null && sdCardRootDocument.canWrite();
     }
 
     public String move(String targetPath, File source) throws IOException {
@@ -110,17 +112,6 @@ public class SDCardOperator {
         }
     }
 
-    public String getUriString() {
-        String uri = dbh.getPreferences().getUriExternalSDCard();
-        if (!TextUtils.isEmpty(uri)) {
-            DocumentFile root = DocumentFile.fromTreeUri(context, Uri.parse(uri));
-            if (root.canWrite()) {
-                return uri;
-            }
-        }
-        return null;
-    }
-
     private DocumentFile getDocumentFileByPath(String parentPath) {
         DocumentFile root = sdCardRootDocument;
         for (String folder : getSubFolders(sdCardRoot, parentPath)) {
@@ -131,6 +122,35 @@ public class SDCardOperator {
             }
         }
         return root;
+    }
+
+    public static void requestSDCardPermission(String sdCardRoot,Context context, Fragment fragment) {
+        Intent intent = getRequestPermissionIntent(context, sdCardRoot);
+        fragment.startActivityForResult(intent, Constants.REQUEST_CODE_TREE);
+    }
+
+    public static void requestSDCardPermission(String sdCardRoot,Context context, Activity activity) {
+        Intent intent = getRequestPermissionIntent(context, sdCardRoot);
+        activity.startActivityForResult(intent, Constants.REQUEST_CODE_TREE);
+    }
+
+    private static Intent getRequestPermissionIntent(Context context, String sdCardRoot) {
+        Intent intent = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            StorageManager sm = context.getSystemService(StorageManager.class);
+            if(sm != null) {
+                StorageVolume volume = sm.getStorageVolume(new File(sdCardRoot));
+                if (volume != null) {
+                    intent = volume.createAccessIntent(null);
+                }
+            }
+        } else {
+            //TODO for below N
+        }
+        if (intent == null) {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        }
+        return intent;
     }
 
 

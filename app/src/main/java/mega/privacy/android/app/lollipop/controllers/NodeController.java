@@ -68,7 +68,7 @@ public class NodeController {
     MegaPreferences prefs = null;
 
     boolean isFolderLink = false;
-    private SDCardOperator sdCardOperator;
+//    private SDCardOperator sdCardOperator;
 
     public NodeController(Context context){
         log("NodeController created");
@@ -78,11 +78,6 @@ public class NodeController {
         }
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
-        }
-        try {
-            sdCardOperator = new SDCardOperator(context);
-        } catch (SDCardOperator.SDCardException e) {
-            e.printStackTrace();
         }
     }
 
@@ -100,11 +95,6 @@ public class NodeController {
         }
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
-        }
-        try {
-            sdCardOperator = new SDCardOperator(context);
-        } catch (SDCardOperator.SDCardException e) {
-            e.printStackTrace();
         }
     }
 
@@ -771,19 +761,36 @@ public class NodeController {
         log("download-----------");
         log("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
         log("files to download: "+hashes.length);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                askForPermissions();
-            }
-        }
-
         boolean downloadToSDCard = false;
         String downloadRoot = null;
+        SDCardOperator sdCardOperator = null;
+        try {
+            sdCardOperator = new SDCardOperator(context);
+        } catch (SDCardOperator.SDCardException e) {
+            e.printStackTrace();
+            log(e.getMessage());
+        }
         if(sdCardOperator != null) {
             if(sdCardOperator.isSDCardPath(parentPath) && !new File(parentPath).canWrite()) {
                 downloadToSDCard = true;
                 downloadRoot = sdCardOperator.getDownloadRoot();
+                try {
+                    if(prefs == null) {
+                        prefs = dbH.getPreferences();
+                    }
+                    sdCardOperator.initDocumentFileRoot(prefs);
+                } catch (SDCardOperator.SDCardException e) {
+                    e.printStackTrace();
+                    log(e.getMessage());
+                    //TODO
+                }
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission && !downloadToSDCard) {
+                askForPermissions();
             }
         }
 

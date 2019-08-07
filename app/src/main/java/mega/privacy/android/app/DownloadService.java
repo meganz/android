@@ -1502,16 +1502,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     if (targetPath != null) {
                         try {
                             SDCardOperator sdCardOperator = new SDCardOperator(this);
+                            sdCardOperator.initDocumentFileRoot(dbH.getPreferences());
                             File source = new File(path);
                             path = sdCardOperator.move(targetPath,source);
                             TL.log(this, "@#@", "new path is: " + path);
                             File newFile = new File(path);
-                            if(newFile.exists() && newFile.length() > 0) {
+                            if(newFile.exists() && newFile.length() == source.length()) {
                                 source.delete();
 
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
+                            log(e.getMessage());
                         }
                     }
                     //To update thumbnails for videos
