@@ -67,13 +67,11 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_PENDING;
-import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS;
-import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
-import static mega.privacy.android.app.utils.Util.context;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
@@ -497,7 +495,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             } else {
                 log("nothing to upload");
                 finish();
-                Util.purgeDirectory(new File(tempRoot));
+                purgeDirectory(new File(tempRoot));
                 return;
             }
         } else {
@@ -1447,9 +1445,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         log("Image sync finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
         log("transfer.getPath:" + transfer.getPath());
         log("transfer.getNodeHandle:" + transfer.getNodeHandle());
-        
+
         try {
-            transferFinished(api,transfer,e);
+            transferFinished(api, transfer, e);
         } catch (Throwable th) {
             log("onTransferFinish error: " + th.getMessage());
             th.printStackTrace();
@@ -1482,7 +1480,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     File thumbDir = ThumbnailUtils.getThumbFolder(this);
                     final File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
                     final SyncRecord finalRecord = record;
-                    if(Util.isVideoFile(transfer.getPath())) {
+                    if(isVideoFile(transfer.getPath())) {
                         threadPool.execute(new Runnable() {
 
                             @Override
@@ -1692,7 +1690,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public synchronized void onCompressUpdateProgress(int progress) {
         if (!canceled) {
             String message = getString(R.string.message_compress_video, progress + "%");
-            String subText = context.getString(R.string.title_compress_video, mVideoCompressor.getCurrentFileIndex(),mVideoCompressor.getTotalCount());
+            String subText = getString(R.string.title_compress_video, mVideoCompressor.getCurrentFileIndex(),mVideoCompressor.getTotalCount());
             showProgressNotification(progress,mPendingIntent,message,subText,"");
         }
     }
@@ -1907,7 +1905,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         String destPath = file.getNewPath();
         File destFile = new File(destPath);
         try {
-            Util.copyFile(srcFile,destFile);
+            copyFile(srcFile,destFile);
             removeGPSCoordinates(destPath);
         } catch (IOException e) {
             e.printStackTrace();
