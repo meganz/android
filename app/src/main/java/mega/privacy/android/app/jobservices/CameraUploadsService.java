@@ -335,17 +335,21 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             String path = isSecondary ? localPathSecondary : localPath;
             
             int dataColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATA);
-            int modifiedColumn = 0;
+            int modifiedColumn = 0, addedColumn = 0;
             if (cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED) != -1) {
                 modifiedColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
             }
-            
+            if (cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED) != -1) {
+                addedColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED);
+            }
+
             while (cursorCamera.moveToNext()) {
                 
                 Media media = new Media();
                 media.filePath = cursorCamera.getString(dataColumn);
+                long addedTime = cursorCamera.getLong(addedColumn) * 1000;
                 long modifiedTime = cursorCamera.getLong(modifiedColumn) * 1000;
-                media.timestamp = modifiedTime;
+                media.timestamp = addedTime > modifiedTime ? addedTime : modifiedTime;
 
                 log("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + path);
                 
@@ -655,11 +659,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private long getLastModifiedTime(SyncRecord file) {
-        return file.getTimestamp();
-    }
-
-    private long getLastModifiedTime(Media media) {
-        return media.timestamp;
+        File source = new File(file.getLocalPath());
+        return source.lastModified();
     }
     
     private void saveDataToDB(ArrayList<SyncRecord> list) {
