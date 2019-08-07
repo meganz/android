@@ -67,7 +67,6 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Display;
@@ -243,7 +242,6 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
@@ -2347,7 +2345,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		///Check the MK file
 		int versionApp = Util.getVersion(this);
 		log("-------------------Version app: "+versionApp);
-		final File fMKOld = buildExternalStorageFile(oldMKFile);
+		final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
 		if (isFileAvailable(fMKOld)) {
 			log("Old MK file need to be renamed!");
 			aC.renameMK();
@@ -7220,7 +7218,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					int index = viewPagerMyAccount.getCurrentItem();
 					if(index==0){
-						if(isFileAvailable(buildExternalStorageFile(rKFile))){
+						if(isFileAvailable(buildExternalStorageFile(RK_FILE))){
 							removeMK.setVisible(true);
 							exportMK.setVisible(false);
 						}
@@ -14166,7 +14164,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String[] split = rKFile.split(File.separator);
+				String[] split = RK_FILE.split(File.separator);
 				String path = parentPath+"/"+split[split.length-1];
 				log("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
@@ -14176,7 +14174,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.REQUEST_SAVE_MK_FROM_OFFLINE && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String[] split = rKFile.split(File.separator);
+				String[] split = RK_FILE.split(File.separator);
 				String path = parentPath+"/"+split[split.length-1];
 				log("REQUEST_SAVE_MK_FROM_OFFLINE:path to download: "+path);
 				AccountController ac = new AccountController(this);

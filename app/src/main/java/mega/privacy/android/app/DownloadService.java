@@ -388,12 +388,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             }
             storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
 
-			if (currentDir.getAbsolutePath().contains(offlineDIR)){
-				log("currentDir contains offlineDIR");
+			if (currentDir.getAbsolutePath().contains(OFFLINE_DIR)){
+				log("currentDir contains OFFLINE_DIR");
 				openFile = false;
 			}
 			else {
-				log("currentDir is NOT on offlineDIR: openFile->"+openFile);
+				log("currentDir is NOT on OFFLINE_DIR: openFile->"+openFile);
 			}
 
 			if (isFolderLink){
@@ -453,12 +453,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     log("IS FILE_:_");
                 }
 
-				if (currentDir.getAbsolutePath().contains(offlineDIR)){
-                	log("currentDir contains offlineDIR");
+				if (currentDir.getAbsolutePath().contains(OFFLINE_DIR)){
+                	log("currentDir contains OFFLINE_DIR");
 					openFile = false;
 				}
 				else {
-					log("currentDir is NOT on offlineDIR: openFile->"+openFile);
+					log("currentDir is NOT on OFFLINE_DIR: openFile->"+openFile);
 				}
 
                 if (isFolderLink){
@@ -1589,7 +1589,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						alterDocument(tranfersUri, node.getName());
 					}
 
-					if(transfer.getPath().contains(offlineDIR)){
+					if(transfer.getPath().contains(OFFLINE_DIR)){
 						log("YESSSS it is Offline file");
 						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 						offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());

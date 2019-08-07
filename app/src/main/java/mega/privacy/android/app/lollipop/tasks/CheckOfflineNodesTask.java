@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +32,7 @@ public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
 
         ArrayList<MegaOffline> offlineNodes = dbH.getOfflineFiles();
 
-        File file = getOfflineFolder(context, offlineDIR);
+        File file = getOfflineFolder(context, OFFLINE_DIR);
 
         if(isFileAvailable(file)){
 

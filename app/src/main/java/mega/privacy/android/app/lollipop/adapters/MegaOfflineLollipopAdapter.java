@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
@@ -302,7 +301,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
 	private boolean isRKSavedForOffline (MegaOffline currentNode) {
-		if(currentNode.getHandle().equals("0") && isFileAvailable(buildExternalStorageFile(rKFile))){
+		if(currentNode.getHandle().equals("0") && isFileAvailable(buildExternalStorageFile(RK_FILE))){
 			return true;
 		}
 
@@ -457,9 +456,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
 	private void addMasterKeyAsOffline(ArrayList<MegaOffline> mOffList) {
-		log("Export in: " + getExternalStoragePath(rKFile));
-		if (isFileAvailable(buildExternalStorageFile(rKFile))) {
-			MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(rKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
+		log("Export in: " + getExternalStoragePath(RK_FILE));
+		if (isFileAvailable(buildExternalStorageFile(RK_FILE))) {
+			MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(RK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
 			mOffList.add(masterKeyFile);
 		}
 	}
@@ -770,7 +769,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.textViewFileName.setText(currentNode.getName());
 
 			long nodeSize;
-			File fileRK = buildExternalStorageFile(rKFile);
+			File fileRK = buildExternalStorageFile(RK_FILE);
 			if(isFileAvailable(fileRK)){
 				nodeSize = fileRK.length();
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));

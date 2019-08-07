@@ -553,7 +553,7 @@ public class Util {
 //		if (fileLogger) {
 //			//Send the log to a file
 //
-//			File dirFile = buildExternalStorageFile(logDIR);
+//			File dirFile = buildExternalStorageFile(LOG_DIR);
 //			if (!dirFile.exists()) {
 //				dirFile.mkdirs();
 //				logFile = new File(dirFile, "log.txt");

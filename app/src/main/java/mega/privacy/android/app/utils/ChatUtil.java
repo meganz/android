@@ -347,11 +347,7 @@ public class ChatUtil {
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
                             if (finish) {
-                                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    activity.finishAndRemoveTask();
-                                }else{
-                                    activity.finish();
-                                }
+                                activity.finishAndRemoveTask();
                             }
                         }
                     });
@@ -359,11 +355,7 @@ public class ChatUtil {
                 @Override
                 public void onCancel(DialogInterface dialog) {
                     if (finish) {
-                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            activity.finishAndRemoveTask();
-                        }else{
-                            activity.finish();
-                        }
+                        activity.finishAndRemoveTask();
                     }
                 }
             });

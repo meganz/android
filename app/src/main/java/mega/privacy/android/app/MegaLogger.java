@@ -1,6 +1,5 @@
 package mega.privacy.android.app;
 
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -28,7 +27,7 @@ public abstract class MegaLogger {
     public MegaLogger(String fileName, boolean fileLogger) {
         simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logFile = null;
-        dir = getExternalStoragePath(logDIR);
+        dir = getExternalStoragePath(LOG_DIR);
         this.fileName = fileName;
         fileLogQueue = new ConcurrentLinkedDeque<>();
         logToFile();

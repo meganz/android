@@ -275,7 +275,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		}
 		
 		currentPath = pathZip;
-		downloadLocationDefaultPath = downloadDIR;
+		downloadLocationDefaultPath = getDownloadLocation(this);
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		

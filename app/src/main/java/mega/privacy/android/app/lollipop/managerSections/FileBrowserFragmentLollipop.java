@@ -134,7 +134,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 	CustomizedGridLayoutManager gridLayoutManager;
 
 	boolean allFiles = true;
-	String downloadLocationDefaultPath = downloadDIR;
+	String downloadLocationDefaultPath;
     
     private int placeholderCount;
 

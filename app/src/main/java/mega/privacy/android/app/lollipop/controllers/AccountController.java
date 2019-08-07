@@ -162,12 +162,12 @@ public class AccountController implements View.OnClickListener{
 
         BufferedWriter out;
         try {
-            File mainDir = buildExternalStorageFile(mainDIR);
-            log("Path main Dir: " + getExternalStoragePath(mainDIR));
+            File mainDir = buildExternalStorageFile(MAIN_DIR);
+            log("Path main Dir: " + getExternalStoragePath(MAIN_DIR));
             mainDir.mkdirs();
 
             if (path == null){
-                path = getExternalStoragePath(rKFile);
+                path = getExternalStoragePath(RK_FILE);
                 pathNull = true;
             }
             log("Export in: "+path);
@@ -271,8 +271,8 @@ public class AccountController implements View.OnClickListener{
 
     public void renameMK(){
         log("renameMK");
-        File oldMKF = buildExternalStorageFile(oldMKFile);
-        File newMKFile = buildExternalStorageFile(rKFile);
+        File oldMKF = buildExternalStorageFile(OLD_MK_FILE);
+        File newMKFile = buildExternalStorageFile(RK_FILE);
 
         oldMKF.renameTo(newMKFile);
     }
@@ -413,13 +413,13 @@ public class AccountController implements View.OnClickListener{
 
     public void removeMK() {
         log("removeMK");
-        final File f = buildExternalStorageFile(rKFile);
+        final File f = buildExternalStorageFile(RK_FILE);
         if (isFileAvailable(f)) {
             f.delete();
         }
 
         //Check if old MK file exists
-        final File fOldMK = buildExternalStorageFile(oldMKFile);
+        final File fOldMK = buildExternalStorageFile(OLD_MK_FILE);
         if(isFileAvailable(fOldMK)){
             log("The old file of MK was also removed");
             fOldMK.delete();
@@ -462,13 +462,13 @@ public class AccountController implements View.OnClickListener{
 
         removeOldTempFolders(context);
 
-        final File fMKOld = buildExternalStorageFile(oldMKFile);
+        final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
         if (isFileAvailable(fMKOld)){
             log("Old MK file removed!");
             fMKOld.delete();
         }
 
-        final File fMK = buildExternalStorageFile(rKFile);
+        final File fMK = buildExternalStorageFile(RK_FILE);
         if (isFileAvailable(fMK)){
             log("MK file removed!");
             fMK.delete();

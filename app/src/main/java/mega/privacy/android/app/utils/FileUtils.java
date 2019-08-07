@@ -33,15 +33,15 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 public class FileUtils {
 
-    public static final String mainDIR = File.separator + "MEGA";
+    public static final String MAIN_DIR = File.separator + "MEGA";
 
-    public static final String downloadDIR = File.separator + "MEGA" + File.separator + "MEGA Downloads";
+    public static final String DOWNLOAD_DIR = File.separator + "MEGA" + File.separator + "MEGA Downloads";
 
-    public static final String logDIR = File.separator + "MEGA" + File.separator + "MEGA Logs";
+    public static final String LOG_DIR = File.separator + "MEGA" + File.separator + "MEGA Logs";
 
-    public static final String oldMKFile = File.separator + "MEGA" + File.separator + "MEGAMasterKey.txt";
+    public static final String OLD_MK_FILE = File.separator + "MEGA" + File.separator + "MEGAMasterKey.txt";
 
-    public static final String rKFile = File.separator + "MEGA" + File.separator + "MEGARecoveryKey.txt";
+    public static final String RK_FILE = File.separator + "MEGA" + File.separator + "MEGARecoveryKey.txt";
 
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
 
@@ -322,7 +322,7 @@ public class FileUtils {
                 && prefs.getStorageDownloadLocation().compareTo("") != 0){
             return prefs.getStorageDownloadLocation();
         }
-        return downloadDIR;
+        return DOWNLOAD_DIR;
     }
 
     public static boolean isFileAvailable(File file) {
@@ -369,7 +369,7 @@ public class FileUtils {
 
     public static File buildDefaultDownloadDir(Context context) {
         if (Environment.getExternalStorageDirectory() != null){
-            return buildExternalStorageFile(downloadDIR);
+            return buildExternalStorageFile(DOWNLOAD_DIR);
         } else {
             return context.getFilesDir();
         }

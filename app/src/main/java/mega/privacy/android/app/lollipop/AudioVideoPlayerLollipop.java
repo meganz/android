@@ -813,19 +813,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if(!offList.isEmpty()) {
                         MegaOffline lastItem = offList.get(offList.size()-1);
                         if(!(lastItem.getHandle().equals("0"))){
-                            log("Export in: "+getExternalStoragePath(oldMKFile));
-                            File file= buildExternalStorageFile(oldMKFile);
+                            log("Export in: "+getExternalStoragePath(OLD_MK_FILE));
+                            File file= buildExternalStorageFile(OLD_MK_FILE);
                             if(isFileAvailable(file)){
-                                MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(oldMKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                                MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
                                 offList.add(masterKeyFile);
                             }
                         }
                     }
                     else{
-                        log("Export in: "+getExternalStoragePath(oldMKFile));
-                        File file= buildExternalStorageFile(oldMKFile);
+                        log("Export in: "+getExternalStoragePath(OLD_MK_FILE));
+                        File file= buildExternalStorageFile(OLD_MK_FILE);
                         if(isFileAvailable(file)){
-                            MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(oldMKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                            MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
                             offList.add(masterKeyFile);
                         }
                     }

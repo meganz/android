@@ -1632,7 +1632,7 @@ public class NodeController {
         log("deleteOffline");
         if (selectedNode == null){
             log("Delete RK");
-            File file= buildExternalStorageFile(rKFile);
+            File file= buildExternalStorageFile(RK_FILE);
             if(isFileAvailable(file)){
                 file.delete();
                 removeNotOfflineElements(pathNavigation);
@@ -1641,7 +1641,7 @@ public class NodeController {
         else {
             if (selectedNode.getHandle().equals("0")) {
                 log("Delete RK");
-                File file = buildExternalStorageFile(rKFile);
+                File file = buildExternalStorageFile(RK_FILE);
                 if (isFileAvailable(file)) {
                     file.delete();
 

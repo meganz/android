@@ -14,7 +14,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -360,7 +359,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setMkButtonText(){
 		log("setMkButtonText");
-		File file= buildExternalStorageFile(rKFile);
+		File file= buildExternalStorageFile(RK_FILE);
 		String mkButtonText;
 		if(isFileAvailable(file)){
 			mkButtonText = getString(R.string.action_remove_master_key);
@@ -573,8 +572,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.MK_button:{
 				log("Master Key button");
-				log("Exists MK in: "+getExternalStoragePath(rKFile));
-				File file= buildExternalStorageFile(rKFile);
+				log("Exists MK in: "+getExternalStoragePath(RK_FILE));
+				File file= buildExternalStorageFile(RK_FILE);
 				if(isFileAvailable(file)){
 					((ManagerActivityLollipop)context).showConfirmationRemoveMK();
 				}

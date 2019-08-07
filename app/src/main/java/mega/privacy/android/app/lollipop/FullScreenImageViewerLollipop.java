@@ -57,7 +57,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -754,7 +753,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				log("Share option");
 				File previewFile = null;
 				if (adapterType == Constants.OFFLINE_ADAPTER){
-					File offline = getOfflineFolder(this, offlineDIR + File.separator + mOffListImages.get(positionG).getPath());
+					File offline = getOfflineFolder(this, OFFLINE_DIR + File.separator + mOffListImages.get(positionG).getPath());
 					if (isFileAvailable(offline)) {
 						previewFile = new File(offline.getAbsolutePath(), mOffListImages.get(positionG).getName());
 					}
@@ -1052,19 +1051,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				if(!mOffList.isEmpty()) {
 					MegaOffline lastItem = mOffList.get(mOffList.size()-1);
 					if(!(lastItem.getHandle().equals("0"))){
-						log("Export in: "+getExternalStoragePath(oldMKFile));
-						File file= buildExternalStorageFile(oldMKFile);
+						log("Export in: "+getExternalStoragePath(OLD_MK_FILE));
+						File file= buildExternalStorageFile(OLD_MK_FILE);
 						if(isFileAvailable(file)){
-							MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(oldMKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
+							MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
 							mOffList.add(masterKeyFile);
 						}
 					}
 				}
 				else{
-					log("Export in: "+getExternalStoragePath(oldMKFile));
-					File file= buildExternalStorageFile(oldMKFile);
+					log("Export in: "+getExternalStoragePath(OLD_MK_FILE));
+					File file= buildExternalStorageFile(OLD_MK_FILE);
 					if(isFileAvailable(file)){
-						MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(oldMKFile), "MEGARecoveryKey.txt", 0, "0", 0, "0");
+						MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
 						mOffList.add(masterKeyFile);
 					}
 				}

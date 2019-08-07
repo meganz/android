@@ -26,13 +26,13 @@ public final class CacheFolderManager {
 
     public static final String CHAT_TEMPORAL_FOLDER = "chatTempMEGA";
 
-    public static final String oldTemporalPicDIR = "MEGA/MEGA AppTemp";
+    public static final String OLD_TEMPORAL_PIC_DIR = "MEGA/MEGA AppTemp";
 
-    public static final String oldProfilePicDIR = "MEGA/MEGA Profile Images";
+    public static final String OLD_PROFILE_PID_DIR = "MEGA/MEGA Profile Images";
 
-    public static final String oldAdvancesDevicesDIR = "MEGA/MEGA Temp";
+    public static final String OLD_ADVANCES_DEVICES_DIR = "MEGA/MEGA Temp";
 
-    public static final String oldChatTempDIR = "MEGA/MEGA Temp/Chat";
+    public static final String OLD_CHAT_TEMPORAL_DIR = "MEGA/MEGA Temp/Chat";
 
     public static File getCacheFolder(Context context, String folderName) {
         log("create cache folder: " + folderName);
@@ -158,11 +158,11 @@ public final class CacheFolderManager {
         new Thread() {
             @Override
             public void run() {
-                removeOldTempFolder(context, oldTemporalPicDIR);
-                removeOldTempFolder(context, oldProfilePicDIR);
-                removeOldTempFolder(context, oldAdvancesDevicesDIR);
-                removeOldTempFolder(context, oldChatTempDIR);
-                File oldOfflineFolder = getOldTempFolder(oldOfflineDIR);
+                removeOldTempFolder(context, OLD_TEMPORAL_PIC_DIR);
+                removeOldTempFolder(context, OLD_PROFILE_PID_DIR);
+                removeOldTempFolder(context, OLD_ADVANCES_DEVICES_DIR);
+                removeOldTempFolder(context, OLD_CHAT_TEMPORAL_DIR);
+                File oldOfflineFolder = getOldTempFolder(OLD_OFFLINE_DIR);
                 if (isFileAvailable(oldOfflineFolder)) {
                     moveOfflineFiles(context);
                 }

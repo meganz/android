@@ -34,10 +34,10 @@ import static mega.privacy.android.app.utils.Util.getSizeString;
 
 public class OfflineUtils {
 
-    public static final String offlineDIR = "MEGA Offline";
-    public static final String offlineInboxDIR = offlineDIR + File.separator + "in";
+    public static final String OFFLINE_DIR = "MEGA Offline";
+    public static final String OFFLINE_INBOX_DIR = OFFLINE_DIR + File.separator + "in";
 
-    public static final String oldOfflineDIR = mainDIR + File.separator + offlineDIR;
+    public static final String OLD_OFFLINE_DIR = MAIN_DIR + File.separator + OFFLINE_DIR;
 
     private static final String DB_FILE = "0";
     private static final String DB_FOLDER = "1";
@@ -248,13 +248,13 @@ public class OfflineUtils {
 
         switch (offlineNode.getOrigin()) {
             case MegaOffline.INCOMING: {
-                return context.getFilesDir().getAbsolutePath() + File.separator + offlineDIR + File.separator + offlineNode.getHandleIncoming();
+                return context.getFilesDir().getAbsolutePath() + File.separator + OFFLINE_DIR + File.separator + offlineNode.getHandleIncoming();
             }
             case MegaOffline.INBOX: {
-                return context.getFilesDir().getAbsolutePath() + File.separator + offlineInboxDIR;
+                return context.getFilesDir().getAbsolutePath() + File.separator + OFFLINE_INBOX_DIR;
             }
             default: {
-                return context.getFilesDir().getAbsolutePath() + File.separator + offlineDIR;
+                return context.getFilesDir().getAbsolutePath() + File.separator + OFFLINE_DIR;
             }
         }
     }
@@ -271,15 +271,15 @@ public class OfflineUtils {
     private static String getOfflinePath(String path, MegaOffline offlineNode) {
         switch (offlineNode.getOrigin()) {
             case MegaOffline.INCOMING: {
-                path = path + offlineDIR + File.separator + offlineNode.getHandleIncoming();
+                path = path + OFFLINE_DIR + File.separator + offlineNode.getHandleIncoming();
                 break;
             }
             case MegaOffline.INBOX: {
-                path = path + offlineInboxDIR;
+                path = path + OFFLINE_INBOX_DIR;
                 break;
             }
             default: {
-                path = path + offlineDIR;
+                path = path + OFFLINE_DIR;
             }
         }
         if (offlineNode.getPath().equals(File.separator)) {
@@ -294,15 +294,15 @@ public class OfflineUtils {
 
         switch (from) {
             case Constants.FROM_INCOMING_SHARES: {
-                path = path + offlineDIR + File.separator + OfflineUtils.findIncomingParentHandle(node, megaApi);
+                path = path + OFFLINE_DIR + File.separator + OfflineUtils.findIncomingParentHandle(node, megaApi);
                 break;
             }
             case Constants.FROM_INBOX: {
-                path = path + offlineInboxDIR;
+                path = path + OFFLINE_INBOX_DIR;
                 break;
             }
             default: {
-                path = path + offlineDIR;
+                path = path + OFFLINE_DIR;
             }
         }
 
@@ -311,7 +311,7 @@ public class OfflineUtils {
 
     public static String getOfflineSize(Context context) {
         log("getOfflineSize");
-        File offline = getOfflineFolder(context, offlineDIR);
+        File offline = getOfflineFolder(context, OFFLINE_DIR);
         long size;
         if (isFileAvailable(offline)) {
             size = getDirSize(offline);
@@ -323,7 +323,7 @@ public class OfflineUtils {
 
     public static void clearOffline(Context context) {
         log("clearOffline");
-        File offline = getOfflineFolder(context, offlineDIR);
+        File offline = getOfflineFolder(context, OFFLINE_DIR);
         if (isFileAvailable(offline)) {
             try {
                 deleteFolderAndSubfolders(context, offline);
@@ -358,7 +358,7 @@ public class OfflineUtils {
             nodesToDB.add(document);
         }
 
-        if (path.contains(offlineInboxDIR)) {
+        if (path.contains(OFFLINE_INBOX_DIR)) {
             insertDB(context, megaApi, dbH, nodesToDB, true);
         } else {
             insertDB(context, megaApi, dbH, nodesToDB, false);
@@ -626,7 +626,7 @@ public class OfflineUtils {
             }
         }
 
-        removeOldTempFolder(context, oldOfflineDIR);
+        removeOldTempFolder(context, OLD_OFFLINE_DIR);
     }
 
     private static void deleteOldOfflineReference(DatabaseHandler dbH, File oldOfflineFile, MegaOffline oldOfflineNode) {
@@ -637,7 +637,7 @@ public class OfflineUtils {
     }
 
     private static File findOldOfflineFile(MegaOffline offlineNode) {
-        String path = getOldTempFolder(mainDIR).getAbsolutePath() + File.separator;
+        String path = getOldTempFolder(MAIN_DIR).getAbsolutePath() + File.separator;
         return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
     }
 
