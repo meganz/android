@@ -59,7 +59,7 @@ public class SDCardOperator {
     public void initDocumentFileRoot(MegaPreferences prefs) throws SDCardException {
         String uriString = prefs.getUriExternalSDCard();
         if (TextUtils.isEmpty(uriString)) {
-            throw new SDCardException("Permission required! No uri string.");
+            throw new SDCardException("Haven't got sd card root uri!");
         } else {
             Uri rootUri = Uri.parse(uriString);
             sdCardRootDocument = DocumentFile.fromTreeUri(context, rootUri);
