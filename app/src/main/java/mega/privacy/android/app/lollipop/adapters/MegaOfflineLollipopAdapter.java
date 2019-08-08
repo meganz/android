@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
@@ -46,6 +45,9 @@ import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
 
 public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener, RotatableAdapter {
@@ -415,11 +417,18 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	
 	public void setNodes(ArrayList<MegaOffline> mOffList){
 		log("setNodes");
-
 		this.mOffList = insertPlaceHolderNode(mOffList);
 		((OfflineFragmentLollipop) fragment).addSectionTitle(this.mOffList);
 		positionClicked = -1;	
 		notifyDataSetChanged();
+	}
+
+	private void addMasterKeyAsOffline(ArrayList<MegaOffline> mOffList) {
+		log("Export in: " + getExternalStoragePath(RK_FILE));
+		if (isFileAvailable(buildExternalStorageFile(RK_FILE))) {
+			MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(RK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
+			mOffList.add(masterKeyFile);
+		}
 	}
 	
 	@Override
@@ -579,27 +588,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.itemLayout.setVisibility(View.INVISIBLE);
 			return;
 		}
+		
+		File currentFile = getOfflineFile(context, currentNode);
 
-		String path=null;
-		
-		if(currentNode.getOrigin()==MegaOffline.INCOMING){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
-		}
-		else if(currentNode.getOrigin()==MegaOffline.INBOX){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
-		}
-		else{
-			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-		}	
-		
-		File currentFile = null;
-		if (Environment.getExternalStorageDirectory() != null){
-			currentFile = new File(path + currentNode.getPath()+currentNode.getName());
-		}
-		else{
-			currentFile = context.getFilesDir();
-		}
-		
 		holder.currentPath = currentFile.getAbsolutePath();
 		holder.currentHandle = currentNode.getHandle();
 
@@ -725,34 +716,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
 	    
 		holder.currentPosition = position;
 				
 		MegaOffline currentNode = (MegaOffline) getItem(position);
 		
-		String path=null;
-		
-		if(currentNode.getOrigin()==MegaOffline.INCOMING){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
-		}
-		else if(currentNode.getOrigin()==MegaOffline.INBOX){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
-		}
-		else{
-			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-		}	
-		
-		File currentFile = null;
-		if (Environment.getExternalStorageDirectory() != null){
-			currentFile = new File(path + currentNode.getPath()+currentNode.getName());
-		}
-		else{
-			currentFile = context.getFilesDir();
-		}
+		File currentFile = getOfflineFile(context, currentNode);
 		
 		holder.currentPath = currentFile.getAbsolutePath();
 		holder.currentHandle = currentNode.getHandle();

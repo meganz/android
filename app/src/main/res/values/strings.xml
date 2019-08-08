@@ -278,9 +278,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Size</string>
-    <string name="file_properties_info_modified" context="when was the file modified">Modified</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Last Modified</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Added</string>
-    <string name="file_properties_info_created" context="when the file was created">Created</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -642,7 +641,7 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Uploading files of media folders</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
-	<!--
+    <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera uploads complete</string>
@@ -698,7 +697,8 @@
         <item context="the options of what to upload.">Photos and videos</item>
     </string-array>
 
-    <string name="settings_camera_upload_charging" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
+    <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Only when charging</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Local Camera folder</string>
@@ -1077,10 +1077,10 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacts will be removed from the shared folder.</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts removed successfully from the shared folder</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;and %d contacts were not successfully removed</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts were not successfully removed</string>
 
 	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
-	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">&#160;and %d contacts permissions were not successfully changed</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Loading contacts from the phone&#8230;</string>
 
@@ -1344,7 +1344,7 @@
         <item context="Plural" quantity="other">%1$d of %2$d files</item>
     </plurals>
 
-	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Process is finishing...</string>
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Process is finishing&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">View</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pause all transfers</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Resume all transfers</string>
@@ -2273,7 +2273,7 @@
 	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
 	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">The total size of the videos to compress exceeds %s, please plug in your device to continue.</string>
 	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
-	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed </string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
 	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
 
@@ -2329,7 +2329,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Allow access to your camera to scan documents, take pictures and make video calls.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
     <string name="general_enable_access" context="General enable access">Enable access</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
@@ -2337,6 +2336,18 @@
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
 
     <string name="call_ended_message" context="Message shown when a call ends.">[A]Call ended[/A][C]. Duration: [/C]</string>
+    <plurals name="plural_call_ended_messages_hours" context="Message that shows the hours of a call when it ends">
+        <item context="one hour" quantity="one">[B]%1$s hour[/B]</item>
+        <item context="more hours" quantity="other">[B]%1$s hours[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes" context="Message that shows the minutes of a call when it ends">
+        <item context="one minute" quantity="one">[B]%1$s minute[/B]</item>
+        <item context="more minutes" quantity="other">[B]%1$s minutes[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds" context="Message that shows the seconds of a call when it ends">
+        <item context="one second" quantity="one">[B]%1$d second[/B]</item>
+        <item context="more seconds" quantity="other">[B]%1$d seconds[/B]</item>
+    </plurals>
 
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]Last seen [/A]today %1$s</string>
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it's been a long time ago that we don't see any activity from that user">[A]Last seen [/A]a long time ago</string>
@@ -2387,19 +2398,6 @@
     <plurals name="num_contacts_not_send" context="Alert shown when a num of contacts have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d contact was not sent to %d chats</item>
         <item context="Plural of file. 2 files" quantity="other">%d contacts were not sent to %d chats</item>
-    </plurals>
-
-    <plurals name="plural_call_ended_messages_hours" context="Message that shows the hours of a call when it ends">
-        <item context="one hour" quantity="one">[B]%1$s hour[/B]</item>
-        <item context="more hours" quantity="other">[B]%1$s hours[/B]</item>
-    </plurals>
-    <plurals name="plural_call_ended_messages_minutes" context="Message that shows the minutes of a call when it ends">
-        <item context="one minute" quantity="one">[B]%1$s minute[/B]</item>
-        <item context="more minutes" quantity="other">[B]%1$s minutes[/B]</item>
-    </plurals>
-    <plurals name="plural_call_ended_messages_seconds" context="Message that shows the seconds of a call when it ends">
-        <item context="one second" quantity="one">[B]%1$d second[/B]</item>
-        <item context="more seconds" quantity="other">[B]%1$d seconds[/B]</item>
     </plurals>
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
@@ -2483,8 +2481,8 @@
 
     <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
     <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
     <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
     <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
     <string name="action_open_contact_link" context="Menu item">Open contact link</string>
@@ -2521,4 +2519,6 @@
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Loading</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Please wait...</string>
 </resources>

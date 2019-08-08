@@ -70,6 +70,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
 
 /**
  * Created by mega on 28/05/18.
@@ -617,15 +618,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             scrollContainerVerify.setVisibility(View.GONE);
             scrollContainer2FAEnabled.setVisibility(View.VISIBLE);
             if (rkSaved) {
-//                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-//                log("Exists MK in: "+path);
-//                File file= new File(path);
-//                if(file.exists()){
-//                    exportRKButton.setVisibility(View.GONE);
-//                }
-//                else{
-//                    exportRKButton.setVisibility(View.VISIBLE);
-//                }
                 dismissRKButton.setVisibility(View.VISIBLE);
             }
             else {
@@ -1170,15 +1162,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
                 if (e.getErrorCode() == MegaError.API_OK && request.getAccess() == 1) {
                     rkSaved = true;
-//                    String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-//                    log("Exists MK in: "+path);
-//                    File file= new File(path);
-//                    if(file.exists()){
-//                        exportRKButton.setVisibility(View.GONE);
-//                    }
-//                    else{
-//                        exportRKButton.setVisibility(View.VISIBLE);
-//                    }
                     dismissRKButton.setVisibility(View.VISIBLE);
                 }
                 else {
@@ -1263,7 +1246,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
                 log("parentPath no NULL");
-                parentPath = parentPath + File.separator + Util.rKFile;
+
+                parentPath = parentPath + File.separator + RK_FILE;
+
                 Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
                 newIntent.putExtra("parentPath", parentPath);
                 newIntent.setAction(Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);

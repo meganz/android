@@ -11,7 +11,6 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.FileProvider;
@@ -41,6 +40,9 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -117,7 +119,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDeleteOffline.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
 
-        LinearLayout separatorRK = (LinearLayout) contentView.findViewById(R.id.separator_rk);
         LinearLayout separatorOpen = (LinearLayout) contentView.findViewById(R.id.separator_open);
 
         nodeName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
@@ -136,29 +137,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
             nodeName.setText(nodeOffline.getName());
 
-            separatorRK.setVisibility(View.GONE);
-
             log("Set node info");
-            String path=null;
-
-            if(nodeOffline.getOrigin()==MegaOffline.INCOMING){
-                path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + nodeOffline.getHandleIncoming() + "/";
-            }
-            else if(nodeOffline.getOrigin()==MegaOffline.INBOX){
-                path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in";
-            }
-            else{
-                path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-            }
-
-            if (Environment.getExternalStorageDirectory() != null){
-                String finalPath = path + nodeOffline.getPath()+nodeOffline.getName();
-                file = new File(finalPath);
-                log("Path to find file: "+finalPath);
-            }
-            else{
-                file = context.getFilesDir();
-            }
+            file = getOfflineFile(context, nodeOffline);
+            if (!isFileAvailable(file)) return;
 
             int folders=0;
             int files=0;

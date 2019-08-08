@@ -82,13 +82,6 @@
             android:orientation="vertical">
 
             <!-- Options -->
-            <LinearLayout
-                android:id="@+id/separator_rk"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"

@@ -42,6 +42,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
+
 /**
  * Created by mega on 3/04/18.
  */
@@ -341,7 +343,8 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
                 log("parentPath no NULL");
-                parentPath = parentPath + File.separator + Util.rKFile;
+                parentPath = parentPath + File.separator + RK_FILE;
+
                 AccountController ac = new AccountController(this);
                 ac.exportMK(parentPath);
             }
