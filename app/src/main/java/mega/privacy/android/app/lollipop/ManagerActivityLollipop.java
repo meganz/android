@@ -13172,11 +13172,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE: {
-						String pathNavigation = getPathNavigationOffline();
 						MegaOffline mOff = getSelectedOfflineNode();
 
 						NodeController nC = new NodeController(managerActivity);
-						nC.deleteOffline(mOff, pathNavigation);
+						nC.deleteOffline(mOff);
 
 						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
                         if(fbFLol != null){
@@ -13227,7 +13226,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						String pathNavigation = getPathNavigationOffline();
 						NodeController nC = new NodeController(managerActivity);
 						for (int i=0;i<documents.size();i++){
-							nC.deleteOffline(documents.get(i), pathNavigation);
+							nC.deleteOffline(documents.get(i));
 						}
 						updateOfflineView(documents.get(0));
 						sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
