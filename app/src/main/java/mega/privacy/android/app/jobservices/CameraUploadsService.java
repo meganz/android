@@ -1442,9 +1442,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (e.getErrorCode() == MegaError.API_OK) {
                 //clear pause state and reset
                 megaApi.pauseTransfers(false,this);
-                if(megaApi.getNumPendingUploads() <= 0) {
-                    megaApi.resetTotalUploads();
-                }
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(megaApi.getNumPendingUploads() <= 0) {
+                            megaApi.resetTotalUploads();
+                        }
+                    }
+                }, 200);
             } else {
                 finish();
             }
