@@ -63,10 +63,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MyChatFilesExisitListener<Intent> {
 
@@ -373,15 +373,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					Bitmap scaleBitmap = Bitmap.createScaledBitmap(fileBitmap, (int)width, (int)height, false);
 					if (scaleBitmap != null) {
 						log("DATA connection scaled Bitmap != null");
-						File defaultDownloadLocation = null;
-						if (Environment.getExternalStorageDirectory() != null) {
-							defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
-						}
-						else{
-							defaultDownloadLocation = getFilesDir();
-						}
-						defaultDownloadLocation.mkdirs();
-						File outFile = new File(defaultDownloadLocation.getAbsolutePath(), file.getName());
+						File outFile = buildChatTempFile(getApplicationContext(), file.getName());
 						if (outFile != null) {
 							log("DATA connection new file != null");
 							FileOutputStream fOut;
@@ -456,22 +448,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			try {
 				totalVideos++;
 				numberVideosPending++;
-				File defaultDownloadLocation = null;
-				if (Environment.getExternalStorageDirectory() != null){
-					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
-				}
-				else{
-					defaultDownloadLocation = getFilesDir();
-				}
-
-				defaultDownloadLocation.mkdirs();
-
-				File outFile = new File(defaultDownloadLocation.getAbsolutePath(), file.getName());
+				File chatTempFolder = getCacheFolder(getApplicationContext(), CHAT_TEMPORAL_FOLDER);
+				File outFile = buildChatTempFile(getApplicationContext(), file.getName());
 				int index = 0;
 				if(outFile!=null){
 					while(outFile.exists()){
 						if(index>0){
-							outFile = new File(defaultDownloadLocation.getAbsolutePath(), file.getName());
+							outFile = new File(chatTempFolder.getAbsolutePath(), file.getName());
 						}
 
 						index++;
@@ -486,7 +469,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						else
 							fileName=fileName.concat("_"+index+".mp4");
 
-						outFile = new File(defaultDownloadLocation.getAbsolutePath(), fileName);
+						outFile = new File(chatTempFolder.getAbsolutePath(), fileName);
 					}
 				}
 
@@ -585,52 +568,17 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		log("after stopSelf");
 
 		try{
-			String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-			File f = new File(pathSelfie);
-			//Delete recursively all files and folder
-			if (f.exists()) {
-				if (f.isDirectory()) {
-					if(f.list().length<=0){
-						f.delete();
-					}
-				}
-			}
+			deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
 		}
 		catch (Exception e){
 			log("EXCEPTION: pathSelfie not deleted");
 		}
 
 		try{
-			String pathVideoDownsampling = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.chatTempDIR;
-			File fVideo = new File(pathVideoDownsampling);
-			//Delete recursively all files and folder
-			if (fVideo.exists()) {
-				if (fVideo.isDirectory()) {
-					if(fVideo.list().length<=0){
-						fVideo.delete();
-					}
-				}
-
-			}
+			deleteCacheFolderIfEmpty(getApplicationContext(), CHAT_TEMPORAL_FOLDER);
 		}
 		catch (Exception e){
 			log("EXCEPTION: pathVideoDownsampling not deleted");
-		}
-
-		try{
-			File f = getExternalFilesDir(null);
-//			File f = new File(pathSelfie);
-			//Delete recursively all files and folder
-			if (f.exists()) {
-				if (f.isDirectory()) {
-					if(f.list().length<=0){
-						f.delete();
-					}
-				}
-			}
-		}
-		catch (Exception e){
-			log("EXCEPTION: pathSelfie not deleted");
 		}
 	}
 
@@ -1132,31 +1080,22 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					ChatUploadService.this.cancel();
 					log("after cancel");
+
 					if(appData.contains(Constants.EXTRA_VOICE_CLIP)) {
 						File localFile = buildVoiceClipFile(this, transfer.getFileName());
 						if (isFileAvailable(localFile) && !localFile.getName().equals(transfer.getFileName())) {
 							localFile.delete();
 						}
 					}else {
-						String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-						File f = new File(pathSelfie);
-						//Delete recursively all files and folder
-						if (f.exists()) {
-							if (f.isDirectory()) {
-								if (f.list().length <= 0) {
-									f.delete();
-								}
-							}
-						}
-						f.delete();
+						//Delete recursively all files and folder-??????
+						deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
 					}
-
 				}
 				else{
 					if (error.getErrorCode() == MegaError.API_OK) {
 						log("Upload OK: " + transfer.getFileName());
 
-						if(Util.isVideoFile(transfer.getPath())){
+						if(isVideoFile(transfer.getPath())){
 							log("Is video!!!");
 
 							File previewDir = PreviewUtils.getPreviewFolder(this);
@@ -1283,16 +1222,15 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							}
 						}
 					}
-
-					log("IN Finish: "+transfer.getFileName()+" path: "+transfer.getPath());
-					String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-					if (transfer.getPath() != null) {
-						if (transfer.getPath().startsWith(pathSelfie)) {
+					File tempPic = getCacheFolder(getApplicationContext(), TEMPORAL_FOLDER);
+					log("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
+					if (isFileAvailable(tempPic) && transfer.getPath() != null) {
+						if (transfer.getPath().startsWith(tempPic.getAbsolutePath())) {
 							File f = new File(transfer.getPath());
 							f.delete();
 						}
 					} else {
-						log("transfer.getPath() is NULL");
+						log("transfer.getPath() is NULL or temporal folder unavailable");
 					}
 				}
 
@@ -1349,7 +1287,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
 			megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 
-			if(Util.isVideoFile(transfer.getPath())){
+			if(isVideoFile(transfer.getPath())){
 				String pathDownsampled = pendMsg.getVideoDownSampled();
 				if(transfer.getPath().equals(pathDownsampled)){
 					//Delete the local temp video file
