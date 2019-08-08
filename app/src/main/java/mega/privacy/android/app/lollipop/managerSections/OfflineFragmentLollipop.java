@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
@@ -65,6 +64,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -73,7 +73,10 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
-public class OfflineFragmentLollipop extends Fragment{
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
+
+public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public static ImageView imageDrag;
 	public static final String REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list";
@@ -120,6 +123,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 	};
 
+	private int lastPlaceHolderCount;
+
 	@Override
 	public void onResume(){
 		super.onResume();
@@ -131,6 +136,11 @@ public class OfflineFragmentLollipop extends Fragment{
 	public void onPause(){
 		super.onPause();
 		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+	}
+
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
 	}
 
 	public void activateActionMode(){
@@ -690,58 +700,10 @@ public class OfflineFragmentLollipop extends Fragment{
 		for(int i=0; i<mOffList.size();i++){
 
 			MegaOffline checkOffline = mOffList.get(i);
-			File offlineDirectory = null;
-			if(checkOffline.getOrigin()==MegaOffline.INCOMING){
-
-				log("isIncomingOffline");
-
-				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-					log("offlineDirectory: "+offlineDirectory);
-				}
-				else{
-					offlineDirectory = context.getFilesDir();
-				}
-			}
-			else if(checkOffline.getOrigin()==MegaOffline.INBOX){
-
-				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
-					log("offlineDirectory: "+offlineDirectory);
-				}
-				else{
-					offlineDirectory = context.getFilesDir();
-				}
-			}
-			else{
-				log("FROM other origin");
-
-				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
-				}
-				else{
-					offlineDirectory = context.getFilesDir();
-				}
-
-				if (!offlineDirectory.exists()){
-					log("Not exists for not incoming offline");
-
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in" + checkOffline.getPath()+checkOffline.getName());
-					}
-					else{
-						offlineDirectory = context.getFilesDir();
-					}
-				}
-			}
-
-			if(offlineDirectory!=null){
-				if (!offlineDirectory.exists()){
-					log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-					//dbH.removeById(mOffList.get(i).getId());
-					mOffList.remove(i);
-					i--;
-				}
+			File offlineFile = getOfflineFile(context, checkOffline);
+			if (!isFileAvailable(offlineFile)) {
+				mOffList.remove(i);
+				i--;
 			}
 			addSectionTitle(mOffList);
 		}
@@ -928,30 +890,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 //		contentText.setText(getInfoFolder(mOffList));
 	}
-	
-//	public void updateView (){
-//		log("updateView");
-//		mOffList=dbH.findByPath(pathNavigation);
-//		
-//		for(int i=0; i<mOffList.size();i++){
-//			
-//			File offlineDirectory = null;
-//			if (Environment.getExternalStorageDirectory() != null){
-//				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
-//			}
-//			else{
-//				offlineDirectory = context.getFilesDir();
-//			}	
-//			
-//			if (!offlineDirectory.exists()){
-//				dbH.removeById(mOffList.get(i).getId());
-//				mOffList.remove(i);
-//				
-//			}			
-//		}
-//		this.setNodes(mOffList);
-//	}
-//	
 
 	public boolean isFolder(String path){
 		log("isFolder");
@@ -978,18 +916,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		int numFolders=0;
 		int numFiles=0;
 		
-		String pathI=null;
-		
 		if(mOffInfo.size()>0){
-			if(mOffInfo.get(0).getOrigin()==MegaOffline.INCOMING){
-				pathI = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + mOffInfo.get(0).getHandleIncoming() + "/";
-			}
-			else if(mOffInfo.get(0).getOrigin()==MegaOffline.INBOX){
-				pathI = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
-			}
-			else{
-				pathI= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-			}	
+			String pathI = getOfflineAbsolutePath(context, mOffInfo.get(0));
 			
 			for(int i=0; i<mOffInfo.size();i++){
 				MegaOffline mOff = (MegaOffline) mOffInfo.get(i);
@@ -1011,10 +939,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 		
 		//Check if the file MarterKey is exported
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-		log("Export in: "+path);
-		File file= new File(path);
-		if(file.exists()){
+		log("Export in: "+getExternalStoragePath(RK_FILE));
+		File file= buildExternalStorageFile(RK_FILE);
+		if(isFileAvailable(file)){
 			numFiles++;
 		}
 		
@@ -1077,26 +1004,13 @@ public class OfflineFragmentLollipop extends Fragment{
 			
 			if(currentNode.getHandle().equals("0")){
 				log("click on Master Key");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-				openFile(new File(path));
+				openFile(buildExternalStorageFile(RK_FILE));
 //				viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
 //				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
 				return;
 			}
-						
-			if(currentNode.getOrigin()==MegaOffline.INCOMING){
-				String handleString = currentNode.getHandleIncoming();
-				currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+currentNode.getPath() + "/" + currentNode.getName());
-			}
-			else if(currentNode.getOrigin()==MegaOffline.INBOX){
-				String handleString = currentNode.getHandleIncoming();
-				currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/"+currentNode.getPath() + "/" + currentNode.getName());
-			}
-			else{
-				currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
-			}
-			
-			if(currentFile.exists() && currentFile.isDirectory()){
+			currentFile = getOfflineFile(context, currentNode);
+			if(isFileAvailable(currentFile) && currentFile.isDirectory()){
 
 				int lastFirstVisiblePosition = 0;
 				if(((ManagerActivityLollipop)context).isList){
@@ -1129,18 +1043,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 				else{
 					File offlineDirectory = null;
-					String path;
-
-					if(currentNode.getOrigin()==MegaOffline.INCOMING){
-						path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming();
-					}
-					else if(currentNode.getOrigin()==MegaOffline.INBOX){
-						path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in";
-					}
-					else{							
-						path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-						log("Path NOT INCOMING: "+path);							
-					}						
+					String path = getOfflineAbsolutePath(context, currentNode);
 											
 					for(int i=0; i<mOffList.size();i++){
 						
@@ -1377,7 +1280,15 @@ public class OfflineFragmentLollipop extends Fragment{
 			}
 		}
     }
-    
+
+	@Override
+	public void multipleItemClick(int position) {
+		if (position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
+			position -= placeholderCount;
+		}
+		adapter.toggleSelection(position);
+	}
+
     public void openFile (File currentFile){
 		log("openFile");
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
@@ -1431,8 +1342,9 @@ public class OfflineFragmentLollipop extends Fragment{
 //			}
 		}
 	}
-	
-	private void updateActionModeTitle() {
+
+	@Override
+	protected void updateActionModeTitle() {
 		log("updateActionModeTitle");
 		if (actionMode == null || getActivity() == null) {
 			return;
@@ -1441,18 +1353,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		int folders=0;
 		int files=0;
 		
-		String pathI=null;
-		
 		if(documents.size()>0){
-			if(documents.get(0).getOrigin()==MegaOffline.INCOMING){
-				pathI = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + documents.get(0).getHandleIncoming() + "/";
-			}
-			else if(documents.get(0).getOrigin()==MegaOffline.INBOX){
-				pathI = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
-			}
-			else{
-				pathI= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-			}	
+			String pathI = getOfflineAbsolutePath(context, documents.get(0));
 			
 			for(int i=0; i<documents.size();i++){
 				MegaOffline mOff = (MegaOffline) documents.get(i);

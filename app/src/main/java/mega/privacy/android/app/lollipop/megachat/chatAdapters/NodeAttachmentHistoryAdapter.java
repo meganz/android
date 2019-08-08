@@ -44,6 +44,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
+
 public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttachmentHistoryAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener {
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
@@ -490,7 +492,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holder.fileGridSelected.setVisibility(View.GONE);
         }
 
-        if (Util.isVideoFile(node.getName())) {
+        if (isVideoFile(node.getName())) {
             holder.videoInfoLayout.setVisibility(View.VISIBLE);
             holder.videoDuration.setVisibility(View.GONE);
             log(node.getName() + " DURATION: " + node.getDuration());
