@@ -76,9 +76,9 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_media_bucket, parent, false);
         ViewHolderMediaBucket holder = new ViewHolderMediaBucket(v);
 
-        holder.thumbnail = (ImageView) v.findViewById(R.id.thumbnail_view);
-        holder.videoLayout = (RelativeLayout) v.findViewById(R.id.video_layout);
-        holder.videoDuration = (TextView) v.findViewById(R.id.duration_text);
+        holder.thumbnail = v.findViewById(R.id.thumbnail_view);
+        holder.videoLayout = v.findViewById(R.id.video_layout);
+        holder.videoDuration = v.findViewById(R.id.duration_text);
         holder.itemView.setOnClickListener(this);
 
         v.setTag(holder);

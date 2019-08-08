@@ -13,7 +13,9 @@ import mega.privacy.android.app.utils.Util;
 
 public class CloudPageAdapter extends FragmentStatePagerAdapter {
 
-    final int PAGE_COUNT = 2;
+    private final int CLOUD_TAB = 0;
+    private final int RECENTS_TAB = 1;
+    private final int PAGE_COUNT = 2;
     private Context context;
 
     public CloudPageAdapter(FragmentManager fm, Context context) {
@@ -25,21 +27,21 @@ public class CloudPageAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         log("getItem: " + position);
         switch (position) {
-            case 0: {
+            case CLOUD_TAB: {
                 FileBrowserFragmentLollipop fbF = (FileBrowserFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag((ManagerActivityLollipop.FragmentTag.CLOUD_DRIVE.getTag()));
                 if (fbF != null) {
                     return fbF;
-                } else {
-                    return FileBrowserFragmentLollipop.newInstance();
                 }
+
+                return FileBrowserFragmentLollipop.newInstance();
             }
-            case 1: {
+            case RECENTS_TAB: {
                 RecentsFragment rF = (RecentsFragment) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag((ManagerActivityLollipop.FragmentTag.RECENTS.getTag()));
                 if (rF != null) {
                     return rF;
-                } else {
-                    return RecentsFragment.newInstance();
                 }
+
+                return RecentsFragment.newInstance();
             }
         }
         return null;
@@ -54,10 +56,10 @@ public class CloudPageAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         // Generate title based on item position
         switch (position) {
-            case 0: {
+            case CLOUD_TAB: {
                 return context.getString(R.string.section_cloud_drive).toLowerCase();
             }
-            case 1: {
+            case RECENTS_TAB: {
                 return context.getString(R.string.section_recents).toLowerCase();
             }
         }

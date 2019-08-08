@@ -161,36 +161,37 @@ import static mega.privacy.android.app.utils.OfflineUtils.*;
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface {
 
-    boolean fromChatSavedInstance = false;
-    int[] screenPosition;
-    int mLeftDelta;
-    int mTopDelta;
-    float mWidthScale;
-    float mHeightScale;
-    int screenWidth;
-    int screenHeight;
-    int placeholderCount;
-
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
+    public static final String IS_PLAYLIST = "IS_PLAYLIST";
 
-    static AudioVideoPlayerLollipop audioVideoPlayerLollipop;
+    private boolean fromChatSavedInstance = false;
+    private int[] screenPosition;
+    private int mLeftDelta;
+    private int mTopDelta;
+    private float mWidthScale;
+    private float mHeightScale;
+    private int screenWidth;
+    private int screenHeight;
+    private int placeholderCount;
+
+    private AudioVideoPlayerLollipop audioVideoPlayerLollipop;
 
     private MegaApiAndroid megaApi;
-    MegaApiAndroid megaApiFolder;
+    private MegaApiAndroid megaApiFolder;
     private MegaChatApiAndroid megaChatApi;
-    DatabaseHandler dbH = null;
-    MegaPreferences prefs = null;
+    private DatabaseHandler dbH = null;
+    private MegaPreferences prefs = null;
 
     private AlertDialog alertDialogTransferOverquota;
 
-    Handler handler;
-    Runnable runnableActionStatusBar = new Runnable() {
+    private Handler handler;
+    private Runnable runnableActionStatusBar = new Runnable() {
         @Override
         public void run() {
             hideActionStatusBar(400L);
         }
     };
-    boolean isFolderLink = false;
+    private boolean isFolderLink = false;
     private SimpleExoPlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
     private Uri uri;
@@ -215,7 +216,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private MenuItem removeMenuItem;
     private MenuItem removelinkMenuItem;
     private MenuItem loopMenuItem;
-    public MenuItem searchMenuItem;
+    private MenuItem searchMenuItem;
     private MenuItem importMenuItem;
     private MenuItem saveForOfflineMenuItem;
     private MenuItem chatRemoveMenuItem;
@@ -224,10 +225,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private RelativeLayout audioContainer;
     private long handle = -1;
-    int countChat = 0;
-    int successSent = 0;
-    int errorSent = 0;
-    boolean transferOverquota = false;
+    private int countChat = 0;
+    private int successSent = 0;
+    private int errorSent = 0;
+    private boolean transferOverquota = false;
 
     private boolean video = false;
     private ProgressDialog statusDialog = null;
@@ -241,7 +242,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private boolean isUrl;
 
-    ArrayList<Long> handleListM = new ArrayList<Long>();
+    private ArrayList<Long> handleListM = new ArrayList<Long>();
 
     private int currentPosition = 0;
     private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -262,16 +263,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private DraggableView draggableView;
     private ImageView ivShadow;
-    NodeController nC;
+    private NodeController nC;
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
     private boolean fromShared = false;
-    int typeExport = -1;
+    private int typeExport = -1;
     private AlertDialog renameDialog;
-    String regex = "[*|\\?:\"<>\\\\\\\\/]";
+    private String regex = "[*|\\?:\"<>\\\\\\\\/]";
     boolean moveToRubbish = false;
-    ProgressDialog moveToTrashStatusDialog;
+    private ProgressDialog moveToTrashStatusDialog;
     private boolean loop = false;
     private boolean isVideo = true;
     private boolean isMP4 = false;
@@ -285,10 +286,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private boolean onPlaylist = false;
 //    public LoopingMediaSource loopingMediaSource;
     public ConcatenatingMediaSource concatenatingMediaSource = null;
-    PlaylistFragment playlistFragment;
+    private PlaylistFragment playlistFragment;
     private ProgressBar playlistProgressBar;
-    int currentWindowIndex;
-    public String querySearch = "";
+    private int currentWindowIndex;
+    private String querySearch = "";
 
     boolean playWhenReady = true;
     boolean searchExpand = false;
@@ -297,34 +298,34 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     boolean isAbHide = false;
     boolean fromDownload = false;
 
-    ChatController chatC;
+    private ChatController chatC;
     private long msgId = -1;
     private long chatId = -1;
-    MegaNode nodeChat;
-    MegaChatMessage msgChat;
+    private MegaNode nodeChat;
+    private MegaChatMessage msgChat;
 
-    MegaNode currentDocument;
-    int playbackStateSaved;
+    private MegaNode currentDocument;
+    private int playbackStateSaved;
 
-    ProgressBar createPlaylistProgressBar;
-    DefaultBandwidthMeter defaultBandwidthMeter;
-    DefaultDataSourceFactory dataSourceFactory;
-    ExtractorsFactory extractorsFactory;
-    MediaSource mediaSource = null;
-    boolean creatingPlaylist = false;
-    boolean playListCreated = false;
-    CreatePlayListTask createPlayListTask;
-    List<MediaSource> mediaSourcePlaylist = new ArrayList<>();
-    int createPlayListErrorCounter = 0;
+    private ProgressBar createPlaylistProgressBar;
+    private DefaultBandwidthMeter defaultBandwidthMeter;
+    private DefaultDataSourceFactory dataSourceFactory;
+    private ExtractorsFactory extractorsFactory;
+    private MediaSource mediaSource = null;
+    private boolean creatingPlaylist = false;
+    private boolean playListCreated = false;
+    private CreatePlayListTask createPlayListTask;
+    private List<MediaSource> mediaSourcePlaylist = new ArrayList<>();
+    private int createPlayListErrorCounter = 0;
 
-    String query;
-    File zipFile;
-    ArrayList<File> zipFiles = new ArrayList<>();
-    ArrayList<File> zipMediaFiles = new ArrayList<>();
-    boolean isZip = false;
-    GetMediaFilesTask getMediaFilesTask;
+    private String query;
+    private File zipFile;
+    private ArrayList<File> zipFiles = new ArrayList<>();
+    private ArrayList<File> zipMediaFiles = new ArrayList<>();
+    private boolean isZip = false;
+    private GetMediaFilesTask getMediaFilesTask;
 
-    long [] nodeHandles;
+    private long [] nodeHandles;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -405,7 +406,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         fromShared = intent.getBooleanExtra("fromShared", false);
         path = intent.getStringExtra("path");
         adapterType = getIntent().getIntExtra("adapterType", 0);
-        isPlayList = intent.getBooleanExtra("isPlayList", true);
+        isPlayList = intent.getBooleanExtra(IS_PLAYLIST, true);
 
         if (adapterType == Constants.OFFLINE_ADAPTER){
             isOffline = true;
@@ -4543,6 +4544,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         return handler;
     }
 
+    public String getQuerySearch() {
+        return querySearch;
+    }
+
+    public MenuItem getSearchMenuItem() {
+        return searchMenuItem;
+    }
     public boolean isCreatingPlaylist () {
         return creatingPlaylist;
     }

@@ -88,6 +88,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
@@ -557,7 +558,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 							}
 
 							mediaIntent.putExtra("adapterType", Constants.FROM_CHAT);
-							mediaIntent.putExtra("isPlayList", false);
+							mediaIntent.putExtra(IS_PLAYLIST, false);
 							mediaIntent.putExtra("msgId", m.getMsgId());
 							mediaIntent.putExtra("chatId", chatId);
 

@@ -59,6 +59,7 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER;
 import static mega.privacy.android.app.utils.FileUtils.*;
 
@@ -125,9 +126,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
         View v = inflater.inflate(R.layout.fragment_recents, container, false);
 
-        emptyLayout = (RelativeLayout) v.findViewById(R.id.empty_state_recents);
+        emptyLayout = v.findViewById(R.id.empty_state_recents);
 
-        emptyImage = (ImageView) v.findViewById(R.id.empty_image_recents);
+        emptyImage = v.findViewById(R.id.empty_image_recents);
 
         RelativeLayout.LayoutParams params;
         int size;
@@ -140,7 +141,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         params.addRule(RelativeLayout.CENTER_HORIZONTAL);
         emptyImage.setLayoutParams(params);
 
-        emptyText = (TextView) v.findViewById(R.id.empty_text_recents);
+        emptyText = v.findViewById(R.id.empty_text_recents);
 
         String textToShow = String.format(context.getString(R.string.context_empty_recents)).toUpperCase();
         try {
@@ -158,15 +159,15 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         }
         emptyText.setText(result);
 
-        headerView = (LinearLayout) v.findViewById(R.id.header_info_layout);
-        folderNameText = (TextView) v.findViewById(R.id.folder_name_text);
-        actionImage = (ImageView) v.findViewById(R.id.action_image);
-        dateText = (TextView) v.findViewById(R.id.date_text);
+        headerView = v.findViewById(R.id.header_info_layout);
+        folderNameText = v.findViewById(R.id.folder_name_text);
+        actionImage = v.findViewById(R.id.action_image);
+        dateText = v.findViewById(R.id.date_text);
 
-        listLayout = (LinearLayout) v.findViewById(R.id.linear_layout_recycler);
-        listView = (RecyclerView) v.findViewById(R.id.list_view_recents);
-        fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
-        multipleBucketView = (RecyclerView) v.findViewById(R.id.multiple_bucket_view);
+        listLayout = v.findViewById(R.id.linear_layout_recycler);
+        listView = v.findViewById(R.id.list_view_recents);
+        fastScroller = v.findViewById(R.id.fastscroll);
+        multipleBucketView = v.findViewById(R.id.multiple_bucket_view);
         multipleBucketView.setClipToPadding(false);
         multipleBucketView.setItemAnimator(new DefaultItemAnimator());
         multipleBucketView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -412,9 +413,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             intent.putExtra("FILENAME", node.getName());
             if (isMedia) {
                 intent.putExtra("nodeHandles", getBucketNodeHandles(false, true));
-                intent.putExtra("isPlayList", true);
+                intent.putExtra(IS_PLAYLIST, true);
             } else {
-                intent.putExtra("isPlayList", false);
+                intent.putExtra(IS_PLAYLIST, false);
             }
 
             if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {

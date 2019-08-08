@@ -254,6 +254,8 @@ import static mega.privacy.android.app.utils.Util.showSnackBar;
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
+	private final String INDEX_CLOUD = "INDEX_CLOUD";
+
 	private final int ERROR_TAB = -1;
 	private final int CLOUD_TAB = 0;
 	private final int RECENTS_TAB = 1;
@@ -1755,7 +1757,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (viewPagerCloud != null) {
 			indexCloud = viewPagerCloud.getCurrentItem();
 		}
-		outState.putInt("indexCloud", indexCloud);
+		outState.putInt(INDEX_CLOUD, indexCloud);
 
 		if (viewPagerShares != null) {
 			indexShares = viewPagerShares.getCurrentItem();
@@ -1870,7 +1872,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			searchDate = savedInstanceState.getLongArray("searchDate");
 			firstLogin = savedInstanceState.getBoolean("firstLogin");
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
-			indexCloud = savedInstanceState.getInt("indexCloud", indexCloud);
+			indexCloud = savedInstanceState.getInt(INDEX_CLOUD, indexCloud);
 			log("savedInstanceState -> indexCloud: "+indexCloud);
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
 			log("savedInstanceState -> indexShares: "+indexShares);
@@ -6380,7 +6382,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						thumbViewMenuItem.setVisible(false);
 					}
 
-					selectMenuItem.setVisible(true);
 					searchMenuItem.setVisible(true);
 
 					if (isCloudAdded() && fbFLol.getItemCount() > 0) {
@@ -9393,16 +9394,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return;
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			if (getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.onBackPressed() == 0) {
+			if ((getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.onBackPressed() == 0)
+					|| (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.onBackPressed() == 0)) {
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItemLollipop(drawerItem);
-				return;
 			}
-			else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.onBackPressed() == 0) {
-				drawerItem = DrawerItem.CLOUD_DRIVE;
-				selectDrawerItemLollipop(drawerItem);
-				return;
-			}
+			return;
 		}
 		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 			oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());

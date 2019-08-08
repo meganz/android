@@ -49,7 +49,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     public RecentsAdapter(Context context, Object fragment, ArrayList<RecentsItem> items) {
         log("new RecentsAdapter");
         this.context = context;
-        this.fragment = (RecentsFragment) fragment;
+        this.fragment = fragment;
         setItems(items);
 
         megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -104,21 +104,21 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bucket, parent, false);
         ViewHolderBucket holder = new ViewHolderBucket(v);
 
-        holder.headerLayout = (RelativeLayout) v.findViewById(R.id.header_layout);
-        holder.headerText = (TextView) v.findViewById(R.id.header_text);
-        holder.itemBucketLayout = (RelativeLayout) v.findViewById(R.id.item_bucket_layout);
+        holder.headerLayout = v.findViewById(R.id.header_layout);
+        holder.headerText = v.findViewById(R.id.header_text);
+        holder.itemBucketLayout = v.findViewById(R.id.item_bucket_layout);
         holder.itemBucketLayout.setTag(holder);
-        holder.imageThumbnail = (ImageView) v.findViewById(R.id.thumbnail_view);
-        holder.threeDots = (ImageButton) v.findViewById(R.id.three_dots);
+        holder.imageThumbnail = v.findViewById(R.id.thumbnail_view);
+        holder.threeDots = v.findViewById(R.id.three_dots);
         holder.threeDots.setTag(holder);
-        holder.title = (TextView) v.findViewById(R.id.first_line_text);
-        holder.actionBy = (TextView) v.findViewById(R.id.second_line_text);
-        holder.subtitle = (TextView) v.findViewById(R.id.name_text);
-        holder.sharedIcon = (ImageView) v.findViewById(R.id.shared_image);
-        holder.actionIcon = (ImageView) v.findViewById(R.id.action_image);
-        holder.time = (TextView) v.findViewById(R.id.time_text);
-        holder.mediaLayout = (LinearLayout) v.findViewById(R.id.media_bucket_layout);
-        holder.mediaRecycler = (RecyclerView) v.findViewById(R.id.media_recyler);
+        holder.title = v.findViewById(R.id.first_line_text);
+        holder.actionBy = v.findViewById(R.id.second_line_text);
+        holder.subtitle = v.findViewById(R.id.name_text);
+        holder.sharedIcon = v.findViewById(R.id.shared_image);
+        holder.actionIcon = v.findViewById(R.id.action_image);
+        holder.time = v.findViewById(R.id.time_text);
+        holder.mediaLayout = v.findViewById(R.id.media_bucket_layout);
+        holder.mediaRecycler = v.findViewById(R.id.media_recyler);
 
         v.setTag(holder);
         return holder;
@@ -256,9 +256,9 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             return Html.fromHtml(userAction, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            return Html.fromHtml(userAction);
         }
+
+        return Html.fromHtml(userAction);
     }
 
     private String getMediaTitle(MegaNodeList nodeList) {

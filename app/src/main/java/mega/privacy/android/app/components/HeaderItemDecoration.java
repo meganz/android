@@ -49,9 +49,6 @@ public class HeaderItemDecoration extends RecyclerView.ItemDecoration {
             if (viewType == ITEM_VIEW_TYPE) {
                 mDividerNode.draw(c);
             }
-            else if(viewType == HEADER_VIEW_TYPE){
-
-            }
         }
     }
 }

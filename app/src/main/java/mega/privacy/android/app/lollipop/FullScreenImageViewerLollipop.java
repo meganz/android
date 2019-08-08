@@ -908,7 +908,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void intentToSendFile(File previewFile){
 		log("intentToSendFile");
 
-		if (previewFile == null || !previewFile.exists()) showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.full_image_viewer_not_preview), -1);
+		if (previewFile == null || !previewFile.exists()) {
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.full_image_viewer_not_preview), -1);
+			return;
+		}
 
 		Intent share = new Intent(android.content.Intent.ACTION_SEND);
 		share.setType("image/*");
@@ -933,7 +936,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_full_screen_image_viewer);
 
-		relativeImageViewerLayout = (RelativeLayout) findViewById(R.id.full_image_viewer_layout);
+		relativeImageViewerLayout = findViewById(R.id.full_image_viewer_layout);
 
 		draggableView.setViewAnimator(new ExitViewAnimator());
 
@@ -948,7 +951,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		float density  = getResources().getDisplayMetrics().density;
 
 
-		appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+		appBarLayout = findViewById(R.id.app_bar);
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
@@ -959,10 +962,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			scaleText = scaleW;
 		}
 
-		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
+		viewPager = findViewById(R.id.image_viewer_pager);
 		viewPager.setPageMargin(40);
 
-		fragmentContainer = (RelativeLayout) findViewById(R.id.full_image_viewer_parent_layout);
+		fragmentContainer = findViewById(R.id.full_image_viewer_parent_layout);
 
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
@@ -1018,7 +1021,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		dbH = DatabaseHandler.getDbHandler(this);
 		handler = new Handler();
 
-		tB = (Toolbar) findViewById(R.id.call_toolbar);
+		tB = findViewById(R.id.call_toolbar);
 		if (tB == null) {
 			log("Tb is Null");
 			return;
@@ -1037,14 +1040,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 
-		imageHandles = new ArrayList<Long>();
-		paths = new ArrayList<String>();
+		imageHandles = new ArrayList<>();
+		paths = new ArrayList<>();
 		long parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
 		fromShared = intent.getBooleanExtra("fromShared", false);
 		MegaNode parentNode;
-		bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
+		bottomLayout = findViewById(R.id.image_viewer_layout_bottom);
 
-		fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+		fileNameTextView = findViewById(R.id.full_image_viewer_file_name);
 		fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 
 		megaApi.addGlobalListener(this);
@@ -1099,7 +1102,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			if (mOffList.size() > 0){
 
-				mOffListImages = new ArrayList<MegaOffline>();
+				mOffListImages = new ArrayList<>();
 				int positionImage = -1;
 				for (int i=0;i<mOffList.size();i++){
 					if (MimeTypeList.typeForName(mOffList.get(i).getName()).isImage()){
@@ -1133,7 +1136,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					viewPager.setCurrentItem(positionG);
 					viewPager.setOnPageChangeListener(this);
 
-					fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+					fileNameTextView = findViewById(R.id.full_image_viewer_file_name);
 					if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 					}else{

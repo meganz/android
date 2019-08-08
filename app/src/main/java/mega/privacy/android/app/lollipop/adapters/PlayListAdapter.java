@@ -187,13 +187,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         }
 
         Bitmap thumb = null;
+        String querySearch = ((AudioVideoPlayerLollipop) context).getQuerySearch();
 
         if (adapterType == Constants.OFFLINE_ADAPTER){
             holder.textViewFileName.setText(offNode.getName());
             holder.textViewFileSize.setText(Util.getSizeString(mediaFile.length()));
 
-            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && ((AudioVideoPlayerLollipop) context).querySearch.equals("")
-                    || (((PlaylistFragment) fragment).isSearchOpen() || !((AudioVideoPlayerLollipop) context).querySearch.equals("")) && (offNode.getName().equals(offNodeChecked.getName()))){
+            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && querySearch.equals("")
+                    || (((PlaylistFragment) fragment).isSearchOpen() || !querySearch.equals("")) && (offNode.getName().equals(offNodeChecked.getName()))){
                 holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
                 holder.textViewFileSize.setVisibility(View.GONE);
                 holder.textViewState.setVisibility(View.VISIBLE);
@@ -215,8 +216,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             holder.textViewFileName.setText(zipFile.getName());
             holder.textViewFileSize.setText(Util.getSizeString(zipFile.length()));
 
-            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && ((AudioVideoPlayerLollipop) context).querySearch.equals("")
-                    || (((PlaylistFragment) fragment).isSearchOpen() || !((AudioVideoPlayerLollipop) context).querySearch.equals("")) && (zipFile.getName().equals(zipChecked.getName()))) {
+            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && querySearch.equals("")
+                    || (((PlaylistFragment) fragment).isSearchOpen() || !querySearch.equals("")) && (zipFile.getName().equals(zipChecked.getName()))) {
                 holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
                 holder.textViewFileSize.setVisibility(View.GONE);
                 holder.textViewState.setVisibility(View.VISIBLE);
@@ -238,8 +239,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             holder.textViewFileName.setText(node.getName());
             holder.textViewFileSize.setText(Util.getSizeString(node.getSize()));
 
-            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && ((AudioVideoPlayerLollipop) context).querySearch.equals("")
-                    || (((PlaylistFragment) fragment).isSearchOpen() || !((AudioVideoPlayerLollipop) context).querySearch.equals("")) && (node.getName().equals(nodeChecked.getName()))){
+            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && querySearch.equals("")
+                    || (((PlaylistFragment) fragment).isSearchOpen() || !querySearch.equals("")) && (node.getName().equals(nodeChecked.getName()))){
                 holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
                 holder.textViewFileSize.setVisibility(View.GONE);
                 holder.textViewState.setVisibility(View.VISIBLE);
@@ -385,9 +386,10 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
         ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
         int currentPosition = holder.getAdapterPosition();
+        String querySearch = ((AudioVideoPlayerLollipop) context).getQuerySearch();
 
         if (!((PlaylistFragment) fragment).isSearchOpen()) {
-            if(!((AudioVideoPlayerLollipop) context).querySearch.equals("")) {
+            if(!querySearch.equals("")) {
                 ((AudioVideoPlayerLollipop) context).onBackPressed();
             }
             if (itemChecked == currentPosition) {
@@ -413,7 +415,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             notifyDataSetChanged();
         }
         else {
-            ((AudioVideoPlayerLollipop) context).searchMenuItem.collapseActionView();
+            ((AudioVideoPlayerLollipop) context).getSearchMenuItem().collapseActionView();
             String name = holder.textViewFileName.getText().toString();
             if (adapterType == Constants.OFFLINE_ADAPTER){
                 if (name.equals(offNodeChecked.getName())){
