@@ -1771,9 +1771,6 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		}
 		else{
 			log("Back to Cloud");
-			recyclerView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyLinearLayout.setVisibility(View.GONE);
 			((ManagerActivityLollipop) context).deepBrowserTreeOutgoing=0;
 			return 0;
 		}

@@ -1497,9 +1497,6 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			}
 			else{
 				log("ELSE deepTree");
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
 				((ManagerActivityLollipop)context).deepBrowserTreeIncoming=0;
 				return 0;
 			}
