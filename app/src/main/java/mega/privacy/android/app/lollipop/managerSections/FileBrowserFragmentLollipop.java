@@ -53,7 +53,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -63,6 +62,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -80,6 +80,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
+
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class FileBrowserFragmentLollipop extends RotatableFragment implements OnClickListener{
 
@@ -132,7 +134,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 	CustomizedGridLayoutManager gridLayoutManager;
 
 	boolean allFiles = true;
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath;
     
     private int placeholderCount;
 
@@ -536,7 +538,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
-		downloadLocationDefaultPath = Util.getDownloadLocation(context);
+		downloadLocationDefaultPath = getDownloadLocation(context);
 		lastPositionStack = new Stack<>();
 
 		if(Util.isChatEnabled()){
@@ -768,23 +770,29 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 			actionLayout.setOnClickListener(this);
 			
 			updateTransferButton();
-			
-			int progressPercent = (int)Math.round((double)totalSizeTransfered / totalSizePendingTransfer * 100);
-			progressBar.setProgress(progressPercent);
-			log("Progress Percent: " + progressPercent);
-			
-			long delay = megaApi.getBandwidthOverquotaDelay();
-			if (delay == 0) {
+            long delay = megaApi.getBandwidthOverquotaDelay();
+
+            if (delay == 0) {
 			} else {
-				log("Overquota delay activated until: " + delay);
-				transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
-			}
-			
-			int inProgress = totalTransfers - pendingTransfers + 1;
-			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
-			transfersNumberText.setText(progressText);
-			
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
+                log("Overquota delay activated until: " + delay);
+                transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
+            }
+
+            //this number could be negative - totalTransfers has been reset to 0, however pendingTransfers has not been reset yet due to the wait time of async response
+            int progressPercent = (int)Math.round((double)totalSizeTransfered / totalSizePendingTransfer * 100);
+            int inProgress = totalTransfers - pendingTransfers + 1;
+            String progressText;
+            if(inProgress > 0){
+                progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
+            }else{
+                progressText = getString(R.string.label_process_finishing);
+                progressPercent = 100;
+            }
+            progressBar.setProgress(progressPercent);
+            log("Progress Percent: " + progressPercent);
+
+            transfersNumberText.setText(progressText);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
 			params.addRule(RelativeLayout.BELOW,transfersOverViewLayout.getId());
 			linearLayoutRecycler.setLayoutParams(params);
 		} else {
@@ -965,7 +973,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 
 					mediaIntent.putExtra("FILENAME", file.getName());
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1065,7 +1073,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 					MegaNode file = nodes.get(position);
 
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1165,7 +1173,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1301,7 +1309,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
                 }
             }
         } else {
-            if (n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)) {
+            if (n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)) {
                 if (prefs != null) {
                     prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
                 }
@@ -1625,7 +1633,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).parentHandleBrowser || ((ManagerActivityLollipop)context).parentHandleBrowser == -1) {
+				if (megaApi.getRootNode() != null && megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).parentHandleBrowser || ((ManagerActivityLollipop)context).parentHandleBrowser == -1) {
 
 					if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
