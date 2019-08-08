@@ -18,7 +18,6 @@ import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +57,9 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
 public class NodeController {
 
@@ -378,7 +380,7 @@ public class NodeController {
         }
 
         boolean askMe = Util.askMe(context);
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation(context);
 
         if (askMe){
             log("askMe");
@@ -492,7 +494,7 @@ public class NodeController {
 
         boolean askMe = Util.askMe(context);
         boolean advancedDevices=false;
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation(context);
         prefs = dbH.getPreferences();
 
         if (prefs != null){
@@ -798,16 +800,16 @@ public class NodeController {
 
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
                     log("ISFILE");
-                    String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+                    String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
                     MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
                     if(localPath != null){
                         log("localPath != null");
                         try {
                             log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
-                            Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+                            copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 
-                            if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
+                            if(isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){
@@ -1610,77 +1612,43 @@ public class NodeController {
         megaApi.removeVersions((ManagerActivityLollipop) context);
     }
 
+    private void removeNotOfflineElements(String pathNavigation) {
+        ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
+
+        log("Number of elements: " + mOffList.size());
+
+        for (int i = 0; i < mOffList.size(); i++) {
+            MegaOffline checkOffline = mOffList.get(i);
+            File offlineFile = getOfflineFile(context, checkOffline);
+
+            if (!isFileAvailable(offlineFile)) {
+                log("Path to remove B: " + (mOffList.get(i).getPath() + mOffList.get(i).getName()));
+                mOffList.remove(i);
+                i--;
+            }
+
+        }
+
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).updateOfflineView(null);
+        }
+    }
+
     public void deleteOffline(MegaOffline selectedNode, String pathNavigation){
         log("deleteOffline");
         if (selectedNode == null){
             log("Delete RK");
-            String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-            File file= new File(path);
-            if(file.exists()){
+            File file= buildExternalStorageFile(RK_FILE);
+            if(isFileAvailable(file)){
                 file.delete();
-
-                ArrayList<MegaOffline> mOffList=dbH.findByPath(pathNavigation);
-
-                log("Number of elements: "+mOffList.size());
-
-                for(int i=0; i<mOffList.size();i++){
-
-                    MegaOffline checkOffline = mOffList.get(i);
-                    File offlineDirectory = null;
-                    if(checkOffline.getOrigin()==MegaOffline.INCOMING){
-                        log("isIncomingOffline");
-
-                        if (Environment.getExternalStorageDirectory() != null){
-                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-                            log("offlineDirectory: "+offlineDirectory);
-                        }
-                        else{
-                            offlineDirectory = context.getFilesDir();
-                        }
-                    }
-                    else if(checkOffline.getOrigin()==MegaOffline.INBOX){
-                        if (Environment.getExternalStorageDirectory() != null){
-                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
-                            log("offlineDirectory: "+offlineDirectory);
-                        }
-                        else{
-                            offlineDirectory = context.getFilesDir();
-                        }
-                    }
-                    else{
-                        log("OTHER Offline preference");
-
-                        if (Environment.getExternalStorageDirectory() != null){
-                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
-                        }
-                        else{
-                            offlineDirectory = context.getFilesDir();
-                        }
-
-                    }
-
-                    if(offlineDirectory!=null){
-                        if (!offlineDirectory.exists()){
-                            log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-                            //dbH.removeById(mOffList.get(i).getId());
-                            mOffList.remove(i);
-                            i--;
-                        }
-                    }
-
-                }
-
-                if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop)context).updateOfflineView(null);
-                }
+                removeNotOfflineElements(pathNavigation);
             }
         }
         else {
             if (selectedNode.getHandle().equals("0")) {
                 log("Delete RK");
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath() + Util.rKFile;
-                File file = new File(path);
-                if (file.exists()) {
+                File file = buildExternalStorageFile(RK_FILE);
+                if (isFileAvailable(file)) {
                     file.delete();
 
                     if(context instanceof ManagerActivityLollipop){
@@ -1691,59 +1659,7 @@ public class NodeController {
                         }
                     }
 
-                    ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
-
-                    log("Number of elements: " + mOffList.size());
-
-                    for (int i = 0; i < mOffList.size(); i++) {
-
-                        MegaOffline checkOffline = mOffList.get(i);
-                        File offlineDirectory = null;
-                        if(checkOffline.getOrigin()==MegaOffline.INCOMING){
-                            log("isIncomingOffline");
-
-                            if (Environment.getExternalStorageDirectory() != null){
-                                offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-                                log("offlineDirectory: "+offlineDirectory);
-                            }
-                            else{
-                                offlineDirectory = context.getFilesDir();
-                            }
-                        }
-                        else if(checkOffline.getOrigin()==MegaOffline.INBOX){
-                            if (Environment.getExternalStorageDirectory() != null){
-                                offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
-                                log("offlineDirectory: "+offlineDirectory);
-                            }
-                            else{
-                                offlineDirectory = context.getFilesDir();
-                            }
-                        }
-                        else{
-                            log("OTHER Offline preference");
-
-                            if (Environment.getExternalStorageDirectory() != null){
-                                offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
-                            }
-                            else{
-                                offlineDirectory = context.getFilesDir();
-                            }
-
-                        }
-
-                        if(offlineDirectory!=null){
-                            if (!offlineDirectory.exists()){
-                                log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-                                //dbH.removeById(mOffList.get(i).getId());
-                                mOffList.remove(i);
-                                i--;
-                            }
-                        }
-                    }
-
-                    if (context instanceof ManagerActivityLollipop) {
-                        ((ManagerActivityLollipop) context).updateOfflineView(null);
-                    }
+                    removeNotOfflineElements(pathNavigation);
                 }
             } else {
                 log("deleteOffline node");
@@ -1760,50 +1676,7 @@ public class NodeController {
                     deleteChildrenDB(mOffListChildren);
                 }
 
-                log("Remove the node physically");
-                //Remove the node physically
-                File destination = null;
-                //Check if the node is incoming
-                if(selectedNode.getOrigin()==MegaOffline.INCOMING){
-                    log("isIncomingOffline");
-
-                    if (Environment.getExternalStorageDirectory() != null){
-                        destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +selectedNode.getHandleIncoming() + "/" + selectedNode.getPath());
-                        log("destination: "+destination);
-                    }
-                    else{
-                        destination = context.getFilesDir();
-                    }
-                }
-                else if(selectedNode.getOrigin()==MegaOffline.INBOX){
-                    if (Environment.getExternalStorageDirectory() != null){
-                        destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + selectedNode.getPath());
-                        log("destination: "+destination);
-                    }
-                    else{
-                        destination = context.getFilesDir();
-                    }
-                }
-                else{
-                    log("OTHER Offline preference");
-
-                    if (Environment.getExternalStorageDirectory() != null){
-                        destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + selectedNode.getPath());
-                    }
-                    else{
-                        destination = context.getFilesDir();
-                    }
-
-                }
-
-                try {
-                    File offlineFile = new File(destination, selectedNode.getName());
-                    log("Delete in phone: " + selectedNode.getName());
-                    Util.deleteFolderAndSubfolders(context, offlineFile);
-                } catch (Exception e) {
-                    log("EXCEPTION: deleteOffline - adapter");
-                }
-                ;
+                removeNodePhysically(selectedNode);
 
                 dbH.removeById(selectedNode.getId());
 
@@ -1821,6 +1694,16 @@ public class NodeController {
                     ((ManagerActivityLollipop) context).updateOfflineView(null);
                 }
             }
+        }
+    }
+
+    private void removeNodePhysically(MegaOffline megaOffline) {
+        log("Remove the node physically");
+        try {
+            File offlineFile = getOfflineFile(context, megaOffline);
+            deleteFolderAndSubfolders(context, offlineFile);
+        } catch (Exception e) {
+            log("EXCEPTION: deleteOffline - adapter");
         }
     }
 
@@ -1855,46 +1738,14 @@ public class NodeController {
             //The node have NO childrens, delete it
 
             dbH.removeById(parentToDelete.getId());
-            if(parentToDelete.getOrigin()==MegaOffline.INCOMING){
-                if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentToDelete.getHandleIncoming() + parentToDelete.getPath());
-                }
-                else{
-                    destination = context.getFilesDir();
-                }
-            }
-            else if(parentToDelete.getOrigin()==MegaOffline.INBOX){
-                if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in" + parentToDelete.getPath());
-                }
-                else{
-                    destination = context.getFilesDir();
-                }
-            }
-            else{
-                if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + parentToDelete.getPath());
-                }
-                else{
-                    destination = context.getFilesDir();
-                }
-            }
 
-            try{
-                File offlineFile = new File(destination, parentToDelete.getName());
-                log("Delete in phone: "+parentToDelete.getName());
-                Util.deleteFolderAndSubfolders(context, offlineFile);
-            }
-            catch(Exception e){
-                log("EXCEPTION: deleteOffline - adapter");
-            };
+            removeNodePhysically(parentToDelete);
 
             int parentId = parentToDelete.getParentId();
             if(parentId==-1){
-                File rootIncomingFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentToDelete.getHandleIncoming());
+                File rootIncomingFile = getOfflineFile(context, parentToDelete);
 
-                if(rootIncomingFile!=null){
-
+                if(isFileAvailable(rootIncomingFile)){
                     String[] fileList = rootIncomingFile.list();
                     if(fileList!=null){
                         if(rootIncomingFile.list().length==0){
@@ -2008,7 +1859,7 @@ public class NodeController {
         }
 
         boolean askMe = Util.askMe(context);
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation(context);
 
         if (askMe){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -2101,11 +1952,11 @@ public class NodeController {
         MegaNode tempNode = currentDocument;
         if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
             log("is file");
-            String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+            String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
             if(localPath != null){
                 File file = new File(localPath);
                 try {
-                    Util.copyFile(file, new File(parentPath, tempNode.getName()));
+                    copyFile(file, new File(parentPath, tempNode.getName()));
                 }catch(Exception e) {}
 
                 if (file != null && file.getParent().equals(parentPath)) {

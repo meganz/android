@@ -46,6 +46,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
+
 
 public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider {
 	
@@ -447,7 +449,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.fileThumbnail.setVisibility(View.GONE);
             holder.fileIcon.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 
-            if (Util.isVideoFile(node.getName())) {
+            if (isVideoFile(node.getName())) {
                 holder.videoLayout.setVisibility(View.VISIBLE);
                 log(node.getName() + " DURATION: " + node.getDuration());
                 String duration = Util.getVideoDuration(node.getDuration());

@@ -375,7 +375,7 @@ public class SorterContentActivity extends BaseActivity {
     private void setFileExplorerOrder (ManagerActivityLollipop.DrawerItem drawerItem, Context context, int order) {
         ((FileExplorerActivityLollipop) context).refreshOrderNodes(order);
         MegaPreferences prefs = Util.getPreferences(context);
-        DatabaseHandler dbH = Util.getDbH(context);
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS && ((FileExplorerActivityLollipop) context).getParentHandleIncoming() == -1) {
             if (prefs != null) {
                 prefs.setPreferredSortOthers(String.valueOf(order));

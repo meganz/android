@@ -81,6 +81,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class FileBrowserFragmentLollipop extends RotatableFragment implements OnClickListener{
 
 	public static ImageView imageDrag;
@@ -132,7 +134,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 	CustomizedGridLayoutManager gridLayoutManager;
 
 	boolean allFiles = true;
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath;
     
     private int placeholderCount;
 
@@ -536,7 +538,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
-		downloadLocationDefaultPath = Util.getDownloadLocation(context);
+		downloadLocationDefaultPath = getDownloadLocation(context);
 		lastPositionStack = new Stack<>();
 
 		if(Util.isChatEnabled()){
@@ -971,7 +973,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 
 					mediaIntent.putExtra("FILENAME", file.getName());
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1071,7 +1073,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 					MegaNode file = nodes.get(position);
 
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1171,7 +1173,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
