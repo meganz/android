@@ -95,6 +95,7 @@ public class Constants {
     public static final int FORTUMO_FRAGMENT = 5005;
     public static final int MONTHLY_YEARLY_FRAGMENT = 5006;
     public static final int CENTILI_FRAGMENT = 5007;
+    public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5008;
 
     public static final int PAYMENT_CC_MONTH = 111;
     public static final int PAYMENT_CC_YEAR = 112;

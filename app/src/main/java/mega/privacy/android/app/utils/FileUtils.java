@@ -64,7 +64,7 @@ public class FileUtils {
     public static boolean isOnMegaDownloads(Context context, MegaNode node) {
         File f = new File(getDownloadLocation(context), node.getName());
 
-        if (f.exists() && (f.length() == node.getSize())) {
+        if (isFileAvailable(f) && f.length() == node.getSize()) {
             return true;
         }
 

@@ -5543,6 +5543,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					case Constants.FORTUMO_FRAGMENT:
 					case Constants.CC_FRAGMENT:
 					case Constants.UPGRADE_ACCOUNT_FRAGMENT:
+					case Constants.BACKUP_RECOVERY_KEY_FRAGMENT:
 					case Constants.MONTHLY_YEARLY_FRAGMENT:{
 						fragmentContainer.setVisibility(View.VISIBLE);
 						break;
@@ -9174,6 +9175,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showMKLayout(){
 		log("showMKLayout");
 
+		accountFragment = Constants.BACKUP_RECOVERY_KEY_FRAGMENT;
 		mkLayoutVisible=true;
 
 		aB.setSubtitle(null);

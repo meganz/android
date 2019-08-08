@@ -350,7 +350,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         context = activity;
     }
 
-    private long[] getBucketNodeHandles(boolean areImages, boolean areVideos) {
+    private long[] getBucketNodeHandles(boolean areImages) {
         if (getBucketSelected() == null || getBucketSelected().getNodes() == null || getBucketSelected().getNodes().size() == 0)
             return null;
 
@@ -362,15 +362,12 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             node = list.get(i);
             if (node == null) continue;
 
-            if (areImages) {
-                if (MimeTypeList.typeForName(node.getName()).isImage()) {
-                    nodeHandlesList.add(node.getHandle());
-                }
-            } else if (areVideos) {
-                if (FileUtils.isAudioOrVideo(node) && FileUtils.isInternalIntent(node)) {
-                    nodeHandlesList.add(node.getHandle());
-                }
-            } else {
+//          Group handles by type of file
+            if (areImages && MimeTypeList.typeForName(node.getName()).isImage()) {
+//              only images on the one hand
+                nodeHandlesList.add(node.getHandle());
+            } else if (!areImages && isAudioOrVideo(node) && isInternalIntent(node)) {
+//              only videos or audios on the other
                 nodeHandlesList.add(node.getHandle());
             }
         }
@@ -391,7 +388,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             intent.putExtra("adapterType", RECENTS_ADAPTER);
             intent.putExtra("handle", node.getHandle());
             if (isMedia) {
-                intent.putExtra("nodeHandles", getBucketNodeHandles(true, false));
+                intent.putExtra("nodeHandles", getBucketNodeHandles(true));
             }
 
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -402,8 +399,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         String localPath = getLocalFile(context, node.getName(), node.getSize(), getDownloadLocation(context));
         boolean paramsSetSuccessfully = false;
 
-        if (FileUtils.isAudioOrVideo(node)) {
-            if (FileUtils.isInternalIntent(node)) {
+        if (isAudioOrVideo(node)) {
+            if (isInternalIntent(node)) {
                 intent = new Intent(context, AudioVideoPlayerLollipop.class);
             } else {
                 intent = new Intent(Intent.ACTION_VIEW);
@@ -412,39 +409,39 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             intent.putExtra("adapterType", RECENTS_ADAPTER);
             intent.putExtra("FILENAME", node.getName());
             if (isMedia) {
-                intent.putExtra("nodeHandles", getBucketNodeHandles(false, true));
+                intent.putExtra("nodeHandles", getBucketNodeHandles(false));
                 intent.putExtra(IS_PLAYLIST, true);
             } else {
                 intent.putExtra(IS_PLAYLIST, false);
             }
 
-            if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
-                paramsSetSuccessfully = FileUtils.setLocalIntentParams(context, node, intent, localPath, false);
+            if (isLocalFile(context, node, megaApi, localPath)) {
+                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
             } else {
-                paramsSetSuccessfully = FileUtils.setStreamingIntentParams(context, node, megaApi, intent);
+                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
             }
 
             if (paramsSetSuccessfully) {
                 intent.putExtra("HANDLE", node.getHandle());
-                if (FileUtils.isOpusFile(node)) {
+                if (isOpusFile(node)) {
                     intent.setDataAndType(intent.getData(), "audio/*");
                 }
             }
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
             intent = new Intent(Intent.ACTION_VIEW);
 
-            if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
-                paramsSetSuccessfully = FileUtils.setURLIntentParams(context, node, intent, localPath);
+            if (isLocalFile(context, node, megaApi, localPath)) {
+                paramsSetSuccessfully = setURLIntentParams(context, node, intent, localPath);
             }
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
             intent.putExtra("inside", true);
             intent.putExtra("adapterType", RECENTS_ADAPTER);
 
-            if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
-                paramsSetSuccessfully = FileUtils.setLocalIntentParams(context, node, intent, localPath, false);
+            if (isLocalFile(context, node, megaApi, localPath)) {
+                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
             } else {
-                paramsSetSuccessfully = FileUtils.setStreamingIntentParams(context, node, megaApi, intent);
+                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
             }
 
             intent.putExtra("HANDLE", node.getHandle());
