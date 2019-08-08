@@ -39,8 +39,9 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 /**
  * Created by mega on 4/07/18.
@@ -109,10 +110,10 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     public int getItemViewType(int position) {
         ShareContactInfo contact = getItem(position);
         if (contact.isHeader()){
-            return Constants.HEADER_VIEW_TYPE;
+            return HEADER_VIEW_TYPE;
         }
         else{
-            return Constants.ITEM_VIEW_TYPE;
+            return ITEM_VIEW_TYPE;
         }
     }
 

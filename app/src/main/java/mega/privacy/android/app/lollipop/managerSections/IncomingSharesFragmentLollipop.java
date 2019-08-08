@@ -5,12 +5,10 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -70,8 +68,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
 
-public class IncomingSharesFragmentLollipop extends Fragment{
+
+public class IncomingSharesFragmentLollipop extends RotatableFragment{
 
 	public static ImageView imageDrag;
 
@@ -86,7 +86,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	TextView emptyTextViewFirst;
 
 	MegaNodeAdapter adapter;
-	IncomingSharesFragmentLollipop incomingSharesFragment = this;
 	
 	public NewHeaderItemDecoration headerItemDecoration;
 
@@ -99,16 +98,21 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	Display display;
 
 	ArrayList<MegaNode> nodes;
-	MegaNode selectedNode;
 
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath;
 
 	public ActionMode actionMode;
 	
 	private int placeholderCount;
 
+	@Override
+	protected MegaNodeAdapter getAdapter() {
+		return adapter;
+	}
+
+	@Override
 	public void activateActionMode(){
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
@@ -194,11 +198,15 @@ public class IncomingSharesFragmentLollipop extends Fragment{
             sections.put(folderCount, getString(R.string.general_files));
         }
 		if (headerItemDecoration == null) {
+			log("create new decoration");
 			headerItemDecoration = new NewHeaderItemDecoration(context);
-			recyclerView.addItemDecoration(headerItemDecoration);
+		} else {
+			log("remove old decoration");
+			recyclerView.removeItemDecoration(headerItemDecoration);
 		}
 		headerItemDecoration.setType(type);
 		headerItemDecoration.setKeys(sections);
+		recyclerView.addItemDecoration(headerItemDecoration);
     }
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -418,13 +426,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
 				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-//				for(int i=0; i<selected.size();i++)	{
-//                    if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-//                        showTrash = false;
-//						break;
-//					}
-//				}
 			}
 			else{
                 menu.findItem(R.id.cab_menu_select_all).setVisible(true);
@@ -461,19 +462,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		}
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+		downloadLocationDefaultPath = getDownloadLocation(context);
 		nodes = new ArrayList<MegaNode>();
 		lastPositionStack = new Stack<>();
 
@@ -519,7 +508,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -593,9 +581,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					emptyTextViewFirst.setText(result);
 
 				}else{
-
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 					}else{
@@ -655,13 +640,11 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, Constants.INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
-//				adapterList.setNodes(nodes);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
-//				adapterList.setNodes(nodes);
 			}
 
 			if (((ManagerActivityLollipop)context).parentHandleIncoming == -1){
@@ -714,8 +697,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					emptyTextViewFirst.setText(result);
 
 				}else{
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 					}else{
@@ -742,18 +723,11 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-			}	
-//			setNodes(nodes);	
+			}
 			
 			return v;
 		}		
 	}
-
-//	public void refresh(){
-//		log("refresh");
-//		findNodes();
-//	}
-	
 
 	public void refresh (){
 		log("refresh");
@@ -810,9 +784,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				emptyTextViewFirst.setText(result);
 
 			}else{
-
-				//emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 				}else{
@@ -921,9 +892,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						}
 						emptyTextViewFirst.setText(result);
 					} else {
-
-//						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 						}else{
@@ -1027,14 +995,13 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("FILENAME", file.getName());
 					imageDrag = imageView;
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
-						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
@@ -1096,7 +1063,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1153,7 +1120,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					MegaNode file = nodes.get(position);
 
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if (f.exists() && (f.length() == file.getSize())) {
 						isOnMegaDownloads = true;
@@ -1248,6 +1215,11 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		}
 	}
 
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
+	}
+
 	public void findNodes(){
 		log("findNodes");
 		nodes=megaApi.getInShares();
@@ -1291,9 +1263,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				emptyTextViewFirst.setText(result);
 
 			}else{
-
-//				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 				}else{
@@ -1377,8 +1346,9 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			adapter.clearSelections();
 		}
 	}
-		
-	private void updateActionModeTitle() {
+
+	@Override
+	protected void updateActionModeTitle() {
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
@@ -1392,7 +1362,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				folders++;
 			}
 		}
-		Resources res = getActivity().getResources();
 
 		String title;
 		int sum=files+folders;
@@ -1413,7 +1382,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			e.printStackTrace();
 			log("oninvalidate error");
 		}
-		// actionMode.
 	}	
 	
 	/*
@@ -1460,7 +1428,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop) context).setToolbarTitle();
 				findNodes();
 				visibilityFastScroller();
-				//				adapterList.setNodes(nodes);
 				recyclerView.setVisibility(View.VISIBLE);
 				int lastVisiblePosition = 0;
 				if (!lastPositionStack.empty()) {
@@ -1530,7 +1497,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 			else{
 				log("ELSE deepTree");
-//			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
@@ -1617,8 +1583,5 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				fastScroller.setVisibility(View.VISIBLE);
 			}
 		}
-
 	}
-
-
 }

@@ -66,6 +66,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle> implements SectionTitleProvider {
 
     private class Media {
@@ -377,19 +379,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         dbH = DatabaseHandler.getDbHandler(context);
         prefs = dbH.getPreferences();
-        if (prefs != null){
-            log("prefs != null");
-            if (prefs.getStorageAskAlways() != null){
-                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-                    log("askMe==false");
-                    if (prefs.getStorageDownloadLocation() != null){
-                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-                        }
-                    }
-                }
-            }
-        }
+        downloadLocationDefaultPath = getDownloadLocation(context);
 
         handler = new Handler();
 
@@ -489,7 +479,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         private ImageView videoIcon;
         private RelativeLayout gradient_effect;
         private ImageView click_icon;
-        private RelativeLayout click_unselected;
         private RelativeLayout content_layout;
         private long document;
         private MegaMonthPicLollipop megaMonthPicLollipop;
@@ -524,8 +513,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 paramsI.setMargins(Util.px2dp(7, outMetrics), Util.px2dp(7, outMetrics), 0, 0);
             }
             click_icon.setLayoutParams(paramsI);
-            click_unselected = (RelativeLayout) itemView.findViewById(R.id.cell_photosync_title_menu_long_click_unselected);
-            click_unselected.setVisibility(View.GONE);
             videoIcon = (ImageView) itemView.findViewById(R.id.cell_photosync_grid_title_video_icon);
             content_layout = (RelativeLayout) itemView.findViewById(R.id.cell_item_grid_title_layout);
 
@@ -611,20 +598,17 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     click_icon.setImageResource(R.drawable.ic_select_folder);
                     photo.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
                     photo.setPadding(Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics));
-                    click_unselected.setVisibility(View.GONE);
                 }
                 else{
                     click_icon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                     photo.setBackground(null);
                     photo.setPadding(0, 0, 0, 0);
-                    click_unselected.setVisibility(View.VISIBLE);
                 }
             }
             else{
                 click_icon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                 photo.setBackground(null);
                 photo.setPadding(0, 0, 0, 0);
-                click_unselected.setVisibility(View.GONE);
             }
 
             if(n == null){
@@ -715,14 +699,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     photo.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
                     photo.setPadding(Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics));
                     gradient_effect.setBackground(ContextCompat.getDrawable(context, R.drawable.gradient_cam_uploads_rounded));
-                    click_unselected.setVisibility(View.GONE);
                 }
                 else{
                     click_icon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                     photo.setBackground(null);
                     photo.setPadding(0, 0, 0, 0);
                     gradient_effect.setBackground(ContextCompat.getDrawable(context, R.drawable.gradient_cam_uploads));
-                    click_unselected.setVisibility(View.VISIBLE);
                 }
             }
             else{
@@ -730,7 +712,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 photo.setBackground(null);
                 photo.setPadding(0, 0, 0, 0);
                 gradient_effect.setBackground(ContextCompat.getDrawable(context, R.drawable.gradient_cam_uploads));
-                click_unselected.setVisibility(View.GONE);
             }
 
             if(n == null){
@@ -1036,6 +1017,16 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         notifyDataSetChanged();
     }
 
+    public void setContext(Context context) {
+        log("context has been updated, the action mode needs to be cleaned");
+        this.context = context;
+        actionMode = null;
+    }
+
+    public Context getContext() {
+        return this.context;
+    }
+
     public void setPhotoSyncHandle(long photoSyncHandle){
         this.photosyncHandle = photoSyncHandle;
         notifyDataSetChanged();
@@ -1266,8 +1257,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             }
                             mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
                         }
-                        String localPath = findLocalPath(file.getName(), file.getSize(), file);
-                        if (localPath != null && (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
+                        String localPath = findVideoLocalPath(context, file);
+                        if (localPath != null && Util.checkFingerprint(megaApi,file,localPath)) {
                             File mediaFile = new File(localPath);
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1415,30 +1406,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
     }
 
-    public String findLocalPath (String fileName, long fileSize, MegaNode file) {
-        log("findLocalPath");
-        String localPath = null;
-
-        localPath = getPath(fileName, fileSize, defaultPath, file);
-        if (localPath != null) {
-            return localPath;
-        }
-
-        if (localPath == null){
-            boolean isOnMegaDownloads = false;
-            localPath = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
-            File f = new File(downloadLocationDefaultPath, file.getName());
-            if(f.exists() && (f.length() == file.getSize())){
-                isOnMegaDownloads = true;
-            }
-            if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
-                return localPath;
-            }
-        }
-
-        return null;
-    }
-
     public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
         log("getPath");
         String path = null;
@@ -1458,7 +1425,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     }
                     else {
                         boolean isOnMegaDownloads = false;
-                        path = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+                        path = getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
                         File f = new File(downloadLocationDefaultPath, file.getName());
                         if(f.exists() && (f.length() == file.getSize())){
                             isOnMegaDownloads = true;
@@ -1552,6 +1519,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
     }
 
+    private void newActionMode() {
+        log("force create new action mode");
+        actionMode = ((AppCompatActivity) context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
+    }
+
     private void updateActionModeTitle() {
 
         log("updateActionModeTitle");
@@ -1634,7 +1606,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             }
             if(position > 0 && position-1 < temp.nodeHandles.size()){
                 MegaNode n = megaApi.getNodeByHandle(temp.nodeHandles.get(position - 1));
-                if(Util.isVideoFile(n.getName())){
+                if(isVideoFile(n.getName())){
                     return TYPE_ITEM_VIDEO;
                 }
                 else{
@@ -1713,5 +1685,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     
     private static void log(String log) {
         Util.log("MegaPhotoSyncGridTitleAdapterLollipop", log);
+    }
+
+    public void refreshActionModeTitle() {
+        newActionMode();
+        updateActionModeTitle();
+        notifyDataSetChanged();
     }
 }

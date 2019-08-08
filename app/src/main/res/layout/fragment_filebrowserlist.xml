@@ -56,6 +56,8 @@
 				android:gravity="center"
 				android:textColor="@color/text_secondary"
 				android:fontFamily="sans-serif"
+				android:paddingLeft="10dp"
+				android:paddingRight="10dp"
 				android:textSize="18sp"/>
 		</LinearLayout>
 	</RelativeLayout>

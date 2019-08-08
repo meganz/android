@@ -75,14 +75,6 @@
                 android:layout_alignParentLeft="true"/>
 
         </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/cell_photosync_title_menu_long_click_unselected"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/background_item_photosync_grid_long_click">
-        </RelativeLayout>
-
     </RelativeLayout>
 
 </RelativeLayout>

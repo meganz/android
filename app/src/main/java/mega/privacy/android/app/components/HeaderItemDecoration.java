@@ -9,7 +9,8 @@ import android.util.DisplayMetrics;
 import android.view.View;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
+
+import static mega.privacy.android.app.utils.Constants.*;
 
 public class HeaderItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDividerNode;
@@ -45,10 +46,10 @@ public class HeaderItemDecoration extends RecyclerView.ItemDecoration {
             int position = parent.getChildAdapterPosition(child);
             int viewType = parent.getAdapter().getItemViewType(position);
 
-            if (viewType == Constants.ITEM_VIEW_TYPE) {
+            if (viewType == ITEM_VIEW_TYPE) {
                 mDividerNode.draw(c);
             }
-            else if(viewType == Constants.HEADER_VIEW_TYPE){
+            else if(viewType == HEADER_VIEW_TYPE){
 
             }
         }

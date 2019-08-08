@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -59,6 +58,9 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
@@ -385,7 +387,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
-            intent.putExtra("adapterType", Constants.RECENTS_ADAPTER);
+            intent.putExtra("adapterType", RECENTS_ADAPTER);
             intent.putExtra("handle", node.getHandle());
             if (isMedia) {
                 intent.putExtra("nodeHandles", getBucketNodeHandles(true, false));
@@ -396,7 +398,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             return;
         }
 
-        String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), Util.getDownloadLocation(context));
+        String localPath = getLocalFile(context, node.getName(), node.getSize(), getDownloadLocation(context));
         boolean paramsSetSuccessfully = false;
 
         if (FileUtils.isAudioOrVideo(node)) {
@@ -406,7 +408,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 intent = new Intent(Intent.ACTION_VIEW);
             }
 
-            intent.putExtra("adapterType", Constants.RECENTS_ADAPTER);
+            intent.putExtra("adapterType", RECENTS_ADAPTER);
             intent.putExtra("FILENAME", node.getName());
             if (isMedia) {
                 intent.putExtra("nodeHandles", getBucketNodeHandles(false, true));
@@ -436,7 +438,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
             intent.putExtra("inside", true);
-            intent.putExtra("adapterType", Constants.RECENTS_ADAPTER);
+            intent.putExtra("adapterType", RECENTS_ADAPTER);
 
             if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
                 paramsSetSuccessfully = FileUtils.setLocalIntentParams(context, node, intent, localPath, false);

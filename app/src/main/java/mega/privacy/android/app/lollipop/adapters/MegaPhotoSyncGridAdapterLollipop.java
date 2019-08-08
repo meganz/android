@@ -58,6 +58,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid> {
 
@@ -99,7 +100,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath;
 	String defaultPath;
 	
 	private ActionMode actionMode;
@@ -521,7 +522,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						mediaIntent.putExtra("HANDLE", file.getHandle());
 						mediaIntent.putExtra("FILENAME", file.getName());
 						boolean isOnMegaDownloads = false;
-						String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+						String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 						File f = new File(downloadLocationDefaultPath, file.getName());
 						if(f.exists() && (f.length() == file.getSize())){
 							isOnMegaDownloads = true;
@@ -773,7 +774,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 							log(n.getName()+" NO ThUMB!!");
 						}
 
-						if(Util.isVideoFile(n.getName())){
+						if(isVideoFile(n.getName())){
 							log("IS VIDEO!");
 							holder.relativeLayoutsVideoInfo.get(i).setVisibility(View.VISIBLE);
 							holder.relativeLayoutsGradientVideo.get(i).setVisibility(View.VISIBLE);
@@ -898,7 +899,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						log(n.getName()+" NO ThUMB!!");
 					}
 
-					if(Util.isVideoFile(n.getName())){
+					if(isVideoFile(n.getName())){
 						holder.relativeLayoutsVideoInfo.get(i).setVisibility(View.VISIBLE);
 						holder.relativeLayoutsGradientVideo.get(i).setVisibility(View.VISIBLE);
 						holder.videoIcons.get(i).setVisibility(View.VISIBLE);
@@ -1004,19 +1005,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+		downloadLocationDefaultPath = getDownloadLocation(context);
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();

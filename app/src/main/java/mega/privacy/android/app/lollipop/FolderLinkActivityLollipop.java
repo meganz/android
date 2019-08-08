@@ -93,6 +93,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener{
 
 	public static ImageView imageDrag;
@@ -161,7 +163,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	MegaNode pN = null;
 	boolean fileLinkFolderLink = false;
 
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath;
 	public static final int FOLDER_LINK = 2;
 
 	public void activateActionMode(){
@@ -429,19 +431,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 
 		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+		downloadLocationDefaultPath = getDownloadLocation(this);
 
 		lastPositionStack = new Stack<>();
 		
@@ -785,23 +775,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 //			dbH = new DatabaseHandler(getApplicationContext());
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
-		
+
 		boolean askMe = Util.askMe(this);
-		String downloadLocationDefaultPath = "";
-		prefs = dbH.getPreferences();		
-		if (prefs != null){
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							askMe = false;
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}		
-			
+		prefs = dbH.getPreferences();
+		downloadLocationDefaultPath = getDownloadLocation(this);
+
 		if (askMe){
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				File[] fs = getExternalFilesDirs(null);
@@ -898,10 +876,10 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 //			dbH = new DatabaseHandler(getApplicationContext());
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
-		
+
 		boolean askMe = Util.askMe(this);
-		String downloadLocationDefaultPath = Util.getDownloadLocation(this);
-			
+		String downloadLocationDefaultPath = getDownloadLocation(this);
+
 		if (askMe){
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1244,8 +1222,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						try{
 							log("API_EARGS - show alert dialog");
 							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-							builder.setMessage(getString(R.string.general_error_folder_not_found));
+							builder.setMessage(getString(R.string.link_broken));
 							builder.setTitle(getString(R.string.general_error_word));
+							builder.setCancelable(false);
 
 							builder.setPositiveButton(getString(android.R.string.ok),new DialogInterface.OnClickListener() {
 								@Override
@@ -1541,8 +1520,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 					}
-
-
+					builder.setCancelable(false);
 					builder.setPositiveButton(
 							getString(android.R.string.ok),
 							new DialogInterface.OnClickListener() {
@@ -1629,7 +1607,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
-		if(adapterList.isMultipleSelect()){
+		if (adapterList != null && adapterList.isMultipleSelect()) {
 			adapterList.clearSelections();
 		}
 	}
@@ -1789,7 +1767,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 					imageDrag = imageView;
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -1882,7 +1860,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					pdfIntent.putExtra("APP", true);
 					pdfIntent.putExtra("adapterType", Constants.FOLDER_LINK_ADAPTER);
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;

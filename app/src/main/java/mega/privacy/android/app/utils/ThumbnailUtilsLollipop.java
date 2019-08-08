@@ -64,9 +64,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.THUMBNAIL_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 
 /*
@@ -1367,7 +1366,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			log("localPath no es nulo: " + localPath);
@@ -1386,7 +1385,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			ResizerParams params = new ResizerParams();
@@ -1404,7 +1403,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			log("localPath no es nulo: " + localPath);
@@ -1424,7 +1423,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			log("localPath no es nulo: " + localPath);
@@ -1443,7 +1442,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			log("localPath no es nulo: " + localPath);

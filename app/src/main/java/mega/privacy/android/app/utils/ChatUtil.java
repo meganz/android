@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -29,6 +30,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
+import static mega.privacy.android.app.utils.Util.brandAlertDialog;
+import static mega.privacy.android.app.utils.Util.getCustomAlertBuilder;
 
 public class ChatUtil {
 
@@ -328,6 +331,42 @@ public class ChatUtil {
             return false;
         }
         return true;
+    }
+
+    public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity){
+        if(activity == null){
+            return;
+        }
+
+        try{
+            android.app.AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+            dialogBuilder.setPositiveButton(
+                    activity.getString(android.R.string.ok),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            if (finish) {
+                                activity.finishAndRemoveTask();
+                            }
+                        }
+                    });
+            dialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    if (finish) {
+                        activity.finishAndRemoveTask();
+                    }
+                }
+            });
+
+
+            android.app.AlertDialog dialog = dialogBuilder.create();
+            dialog.show();
+            brandAlertDialog(dialog);
+        }catch(Exception ex){
+            Util.showToast(activity, message);
+        }
     }
 
     private static void log(String message) {
