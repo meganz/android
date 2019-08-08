@@ -4516,8 +4516,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		switch (drawerItem){
 			case CLOUD_DRIVE:{
+                aB.setSubtitle(null);
 				if (getTabItemCloud() == CLOUD_TAB) {
-					aB.setSubtitle(null);
 					log("setToolbarTitle: Cloud Drive SECTION");
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 					if (parentNode != null) {
