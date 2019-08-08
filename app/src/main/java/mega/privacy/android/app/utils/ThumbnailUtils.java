@@ -18,9 +18,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.THUMBNAIL_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 
 
 /*

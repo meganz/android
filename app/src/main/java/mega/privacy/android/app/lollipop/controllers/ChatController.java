@@ -65,7 +65,8 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatController {
@@ -1407,17 +1408,11 @@ public class ChatController {
             MegaNode document = nodeList.get(i);
             if (document != null) {
                 document = authorizeNodeIfPreview(document, chatRoom);
-                if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(document, context));
-                }
-                else{
-                    destination = context.getFilesDir();
-                }
-
+                destination = getOfflineParentFile(context, Constants.FROM_OTHERS, document, null);
                 destination.mkdirs();
 
                 log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
-                if (destination.exists() && destination.isDirectory()){
+                if (isFileAvailable(destination) && destination.isDirectory()){
 
                     File offlineFile = new File(destination, document.getName());
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
@@ -1562,14 +1557,13 @@ public class ChatController {
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
+        String downloadLocationDefaultPath = getDownloadLocation(context);
+
         if(!nodeList.isEmpty() && ChatUtil.isVoiceClip(nodeList.get(0).getName())){
             File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
             checkSizeBeforeDownload(vcFile.getParentFile().getPath(), nodeList);
             return;
         }
-
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
-
 
         boolean askMe = Util.askMe(context);
         if (askMe){
@@ -1758,17 +1752,18 @@ public class ChatController {
                     tempNode = authorizeNodeIfPreview(tempNode, ((NodeAttachmentHistoryActivity) context).getChatRoom());
                 }
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-                    log("IsFile");
-                    String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+                    log("ISFILE");
+                    String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+
                     //Check if the file is already downloaded
                     MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
                     if(localPath != null){
                         log("localPath != null");
                         try {
                             log("download:Call to copyFile: localPath: ");
-                            Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
-                            
-                            if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
+                            copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+
+                            if(isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){

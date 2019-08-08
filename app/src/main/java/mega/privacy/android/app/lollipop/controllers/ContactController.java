@@ -27,6 +27,8 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 public class ContactController {
@@ -488,6 +490,24 @@ public class ContactController {
         }
 
         return fullName;
+    }
+
+    public void checkShares(List<MegaShare> shares, int newPermission, MegaNode node, MegaRequestListenerInterface changeListener) {
+        for (int i = 0; i < shares.size(); i++) {
+            String userId = shares.get(i).getUser();
+            changePermission(userId, newPermission, node, changeListener);
+        }
+    }
+
+    private void changePermission(String userId, int newPermission, MegaNode node, MegaRequestListenerInterface changeListener) {
+        if (userId != null) {
+            MegaUser megaUser = megaApi.getContact(userId);
+            if(megaUser != null){
+                megaApi.share(node, megaUser, newPermission, changeListener);
+            }else{
+                megaApi.share(node, userId, newPermission, changeListener);
+            }
+        }
     }
 
     public static void log(String message) {
