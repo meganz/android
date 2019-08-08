@@ -19,27 +19,28 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
-import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.InfoPeerGroupCall;
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
 import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
 
 import static android.view.View.GONE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.ViewHolderGroupCall> implements MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
 
@@ -678,17 +679,15 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 }
             }
 
-            if(peerEmail!=null){
+            if (peerEmail != null) {
                 File avatar = null;
                 Bitmap bitmap = null;
-                if(context!=null){
-                    if((megaChatApi!=null)&&(context.getExternalCacheDir() != null)) {
-                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), peerEmail + ".jpg");
-                    } else {
-                        avatar = new File(context.getCacheDir().getAbsolutePath(), peerEmail + ".jpg");
+                if (context != null) {
+                    if (megaChatApi != null) {
+                        avatar = buildAvatarFile(context,peerEmail + ".jpg");
                     }
                 }
-                if ((avatar.exists())&& (avatar.length() > 0)){
+                if ((isFileAvailable(avatar)) && (avatar.length() > 0)) {
                     BitmapFactory.Options bOpts = new BitmapFactory.Options();
                     bOpts.inPurgeable = true;
                     bOpts.inInputShareable = true;
@@ -706,11 +705,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                             if (megaApi == null) {
                                 return;
                             }
-                            if (context.getExternalCacheDir() != null) {
-                                megaApi.getUserAvatar(peerEmail, context.getExternalCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", listener);
-                            } else {
-                                megaApi.getUserAvatar(peerEmail, context.getCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", listener);
-                            }
+                            megaApi.getUserAvatar(peerEmail,buildAvatarFile(context,peerEmail + ".jpg").getAbsolutePath(),listener);
                         }
                     }
                 } else {
@@ -719,11 +714,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                         if (megaApi == null) {
                             return;
                         }
-                        if (context.getExternalCacheDir() != null) {
-                            megaApi.getUserAvatar(peerEmail, context.getExternalCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", listener);
-                        } else {
-                            megaApi.getUserAvatar(peerEmail, context.getCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", listener);
-                        }
+                        megaApi.getUserAvatar(peerEmail,buildAvatarFile(context,peerEmail + ".jpg").getAbsolutePath(),listener);
                     }
                 }
             }

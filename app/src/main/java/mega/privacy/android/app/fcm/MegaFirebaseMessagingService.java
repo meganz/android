@@ -237,6 +237,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                     if(app.isActivityVisible()){
                         log("App on foreground --> return");
+                        retryPendingConnections();
                         return;
                     }
 
@@ -349,7 +350,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE) {
                         log("condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaChatApi.enableGroupChatCalls(true);
 
                     } else if (ret == MegaChatApi.INIT_ERROR) {
                         log("condition ret == MegaChatApi.INIT_ERROR");
@@ -366,7 +366,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                     } else {
                         log("Chat correctly initialized");
-                        megaChatApi.enableGroupChatCalls(true);
                     }
                 }
             }

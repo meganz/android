@@ -190,7 +190,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE) {
                         log("condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaChatApi.enableGroupChatCalls(true);
 
                     } else if (ret == MegaChatApi.INIT_ERROR) {
                         log("condition ret == MegaChatApi.INIT_ERROR");
@@ -206,7 +205,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                         megaChatApi.logout(this);
                     } else {
                         log("Chat correctly initialized");
-                        megaChatApi.enableGroupChatCalls(true);
                     }
                 }
             }

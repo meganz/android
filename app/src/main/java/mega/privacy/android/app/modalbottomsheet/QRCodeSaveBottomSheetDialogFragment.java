@@ -23,6 +23,9 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 /**
  * Created by mega on 12/01/18.
  */
@@ -78,17 +81,9 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
         }
         MegaNode parentNode = megaApi.getRootNode();
         String myEmail = megaApi.getMyUser().getEmail();
-        File qrFile = null;
-        if (getActivity().getExternalCacheDir() != null){
-            File qrDir = new File (getActivity().getExternalCacheDir(), "qrMEGA");
-            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-        }
-        else{
-            File qrDir = getActivity().getDir("qrMEGA", 0);
-            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-        }
+        File qrFile = buildQrFile(getActivity(),myEmail + "QRcode.jpg");
 
-        if (qrFile != null && qrFile.exists()){
+        if (isFileAvailable(qrFile)){
             ShareInfo info = ShareInfo.infoFromFile(qrFile);
             Intent intent = new Intent(getActivity().getApplicationContext(), UploadService.class);
             intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());

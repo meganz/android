@@ -14,7 +14,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -72,6 +71,8 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
 	
@@ -319,8 +320,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		setAccountDetails();
 
-		refreshAccountInfo();
-
 		return v;
 	}
     
@@ -329,6 +328,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         super.onResume();
         //Refresh
 		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+		refreshAccountInfo();
         updateView();
     }
     
@@ -359,11 +359,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setMkButtonText(){
 		log("setMkButtonText");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-		log("Exists MK in: "+path);
-		File file= new File(path);
+		File file= buildExternalStorageFile(RK_FILE);
 		String mkButtonText;
-		if(file.exists()){
+		if(isFileAvailable(file)){
 			mkButtonText = getString(R.string.action_remove_master_key);
 		}
 		else{
@@ -421,7 +419,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("megaApi.getExtendedAccountDetails SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForExtendedAccountDetails();
 		}
-		log("Check the last call to callToPaymentMethods");
+		log("Check the last call to getPaymentMethods");
 		if(DBUtil.callToPaymentMethods(context)){
 			log("megaApi.getPaymentMethods SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
@@ -574,10 +572,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.MK_button:{
 				log("Master Key button");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-				log("Exists MK in: "+path);
-				File file= new File(path);
-				if(file.exists()){
+				log("Exists MK in: "+getExternalStoragePath(RK_FILE));
+				File file= buildExternalStorageFile(RK_FILE);
+				if(isFileAvailable(file)){
 					((ManagerActivityLollipop)context).showConfirmationRemoveMK();
 				}
 				else{
@@ -736,15 +733,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			infoEmail.setText(newMail);
 		}
 
-		File avatar = null;
-		if (context.getExternalCacheDir() != null){
-			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), newMail + ".jpg");
-		}
-		else{
-			avatar = new File(context.getCacheDir().getAbsolutePath(), newMail + ".jpg");
-		}
+		File avatar = buildAvatarFile(context,newMail + ".jpg");
 
-		if (!avatar.exists()){
+		if (!isFileAvailable(avatar)){
 			setDefaultAvatar();
 		}
 	}
@@ -764,24 +755,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		String contactEmail = megaApi.getMyEmail();
 		if(context!=null){
 			log("context is not null");
-
-			if (context.getExternalCacheDir() != null){
-				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
-			}
-			else{
-				avatar = new File(context.getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
-			}
+			avatar = buildAvatarFile(context,contactEmail + ".jpg");
 		}
 		else{
 			log("context is null!!!");
 			if(getActivity()!=null){
 				log("getActivity is not null");
-				if (getActivity().getExternalCacheDir() != null){
-					avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
-				}
-				else{
-					avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
-				}
+                avatar = buildAvatarFile(getActivity(),contactEmail + ".jpg");
 			}
 			else{
 				log("getActivity is ALSOOO null");
@@ -823,13 +803,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					log("Call to getUserAvatar");
 					if(retry){
 						log("Retry!");
-						if (context.getExternalCacheDir() != null){
-							megaApi.getUserAvatar(megaApi.getMyUser(), context.getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail(), (ManagerActivityLollipop)context);
-						}
-						else{
-							megaApi.getUserAvatar(megaApi.getMyUser(), context.getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail(), (ManagerActivityLollipop)context);
-						}
-					}
+                        megaApi.getUserAvatar(megaApi.getMyUser(),buildAvatarFile(context,megaApi.getMyEmail()).getAbsolutePath(),(ManagerActivityLollipop)context);
+                    }
 					else{
 						log("DO NOT Retry!");
 						setDefaultAvatar();
@@ -845,12 +820,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("Call to getUserAvatar");
 			if(retry){
 				log("Retry!");
-				if (context.getExternalCacheDir() != null){
-					megaApi.getUserAvatar(megaApi.getMyUser(), context.getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail(), (ManagerActivityLollipop)context);
-				}
-				else{
-					megaApi.getUserAvatar(megaApi.getMyUser(), context.getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail(), (ManagerActivityLollipop)context);
-				}
+                megaApi.getUserAvatar(megaApi.getMyUser(),buildAvatarFile(context,megaApi.getMyEmail()).getAbsolutePath(),(ManagerActivityLollipop)context);
 			}
 			else{
 				log("DO NOT Retry!");

@@ -1,16 +1,23 @@
 package mega.privacy.android.app.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -19,6 +26,12 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
+import static mega.privacy.android.app.utils.Util.brandAlertDialog;
+import static mega.privacy.android.app.utils.Util.getCustomAlertBuilder;
 
 public class ChatUtil {
 
@@ -96,6 +109,25 @@ public class ChatUtil {
         }
         return false;
     }
+
+    public static boolean isVoiceClip(String name) {
+        return MimeTypeList.typeForName(name).isAudioVoiceClip();
+    }
+
+    public static long getVoiceClipDuration(MegaNode node) {
+        return node.getDuration() <= 0 ? 0 : node.getDuration() * 1000;
+    }
+
+    /* Get the height of the action bar */
+    public static int getActionBarHeight(Activity activity, Resources resources) {
+        int actionBarHeight = 0;
+        TypedValue tv = new TypedValue();
+        if (activity != null && activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.getDisplayMetrics());
+        }
+        return actionBarHeight;
+    }
+
     public static void log(String origin, String message) {
         MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
     }
@@ -219,6 +251,122 @@ public class ChatUtil {
         builder.setTitle(R.string.action_delete_link);
         builder.setMessage(R.string.context_remove_chat_link_warning_text).setPositiveButton(R.string.delete_button, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
+    /**
+     * Locks the device window in landscape mode.
+     */
+    public static void lockOrientationLandscape(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
+
+    /**
+     * Locks the device window in reverse landscape mode.
+     */
+    public static void lockOrientationReverseLandscape(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+    }
+
+    /**
+     * Locks the device window in portrait mode.
+     */
+    public static void lockOrientationPortrait(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    }
+
+    /**
+     * Locks the device window in reverse portrait mode.
+     */
+    public static void lockOrientationReversePortrait(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+    }
+
+    /**
+     * Allows user to freely use portrait or landscape mode.
+     */
+    public static void unlockOrientation(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+
+    public static String milliSecondsToTimer(long milliseconds) {
+        String minutesString;
+        String secondsString;
+        String finalTime = "";
+        int hours = (int) (milliseconds / (1000 * 60 * 60));
+        int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
+        int seconds = (int) ((milliseconds % (1000 * 60 * 60)) % (1000 * 60) / 1000);
+
+        if (minutes < 10) {
+            minutesString = "0" + minutes;
+        } else {
+            minutesString = "" + minutes;
+        }
+        if (seconds < 10) {
+            secondsString = "0" + seconds;
+        } else {
+            secondsString = "" + seconds;
+        }
+
+        if (hours > 0) {
+            if (hours < 10) {
+                finalTime = "0" + hours + ":";
+            } else {
+                finalTime = "" + hours + ":";
+            }
+        }
+
+        finalTime = finalTime + minutesString + ":" + secondsString;
+        return finalTime;
+    }
+
+    /**
+     * To detect whether My Chat Files folder exist or not.
+     * If no, store the passed data and process after the folder is created
+     */
+    public static <T> boolean existsMyChatFiles(T preservedData, MegaApiAndroid megaApi, MegaRequestListenerInterface requestListener, MyChatFilesExisitListener listener) {
+        MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
+        if (parentNode == null) {
+            megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), requestListener);
+            listener.storedUnhandledData(preservedData);
+            return false;
+        }
+        return true;
+    }
+
+    public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity){
+        if(activity == null){
+            return;
+        }
+
+        try{
+            android.app.AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+            dialogBuilder.setPositiveButton(
+                    activity.getString(android.R.string.ok),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            if (finish) {
+                                activity.finishAndRemoveTask();
+                            }
+                        }
+                    });
+            dialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    if (finish) {
+                        activity.finishAndRemoveTask();
+                    }
+                }
+            });
+
+
+            android.app.AlertDialog dialog = dialogBuilder.create();
+            dialog.show();
+            brandAlertDialog(dialog);
+        }catch(Exception ex){
+            Util.showToast(activity, message);
+        }
     }
 
     private static void log(String message) {

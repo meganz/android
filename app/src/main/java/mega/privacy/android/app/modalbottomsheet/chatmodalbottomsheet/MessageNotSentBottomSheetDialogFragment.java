@@ -87,8 +87,8 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
         }
 
         if(selectedMessage!=null){
-            log("selectedMessage content: "+selectedMessage.getMessage().getContent());
-            log("Temporal id of MS message: "+selectedMessage.getMessage().getTempId());
+            log("Selected message ID: " + selectedMessage.getMessage().getMsgId());
+            log("Temporal ID of MS message: " + selectedMessage.getMessage().getTempId());
         }
         else{
             log("Error the selectedMessage is NULL");

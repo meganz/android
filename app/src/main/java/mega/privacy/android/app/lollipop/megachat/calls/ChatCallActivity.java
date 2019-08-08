@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -37,6 +36,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -68,9 +68,9 @@ import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
@@ -95,6 +95,9 @@ import nz.mega.sdk.MegaUser;
 
 import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.showErrorAlertDialogGroupCall;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.context;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
@@ -917,15 +920,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (e.getErrorCode() != MegaError.API_OK) {
                 log("onRequestFinish:TYPE_GET_ATTR_USER: OK");
 
-                File avatar = null;
+                File avatar = buildAvatarFile(this, request.getEmail() + ".jpg");
                 Bitmap bitmap = null;
 
-                if (this.getExternalCacheDir() != null){
-                    avatar = new File(this.getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-                }else{
-                    avatar = new File(this.getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-                }
-                if (avatar.exists()){
+                if (isFileAvailable(avatar)){
                     if (avatar.length() > 0){
                         BitmapFactory.Options bOpts = new BitmapFactory.Options();
                         bOpts.inPurgeable = true;
@@ -981,13 +979,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             email = chat.getPeerEmail(0);
             name = chat.getPeerFullname(0);
         }
-        if((megaChatApi!=null)&&(this.getExternalCacheDir() != null)) {
-            avatar = new File(this.getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-        } else {
-            avatar = new File(this.getCacheDir().getAbsolutePath(), email + ".jpg");
+        if (!TextUtils.isEmpty(email)) {
+            avatar = buildAvatarFile(this, email + ".jpg");
         }
 
-        if((avatar.exists())&&(avatar.length() > 0)){
+        if ((isFileAvailable(avatar)) && (avatar.length() > 0)) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
                 bOpts.inInputShareable = true;
@@ -1017,28 +1013,20 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         }
                     }
                 }else{
-                    if(peerId != megaChatApi.getMyUserHandle()){
+                    if (peerId != megaChatApi.getMyUserHandle()) {
                         avatar.delete();
                         if (!avatarRequested) {
                             avatarRequested = true;
-                            if (this.getExternalCacheDir() != null) {
-                                megaApi.getUserAvatar(email, this.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", this);
-                            } else {
-                                megaApi.getUserAvatar(email, this.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", this);
-                            }
+                            megaApi.getUserAvatar(email,buildAvatarFile(this,email + ".jpg").getAbsolutePath(),this);
                         }
                     }
                     createDefaultAvatar(peerId, name);
                 }
         }else{
-            if(peerId != megaChatApi.getMyUserHandle()) {
+            if (peerId != megaChatApi.getMyUserHandle()) {
                 if (!avatarRequested) {
                     avatarRequested = true;
-                    if (this.getExternalCacheDir() != null) {
-                        megaApi.getUserAvatar(email, this.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", this);
-                    } else {
-                     megaApi.getUserAvatar(email, this.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", this);
-                    }
+                    megaApi.getUserAvatar(email,buildAvatarFile(this,email + ".jpg").getAbsolutePath(),this);
                 }
             }
             createDefaultAvatar(peerId, name);
@@ -1130,13 +1118,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             File avatar = null;
             Bitmap bitmap = null;
 
-            if((megaChatApi!=null)&&(getExternalCacheDir() != null)) {
-                avatar = new File(getExternalCacheDir().getAbsolutePath(), peerEmail + ".jpg");
-            } else {
-                avatar = new File(getCacheDir().getAbsolutePath(), peerEmail + ".jpg");
+            if (!TextUtils.isEmpty(peerEmail)) {
+                avatar = buildAvatarFile(this, peerEmail + ".jpg");
             }
 
-            if ((avatar.exists())&& (avatar.length() > 0)){
+            if (isFileAvailable(avatar) && (avatar.length() > 0)) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
                 bOpts.inInputShareable = true;
@@ -1147,30 +1133,22 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     avatarBigCameraGroupCallImage.setVisibility(View.VISIBLE);
                     avatarBigCameraGroupCallImage.setImageBitmap(bitmap);
 
-                }else{
-                    if(peerId !=  megaChatApi.getMyUserHandle()){
+                } else {
+                    if (peerId != megaChatApi.getMyUserHandle()) {
                         avatar.delete();
                         if (megaApi == null) {
                             return;
                         }
-                        if (this.getExternalCacheDir() != null) {
-                            megaApi.getUserAvatar(peerEmail, this.getExternalCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", this);
-                        } else {
-                            megaApi.getUserAvatar(peerEmail, this.getCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", this);
-                        }
+                        megaApi.getUserAvatar(peerEmail,buildAvatarFile(this,peerEmail + ".jpg").getAbsolutePath(),this);
                     }
-                    createDefaultAvatarPeerSelected(peerId, fullName, peerEmail);
+                    createDefaultAvatarPeerSelected(peerId,fullName,peerEmail);
                 }
             } else {
                 if(peerId != megaChatApi.getMyUserHandle()){
                     if (megaApi == null) {
                         return;
                     }
-                    if (this.getExternalCacheDir() != null) {
-                        megaApi.getUserAvatar(peerEmail, this.getExternalCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", this);
-                    } else {
-                        megaApi.getUserAvatar(peerEmail, this.getCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", this);
-                    }
+                    megaApi.getUserAvatar(peerEmail,buildAvatarFile(this,peerEmail + ".jpg").getAbsolutePath(),this);
                 }
                 createDefaultAvatarPeerSelected(peerId, fullName, peerEmail);
             }
@@ -1496,7 +1474,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                 if (e.getErrorCode() == MegaChatError.ERROR_TOOMANY) {
 
-                    Util.showErrorAlertDialogGroupCall(getString(R.string.call_error_too_many_participants), true, this);
+                    showErrorAlertDialogGroupCall(getString(R.string.call_error_too_many_participants), true, this);
                 } else {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         super.finishAndRemoveTask();

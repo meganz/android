@@ -30,9 +30,12 @@ import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRoom;
 
 public class BaseActivity extends AppCompatActivity {
@@ -76,24 +79,7 @@ public class BaseActivity extends AppCompatActivity {
 
         checkMegaApiObjects();
 
-        if(megaChatApi != null){
-            if(megaChatApi.getPresenceConfig()==null){
-                delaySignalPresence = true;
-            }
-            else{
-                if(megaChatApi.getPresenceConfig().isPending()==true){
-                    delaySignalPresence = true;
-                }
-                else{
-                    delaySignalPresence = false;
-                    retryConnectionsAndSignalPresence();
-                }
-            }
-        }
-        else{
-            delaySignalPresence = false;
-            retryConnectionsAndSignalPresence();
-        }
+        retryConnectionsAndSignalPresence();
     }
 
     @Override
@@ -149,7 +135,7 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                log("****BROADCAST TO SEND SIGNAL PRESENCE");
+                log("BROADCAST TO SEND SIGNAL PRESENCE");
                 if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending()==false){
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();
@@ -224,32 +210,34 @@ public class BaseActivity extends AppCompatActivity {
         sslErrorDialog.show();
     }
 
-    public void retryConnectionsAndSignalPresence(){
+    protected void retryConnectionsAndSignalPresence(){
         log("retryConnectionsAndSignalPresence");
         try{
             if (megaApi != null){
                 megaApi.retryPendingConnections();
             }
 
-            if(Util.isChatEnabled()){
-                if (megaChatApi != null){
+            if(Util.isChatEnabled()) {
+                if (megaChatApi != null) {
                     megaChatApi.retryPendingConnections(false, null);
-                }
 
-                if(!(this instanceof ChatCallActivity)){
-                    log("Send signal presence if needed");
-                    if(megaChatApi != null && megaChatApi.isSignalActivityRequired()){
-                        megaChatApi.signalPresenceActivity();
+                    if(megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending() == false){
+                        delaySignalPresence = false;
+                        if(!(this instanceof ChatCallActivity) && megaChatApi.isSignalActivityRequired()){
+                            log("Send signal presence");
+                            megaChatApi.signalPresenceActivity();
+                        }
+                    }
+                    else {
+                        delaySignalPresence = true;
                     }
                 }
             }
         }
         catch (Exception e){
-            log("retryPendingConnections:Exception: "+e.getMessage());
+            log("retryConnectionsAndSignalPresence:Exception: " + e.getMessage());
         }
     }
-
-
 
     @Override
     public void onBackPressed() {
@@ -392,6 +380,20 @@ public class BaseActivity extends AppCompatActivity {
             for(int i=0;i<chats.size();i++){
                 megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
             }
+        }
+    }
+
+    /**
+     * Method to refresh the account details info if necessary.
+     */
+    protected void refreshAccountInfo(){
+        log("refreshAccountInfo");
+
+        //Check if the call is recently
+        log("Check the last call to getAccountDetails");
+        if(DBUtil.callToAccountDetails(getApplicationContext())){
+            log("megaApi.getAccountDetails SEND");
+            ((MegaApplication) getApplication()).askForAccountDetails();
         }
     }
 

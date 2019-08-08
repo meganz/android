@@ -24,7 +24,6 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
     @Override
     public void onClick(View v) {
         log("onClick FabButtonListener");
-
         switch(v.getId()) {
             case R.id.floating_button: {
                 log("Floating Button click!");

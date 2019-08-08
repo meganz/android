@@ -222,7 +222,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		downloadButton.setVisibility(View.INVISIBLE);
 
 		importButton = (TextView) findViewById(R.id.file_link_button_import);
-		importButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
+		importButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		importButton.setOnClickListener(this);
 		importButton.setVisibility(View.GONE);
 
@@ -535,6 +535,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			else{
 				log("ERROR: " + e.getErrorCode());
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setCancelable(false);
 				if(e.getErrorCode() == MegaError.API_EBLOCKED){
 					dialogBuilder.setMessage(getString(R.string.file_link_unavaible_ToS_violation));
 					dialogBuilder.setTitle(getString(R.string.general_error_file_not_found));
@@ -549,7 +550,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					else{
 						//Link no valido
 						dialogBuilder.setTitle(getString(R.string.general_error_word));
-						dialogBuilder.setMessage(getString(R.string.general_error_file_not_found));
+						dialogBuilder.setMessage(getString(R.string.link_broken));
 					}
 				}
 				else if(e.getErrorCode() == MegaError.API_ETOOMANY){

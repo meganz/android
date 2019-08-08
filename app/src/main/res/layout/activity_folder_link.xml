@@ -83,7 +83,7 @@
                android:minWidth="0dp"
                android:layout_marginRight="16dp"
                android:background="@color/participants_layout"
-               android:text="@string/add_to_cloud_import"/>
+               android:text="@string/add_to_cloud"/>
 
             <Button
                 android:id="@+id/folder_link_button_download"

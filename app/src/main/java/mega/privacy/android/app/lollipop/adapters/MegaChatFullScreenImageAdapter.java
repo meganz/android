@@ -54,6 +54,9 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface  {
 
 	private Activity activity;
@@ -69,7 +72,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	MegaApiAndroid megaApi;
 	Context context;
 
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath;
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 
@@ -160,15 +163,9 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				return 0;
 			}
 			else{
-				if (activity.getExternalCacheDir() != null){
-					cacheDir = activity.getExternalCacheDir();
-				}
-				else{
-					cacheDir = activity.getCacheDir();
-				}
-				destination = new File(cacheDir, node.getName());
+				destination = buildPreviewFile(activity, node.getName());
 
-				if (destination.exists()){
+				if (isFileAvailable(destination)){
 					if (destination.length() == node.getSize()){
 						File previewDir = PreviewUtils.getPreviewFolder(activity);
 						File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
@@ -242,19 +239,8 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+
+		downloadLocationDefaultPath = getDownloadLocation(context);
 	}
 
 	@Override
@@ -319,7 +305,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			}
 
 			boolean isOnMegaDownloads = false;
-			String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
+			String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
 			log("isOnMegaDownloads: "+isOnMegaDownloads+" nodeName: "+node.getName()+" localPath: "+localPath);
 			if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))){
 
