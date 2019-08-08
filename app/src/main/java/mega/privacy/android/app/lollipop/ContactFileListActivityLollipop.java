@@ -67,6 +67,7 @@ import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1067,7 +1068,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				nC = new NodeController(this);
 			}
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
-		} 
+		} else if(requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
+            String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            log("select " + path + " as download location.");
+            dbH.setStorageDownloadLocation(path);
+        }
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
 			if (!Util.isOnline(this)) {
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));

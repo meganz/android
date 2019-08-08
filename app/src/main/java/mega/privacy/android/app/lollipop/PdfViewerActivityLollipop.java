@@ -46,7 +46,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -96,6 +95,7 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2369,6 +2369,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     }
                 }
             }
+        } else if(requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
+            String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            log("select " + path + " as download location.");
+            dbH.setStorageDownloadLocation(path);
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             log("local folder selected");

@@ -196,6 +196,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
@@ -13665,7 +13666,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				service.putExtra(DownloadService.EXTRA_PATH, path);
 				startService(service);
 			}
-		}
+		} else if(requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
+            String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            log("select " + path + " as download location.");
+            dbH.setStorageDownloadLocation(path);
+        }
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			log("requestCode == REQUEST_CODE_SELECT_FILE");
 			if (intent == null) {

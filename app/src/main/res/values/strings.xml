@@ -1661,6 +1661,7 @@
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Advanced options</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">To download files MEGA needs your permission.</string>
     <string name="donot_support_write_on_sdcard" context="Some devices don't allow MEGA to write on SD card">Your device only allows MEGA to access the internal storage.</string>
+    <string name="sdcard_unavailable" context="Default download location is on sd card, but currently the sd card is unavailable(eg, user unintsalled it), need user to reset download location on internal storage.">SD Card is unavailable, please set a new download location.</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">No contact permissions granted</string>
 

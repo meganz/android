@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.support.v4.app.Fragment;
@@ -42,6 +43,10 @@ public class SDCardOperator {
         public SDCardException(String message) {
             super(message);
         }
+
+        public SDCardException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 
     public SDCardOperator(Context context) throws SDCardException {
@@ -61,10 +66,14 @@ public class SDCardOperator {
         if (TextUtils.isEmpty(uriString)) {
             throw new SDCardException("Haven't got sd card root uri!");
         } else {
-            Uri rootUri = Uri.parse(uriString);
-            sdCardRootDocument = DocumentFile.fromTreeUri(context, rootUri);
-            if (!sdCardRootDocument.canWrite()) {
-                throw new SDCardException("Permission required!");
+            try {
+                Uri rootUri = Uri.parse(uriString);
+                sdCardRootDocument = DocumentFile.fromTreeUri(context, rootUri);
+                if (!sdCardRootDocument.canWrite()) {
+                    throw new SDCardException("Permission required!");
+                }
+            } catch (Exception e) {
+                throw new SDCardException("Invalid uri string.", e);
             }
         }
     }
@@ -77,8 +86,8 @@ public class SDCardOperator {
         return sdCardRoot;
     }
 
-    public boolean isSDCardPath(String path) {
-        return path.contains(sdCardRoot);
+    public static boolean isSDCardPath(String path) {
+        return !path.startsWith(Environment.getExternalStorageDirectory().toString());
     }
 
     public boolean canWriteWithFile() {

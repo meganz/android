@@ -79,6 +79,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static String EXTRA_SIZE = "filesize";
 	public static String EXTRA_DOCUMENT_HASHES = "document_hash";
 	public static String EXTRA_FROM_SETTINGS = "from_settings";
+	public static String EXTRA_PROMPT = "prompt";
 	public static String EXTRA_CAMERA_FOLDER = "camera_folder";
 	public static String EXTRA_BUTTON_PREFIX = "button_prefix";
 	public static String EXTRA_SD_ROOT = "sd_root";
@@ -135,6 +136,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private Boolean cameraFolderSettings;
 	private String sdRoot;
 	private boolean hasSDCard;
+    private String prompt;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -370,6 +372,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 		Intent intent = getIntent();
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
+		prompt = intent.getStringExtra(EXTRA_PROMPT);
+		if(prompt != null) {
+            Util.showSnackBar(this, Constants.SNACKBAR_TYPE, prompt, -1);
+        }
 		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
 		sdRoot = intent.getStringExtra(EXTRA_SD_ROOT);
 		hasSDCard = (sdRoot != null);
@@ -1140,7 +1146,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
             e.printStackTrace();
         }
 		if(sdCardOperator != null) {
-		    if(sdCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
+		    if(SDCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
                 if(prefs == null) {
                     prefs = dbH.getPreferences();
                 }

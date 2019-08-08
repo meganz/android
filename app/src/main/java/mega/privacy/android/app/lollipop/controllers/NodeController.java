@@ -50,6 +50,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.TL;
@@ -769,9 +770,17 @@ public class NodeController {
         } catch (SDCardOperator.SDCardException e) {
             e.printStackTrace();
             log(e.getMessage());
+            // user uninstall the sd card. but default download location is still on the sd card
+            if(SDCardOperator.isSDCardPath(parentPath)) {
+                log("select new path as download location.");
+                if(context instanceof Activity) {
+                    LocalFolderSelector.toFileStorageActivity((Activity) context);
+                }
+                return;
+            }
         }
         if(sdCardOperator != null) {
-            if(sdCardOperator.isSDCardPath(parentPath) && !new File(parentPath).canWrite()) {
+            if(SDCardOperator.isSDCardPath(parentPath) && !new File(parentPath).canWrite()) {
                 downloadToSDCard = true;
                 downloadRoot = sdCardOperator.getDownloadRoot();
                 try {
@@ -783,6 +792,9 @@ public class NodeController {
                     e.printStackTrace();
                     log(e.getMessage());
                     //TODO
+                    //don't have permission with sd card root. need to request.
+                    SDCardOperator.requestSDCardPermission(sdCardOperator.getSDCardRoot(), context, (Activity) context);
+                    return;
                 }
             }
         }
