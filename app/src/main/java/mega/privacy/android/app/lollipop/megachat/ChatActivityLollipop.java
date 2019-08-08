@@ -157,19 +157,13 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.EDITING_MESSAGE;
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.LATITUDE;
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.LONGITUDE;
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.MSG_ID;
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.SNAPSHOT;
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.getAddresses;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
-import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
-import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
-import static mega.privacy.android.app.utils.Util.context;
-import static mega.privacy.android.app.utils.Util.toCDATA;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
+import static mega.privacy.android.app.utils.Constants.*;
+
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<ArrayList<AndroidMegaChatMessage>> {
 
@@ -2709,16 +2703,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
             if (resultCode == Activity.RESULT_OK) {
                 log("TAKE_PHOTO_CODE ");
-//                String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
-//                File imgFile = new File(filePath);
-//                String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-//                String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/" + name;
-//                File newFile = new File(newPath);
-//                imgFile.renameTo(newFile);
-//                uploadPicture(newPath);
-
                 onCaptureImageResult();
-//                uploadPicture(finalUri);
 
             } else {
                 log("TAKE_PHOTO_CODE--->ERROR!");
@@ -4187,9 +4172,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         mediaIntent.putExtra("chatId", idChat);
                                         mediaIntent.putExtra("FILENAME", node.getName());
 
-                                        String downloadLocationDefaultPath = Util.getDownloadLocation(this);
-                                        String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
-                                        log("localPath: "+localPath);
+                                        String downloadLocationDefaultPath = getDownloadLocation(this);
+                                        String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
 
                                         File f = new File(downloadLocationDefaultPath, node.getName());
                                         boolean isOnMegaDownloads = false;
@@ -4298,8 +4282,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         pdfIntent.putExtra("msgId", m.getMessage().getMsgId());
                                         pdfIntent.putExtra("chatId", idChat);
 
-                                        String downloadLocationDefaultPath = Util.getDownloadLocation(this);
-                                        String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+                                        String downloadLocationDefaultPath = getDownloadLocation(this);
+                                        String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
                                         File f = new File(downloadLocationDefaultPath, node.getName());
                                         boolean isOnMegaDownloads = false;
                                         if(f.exists() && (f.length() == node.getSize())){

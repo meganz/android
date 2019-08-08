@@ -13,7 +13,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
-import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -45,18 +44,14 @@ import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.JobUtil;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.ACTION_LOG_OUT;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public class AccountController implements View.OnClickListener{
 
@@ -167,13 +162,12 @@ public class AccountController implements View.OnClickListener{
 
         BufferedWriter out;
         try {
-            String mainDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + Util.mainDIR;
-            File mainDir = new File(mainDirPath);
-            log("Path main Dir: " + mainDirPath);
+            File mainDir = buildExternalStorageFile(MAIN_DIR);
+            log("Path main Dir: " + getExternalStoragePath(MAIN_DIR));
             mainDir.mkdirs();
 
             if (path == null){
-                path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+                path = getExternalStoragePath(RK_FILE);
                 pathNull = true;
             }
             log("Export in: "+path);
@@ -275,41 +269,12 @@ public class AccountController implements View.OnClickListener{
         recoveryKeyExportedDialog.show();
     }
 
-//    public void updateMK(){
-//        log("updateMK");
-//
-//        String key = megaApi.exportMasterKey();
-//        BufferedWriter out;
-//        try {
-//
-//            final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-//            log("Export in: "+path);
-//            FileWriter fileWriter= new FileWriter(path);
-//            out = new BufferedWriter(fileWriter);
-//            if(out==null){
-//                log("Error!!!");
-//                return;
-//            }
-//            out.write(key);
-//            out.close();
-//
-//        }catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public void renameMK(){
         log("renameMK");
+        File oldMKF = buildExternalStorageFile(OLD_MK_FILE);
+        File newMKFile = buildExternalStorageFile(RK_FILE);
 
-        final String oldPath = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-        File oldMKFile = new File(oldPath);
-
-        final String newPath = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-        File newMKFile = new File(newPath);
-
-        oldMKFile.renameTo(newMKFile);
+        oldMKF.renameTo(newMKFile);
     }
 
     public void copyMK(boolean logout){
@@ -448,16 +413,16 @@ public class AccountController implements View.OnClickListener{
 
     public void removeMK() {
         log("removeMK");
-        final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-        final File f = new File(path);
-        f.delete();
+        final File f = buildExternalStorageFile(RK_FILE);
+        if (isFileAvailable(f)) {
+            f.delete();
+        }
 
         //Check if old MK file exists
-        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-        final File fOldMK = new File(pathOldMK);
-        if(fOldMK.exists()){
+        final File fOldMK = buildExternalStorageFile(OLD_MK_FILE);
+        if(isFileAvailable(fOldMK)){
             log("The old file of MK was also removed");
-            f.delete();
+            fOldMK.delete();
         }
 
         String message = context.getString(R.string.toast_master_key_removed);
@@ -479,56 +444,32 @@ public class AccountController implements View.OnClickListener{
 
         try {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
             notificationManager.cancelAll();
         }
         catch(Exception e){
             log("EXCEPTION removing all the notifications");
+            e.printStackTrace();
         }
 
-        File offlineDirectory = null;
-        if (Environment.getExternalStorageDirectory() != null){
-            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
-        }
-        else{
-            offlineDirectory = context.getFilesDir();
-        }
-
-        try {
-            Util.deleteFolderAndSubfolders(context, offlineDirectory);
-        } catch (IOException e) {}
-
-        File thumbDir = ThumbnailUtils.getThumbFolder(context);
-        File previewDir = PreviewUtils.getPreviewFolder(context);
-
-        try {
-            Util.deleteFolderAndSubfolders(context, thumbDir);
-        } catch (IOException e) {}
-
-        try {
-            Util.deleteFolderAndSubfolders(context, previewDir);
-        } catch (IOException e) {}
+        File privateDir = context.getFilesDir();
+        removeFolder(context, privateDir);
 
         File externalCacheDir = context.getExternalCacheDir();
+        removeFolder(context, externalCacheDir);
+
         File cacheDir = context.getCacheDir();
-        try {
-            Util.deleteFolderAndSubfolders(context, externalCacheDir);
-        } catch (IOException e) {}
+        removeFolder(context, cacheDir);
 
-        try {
-            Util.deleteFolderAndSubfolders(context, cacheDir);
-        } catch (IOException e) {}
+        removeOldTempFolders(context);
 
-        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-        final File fMKOld = new File(pathOldMK);
-        if (fMKOld.exists()){
+        final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
+        if (isFileAvailable(fMKOld)){
             log("Old MK file removed!");
             fMKOld.delete();
         }
 
-        final String pathMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-        final File fMK = new File(pathMK);
-        if (fMK.exists()){
+        final File fMK = buildExternalStorageFile(RK_FILE);
+        if (isFileAvailable(fMK)){
             log("MK file removed!");
             fMK.delete();
         }
@@ -554,6 +495,7 @@ public class AccountController implements View.OnClickListener{
             dbH.setFirstTime(false);
             JobUtil.stopRunningCameraUploadService(context);
         }
+
         dbH.clearOffline();
 
         dbH.clearContacts();
@@ -572,6 +514,15 @@ public class AccountController implements View.OnClickListener{
 
         dbH.clearChatSettings();
         dbH.setEnabledChat(true + "");
+    }
+
+    public static void removeFolder(Context context, File folder) {
+        try {
+            deleteFolderAndSubfolders(context, folder);
+        } catch (IOException e) {
+            log("Exception deleting" + folder.getName() + "directory");
+            e.printStackTrace();
+        }
     }
 
     static public void logout(Context context, MegaApiAndroid megaApi) {
@@ -597,8 +548,6 @@ public class AccountController implements View.OnClickListener{
             megaApi.logout();
         }
 
-        localLogoutApp(context);
-
         Intent intent = new Intent();
         intent.setAction(ACTION_LOG_OUT);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -607,8 +556,7 @@ public class AccountController implements View.OnClickListener{
     static public void logoutConfirmed(Context context){
         log("logoutConfirmed");
 
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-        dbH.clearChatSettings();
+        localLogoutApp(context);
 
         PackageManager m = context.getPackageManager();
         String s = context.getPackageName();
