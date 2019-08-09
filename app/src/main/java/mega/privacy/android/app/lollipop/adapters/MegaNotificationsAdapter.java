@@ -29,6 +29,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.FileUtils.isFile;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 
@@ -1258,13 +1259,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String name = alert.getName();
 				String path = alert.getPath();
 				String textToShow = "";
-				if(path!=null){
-					if(Util.isFile(path)){
-						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_notification), toCDATA(name));
-					}
-					else{
-						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), toCDATA(name));
-					}
+				if (path != null && isFile(path)) {
+					textToShow = String.format(context.getString(R.string.subtitle_file_takedown_notification), toCDATA(name));
 				}
 				else{
 					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), toCDATA(name));
@@ -1333,13 +1329,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
                 String name = alert.getName();
                 String path = alert.getPath();
 				String textToShow = "";
-				if(path!=null){
-					if(Util.isFile(path)){
-						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_reinstated_notification), toCDATA(name));
-					}
-					else{
-						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), toCDATA(name));
-					}
+				if (path != null && isFile(path)) {
+					textToShow = String.format(context.getString(R.string.subtitle_file_takedown_reinstated_notification), toCDATA(name));
 				}
 				else{
 					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), toCDATA(name));

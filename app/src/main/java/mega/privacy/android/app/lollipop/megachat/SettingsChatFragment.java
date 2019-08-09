@@ -126,7 +126,14 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
                     log("Notification sound is EMPTY");
                     Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                     Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
-                    chatSoundPreference.setSummary(defaultSound.getTitle(context));
+                    if (defaultSound == null) {
+//                        None Mode could not be fetched as default sound in some devices such as Huawei's devices, set Silent as title
+                        log("defaultSound == null");
+                        chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
+                    }
+                    else {
+                        chatSoundPreference.setSummary(defaultSound.getTitle(context));
+                    }
                 }
                 else{
                     String soundString = chatSettings.getNotificationsSound();

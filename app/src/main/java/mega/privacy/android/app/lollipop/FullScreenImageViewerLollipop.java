@@ -112,6 +112,9 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
 public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
@@ -258,7 +261,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	boolean isDownloaded(MegaNode node) {
 		log("isDownloaded");
 		boolean isOnMegaDownloads = false;
-		String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+		String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
 		File f = new File(downloadLocationDefaultPath, node.getName());
 		if (f.exists() && (f.length() == node.getSize())) {
 			isOnMegaDownloads = true;
@@ -304,7 +307,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 
 		if (downloadLocationDefaultPath == null || downloadLocationDefaultPath.equals("")){
-			downloadLocationDefaultPath = Util.getDownloadLocation(this);
+			downloadLocationDefaultPath = getDownloadLocation(this);
 		}
 
 		if (adapterType == Constants.OFFLINE_ADAPTER){
@@ -750,23 +753,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				log("Share option");
 				File previewFile = null;
 				if (adapterType == Constants.OFFLINE_ADAPTER){
-					String offlineDirectory;
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
+					File offline = getOfflineFolder(this, OFFLINE_DIR + File.separator + mOffListImages.get(positionG).getPath());
+					if (isFileAvailable(offline)) {
+						previewFile = new File(offline.getAbsolutePath(), mOffListImages.get(positionG).getName());
 					}
-					else{
-						offlineDirectory = getFilesDir().getPath();
-					}
-
-					String fileName = offlineDirectory + mOffListImages.get(positionG).getPath() + mOffListImages.get(positionG).getName();
-					previewFile = new File(fileName);
 				}else if (adapterType == Constants.ZIP_ADAPTER){
 					String fileName = paths.get(positionG);
 					previewFile = new File(fileName);
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 					if (MimeTypeList.typeForName(node.getName()).isGIF()){
-						String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+						String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
 						if (localPath != null) {
 							previewFile = new File(localPath);
 						}
@@ -1043,44 +1040,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			for(int i=0; i<mOffList.size();i++){
 				MegaOffline checkOffline = mOffList.get(i);
-				File offlineDirectory = null;
-				if(checkOffline.getOrigin()==MegaOffline.INCOMING){
-					log("isIncomingOffline");
-
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-						log("offlineDirectory: "+offlineDirectory);
-					}
-					else{
-						offlineDirectory = getFilesDir();
-					}
-				}
-				else if(checkOffline.getOrigin()==MegaOffline.INBOX){
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
-						log("offlineDirectory: "+offlineDirectory);
-					}
-					else{
-						offlineDirectory = getFilesDir();
-					}
-				}
-				else{
-					log("NOT isIncomingOffline");
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
-					}
-					else{
-						offlineDirectory = getFilesDir();
-					}
-				}
-
-				if(offlineDirectory!=null){
-					if (!offlineDirectory.exists()){
-						log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-						//dbH.removeById(mOffList.get(i).getId());
-						mOffList.remove(i);
-						i--;
-					}
+				File offlineFile = getOfflineFile(this, checkOffline);
+				if(!isFileAvailable(offlineFile)){
+					log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
+					mOffList.remove(i);
+					i--;
 				}
 			}
 
@@ -1088,21 +1052,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				if(!mOffList.isEmpty()) {
 					MegaOffline lastItem = mOffList.get(mOffList.size()-1);
 					if(!(lastItem.getHandle().equals("0"))){
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-						log("Export in: "+path);
-						File file= new File(path);
-						if(file.exists()){
-							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+						log("Export in: "+getExternalStoragePath(OLD_MK_FILE));
+						File file= buildExternalStorageFile(OLD_MK_FILE);
+						if(isFileAvailable(file)){
+							MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
 							mOffList.add(masterKeyFile);
 						}
 					}
 				}
 				else{
-					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-					log("Export in: "+path);
-					File file= new File(path);
-					if(file.exists()){
-						MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+					log("Export in: "+getExternalStoragePath(OLD_MK_FILE));
+					File file= buildExternalStorageFile(OLD_MK_FILE);
+					if(isFileAvailable(file)){
+						MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
 						mOffList.add(masterKeyFile);
 					}
 				}
@@ -1188,12 +1150,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 			File currentImage = new File(offlinePathDirectory);
 			File offlineDirectory = new File(currentImage.getParent());
-//			if (Environment.getExternalStorageDirectory() != null){
-//				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
-//			}
-//			else{
-//				offlineDirectory = getFilesDir();
-//			}
 
 			paths.clear();
 			int imageNumber = 0;
@@ -1485,7 +1441,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			});
 		}
 
-		downloadLocationDefaultPath = Util.getDownloadLocation(this);
+		downloadLocationDefaultPath = getDownloadLocation(this);
 
 	}
 
@@ -2706,11 +2662,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				Intent service = new Intent(this, DownloadService.class);
 				service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
 				service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR + "/";
-				File tempDownDirectory = new File(path);
-				if(!tempDownDirectory.exists()){
-					tempDownDirectory.mkdirs();
-				}
+				String path = getCacheFolder(context, TEMPORAL_FOLDER).getAbsolutePath();
 				service.putExtra(DownloadService.EXTRA_PATH, path);
 				service.putExtra("fromMV", true);
 				service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
@@ -3032,7 +2984,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		while (it.hasNext()){
 			MegaNode n = it.next();
 			if (n != null){
-				if (n.getHandle() == imageHandles.get(positionG)){
+				if (positionG < imageHandles.size() && n.getHandle() == imageHandles.get(positionG)){
 					thisNode = true;
 				}
 			}
@@ -3043,7 +2995,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			return;
 		}
 
-		if (imageHandles.get(positionG) != -1){
+		if (positionG < imageHandles.size() && imageHandles.get(positionG) != -1){
 			log("node updated");
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 		}
@@ -3052,7 +3004,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			return;
 		}
 
-		fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+		fileNameTextView.setText(node.getName());
 		supportInvalidateOptionsMenu();
 
 	}

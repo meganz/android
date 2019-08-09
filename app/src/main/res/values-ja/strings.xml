@@ -498,9 +498,9 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">あなたのサブスクリプションはキャンセルされていません。キャンセルの理由をご入力ください</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">このフォルダはプライベートになりました。</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">共有は解除されました。</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">新しいフォルダ</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">知り合いの追加</string>
@@ -539,7 +539,7 @@
     <string name="upload_prepare" context="Status text at the beginning of an upload">ファイルを処理しています</string>
     <plurals name="upload_prepare" context="Status text at the beginning of an upload">
         <item context="Status text at the beginning of an upload for 1 file" quantity="one">ファイルを処理しています</item>
-        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">ファイルの処理中</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">容量不足です。後でもう一度トライして下さい。</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">選択したファイルを開くことができません</string>
@@ -642,6 +642,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">メディアフォルダのファイルをアップロード</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -649,6 +651,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">ストレージ</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN ロック</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">動画圧縮は非常に電力を消費します。そのためMEGAは、圧縮される動画が%sよりも大きい場合、あなたの端末を充電するように通知いたします。</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">高度設定</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">キャッシュ消去</string>
@@ -698,6 +701,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">チャージ中のみ</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">ファイル名はデバイスと同じにする</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">ローカルカメラフォルダ</string>
@@ -727,7 +731,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">試行が10回失敗後、あなたのローカルファイルが削除され、あなたはログアウトされます。</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">コードの間違い</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PINコードが間違っています。もう一度お試しください。残りの試行回数は1回です</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">PINコードが間違っています。もう一度お試しください。残りの試行回数は%2d回です</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PINコードは一致しない</string>
@@ -999,6 +1003,8 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">ファイルリンクがありません</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">ファイルリングはToS/AUP違反により削除されました。</string>
 
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">このURLは破損しているか変形しています。アクセスしようとしているリンクは存在しません。</string>
+
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">メールの確認を待っています</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">メールを確認し、そこにあるリンクをクリックすると、あなたのアカウントにアクセス出来ます。</string>
 
@@ -1075,6 +1081,9 @@
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d件の連絡先が共有フォルダから正確に削除されました</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;また、%d件の連絡先は正常に削除されませんでした</string>
+
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">携帯電話からの連絡先を読み込み中&#8230;</string>
 
@@ -1338,6 +1347,7 @@
         <item context="Plural" quantity="other">%1$d/%2$dファイル</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">プロセスは終了しています&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">表示</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">全転送を一時停止</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">すべての転送を再開</string>
@@ -1469,7 +1479,7 @@
     <string name="alert_user_is_not_contact">このユーザーは連絡先ではありません</string>
 
     <string name="camera_uploads_cellular_connection">モバイル接続を使う</string>
-    <string name="camera_uploads_upload_videos">動画アップロード</string>
+    <string name="camera_uploads_upload_videos">動画をアップロード</string>
 
     <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">プロファイル画像が更新されました</string>
     <string name="error_changing_user_avatar_image_not_available" context="Message when an error ocurred when changing an user avatar">エラー。選択された画像が存在しません</string>
@@ -1788,7 +1798,8 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">チャットのアップロード</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">チャットメディアの品質</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">動画の品質</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">元の品質</item>
         <item context="the options of medium quality multimedia file to  upload.">中程度の品質</item>
@@ -2131,9 +2142,13 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">最小期間は7日間です。</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">最小期間は7日間で、あなたの最大期間は30日間です。</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">ファイル失効日は</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d日</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">以下のサイズを超えたら通知を受けます：</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">圧縮する動画が以下より大きい場合：</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">ごみ箱クリアスケジューラを無効にするか、より長い保存期間を設定するには、PROプランのご契約をしていただく必要がございます。</string>
 
@@ -2256,6 +2271,15 @@
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">最終ログインを表示&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">あなたの連絡先がMEGAであなたが最後に活動していた時間を見れるようにします。</string>
 
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">ストレージ容量が足りません</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">動画圧縮を実行するためのストレージ容量が足りません。</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">圧縮する動画の合計サイズが%sを超えています。続行するには端末をプラグで接続してください。</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
+	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">無効なフォルダが選択されました</string>
+
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">ファイル%dこ</item>
         <item context="Plural of file. 2 files" quantity="other">ファイル%dこ</item>
@@ -2308,7 +2332,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">カメラを有効にする</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">あなたのカメラへのアクセスを許可して、ドキュメントのスキャン、写真の撮影、ビデオ通話を行います。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">通話を有効にする</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">あなたのマイクへのアクセスを許可して、暗号化通話を行います。</string>
     <string name="general_enable_access" context="General enable access">アクセスを有効にする</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">共有ファイル</string>
@@ -2459,13 +2482,13 @@
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">チャットリンクを入力</string>
 
-    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
-    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
-    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
-    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">リンクを貼り付ける</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">ファイルまたはフォルダリンクが無効です</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">有効なファイルまたはフォルダのリンクをご入力ください</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">有効なチャットリンクをご入力ください</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">チャットリンクを貼り付けました。</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">連絡先リンクを貼り付けました。</string>
+    <string name="action_open_contact_link" context="Menu item">連絡先リンクを開く</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">このリンクを使用すると、人々はあなたのグループに参加できます。</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">新しいチャットリンク</string>
@@ -2484,8 +2507,8 @@
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s（保留中）</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">長押しすると録音し、離すと送信します。</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">スライドしてキャンセル</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">このボイスクリップは利用できません</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">スライドしてキャンセル</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">このボイスメッセージは利用できません</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d個のファイルがすでにダウンロードされました。&#160;</item>
@@ -2496,4 +2519,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d個のファイルが保留中です。</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%dファイルが保留中です。</item>
 	</plurals>
+
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">通話中にボイスメッセージの録音はできません。</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">ボイスメッセージをアップロードしようとしたときにエラーが発生しました。</string>
 </resources>
