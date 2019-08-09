@@ -14,16 +14,6 @@
         }
       },
       "oauth_client": [
-        {
-          "client_id": "268821755439-tdjso866kpts8fgh2qbjg6m9db8sihdu.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA0c1JwVioqS4TLZ2COIjYgmgYqeBvWIro"
-        }
-      ],
       "services": {
         "analytics_service": {
           "status": 1
