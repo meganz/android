@@ -8,6 +8,8 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.OfflineUtils.*;
+
 /*
 	 * Background task to clear offline files
 	 */
@@ -25,9 +27,9 @@ public class ClearOfflineTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
         log("doInBackground-Async Task ClearOfflineTask");
 
-        Util.clearOffline(context);
+        clearOffline(context);
         dbH.clearOffline();
-        String size = Util.getOfflineSize(context);
+        String size = getOfflineSize(context);
         return size;
     }
 
