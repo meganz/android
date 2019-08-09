@@ -35,13 +35,13 @@ public class FileUtils {
 
     public static final String MAIN_DIR = File.separator + "MEGA";
 
-    public static final String DOWNLOAD_DIR = File.separator + "MEGA" + File.separator + "MEGA Downloads";
+    public static final String DOWNLOAD_DIR = MAIN_DIR + File.separator + "MEGA Downloads";
 
-    public static final String LOG_DIR = File.separator + "MEGA" + File.separator + "MEGA Logs";
+    public static final String LOG_DIR = MAIN_DIR + File.separator + "MEGA Logs";
 
-    public static final String OLD_MK_FILE = File.separator + "MEGA" + File.separator + "MEGAMasterKey.txt";
+    public static final String OLD_MK_FILE = MAIN_DIR + File.separator + "MEGAMasterKey.txt";
 
-    public static final String RK_FILE = File.separator + "MEGA" + File.separator + "MEGARecoveryKey.txt";
+    public static final String RK_FILE = "MEGARecoveryKey.txt";
 
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
 

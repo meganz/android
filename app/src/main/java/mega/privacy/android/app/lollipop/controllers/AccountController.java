@@ -168,8 +168,6 @@ public class AccountController implements View.OnClickListener{
             return;
         }
 
-        boolean pathNull = false;
-
         String key = megaApi.exportMasterKey();
         if (context instanceof ManagerActivityLollipop) {
             megaApi.masterKeyExported((ManagerActivityLollipop) context);
@@ -181,10 +179,6 @@ public class AccountController implements View.OnClickListener{
 
         BufferedWriter out;
         try {
-            File mainDir = buildExternalStorageFile(MAIN_DIR);
-            log("Path main Dir: " + getExternalStoragePath(MAIN_DIR));
-            mainDir.mkdirs();
-
             log("Export in: "+path);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -242,7 +236,7 @@ public class AccountController implements View.OnClickListener{
     public void renameMK(){
         log("renameMK");
         File oldMKF = buildExternalStorageFile(OLD_MK_FILE);
-        File newMKFile = buildExternalStorageFile(RK_FILE);
+        File newMKFile = new File(oldMKF.getParentFile(), RK_FILE);
 
         oldMKF.renameTo(newMKFile);
     }
@@ -403,12 +397,6 @@ public class AccountController implements View.OnClickListener{
         removeFolder(context, cacheDir);
 
         removeOldTempFolders(context);
-
-        final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
-        if (isFileAvailable(fMKOld)){
-            log("Old MK file removed!");
-            fMKOld.delete();
-        }
 
         try{
             Intent cancelTransfersIntent = new Intent(context, DownloadService.class);
