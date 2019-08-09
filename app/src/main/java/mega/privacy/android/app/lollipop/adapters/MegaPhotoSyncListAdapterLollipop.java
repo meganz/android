@@ -117,6 +117,22 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		this.nodes = nodes;
 		notifyDataSetChanged();
 	}
+
+	public void setContext(Context context) {
+		this.context = context;
+	}
+
+	public Context getContext() {
+		return this.context;
+	}
+
+	public void setListFragment(RecyclerView listFragment) {
+		this.listFragment = listFragment;
+	}
+
+	public RecyclerView getListFragment() {
+		return this.listFragment;
+	}
 	
 	public void setPhotoSyncHandle(long photoSyncHandle){
 		this.photosyncHandle = photoSyncHandle;

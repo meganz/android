@@ -23,8 +23,8 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 
 public class MegaApiUtils {
@@ -260,6 +260,16 @@ public class MegaApiUtils {
 
         log("createStringTree: "+s);
         return s;
+    }
+
+    public static String getNodePath(Context context, MegaNode node) {
+        String path = MegaApiUtils.createStringTree(node, context);
+
+        if (path == null) {
+            return File.separator;
+        }
+
+        return File.separator + path;
     }
 
     public static ArrayList<MegaUser> getLastContactedUsers(Context context) {
