@@ -98,9 +98,9 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
-
 
 
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
@@ -577,7 +577,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 		EmojiCompat.init(config);
 		// clear the cache files stored in the external cache folder.
-        CacheFolderManager.clearPublicCache(this);
+        clearPublicCache(this);
 
 //		initializeGA();
 		

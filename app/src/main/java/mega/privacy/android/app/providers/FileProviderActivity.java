@@ -95,6 +95,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 
 @SuppressLint("NewApi") 
 public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
@@ -1177,12 +1179,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (hashes != null&&hashes.length>0){
 			for (long hash : hashes) {
 				MegaNode tempNode = megaApi.getNodeByHandle(hash);
-				String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), pathToDownload);
+				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize(), pathToDownload);
 				if(localPath != null){
 					try {
 						log("COPY_FILE");
 						File fileToShare = new File(pathToDownload, tempNode.getName());
-						Util.copyFile(new File(localPath), fileToShare);
+						copyFile(new File(localPath), fileToShare);
 
 						if(fileToShare.exists()){
 							Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", fileToShare);

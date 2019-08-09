@@ -357,6 +357,7 @@ public class Constants {
 
     public static final int FROM_INCOMING_SHARES = 140;
     public static final int FROM_INBOX = 150;
+    public static final int FROM_OTHERS = 0;
 
     public static final int SNACKBAR_TYPE = 0;
     public static final int MESSAGE_SNACKBAR_TYPE = 1;

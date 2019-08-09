@@ -39,7 +39,8 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.context;
 
 public class CallService extends Service implements MegaChatCallListenerInterface {
@@ -281,7 +282,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
 
     public Bitmap setProfileContactAvatar(long userHandle, String fullName, String email) {
         Bitmap bitmap = null;
-        File avatar = CacheFolderManager.buildAvatarFile(context, email + ".jpg");
+        File avatar = buildAvatarFile(context, email + ".jpg");
 
         if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
