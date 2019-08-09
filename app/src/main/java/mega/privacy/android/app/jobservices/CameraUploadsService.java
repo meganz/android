@@ -116,7 +116,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     
     private boolean isOverQuota = false;
     private boolean canceled;
-    private boolean pauseByNetworkStateChange;
+    private boolean stopByNetworkStateChange;
     
     private DatabaseHandler dbH;
     
@@ -233,9 +233,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         log("onTypeChanges: " + type);
         DatabaseHandler handler = DatabaseHandler.getDbHandler(this);
         MegaPreferences prefs = handler.getPreferences();
-        if(prefs != null) {
-            pauseByNetworkStateChange = type == MOBILE && Boolean.valueOf(prefs.getCamSyncWifi());
-            megaApi.pauseTransfers(pauseByNetworkStateChange);
+        if (prefs != null) {
+            stopByNetworkStateChange = type == MOBILE && Boolean.valueOf(prefs.getCamSyncWifi());
+            if (stopByNetworkStateChange) {
+                for (MegaTransfer transfer : cuTransfers) {
+                    megaApi.cancelTransfer(transfer, this);
+                }
+                stopped = true;
+                finish();
+            }
         }
     }
 
@@ -1195,7 +1201,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             lock.acquire();
         }
 
-        pauseByNetworkStateChange = false;
+        stopByNetworkStateChange = false;
         lastUpdated = 0;
         totalUploaded = 0;
         totalToUpload = 0;
