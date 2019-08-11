@@ -110,6 +110,15 @@ public class PinActivityLollipop extends BaseActivity {
         }
     }
 
+    protected void onSelectDownloadLocation(Intent intent,int resultCode) {
+	    if(resultCode == RESULT_OK) {
+            String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            log("select " + path + " as download location.");
+            DatabaseHandler.getDbHandler(this).setStorageDownloadLocation(path);
+            //TODO resume download with the new download location automatically?
+        }
+    }
+
 	public static void log(String message) {
 		Util.log("PinActivityLollipop", message);
 	}

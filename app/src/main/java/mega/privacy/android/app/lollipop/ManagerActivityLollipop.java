@@ -13607,10 +13607,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
         } else if (requestCode == Constants.REQUEST_CODE_TREE) {
             onRequestSDCardWritePermission(intent, resultCode);
-        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
-            String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            log("select " + path + " as download location.");
-            dbH.setStorageDownloadLocation(path);
+        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER) {
+            onSelectDownloadLocation(intent,resultCode);
         }
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			log("requestCode == REQUEST_CODE_SELECT_FILE");

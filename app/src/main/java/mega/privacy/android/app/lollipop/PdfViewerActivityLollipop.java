@@ -2373,10 +2373,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         } else if (requestCode == Constants.REQUEST_CODE_TREE) {
             onRequestSDCardWritePermission(intent, resultCode);
-        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
-            String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            log("select " + path + " as download location.");
-            dbH.setStorageDownloadLocation(path);
+        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER) {
+            onSelectDownloadLocation(intent,resultCode);
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             log("local folder selected");
