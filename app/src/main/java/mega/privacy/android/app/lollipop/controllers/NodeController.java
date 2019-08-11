@@ -43,6 +43,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
@@ -61,7 +62,14 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
+import static mega.privacy.android.app.utils.FileUtils.buildExternalStorageFile;
+import static mega.privacy.android.app.utils.FileUtils.copyFile;
+import static mega.privacy.android.app.utils.FileUtils.deleteFolderAndSubfolders;
+import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
 public class NodeController {
@@ -776,14 +784,22 @@ public class NodeController {
             // user uninstall the sd card. but default download location is still on the sd card
             if(SDCardOperator.isSDCardPath(parentPath)) {
                 log("select new path as download location.");
-                if(context instanceof Activity) {
-                    LocalFolderSelector.toFileStorageActivity((Activity) context);
+                if(context instanceof PinActivityLollipop) {
+                    LocalFolderSelector.toSelectFolder((PinActivityLollipop) context,context.getString(R.string.sdcard_unavailable));
                 }
                 return;
             }
         }
-        if(sdCardOperator != null) {
-            if(SDCardOperator.isSDCardPath(parentPath) && !new File(parentPath).canWrite()) {
+        if(sdCardOperator != null && SDCardOperator.isSDCardPath(parentPath)) {
+            //user has installed another sd card.
+            if(sdCardOperator.isNewSDCardPath(parentPath)) {
+                log("new sd card, check permission.");
+                showSnackbar(Constants.SNACKBAR_TYPE,context.getString(R.string.old_sdcard_unavailable));
+                showSelectDownloadLocationDialog(sdCardOperator);
+                return;
+            }
+            if(!new File(parentPath).canWrite()) {
+                log("init sd card root with document file.");
                 downloadToSDCard = true;
                 downloadRoot = sdCardOperator.getDownloadRoot();
                 try {
@@ -794,7 +810,6 @@ public class NodeController {
                 } catch (SDCardOperator.SDCardException e) {
                     e.printStackTrace();
                     log(e.getMessage());
-                    //TODO
                     //don't have permission with sd card root. need to request.
                     SDCardOperator.requestSDCardPermission(sdCardOperator.getSDCardRoot(), context, (Activity) context);
                     return;
@@ -1113,6 +1128,70 @@ public class NodeController {
                 }
                 showSnackbar(Constants.SNACKBAR_TYPE,msg);
             }
+        }
+    }
+
+    private void showSelectDownloadLocationDialog(final SDCardOperator sdCardOperator) {
+        Dialog downloadLocationDialog;
+        String[] sdCardOptions = context.getResources().getStringArray(R.array.settings_storage_download_location_array);
+        AlertDialog.Builder b = new AlertDialog.Builder(context);
+
+        b.setTitle(context.getResources().getString(R.string.settings_storage_download_location));
+        b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                log("onClick");
+                switch (which) {
+                    case 0: {
+                        toSelectFolder();
+                        break;
+                    }
+                    case 1: {
+                        log("get External Files");
+                        if (sdCardOperator != null) {
+                            String sdCardRoot = sdCardOperator.getSDCardRoot();
+                            //don't use DocumentFile
+                            if(sdCardOperator.canWriteWithFile()) {
+                                log("can operate sd card with file.");
+                                LocalFolderSelector.toSelectFolder((PinActivityLollipop) context,null);
+                            } else {
+                                if (prefs == null) {
+                                    prefs = dbH.getPreferences();
+                                }
+                                try {
+                                    sdCardOperator.initDocumentFileRoot(prefs);
+                                    log("operate sd card with document file.");
+                                    LocalFolderSelector.toSelectFolder((PinActivityLollipop) context,null);
+                                } catch (SDCardOperator.SDCardException e) {
+                                    e.printStackTrace();
+                                    log(e.getMessage());
+                                    //request sd card root request and write permission.
+                                    SDCardOperator.requestSDCardPermission(sdCardRoot,context, (Activity) context);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+        b.setNegativeButton(context.getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                log("Cancel dialog");
+                dialog.cancel();
+            }
+        });
+        downloadLocationDialog = b.create();
+        downloadLocationDialog.show();
+        log("downloadLocationDialog shown");
+    }
+
+    private void toSelectFolder() {
+        if(context instanceof PinActivityLollipop) {
+            LocalFolderSelector.toSelectFolder((PinActivityLollipop) context,null);
         }
     }
 

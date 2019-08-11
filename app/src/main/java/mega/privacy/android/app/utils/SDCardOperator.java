@@ -73,7 +73,11 @@ public class SDCardOperator {
                     throw new SDCardException("Permission required!");
                 }
             } catch (Exception e) {
-                throw new SDCardException("Invalid uri string.", e);
+                if(!(e instanceof SDCardException)) {
+                    throw new SDCardException("Invalid uri string.", e);
+                } else {
+                    throw e;
+                }
             }
         }
     }
@@ -84,6 +88,10 @@ public class SDCardOperator {
 
     public String getSDCardRoot() {
         return sdCardRoot;
+    }
+
+    public boolean isNewSDCardPath(String path) {
+        return !path.startsWith(sdCardRoot);
     }
 
     public static boolean isSDCardPath(String path) {

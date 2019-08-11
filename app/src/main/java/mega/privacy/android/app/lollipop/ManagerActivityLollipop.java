@@ -53,7 +53,6 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.provider.DocumentFile;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -197,12 +196,12 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LocalFolderSelector;
-import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.JobUtil;
+import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.ProgressDialogUtil;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -242,8 +241,18 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.createCacheFolders;
+import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
+import static mega.privacy.android.app.utils.FileUtils.OLD_MK_FILE;
+import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
+import static mega.privacy.android.app.utils.FileUtils.buildExternalStorageFile;
+import static mega.privacy.android.app.utils.FileUtils.createTemporalTextFile;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
 
@@ -254,7 +263,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	final int CAMERA_UPLOADS_BNV = 1;
 	final int CHAT_BNV = 2;
 	final int SHARED_BNV = 3;
-	final int OFFLINE_BNV = 4;
+    final int OFFLINE_BNV = 4;
 	final int HIDDEN_BNV = 5;
 	final int MEDIA_UPLOADS_BNV = 6;
 
@@ -13441,16 +13450,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return;
 		}
 
-		if (requestCode == Constants.REQUEST_CODE_TREE && resultCode == RESULT_OK){
-			if (intent == null){
-				log("intent NULL");
-				return;
-			}
-
-			Uri treeUri = intent.getData();
-	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
-		}
-		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
+        if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			if (intent == null) {
 				log("Return.....");
 				return;
@@ -13605,7 +13605,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				service.putExtra(DownloadService.EXTRA_PATH, tempFolder.getAbsolutePath());
 				startService(service);
 			}
-		} else if(requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
+        } else if (requestCode == Constants.REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode);
+        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
             String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             log("select " + path + " as download location.");
             dbH.setStorageDownloadLocation(path);

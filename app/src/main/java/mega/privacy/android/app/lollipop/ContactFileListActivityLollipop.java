@@ -1068,7 +1068,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				nC = new NodeController(this);
 			}
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
-		} else if(requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
+        } else if (requestCode == Constants.REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode);
+        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
             String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             log("select " + path + " as download location.");
             dbH.setStorageDownloadLocation(path);

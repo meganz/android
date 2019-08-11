@@ -104,7 +104,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	Handler handler = new Handler();
 
 	private static int REQUEST_DOWNLOAD_FOLDER = 1000;
-	private static int REQUEST_CODE_TREE_LOCAL_CAMERA = 1014;
+	private static int REQUEST_CODE_TREE_LOCAL_CAMERA = 1050;
 	private static int REQUEST_CAMERA_FOLDER = 2000;
 	private static int REQUEST_MEGA_CAMERA_FOLDER = 3000;
 	private static int REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER = 4000;
