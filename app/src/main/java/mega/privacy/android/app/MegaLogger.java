@@ -1,4 +1,3 @@
-
 package mega.privacy.android.app;
 
 import android.os.Environment;
@@ -9,6 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import mega.privacy.android.app.utils.Util;
 
@@ -20,11 +20,13 @@ import mega.privacy.android.app.utils.Util;
 public abstract class MegaLogger {
     protected File logFile;
     protected String dir, fileName;
-    
+    protected ConcurrentLinkedDeque<String> fileLogQueue;
+
     public MegaLogger(String fileName,boolean fileLogger) {
         logFile = null;
         dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
         this.fileName = fileName;
+        fileLogQueue = new ConcurrentLinkedDeque<>();
         logToFile();
     }
     
@@ -63,5 +65,29 @@ public abstract class MegaLogger {
         }
     }
 
-    protected abstract void logToFile();
+    //save logs to file in new thread
+    protected void logToFile() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    if (fileLogQueue == null) {
+                        fileLogQueue = new ConcurrentLinkedDeque<>();
+                    }
+
+                    String log = fileLogQueue.pollFirst();
+                    if (log != null) {
+                        writeToFile(log);
+                    } else {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+        thread.start();
+    }
 }

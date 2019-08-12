@@ -106,6 +106,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
@@ -801,11 +803,38 @@ public class Util {
         return fileLoggerKarere;
     }
 
-	/*
-	 * Global log handler
+	/**
+	 * Send a log message to the logging system.
+	 *
+	 * @param logLevel Log level for this message.
+	 * @param message  Message for the logging system.
+	 */
+	public static void log(int logLevel, String message) {
+		final int STACK_TRACE_LEVELS_UP = 3;
+
+		String filename = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getFileName();
+		String methodName = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getMethodName();
+		int line = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getLineNumber();
+
+		MegaApiAndroid.log(logLevel, "[clientApp]: " + message +
+				" (" + methodName + "::" + filename + ":" + line + ")");
+	}
+
+	/**
+	 * Send a log message to the logging system.
+	 *
+	 * @param origin  Origin of the log message.
+	 * @param message Message for the logging system.
 	 */
 	public static void log(String origin, String message) {
-		MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
+		final int STACK_TRACE_LEVELS_UP = 4;
+
+		String filename = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getFileName();
+		String methodName = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getMethodName();
+		int line = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getLineNumber();
+
+		MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp]: " + message +
+				" (" + methodName + "::" + filename + ":" + line + ")");
 
 //		try {
 //			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

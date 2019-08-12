@@ -1,39 +1,61 @@
 package mega.privacy.android.app;
 
-
 import android.util.Log;
 
-import java.util.concurrent.ConcurrentLinkedDeque;
-
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaLoggerInterface;
 
 
 public class AndroidLogger extends MegaLogger implements MegaLoggerInterface {
-    
+
     public static final String LOG_FILE_NAME = "logSDK.txt";
     private final String TAG = "AndroidLogger";
-    private ConcurrentLinkedDeque<String> sdkFileLogQueue;
-    
-    public AndroidLogger(String fileName,boolean fileLogger) {
-        super(fileName,fileLogger);
+
+    public AndroidLogger(String fileName, boolean fileLogger) {
+        super(fileName, fileLogger);
     }
 
-    @Override
-    public void log(String time,int logLevel,String source,String message) {
+    public void log(String time, int logLevel, String source, String message) {
         //display to console
         if (Util.DEBUG) {
-            Log.d(TAG,createMessage(source,time,message));
+            Log.d(TAG, createMessage(time, logLevel, source, message));
         }
 
         //save to log file
         if (isReadyToWriteToFile(Util.getFileLoggerSDK())) {
-            sdkFileLogQueue.add(createMessage(source,time,message));
+            fileLogQueue.add(createMessage(time, logLevel, source, message));
         }
     }
-    
+
     //create SDK specific log message
-    private String createMessage(String source,String time,String message) {
+    private String createMessage(String time, int logLevel, String source, String message) {
+
+        String logLevelMessage = "";
+        switch (logLevel) {
+            case MegaApiAndroid.LOG_LEVEL_DEBUG:
+                logLevelMessage = "DEB";
+                break;
+            case MegaApiAndroid.LOG_LEVEL_ERROR:
+                logLevelMessage = "ERR";
+                break;
+            case MegaApiAndroid.LOG_LEVEL_FATAL:
+                logLevelMessage = "FAT";
+                break;
+            case MegaApiAndroid.LOG_LEVEL_INFO:
+                logLevelMessage = "INF";
+                break;
+            case MegaApiAndroid.LOG_LEVEL_MAX:
+                logLevelMessage = "MAX";
+                break;
+            case MegaApiAndroid.LOG_LEVEL_WARNING:
+                logLevelMessage = "WRN";
+                break;
+            default:
+                logLevelMessage = "NON";
+                break;
+        }
+
         String sourceMessage = "";
         if (source != null) {
             String[] s = source.split("jni/mega");
@@ -45,36 +67,9 @@ public class AndroidLogger extends MegaLogger implements MegaLoggerInterface {
                 }
             }
         }
-        
-        sourceMessage = "[" + time + "] - " + sourceMessage + " - " + message + "\n";
-        
-        return sourceMessage;
-    }
 
-    //save logs to file in new thread
-    @Override
-    protected void logToFile() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    if (sdkFileLogQueue == null) {
-                        sdkFileLogQueue = new ConcurrentLinkedDeque<>();
-                    }
-                    
-                    String log = sdkFileLogQueue.pollFirst();
-                    if (log != null) {
-                        writeToFile(log);
-                    } else {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        });
-        thread.start();
+        return (sourceMessage == null || sourceMessage.isEmpty()) ?
+                "[" + time + "][" + logLevelMessage + "] " + message + "\n" :
+                "[" + time + "][" + logLevelMessage + "] " + message + " (" + sourceMessage + ")\n";
     }
 }
