@@ -689,6 +689,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	}
 
 	public void cancelPreviousAsyncTask() {
+//		megaApi.cancelSearch();
 		if (searchNodesTask != null) {
 			searchNodesTask.cancel(true);
 		}

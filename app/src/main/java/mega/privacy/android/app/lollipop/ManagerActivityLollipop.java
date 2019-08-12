@@ -4360,12 +4360,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
+		cancelSearch();
+
+    	super.onDestroy();
+	}
+
+	private void cancelSearch() {
 		sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
 		if (sFLol != null) {
 			sFLol.cancelPreviousAsyncTask();
 		}
-
-    	super.onDestroy();
 	}
 
 	void replaceFragment (Fragment f, String fTag) {
@@ -6297,7 +6301,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("onMenuItemActionCollapse()");
 				searchExpand = false;
 				if (drawerItem != DrawerItem.CHAT) {
-					backToDrawerItem(bottomNavigationCurrentItem);
+					cancelSearch();
+					drawerItem = searchDrawerItem;
+					selectDrawerItemLollipop(drawerItem);
 					textSubmitted = true;
 					changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
 					searchDrawerItem = null;
@@ -6323,6 +6329,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					supportInvalidateOptionsMenu();
 					log("Search query: " + query);
 					textSubmitted = true;
+					showFabButton();
 					searchExpand = false;
 				}
 				else {
@@ -17772,39 +17779,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				break;
 			}
-			case SEARCH:{
-                log("parentHandleSearch: "+parentHandleSearch);
-                if(levelsSearch<0){
-                    fabButton.setVisibility(View.GONE);
-                }
-                else{
-                    if(parentHandleSearch!=-1){
-                        MegaNode node = megaApi.getNodeByHandle(parentHandleSearch);
-                        if(node.isInShare()){
-                            log("Node is incoming folder");
-                            int accessLevel = megaApi.getAccess(node);
+			case SEARCH: {
+				log("parentHandleSearch: " + parentHandleSearch);
+				if (!textSubmitted
+						|| searchDrawerItem == DrawerItem.RUBBISH_BIN
+						|| searchDrawerItem == DrawerItem.INBOX
+						|| (searchDrawerItem == DrawerItem.SHARED_ITEMS && parentHandleSearch == -1)) {
+					fabButton.setVisibility(View.GONE);
+				} else if (parentHandleSearch == -1 && textSubmitted) {
+					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+					fabButton.setVisibility(View.VISIBLE);
+				} else if (parentHandleSearch != -1){
+					MegaNode node = megaApi.getNodeByHandle(parentHandleSearch);
+					if (node.isInShare()) {
+						log("Node is incoming folder");
+						int accessLevel = megaApi.getAccess(node);
 
-                            if(accessLevel== MegaShare.ACCESS_FULL||accessLevel== MegaShare.ACCESS_OWNER){
-                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                                fabButton.setVisibility(View.VISIBLE);
-                            }
-                            else if(accessLevel== MegaShare.ACCESS_READWRITE){
-                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                                fabButton.setVisibility(View.VISIBLE);
-                            }
-                            else{
-                                fabButton.setVisibility(View.GONE);
-                            }
-                        }
-                        else{
-                            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                            fabButton.setVisibility(View.VISIBLE);
-                        }
-                    }
-                    else{
-                        fabButton.setVisibility(View.GONE);
-                    }
-                }
+						if (accessLevel == MegaShare.ACCESS_FULL || accessLevel == MegaShare.ACCESS_OWNER || accessLevel == MegaShare.ACCESS_READWRITE) {
+							lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+							fabButton.setVisibility(View.VISIBLE);
+						} else {
+							fabButton.setVisibility(View.GONE);
+						}
+					} else {
+						lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+						fabButton.setVisibility(View.VISIBLE);
+					}
+				}
 				break;
 			}
 			default:{
