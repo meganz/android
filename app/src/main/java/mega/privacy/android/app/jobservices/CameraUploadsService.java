@@ -83,6 +83,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private static final String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
     private static final String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
     private static final String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
+    private static final int BATTERY_STATE_LOW = 20;
     private static final int LOW_BATTERY_LEVEL = 20;
     public static String PHOTO_SYNC = "PhotoSync";
     public static String CAMERA_UPLOADS = "Camera Uploads";
@@ -166,7 +167,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private long currentVideoTimeStamp = 0;
     private long secondaryVideoTimeStamp = 0;
     private Notification mNotification;
-    private Intent mIntent;
+    private Intent mIntent, batteryIntent;
     private PendingIntent mPendingIntent;
     private String tempRoot;
     private Context mContext;
@@ -185,17 +186,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver(){
         @Override
         public void onReceive(Context context, Intent intent) {
-            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-
-            log("device batter level is " + level);
-            if(level < LOW_BATTERY_LEVEL && !Util.isCharging(CameraUploadsService.this)){
+            batteryIntent = intent;
+            if(isDeviceLowOnBattery(batteryIntent)){
                 stopped = true;
                 if(megaApi != null){
                     for(MegaTransfer transfer : cuTransfers) {
                         megaApi.cancelTransfer(transfer);
                     }
                 }
-                cancelNotification();
                 finish();
             }
         }
@@ -871,7 +869,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             finish();
             return 1;
         }
-        
+
+        if (isDeviceLowOnBattery(batteryIntent)) {
+            return BATTERY_STATE_LOW;
+        }
+
         prefs = dbH.getPreferences();
         if (prefs == null) {
             log("Not defined, so not enabled");
@@ -1332,7 +1334,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     
     private void cancelNotification() {
         if (mNotificationManager != null) {
-            log("cancelling notification id is " + notificationChannelId);
+            log("cancelling notification id is " + notificationId);
             mNotificationManager.cancel(notificationId);
         } else {
             log("no notification to cancel");
@@ -1736,7 +1738,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         totalUploaded = 0;
         totalToUpload = 0;
-        
+
         mVideoCompressor = new VideoCompressor(this,this);
         mVideoCompressor.setPendingList(fullList);
         mVideoCompressor.setOutputRoot(tempRoot);
@@ -2167,5 +2169,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if(dbH == null){
             dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         }
+    }
+
+    private boolean isDeviceLowOnBattery(Intent intent){
+        if(intent == null){
+            return false;
+        }
+        int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        log("device batter level is " + level);
+        return level <= LOW_BATTERY_LEVEL && !Util.isCharging(CameraUploadsService.this);
     }
 }
