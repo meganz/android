@@ -18339,35 +18339,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		if(call!=null){
-			if(call.getChatid() != -1){
-				if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
-					int callStatus = call.getStatus();
-					log("onChatCallUpdate:CHANGE_TYPE_STATUS: callStatus =  "+callStatus);
+		if (call == null || call.getChatid() == -1) return;
+		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
+			int callStatus = call.getStatus();
+			log("onChatCallUpdatecallStatus =  " + callStatus);
 
-					switch (callStatus) {
-						case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-						case MegaChatCall.CALL_STATUS_RING_IN:
-						case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-						case MegaChatCall.CALL_STATUS_DESTROYED:
-						case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
-							setCallBadge();
-							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-							if ((rChatFL != null) && (rChatFL.isVisible())){
-								rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
-							}
-
-							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-							if ((fbFLol != null) && (fbFLol.isVisible())){
-								fbFLol.showCallLayout();
-							}
-							break;
-						}
-
-						default:
-							break;
+			switch (callStatus) {
+				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+				case MegaChatCall.CALL_STATUS_RING_IN:
+				case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+				case MegaChatCall.CALL_STATUS_DESTROYED:
+				case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+					setCallBadge();
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+					if ((rChatFL != null) && (rChatFL.isVisible())) {
+						rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
 					}
+
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+					if ((fbFLol != null) && (fbFLol.isVisible())) {
+						fbFLol.showCallLayout();
+					}
+					break;
 				}
+				default:
+					break;
 			}
 		}
 	}

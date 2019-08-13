@@ -42,11 +42,8 @@ public class PinActivityLollipop extends BaseActivity {
 				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
 			}
 		}
-
 		PinUtil.pause(this);
-
 		MegaApplication.activityPaused();
-
 		super.onPause();
 	}
 	
