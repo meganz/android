@@ -125,7 +125,6 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LocalFolderSelector;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -156,10 +155,15 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
-import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.FileUtils.OLD_MK_FILE;
+import static mega.privacy.android.app.utils.FileUtils.buildExternalStorageFile;
+import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtils.getExternalStoragePath;
+import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
+public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface {
 
     boolean fromChatSavedInstance = false;
@@ -3293,12 +3297,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
             }
-        } else if(requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER) {
-            onSelectDownloadLocation(intent,resultCode);
+        } else if (requestCode == Constants.REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, nC);
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             log("local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            dbH.setStorageDownloadLocation(parentPath);
             if (adapterType == Constants.FILE_LINK_ADAPTER){
                 if (nC == null) {
                     nC = new NodeController(this);

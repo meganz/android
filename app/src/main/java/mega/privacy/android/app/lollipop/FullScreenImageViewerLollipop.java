@@ -86,7 +86,6 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -118,7 +117,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
+public class FullScreenImageViewerLollipop extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
 
 	int[] screenPosition;
 	int mLeftDelta;
@@ -193,7 +192,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
-	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
 
 	MegaNode node;
@@ -2609,10 +2607,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			return;
 		}
 
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			if(adapterType == Constants.FILE_LINK_ADAPTER){
 				String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+                dbH.setStorageDownloadLocation(parentPath);
 				if (nC == null) {
 					nC = new NodeController(this);
 				}
@@ -2620,6 +2619,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			else{
 				String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+                dbH.setStorageDownloadLocation(parentPath);
 				String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 				long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 				long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
@@ -2632,9 +2632,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				nC.checkSizeBeforeDownload(parentPath, url, size, hashes, highPriority);
 			}
         } else if (requestCode == Constants.REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode);
-        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER) {
-            onSelectDownloadLocation(intent,resultCode);
+            onRequestSDCardWritePermission(intent, resultCode, nC);
         }
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 

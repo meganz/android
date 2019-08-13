@@ -198,7 +198,6 @@ import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.JobUtil;
-import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ProgressDialogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -256,7 +255,7 @@ import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
 	final int CLOUD_DRIVE_BNV = 0;
@@ -13606,9 +13605,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				startService(service);
 			}
         } else if (requestCode == Constants.REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode);
-        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER) {
-            onSelectDownloadLocation(intent,resultCode);
+            onRequestSDCardWritePermission(intent, resultCode, nC);
         }
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			log("requestCode == REQUEST_CODE_SELECT_FILE");
@@ -13907,6 +13904,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            dbH.setStorageDownloadLocation(parentPath);
 			log("parentPath: "+parentPath);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			log("url: "+url);

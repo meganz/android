@@ -1,0 +1,51 @@
+package mega.privacy.android.app.utils;
+
+import java.util.Arrays;
+
+public class DownloadInfo {
+
+    private boolean highPriority;
+
+    private long size;
+
+    private long[] hashes;
+
+    public DownloadInfo(boolean highPriority, long size, long[] hashes) {
+        this.highPriority = highPriority;
+        this.size = size;
+        this.hashes = hashes;
+    }
+
+    @Override
+    public String toString() {
+        return "DownloadInfo{" +
+                "highPriority=" + highPriority +
+                ", size=" + size +
+                ", hashes=" + Arrays.toString(hashes) +
+                '}';
+    }
+
+    public boolean isHighPriority() {
+        return highPriority;
+    }
+
+    public void setHighPriority(boolean highPriority) {
+        this.highPriority = highPriority;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public long[] getHashes() {
+        return hashes;
+    }
+
+    public void setHashes(long[] hashes) {
+        this.hashes = hashes;
+    }
+}

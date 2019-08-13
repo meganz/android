@@ -82,7 +82,6 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -118,7 +117,7 @@ import static mega.privacy.android.app.utils.Util.context;
 
 
 @SuppressLint("NewApi")
-public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
 
 	ContactController cC;
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
@@ -1405,10 +1404,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
 				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
 			}
-        } else if (requestCode == Constants.REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode);
-        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER) {
-            onSelectDownloadLocation(intent,resultCode);
+        }
+		else if (requestCode == Constants.REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode,nC);
         }
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			log("requestCode == REQUEST_CODE_SELECT_FILE");
@@ -1435,6 +1433,27 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				megaChatApi.createChat(false, peers, listener);
 			}
 		}
+        else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+            log("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
+            if (intent == null) {
+                log("Return.....");
+                return;
+            }
+
+            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            dbH.setStorageDownloadLocation(parentPath);
+            log("parentPath: "+parentPath);
+            String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
+            log("url: "+url);
+            long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
+            log("size: "+size);
+            long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+            log("hashes size: "+hashes.length);
+
+            boolean highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false);
+
+            nC.checkSizeBeforeDownload(parentPath, url, size, hashes, highPriority);
+        }
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
 			log("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 

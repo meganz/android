@@ -95,7 +95,6 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -125,7 +124,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EX
 import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
 import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
 
-public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
+public class PdfViewerActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
 
     int[] screenPosition;
     int mLeftDelta;
@@ -2372,13 +2371,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 }
             }
         } else if (requestCode == Constants.REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode);
-        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER) {
-            onSelectDownloadLocation(intent,resultCode);
+            onRequestSDCardWritePermission(intent, resultCode, nC);
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             log("local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            dbH.setStorageDownloadLocation(parentPath);
             if (type == Constants.FILE_LINK_ADAPTER){
                 if (nC == null) {
                     nC = new NodeController(this);

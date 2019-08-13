@@ -83,7 +83,6 @@ import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionList
 import mega.privacy.android.app.lollipop.listeners.FileContactMultipleRequestListener;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -117,7 +116,7 @@ import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 
 @SuppressLint("NewApi")
-public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
+public class FileInfoActivityLollipop extends DownloadableActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 
 	public static int MAX_WIDTH_FILENAME_LAND=400;
 	public static int MAX_WIDTH_FILENAME_LAND_2=400;
@@ -271,7 +270,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	public static int REQUEST_CODE_SELECT_CONTACT = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
-	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
 	Display display;
 	DisplayMetrics outMetrics;
@@ -2534,9 +2532,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			return;
 		}
 
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            dbH.setStorageDownloadLocation(parentPath);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
@@ -2548,9 +2547,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             }
             nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
         } else if (requestCode == Constants.REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode);
-        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER) {
-            onSelectDownloadLocation(intent,resultCode);
+            onRequestSDCardWritePermission(intent, resultCode, nC);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 

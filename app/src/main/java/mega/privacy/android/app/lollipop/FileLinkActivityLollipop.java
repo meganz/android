@@ -54,7 +54,6 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LocalFolderSelector;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
@@ -67,7 +66,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class FileLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener {
+public class FileLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener {
 	
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -855,6 +854,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            dbH.setStorageDownloadLocation(parentPath);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
@@ -863,9 +863,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			NodeController nC = new NodeController(this);
 			nC.downloadTo(document, parentPath, url);
         } else if (requestCode == Constants.REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode);
-        } else if (requestCode == LocalFolderSelector.REQUEST_DOWNLOAD_FOLDER) {
-            onSelectDownloadLocation(intent,resultCode);
+            onRequestSDCardWritePermission(intent, resultCode, null);
         }
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!Util.isOnline(this)) {
