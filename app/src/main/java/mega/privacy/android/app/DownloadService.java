@@ -49,7 +49,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1548,7 +1547,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                             sdCardOperator.initDocumentFileRoot(dbH.getPreferences());
                             File source = new File(path);
                             path = sdCardOperator.move(targetPath,source);
-                            TL.log(this, "@#@", "new path is: " + path);
                             File newFile = new File(path);
                             if(newFile.exists() && newFile.length() == source.length()) {
                                 source.delete();

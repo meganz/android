@@ -11,7 +11,6 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DownloadInfo;
 import mega.privacy.android.app.utils.SDCardOperator;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 
 public class DownloadableActivity extends PinActivityLollipop {
@@ -41,7 +40,6 @@ public class DownloadableActivity extends PinActivityLollipop {
                 DatabaseHandler.getDbHandler(this).setUriExternalSDCard(treeUri.toString());
                 try {
                     SDCardOperator sdCardOperator = new SDCardOperator(this);
-                    TL.log(this, "@#@", downloadInfo);
                     if (nC != null && downloadInfo != null) {
                         nC.requestLocalFolder(downloadInfo, sdCardOperator.getSDCardRoot(), null);
                     }
