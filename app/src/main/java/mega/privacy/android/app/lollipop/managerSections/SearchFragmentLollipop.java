@@ -81,44 +81,42 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	public static ImageView imageDrag;
 
-	Context context;
-	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
-	FastScroller fastScroller;
+	private Context context;
+	private RecyclerView recyclerView;
+	private LinearLayoutManager mLayoutManager;
+	private CustomizedGridLayoutManager gridLayoutManager;
+	private FastScroller fastScroller;
 
-	ImageView emptyImageView;
-	LinearLayout emptyTextView;
-	TextView emptyTextViewFirst;
+	private ImageView emptyImageView;
+	private LinearLayout emptyTextView;
+	private TextView emptyTextViewFirst;
 
-    MegaNodeAdapter adapter;
-	SearchFragmentLollipop searchFragment = this;
-	ProgressBar progressBar;
-	MegaApiAndroid megaApi;
-	RelativeLayout transfersOverViewLayout;
+	private MegaNodeAdapter adapter;
+	private ProgressBar progressBar;
+	private MegaApiAndroid megaApi;
+	private RelativeLayout transfersOverViewLayout;
 
-	Stack<Integer> lastPositionStack;
+	private Stack<Integer> lastPositionStack;
 
     private MenuItem trashIcon;
 
-	ArrayList<MegaNode> nodes = new ArrayList<>();
+	private ArrayList<MegaNode> nodes = new ArrayList<>();
 
 	private ActionMode actionMode;
-	
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
 
-	boolean allFiles = true;
-	DatabaseHandler dbH;
-	MegaPreferences prefs;
-	String downloadLocationDefaultPath;
+	private DisplayMetrics outMetrics;
+	private Display display;
 
-	boolean multiselectBoolean=false;
+	private boolean allFiles = true;
+	private DatabaseHandler dbH;
+	private MegaPreferences prefs;
+	private String downloadLocationDefaultPath;
+
+	private boolean multiselectBoolean=false;
 
     private int placeholderCount;
 
-	public NewHeaderItemDecoration headerItemDecoration;
+	private NewHeaderItemDecoration headerItemDecoration;
 
 	private SearchNodesTask searchNodesTask;
 	private RelativeLayout contentLayout;
@@ -131,6 +129,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	public void activateActionMode(){
 		log("activateActionMode");
+
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -570,7 +569,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
 
 		((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH);
 
@@ -1452,4 +1450,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		multiselectBoolean = option;
 	}
 
+	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
+		this.headerItemDecoration = headerItemDecoration;
+	}
 }

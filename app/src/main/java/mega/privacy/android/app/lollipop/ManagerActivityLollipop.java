@@ -244,6 +244,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
@@ -4403,14 +4404,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				((OutgoingSharesFragmentLollipop) f).headerItemDecoration = null;
 			}
 			else if (fTag.equals(FragmentTag.OFFLINE.getTag())) {
-				((OfflineFragmentLollipop) f).headerItemDecoration = null;
+				((OfflineFragmentLollipop) f).setHeaderItemDecoration(null);
 				((OfflineFragmentLollipop) f).setPathNavigation(pathNavigationOffline);
 			}
 			else if (fTag.equals(FragmentTag.INBOX.getTag())) {
 				((InboxFragmentLollipop) f).headerItemDecoration = null;
 			}
 			else if (fTag.equals(FragmentTag.SEARCH.getTag())) {
-				((SearchFragmentLollipop) f).headerItemDecoration = null;
+				((SearchFragmentLollipop) f).setHeaderItemDecoration(null);
 			}
 
 			ft.attach(f);
@@ -5628,12 +5629,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (oFLol == null){
 					log("New OfflineFragment");
     				oFLol = new OfflineFragmentLollipop();
-//    				oFLol.setPathNavigation("/");
-    			}
-    			else{
-					log("OfflineFragment exist");
-//    				oFLol.setPathNavigation("/");
-					oFLol.findNodes();
     			}
 
 				tabLayoutContacts.setVisibility(View.GONE);
@@ -6274,13 +6269,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_manager, menu);
-//	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 
 		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
 		searchMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
 
-		searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+		searchView = (SearchView) searchMenuItem.getActionView();
 
 		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
 		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
@@ -6293,13 +6287,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			searchView.setIconifiedByDefault(true);
 		}
 
-		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+		searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				log("onMenuItemActionExpand");
 				searchQuery = "";
 				searchExpand = true;
-				if (drawerItem != DrawerItem.CHAT) {
+				if (drawerItem != DrawerItem.CHAT && drawerItem != DrawerItem.SAVED_FOR_OFFLINE) {
 					textsearchQuery = false;
 					firstNavigationLevel = true;
 					parentHandleSearch = -1;
@@ -6314,27 +6308,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public boolean onMenuItemActionCollapse(MenuItem item) {
 				log("onMenuItemActionCollapse()");
 				searchExpand = false;
-				if (drawerItem != DrawerItem.CHAT) {
-					cancelSearch();
-					textSubmitted = true;
-					closeSearchSection();
-				}
-				else {
+				if (drawerItem == DrawerItem.CHAT) {
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if (rChatFL != null) {
 						rChatFL.closeSearch();
 						supportInvalidateOptionsMenu();
 					}
+				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+					if (oFLol != null) {
+						oFLol.closeSearch();
+						supportInvalidateOptionsMenu();
+					}
+				} else {
+					cancelSearch();
+					textSubmitted = true;
+					closeSearchSection();
 				}
 				return true;
 			}
 		});
+
 		searchView.setMaxWidth(Integer.MAX_VALUE);
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 				log("onQueryTextSubmit: "+query);
-				if (drawerItem != DrawerItem.CHAT) {
+				if (drawerItem == DrawerItem.CHAT || drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					hideKeyboard(managerActivity, 0);
+				} else {
 					searchQuery = "" + query;
 					setToolbarTitle();
 					supportInvalidateOptionsMenu();
@@ -6343,37 +6345,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					showFabButton();
 					searchExpand = false;
 				}
-				else {
-					Util.hideKeyboard(managerActivity, 0);
-				}
 				return true;
 			}
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
 				log("onQueryTextChange");
-				if (drawerItem != DrawerItem.CHAT) {
+				if (drawerItem == DrawerItem.CHAT) {
+					searchQuery = newText;
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+					if (rChatFL != null) {
+						rChatFL.filterChats(newText);
+					}
+				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					searchQuery = newText;
+					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+					if (oFLol != null) {
+						oFLol.filterOffline(newText);
+					}
+				} else {
 					sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
 					if (textSubmitted) {
 						if (sFLol != null) {
 							sFLol.setAllowedMultiselect(true);
 						}
 						textSubmitted = false;
-					}
-					else {
+					} else {
 						if (!textsearchQuery) {
 							searchQuery = newText;
 						}
 						if (sFLol != null) {
 							sFLol.newSearchNodesTask();
 						}
-					}
-				}
-				else {
-					searchQuery = newText;
-					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-					if (rChatFL != null) {
-						rChatFL.filterChats(newText);
 					}
 				}
 				return true;
@@ -10360,7 +10363,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				Util.hideKeyboard(managerActivity, InputMethodManager.HIDE_NOT_ALWAYS);
+				hideKeyboard(managerActivity, InputMethodManager.HIDE_NOT_ALWAYS);
 			}
 		});
 
@@ -10794,7 +10797,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public void afterTextChanged(Editable s) {
 				if (sixthPin.length()!=0){
 					sixthPin.setCursorVisible(true);
-					Util.hideKeyboard(managerActivity, 0);
+					hideKeyboard(managerActivity, 0);
 
 					if (pinLongClick) {
 						pasteClipboard();
@@ -10932,7 +10935,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void permitVerify(int type){
 		log("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			Util.hideKeyboard(managerActivity, 0);
+			hideKeyboard(managerActivity, 0);
 			if (sb.length()>0) {
 				sb.delete(0, sb.length());
 			}
@@ -15977,7 +15980,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The change link has been sent");
-				Util.hideKeyboard(managerActivity, 0);
+				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -15985,7 +15988,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXIST){
 				log("The new mail already exists");
-				Util.hideKeyboard(managerActivity, 0);
+				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -15999,7 +16002,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				log("Error when asking for change mail link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.hideKeyboard(managerActivity, 0);
+				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -16066,7 +16069,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("cancelation link received!");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.hideKeyboard(managerActivity, 0);
+				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -16080,7 +16083,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				log("Error when asking for the cancelation link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.hideKeyboard(managerActivity, 0);
+				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()){
 					verify2FADialog.dismiss();
 				}
@@ -16588,7 +16591,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sttFLol.update2FAPreference(false);
 					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.label_2fa_disabled), -1);
 				}
-				Util.hideKeyboard(managerActivity, 0);
+				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null) {
 					verify2FADialog.dismiss();
 				}
@@ -16598,7 +16601,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				verifyShowError();
 			}
 			else {
-				Util.hideKeyboard(managerActivity, 0);
+				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null) {
 					verify2FADialog.dismiss();
 				}
@@ -17839,7 +17842,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		switch (searchDrawerItem) {
 			case RUBBISH_BIN:
 			case INBOX:
-			case SAVED_FOR_OFFLINE:
 				return false;
 			case CLOUD_DRIVE:
 				return true;
