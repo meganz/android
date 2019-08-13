@@ -323,6 +323,14 @@ public class NodeController {
     }
 
     public void prepareForDownload(ArrayList<Long> handleList, boolean highPriority) {
+        //check permission first.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                askForPermissions();
+                return;
+            }
+        }
         prepareForDownloadLollipop(handleList, highPriority);
     }
 
@@ -709,13 +717,6 @@ public class NodeController {
                     SDCardOperator.requestSDCardPermission(sdRoot, context, (Activity) context);
                     return;
                 }
-            }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission && !downloadToSDCard) {
-                askForPermissions();
             }
         }
 
