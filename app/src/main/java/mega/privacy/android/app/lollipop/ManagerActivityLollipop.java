@@ -252,6 +252,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	private final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
 	private final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
+	private final String OFFLINE_SEARCH_PATHS = "OFFLINE_SEARCH_PATHS";
+	public static final String OFFLINE_SEARCH_QUERY = "OFFLINE_SEARCH_QUERY:";
 
 	final int CLOUD_DRIVE_BNV = 0;
 	final int CAMERA_UPLOADS_BNV = 1;
@@ -465,7 +467,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	ViewPager viewPagerTransfers;
 
 	boolean firstTimeAfterInstallation = true;
-//	String pathNavigation = "/";
+	private ArrayList<String> offlineSearchPaths = new ArrayList<>();
 	SearchView searchView;
 	public boolean searchExpand = false;
 	public String searchQuery = "";
@@ -1750,6 +1752,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
+		outState.putStringArrayList(OFFLINE_SEARCH_PATHS, offlineSearchPaths);
 		if(searchQuery!=null){
 			outState.putInt("levelsSearch", levelsSearch);
 			outState.putString("searchQuery", searchQuery);
@@ -1845,6 +1848,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			accountFragment = savedInstanceState.getInt("accountFragment", -1);
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
+			offlineSearchPaths = savedInstanceState.getStringArrayList(OFFLINE_SEARCH_PATHS);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
@@ -6334,8 +6338,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 				log("onQueryTextSubmit: "+query);
-				if (drawerItem == DrawerItem.CHAT || drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+				if (drawerItem == DrawerItem.CHAT) {
 					hideKeyboard(managerActivity, 0);
+				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					searchQuery = "" + query;
+					addOfflineSearchPath(OFFLINE_SEARCH_QUERY + searchQuery);
+					hideKeyboard(managerActivity, 0);
+					setToolbarTitle();
+					supportInvalidateOptionsMenu();
 				} else {
 					searchQuery = "" + query;
 					setToolbarTitle();
@@ -12868,12 +12878,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 		if (oFLol != null){
 			oFLol.setOrder(orderOthers);
-			if (orderOthers == MegaApiJava.ORDER_DEFAULT_ASC){
-				oFLol.sortByNameAscending();
-			}
-			else{
-				oFLol.sortByNameDescending();
-			}
 		}
 	}
 
@@ -18849,6 +18853,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		searchSharedTab = getTabItemShares();
 
 		drawerItem = DrawerItem.SEARCH;
+	}
+
+	public String getOfflineSearchPath() {
+		if (isOfflineSearchPathEmpty()) return null;
+
+		return offlineSearchPaths.get(offlineSearchPaths.size() - 1);
+	}
+
+	public void addOfflineSearchPath(String path) {
+		if (offlineSearchPaths == null) {
+			offlineSearchPaths = new ArrayList<>();
+		}
+		offlineSearchPaths.add(path);
+	}
+
+	public void removeOfflineSearchPath() {
+		if (isOfflineSearchPathEmpty()) return;
+
+		offlineSearchPaths.remove(offlineSearchPaths.size() - 1);
+	}
+
+	public boolean isOfflineSearchPathEmpty() {
+		if (offlineSearchPaths == null || offlineSearchPaths.isEmpty()) {
+			return true;
+		}
+
+		return false;
 	}
 
     public DrawerItem getSearchDrawerItem(){

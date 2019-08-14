@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,8 +71,10 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OFFLINE_SEARCH_QUERY;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.SortUtil.*;
 
 public class OfflineFragmentLollipop extends RotatableFragment{
 
@@ -518,7 +519,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	    display.getMetrics(outMetrics);
 
 	    View v;
-	    int viewType;
 
 		if (((ManagerActivityLollipop)context).isList){
 			log("onCreateList");
@@ -529,7 +529,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			emptyImageView = v.findViewById(R.id.offline_empty_image);
 			emptyTextView = v.findViewById(R.id.offline_empty_text);
 			emptyTextViewFirst = v.findViewById(R.id.offline_empty_text_first);
-			viewType = MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST;
 		} else{
 			log("onCreateGRID");
 			v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
@@ -539,19 +538,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			emptyImageView = v.findViewById(R.id.offline_empty_image_grid);
 			emptyTextView = v.findViewById(R.id.offline_empty_text_grid);
 			emptyTextViewFirst = v.findViewById(R.id.offline_empty_text_grid_first);
-			viewType = MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
 		}
 
-		if (adapter == null){
-			adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, viewType);
-			adapter.setPositionClicked(-1);
-			adapter.setMultipleSelect(false);
-			recyclerView.setAdapter(adapter);
-		}
-		else{
-			adapter.setRecylerView(recyclerView);
-		}
-
+		setAdapter();
+		recyclerView.setAdapter(adapter);
 		recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 		recyclerView.setClipToPadding(false);
 		recyclerView.removeItemDecoration(headerItemDecoration);
@@ -566,7 +556,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 		});
 
-		findNodes();
+		mOffList = dbH.findByPath(pathNavigation);
 
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			emptyImageView.setImageResource(R.drawable.offline_empty_landscape);
@@ -590,255 +580,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 		emptyTextViewFirst.setText(result);
 
-		setLayoutVisibility();
+		setNodes(mOffList);
 		return v;
-	}
-
-	public void findNodes(){
-		log("findNodes");
-
-		if((getActivity() == null) || (!isAdded())){
-			log("Fragment NOT Attached!");
-			return;
-		}
-
-		mOffList=dbH.findByPath(pathNavigation);
-
-		log("Number of elements: "+mOffList.size());
-
-		for(int i=0; i<mOffList.size();i++){
-
-			MegaOffline checkOffline = mOffList.get(i);
-			File offlineFile = getOfflineFile(context, checkOffline);
-			if (!isFileAvailable(offlineFile)) {
-				mOffList.remove(i);
-				i--;
-			}
-		}
-		addSectionTitle(mOffList);
-
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
-
-		if(adapter!=null){
-			adapter.setNodes(mOffList);
-			adapter.setPositionClicked(-1);
-			adapter.setMultipleSelect(false);
-			setLayoutVisibility();
-		}
-	}
-
-	public void sortByNameDescending(){
-		log("sortByNameDescending");
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
-		
-		//Remove MK before sorting
-		if(mOffList.size()>0){
-			MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-			if(lastItem.getHandle().equals("0")){
-				mOffList.remove(mOffList.size()-1);
-			}
-		}		
-		else{
-			return;
-		}
-		
-		for(int k = 0; k < mOffList.size() ; k++) {
-			MegaOffline node = mOffList.get(k);
-			if(node.getType().equals("1")){
-				foldersOrder.add(node.getName());
-			}
-			else{
-				filesOrder.add(node.getName());
-			}
-		}		
-	
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(foldersOrder);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(filesOrder);
-
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = foldersOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));
-				}				
-			}
-		}
-		
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = filesOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));					
-				}				
-			}
-		}
-		
-		mOffList.clear();
-		mOffList.addAll(tempOffline);
-		if (adapter!= null) {
-			adapter.setNodes(mOffList);
-		}
-//		contentText.setText(getInfoFolder(mOffList));
-	}
-    
-    
-    public void sortByNameAscending() {
-		log("sortByNameAscending");
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
-		
-		//Remove MK before sorting
-		if(mOffList.size()>0){
-			MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-			if(lastItem.getHandle().equals("0")){
-				mOffList.remove(mOffList.size()-1);
-			}
-		}		
-		else{
-			return;
-		}
-				
-		for(int k = 0; k < mOffList.size() ; k++) {
-			MegaOffline node = mOffList.get(k);
-			if(node == null) {
-			    continue;
-            }
-			if(node.getType().equals("1")){
-				foldersOrder.add(node.getName());
-			}
-			else{
-				filesOrder.add(node.getName());
-			}
-		}		
-	
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = foldersOrder.get(k);
-                MegaOffline offline = mOffList.get(j);
-                if(offline == null) {
-                    continue;
-                }
-                String nameOffline = offline.getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(offline);
-				}				
-			}			
-		}
-		
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = filesOrder.get(k);
-                MegaOffline offline = mOffList.get(j);
-                if(offline == null) {
-                    continue;
-                }
-                String nameOffline = offline.getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(offline);
-				}				
-			}
-			
-		}
-		
-		mOffList.clear();
-		mOffList.addAll(tempOffline);
-		if (adapter!= null) {
-			adapter.setNodes(mOffList);
-		}
-//		contentText.setText(getInfoFolder(mOffList));
-	}
-
-	public boolean isFolder(String path){
-		log("isFolder");
-
-		MegaNode n = megaApi.getNodeByPath(path);
-		if(n == null)
-		{
-			return false;
-		}
-		
-		if(n.isFile()){
-			return false;
-		}
-		else{
-			return true;
-		}		
-	}
-	
-	private String getInfoFolder(ArrayList<MegaOffline> mOffInfo) {
-		log("getInfoFolder");
-//		log("primer elemento: "+mOffInfo.get(0).getName());
-		
-		String info = "";
-		int numFolders=0;
-		int numFiles=0;
-		
-		if(mOffInfo.size()>0){
-			String pathI = getOfflineAbsolutePath(context, mOffInfo.get(0));
-			
-			for(int i=0; i<mOffInfo.size();i++){
-				MegaOffline mOff = (MegaOffline) mOffInfo.get(i);
-				String path = pathI + mOff.getPath() + mOff.getName();			
-
-				File destination = new File(path);
-				if (destination.exists()){
-					if(destination.isFile()){
-						numFiles++;					
-					}
-					else{
-						numFolders++;					
-					}
-				}
-				else{
-					log("File do not exist");
-				}		
-			}
-		}
-		
-		//Check if the file MarterKey is exported
-		log("Export in: "+getExternalStoragePath(RK_FILE));
-		File file= buildExternalStorageFile(RK_FILE);
-		if(isFileAvailable(file)){
-			numFiles++;
-		}
-		
-		if (numFolders > 0) {
-			info = numFolders
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info
-						+ ", "
-						+ numFiles
-						+ " "
-						+ context.getResources().getQuantityString(
-								R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			info = numFiles
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_files, numFiles);
-		}
-
-		log(info);
-		return info;
 	}
 
 	@Override
@@ -847,9 +590,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
-        if(mOffList != null && mOffList.size() != 0) {
-			addSectionTitle(mOffList);
-		}
     }
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
@@ -883,7 +623,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 			currentFile = getOfflineFile(context, currentNode);
 			if(isFileAvailable(currentFile) && currentFile.isDirectory()){
-
 				int lastFirstVisiblePosition = 0;
 				if(((ManagerActivityLollipop)context).isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
@@ -899,12 +638,14 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				log("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
+				if (isSearching() && ((ManagerActivityLollipop) context).isOfflineSearchPathEmpty()) {
+					((ManagerActivityLollipop) context).setTextSubmitted();
+					((ManagerActivityLollipop) context).addOfflineSearchPath(pathNavigation);
+				}
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";
 				
-				if (context instanceof ManagerActivityLollipop){
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-					((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
-				}
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 				((ManagerActivityLollipop)context).setToolbarTitle();
 
 				mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
@@ -919,8 +660,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 											
 					for(int i=0; i<mOffList.size();i++){
 						
-						if (Environment.getExternalStorageDirectory() != null){								
-							log("mOffList path: "+path+mOffList.get(i).getPath());
+						if (Environment.getExternalStorageDirectory() != null){
 							offlineDirectory = new File(path + mOffList.get(i).getPath()+mOffList.get(i).getName());
 						}
 						else{
@@ -928,27 +668,15 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						}	
 
 						if (!offlineDirectory.exists()){
-							//Updating the DB because the file does not exist	
-							log("Path to remove C: "+(path + mOffList.get(i).getName()));
+							//Updating the DB because the file does not exist
 							dbH.removeById(mOffList.get(i).getId());
 							mOffList.remove(i);
 							i--;
 						}			
 					}
 				}
-				adapter.setNodes(mOffList);
-				
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					sortByNameDescending();
-				}
-				else{
-					sortByNameAscending();
-				}
-				
-				setLayoutVisibility();
-				adapter.setPositionClicked(-1);
+				orderNodes();
 				recyclerView.scrollToPosition(0);
-				notifyDataSetChanged();
 			}
 			else{
 				if(currentFile.exists() && currentFile.isFile()){			
@@ -1163,23 +891,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 		}
     }
-	
-	/*
-	 * Clear all selected items
-	 */
-	private void clearSelections() {
-		if(adapter.isMultipleSelect()){
-			adapter.clearSelections();
-		}else{
-//			if(adapter.getItemCount() == 1 ){
-//				boolean result = adapter.isRecoveryKey(adapter.getItemOff(0));
-//				if(result){
-//
-//					adapter.clearSelections();
-//				}
-//			}
-		}
-	}
 
 	@Override
 	protected void updateActionModeTitle() {
@@ -1212,23 +923,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				}		
 			}
 		}
-		
-		Resources res = getActivity().getResources();
-		/*String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
-		String title;
-		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
-		} else if (files == 0) {
-			title = foldersStr;
-		} else if (folders == 0) {
-			title = filesStr;
-		} else {
-			title = foldersStr + ", " + filesStr;
-		}*/
 
 		String title;
 		int sum=files+folders;
@@ -1249,7 +943,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			e.printStackTrace();
 			log("oninvalidate error");
 		}
-		// actionMode.
 	}
 	
 	/*
@@ -1263,84 +956,73 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			actionMode.finish();
 		}
 	}
-	
-	public int onBackPressed(){
+
+	public int onBackPressed() {
 		log("onBackPressed");
 
-		if (adapter == null){
+		if (adapter == null || pathNavigation == null || pathNavigation.isEmpty() || pathNavigation.equals("/")) {
 			return 0;
 		}
 
-		if (adapter.getPositionClicked() != -1){
-			adapter.setPositionClicked(-1);
-			adapter.notifyDataSetChanged();
-			return 1;
+		if (isSearching()) {
+			pathNavigation = ((ManagerActivityLollipop) context).getOfflineSearchPath();
+			((ManagerActivityLollipop) context).removeOfflineSearchPath();
+			if (pathNavigation.contains(OFFLINE_SEARCH_QUERY)) {
+
+			}
+		} else {
+			pathNavigation = pathNavigation.substring(0, pathNavigation.length() - 1);
+			int index = pathNavigation.lastIndexOf("/");
+			pathNavigation = pathNavigation.substring(0, index + 1);
 		}
-		else if(pathNavigation != null){
-			if(pathNavigation.isEmpty()){
-				return 0;
-			}
-			if (!pathNavigation.equals("/")){
-				log("onBackPress: "+pathNavigation);
-				pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
-				log("substring: "+pathNavigation);
-				int index=pathNavigation.lastIndexOf("/");				
-				pathNavigation=pathNavigation.substring(0,index+1);
-				
-				if (context instanceof ManagerActivityLollipop){
-					((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-					((ManagerActivityLollipop)context).setToolbarTitle();
-				}
-				mOffList = dbH.findByPath(pathNavigation);
-				
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					sortByNameDescending();
-				}
-				else{
-					sortByNameAscending();
-				}
 
-				setNodes(mOffList);
+		((ManagerActivityLollipop) context).setPathNavigationOffline(pathNavigation);
+		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
+		((ManagerActivityLollipop) context).setToolbarTitle();
 
-				int lastVisiblePosition = 0;
-				if(!lastPositionStack.empty()){
-					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack "+lastVisiblePosition+" position");
-				}
-				log("Scroll to "+lastVisiblePosition+" position");
+		mOffList = dbH.findByPath(pathNavigation);
+		orderNodes();
 
-				if(lastVisiblePosition>=0){
+		int lastVisiblePosition = 0;
+		if (!lastPositionStack.empty()) {
+			lastVisiblePosition = lastPositionStack.pop();
+			log("Pop of the stack " + lastVisiblePosition + " position");
+		}
+		log("Scroll to " + lastVisiblePosition + " position");
 
-					if(((ManagerActivityLollipop)context).isList){
-						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-					else{
-						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-				}
-				return 2;
-			}
-			else{
-				log("pathNavigation  / ");
-				return 0;
+		if (lastVisiblePosition >= 0) {
+			if (((ManagerActivityLollipop) context).isList) {
+				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+			} else {
+				gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 			}
 		}
-		else{
-				return 0;
-		}
+		return 1;
 	}
 	
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
 	}
 	
-	public void setNodes(ArrayList<MegaOffline> _mOff){
+	public void setNodes(ArrayList<MegaOffline> megaOfflines){
 		log("setNodes");
-		this.mOffList = _mOff;
+
+		if((getActivity() == null) || (!isAdded())){
+			log("Fragment NOT Attached!");
+			return;
+		}
+
+		for(int i=0; i<megaOfflines.size();i++){
+			MegaOffline checkOffline = megaOfflines.get(i);
+			File offlineFile = getOfflineFile(context, checkOffline);
+			if (!isFileAvailable(offlineFile)) {
+				megaOfflines.remove(i);
+				i--;
+			}
+		}
 
 		if (adapter != null){
-			adapter.setNodes(mOffList);
+			adapter.setNodes(megaOfflines);
 			setLayoutVisibility();
 		}
 	}
@@ -1357,13 +1039,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 	}
 	
-	public void setPositionClicked(int positionClicked){
-		log("setPositionClicked");
-		if (adapter != null){
-			adapter.setPositionClicked(positionClicked);
-		}
-	}
-	
 	public void notifyDataSetChanged(){
 		log("notifyDataSetChanged");
 		if (adapter != null){
@@ -1371,115 +1046,51 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 	}
 
+	private void setAdapter() {
+		int adapterType;
+		if (((ManagerActivityLollipop) context).isList) {
+			adapterType = MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST;
+		} else {
+			adapterType = MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
+		}
+
+		if (adapter == null) {
+			adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, adapterType);
+		} else {
+			adapter.setRecylerView(recyclerView);
+			recyclerView.invalidate();
+		}
+	}
+
 	public void refresh(){
 		log("refresh");
 
-		mOffList=dbH.findByPath(pathNavigation);
-
-
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
-		if (((ManagerActivityLollipop)context).isList) {
-			addSectionTitle(mOffList);
-			if (adapter == null) {
-				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-			} else {
-//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-				adapter.setNodes(mOffList);
-				adapter.notifyDataSetChanged();
-				recyclerView.invalidate();
-			}
-		} else {
-			addSectionTitle(mOffList);
-			if (adapter == null) {
-				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
-			} else {
-//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
-				adapter.setNodes(mOffList);
-                adapter.notifyDataSetChanged();
-                recyclerView.invalidate();
-			}
-		}
-
-		setLayoutVisibility();
-		addSectionTitle(mOffList);
-		setPositionClicked(-1);
-		notifyDataSetChanged();
-	}
-	
-	public void refreshPaths(){
-		log("refreshPaths()");
-		mOffList=dbH.findByPath("/");	
-		
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
-		if (((ManagerActivityLollipop)context).isList) {
-			addSectionTitle(mOffList);
-			if (adapter == null) {
-				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-			} else {
-//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-				adapter.setNodes(mOffList);
-			}
-		} else {
-			addSectionTitle(mOffList);
-			if (adapter == null) {
-				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
-			} else {
-//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
-				adapter.setNodes(mOffList);
-			}
-		}
-		addSectionTitle(mOffList);
-//		setNodes(mOffList);
-		recyclerView.invalidate();
+		mOffList = dbH.findByPath(pathNavigation);
+		setAdapter();
+		orderNodes();
 	}
 	
 	public void refreshPaths(MegaOffline mOff){
-		log("refreshPaths(MegaOffline mOff): "+mOff.getName());
-		int index=0;
-//		MegaOffline retFindPath = null;
+		int index;
 		
 		//Find in the tree, the last existing node
 		String pNav= mOff.getPath();
 
 		if(mOff.getType()==DB_FILE){
-
 			index=pNav.lastIndexOf("/");				
 			pNav=pNav.substring(0,index+1);
-
-		}
-		else{
+		} else{
 			pNav=pNav.substring(0,pNav.length()-1);
 		}	
 			
 		if(pNav.length()==0){
 			mOffList=dbH.findByPath("/");
-			pNav="/";
-		}
-		else{
+		} else{
 			findPath(pNav);			
 		}
 				
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
-
+		orderNodes();
 		((ManagerActivityLollipop)context).setToolbarTitle();
-		log("At the end of refreshPaths the path is: "+pathNavigation);
-//		contentText.setText(getInfoFolder(mOffList));
-		setNodes(mOffList);
 	}
 	
 	public int getItemCount(){
@@ -1499,29 +1110,22 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 	
 	private void findPath (String pNav){
-		log("findPath():" + pNav);
-
-		MegaOffline nodeToShow = null;
+		MegaOffline nodeToShow;
 		
 		if(!pNav.equals("/")){
 			
 			if (pNav.endsWith("/")) {
 				pNav = pNav.substring(0, pNav.length() - 1);
-				log("NEW findPath:" + pNav);		
 			}
 			
 			int index=pNav.lastIndexOf("/");	
 			String pathToShow = pNav.substring(0, index+1);
-			log("Path: "+ pathToShow);
 			String nameToShow = pNav.substring(index+1, pNav.length());
-			log("Name: "+ nameToShow);
 			
 			nodeToShow = dbH.findbyPathAndName(pathToShow, nameToShow);
 			if(nodeToShow!=null){
 				//Show the node
-				log("findPath:Node: "+ nodeToShow.getName());
 				pathNavigation=pathToShow+nodeToShow.getName()+"/";
-				log("findPath:pathNavigation: "+pathNavigation);
 				return;
 			}
 			else{
@@ -1540,22 +1144,26 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void setPathNavigation(String _pathNavigation){
-		log("setPathNavigation(): "+pathNavigation);
 		this.pathNavigation = _pathNavigation;
-		addSectionTitle(mOffList);
-		if (adapter != null){
-//			contentText.setText(getInfoFolder(mOffList));
-			adapter.setNodes(dbH.findByPath(_pathNavigation));
-		}
+		mOffList = dbH.findByPath(pathNavigation);
+		orderNodes();
 	}
 
 	public void setOrder(int orderGetChildren){
 		log("setOrder");
 		this.orderGetChildren = orderGetChildren;
+		orderNodes();
 	}
-	
-	private static void log(String log) {
-		Util.log("OfflineFragmentLollipop", log);
+
+	private void orderNodes() {
+		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortOfflineByNameDescending(mOffList);
+		}
+		else{
+			sortOfflineByNameAscending(mOffList);
+		}
+
+		setNodes(mOffList);
 	}
 
 	public String getPathNavigation() {
@@ -1586,17 +1194,78 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	private class FilterOfflineTask extends AsyncTask<String, Void, Void> {
 
+		ArrayList<MegaOffline> filteredOffline = new ArrayList<>();
+
 		@Override
 		protected Void doInBackground(String... strings) {
+			String s = strings[0];
+			if (s.isEmpty()) {
+				filteredOffline = mOffList;
+				return null;
+			}
+
+			File parentFile = getOfflineFolder(context, pathNavigation);
+			if (!isFileAvailable(parentFile)) return null;
+
+			searchOfflineNodes(pathNavigation, strings[0], filteredOffline);
+
+			if (orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC) {
+				sortOfflineByNameDescending(filteredOffline);
+			} else {
+				sortOfflineByNameAscending(filteredOffline);
+			}
+
 			return null;
 		}
 
 		@Override
 		protected void onPostExecute(Void aVoid) {
+			setNodes(filteredOffline);
 		}
+
+		private void searchOfflineNodes(String path, final String query, ArrayList<MegaOffline> filteredOffline) {
+			if (path == null || path.isEmpty()) return;
+
+			ArrayList<MegaOffline> megaOfflines = dbH.findByPath(path);
+			if (megaOfflines == null) return;
+
+			for (MegaOffline offline : megaOfflines) {
+				if (isCancelled()) return;
+
+				if (offline.isFolder()) {
+					searchOfflineNodes(getChildsPath(offline), query, filteredOffline);
+				}
+
+				if (offline.getName().toLowerCase().contains(query.toLowerCase())
+						&& isFileAvailable(getOfflineFile(context, offline))) {
+					filteredOffline.add(offline);
+				}
+			}
+		}
+
+		private String getChildsPath(MegaOffline offline) {
+			if (offline.getPath().endsWith(File.separator)) {
+				return offline.getPath() + offline.getName() + File.separator;
+			}
+
+			return offline.getPath() + File.separator + offline.getName() + File.separator;
+		}
+	}
+
+	private boolean isSearching() {
+		String query = ((ManagerActivityLollipop) context).searchQuery;
+		if (!((ManagerActivityLollipop) context).isOfflineSearchPathEmpty() || (query != null && !query.isEmpty())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
 		this.headerItemDecoration = headerItemDecoration;
+	}
+
+	private static void log(String log) {
+		Util.log("OfflineFragmentLollipop", log);
 	}
 }

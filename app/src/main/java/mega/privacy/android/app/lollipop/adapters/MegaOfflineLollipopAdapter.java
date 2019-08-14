@@ -56,8 +56,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	
 	Context context;
- 
-	int positionClicked;
+
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
 	public DatabaseHandler dbH;
@@ -418,15 +417,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		log("MegaOfflineListAdapter");
 		this.fragment = _fragment;
 		this.context = _context;
-//		this.getAdapterType() =  getAdapterType();
         this.listFragment = listView;
         this.emptyImageViewFragment = emptyImageView;
         this.emptyTextViewFragment = emptyTextView;
         this.aB = aB;
-        
-        this.positionClicked = -1;
-        //After this.listFragment = listView;
-//        this.mOffList = insertPlaceHolderNode(_mOffList);
+
 		setNodes(_mOffList);
     }
     
@@ -451,7 +446,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 		this.mOffList = insertPlaceHolderNode(mOffList);
 		((OfflineFragmentLollipop) fragment).addSectionTitle(this.mOffList);
-		positionClicked = -1;	
 		notifyDataSetChanged();
 	}
 
@@ -1008,26 +1002,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     public long getItemId(int position) {
     	log("getItemId");
         return position;
-    }    
-    
-    public int getPositionClicked (){
-    	log("getPositionClicked");
-    	return positionClicked;
     }
-    
-    public void setPositionClicked(int p){
-    	log("setPositionClicked");
-    	positionClicked = p;
-		notifyDataSetChanged();
-    }
-    
-//    public void setAdapterType(int getAdapterType()){
-//    	this.getAdapterType() = getAdapterType();
-//    }
-//
-//    public int getAdapterType(){
-//    	return getAdapterType();
-//	}
 
 	@Override
 	public void onClick(View v) {
