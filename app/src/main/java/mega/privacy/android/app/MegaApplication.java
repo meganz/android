@@ -925,8 +925,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		return openCallChatId;
 	}
 
-	public static void setOpenCallChatId(long openCallChatId) {
-		MegaApplication.openCallChatId = openCallChatId;
+	public static void setOpenCallChatId(long value) {
+	    log("setOpenCallChatId: "+value);
+		openCallChatId = value;
 	}
 
 	public static boolean isRecentChatVisible() {
@@ -1571,7 +1572,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		log("onChatCallUpdate: call.getStatus " + call.getStatus());
+		log("onChatCallUpdate: callId "+call+", call.getStatus " + call.getStatus());
 		stopService(new Intent(this, IncomingCallService.class));
 
 		if (call.getStatus() >= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
@@ -1599,7 +1600,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 							if (listAllCalls.size() == 1) {
 								log("onChatCallUpdate:One call");
 								long chatId = listAllCalls.get(0);
-								if (openCallChatId != chatId) {
+
+								if ( openCallChatId != chatId) {
 									MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 									if (callToLaunch != null) {
 										if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
@@ -1696,6 +1698,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
 					log("onChatCallUpdate:STATUS: DESTROYED");
 					hashMapSpeaker.remove(call.getChatid());
+//					setOpenCallChatId(-1);
 
 					//Show missed call if time out ringing (for incoming calls)
 					try {
@@ -2019,7 +2022,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void launchCallActivity(MegaChatCall call) {
 		log("launchCallActivity: " + call.getStatus());
 		MegaApplication.setShowPinScreen(false);
-		MegaApplication.setOpenCallChatId(call.getChatid());
+//		MegaApplication.setOpenCallChatId(call.getChatid());
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra(Constants.CHAT_ID, call.getChatid());
 		i.putExtra(Constants.CALL_ID, call.getId());
