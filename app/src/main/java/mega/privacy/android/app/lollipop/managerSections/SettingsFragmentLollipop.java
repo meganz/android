@@ -2769,16 +2769,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	private void setupLocalPathForCameraUpload(){
+		String cameraFolderLocation = getLocalDCIMFolderPath();
 		if (camSyncLocalPath != null) {
 			if (!isExternalSDCard) {
 				File checkFile = new File(camSyncLocalPath);
 				if (!checkFile.exists()) {
 					log("local path not exist, use default camera folder path");
-					String cameraFolderLocation = getLocalDCIMFolderPath();
-					dbH.setCamSyncLocalPath(cameraFolderLocation);
 					camSyncLocalPath = cameraFolderLocation;
-					localCameraUploadFolder.setSummary(cameraFolderLocation);
-					localCameraUploadFolderSDCard.setSummary(cameraFolderLocation);
 				}
 			} else {
 				Uri uri = Uri.parse(prefs.getUriExternalSDCard());
@@ -2786,22 +2783,18 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				String pickedDirName = pickedDir.getName();
 				if (pickedDirName != null) {
 					camSyncLocalPath = pickedDirName;
-					localCameraUploadFolder.setSummary(pickedDirName);
-					localCameraUploadFolderSDCard.setSummary(pickedDirName);
 				} else {
 					log("pickedDirName is NULL");
 				}
 			}
 		} else {
 			log("local path is NULL");
-			String cameraDownloadLocation = getLocalDCIMFolderPath();
-			dbH.setCamSyncLocalPath(cameraDownloadLocation);
 			dbH.setCameraFolderExternalSDCard(false);
 			isExternalSDCard = false;
-			camSyncLocalPath = cameraDownloadLocation;
+			camSyncLocalPath = cameraFolderLocation;
 		}
 
-
+		dbH.setCamSyncLocalPath(cameraFolderLocation);
 		localCameraUploadFolder.setSummary(camSyncLocalPath);
 		localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
 		File[] fs = context.getExternalFilesDirs(null);
@@ -2982,9 +2975,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         cameraUploadCategory.removePreference(cameraUploadWhat);
         cameraUploadCategory.removePreference(localCameraUploadFolder);
         cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-		cameraUploadCategory.removePreference(videoQuality);
-		cameraUploadCategory.removePreference(cameraUploadCharging);
-		cameraUploadCategory.removePreference(cameraUploadVideoQueueSize);
+		hideVideoQualitySettingsSection();
         cameraUploadCategory.removePreference(keepFileNames);
         cameraUploadCategory.removePreference(megaCameraFolder);
         cameraUploadCategory.removePreference(secondaryMediaFolderOn);
