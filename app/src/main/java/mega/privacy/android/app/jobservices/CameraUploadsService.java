@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -22,6 +21,7 @@ import android.os.PowerManager;
 import android.os.StatFs;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.media.ExifInterface;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
@@ -1588,7 +1588,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             public void run() {
                                 File img = new File(finalRecord.getLocalPath());
                                 if(!preview.exists()) {
-                                    ImageProcessor.createVideoPreview(CameraUploadsService.this,img, preview);
+                                    //for Android 5, 5.1 devices may have insufficient memory, so don't create priviews.
+                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        ImageProcessor.createVideoPreview(CameraUploadsService.this, img, preview);
+                                    }
                                 }
                                 ImageProcessor.createVideoThumbnail(api,finalRecord.getLocalPath(),thumb);
                             }
@@ -1600,7 +1603,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             public void run() {
                                 File img = new File(finalRecord.getLocalPath());
                                 if(!preview.exists()) {
-                                    ImageProcessor.createImagePreview(img, preview);
+                                    //for Android 5, 5.1 devices may have insufficient memory, so don't create priviews.
+                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        ImageProcessor.createImagePreview(img, preview);
+                                    }
                                 }
                                 ImageProcessor.createImageThumbnail(api,finalRecord.getLocalPath(),thumb);
                             }
