@@ -40,9 +40,6 @@ public class VideoDownsampling {
     private int mWidth = 1280;
     private int mHeight = 720;
 
-    private static final int MEDIUM_WIDTH = 1280;
-    private static final int MEDIUM_HEIGHT = 720;
-
     static Context context;
 
     static ConcurrentLinkedQueue<VideoUpload> queue;

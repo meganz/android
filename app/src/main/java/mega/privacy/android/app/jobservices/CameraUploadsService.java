@@ -50,6 +50,7 @@ import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ImageProcessor;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
@@ -258,13 +259,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (intent != null && intent.getAction() != null) {
             if (intent.getAction().equals(ACTION_CANCEL) ||
                     intent.getAction().equals(ACTION_STOP) ||
-                    intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER) ||
-                    intent.getAction().equals(ACTION_LOGOUT)) {
+                    intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER) ) {
                 log("onStartCommand intent action is " + intent.getAction());
                 for(MegaTransfer transfer : cuTransfers) {
                     megaApi.cancelTransfer(transfer,this);
                 }
-            } else if(ACTION_CANCEL_ALL.equals(intent.getAction())) {
+            } else if(ACTION_CANCEL_ALL.equals(intent.getAction()) || intent.getAction().equals(ACTION_LOGOUT)) {
                 log("onStartCommand intent action is " + intent.getAction());
                 megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
             }
@@ -480,7 +480,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             Cursor cursorCamera;
             String orderVideo = MediaStore.MediaColumns.DATE_MODIFIED;
             String orderImage = MediaStore.MediaColumns.DATE_MODIFIED;
-            if(!isLocalFolderOnSDCard(localPath)) {
+            if(!SDCardUtils.isLocalFolderOnSDCard(this,localPath)) {
                 orderVideo += " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
                 orderImage += " ASC LIMIT 0," + PAGE_SIZE;
             }
@@ -499,7 +499,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 Cursor cursorSecondary;
                 String orderVideoSecondary = MediaStore.MediaColumns.DATE_MODIFIED;
                 String orderImageSecondary = MediaStore.MediaColumns.DATE_MODIFIED;
-                if(!isLocalFolderOnSDCard(localPathSecondary)) {
+                if(!SDCardUtils.isLocalFolderOnSDCard(this,localPathSecondary)) {
                     orderVideoSecondary += " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
                     orderImageSecondary += " ASC LIMIT 0," + PAGE_SIZE;
                 }
@@ -1258,29 +1258,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             dbH.saveShouldClearCamsyncRecords(false);
         }
     }
-
-    private static String getSDCardRoot(String path) {
-        int i = 0,x = 0;
-        for(; x < path.toCharArray().length;x++) {
-            char c = path.toCharArray()[x];
-            if(c == '/') {
-                i++;
-            }
-            if(i == 3) {
-                break;
-            }
-        }
-        return path.substring(0,x);
-    }
-
-    private boolean isLocalFolderOnSDCard(String localPath) {
-        File[] fs = getExternalCacheDirs();
-        if (fs.length > 1 && fs[1] != null) {
-            String sdRoot = getSDCardRoot(fs[1].getAbsolutePath());
-            return localPath.startsWith(sdRoot);
-        }
-        return false;
-    }
     
     private void handleException(Exception e) {
         log("handle exception: " + e + " / " + e.getMessage());
@@ -1586,7 +1563,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             public void run() {
                                 File img = new File(finalRecord.getLocalPath());
                                 if(!preview.exists()) {
-                                    //for Android 5, 5.1 devices may have insufficient memory, so don't create priviews.
+                                    //for Android 5, 5.1 devices may have insufficient memory, so don't create previews.
                                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                         ImageProcessor.createVideoPreview(CameraUploadsService.this, img, preview);
                                     }
@@ -1601,7 +1578,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             public void run() {
                                 File img = new File(finalRecord.getLocalPath());
                                 if(!preview.exists()) {
-                                    //for Android 5, 5.1 devices may have insufficient memory, so don't create priviews.
+                                    //for Android 5, 5.1 devices may have insufficient memory, so don't create previews.
                                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                         ImageProcessor.createImagePreview(img, preview);
                                     }
