@@ -3557,6 +3557,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									if(sttFLol != null  && sttFLol.isResumed()){
 										sttFLol.disableCameraUpload();
 									}
+									if(cuFL != null && cuFL.isResumed()){
+										cuFL.resetSwitchButtonLabel();
+									}
                                 }
                             });
                     builder.setNegativeButton(getString(R.string.general_cancel), null);
