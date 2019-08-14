@@ -14,7 +14,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -72,8 +71,8 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
 	
@@ -360,11 +359,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setMkButtonText(){
 		log("setMkButtonText");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-		log("Exists MK in: "+path);
-		File file= new File(path);
+		File file= buildExternalStorageFile(RK_FILE);
 		String mkButtonText;
-		if(file.exists()){
+		if(isFileAvailable(file)){
 			mkButtonText = getString(R.string.action_remove_master_key);
 		}
 		else{
@@ -575,10 +572,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.MK_button:{
 				log("Master Key button");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-				log("Exists MK in: "+path);
-				File file= new File(path);
-				if(file.exists()){
+				log("Exists MK in: "+getExternalStoragePath(RK_FILE));
+				File file= buildExternalStorageFile(RK_FILE);
+				if(isFileAvailable(file)){
 					((ManagerActivityLollipop)context).showConfirmationRemoveMK();
 				}
 				else{
