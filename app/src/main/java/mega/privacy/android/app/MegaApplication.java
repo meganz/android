@@ -1698,7 +1698,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
 					log("onChatCallUpdate:STATUS: DESTROYED");
 					hashMapSpeaker.remove(call.getChatid());
-//					setOpenCallChatId(-1);
 
 					//Show missed call if time out ringing (for incoming calls)
 					try {

@@ -108,12 +108,19 @@ public class ChatUtil {
 
     /*Method to show or hide the "return the call" layout*/
     public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono) {
-        if (megaChatApi == null) return;
+        if (megaChatApi == null || callInProgressLayout == null) return;
+        log("showCallLayout");
+
         if (!Util.isChatEnabled() || !(context instanceof ManagerActivityLollipop) || !participatingInACall(megaChatApi)) {
+            log("callInProgressLayout: GONE ");
+
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
             return;
         }
+
+        log("callInProgressLayout: VISIBLE ");
+
         callInProgressLayout.setVisibility(View.VISIBLE);
 
         long chatId = getChatCallInProgress(megaChatApi);

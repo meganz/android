@@ -707,6 +707,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 			emptyTextView = v.findViewById(R.id.file_grid_empty_text);
 			emptyTextViewFirst = v.findViewById(R.id.file_grid_empty_text_first);
 
+			callInProgressLayout = v.findViewById(R.id.call_in_progress_layout);
+			callInProgressLayout.setOnClickListener(this);
+			callInProgressChrono = v.findViewById(R.id.call_in_progress_chrono);
+			callInProgressLayout.setVisibility(View.GONE);
+			callInProgressChrono.setVisibility(View.GONE);
+
 			transfersOverViewLayout = v.findViewById(R.id.transfers_overview_item_layout);
 			transfersTitleText = v.findViewById(R.id.transfers_overview_title);
 			transfersNumberText = v.findViewById(R.id.transfers_overview_number);
@@ -742,8 +748,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
             }
             
             setOverviewLayout();
-            
-            return v;
+			showCallLayout();
+
+			return v;
         }
     }
 
