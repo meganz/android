@@ -42,6 +42,7 @@ public class MegaPreferences{
 	String shouldClearCameraSyncRecords;
 
 	String isAutoPlayEnabled = "";
+	String sdCardUri = "";
 
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
@@ -55,7 +56,7 @@ public class MegaPreferences{
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
 			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String pinLockType, String preferredSortCloud, String preferredSortContacts,
-			String preferredSortOthers, String firstTimeChat, String smallGridCamera,String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String shouldClearCameraSyncRecords,String camVideoSyncTimeStamp,String secVideoSyncTimeStamp, String isAutoPlayEnabled){
+			String preferredSortOthers, String firstTimeChat, String smallGridCamera,String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String shouldClearCameraSyncRecords,String camVideoSyncTimeStamp,String secVideoSyncTimeStamp, String isAutoPlayEnabled, String sdCardUri){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -93,6 +94,7 @@ public class MegaPreferences{
 		this.camVideoSyncTimeStamp = camVideoSyncTimeStamp;
 		this.secVideoSyncTimeStamp = secVideoSyncTimeStamp;
 		this.isAutoPlayEnabled = isAutoPlayEnabled;
+		this.sdCardUri = sdCardUri;
 	}
 
 	public String getFirstTime (){
@@ -367,6 +369,14 @@ public class MegaPreferences{
 
     public void setConversionOnCharging(String conversionOnCharging) {
         this.conversionOnCharging = conversionOnCharging;
+    }
+
+    public String getSdCardUri() {
+        return sdCardUri;
+    }
+
+    public void setSdCardUri(String sdCardUri) {
+        this.sdCardUri = sdCardUri;
     }
 
     public String getChargingOnSize() {

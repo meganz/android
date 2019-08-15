@@ -30,7 +30,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 45;
+	private static final int DATABASE_VERSION = 46;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -97,6 +97,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PREFERRED_VIEW_LIST = "preferredviewlist";
     private static final String KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera";
     private static final String KEY_URI_EXTERNAL_SD_CARD = "uriexternalsdcard";
+    private static final String KEY_SD_CARD_URI = "sdcarduri";
     private static final String KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = "camerafolderexternalsdcard";
     private static final String KEY_CONTACT_HANDLE = "handle";
     private static final String KEY_CONTACT_MAIL = "mail";
@@ -254,7 +255,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT," +
 				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN," + KEY_AUTO_PLAY + " BOOLEAN," + KEY_UPLOAD_VIDEO_QUALITY + " TEXT," +
                 KEY_CONVERSION_ON_CHARGING + " BOOLEAN," + KEY_CHARGING_ON_SIZE + " TEXT," + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT," +  KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT," +
-                KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT" + ")";
+                KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT," + KEY_SD_CARD_URI + " TEXT" +")";
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -660,6 +661,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT;");
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT;");
 		}
+
+        if (oldVersion <= 45){
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SD_CARD_URI + " TEXT;");
+        }
 	}
 
 //	public MegaOffline encrypt(MegaOffline off){
@@ -1272,12 +1277,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String shouldClearCameraSyncRecords = decrypt(cursor.getString(35));
 			String camVideoSyncTimeStamp = decrypt(cursor.getString(36));
 			String secVideoSyncTimeStamp = decrypt(cursor.getString(37));
+			String sdCardUri = decrypt(cursor.getString(38));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
 					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,shouldClearCameraSyncRecords,camVideoSyncTimeStamp,
-                    secVideoSyncTimeStamp,isAutoPlayEnabled);
+                    secVideoSyncTimeStamp,isAutoPlayEnabled,sdCardUri);
 		}
 		cursor.close();
 
@@ -2685,6 +2691,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
+    public void setSDCardUri (String sdCardUri){
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SD_CARD_URI + "= '" + encrypt(sdCardUri) + "' WHERE " + KEY_ID + " = '1'";
+            db.execSQL(UPDATE_PREFERENCES_TABLE);
+            log("KEY_URI_EXTERNAL_SD_CARD URI: " + UPDATE_PREFERENCES_TABLE);
+        }
+        else{
+            values.put(KEY_SD_CARD_URI, encrypt(sdCardUri));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
+    }
+
 	public void setCameraFolderExternalSDCard (boolean cameraFolderExternalSDCard){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
@@ -3523,6 +3545,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
 
         return "false";
+    }
+
+    public String getSDCardUri(){
+        String selectQuery = "SELECT " + KEY_SD_CARD_URI + " FROM " + TABLE_PREFERENCES + " WHERE " + KEY_ID + " = '1'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String uri = decrypt(cursor.getString(0));
+            return uri;
+        }
+        cursor.close();
+        return "";
     }
 
     public void setAutoPlayEnabled(String enabled){
