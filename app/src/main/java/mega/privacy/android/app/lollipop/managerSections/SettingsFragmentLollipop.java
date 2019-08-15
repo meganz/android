@@ -70,6 +70,7 @@ import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.Util;
@@ -1568,17 +1569,20 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                                 log("can operate sd card with file.");
                                 toSelectFolder(sdCardRoot);
                             } else {
-                                if (prefs == null) {
-                                    prefs = dbH.getPreferences();
-                                }
-                                try {
-                                   sdCardOperator.initDocumentFileRoot(prefs);
-                                   log("operate sd card with document file.");
-                                   toSelectFolder(sdCardRoot);
-                                } catch (SDCardOperator.SDCardException e) {
-                                    e.printStackTrace();
-                                    log(e.getMessage());
-                                    //request sd card root request and write permission.
+                                String uri = dbH.getSDCardUri();
+                                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    try {
+                                        sdCardOperator.initDocumentFileRoot(uri);
+                                        log("operate sd card with document file.");
+                                        toSelectFolder(sdCardRoot);
+                                    } catch (SDCardOperator.SDCardException e) {
+                                        e.printStackTrace();
+                                        log(e.getMessage());
+                                        //request sd card root request and write permission.
+                                        SDCardOperator.requestSDCardPermission(sdCardRoot,context,SettingsFragmentLollipop.this);
+                                    }
+                                } else {
+                                    //open SAF to select target folder
                                     SDCardOperator.requestSDCardPermission(sdCardRoot,context,SettingsFragmentLollipop.this);
                                 }
                             }
@@ -2282,7 +2286,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			isExternalSDCard = true;
 
 			DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
-
 			String pickedDirName = pickedDir.getName();
 			if(pickedDirName!=null){
 				prefs.setCamSyncLocalPath(pickedDir.getName());
@@ -2313,7 +2316,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             if (intent == null){
                 log("intent NULL");
                 if(requestCode != Activity.RESULT_OK) {
-                    Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+                    }
                 } else {
                     onCannotWriteOnSDCard();
                 }
@@ -2323,10 +2328,21 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             if(treeUri != null) {
                 DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
                 if(pickedDir.canWrite()) {
-                    log("sd card root uri is " + treeUri);
+                    log("sd card uri is " + treeUri);
+                    dbH.setSDCardUri(treeUri.toString());
                     if(sdCardOperator != null) {
-                        dbH.setUriExternalSDCard(treeUri.toString());
-                        toSelectFolder(sdCardOperator.getSDCardRoot());
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            toSelectFolder(sdCardOperator.getSDCardRoot());
+                        } else {
+                            String path = FileUtil.getFullPathFromTreeUri(treeUri, context);
+                            dbH.setStorageDownloadLocation(path);
+                            if (downloadLocation != null){
+                                downloadLocation.setSummary(path);
+                            }
+                            if (downloadLocationPreference != null){
+                                downloadLocationPreference.setSummary(path);
+                            }
+                        }
                     } else {
                         onCannotWriteOnSDCard();
                     }

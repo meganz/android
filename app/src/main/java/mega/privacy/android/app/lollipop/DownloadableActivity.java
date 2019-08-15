@@ -37,7 +37,7 @@ public class DownloadableActivity extends PinActivityLollipop {
             if (pickedDir.canWrite()) {
                 log("sd card root uri is " + treeUri);
                 //save the sd card root uri string
-                DatabaseHandler.getDbHandler(this).setUriExternalSDCard(treeUri.toString());
+                DatabaseHandler.getDbHandler(this).setSDCardUri(treeUri.toString());
                 try {
                     SDCardOperator sdCardOperator = new SDCardOperator(this);
                     if (nC != null && downloadInfo != null) {

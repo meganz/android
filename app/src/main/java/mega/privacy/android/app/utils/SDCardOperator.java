@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import mega.privacy.android.app.MegaPreferences;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
@@ -32,6 +31,8 @@ public class SDCardOperator {
     private String downloadRoot;
 
     private String sdCardRoot;
+
+    private String targetRoot;
 
     private DocumentFile sdCardRootDocument;
 
@@ -61,14 +62,14 @@ public class SDCardOperator {
         sdCardRoot = Util.getSDCardRoot(downloadRoot);
     }
 
-    public void initDocumentFileRoot(MegaPreferences prefs) throws SDCardException {
-        String uriString = prefs.getUriExternalSDCard();
+    public void initDocumentFileRoot(String  uriString) throws SDCardException {
         if (TextUtils.isEmpty(uriString)) {
             throw new SDCardException("Haven't got sd card root uri!");
         } else {
             try {
-                Uri rootUri = Uri.parse(uriString);
-                sdCardRootDocument = DocumentFile.fromTreeUri(context, rootUri);
+                Uri tragetUri = Uri.parse(uriString);
+                targetRoot = FileUtil.getFullPathFromTreeUri(tragetUri, context);
+                sdCardRootDocument = DocumentFile.fromTreeUri(context, tragetUri);
                 if (!sdCardRootDocument.canWrite()) {
                     throw new SDCardException("Permission required!");
                 }
@@ -131,7 +132,7 @@ public class SDCardOperator {
 
     private DocumentFile getDocumentFileByPath(String parentPath) {
         DocumentFile root = sdCardRootDocument;
-        for (String folder : getSubFolders(sdCardRoot, parentPath)) {
+        for (String folder : getSubFolders(targetRoot, parentPath)) {
             if (root.findFile(folder) == null) {
                 root = root.createDirectory(folder);
             } else {
@@ -161,9 +162,8 @@ public class SDCardOperator {
                     intent = volume.createAccessIntent(null);
                 }
             }
-        } else {
-            //TODO for below N
         }
+        //for below N, open SAF
         if (intent == null) {
             intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         }

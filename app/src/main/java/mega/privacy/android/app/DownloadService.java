@@ -516,7 +516,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			try{ wl.release(); } catch(Exception ex) {}
 
         showCompleteNotification(handle);
-
+		//clear download cache folder
+        File [] fs = getExternalCacheDirs();
+        if(fs.length > 1 && fs[1] != null) {
+            log("clear download cache.");
+            for(File file : fs[1].listFiles()) {
+                file.delete();
+            }
+        }
 		isForeground = false;
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
@@ -1544,13 +1551,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     if (targetPath != null) {
                         try {
                             SDCardOperator sdCardOperator = new SDCardOperator(this);
-                            sdCardOperator.initDocumentFileRoot(dbH.getPreferences());
+                            sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                             File source = new File(path);
                             path = sdCardOperator.move(targetPath,source);
                             File newFile = new File(path);
                             if(newFile.exists() && newFile.length() == source.length()) {
                                 source.delete();
-
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

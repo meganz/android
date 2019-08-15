@@ -703,8 +703,7 @@ public class NodeController {
                 downloadToSDCard = true;
                 downloadRoot = sdCardOperator.getDownloadRoot();
                 try {
-                    prefs = dbH.getPreferences();
-                    sdCardOperator.initDocumentFileRoot(prefs);
+                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                 } catch (SDCardOperator.SDCardException e) {
                     e.printStackTrace();
                     log(e.getMessage());
@@ -1047,10 +1046,8 @@ public class NodeController {
                             log("can operate sd card with file.");
                             requestLocalFolder(downloadInfo, sdCardRoot, null);
                         } else {
-                            //need to refresh preferences
-                            prefs = dbH.getPreferences();
                             try {
-                                sdCardOperator.initDocumentFileRoot(prefs);
+                                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                                 log("operate sd card with document file.");
                                 requestLocalFolder(downloadInfo, sdCardRoot, null);
                             } catch (SDCardOperator.SDCardException e) {
