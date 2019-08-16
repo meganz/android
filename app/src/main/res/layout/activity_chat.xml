@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_container_chat"
-    android:background="@android:color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:fitsSystemWindows="true"
     android:orientation="horizontal">
 
     <RelativeLayout
+        android:id="@+id/activity_chat_content_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:id="@+id/activity_chat_content_layout">
+        android:background="@android:color/transparent">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -23,20 +23,21 @@
                 android:id="@+id/toolbar_chat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
                 android:elevation="4dp"
-                app:titleTextAppearance="@style/ToolbarTitle.Secondary"
+                android:minHeight="?attr/actionBarSize"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                tools:context=".lollipop.megachat.ChatActivityLollipop" >
+                app:titleTextAppearance="@style/ToolbarTitle.Secondary"
+                tools:context=".lollipop.megachat.ChatActivityLollipop">
 
                 <LinearLayout
                     android:id="@+id/toolbar_elements"
-                    android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="center_vertical|left"
                     android:orientation="vertical">
+
                     <RelativeLayout
                         android:id="@+id/toolbar_elements_inside"
                         android:layout_width="wrap_content"
@@ -48,17 +49,19 @@
                             android:id="@+id/title_toolbar"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
+                            android:layout_gravity="left"
+                            android:layout_toLeftOf="@+id/icons_layout"
+                            android:ellipsize="end"
                             android:fontFamily="sans-serif-light"
-                            android:textStyle="bold"
                             android:gravity="center_vertical|left"
                             android:layout_gravity="left"
                             android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
                             android:singleLine="true"
                             android:maxLines="1"
                             android:layout_alignParentLeft="true"
                             android:ellipsize="end"/>
-
                         <LinearLayout
                             android:id="@+id/icons_layout"
                             android:layout_width="wrap_content"
@@ -67,27 +70,28 @@
                             android:layout_toRightOf="@id/title_toolbar"
                             android:layout_alignParentTop="true">
 
+
                             <ImageView
                                 android:id="@+id/state_icon_toolbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:background="@null"
+                                android:layout_marginLeft="3dp"
                                 android:layout_marginTop="7dp"
                                 android:layout_marginRight="1.5dp"
-                                android:layout_marginLeft="3dp"
-                                android:visibility="gone"/>
+                                android:background="@null"
+                                android:visibility="gone" />
 
                             <ImageView
                                 android:id="@+id/private_icon_toolbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:background="@null"
+                                android:layout_marginLeft="1.5dp"
                                 android:layout_marginTop="2dp"
                                 android:layout_marginRight="1.5dp"
-                                android:layout_marginLeft="1.5dp"
-                                android:tint="@color/white"
+                                android:background="@null"
                                 android:src="@drawable/ic_private_chat"
-                                android:visibility="gone"/>
+                                android:tint="@color/white"
+                                android:visibility="gone" />
                         </LinearLayout>
 
                     </RelativeLayout>
@@ -96,41 +100,42 @@
                         android:id="@+id/individual_subtitle_toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginRight="0dp"
+                        android:ellipsize="none"
+                        android:singleLine="true"
                         android:textColor="@color/white"
                         android:textSize="12sp"
-                        android:visibility="gone"
-                        android:singleLine="true"
-                        android:ellipsize="none"
-                        android:layout_marginRight="0dp"/>
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/groupal_subtitle_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:textSize="12sp"
-                        android:visibility="gone"
-                        android:singleLine="true"
+                        android:layout_marginRight="0dp"
                         android:ellipsize="marquee"
                         android:focusable="true"
                         android:focusableInTouchMode="true"
                         android:marqueeRepeatLimit="marquee_forever"
                         android:scrollHorizontally="true"
-                        android:layout_marginRight="0dp"/>
+                        android:singleLine="true"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
 
                     <LinearLayout
                         android:id="@+id/subtitle_call"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
+
                         <Chronometer
                             android:id="@+id/chrono_call"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="gone"
+                            android:layout_marginRight="8dp"
                             android:textColor="@color/white"
                             android:textSize="14sp"
-                            android:layout_marginRight="8dp"/>
+                            android:visibility="gone" />
 
                         <LinearLayout
                             android:id="@+id/ll_participants"
@@ -138,17 +143,19 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:visibility="gone">
+
                             <TextView
                                 android:id="@+id/participants_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginRight="4dp"
                                 android:textColor="@color/white"
-                                android:textSize="14sp"
-                                android:layout_marginRight="4dp"/>
+                                android:textSize="14sp" />
+
                             <ImageView
-                                android:layout_height="18dp"
                                 android:layout_width="18dp"
-                                android:src="@drawable/ic_videocam_white"/>
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_videocam_white" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -157,13 +164,13 @@
             </android.support.v7.widget.Toolbar>
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/writing_container_layout_chat_layout"
-                android:layout_alignParentBottom="true"
-                android:background="@android:color/transparent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="@android:color/transparent"
                 android:orientation="vertical"
                 android:visibility="gone">
 
@@ -177,50 +184,51 @@
                         android:id="@+id/write_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="bottom"
-                        android:background="@android:color/transparent">
+                        android:background="@android:color/transparent"
+                        android:gravity="bottom">
 
                         <LinearLayout
                             android:id="@+id/separator_edit_text"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:visibility="visible"
+                            android:layout_alignTop="@id/writing_linear_layout_chat"
                             android:background="@color/keyboard_chat_separator"
                             android:orientation="horizontal"
-                            android:layout_alignTop="@id/writing_linear_layout_chat"/>
+                            android:visibility="visible" />
 
                         <RelativeLayout
                             android:id="@+id/writing_linear_layout_chat"
                             android:layout_width="match_parent"
                             android:layout_height="48dp"
-                            android:visibility="visible"
+                            android:background="@android:color/transparent"
                             android:gravity="center_vertical"
-                            android:background="@android:color/transparent">
+                            android:visibility="visible">
+
                             <ImageButton
                                 android:id="@+id/send_message_icon_chat"
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
-                                android:visibility="visible"
                                 android:layout_alignParentRight="true"
                                 android:layout_marginRight="8dp"
                                 android:background="@null"
+                                android:src="@drawable/ic_send_black"
                                 android:tint="@color/accentColor"
-                                android:src="@drawable/ic_send_black"/>
+                                android:visibility="visible" />
 
                             <mega.privacy.android.app.components.twemoji.EmojiEditText
                                 android:id="@+id/edit_text_chat"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:background="@android:color/transparent"
-                                android:layout_marginRight="58dp"
-                                android:layout_marginLeft="10dp"
                                 android:layout_centerVertical="true"
-                                android:textSize="14sp"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginRight="58dp"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:gravity="center_vertical"
                                 android:inputType="textMultiLine|textCapSentences"
                                 android:maxLines="1"
-                                android:ellipsize="end"
-                                android:textColor="@color/black"/>
+                                android:textColor="@color/black"
+                                android:textSize="14sp" />
                         </RelativeLayout>
                     </RelativeLayout>
 
@@ -228,93 +236,102 @@
                         android:id="@+id/linear_layout_options"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
-                        android:orientation="horizontal"
-                        android:background="@color/white">
+                        android:background="@color/white"
+                        android:orientation="horizontal">
+
                         <RelativeLayout
                             android:id="@+id/rl_keyboard_twemoji_chat"
                             android:layout_width="56dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1">
+
                             <ImageButton
                                 android:id="@+id/keyboard_twemoji_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
                                 android:background="@null"
-                                android:tint="@color/transparent_black"
                                 android:src="@drawable/ic_emojicon"
-                                android:layout_centerInParent="true"/>
+                                android:tint="@color/transparent_black" />
                         </RelativeLayout>
+
                         <RelativeLayout
                             android:id="@+id/rl_media_icon_chat"
                             android:layout_width="56dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1">
+
                             <ImageButton
                                 android:id="@+id/media_icon_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
                                 android:background="@null"
-                                android:tint="@color/transparent_black"
                                 android:src="@drawable/ic_media"
-                                android:layout_centerInParent="true"/>
+                                android:tint="@color/transparent_black" />
 
                         </RelativeLayout>
+
                         <RelativeLayout
                             android:id="@+id/rl_pick_file_storage_icon_chat"
                             android:layout_width="56dp"
-                            android:layout_weight="1"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+
                             <ImageButton
                                 android:id="@+id/pick_file_storage_icon_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
                                 android:background="@null"
-                                android:src="@drawable/ic_b_select_image"
-                                android:layout_centerInParent="true"/>
+                                android:src="@drawable/ic_b_select_image" />
                         </RelativeLayout>
 
                         <RelativeLayout
                             android:id="@+id/rl_attach_icon_chat"
                             android:layout_width="56dp"
-                            android:layout_weight="1"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
 
                             <ImageButton
                                 android:id="@+id/pick_attach_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
                                 android:background="@null"
-                                android:tint="@color/transparent_black"
                                 android:src="@drawable/attach_file"
-                                android:layout_centerInParent="true"/>
+                                android:tint="@color/transparent_black" />
                         </RelativeLayout>
                     </LinearLayout>
+
                     <mega.privacy.android.app.components.twemoji.EmojiKeyboard
                         android:id="@+id/emojiView"
-                        android:animateLayoutChanges="true"
-                        android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:animateLayoutChanges="true"
+                        android:visibility="gone" />
+
                     <RelativeLayout
                         android:id="@+id/relative_layout_file_storage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:background="@android:color/transparent">
+
                         <FrameLayout
                             android:id="@+id/fragment_container_file_storage"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"/>
+                            android:background="@android:color/transparent" />
                     </RelativeLayout>
                 </LinearLayout>
             </RelativeLayout>
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/join_chat_layout_chat_layout"
-                android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
                 android:layout_height="96dp"
+                android:layout_alignParentBottom="true"
                 android:background="@android:color/transparent"
                 android:visibility="gone">
 
@@ -328,23 +345,23 @@
                     android:id="@+id/join_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:layout_centerInParent="true"
                     android:background="@color/accentColor"
                     android:elevation="@dimen/elevation_upgrade_low"
                     android:minHeight="36dp"
                     android:stateListAnimator="@anim/button_upgrade_elevation"
                     android:text="@string/action_join"
                     android:textColor="@color/white"
-                    android:tint="@android:color/white"/>
+                    android:tint="@android:color/white" />
 
             </RelativeLayout>
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/message_container_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -360,18 +377,20 @@
                     android:layout_height="match_parent"
                     android:background="@color/background_chat"
                     android:orientation="vertical">
+
                     <ImageView
                         android:id="@+id/empty_image_view_chat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"/>
+                        android:layout_gravity="center_horizontal" />
+
                     <TextView
                         android:id="@+id/empty_text_chat_recent"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
                         android:gravity="center"
                         android:text="@string/chat_loading_messages"
-                        android:layout_gravity="center_horizontal"
                         android:textColor="@color/adapters_background"
                         android:textSize="18sp" />
                 </LinearLayout>
@@ -382,12 +401,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/background_chat">
+
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/messages_chat_list_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:choiceMode="multipleChoice"
-                        android:paddingBottom="24dp"/>
+                        android:paddingBottom="24dp" />
                 </RelativeLayout>
 
                 <!--User typing-->
@@ -397,17 +417,18 @@
                     android:layout_height="22dp"
                     android:layout_alignParentBottom="true"
                     android:background="@color/background_chat">
+
                     <TextView
                         android:id="@+id/user_typing_text"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
                         android:layout_width="wrap_content"
                         android:layout_height="18dp"
+                        android:layout_marginLeft="16dp"
                         android:layout_marginTop="4dp"
+                        android:layout_marginRight="16dp"
                         android:ellipsize="middle"
                         android:singleLine="true"
                         android:textColor="@color/name_my_account"
-                        android:textSize="10sp"/>
+                        android:textSize="10sp" />
                 </RelativeLayout>
 
                 <!--Jump and new messages-->
@@ -418,32 +439,35 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="6dp"
                     android:animateLayoutChanges="true"
-                    android:visibility="gone"
-                    android:background="@drawable/dark_rounded_jump_to_latest">
+                    android:background="@drawable/dark_rounded_jump_to_latest"
+                    android:visibility="gone">
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:orientation="horizontal">
+
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_w_shared_read"
-                            android:layout_marginLeft="12dp"/>
+                            android:layout_marginLeft="12dp"
+                            android:src="@drawable/ic_w_shared_read" />
+
                         <TextView
                             android:id="@+id/observers_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="12dp"
-                            android:layout_marginLeft="12dp"
                             android:layout_gravity="center_vertical"
-                            android:gravity="center_vertical"
-                            android:textSize="14sp"
-                            android:textColor="@color/white"
-                            android:text="2"
-                            android:singleLine="true"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginRight="12dp"
+                            android:ellipsize="end"
                             android:fontFamily="Roboto"
-                            android:ellipsize="end"/>
+                            android:gravity="center_vertical"
+                            android:singleLine="true"
+                            android:text="2"
+                            android:textColor="@color/white"
+                            android:textSize="14sp" />
                     </LinearLayout>
                 </RelativeLayout>
 
@@ -451,46 +475,51 @@
                     android:id="@+id/message_jump_layout"
                     android:layout_width="163dp"
                     android:layout_height="36dp"
-                    android:layout_centerHorizontal="true"
                     android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginBottom="22dp"
                     android:animateLayoutChanges="true"
                     android:background="@drawable/dark_rounded_jump_to_latest">
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:orientation="horizontal">
+
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_new_messages"
-                            android:layout_marginRight="12dp"/>
+                            android:layout_marginRight="12dp"
+                            android:src="@drawable/ic_new_messages" />
+
                         <TextView
                             android:id="@+id/message_jump_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="5dp"
                             android:layout_gravity="center_vertical"
-                            android:gravity="center_vertical"
-                            android:textSize="14sp"
-                            android:textColor="@color/white"
-                            android:text="@string/message_jump_latest"
-                            android:singleLine="true"
+                            android:layout_marginRight="5dp"
+                            android:ellipsize="end"
                             android:fontFamily="Roboto"
-                            android:ellipsize="end"/>
+                            android:gravity="center_vertical"
+                            android:singleLine="true"
+                            android:text="@string/message_jump_latest"
+                            android:textColor="@color/white"
+                            android:textSize="14sp" />
                     </LinearLayout>
                 </RelativeLayout>
             </RelativeLayout>
 
-            <include layout="@layout/item_call_in_progress_layout"
+            <include
+                layout="@layout/item_call_in_progress_layout"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_below="@id/toolbar_chat"/>
 
+
             <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/fragment_voice_clip"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -501,53 +530,57 @@
                     android:id="@+id/record_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxHeight ="150dp"
-                    android:visibility="visible"
-                    android:background="@null"/>
+                    android:background="@null"
+                    android:maxHeight="150dp"
+                    android:visibility="visible" />
 
                 <RelativeLayout
                     android:id="@+id/layout_button_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone"
-                    android:background="@null">
+                    android:background="@null"
+                    android:visibility="gone">
+
                     <RelativeLayout
                         android:id="@+id/record_button_layout"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:layout_alignParentBottom="true"
                         android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
                         android:background="@null"
                         android:visibility="visible">
+
                         <mega.privacy.android.app.components.voiceClip.RecordButton
                             android:id="@+id/record_button"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            android:visibility="visible"
                             android:layout_centerInParent="true"
-                            android:src="@drawable/ic_mic_vc_off"/>
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_mic_vc_off"
+                            android:visibility="visible" />
                     </RelativeLayout>
+
                     <LinearLayout
                         android:id="@+id/bubble_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:layout_above="@+id/record_button_layout"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="25dp"
-                        android:layout_above="@+id/record_button_layout"
+                        android:orientation="vertical"
                         android:visibility="visible">
+
                         <TextView
                             android:id="@+id/bubble_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/recording_less_than_second"
-                            android:textSize="12sp"
-                            android:gravity="center"
                             android:layout_gravity="center"
+                            android:fontFamily="Roboto"
+                            android:gravity="center"
+                            android:text="@string/recording_less_than_second"
                             android:textColor="@color/white"
-                            android:textStyle="normal"
-                            android:fontFamily="Roboto"/>
+                            android:textSize="12sp"
+                            android:textStyle="normal" />
                     </LinearLayout>
                 </RelativeLayout>
             </FrameLayout>
