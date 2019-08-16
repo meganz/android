@@ -65,6 +65,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle> implements SectionTitleProvider {
 
     private class Media {
@@ -376,19 +378,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         dbH = DatabaseHandler.getDbHandler(context);
         prefs = dbH.getPreferences();
-        if (prefs != null){
-            log("prefs != null");
-            if (prefs.getStorageAskAlways() != null){
-                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-                    log("askMe==false");
-                    if (prefs.getStorageDownloadLocation() != null){
-                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-                        }
-                    }
-                }
-            }
-        }
+        downloadLocationDefaultPath = getDownloadLocation(context);
 
         handler = new Handler();
 
@@ -1280,7 +1270,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             }
                             mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
                         }
-                        String localPath = Util.findVideoLocalPath(file);
+                        String localPath = findVideoLocalPath(context, file);
                         if (localPath != null && Util.checkFingerprint(megaApi,file,localPath)) {
                             File mediaFile = new File(localPath);
 
@@ -1448,7 +1438,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     }
                     else {
                         boolean isOnMegaDownloads = false;
-                        path = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+                        path = getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
                         File f = new File(downloadLocationDefaultPath, file.getName());
                         if(f.exists() && (f.length() == file.getSize())){
                             isOnMegaDownloads = true;
@@ -1629,7 +1619,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             }
             if(position > 0 && position-1 < temp.nodeHandles.size()){
                 MegaNode n = megaApi.getNodeByHandle(temp.nodeHandles.get(position - 1));
-                if(Util.isVideoFile(n.getName())){
+                if(isVideoFile(n.getName())){
                     return TYPE_ITEM_VIDEO;
                 }
                 else{

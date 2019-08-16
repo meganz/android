@@ -11,7 +11,6 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.FileProvider;
@@ -41,6 +40,9 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -85,8 +87,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             log("Handle of the node offline: "+handle);
             if(handle.equals("0")){
                 //recovery key will have handle as 0 and have to be handled specifically
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-                nodeOffline = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                nodeOffline = new MegaOffline("0", getExternalStoragePath(RK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
             }else{
                 nodeOffline = dbH.findByHandle(handle);
             }
@@ -155,9 +156,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
             //Check if the node is the Master Key file
             if(nodeOffline.getHandle().equals("0")){
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-                file= new File(path);
-                if(file.exists()){
+                file= buildExternalStorageFile(RK_FILE);
+                if(isFileAvailable(file)){
                     if(file.exists()){
                         long nodeSize = file.length();
                         nodeInfo.setText(Util.getSizeString(nodeSize));
@@ -182,26 +182,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 separatorRK.setVisibility(View.GONE);
 
                 log("Set node info");
-                String path=null;
-
-                if(nodeOffline.getOrigin()==MegaOffline.INCOMING){
-                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + nodeOffline.getHandleIncoming() + "/";
-                }
-                else if(nodeOffline.getOrigin()==MegaOffline.INBOX){
-                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in";
-                }
-                else{
-                    path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-                }
-
-                if (Environment.getExternalStorageDirectory() != null){
-                    String finalPath = path + nodeOffline.getPath()+nodeOffline.getName();
-                    file = new File(finalPath);
-                    log("Path to find file: "+finalPath);
-                }
-                else{
-                    file = context.getFilesDir();
-                }
+                file = getOfflineFile(context, nodeOffline);
+                if (file == null) return;
 
                 int folders=0;
                 int files=0;
