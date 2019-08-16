@@ -97,6 +97,13 @@ public class JobUtil {
         stopIntent.setAction(CameraUploadsService.ACTION_STOP);
         context.startService(stopIntent);
     }
+
+    public static synchronized void cancelAllUploads(Context context) {
+        log("stopRunningCameraUploadService");
+        Intent stopIntent = new Intent(context,CameraUploadsService.class);
+        stopIntent.setAction(CameraUploadsService.ACTION_CANCEL_ALL);
+        context.startService(stopIntent);
+    }
     
     public static void rescheduleCameraUpload(final Context context) {
         stopRunningCameraUploadService(context);
