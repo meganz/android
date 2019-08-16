@@ -79,9 +79,9 @@
                 android:id="@+id/recent_chat_list_contact_state"
                 android:layout_width="6dp"
                 android:layout_height="6dp"
-                android:layout_alignTop="@id/recent_chat_list_name"
+                android:layout_gravity="center_vertical"
                 android:layout_toRightOf="@id/recent_chat_list_name"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="2dp"
                 android:layout_marginLeft="6dp"
                 android:src="@drawable/circle_status_contact_offline" />
 

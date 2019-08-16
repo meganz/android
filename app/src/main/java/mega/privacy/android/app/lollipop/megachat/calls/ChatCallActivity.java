@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -61,8 +60,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
@@ -86,13 +83,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
-import android.provider.CallLog;
-import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
-import static android.view.View.GONE;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.ChatUtil.showErrorAlertDialogGroupCall;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
@@ -738,6 +732,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }
     }
+
     private void setAvatarLayout() {
         log("setAvatarLayout");
         setProfileAvatar(megaChatApi.getMyUserHandle());
@@ -2297,7 +2292,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
-
 
 
     private void answerCall(boolean isVideoCall) {

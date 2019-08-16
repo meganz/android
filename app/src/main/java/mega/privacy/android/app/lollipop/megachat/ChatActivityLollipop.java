@@ -555,6 +555,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         //Set toolbar
         tB = findViewById(R.id.toolbar_chat);
+
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         aB.setDisplayHomeAsUpEnabled(true);
@@ -563,20 +564,33 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         aB.setSubtitle(null);
         tB.setOnClickListener(this);
 
-        toolbarElementsInside = findViewById(R.id.toolbar_elements_inside);
+        toolbarElementsInside = tB.findViewById(R.id.toolbar_elements_inside);
         titleToolbar = tB.findViewById(R.id.title_toolbar);
-        titleToolbar.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+        iconStateToolbar = tB.findViewById(R.id.state_icon_toolbar);
+        privateIconToolbar = tB.findViewById(R.id.private_icon_toolbar);
 
         individualSubtitleToobar = tB.findViewById(R.id.individual_subtitle_toolbar);
         groupalSubtitleToolbar = tB.findViewById(R.id.groupal_subtitle_toolbar);
+
         subtitleCall = tB.findViewById(R.id.subtitle_call);
         subtitleChronoCall = tB.findViewById(R.id.chrono_call);
         participantsLayout = tB.findViewById(R.id.ll_participants);
         participantsText = tB.findViewById(R.id.participants_text);
-        iconStateToolbar = tB.findViewById(R.id.state_icon_toolbar);
-        privateIconToolbar = tB.findViewById(R.id.private_icon_toolbar);
+
+        textChat = findViewById(R.id.edit_text_chat);
+        textChat.setVisibility(View.VISIBLE);
+        textChat.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+        textChat.setEnabled(true);
+
+        emptyLayout = findViewById(R.id.empty_messages_layout);
+        emptyTextView = findViewById(R.id.empty_text_chat_recent);
+        emptyImageView = findViewById(R.id.empty_image_view_chat);
+
+        fragmentContainer = findViewById(R.id.fragment_container_chat);
+        writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
 
         titleToolbar.setText("");
+        titleToolbar.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
         individualSubtitleToobar.setText("");
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
@@ -590,14 +604,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        emptyLayout = findViewById(R.id.empty_messages_layout);
-        emptyTextView = findViewById(R.id.empty_text_chat_recent);
-        emptyImageView = findViewById(R.id.empty_image_view_chat);
 
         updateNavigationToolbarIcon();
 
-        fragmentContainer = findViewById(R.id.fragment_container_chat);
-        writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
+
 
         joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
         joinButton = findViewById(R.id.join_button);
@@ -619,13 +629,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickAttachButton = findViewById(R.id.pick_attach_chat);
 
 
-        textChat = findViewById(R.id.edit_text_chat);
-        textChat.setVisibility(View.VISIBLE);
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            textChat.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-        } else {
-            textChat.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-        }
 
         keyboardHeight = outMetrics.heightPixels / 2 - ChatUtil.getActionBarHeight(this, getResources());
         marginBottomDeactivated = Util.px2dp(MARGIN_BUTTON_DEACTIVATED, outMetrics);
@@ -680,10 +683,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         handlerKeyboard = new Handler();
         handlerEmojiKeyboard = new Handler();
 
-        textChat = findViewById(R.id.edit_text_chat);
-        textChat.setVisibility(View.VISIBLE);
-        textChat.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-        textChat.setEnabled(true);
+
 
         emojiKeyboard = findViewById(R.id.emojiView);
         emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
@@ -1184,7 +1184,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 setPreviewersView();
-
+                log("************ 1 titleToolbar - "+chatRoom.getTitle());
                 titleToolbar.setText(chatRoom.getTitle());
                 setChatSubtitle();
 
@@ -5350,6 +5350,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Change of chat title");
             String newTitle = msg.getContent();
             if(newTitle!=null){
+                log("************ 2 titleToolbar - "+newTitle);
 
                 titleToolbar.setText(newTitle);
             }
@@ -7626,6 +7627,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             activityVisible = true;
             showCallLayout(megaChatApi.getChatCall(idChat));
             if(aB != null && aB.getTitle() != null){
+                log("************ 3 titleToolbar - "+adjustForLargeFont(titleToolbar.getText().toString()));
+
                 titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
             }
         }

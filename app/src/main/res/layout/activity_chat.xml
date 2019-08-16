@@ -32,7 +32,6 @@
                 tools:context=".lollipop.megachat.ChatActivityLollipop">
 
                 <LinearLayout
-                    android:id="@+id/toolbar_elements"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|left"
@@ -50,11 +49,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="left"
-                            android:layout_toLeftOf="@+id/icons_layout"
-                            android:ellipsize="end"
                             android:fontFamily="sans-serif-light"
                             android:gravity="center_vertical|left"
-                            android:layout_gravity="left"
                             android:textSize="20sp"
                             android:textColor="@color/white"
                             android:textStyle="bold"
@@ -66,17 +62,16 @@
                             android:id="@+id/icons_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/title_toolbar"
                             android:orientation="horizontal"
-                            android:layout_toRightOf="@id/title_toolbar"
-                            android:layout_alignParentTop="true">
-
-
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center_vertical">
                             <ImageView
                                 android:id="@+id/state_icon_toolbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="3dp"
-                                android:layout_marginTop="7dp"
+                                android:layout_marginTop="2dp"
                                 android:layout_marginRight="1.5dp"
                                 android:background="@null"
                                 android:visibility="gone" />
