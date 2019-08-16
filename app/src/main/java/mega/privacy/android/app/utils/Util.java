@@ -1085,7 +1085,6 @@ public class Util {
 		} finally {
 			if (cursor != null) {
 				cursor.close();
-
 			}
 		}
 
