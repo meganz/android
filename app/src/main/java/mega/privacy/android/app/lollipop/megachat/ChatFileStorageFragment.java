@@ -335,12 +335,12 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                             photoUris.add("file://" + cursor.getString(dataColumn));
                             context.createImagesPath(cursor.getString(dataColumn));
                         }
-                        cursor.close();
 
                         return photoUris;
                     }
                 } catch (Exception ex) {
                     log("Exception is thrown, ex: " + ex.toString());
+                } finally {
                     if (cursor != null) {
                         cursor.close();
                     }

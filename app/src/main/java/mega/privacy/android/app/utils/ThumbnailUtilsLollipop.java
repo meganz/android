@@ -1592,6 +1592,7 @@ public class ThumbnailUtilsLollipop {
 			return result;
 		} catch (Exception ex) {
 			log("Exception is thrown, ex: " + ex.toString());
+		} finally {
 			if (cursor != null) {
 				cursor.close();
 			}
