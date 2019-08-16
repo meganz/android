@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.provider.DocumentFile;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -10,6 +11,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DownloadInfo;
+import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.Util;
 
@@ -37,11 +39,18 @@ public class DownloadableActivity extends PinActivityLollipop {
             if (pickedDir.canWrite()) {
                 log("sd card root uri is " + treeUri);
                 //save the sd card root uri string
-                DatabaseHandler.getDbHandler(this).setSDCardUri(treeUri.toString());
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(this);
+                dbH.setSDCardUri(treeUri.toString());
                 try {
-                    SDCardOperator sdCardOperator = new SDCardOperator(this);
                     if (nC != null && downloadInfo != null) {
-                        nC.requestLocalFolder(downloadInfo, sdCardOperator.getSDCardRoot(), null);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            SDCardOperator sdCardOperator = new SDCardOperator(this);
+                            nC.requestLocalFolder(downloadInfo, sdCardOperator.getSDCardRoot(), null);
+                        } else {
+                            String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
+                            dbH.setStorageDownloadLocation(path);
+                            nC.checkSizeBeforeDownload(path, downloadInfo.getUrl(), downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
+                        }
                     }
                 } catch (SDCardOperator.SDCardException e) {
                     e.printStackTrace();
