@@ -1,33 +1,30 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
 
-import android.util.Log;
-import android.view.SurfaceView;
-
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 
 public class InfoPeerGroupCall {
 
-    long peerId;
-    long clientId;
-    String name;
-    boolean videoOn;
-    boolean audioOn;
-    boolean greenLayer;
-    GroupCallListener listener = null;
-    boolean goodQuality = true;
+    private long peerId;
+    private long clientId;
+    private String name;
+    private boolean videoOn;
+    private boolean audioOn;
+    private boolean greenLayer;
+    private GroupCallListener listener;
+    private boolean goodQuality;
 
-public InfoPeerGroupCall(long peerId, long clientId, String name, boolean videoOn, boolean audioOn, boolean greenLayer, boolean goodQuality, GroupCallListener listener) {
+    public InfoPeerGroupCall(long peerId, long clientId, String name, boolean videoOn, boolean audioOn, boolean greenLayer, boolean goodQuality, GroupCallListener listener) {
 
-    this.peerId = peerId;
-    this.clientId = clientId;
-    this.name = name;
-    this.videoOn = videoOn;
-    this.audioOn = audioOn;
-    this.greenLayer = greenLayer;
-    this.listener = listener;
-    this.goodQuality = goodQuality;
-}
+        this.peerId = peerId;
+        this.clientId = clientId;
+        this.name = name;
+        this.videoOn = videoOn;
+        this.audioOn = audioOn;
+        this.greenLayer = greenLayer;
+        this.listener = listener;
+        this.goodQuality = goodQuality;
+    }
 
     public long getPeerId() {
         return peerId;

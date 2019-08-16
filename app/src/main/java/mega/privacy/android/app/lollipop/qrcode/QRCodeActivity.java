@@ -44,6 +44,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+
 public class QRCodeActivity extends PinActivityLollipop implements MegaRequestListenerInterface{
 
     private static int REQUEST_DOWNLOAD_FOLDER = 1000;
@@ -282,14 +284,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                     megaApi = ((MegaApplication) getApplication()).getMegaApi();
                 }
                 String myEmail = megaApi.getMyEmail();
-                if (this.getExternalCacheDir() != null) {
-                    File qrDir = new File (this.getExternalCacheDir(), "qrMEGA");
-                    qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-                }
-                else {
-                    File qrDir = this.getDir("qrMEGA", 0);
-                    qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-                }
+                qrFile = buildQrFile(this,myEmail + "QRcode.jpg");
                 if (qrFile == null) {
                     showSnackbar(drawerLayout, getString(R.string.general_error));
                 }
@@ -406,10 +401,10 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     public void showSnackbar(View view, String s){
         if (view == null) {
-            showSnackbar(drawerLayout, s);
+            showSnackbar(Constants.SNACKBAR_TYPE, drawerLayout, s);
         }
         else {
-            showSnackbar(view, s);
+            showSnackbar(Constants.SNACKBAR_TYPE, view, s);
         }
     }
 

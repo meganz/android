@@ -10,10 +10,12 @@ import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -42,6 +44,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -114,7 +117,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -135,7 +137,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
-import mega.privacy.android.app.fcm.MegaFirebaseMessagingService;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -193,11 +195,13 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.ProgressDialogUtil;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -237,7 +241,11 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
-import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
+import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
+import static mega.privacy.android.app.utils.Util.showSnackBar;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -252,7 +260,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public int accountFragment;
 
-	public long handleInviteContact = 0;
+	private long handleInviteContact = -1;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -551,6 +559,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog permissionsDialog;
 	private AlertDialog presenceStatusDialog;
 	private AlertDialog openLinkDialog;
+	private boolean openLinkDialogIsShown = false;
+	private boolean openLinkDialogIsErrorShown = false;
 	private AlertDialog alertNotPermissionsUpload;
 	private AlertDialog clearRubbishBinDialog;
 	private AlertDialog downloadConfirmationDialog;
@@ -646,9 +656,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	private boolean onAskingPermissionsFragment = false;
 
-	private AlertDialog openchatLinkDialog;
-	private EditText openChatLinkText;
-	private RelativeLayout openChatLinkError;
+	private EditText openLinkText;
+	private RelativeLayout openLinkError;
+	private TextView openLinkErrorText;
+	private Button openLinkOpenButton;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -755,6 +766,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				actionType = intent.getIntExtra("actionType", -1);
 
 				if(actionType == Constants.GO_OFFLINE){
+				    //stop cu process
+                    JobUtil.stopRunningCameraUploadService(ManagerActivityLollipop.this);
 					showOfflineMode();
 				}
 				else if(actionType == Constants.GO_ONLINE){
@@ -766,6 +779,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 	};
+
+	private BroadcastReceiver cameraUploadLauncherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context,Intent intent) {
+            try {
+                log("cameraUploadLauncherReceiver: start service here");
+                JobUtil.startCameraUploadService(ManagerActivityLollipop.this);
+            } catch (Exception e) {
+                log("cameraUploadLauncherReceiver: Exception: " + e.getMessage() + "_" + e.getStackTrace());
+            }
+        }
+    };
 
 	private BroadcastReceiver receiverUpdatePosition = new BroadcastReceiver() {
 		@Override
@@ -1523,6 +1548,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 					onGetReadWritePermission();
 				}
+				break;
 			}
 	        case Constants.REQUEST_WRITE_STORAGE:{
 				log("REQUEST_WRITE_STORAGE PERMISSIONS");
@@ -1596,6 +1622,55 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 	        	break;
 	        }
+
+            case Constants.REQUEST_CAMERA_UPLOAD:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
+                    if(sttFLol != null){
+                        sttFLol.enableCameraUpload();
+                    }
+                } else {
+                    showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+                }
+
+                break;
+            }
+
+            case Constants.REQUEST_CAMERA_ON_OFF: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    cuFL = (CameraUploadFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                    if (cuFL != null) {
+                        cuFL.cameraOnOff();
+                    }
+                } else {
+                    showSnackBar(this,Constants.SNACKBAR_TYPE,getString(R.string.on_refuse_storage_permission),-1);
+                }
+                break;
+            }
+
+            case Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME:{
+                if(permissions.length == 0) {
+                    return;
+                }
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                    if(cuFL != null){
+                        cuFL.cameraOnOffFirstTime();
+                    }
+                } else {
+                    if(!ActivityCompat.shouldShowRequestPermissionRationale(this,permissions[0])){
+                        cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                        if(cuFL != null){
+                            cuFL.onStoragePermissionRefused();
+                        }
+                    } else {
+                        showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+                    }
+                }
+
+                break;
+            }
+
 			case PermissionsFragment.PERMISSIONS_FRAGMENT: {
 				pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
 				if (pF != null) {
@@ -1706,6 +1781,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putSerializable("drawerItemPreUpgradeAccount", drawerItemPreUpgradeAccount);
 		outState.putInt("accountFragmentPreUpgradeAccount", accountFragmentPreUpgradeAccount);
 		outState.putInt("comesFromNotificationDeepBrowserTreeIncoming", comesFromNotificationDeepBrowserTreeIncoming);
+		outState.putBoolean("openLinkDialogIsShown", openLinkDialogIsShown);
+		if (openLinkDialogIsShown) {
+			if (openLinkText != null && openLinkText.getText() != null) {
+				outState.putString("openLinkText", openLinkText.getText().toString());
+			}
+			else {
+				outState.putString("openLinkText", "");
+			}
+			outState.putBoolean("openLinkDialogIsErrorShown", openLinkDialogIsErrorShown);
+		}
 	}
 
 	@Override
@@ -1724,6 +1809,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onCreate after call super");
 
 		boolean selectDrawerItemPending = true;
+		//upload from device, progress dialog should show when screen orientation changes.
+        if (ProgressDialogUtil.shouldShowDialog) {
+            ProgressDialogUtil.showProcessFileDialog(this,null);
+        }
 		if(savedInstanceState!=null){
 			log("Bundle is NOT NULL");
 			parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser", -1);
@@ -1774,6 +1863,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			drawerItemPreUpgradeAccount = (DrawerItem) savedInstanceState.getSerializable("drawerItemPreUpgradeAccount");
 			accountFragmentPreUpgradeAccount = savedInstanceState.getInt("accountFragmentPreUpgradeAccount", -1);
 			comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", -1);
+			openLinkDialogIsShown = savedInstanceState.getBoolean("openLinkDialogIsShown", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -1805,32 +1895,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			localBroadcastManager.registerReceiver(networkReceiver,
 					new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 		}
+        registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
-		nC = new NodeController(this);
+
+        nC = new NodeController(this);
 		cC = new ContactController(this);
 		aC = new AccountController(this);
 
-		File thumbDir;
-		if (getExternalCacheDir() != null){
-			thumbDir = new File (getExternalCacheDir(), "thumbnailsMEGA");
-			thumbDir.mkdirs();
-			log("------------------ThumbnailsMEGA folder created: "+thumbDir.getAbsolutePath());
-		}
-		else{
-			thumbDir = getDir("thumbnailsMEGA", 0);
-		}
+        createCacheFolders(this);
 
-		File previewDir;
-		if (getExternalCacheDir() != null){
-			previewDir = new File (getExternalCacheDir(), "previewsMEGA");
-			previewDir.mkdirs();
-		}
-
-		else{
-			previewDir = getDir("previewsMEGA", 0);
-		}
-
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		managerActivity = this;
 		app = (MegaApplication)getApplication();
@@ -1884,11 +1958,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    			openLink = true;
 		    		}
 		    		else if (newIntent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-						Intent cancelTourIntent = new Intent(this, LoginActivityLollipop.class);
-						cancelTourIntent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
-						cancelTourIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		    			cancelTourIntent.setAction(newIntent.getAction());
-		    			startActivity(cancelTourIntent);
+                        stopRunningCameraUploadService(getApplicationContext());
 		    			finish();
 		    			return;
 		    		}
@@ -2262,7 +2332,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
 						}else{
 							log("onCreate: Chat correctly initialized");
-							megaChatApi.enableGroupChatCalls(true);
 						}
 					}
 					else{
@@ -2279,17 +2348,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		///Check the MK file
 		int versionApp = Util.getVersion(this);
 		log("-------------------Version app: "+versionApp);
-		final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-		final File fMKOld = new File(pathOldMK);
-		if (fMKOld != null) {
-			if (fMKOld.exists()) {
-				log("Old MK file need to be renamed!");
-				aC.renameMK();
-			}
+		final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
+		if (isFileAvailable(fMKOld)) {
+			log("Old MK file need to be renamed!");
+			aC.renameMK();
 		}
 
 		rootNode = megaApi.getRootNode();
-		if (rootNode == null){
+		if (rootNode == null || LoginActivityLollipop.isBackFromLoginPage){
 			 if (getIntent() != null){
 			 	log("Action: "+getIntent().getAction());
 				if (getIntent().getAction() != null){
@@ -2334,11 +2400,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						return;
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(getIntent().getAction());
-						startActivity(intent);
+                        stopRunningCameraUploadService(getApplicationContext());
 						finish();
 						return;
 					}
@@ -2426,10 +2488,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 						log("Login loin");
-						handleInviteContact = getIntent().getLongExtra("handle", 0);
-
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("handle", handleInviteContact);
+						intent.putExtra(Constants.CONTACT_HANDLE, getIntent().getLongExtra(Constants.CONTACT_HANDLE, -1));
 						intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
@@ -2503,6 +2563,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(Util.isChatEnabled()){
 				megaApi.shouldShowRichLinkWarning(this);
 				megaApi.isRichPreviewsEnabled(this);
+				megaApi.isGeolocationEnabled(this);
 			}
 
 			transferData = megaApi.getTransferData(this);
@@ -2807,12 +2868,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 						markNotificationsSeen(true);
-
-						handleInviteContact = getIntent().getLongExtra("handle", 0);
-
-						drawerItem = DrawerItem.CONTACTS;
-						indexContacts = 0;
-						selectDrawerItemLollipop(drawerItem);
+						openContactLink(getIntent().getLongExtra(Constants.CONTACT_HANDLE, -1));
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_REFRESH_STAGING)){
 						update2FASetting();
@@ -3025,10 +3081,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			askForAccess();
 		}
 
+		if (openLinkDialogIsShown) {
+			showOpenLinkDialog();
+			String text = savedInstanceState.getString("openLinkText", "");
+			openLinkText.setText(text);
+			openLinkText.setSelection(text.length());
+			boolean openLinkDialogIsErrorShown = savedInstanceState.getBoolean("openLinkDialogIsErrorShown", false);
+			if (openLinkDialogIsErrorShown) {
+				openLink(text);
+			}
+		}
+
 		log("END onCreate");
 	}
 
+	private void openContactLink (long handle) {
+    	if (handle == -1) {
+    		log("Not valid contact handle");
+    		return;
+		}
+		handleInviteContact = handle;
+    	dismissOpenLinkDialog();
+		log("openContactLink Handle to invite a contact: "+handle);
+		drawerItem = DrawerItem.CONTACTS;
+		indexContacts = 0;
+		selectDrawerItemLollipop(drawerItem);
+	}
+
 	void askForAccess () {
+    	//If mobile device, only portrait mode is allowed
+		if (!Util.isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			log("mobile only portrait mode");
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+
     	boolean writeStorageGranted = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		boolean readStorageGranted = checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
     	boolean cameraGranted = checkPermission(Manifest.permission.CAMERA);
@@ -3066,6 +3152,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void destroyPermissionsFragment () {
+		//In mobile, allow all orientation after permission screen
+		if (!Util.isTablet(this)) {
+			log("mobile, all orientation");
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+		}
+
 		turnOnNotifications = false;
 
 		tB.setVisibility(View.VISIBLE);
@@ -3449,51 +3541,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					String path = intent.getStringExtra("IMAGE_PATH");
 					log("onPostResume: Path of the avatar: "+path);
 					megaApi.setAvatar(path, this);
-				}
-    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-    				log("onPostResume: ACTION_CANCEL_CAM_SYNC");
-					String title = getString(R.string.cam_sync_syncing);
-					String text = getString(R.string.cam_sync_cancel_sync);
+				} else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+                    log("onPostResume: ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+                    String text = getString(R.string.cam_sync_cancel_sync);
 
-					Intent tempIntent = null;
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-						tempIntent = new Intent(this, CameraSyncService.class);
-						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-					}
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(text);
 
-					final Intent cancelIntent = tempIntent;
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//					builder.setTitle(title);
-					builder.setMessage(text);
-					builder.setPositiveButton(getString(R.string.cam_sync_stop),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-										startService(cancelIntent);
+                    builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    stopRunningCameraUploadService(ManagerActivityLollipop.this);
+                                    dbH.setCamSyncEnabled(false);
+									dbH.setSecondaryUploadEnabled(false);
+									if(sttFLol != null  && sttFLol.isResumed()){
+										sttFLol.disableCameraUpload();
 									}
-									else {
-										if (megaApi != null) {
-											megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
-										}
-
-										if (dbH == null){
-											dbH = DatabaseHandler.getDbHandler(managerActivity);
-										}
-
-										dbH.setCamSyncEnabled(false);
-									}
-
-									Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
-									intent.setAction(SettingsFragmentLollipop.ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
-									intent.putExtra(SettingsFragmentLollipop.CAMERA_UPLOADS_STATUS, false);
-									LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-								}
-					});
-					builder.setNegativeButton(getString(R.string.general_cancel), null);
-					final AlertDialog dialog = builder.create();
-					try {
-						dialog.show();
-					} catch (Exception ex) { }
+                                }
+                            });
+                    builder.setNegativeButton(getString(R.string.general_cancel), null);
+                    final AlertDialog dialog = builder.create();
+                    try {
+                        dialog.show();
+                    } catch (Exception ex) {
+                        log(ex.toString());
+                    }
 				}
     			else if (intent.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
     				log("onPostResume: intent show transfers");
@@ -3546,12 +3618,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 					log("onPostResume: ACTION_OPEN_CONTACTS_SECTION");
 					markNotificationsSeen(true);
-
-					handleInviteContact = getIntent().getLongExtra("handle", 0);
-
-					drawerItem = DrawerItem.CONTACTS;
-					indexContacts = 0;
-					selectDrawerItemLollipop(drawerItem);
+					openContactLink(getIntent().getLongExtra(Constants.CONTACT_HANDLE, -1));
 				}
 				else if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_EXPORTED)){
 					log("onPostResume: ACTION_RECOVERY_KEY_EXPORTED");
@@ -3688,7 +3755,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				case CAMERA_UPLOADS: {
 					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
-					setToolbarTitle();
 				}
 				case NOTIFICATIONS: {
 					notificFragment = (NotificationsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
@@ -3744,15 +3810,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setProfileAvatar(){
 		log("setProfileAvatar");
-		File avatar = null;
-		if (getExternalCacheDir() != null){
-			avatar = new File(getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
-		}
-		else{
-			avatar = new File(getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
-		}
+		File avatar = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg");
 		Bitmap imBitmap = null;
-		if (avatar.exists()){
+		if (isFileAvailable(avatar)){
 			if (avatar.length() > 0){
 				BitmapFactory.Options options = new BitmapFactory.Options();
 				options.inJustDecodeBounds = true;
@@ -3767,13 +3827,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
 				if (imBitmap == null) {
 					avatar.delete();
-					if (getExternalCacheDir() != null){
-						megaApi.getUserAvatar(megaApi.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg", this);
-					}
-					else{
-						megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg", this);
-					}
-				}
+                    megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
+                }
 				else{
 					Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
@@ -3793,21 +3848,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 			else{
-				if (getExternalCacheDir() != null){
-					megaApi.getUserAvatar(megaApi.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
-				}
-				else{
-					megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
-				}
+                megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyUser().getEmail() + ".jpg").getAbsolutePath(), this);
 			}
 		}
 		else{
-			if (getExternalCacheDir() != null){
-				megaApi.getUserAvatar(megaApi.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
-			}
-			else{
-				megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
-			}
+            megaApi.getUserAvatar(megaApi.getMyUser(),buildAvatarFile(this,megaApi.getMyUser().getEmail() + ".jpg").getAbsolutePath(),this);
 		}
 	}
 
@@ -3828,15 +3873,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
 		log("setOfflineAvatar");
 
-		File avatar = null;
-		if (getExternalCacheDir() != null){
-			avatar = new File(getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-		}
-		else{
-			avatar = new File(getCacheDir().getAbsolutePath(), email + ".jpg");
-		}
+		File avatar = buildAvatarFile(this, email + ".jpg");
 		Bitmap imBitmap = null;
-		if (avatar.exists()) {
+		if (isFileAvailable(avatar)) {
 			if (avatar.length() > 0) {
 				BitmapFactory.Options options = new BitmapFactory.Options();
 				options.inJustDecodeBounds = true;
@@ -4323,6 +4362,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
+		unregisterReceiver(cameraUploadLauncherReceiver);
 
     	super.onDestroy();
 	}
@@ -4662,8 +4702,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					setFirstNavigationLevel(true);
+					aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				}
-				aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				break;
 			}
 			case MEDIA_UPLOADS:{
@@ -5053,14 +5093,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		setToolbarTitle();
-
-		if(Util.isChatEnabled()) {
-			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-			if (parentNode == null) {
-				log("Create folder: " + CHAT_FOLDER);
-				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
-			}
-		}
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -5202,6 +5234,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		});
 
+		supportInvalidateOptionsMenu();
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -5467,12 +5500,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		catch (Exception e){
 			log("Exception NotificationManager - remove all notifications");
-		}
-
-		MegaNode parentNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
-		if(parentNode == null){
-			log("Create folder: "+CHAT_FOLDER);
-			megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 		}
 
 		setToolbarTitle();
@@ -5758,7 +5785,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		case CONTACTS:{
 				showHideBottomNavigationView(true);
 				selectDrawerItemContacts();
-				supportInvalidateOptionsMenu();
 				showFabButton();
     			break;
     		}
@@ -5826,11 +5852,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
     			drawerItem = DrawerItem.SEARCH;
-    			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-    			if (sFLol != null) {
-    				getSupportFragmentManager().beginTransaction().remove(sFLol).commitNowAllowingStateLoss();
+				sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
+				if (sFLol == null) {
+					sFLol = SearchFragmentLollipop.newInstance();
 				}
-				sFLol = SearchFragmentLollipop.newInstance();
 
 				tabLayoutContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -6252,13 +6277,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
-				if(Util.isChatEnabled()) {
-					MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-					if (parentNode == null) {
-						log("Create folder: " + CHAT_FOLDER);
-						megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
-					}
-				}
 				searchQuery = "";
 				searchExpand = true;
 				if (drawerItem != DrawerItem.CHAT) {
@@ -6354,7 +6372,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
 		clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers);
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
+		playTransfersMenuIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_play_white, R.color.black));
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
+		pauseTransfersMenuIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_pause_white, R.color.black));
 		cancelAllTransfersMenuItem.setVisible(false);
 		clearCompletedTransfers.setVisible(false);
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
@@ -6979,11 +6999,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectMenuItem.setVisible(false);
 						sortByMenuItem.setVisible(false);
 					}
-					if (handleInviteContact != 0) {
-						if (cFLol != null) {
-							cFLol.invite(handleInviteContact);
-						}
-						handleInviteContact = 0;
+
+					if (handleInviteContact != -1 && cFLol != null) {
+						cFLol.invite(handleInviteContact);
 					}
 
 					//Hide
@@ -7207,10 +7225,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					int index = viewPagerMyAccount.getCurrentItem();
 					if(index==0){
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-						log("Exists MK in: "+path);
-						File file= new File(path);
-						if(file.exists()){
+						if(isFileAvailable(buildExternalStorageFile(RK_FILE))){
 							removeMK.setVisible(true);
 							exportMK.setVisible(false);
 						}
@@ -7822,12 +7837,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return true;
 			}
 		    case R.id.action_import_link:{
-		    	if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-					showImportLinkDialog();
-				}
-				else if (drawerItem == DrawerItem.CHAT) {
-					showOpenChatLinkDialog();
-				}
+				showOpenLinkDialog();
 		    	return true;
 		    }
 		    case R.id.action_take_picture:{
@@ -9567,9 +9577,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (drawerItem == DrawerItem.CHAT){
-
 			if (!Util.isOnline(this)){
-				showOfflineMode();
+				super.onBackPressed();
+				return;
 			}
 			else{
 				if(megaApi!=null && megaApi.getRootNode()!=null){
@@ -10918,39 +10928,122 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	void showOpenChatLinkError(boolean show) {
-		if (openchatLinkDialog != null) {
+	private void showOpenLinkError(boolean show, int error) {
+		if (openLinkDialog != null) {
 			if (show) {
-				openChatLinkText.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-				openChatLinkText.getBackground().mutate().clearColorFilter();
-				openChatLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
-				openChatLinkError.setVisibility(View.VISIBLE);
+				openLinkDialogIsErrorShown = true;
+				openLinkText.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+				openLinkText.getBackground().mutate().clearColorFilter();
+				openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
+				openLinkError.setVisibility(View.VISIBLE);
+				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+					if (openLinkText.getText().toString().isEmpty()) {
+						openLinkErrorText.setText(R.string.invalid_file_folder_link_empty);
+						return;
+					}
+                    switch (error) {
+                        case Constants.CHAT_LINK: {
+							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                            openLinkErrorText.setText(R.string.valid_chat_link);
+                            openLinkOpenButton.setText(R.string.action_open_chat_link);
+                            break;
+                        }
+                        case Constants.CONTACT_LINK: {
+							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                            openLinkErrorText.setText(R.string.valid_contact_link);
+                            openLinkOpenButton.setText(R.string.action_open_contact_link);
+                            break;
+                        }
+                        case Constants.ERROR_LINK: {
+                            openLinkErrorText.setText(R.string.invalid_file_folder_link);
+                            break;
+                        }
+                    }
+                }
+                else if (drawerItem == DrawerItem.CHAT) {
+					if (openLinkText.getText().toString().isEmpty()) {
+						openLinkErrorText.setText(R.string.invalid_chat_link_empty);
+						return;
+					}
+                    openLinkErrorText.setText(R.string.invalid_chat_link_args);
+                }
 			}
 			else {
-				if (openChatLinkError.getVisibility() == View.VISIBLE) {
-					openChatLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-					openChatLinkText.getBackground().mutate().clearColorFilter();
-					openChatLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-					openChatLinkError.setVisibility(View.GONE);
+				openLinkDialogIsErrorShown = false;
+				if (openLinkError.getVisibility() == View.VISIBLE) {
+					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+					openLinkText.getBackground().mutate().clearColorFilter();
+					openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					openLinkError.setVisibility(View.GONE);
+					openLinkOpenButton.setText(R.string.context_open_link);
 				}
 			}
 		}
 	}
 
-	void dismissOpenChatLinkDialog() {
+	private void dismissOpenLinkDialog() {
 		try {
-			openchatLinkDialog.dismiss();
+			openLinkDialog.dismiss();
+			openLinkDialogIsShown = false;
 		} catch (Exception e) {}
 	}
 
-	public void showOpenChatLinkDialog() {
+	private void openLink (String link) {
+		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+			int error = nC.importLink(link);
+			if (openLinkError.getVisibility() == View.VISIBLE) {
+                switch (error) {
+                    case Constants.CHAT_LINK: {
+                        log("Open chat link: correct chat link");
+                        showChatLink(link);
+                        dismissOpenLinkDialog();
+                        break;
+                    }
+                    case Constants.CONTACT_LINK: {
+                        log("Open contact link: correct contact link");
+                        String[] s = link.split("C!");
+                        if (s!= null && s.length>1) {
+                            long handle = MegaApiAndroid.base64ToHandle(s[1].trim());
+                            openContactLink(handle);
+                            dismissOpenLinkDialog();
+                        }
+                        break;
+                    }
+                }
+            }
+            else {
+                switch (error) {
+                    case Constants.FILE_LINK:
+                    case Constants.FOLDER_LINK: {
+                        log("Do nothing: correct file or folder link");
+                        dismissOpenLinkDialog();
+                        break;
+                    }
+                    case Constants.CHAT_LINK:
+                    case Constants.CONTACT_LINK:
+                    case Constants.ERROR_LINK: {
+                        log("Show error: invalid link or correct chat or contact link");
+                        showOpenLinkError(true, error);
+                        break;
+                    }
+                }
+            }
+		}
+		else if (drawerItem == DrawerItem.CHAT) {
+			megaChatApi.checkChatLink(link, managerActivity);
+		}
+	}
+
+	private void showOpenLinkDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_open_chat_link, null);
+		View v = inflater.inflate(R.layout.dialog_open_link, null);
 		builder.setView(v);
 
-		openChatLinkText = (EditText) v.findViewById(R.id.chat_link_text);
-		openChatLinkText.addTextChangedListener(new TextWatcher() {
+		TextView title = (TextView) v.findViewById(R.id.link_title);
+
+		openLinkText = (EditText) v.findViewById(R.id.link_text);
+		openLinkText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -10963,200 +11056,64 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				showOpenChatLinkError(false);
+				showOpenLinkError(false, 0);
 			}
 		});
 
-		openChatLinkText.setOnEditorActionListener(new OnEditorActionListener() {
+		openLinkText.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					megaChatApi.checkChatLink(openChatLinkText.getText().toString(), managerActivity);
+					Util.hideKeyboardView(managerActivity, v, 0);
+					openLink(openLinkText.getText().toString());
 					return true;
 				}
 				return false;
 			}
 		});
 
-		openChatLinkError = (RelativeLayout) v.findViewById(R.id.chat_link_error);
-		openChatLinkError.setVisibility(View.GONE);
+		openLinkError = (RelativeLayout) v.findViewById(R.id.link_error);
+		openLinkError.setVisibility(View.GONE);
+		openLinkErrorText = (TextView) v.findViewById(R.id.link_error_text);
+
+		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+			title.setText(R.string.action_open_link);
+			openLinkText.setHint(R.string.hint_paste_link);
+		}
+		else if (drawerItem == DrawerItem.CHAT) {
+			title.setText(R.string.action_open_chat_link);
+			openLinkText.setHint(R.string.hint_enter_chat_link);
+		}
 
 		OnClickListener clickListener = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				switch (v.getId()) {
-					case R.id.chat_link_cancel_button: {
-						dismissOpenChatLinkDialog();
+					case R.id.link_cancel_button: {
+						dismissOpenLinkDialog();
 						break;
 					}
-					case R.id.chat_link_open_button: {
-						megaChatApi.checkChatLink(openChatLinkText.getText().toString(), managerActivity);
+					case R.id.link_open_button: {
+						Util.hideKeyboardView(managerActivity, v, 0);
+						openLink(openLinkText.getText().toString());
 						break;
 					}
 				}
 			}
 		};
 
-		Button cancelButton = (Button) v.findViewById(R.id.chat_link_cancel_button);
+		Button cancelButton = (Button) v.findViewById(R.id.link_cancel_button);
 		cancelButton.setOnClickListener(clickListener);
-		Button openButton = (Button) v.findViewById(R.id.chat_link_open_button);
-		openButton.setOnClickListener(clickListener);
+		openLinkOpenButton = (Button) v.findViewById(R.id.link_open_button);
+		openLinkOpenButton.setOnClickListener(clickListener);
 
-		openchatLinkDialog = builder.create();
-		openchatLinkDialog.setCanceledOnTouchOutside(false);
+		openLinkDialog = builder.create();
+		openLinkDialog.setCanceledOnTouchOutside(false);
 
 		try {
-			openchatLinkDialog.show();
+			openLinkDialog.show();
+			openLinkDialogIsShown = true;
 		}catch (Exception e){}
-	}
-
-	public void showImportLinkDialog(){
-		log("showImportLinkDialog");
-		LinearLayout layout = new LinearLayout(this);
-	    layout.setOrientation(LinearLayout.VERTICAL);
-	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
-
-	    final EditText input = new EditText(this);
-//		input.setId(EDIT_TEXT_ID);
-		input.setSingleLine(false);
-
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		layout.addView(input, params);
-		input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
-
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
-//		params_icon.width = 80;
-//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
-//		params_icon.height = 80;
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		final TextView textError = new TextView(ManagerActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		error_layout.setVisibility(View.GONE);
-
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.context_open_link_title));
-		builder.setPositiveButton(getString(R.string.context_open_link),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-
-						try{
-							openLinkDialog.dismiss();
-						}
-						catch(Exception e){}
-						nC.importLink(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		builder.setView(layout);
-		openLinkDialog = builder.create();
-		openLinkDialog.show();
-
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-						return true;
-					}
-					nC.importLink(value);
-					try{
-						openLinkDialog.dismiss();
-					}
-					catch(Exception e){}
-					return true;
-				}
-				try{
-					openLinkDialog.dismiss();
-				}
-				catch(Exception e){}
-				return false;
-			}
-		});
-
-		openLinkDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-					return;
-				}
-
-				try{
-					openLinkDialog.dismiss();
-				}
-				catch(Exception e){}
-
-				nC.importLink(value);
-			}
-		});
 	}
 
 	public void showChatLink(String link){
@@ -11170,16 +11127,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		openChatLinkIntent.setData(Uri.parse(link));
 		startActivity(openChatLinkIntent);
+		drawerItem = DrawerItem.CHAT;
+		selectDrawerItemLollipop(drawerItem);
 	}
 
 	public void takePicture(){
 		log("takePicture");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-        File newFolder = new File(path);
-        newFolder.mkdirs();
-
-        String file = path + "/picture.jpg";
-        File newFile = new File(file);
+        File newFile = buildTempFile(this, "picture.jpg");
         try {
         	newFile.createNewFile();
         } catch (IOException e) {}
@@ -11228,13 +11182,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void takeProfilePicture(){
-		log("takeProfilePicture");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR;
-		File newFolder = new File(path);
-		newFolder.mkdirs();
-
-		String file = path + "/picture.jpg";
-		File newFile = new File(file);
+		File newFile = buildTempFile(this, "picture.jpg");
 		try {
 			newFile.createNewFile();
 		} catch (IOException e) {}
@@ -12792,7 +12740,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			spaceTV.setText(result);
 			int progress = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc();
 			long usedSpace = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedStorage();
-			log("*** "+progress+ " *** "+usedSpace);
+			log("progress "+progress+ " usedSpace "+usedSpace);
 			usedSpacePB.setProgress(progress);
 			if (progress >=0 && usedSpace >=0) {
 				usedSpaceLayout.setVisibility(View.VISIBLE);
@@ -13509,7 +13457,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
-			log("REQUEST_CODE_GET");
 			if (intent == null) {
 				log("Return.....");
 				return;
@@ -13521,16 +13468,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.upload_prepare));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+			ProgressDialogUtil.showProcessFileDialog(this,intent);
 		}
 		else if (requestCode == Constants.CHOOSE_PICTURE_PROFILE_CODE && resultCode == RESULT_OK) {
 
@@ -13665,12 +13603,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				Intent service = new Intent(this, DownloadService.class);
 				service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
 				service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR + "/";
-				File tempDownDirectory = new File(path);
-				if(!tempDownDirectory.exists()){
-					tempDownDirectory.mkdirs();
-				}
-				service.putExtra(DownloadService.EXTRA_PATH, path);
+				File tempFolder = getCacheFolder(this, TEMPORAL_FOLDER);
+				if (!isFileAvailable(tempFolder)) {
+				    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
+				    return;
+                }
+				service.putExtra(DownloadService.EXTRA_PATH, tempFolder.getAbsolutePath());
 				startService(service);
 			}
 		}
@@ -13682,11 +13620,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-			if(cFLol!=null){
-				if(cFLol.isMultipleselect()){
-					cFLol.hideMultipleSelect();
-					cFLol.clearSelectionsNoAnimations();
-				}
+			if(cFLol!=null && cFLol.isMultipleselect()){
+				cFLol.hideMultipleSelect();
+				cFLol.clearSelectionsNoAnimations();
 			}
 
 			ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
@@ -13748,6 +13684,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if((searchByDate) != null && (searchDate!=null)){
 						ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
 						cuFL.setNodes(nodesSearch);
+						if (nodesSearch.size() == 0) {
+							cuFL.showEmptySearchResults();
+						}
 						isSearchEnabled = true;
 					}else{
 						cuFL.setNodes(nodes);
@@ -14060,17 +13999,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
 			log("TAKE_PHOTO_CODE");
 			if(resultCode == Activity.RESULT_OK){
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
-				File imgFile = new File(filePath);
+				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
+				if (!isFileAvailable(imgFile)) {
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
+					return;
+				}
 
 				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
 				log("Taken picture Name: "+name);
-				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/"+name;
-				log("----NEW Name: "+newPath);
-				File newFile = new File(newPath);
+				File newFile = buildTempFile(this, name);
 				imgFile.renameTo(newFile);
 
-				uploadTakePicture(newPath);
+				uploadTakePicture(newFile.getAbsolutePath());
 			}
 			else{
 				log("TAKE_PHOTO_CODE--->ERROR!");
@@ -14082,39 +14022,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(resultCode == Activity.RESULT_OK){
 
 				String myEmail =  megaApi.getMyUser().getEmail();
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";;
-				File imgFile = new File(filePath);
-
-				String newPath = null;
-				File qrFile = null;
-				if (getExternalCacheDir() != null){
-					newPath = getExternalCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
-					File qrDir = new File (getApplicationContext().getExternalCacheDir(), "qrMEGA");
-					qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-				}else{
-					log("getExternalCacheDir() is NULL");
-					newPath = getCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
-					File qrDir = getApplicationContext().getDir("qrMEGA", 0);
-					qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
+				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
+				if (!isFileAvailable(imgFile)) {
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
+					return;
 				}
-				if (qrFile.exists()) {
+
+                File qrFile = buildQrFile(this,myEmail + "QRcode.jpg");
+                File newFile = buildAvatarFile(this,myEmail + "Temp.jpg");
+				if (isFileAvailable(qrFile)) {
 					qrFile.delete();
 				}
 
-				if(newPath!=null) {
-					File newFile = new File(newPath);
-					log("NEW - the destination of the avatar is: " + newPath);
-					if (newFile != null) {
-						MegaUtilsAndroid.createAvatar(imgFile, newFile);
-						megaApi.setAvatar(newFile.getAbsolutePath(), this);
-
-					} else {
-						log("Error new path avatar!!");
-					}
-
-				}else{
-					log("ERROR! Destination PATH is NULL");
-				}
+                if (newFile != null) {
+                    log("NEW - the destination of the avatar is: " + newFile.getAbsolutePath());
+                    MegaUtilsAndroid.createAvatar(imgFile,newFile);
+                    megaApi.setAvatar(newFile.getAbsolutePath(),this);
+                } else {
+                    log("ERROR! Destination PATH is NULL");
+                }
 			}else{
 				log("TAKE_PICTURE_PROFILE_CODE--->ERROR!");
 			}
@@ -14245,7 +14171,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String[] split = Util.rKFile.split("/");
+				String[] split = RK_FILE.split(File.separator);
 				String path = parentPath+"/"+split[split.length-1];
 				log("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
@@ -14255,7 +14181,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.REQUEST_SAVE_MK_FROM_OFFLINE && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String[] split = Util.rKFile.split("/");
+				String[] split = RK_FILE.split(File.separator);
 				String path = parentPath+"/"+split[split.length-1];
 				log("REQUEST_SAVE_MK_FROM_OFFLINE:path to download: "+path);
 				AccountController ac = new AccountController(this);
@@ -14465,6 +14391,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("EXTRA_FOLDER_PATH:" + folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+				uploadServiceIntent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, paths.size());
 				startService(uploadServiceIntent);
 			}
 		}
@@ -14780,11 +14707,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 */
 	private void checkStorageStatus(int newStorageState, boolean onCreate) {
         Intent intent = new Intent(this,UploadService.class);
+        MegaApplication app = (MegaApplication)getApplication();
         switch (newStorageState) {
             case MegaApiJava.STORAGE_STATE_GREEN:
                 log("STORAGE STATE GREEN");
                 intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
-                startService(intent);
+
+                // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
+                try {
+					startService(intent);
+				}
+				catch (Exception e) {
+					log("Exception starting UploadService: " + e.getMessage());
+					e.printStackTrace();
+				}
+
 				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
 				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
 					log("ACCOUNT TYPE FREE");
@@ -14793,18 +14730,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						showProPanel();
 					}
 				}
+				storageState = newStorageState;
+                JobUtil.startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
 				log("STORAGE STATE ORANGE");
                 intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
-                startService(intent);
+
+				// TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
+                try {
+					startService(intent);
+				}
+				catch (Exception e) {
+					log("Exception starting UploadService: " + e.getMessage());
+					e.printStackTrace();
+				}
+
 				if (onCreate && isStorageStatusDialogShown) {
 					isStorageStatusDialogShown = false;
 					showStorageAlmostFullDialog();
 				} else if (newStorageState > storageState) {
 					showStorageAlmostFullDialog();
 				}
+				storageState = newStorageState;
+                JobUtil.startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
@@ -14821,6 +14771,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 		}
 
+		app.setStorageState(storageState);
 		storageState = newStorageState;
 	}
 
@@ -15141,7 +15092,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			catch(Exception ex){}
 		}
-
+		ProgressDialogUtil.dissmisDialog();
 		long parentHandle = -1;
 		MegaNode parentNode = null;
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -15172,49 +15123,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Chosen picture to change the avatar: "+avatarPath);
 						File imgFile = new File(avatarPath);
 //						String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-						String newPath = null;
-						File qrFile = null;
-						if (getExternalCacheDir() != null){
-							newPath = getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + "Temp.jpg";
-							File qrDir = new File (getApplicationContext().getExternalCacheDir(), "qrMEGA");
-							qrFile = new File(qrDir.getAbsolutePath(), megaApi.getMyUser().getEmail() + "QRcode.jpg");
-						}
-						else{
-							log("getExternalCacheDir() is NULL");
-							newPath = getCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + "Temp.jpg";
-							File qrDir = getApplicationContext().getDir("qrMEGA", 0);
-							qrFile = new File(qrDir.getAbsolutePath(), megaApi.getMyUser().getEmail() + "QRcode.jpg");
-						}
+                        File qrFile = buildQrFile(this,megaApi.getMyUser().getEmail() + "QRcode.jpg");
+                        File newFile = buildAvatarFile(this, megaApi.getMyUser().getEmail() + "Temp.jpg");
 
-						if (qrFile.exists()) {
+
+						if (isFileAvailable(qrFile)) {
 							qrFile.delete();
 						}
-
-						if(newPath!=null){
-							File newFile = new File(newPath);
-							log("NEW - the destination of the avatar is: "+newPath);
-							if(newFile!=null){
-								MegaUtilsAndroid.createAvatar(imgFile, newFile);
-								maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-								if(maFLol!=null){
-									megaApi.setAvatar(newFile.getAbsolutePath(), this);
-								}
-
-							}
-							else{
-								log("Error new path avatar!!");
-							}
-						}
-						else{
-							log("ERROR! Destination PATH is NULL");
-						}
-
-
-//						String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/"+name;
-//						log("----NEW Name: "+newPath);
-//						File newFile = new File(newPath);
-//						MegaUtilsAndroid.createAvatar(imgFile, newFile);
-
+                        if (newFile != null) {
+                            log("NEW - the destination of the avatar is: " + newFile.getAbsolutePath());
+                            MegaUtilsAndroid.createAvatar(imgFile,newFile);
+                            maFLol = (MyAccountFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
+                            if (maFLol != null) {
+                                megaApi.setAvatar(newFile.getAbsolutePath(),this);
+                            }
+                        } else {
+                            log("ERROR! Destination PATH is NULL");
+                        }
 					}
 					else{
 						log("The chosen avatar path is NULL");
@@ -15236,6 +15161,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
 		}
 		else {
+			Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
 			for (ShareInfo info : infos) {
 				if(info.isContact){
 					requestContactsPermissions(info, parentNode);
@@ -15247,8 +15173,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-					startService(intent);
+					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+						startForegroundService(intent);
+					} else {
+						startService(intent);
+					}
 				}
 			}
 		}
@@ -15282,7 +15212,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				String id = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
 				String name = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-				Integer hasPhone = cursorID.getInt(cursorID.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+				int hasPhone = cursorID.getInt(cursorID.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
 				// get the user's email address
 				String email = null;
@@ -15316,6 +15246,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				createFile(name, data.toString(), parentNode);
 			}
+			cursorID.close();
 		}
 		else{
 			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_temporary_unavaible), -1);
@@ -15324,7 +15255,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	private void createFile(String name, String data, MegaNode parentNode){
 
-		File file = Util.createTemporalTextFile(name, data);
+		File file = createTemporalTextFile(this, name, data);
 		if(file!=null){
 			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_began), -1);
 
@@ -15487,15 +15418,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST){
 				showChatLink(request.getLink());
-				dismissOpenChatLinkDialog();
+				dismissOpenLinkDialog();
 			}
 			else {
 				if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
-					dismissOpenChatLinkDialog();
+					dismissOpenLinkDialog();
 					Util.showAlert(this, getString(R.string.invalid_chat_link), getString(R.string.title_alert_chat_link_error));
 				}
 				else {
-					showOpenChatLinkError(true);
+					showOpenLinkError(true, 0);
 				}
 			}
 		}
@@ -15686,29 +15617,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 			else if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
-
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("Avatar changed!!");
-					if(request.getFile()!=null){
-						log("old path: "+request.getFile());
-						File oldFile = new File(request.getFile());
-						if(oldFile!=null){
-							if(oldFile.exists()){
-								String newPath = null;
-								if (getExternalCacheDir() != null){
-									newPath = getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg";
-								}
-								else{
-									log("getExternalCacheDir() is NULL");
-									newPath = getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg";
-								}
-								File newFile = new File(newPath);
-								boolean result = oldFile.renameTo(newFile);
-								if(result){
-									log("The avatar file was correctly renamed");
-								}
-							}
-						}
+                    if (request.getFile() != null) {
+                        log("old path: " + request.getFile());
+                        File oldFile = new File(request.getFile());
+                        if (isFileAvailable(oldFile)) {
+                            File newFile = buildAvatarFile(this,megaApi.getMyEmail() + ".jpg");
+                            boolean result = oldFile.renameTo(newFile);
+                            if (result) {
+                                log("The avatar file was correctly renamed");
+                            }
+                        }
 						log("User avatar changed!");
 						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.success_changing_user_avatar), -1);
 					}
@@ -15932,6 +15852,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     }
 				}
             }
+			else if(request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION){
+
+				if(e.getErrorCode() == MegaError.API_OK){
+					log("Attribute USER_ATTR_GEOLOCATION enabled");
+					MegaApplication.setEnabledGeoLocation(true);
+				}
+				else{
+					log("Attribute USER_ATTR_GEOLOCATION disabled");
+					MegaApplication.setEnabledGeoLocation(false);
+				}
+			}
             else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
 				log("Type: GET_ATTR_USER ParamType: USER_ATTR_CONTACT_LINK_VERIFICATION --> getContactLinkOption");
 				if (e.getErrorCode() == MegaError.API_OK) {
@@ -16478,9 +16409,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				statusDialog.dismiss();
 			}
 			catch (Exception ex) {}
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
+            if (e.getErrorCode() == MegaError.API_OK){
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
 					if (fbFLol != null){
@@ -16749,35 +16679,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
 							log("The user: "+user.getEmail()+"changed his AVATAR");
 
-							File avatar = null;
-							if (this.getExternalCacheDir() != null){
-								avatar = new File(this.getExternalCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
-							}
-							else{
-								avatar = new File(this.getCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
-							}
+							File avatar = buildAvatarFile(this, user.getEmail() + ".jpg");
 							Bitmap bitmap = null;
-							if (avatar.exists()){
+							if (isFileAvailable(avatar)){
 								avatar.delete();
 							}
 
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
-								log("I change my avatar");
-								if (getExternalCacheDir() != null){
-									String destinationPath = null;
-									destinationPath = getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg";
-									if(destinationPath!=null){
-										log("The destination of the avatar is: "+destinationPath);
-										megaApi.getUserAvatar(megaApi.getMyUser(), destinationPath, this);
-									}
-									else{
-										log("ERROR! Destination PATH is NULL");
-									}
-								}
-								else{
-									log("getExternalCacheDir() is NULL");
-									megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg", this);
-								}
+                                log("I change my avatar");
+                                String destinationPath = buildAvatarFile(this,megaApi.getMyEmail() + ".jpg").getAbsolutePath();
+                                log("The destination of the avatar is: " + destinationPath);
+                                megaApi.getUserAvatar(megaApi.getMyUser(),destinationPath,this);
 							}
 							else {
 								log("Update de ContactsFragment");
@@ -16906,34 +16818,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		String oldEmail = dbH.getMyEmail();
 		if(oldEmail!=null){
 			log("updateMyEmail:oldEmail: "+oldEmail);
-
-			try{
-				File avatarFile = null;
-				if (getExternalCacheDir() != null){
-					avatarFile = new File(getExternalCacheDir().getAbsolutePath(), oldEmail + ".jpg");
-				}
-				else{
-					avatarFile = new File(getCacheDir().getAbsolutePath(), oldEmail + ".jpg");
-				}
-
-				if(avatarFile!=null){
-					if(avatarFile.exists()){
-						String newPath = null;
-						if (getExternalCacheDir() != null){
-							newPath = getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg";
-						}
-						else{
-							log("getExternalCacheDir() is NULL");
-							newPath = getCacheDir().getAbsolutePath() + "/" + email + ".jpg";
-						}
-						File newFile = new File(newPath);
-						boolean result = avatarFile.renameTo(newFile);
-						if(result){
-							log("The avatar file was correctly renamed");
-						}
-					}
-				}
-			}
+            try {
+                File avatarFile = buildAvatarFile(this,oldEmail + ".jpg");
+                if (isFileAvailable(avatarFile)) {
+                    File newFile = buildAvatarFile(this, email + ".jpg");
+                    if(newFile != null) {
+                        boolean result = avatarFile.renameTo(newFile);
+                        if (result) {
+                            log("The avatar file was correctly renamed");
+                        }
+                    }
+                }
+            }
 			catch(Exception e){
 				log("EXCEPTION renaming the avatar on changing email");
 			}
@@ -17341,7 +17237,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Pressed button positive to cancel transfer");
 						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-
+                        cancelAllUploads(ManagerActivityLollipop.this);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -17381,9 +17277,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		if(transferCallback<transfer.getNotificationNumber()) {
-
 			transferCallback = transfer.getNotificationNumber();
-
 			long now = Calendar.getInstance().getTimeInMillis();
 			lastTimeOnTransferUpdate = now;
 
@@ -17410,6 +17304,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
+
+		//workaround - can not get folder transfer children detail except using global listener
+        if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
+            Intent intent = new Intent(this,UploadService.class);
+            if (e.getErrorCode() == MegaError.API_OK) {
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_OK);
+                startService(intent);
+            }else{
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_FAILED);
+                startService(intent);
+            }
+        }
+
+        //workaround - can not get folder transfer children detail except using global listener
+        if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
+            Intent intent = new Intent(this,UploadService.class);
+            if (e.getErrorCode() == MegaError.API_OK) {
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_OK);
+                startService(intent);
+            }else{
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_FAILED);
+                startService(intent);
+            }
+        }
 
 		if(transferCallback<transfer.getNotificationNumber()) {
 
@@ -18098,7 +18016,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 		if (item != null){
-			log("onChatListItemUpdate:" + item.getTitle());
+			log("onChatListItemUpdate:" + item.getChatId());
 			if (item.isPreview()) {
 				return;
 			}
@@ -18115,7 +18033,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(Util.isChatEnabled()){
 			if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-				log("Change unread count: " + item.getTitle());
+				log("Change unread count: " + item.getUnreadCount());
 				setChatBadge();
 				updateNavigationToolbarIcon();
 			}
@@ -18361,35 +18279,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		if(call!=null){
-			if(call.getChatid() != -1){
-				if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
-					int callStatus = call.getStatus();
-					log("onChatCallUpdate:CHANGE_TYPE_STATUS: callStatus =  "+callStatus);
+		if (call == null || call.getChatid() == -1) return;
+		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
+			int callStatus = call.getStatus();
+			log("onChatCallUpdatecallStatus =  " + callStatus);
 
-					switch (callStatus) {
-						case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-						case MegaChatCall.CALL_STATUS_RING_IN:
-						case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-						case MegaChatCall.CALL_STATUS_DESTROYED:
-						case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
-							setCallBadge();
-							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-							if ((rChatFL != null) && (rChatFL.isVisible())){
-								rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
-							}
-
-							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-							if ((fbFLol != null) && (fbFLol.isVisible())){
-								fbFLol.showCallLayout();
-							}
-							break;
-						}
-
-						default:
-							break;
+			switch (callStatus) {
+				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+				case MegaChatCall.CALL_STATUS_RING_IN:
+				case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+				case MegaChatCall.CALL_STATUS_DESTROYED:
+				case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+					setCallBadge();
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+					if ((rChatFL != null) && (rChatFL.isVisible())) {
+						rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
 					}
+
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+					if ((fbFLol != null) && (fbFLol.isVisible())) {
+						fbFLol.showCallLayout();
+					}
+					break;
 				}
+				default:
+					break;
 			}
 		}
 	}
@@ -18723,7 +18637,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}else{
-			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
+			if(n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)){
 				if (prefs != null){
 					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
 				}
@@ -18847,4 +18761,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
 		this.accountFragmentPreUpgradeAccount = accountFragment;
 	}
+
+	public void deleteInviteContactHandle(){
+		handleInviteContact = -1;
+	}
+
+    @Override
+    public void onTrimMemory(int level){
+        // Determine which lifecycle or system event was raised.
+        //we will stop creating thumbnails while the phone is running low on memory to prevent OOM
+        log("onTrimMemory lvl " + level);
+        if(level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL){
+            log("low memory");
+            ThumbnailUtilsLollipop.isDeviceMemoryLow = true;
+        }else{
+            log("memory ok");
+            ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
+        }
+    }
 }

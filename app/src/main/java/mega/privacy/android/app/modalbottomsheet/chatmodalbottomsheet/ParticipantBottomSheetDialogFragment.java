@@ -41,6 +41,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+
 public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
@@ -355,42 +357,22 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         if(handle == megaChatApi.getMyUserHandle()){
             //Ask for my avatar
-            if (getActivity().getExternalCacheDir() != null){
-                avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-            }
-            else{
-                avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
-            }
+            avatar = buildAvatarFile(getActivity(),email + ".jpg");
         }
         else{
 
             if(email!=null){
                 //Ask for avatar
-                if (getActivity().getExternalCacheDir() != null){
-                    avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-                }
-                else{
-                    avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
-                }
+                avatar = buildAvatarFile(getActivity(),email + ".jpg");
             }
 
             if(avatar!=null){
                 if (!avatar.exists()){
-                    if (getActivity().getExternalCacheDir() != null){
-                        avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), userHandleEncoded + ".jpg");
-                    }
-                    else{
-                        avatar = new File(getActivity().getCacheDir().getAbsolutePath(), userHandleEncoded + ".jpg");
-                    }
+                    avatar = buildAvatarFile(getActivity(),userHandleEncoded + ".jpg");
                 }
             }
             else{
-                if (getActivity().getExternalCacheDir() != null){
-                    avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), userHandleEncoded + ".jpg");
-                }
-                else{
-                    avatar = new File(getActivity().getCacheDir().getAbsolutePath(), userHandleEncoded + ".jpg");
-                }
+                avatar = buildAvatarFile(getActivity(),userHandleEncoded + ".jpg");
             }
         }
 

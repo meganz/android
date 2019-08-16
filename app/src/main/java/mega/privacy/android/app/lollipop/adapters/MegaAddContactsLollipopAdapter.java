@@ -7,10 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -27,16 +24,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 /**
  * Created by mega on 28/11/17.
@@ -210,14 +208,9 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
             return createDefaultAvatar(contact.getFullName(), contact);
         }
 
-        if (context.getExternalCacheDir() != null){
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), mail + ".jpg");
-        }
-        else{
-            avatar = new File(context.getCacheDir().getAbsolutePath(), mail + ".jpg");
-        }
+        avatar = buildAvatarFile(context, mail + ".jpg");
         Bitmap bitmap = null;
-        if (avatar.exists()){
+        if (isFileAvailable(avatar)){
             if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;

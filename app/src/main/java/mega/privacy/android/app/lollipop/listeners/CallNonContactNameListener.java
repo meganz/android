@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 
 import java.io.File;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
@@ -18,6 +19,9 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class CallNonContactNameListener implements MegaChatRequestListenerInterface, MegaRequestListenerInterface {
 
@@ -119,15 +123,9 @@ public class CallNonContactNameListener implements MegaChatRequestListenerInterf
             if (e.getErrorCode() != MegaError.API_OK) {
                 log("onRequestFinish:TYPE_GET_ATTR_USER: OK");
                 if((holder!=null) && (holder instanceof GroupCallAdapter.ViewHolderGroupCall)){
-                    File avatar = null;
+                    File avatar = buildAvatarFile(context, request.getEmail() + ".jpg");
                     Bitmap bitmap = null;
-
-                    if (context.getExternalCacheDir() != null){
-                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-                    }else{
-                        avatar = new File(context.getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-                    }
-                    if (avatar.exists()){
+                    if (isFileAvailable(avatar)){
                         if (avatar.length() > 0){
                             BitmapFactory.Options bOpts = new BitmapFactory.Options();
                             bOpts.inPurgeable = true;
@@ -142,8 +140,6 @@ public class CallNonContactNameListener implements MegaChatRequestListenerInterf
                         }
                     }
                 }
-
-
             }
         }
     }

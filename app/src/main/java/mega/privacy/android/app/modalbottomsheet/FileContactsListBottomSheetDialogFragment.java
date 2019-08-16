@@ -38,6 +38,9 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
@@ -232,15 +235,9 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
 
         if(contact!=null){
             String contactMail = contact.getEmail();
-            File avatar = null;
-            if (getActivity().getExternalCacheDir() != null){
-                avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-            }
-            else{
-                avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-            }
+            File avatar = buildAvatarFile(getActivity(),contactMail + ".jpg");
             Bitmap bitmap = null;
-            if (avatar.exists()){
+            if (isFileAvailable(avatar)){
                 if (avatar.length() > 0){
                     BitmapFactory.Options bOpts = new BitmapFactory.Options();
                     bOpts.inPurgeable = true;
