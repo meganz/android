@@ -42,6 +42,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -56,8 +57,8 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
 	
@@ -78,7 +79,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	MegaNode fileLink = null;
 	boolean isFolderLink = false;
 
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath;
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 
@@ -156,8 +157,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		long handle;
     	Bitmap preview;
-    	File cacheDir;
-    	File destination; 
+    	File destination;
     	
 		@Override
 		protected Integer doInBackground(Long... params){
@@ -246,9 +246,9 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			else if (param == 2){
 				MegaNode node = megaApi.getNodeByHandle(handle);
 				pendingFullImages.add(handle);
-				log("document.name: " +  node.getName() + "_handle: " + node.getHandle());
-				log("destination.getabsolutepath: " + destination.getAbsolutePath());
-				megaApi.startDownload(node, cacheDir.getAbsolutePath() + "/", megaFullScreenImageAdapter);
+				log("Node handle: " + node.getHandle());
+				String previewFolder = CacheFolderManager.getCacheFolder(context, CacheFolderManager.PREVIEW_FOLDER).getAbsolutePath() + File.separator;
+				megaApi.startDownload(node, previewFolder, megaFullScreenImageAdapter);
 			}
 		}
 	}	
@@ -322,19 +322,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+
+		downloadLocationDefaultPath = getDownloadLocation(context);
 	}
 
 	@Override
@@ -488,7 +477,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				}
 
 				boolean isOnMegaDownloads = false;
-				String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
+				String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
 				log("isOnMegaDownloads: " + isOnMegaDownloads + " nodeName: " + node.getName() + " localPath: " + localPath);
 				if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))) {
 

@@ -258,7 +258,7 @@ public class TransfersFragmentLollipop extends Fragment {
 		int position = -1;
         for (int i=0; i<tL.size(); i++) {
             MegaTransfer transfer = tL.get(i);
-            if(transfer.getTag() == transferTag){
+            if(transfer != null && transfer.getTag() == transferTag){
                 position = i;
                 break;
             }
