@@ -52,6 +52,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DownloadInfo;
+import mega.privacy.android.app.utils.DownloadLinkInfo;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -402,7 +403,7 @@ public class NodeController {
         if (askMe){
             log("askMe");
             File[] fs = context.getExternalFilesDirs(null);
-            final DownloadInfo downloadInfo = new DownloadInfo(null,highPriority,size,hashes);
+            final DownloadInfo downloadInfo = new DownloadInfo(highPriority,size,hashes);
             if (fs.length > 1){
                 if (fs[1] == null){
                     requestLocalFolder(downloadInfo, null, null);
@@ -677,7 +678,7 @@ public class NodeController {
         boolean downloadToSDCard = false;
         String downloadRoot = null;
         SDCardOperator sdCardOperator = null;
-        DownloadInfo downloadInfo = new DownloadInfo(url,highPriority, size, hashes);
+        DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
         try {
             sdCardOperator = new SDCardOperator(context);
         } catch (SDCardOperator.SDCardException e) {
@@ -710,7 +711,7 @@ public class NodeController {
                     //don't have permission with sd card root. need to request.
                     String sdRoot = sdCardOperator.getSDCardRoot();
                     if(context instanceof DownloadableActivity) {
-                        ((DownloadableActivity) context).setDownloadInfo(new DownloadInfo(url,highPriority, size, hashes));
+                        ((DownloadableActivity) context).setDownloadInfo(new DownloadInfo(highPriority, size, hashes));
                     }
                     //request SD card write permission.
                     SDCardOperator.requestSDCardPermission(sdRoot, context, (Activity) context);
@@ -751,6 +752,7 @@ public class NodeController {
                     if(localPath != null){
                         log("localPath != null");
                         try {
+                            //TODO should do it in a thread
                             log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
                             if(downloadToSDCard) {
                                 sdCardOperator.moveFile(parentPath,new File(localPath));
@@ -1022,6 +1024,72 @@ public class NodeController {
                 showSnackbar(Constants.SNACKBAR_TYPE,msg);
             }
         }
+    }
+
+    private void showSelectDownloadLocationDialog(final MegaNode document, final String url) {
+        Dialog downloadLocationDialog;
+        String[] sdCardOptions = context.getResources().getStringArray(R.array.settings_storage_download_location_array);
+        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(context);
+
+        b.setTitle(context.getString(R.string.settings_storage_download_location));
+        b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0: {
+                        intentPickFolder(document, url, null);
+                        break;
+                    }
+                    case 1: {
+                        SDCardOperator sdCardOperator = null;
+                        try {
+                            sdCardOperator = new SDCardOperator(context);
+                        } catch (SDCardOperator.SDCardException e) {
+                            e.printStackTrace();
+                            log(e.getMessage());
+                            //sd card is available, choose internal storage location
+                            intentPickFolder(document, url, null);
+                        }
+                        String sdCardRoot = sdCardOperator.getSDCardRoot();
+                        DownloadLinkInfo linkInfo = new DownloadLinkInfo(document, url);
+                        //don't use DocumentFile
+                        if (sdCardOperator.canWriteWithFile()) {
+                            log("can operate sd card with file.");
+                            intentPickFolder(document, url, sdCardRoot);
+                        } else {
+                            if (context instanceof DownloadableActivity) {
+                                ((DownloadableActivity) context).setLinkInfo(linkInfo);
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                try {
+                                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                                    log("operate sd card with document file.");
+                                    intentPickFolder(document, url, sdCardRoot);
+                                } catch (SDCardOperator.SDCardException e) {
+                                    e.printStackTrace();
+                                    log(e.getMessage());
+                                    //request sd card root request and write permission.
+                                    SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
+                                }
+                            } else {
+                                SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+        b.setNegativeButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        downloadLocationDialog = b.create();
+        downloadLocationDialog.show();
     }
 
     private void showSelectDownloadLocationDialog(final DownloadInfo downloadInfo, final SDCardOperator sdCardOperator) {
@@ -1822,48 +1890,12 @@ public class NodeController {
             File[] fs = context.getExternalFilesDirs(null);
             if (fs.length > 1) {
                 if (fs[1] == null) {
-                    intentPickFolder(document, url);
+                    intentPickFolder(document, url,null);
                 } else {
-                    Dialog downloadLocationDialog;
-                    String[] sdCardOptions = context.getResources().getStringArray(R.array.settings_storage_download_location_array);
-                    android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(context);
-
-                    b.setTitle(context.getString(R.string.settings_storage_download_location));
-                    b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0: {
-                                    intentPickFolder(document, url);
-                                    break;
-                                }
-                                case 1: {
-                                    File[] fs = context.getExternalFilesDirs(null);
-                                    if (fs.length > 1) {
-                                        String path = fs[1].getAbsolutePath();
-                                        File defaultPathF = new File(path);
-                                        defaultPathF.mkdirs();
-                                        Toast.makeText(context, context.getString(R.string.general_save_to_device) + ": " + defaultPathF.getAbsolutePath(), Toast.LENGTH_LONG).show();
-                                        downloadTo(document, path, url);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    });
-                    b.setNegativeButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-                    downloadLocationDialog = b.create();
-                    downloadLocationDialog.show();
+                    showSelectDownloadLocationDialog(document, url);
                 }
             } else {
-                intentPickFolder(document, url);
+                intentPickFolder(document, url,null);
             }
             return;
         }
@@ -1875,48 +1907,12 @@ public class NodeController {
             File[] fs = context.getExternalFilesDirs(null);
             if (fs.length > 1) {
                 if (fs[1] == null) {
-                    intentPickFolder(document, url);
+                    intentPickFolder(document, url,null);
                 } else {
-                    Dialog downloadLocationDialog;
-                    String[] sdCardOptions = context.getResources().getStringArray(R.array.settings_storage_download_location_array);
-                    android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(context);
-
-                    b.setTitle(context.getString(R.string.settings_storage_download_location));
-                    b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0: {
-                                    intentPickFolder(document, url);
-                                    break;
-                                }
-                                case 1: {
-                                    File[] fs = context.getExternalFilesDirs(null);
-                                    if (fs.length > 1) {
-                                        String path = fs[1].getAbsolutePath();
-                                        File defaultPathF = new File(path);
-                                        defaultPathF.mkdirs();
-                                        Toast.makeText(context, context.getString(R.string.general_save_to_device) + ": " + defaultPathF.getAbsolutePath(), Toast.LENGTH_LONG).show();
-                                        downloadTo(document, path, url);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    });
-                    b.setNegativeButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-                    downloadLocationDialog = b.create();
-                    downloadLocationDialog.show();
+                    showSelectDownloadLocationDialog(document, url);
                 }
             } else {
-                intentPickFolder(document, url);
+                intentPickFolder(document, url,null);
             }
         }
         else{
@@ -1924,12 +1920,15 @@ public class NodeController {
         }
     }
 
-    void intentPickFolder(MegaNode document, String url) {
+    public void intentPickFolder(MegaNode document, String url,String sdRoot) {
         Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.context_download_to));
         intent.setClass(context, FileStorageActivityLollipop.class);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+        if(sdRoot != null) {
+            intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
+        }
         if (context instanceof FileLinkActivityLollipop) {
             ((FileLinkActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
@@ -1946,6 +1945,51 @@ public class NodeController {
 
     public void downloadTo(MegaNode currentDocument, String parentPath, String url){
         log("downloadTo");
+        boolean downloadToSDCard = false;
+        String downloadRoot = null;
+        SDCardOperator sdCardOperator = null;
+//        DownloadInfo downloadInfo = new DownloadInfo(url,highPriority, size, hashes);
+        try {
+            sdCardOperator = new SDCardOperator(context);
+        } catch (SDCardOperator.SDCardException e) {
+            e.printStackTrace();
+            log(e.getMessage());
+            // user uninstall the sd card. but default download location is still on the sd card
+            if (SDCardOperator.isSDCardPath(parentPath)) {
+                log("select new path as download location.");
+                intentPickFolder(currentDocument, url,null);
+                return;
+            }
+        }
+        if(sdCardOperator != null && SDCardOperator.isSDCardPath(parentPath)) {
+            //user has installed another sd card.
+            if(sdCardOperator.isNewSDCardPath(parentPath)) {
+                log("new sd card, check permission.");
+                showSnackbar(Constants.SNACKBAR_TYPE,context.getString(R.string.old_sdcard_unavailable));
+                showSelectDownloadLocationDialog(currentDocument, url);
+                return;
+            }
+            if (!new File(parentPath).canWrite()) {
+                log("init sd card root with document file.");
+                downloadToSDCard = true;
+                downloadRoot = sdCardOperator.getDownloadRoot();
+                try {
+                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                } catch (SDCardOperator.SDCardException e) {
+                    e.printStackTrace();
+                    log(e.getMessage());
+                    //don't have permission with sd card root. need to request.
+                    String sdRoot = sdCardOperator.getSDCardRoot();
+                    if(context instanceof DownloadableActivity) {
+                        ((DownloadableActivity) context).setLinkInfo(new DownloadLinkInfo(currentDocument,url));
+                    }
+                    //request SD card write permission.
+                    SDCardOperator.requestSDCardPermission(sdRoot, context, (Activity) context);
+                    return;
+                }
+            }
+        }
+
         double availableFreeSpace = Double.MAX_VALUE;
         try{
             StatFs stat = new StatFs(parentPath);
@@ -1959,7 +2003,13 @@ public class NodeController {
             if(localPath != null){
                 File file = new File(localPath);
                 try {
-                    copyFile(file, new File(parentPath, tempNode.getName()));
+                    //TODO should do it in a thread
+                    log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
+                    if(downloadToSDCard) {
+                        sdCardOperator.moveFile(parentPath,new File(localPath));
+                    } else {
+                        copyFile(file, new File(parentPath, tempNode.getName()));
+                    }
                 }catch(Exception e) {}
 
                 if (file != null && file.getParent().equals(parentPath)) {
@@ -1991,7 +2041,13 @@ public class NodeController {
                         service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
                         service.putExtra(Constants.EXTRA_SERIALIZE_STRING, currentDocument.serialize());
                         service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-                        service.putExtra(DownloadService.EXTRA_PATH, path);
+                        if(downloadToSDCard) {
+                            service.putExtra(DownloadService.EXTRA_PATH, downloadRoot);
+                            service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
+                            service.putExtra(DownloadService.EXTRA_TARGET_ROOT, path);
+                        }else{
+                            service.putExtra(DownloadService.EXTRA_PATH, path);
+                        }
                         log("intent to DownloadService");
                         if (context instanceof AudioVideoPlayerLollipop || context instanceof FullScreenImageViewerLollipop || context instanceof PdfViewerActivityLollipop) {
                             service.putExtra("fromMV", true);

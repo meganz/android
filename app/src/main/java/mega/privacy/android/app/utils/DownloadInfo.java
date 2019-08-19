@@ -1,10 +1,6 @@
 package mega.privacy.android.app.utils;
 
-import java.util.Arrays;
-
 public class DownloadInfo {
-
-    private String url;
 
     private boolean highPriority;
 
@@ -12,29 +8,10 @@ public class DownloadInfo {
 
     private long[] hashes;
 
-    public DownloadInfo(String url, boolean highPriority, long size, long[] hashes) {
-        this.url = url;
+    public DownloadInfo(boolean highPriority, long size, long[] hashes) {
         this.highPriority = highPriority;
         this.size = size;
         this.hashes = hashes;
-    }
-
-    @Override
-    public String toString() {
-        return "DownloadInfo{" +
-                "url='" + url + '\'' +
-                ", highPriority=" + highPriority +
-                ", size=" + size +
-                ", hashes=" + Arrays.toString(hashes) +
-                '}';
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public boolean isHighPriority() {
