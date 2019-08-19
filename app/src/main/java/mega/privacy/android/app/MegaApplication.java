@@ -395,8 +395,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					if (megaChatApi != null) {
 						backgroundStatus = megaChatApi.getBackgroundStatus();
 						log("backgroundStatus_activityVisible: " + backgroundStatus);
-						if (backgroundStatus != -1){
-							if (backgroundStatus != 0){
+						if (backgroundStatus != -1 && backgroundStatus != 0) {
+							MegaHandleList callRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
+							if (callRingIn == null || callRingIn.size() <= 0) {
 								megaChatApi.setBackgroundStatus(false);
 							}
 						}
@@ -407,10 +408,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					if (megaChatApi != null) {
 						backgroundStatus = megaChatApi.getBackgroundStatus();
 						log("backgroundStatus_!activityVisible: " + backgroundStatus);
-						if (backgroundStatus != -1){
-							if (backgroundStatus != 1){
-								megaChatApi.setBackgroundStatus(true);
-							}
+						if (backgroundStatus != -1 && backgroundStatus != 1) {
+							megaChatApi.setBackgroundStatus(true);
 						}
 					}
 				}
