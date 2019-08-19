@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activating account</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Please log in to share with MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Your confirmation link is no longer valid. Your account may already be activated or you may have cancelled your registration.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
