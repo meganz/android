@@ -61,6 +61,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -70,9 +71,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
-public class SearchFragmentLollipop extends Fragment{
+public class SearchFragmentLollipop extends RotatableFragment{
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
@@ -109,7 +111,7 @@ public class SearchFragmentLollipop extends Fragment{
 	boolean allFiles = true;
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	String downloadLocationDefaultPath;
 
 	boolean multiselectBoolean=false;
 
@@ -117,12 +119,22 @@ public class SearchFragmentLollipop extends Fragment{
 
 	public NewHeaderItemDecoration headerItemDecoration;
 
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
+	}
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
 	}
 
 	public void updateScrollPosition(int position) {
@@ -463,19 +475,8 @@ public class SearchFragmentLollipop extends Fragment{
 		}
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+		downloadLocationDefaultPath = getDownloadLocation(context);
+
 		lastPositionStack = new Stack<>();
 		super.onCreate(savedInstanceState);
 	}
@@ -538,11 +539,15 @@ public class SearchFragmentLollipop extends Fragment{
             sections.put(folderCount, getString(R.string.general_files));
         }
 		if (headerItemDecoration == null) {
+			log("create new decoration");
 			headerItemDecoration = new NewHeaderItemDecoration(context);
-			recyclerView.addItemDecoration(headerItemDecoration);
+		} else {
+			log("remove old decoration");
+			recyclerView.removeItemDecoration(headerItemDecoration);
 		}
 		headerItemDecoration.setType(type);
 		headerItemDecoration.setKeys(sections);
+		recyclerView.addItemDecoration(headerItemDecoration);
     }
 	
 	@Override
@@ -860,7 +865,7 @@ public class SearchFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("FILENAME", file.getName());
 					imageDrag = imageView;
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -928,7 +933,7 @@ public class SearchFragmentLollipop extends Fragment{
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.SEARCH_ADAPTER);
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -985,7 +990,7 @@ public class SearchFragmentLollipop extends Fragment{
 					MegaNode file = nodes.get(position);
 
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if (f.exists() && (f.length() == file.getSize())) {
 						isOnMegaDownloads = true;
@@ -1087,8 +1092,9 @@ public class SearchFragmentLollipop extends Fragment{
 			adapter.clearSelections();
 		}
 	}
-	
-	private void updateActionModeTitle() {
+
+	@Override
+	protected void updateActionModeTitle() {
 		if (actionMode == null || context == null) {
 			return;
 		}

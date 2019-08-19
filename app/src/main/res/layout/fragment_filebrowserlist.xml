@@ -9,7 +9,7 @@
 
 	<include layout="@layout/item_call_in_progress_layout"
 		android:layout_width="match_parent"
-		android:layout_height="48dp"
+		android:layout_height="wrap_content"
 		android:visibility="gone"
 		android:layout_alignParentTop="true" />
 
@@ -55,8 +55,11 @@
 				android:id="@+id/file_list_empty_text_first"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:gravity="center"
 				android:textColor="@color/text_secondary"
 				android:fontFamily="sans-serif"
+				android:paddingLeft="10dp"
+				android:paddingRight="10dp"
 				android:textSize="18sp"/>
 		</LinearLayout>
 	</RelativeLayout>

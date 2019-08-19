@@ -8,9 +8,10 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 234
-        versionName "3.6.1 (234)"
+        versionCode 250
+        versionName "3.7.0 (250)"
         multiDexEnabled true
+        ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
     }
 
     sourceSets.main {
@@ -58,6 +59,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:exifinterface:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.google.android.gms:play-services-wallet:16.0.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
@@ -80,6 +82,10 @@ dependencies {
     implementation 'com.android.support:support-emoji-appcompat:27.1.1'
     implementation 'com.android.support:support-emoji-bundled:27.1.1'
     implementation 'com.android.support:preference-v7:27.1.1'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
+    implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'net.opacapp:multiline-collapsingtoolbar:27.1.1'
 }
 

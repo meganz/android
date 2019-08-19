@@ -116,4 +116,17 @@
         <attr name="exampleDrawable" format="color|reference" />
     </declare-styleable>
 
+    <declare-styleable name="RecordView">
+        <attr name="slide_to_cancel_text" format="string" />
+        <attr name="slide_to_cancel_arrow" format="reference" />
+        <attr name="slide_to_cancel_margin_right" format="dimension" />
+        <attr name="slide_to_cancel_bounds" format="dimension" />
+        <attr name="slide_to_cancel_arrow_color" format="color" />
+        <attr name="counter_time_color" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="RecordButton">
+        <attr name="mic_icon" format="reference" />
+    </declare-styleable>
+
 </resources>
