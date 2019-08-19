@@ -29,7 +29,6 @@ import nz.mega.sdk.MegaApiJava;
 public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnClickListener {
 
     private AlertDialog mDialog;
-    private String mPassword, mLink;
     private EditText userPassword, userPasswordConfirm;
     private MegaApiAndroid megaApi;
     private RelativeLayout passwordConfirmErrorLayout, passwordErrorLayout;
@@ -39,10 +38,8 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
     private TextView passwordType, passwordAdvice, passwordConfirmErrorText, passwordErrorText;
     private boolean isPasswordValid, isPasswordVisible;
 
-    protected SetPasswordDialog(@NonNull Context mContext, @NonNull SetPasswordCallback callback, MegaApiAndroid api, String password, String link) {
+    protected SetPasswordDialog(@NonNull Context mContext, @NonNull SetPasswordCallback callback, MegaApiAndroid api) {
         super(mContext, callback);
-        mPassword = password;
-        mLink = link;
         megaApi = api;
         setupView();
         mDialog = builder.create();
@@ -51,13 +48,13 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
     }
 
     public void show() {
-        if(mDialog != null){
+        if (mDialog != null) {
             mDialog.show();
         }
     }
-    
-    public void dismiss(){
-        if(mDialog != null) {
+
+    public void dismiss() {
+        if (mDialog != null) {
             mDialog.dismiss();
         }
     }
@@ -364,8 +361,6 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
                     if (mCallback != null) {
                         mCallback.onConfirmed(userPassword.getText().toString());
                     }
-                } else {
-                    //containerPasswordElements.setVisibility(View.GONE);
                 }
                 break;
             case R.id.button_cancel:

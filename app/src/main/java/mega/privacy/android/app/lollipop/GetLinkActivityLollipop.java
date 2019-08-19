@@ -252,19 +252,8 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		};
 
-		SetPasswordDialog dialog = new SetPasswordDialog(this, callback, megaApi, password, link);
+		SetPasswordDialog dialog = new SetPasswordDialog(this, callback, megaApi);
 		dialog.show();
-	}
-
-	private void showKeyboardDelayed(final View view) {
-		log("showKeyboardDelayed");
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
 	}
 
 	public void showFragment(int visibleFragment){
