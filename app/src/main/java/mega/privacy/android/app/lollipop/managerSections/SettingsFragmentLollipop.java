@@ -2108,36 +2108,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             dbH.setAutoPlayEnabled(String.valueOf(isChecked));
 
         }
-		else{
-			log("Camera OFF");
-			secondaryUpload = false;
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-				Intent stopIntent = new Intent(context, CameraUploadsService.class);
-				stopIntent.setAction(CameraUploadsService.ACTION_STOP);
-				context.startService(stopIntent);
-			}
-			else {
-				dbH.setCamSyncEnabled(false);
-				dbH.setSecondaryUploadEnabled(false);
-				if (megaApi != null) {
-					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-				}
-			}
-
-			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
-            cameraUploadOn.setSummary("");
-			secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
-			cameraUploadCategory.removePreference(cameraUploadHow);
-			cameraUploadCategory.removePreference(cameraUploadWhat);
-			cameraUploadCategory.removePreference(localCameraUploadFolder);
-			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-			cameraUploadCategory.removePreference(cameraUploadCharging);
-			cameraUploadCategory.removePreference(keepFileNames);
-			cameraUploadCategory.removePreference(megaCameraFolder);
-			cameraUploadCategory.removePreference(secondaryMediaFolderOn);
-			cameraUploadCategory.removePreference(localSecondaryFolder);
-			cameraUploadCategory.removePreference(megaSecondaryFolder);
-		}
 		return true;
 	}
 
@@ -2914,8 +2884,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		cameraUploadCategory.addPreference(keepFileNames);
 		cameraUploadCategory.addPreference(megaCameraFolder);
 		cameraUploadCategory.addPreference(secondaryMediaFolderOn);
-		cameraUploadCategory.removePreference(localSecondaryFolder);
-		cameraUploadCategory.removePreference(megaSecondaryFolder);
 	}
 
     public void disableCameraUpload(){
@@ -2934,8 +2902,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         },10 * 1000);
 
         dbH.setCamSyncEnabled(false);
-        dbH.setSecondaryUploadEnabled(false);
-        secondaryUpload = false;
         stopRunningCameraUploadService(context);
 
         cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
