@@ -385,8 +385,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
-    // The ArrayList to preserve selected message if the permission is not granted
-    ArrayList<AndroidMegaChatMessage> unprocessedMessagesSelected;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {

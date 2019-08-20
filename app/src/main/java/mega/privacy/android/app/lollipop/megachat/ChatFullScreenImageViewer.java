@@ -803,7 +803,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            chatC.prepareForDownload(intent, parentPath);
+			chatC.prepareForDownload(intent, parentPath);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
