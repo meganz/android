@@ -75,17 +75,17 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 
 
 public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
-	
-	public static String EXTRA_URL = "fileurl";
-	public static String EXTRA_SIZE = "filesize";
-	public static String EXTRA_SERIALIZED_NODES = "serialized_nodes";
-    public static String EXTRA_DOCUMENT_HASHES = "document_hash";
-	public static String EXTRA_FROM_SETTINGS = "from_settings";
-	public static String EXTRA_CAMERA_FOLDER = "camera_folder";
-	public static String EXTRA_BUTTON_PREFIX = "button_prefix";
-	public static String EXTRA_SD_ROOT = "sd_root";
-	public static String EXTRA_PATH = "filepath";
-	public static String EXTRA_FILES = "fileslist";	
+
+	public static final String EXTRA_URL = "fileurl";
+	public static final String EXTRA_SIZE = "filesize";
+	public static final String EXTRA_SERIALIZED_NODES = "serialized_nodes";
+	public static final String EXTRA_DOCUMENT_HASHES = "document_hash";
+	public static final String EXTRA_FROM_SETTINGS = "from_settings";
+	public static final String EXTRA_CAMERA_FOLDER = "camera_folder";
+	public static final String EXTRA_BUTTON_PREFIX = "button_prefix";
+	public static final String EXTRA_SD_ROOT = "sd_root";
+	public static final String EXTRA_PATH = "filepath";
+	public static final String EXTRA_FILES = "fileslist";
 	
 	// Pick modes
 	public enum Mode {
