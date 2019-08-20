@@ -121,6 +121,8 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
 
@@ -2262,9 +2264,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     supportInvalidateOptionsMenu();
 
 
-                    downloadLocationDefaultPath = Util.getDownloadLocation(this);
+                    downloadLocationDefaultPath = getDownloadLocation(this);
                     boolean isOnMegaDownloads = false;
-                    String localPath = Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
                     File f = new File(downloadLocationDefaultPath, file.getName());
                     if(f.exists() && (f.length() == file.getSize())){
                         isOnMegaDownloads = true;
