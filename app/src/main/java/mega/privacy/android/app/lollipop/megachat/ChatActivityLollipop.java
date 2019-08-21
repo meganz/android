@@ -155,11 +155,20 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
-import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.EDITING_MESSAGE;
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.LATITUDE;
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.LONGITUDE;
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.MSG_ID;
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.SNAPSHOT;
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.getAddresses;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
+import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
+import static mega.privacy.android.app.utils.Util.context;
+import static mega.privacy.android.app.utils.Util.toCDATA;
 
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<ArrayList<AndroidMegaChatMessage>> {
@@ -7512,7 +7521,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void markAsSeen(MegaChatMessage msg){
         log("markAsSeen");
         if(activityVisible){
-            if(msg.getStatus()!=MegaChatMessage.STATUS_SEEN) {
+            if(msg.getStatus()!=MegaChatMessage.STATUS_SEEN && MegaApplication.isActivityVisible()) {
+                log("markAsSeen: request to set " + msg.getMsgId() + " as seen");
                 megaChatApi.setMessageSeen(chatRoom.getChatId(), msg.getMsgId());
             }
         }
@@ -7654,7 +7664,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             lastMessage = messages.get(index);
                         }
 
-                        if (lastMessage.getMessage() != null) {
+                        if (lastMessage.getMessage() != null && MegaApplication.isActivityVisible()) {
                             boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                             log("(A)Result setMessageSeen: " + resultMarkAsSeen);
                         }
@@ -7677,7 +7687,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 lastMessage = messages.get(index);
                             }
 
-                            if (lastMessage.getMessage() != null) {
+                            if (lastMessage.getMessage() != null && MegaApplication.isActivityVisible()) {
                                 boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                                 log("(B)Result setMessageSeen: " + resultMarkAsSeen);
                             }

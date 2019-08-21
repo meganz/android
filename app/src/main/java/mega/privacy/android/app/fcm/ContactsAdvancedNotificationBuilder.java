@@ -38,8 +38,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 
 public final class ContactsAdvancedNotificationBuilder implements MegaRequestListenerInterface {
 
@@ -639,9 +639,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
     public void showSimpleNotificationAPC(){
         log("showSimpleNotificationAPC");
-    
-        Intent myService = new Intent(context, IncomingMessageService.class);
-        context.stopService(myService);
+
         String title = context.getString(R.string.title_acceptance_contact_request_notification);
         String fullName = "";
 

@@ -51,8 +51,8 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNodeList;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 
 public final class ChatAdvancedNotificationBuilder {
 
@@ -781,9 +781,6 @@ public final class ChatAdvancedNotificationBuilder {
 
     public void showSimpleNotification(){
         log("showSimpleNotification");
-    
-        Intent myService = new Intent(context, IncomingMessageService.class);
-        context.stopService(myService);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
             channel.enableVibration(false);
@@ -1163,8 +1160,6 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             log("generateChatNotification:POST Android O");
-            Intent myService = new Intent(context, IncomingMessageService.class);
-            context.stopService(myService);
             newGenerateChatNotification(request);
         }
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -1192,6 +1187,7 @@ public final class ChatAdvancedNotificationBuilder {
             log("should beep: " + beep);
 
             MegaHandleList chatHandleList = request.getMegaHandleList();
+            log("chats size: " + chatHandleList.size());
             ArrayList<MegaChatListItem> chats = new ArrayList<>();
             for (int i = 0; i < chatHandleList.size(); i++) {
                 MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));

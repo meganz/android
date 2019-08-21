@@ -136,7 +136,6 @@ import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
-import mega.privacy.android.app.fcm.IncomingMessageService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -241,8 +240,18 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.createCacheFolders;
+import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
+import static mega.privacy.android.app.utils.FileUtils.OLD_MK_FILE;
+import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
+import static mega.privacy.android.app.utils.FileUtils.buildExternalStorageFile;
+import static mega.privacy.android.app.utils.FileUtils.createTemporalTextFile;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
@@ -4729,8 +4738,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void updateNavigationToolbarIcon(){
 		log("updateNavigationToolbarIcon");
-        Intent myService = new Intent(this, IncomingMessageService.class);
-        stopService(myService);
 		//Just working on 4.4.+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
