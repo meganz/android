@@ -63,6 +63,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     Handler h;
 
+    PowerManager.WakeLock wl;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -180,13 +182,14 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                        boolean isActivityVisible = MegaApplication.isActivityVisible();
                         boolean isIdle = pm.isDeviceIdleMode();
-                        log("isActivityVisible: " + isActivityVisible);
-                        log("isIdle: " + isIdle);
-                        if(!isActivityVisible || isIdle) {
+                        if ((!app.isActivityVisible() && megaApi.getRootNode() == null) || isIdle) {
                             log("launch foreground service!");
-                            startService(new Intent(this,IncomingCallService.class));
+                            wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingCallLock:");
+                            wl.acquire();
+                            wl.release();
+                            log("startService-MegaFirebaseMessagingService:onMessageReceived ");
+                            startService(new Intent(this, IncomingCallService.class));
                             return;
                         }
                     }
@@ -215,6 +218,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         log("isActivityVisible: " + app.isActivityVisible());
                         log("isIdle: " + isIdle);
                         if((!app.isActivityVisible() && megaApi.getRootNode() == null )|| isIdle) {
+
                             log("launch foreground service!");
                             Intent intent = new Intent(this,IncomingMessageService.class);
                             intent.putExtra("remoteMessage", remoteMessage);

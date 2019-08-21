@@ -166,6 +166,8 @@
     <string name="alert_no_app" context="Alert text before download">Không có ứng dụng nào trong điện thoại để mở tệp %s. Vẫn tiếp tục tải về?</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">Không hiện nữa</string>
 
+    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Are you sure that you want to cancel the current login process?</string>
+
     <string name="login_text" context="Login button">Đăng nhập</string>
     <string name="email_text" context="email label">E-mail</string>
     <string name="password_text" context="password label">Mật khẩu</string>
@@ -254,7 +256,7 @@
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">GỬI ĐI</string>
 
     <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Mục Chia Sẻ Nhận Được</string>
-	<string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Mục chia sẻ nhận được từ</string>
+    <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Mục chia sẻ nhận được từ</string>
     <!--
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
     -->
@@ -294,25 +296,25 @@
     <string name="file_properties_owner" context="shows the owner of an incoming shared folder">Chủ sở hữu</string>
     <string name="contact_invite" context="positive button on dialog to invite a contact">Mời</string>
     <string name="contact_reinvite" context="option to reinvite a contact">Mời lại</string>
-	<string name="contact_ignore" context="option to ignore a contact invitation">Bỏ Qua</string>
-	<string name="contact_decline" context="option to decline a contact invitation">Từ chối</string>
-	<string name="contact_accept" context="option to accept a contact invitation">Nhận</string>
-	<string name="contact_properties_activity" context="title of the contact properties screen">Thông tin liên lạc</string>	
-	<!--
+    <string name="contact_ignore" context="option to ignore a contact invitation">Bỏ Qua</string>
+    <string name="contact_decline" context="option to decline a contact invitation">Từ chối</string>
+    <string name="contact_accept" context="option to accept a contact invitation">Nhận</string>
+    <string name="contact_properties_activity" context="title of the contact properties screen">Thông tin liên lạc</string>
+    <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Thêm tên liên lạc mới bằng nút ở dưới đây</string>	
-	<!--
+    <string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Thêm tên liên lạc mới bằng nút ở dưới đây</string>
+    <!--
     <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
 	-->
-	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Thêm tên liên lạc vào danh bạ để chia sẻ</string>
-	
-	<string name="error_not_enough_free_space" context="Error message">Không đủ chỗ trống trong điện thoại</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Thêm tên liên lạc vào danh bạ để chia sẻ</string>
 
-	<string name="option_link_without_key" context="Alert Dialog to get link">Liên kết không kèm mã khóa</string>
-	<string name="option_decryption_key" context="Alert Dialog to get link">Mã giải khóa</string>
-	
-	<!--
+    <string name="error_not_enough_free_space" context="Error message">Không đủ chỗ trống trong điện thoại</string>
+
+    <string name="option_link_without_key" context="Alert Dialog to get link">Liên kết không kèm mã khóa</string>
+    <string name="option_decryption_key" context="Alert Dialog to get link">Mã giải khóa</string>
+
+    <!--
     <string name="download_failed" context="Error message">Download failed</string>
     -->
     <!--
@@ -324,7 +326,7 @@
     <!--
 	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
 	-->
-	<string name="download_preparing_files" context="message before the download or upload start ">Đang chuẩn bị cho tệp tin</string>
+    <string name="download_preparing_files" context="message before the download or upload start ">Đang chuẩn bị cho tệp tin</string>
     <string name="download_began" context="message when the download starts">Đã bắt đầu tải xuống</string>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -450,7 +452,7 @@
     <string name="number_correctly_moved" context="success message when moving a node">%d mục đã được di chuyển thành công</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d mục chưa thể xóa được</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Đã di chuyển vào thùng rác thành công</string>
-    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d mục đã được di chuyển vào thùng rác</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">Đã di chuyển %d mục đến Thùng Rác thành công</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">&#160;và %d mục chưa được gửi đi thành công</string>
     <string name="context_no_moved" context="error message">Lỗi. Chưa di chuyển được</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Đã được chia sẻ cho:</string>
@@ -483,10 +485,10 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">Thư mục này đã không còn được chia sẻ nữa</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Lỗi, thư mục vẫn còn dính chia sẻ với người khác</string>
     <string name="context_select_one_file" context="option available for just one file">Chọn đúng một mục</string>
-    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Đã hoàn tất dọn sạch Thùng Rác</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Thùng Rác đã được dọn sạch sẽ</string>
     <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Phát sinh lỗi. Không dọn được thùng rác</string>
 
-    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Quý khách đang chuẩn bị tiến hành hủy bỏ hạng thành viên MEGA trả phí. Nếu có lời nhận xét hay yêu cầu gì để làm hài lòng quý khách hàng, xin hãy liên hệ với chúng tôi</string>
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Quý khách đang chuẩn bị hủy bỏ gói thành viên MEGA. Xin vui lòng cho chúng tôi biết lý do để chúng tôi cải thiện và làm vừa lòng quý khách.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Viết lời phản hồi ở đây</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Gửi</string>
     <!--
@@ -495,10 +497,10 @@
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Cảm ơn lời nhận xét của quý khách! Quý khách có muốn hủy thuê bao MEGA ngay không?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Quá trình hủy bỏ hạng tài khoản PRO và ngưng trả phí chưa thể tiếp tục vì quý khách chưa điền lý do</string>
 
-    <string name="context_node_private" context="success message after removing the public link of a folder">Thư mục không còn ở chế độ công khai</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+    <string name="context_node_private" context="success message after removing the public link of a folder">Thư mục hiện ở chế độ riêng tư</string>
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Đã xóa chia sẻ</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Thư mục mới</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Thêm liên lạc</string>
@@ -517,7 +519,7 @@
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
     <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Chọn từ Hệ Thống Tệp</string>
-    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Pick from</string>
+    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Chọn từ chỗ</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -535,6 +537,10 @@
     <string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
     -->
     <string name="upload_prepare" context="Status text at the beginning of an upload">Đang xử lý tệp tin</string>
+    <plurals name="upload_prepare" context="Status text at the beginning of an upload">
+        <item context="Status text at the beginning of an upload for 1 file" quantity="one">Đang xử lý tệp tin</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+    </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">Nguồn dữ liệu hiện không khả dụng, xin thử lại sau</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Không thể mở tệp đã chọn</string>
     <string name="upload_began" context="when an upload starts, a message is shown to the user">Đã bắt đầu tải lên</string>
@@ -636,6 +642,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Đang tải lên hình ảnh từ các thư mục chứa media</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -643,12 +651,13 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Lưu trữ</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Khóa bằng PIN</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression is very power consuming, MEGA will remind you to charge your device if the videos to be compressed are larger than %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Nâng Cao</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Dọn Bộ Nhớ Tạm</string>
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Dọn Các Tệp Ngoại Tuyến</string>
 
-	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
+    <string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Mở tệp tin khi tải xong</string>
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Xóa bỏ tài khoản này</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Hiện đang dùng %s</string>
@@ -692,6 +701,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Chỉ được tải lúc sạc pin</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Giữ nguyên tên tệp tin như trên điện thoại</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Thư mục chứa ảnh Camera trong máy</string>
@@ -720,7 +730,10 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Nhập</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Tất cả các dữ liệu đã được lưu nội bộ trong ứng dụng MEGA sẽ bị xóa sau 10 lần nhập sai mã</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Mã chưa đúng</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Sai mã PIN, xin thử lại. Bạn còn lại %2d lần để thử</string>
+    <plurals name="pin_lock_incorrect_alert">
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Sai mã PIN, xin thử lại. Bạn còn lại %2d lần để thử</item>
+    </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Mã PIN không trùng khớp</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Nhập Mã PIN</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Nhập Mã PIN lần nữa</string>
@@ -848,7 +861,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Sao chép Mã Khóa Phục Hồi vào bộ ghi nhớ hoặc lưu lại mã dưới dạng tệp tin chữ</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Lưu</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Mã Khóa Phục Hồi đã được ghi vào bộ nhớ</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Mã Khóa Phục Hồi đã được lưu lại vào bộ nhớ</string>
 
     <string name="change_pass" context="Button to change the password">Thay đổi</string>
 
@@ -990,6 +1003,8 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Đường liên kết này không còn tồn tại</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Đường liên kết đã bị xóa bỏ do vi phạm Điều khoản S/dụng và D/vụ.</string>
 
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">Đường liên kết URL vừa nhập không đúng hoặc bị viết sai. Không thể sử dụng để truy cập được.</string>
+
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Đang chờ xác nhận địa chỉ email</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Hãy kiểm tra hộp thư của bạn và xác nhận tài khoản của bạn.</string>
 
@@ -1067,6 +1082,9 @@
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d tên liên lạc đã được xoá bỏ khỏi thư mục chia sẻ</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;và %d tên liên lạc chưa được xoá đi thành công</string>
 
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
+
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Đang tải danh bạ từ điện thoại&#8230;</string>
 
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d lời mời đã được gửi đi thành công.</string>
@@ -1078,7 +1096,7 @@
     <string name="general_mute" context="button">Tắt tiếng</string>
     <string name="general_unmute" context="button">Bỏ tắt tiếng</string>
 
-    <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Thông báo</string>
+    <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Thông Báo</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Âm báo tin nhắn</string>
     <string name="title_properties_chat_clear_chat" context="Title of the section to clear the chat content in the Contact Properties screen">Xóa nội dung chat</string>
     <string name="title_properties_chat_share_contact" context="Title of the section to share the contact in the Contact Properties screen">Chia sẻ liên lạc</string>
@@ -1259,13 +1277,13 @@
     </plurals>
 
     <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]và vài người khác đang viết tin nhắn&#8230;[/A]</string>
-	<string name="label_more" context="button label more">Thêm nữa</string>
-	<string name="label_close" context="button label Close">Đóng</string>
+    <string name="label_more" context="button label more">Thêm nữa</string>
+    <string name="label_close" context="button label Close">Đóng</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">Tổng Quan</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Lưu trữ</string>
-	<string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Lưu trữ</string>
-	<string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Băng thông truyền tải</string>
-	<string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Băng thông truyền tải</string>
+    <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Lưu trữ</string>
+    <string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Băng thông truyền tải</string>
+    <string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Băng thông truyền tải</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Gói Cước</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Không gian lưu trữ</string>
@@ -1329,6 +1347,7 @@
         <item context="Plural" quantity="other">%1$d trong tổng %2$d tệp</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Tiến trình đang được hoàn tất&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Xem</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Dừng tất cả truyền tải</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Tiếp tục tất cả các truyền tải</string>
@@ -1363,8 +1382,8 @@
     </plurals>
 
 	<plurals name="folder_upload_service_notification" context="Text of the notification shown when the folder upload service is running">
-		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder</item>
-		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders</item>
+		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Đang tải lên thư mục số %1$d trong tổng %2$d</item>
+		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Đang tải lên thư mục số %1$d trong tổng %2$d</item>
 	</plurals>
 
     <plurals name="upload_service_final_notification" context="Text of the notification shown when the upload service has finished">
@@ -1373,8 +1392,8 @@
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification" context="Text of the notification shown when the folder upload service has finished">
-		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">Uploaded %1$d folder</item>
-		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">Uploaded %1$d folders</item>
+		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">Đã tải lên %1$d thư mục</item>
+		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">Đã tải lên %1$d thư mục</item>
 	</plurals>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">Tổng kích thước: %1$s</string>
@@ -1425,7 +1444,7 @@
     </plurals>
 
     <string name="general_view" context="Menu option">Xem tệp tin</string>
-    <string name="add_to_cloud" context="Menu option">Lưu vào Ổ Mây</string>
+    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Chuyển nhập</string>
     <string name="save_for_offline" context="Menu option">Lưu để dùng ngoại tuyến</string>
 
     <string name="general_view_contacts" context="Menu option">Xem danh bạ</string>
@@ -1542,7 +1561,7 @@
 
     <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Âm báo chát</string>
 
-    <string name="achievements_title" context="title of the section for achievements">Trang Thành Tích</string>
+    <string name="achievements_title" context="title of the section for achievements">Phần Thưởng Thành Tích</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">Mời bạn bè tham gia và nhận thưởng</string>
 
     <string name="button_invite_friends" context="button to invite friends for getting achievements">Mời bạn bè</string>
@@ -1718,7 +1737,7 @@
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Không có [/B][A]Thư Mục Chia Sẻ Nhân Được[/A][B] nào.[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Không có [/B][A]Thư Mục Chia Sẻ Gửi Đi[/A][B] nào.[/B]</string>
 
-    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Yêu cầu đã gửi</string>
+    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Yêu cầu gửi đi</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Yêu cầu đã nhận</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Cảnh báo vượt mức</string>
 
@@ -1779,10 +1798,11 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Đăng tải lên chát</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chất lượng phim ảnh tải lên cuộc chát</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Chất Lượng Video</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload.">Giữ nguyên gốc</item>
-        <item context="the options of what to upload.">Trung Bình</item>
+        <item context="the options of origin quality multimedia file to upload.">Chất lượng nguyên gốc</item>
+        <item context="the options of medium quality multimedia file to  upload.">Chất lượng trung bình</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Cuộc gọi nhỡ</string>
@@ -1809,10 +1829,10 @@
 
     <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">Bật Thông Báo</string>
     <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">Bằng cách này, các tin nhắn mới sẽ hiển thị\ntrên điện thoại Android ngày tức thì.</string>
-    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Open Android device [A]Settings[/A]</string>
-    <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">Open [A]Apps &amp; notifications[/A]</string>
+    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Vào phần [A]Cài Đặt[/A] trên máy Android</string>
+    <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">Vào [A]Ứng dụng &amp; thông báo[/A]</string>
     <string name="turn_on_notifications_third_step" context="Third step to turn on notifications">Chọn [A]MEGA[/A]</string>
-    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">Open [A]App notifications[/A]</string>
+    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">Vào [A]Thông báo ứng dụng[/A]</string>
     <string name="turn_on_notifications_fifth_step" context="Fifth step to turn on notifications">Bật thông báo và tùy chỉnh dạng tin muốn xem</string>
 
     <plurals name="files_send_to_chat_success" context="Alert message after sending to chat one or several messages to several chats">
@@ -1830,7 +1850,7 @@
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">Kiểm tra mật khẩu</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Kiểm tra mật khẩu</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Mật khẩu chính xác</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Mật khẩu không đúng!\nHãy lưu lại đề phòng Mã Khoá Phục Hồi ngay!</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">Đã xuất Mã Phục Hồi</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">Mã Khoá Phục Hồi đã được xuất vào trang Lưu về Ngoại Tuyến với tên MEGARecoveryKey.txt.\nChú ý: Tệp tin này sẽ bị xoá sau khi đăng xuất, vì vậy nên lưu lại ở một nơi an toàn.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Trước khi tiến hành việc đăng xuất, xin thử điền mật khẩu để kiểm tra rằng mình còn nhớ chính xác.\nQuên mất mật khẩu và không có mã phục hồi sẽ không lấy lại được tài khoản.</string>
@@ -1872,6 +1892,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Máy chủ hiện đang bận. Xin chờ.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Quý trình hiện diễn ra lâu hơn dự đoán. Xin chờ.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit ">Quá nhiều lời yêu cầu. Xin chờ.</string>
+    <string name="login_in_progress" context="message when previous login is being canceled">Đang hủy bỏ quá trình đăng nhập. Xin chờ&#8230;</string>
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Lỗi. Tệp tin bị hư hỏng hoặc không có tồn tại.</string>
 
@@ -1944,7 +1965,7 @@
     <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">Lỗi phát sinh khi thử bật tính năng Xác Minh 2-Bước. Xin thử lại.</string>
     <string name="title_enable_2fa" context="Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication">Bật Xác Minh 2-Bước</string>
     <string name="label_2fa_disabled" context="Label shown when it disables the Two-Factor Authentication">Xác Minh 2-Bước Đã Tắt</string>
-    <string name="open_app_button" context="Text of the button which action is to show the authentication apps">Open in</string>
+    <string name="open_app_button" context="Text of the button which action is to show the authentication apps">Mở trong</string>
     <string name="intent_not_available_2fa" context="message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn\'t any app that open it">Hiện không có ứng dụng nào phù hợp để bật chức năng  Xác Minh 2-Bước cho thiết bị này</string>
     <string name="general_close" context="Text button">Đóng</string>
 
@@ -1981,8 +2002,6 @@
 
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Định dạng tin nhắn không hợp lệ</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Chữ ký cho tin nhắn không hợp lệ</string>
-
-    <string name="add_to_cloud_import" context="Menu option">Lưu vào Ổ Mây</string>
 
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">Lỗi phát sinh khi thực hiện đường truyền</string>
 
@@ -2071,8 +2090,8 @@
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Mã không phù hợp</string>
 
     <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Ổ Mây sắp bị đầy. Nâng cấp tài khoản lên hạng PRO để nhận lên đến 8 TB không gian lưu trữ và 16 TB băng thông truyền tải.</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Cloud Drive is almost full. Upgrade now and get up to 8 TB of storage and 16 TB of transfer quota.</string>
-    <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Cloud Drive is almost full. If you need more storage please contact MEGA support to get a custom plan.</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Ổ Mây sắp đầy. Nâng cấp ngay và nhận lên đến 8 TB không gian lưu trữ và 16 TB băng thông truyền tải.</string>
+    <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Ổ Mây sắp đầy. Nếu quý khách cần thêm không gian lưu trữ, xin liên hệ với MEGA để lấy gói cước phù hợp.</string>
     <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Ổ Mây bị đầy. Nâng cấp lên PRO để nhận lên đến 8 TB không gian lưu trữ và 16 TB băng thông truyền tải.</string>
     <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Ổ Mây bị đầy. Nâng cấp ngay để nhận lên đến 8 TB không gian lưu trữ và 16 TB băng thông truyền tải.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Ổ Mây bị đầy. Nếu quý khách cần thêm không gian, xin vui lòng liên hệ với MEGA để mua gói cước phù hợp.</string>
@@ -2092,7 +2111,7 @@
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Gửi cho&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Tải lên tới&#8230;</string>
 
-	<string name="contact_info_button_more" context="More button in contact info page">Thêm nữa</string>
+    <string name="contact_info_button_more" context="More button in contact info page">Thêm nữa</string>
 
     <plurals name="plural_select_file" context="Section title to select a file to perform an action">
         <item context="one file" quantity="one">Chọn Tệp Tin</item>
@@ -2112,25 +2131,29 @@
     <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">Bạn có chắc muốn chuyển sang máy chủ thử nghiệm? Tài khoản có thể sẽ gặp các vấn đề không thể phục hồi</string>
 
     <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Bật máy ảnh?</string>
-    <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">If you open the camera, your video transmission will be paused in the current call.</string>
+    <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Nếu bạn mở camera, cuộc gọi video hiện tại sẽ bị gián đoạn.</string>
 
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Hoạt động chát</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">Có vài tin nhắn mới</string>
-	<string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
+    <string name="retrieving_message_title" context="When app is retrieving push message">Đang lấy tin nhắn</string>
 
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Lịch Dọn Dẹp Thùng Rác</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">Thùng Rác sẽ được tự động dọn dẹp đình kỳ.</string>
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Thời gian chờ tối thiểu là 7 ngày.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Chu kỳ chờ tối thiểu là 7 ngày và tối đa là 30 ngày.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Dọn dữ liệu tồn đọng hơn</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d ngày</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Nhắc cho tôi biết khi kích thước của tệp tin lớn hơn</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Nếu videos cần nén có kích thước lớn hơn</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Để tắt Lịch Dọn Dẹp Thùng Rác hay gia hạn chờ thời gian tự dọn dẹp được lâu hơn, tài khoản cần phải nâng cấp lên hạng PRO.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">ngày</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Lấy đường liên kết tới Cuộc Chát</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Lấy liên kết tới chát</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Quản lý liên kết cuộc chát</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Bật Luân Phiên Mã Khóa</string>
@@ -2139,26 +2162,26 @@
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] vừa tạo đường liên kết tới cuộc chát.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] đã xóa đường liên kết tới cuộc chát.[/B]</string>
 
-    <string name="action_delete_link" context="Title of the option to delete a chat link">Xóa đường liên kết tới cuộc chát</string>
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Xóa đường liên kết</string>
 
-    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Đường liên kết tới Cuộc Chat</string>
-    <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Liên kết chát</string>
+    <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">Việc này sẽ đăng xuất tài khoản ra khỏi tất cả các thiết bị ngoại trừ phiên hiện hành này.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Ban có muốn đóng các phiên hoạt động khác không?</string>
 
     <string name="number_of_participants" context="Subtitle to show the number of participants of a chat. Please keep the placeholder because is to show the number of participants in runtime.">%d người tham gia</string>
 
     <string name="action_join" context="Label of the button to join a chat by a chat link">Tham gia</string>
 
-    <string name="observers_chat_label" context="Label for observers of a group chat">Observers</string>
+    <string name="observers_chat_label" context="Label for observers of a group chat">Theo Dõi</string>
 
     <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Lỗi tải tới đường liên kết chát.</string>
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Lỗi khởi tạo chát phát sinh khi tải đường liên kết cuộc chát.</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">You are trying to preview a chat that you were previously a member of. Do you want to join the chat again?</string>
+    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Bạn đang cố thử xem qua tổng quan của phòng chát mà bạn đã từng là thành viên. Bạn có muốn tham gia vào lại phòng chát hay không?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Bạn đã là thành viên trong cuộc chát này.</string>
 
-    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is no longer available. If you leave the preview, you won’t be able to reopen it.</string>
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">Phần xem tổng quan của phòng chát không còn tồn tại. Nếu bạn thoát ra, bạn sẽ không mở lại được nữa.</string>
 
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] đã bật luân phiên mã khóa.[/B]</string>
 
@@ -2171,7 +2194,7 @@
     <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Luân phiên mã khóa giúp cho việc an ninh được nâng cấp hơn, nhưng sẽ không cho phép bất kỳ ai tạo ra đường liên kết tới cuộc chát và người mới tham gia vào chát sẽ không thấy các tin nhắn diễn ra từ trước.</string>
     <string name="action_open_chat_link" context="Menu item">Mở đường liên kết tới chát</string>
 
-    <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
+    <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">Lời mời đã được gửi tới %s trước đây rồi. Theo dõi tình trạng của lời mời trong phần Yêu Cầu Gửi Đi.</string>
 
     <string name="save_qr_cloud_drive" context="Label shown to indicate the QR is saving in Cloud Drive">Đang lưu %s vào Ổ Mây&#8230;</string>
 
@@ -2248,6 +2271,15 @@
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Hiện "Lần thấy cuối&#8230;"</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Cho phép các tên trong liên lạc biết được lần thấy cuối bạn ở MEGA.</string>
 
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video compression.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">Tổng kích thước của các videos muốn chuyển đổi vượt hơn mức là $size MB, xin cắm vào thiết bị mong muốn để tiếp tục.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
+	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Thư mục vừa chọn không hợp lệ</string>
+
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d tệp</item>
         <item context="Plural of file. 2 files" quantity="other">%d tệp tin</item>
@@ -2280,7 +2312,7 @@
         <item context="Plural of participant. 2 participants" quantity="other">%d người tham gia</item>
     </plurals>
 
-    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Before you can generate a link for this chat, you need to set a description:</string>
+    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Trước khi tạo ra đường liên kết tới cuộc chát này, chủ đề phòng chát cần phải được chọn trước:</string>
 
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Đường liên kết tới chát đã được ghi vào bộ nhớ</string>
 
@@ -2294,18 +2326,17 @@
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Không có [/B][A]Thông Báo[/A][B].[/B]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">Cài đặt MEGA</string>
-    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA needs access to your photos, media and files so you are able to share them with friends, exchange encrypted messages and make secure calls.</string>
+    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA cần khả năng truy cập vào kho ảnh, media và tệp tin trong máy để thực hiện việc chia sẻ khi được yêu cầu, trao đổi các tin nhắn được mã hóa và các cuộc gọi bảo mật.</string>
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Cho phép truy cập vào hình ảnh, đa phương tiện và tệp tin.</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Để có thể chia sẻ hình ảnh, nội dung đa phương tiện và tệp tin, MEGA cần sự cho phép của bạn.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Truy cập camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Cho phép ứng dụng MEGA sử dụng camera chủa điện thoại để thao tác các việc như quét tài liệu, chụp ảnh và gọi video khi bạn yêu cầu.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Thực hiện cuộc gọi</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Cho phép ứng dụng MEGA sử dụng microphone của điện thoại để thực hiện cuộc gọi khi bạn yêu cầu.</string>
     <string name="general_enable_access" context="General enable access">Cho phép sử dụng</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Tệp Tin Đã Chia Sẻ</string>
 
-    <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
+    <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Tệp đsính kèm đã được gửi đi rồi</string>
 
     <string name="call_ended_message" context="Message shown when a call ends.">[A]Cuộc gọi chấm dứt[/A][C]. Thời lượng: [/C]</string>
     <plurals name="plural_call_ended_messages_hours" context="Message that shows the hours of a call when it ends">
@@ -2333,14 +2364,24 @@
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s vừa tham gia vào cuộc gọi</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s đã rời khỏi cuộc gọi</string>
 
-    <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">You are not allowed to join this call as it has reached the maximum number of participants.</string>
-    <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">You are not allowed to enable video as this call has reached the maximum number of participants using video.</string>
+    <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Không thể tham gia cuộc gọi này vì đã quá mức số lượng thành viên đang có trong cuộc gọi.</string>
+    <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Không thể bật video cho cuộc gọi này được vì quá mức số lượng thành viên tham gia cuộc gọi đang sử dụng video.</string>
 
-    <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
+    <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Lỗi. Không mở được tệp tin.</string>
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Đang có cuộc gọi đến&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">Đang gọi&#8230;</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">Tin nhắn có chứa đựng siêu dữ liệu không hợp lệ</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">Tin nhắn có chứa đựng siêu dữ liệu không hợp lệ</string>
+
+    <string name="title_activity_maps" context="Title of the activity that sends a location">Gửi Vị Trí</string>
+    <string name="current_location_label" context="Label layout on maps activity that permits send current location">Gửi đi vị trí hiện tại</string>
+    <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">Gửi đi vị trí hiện tại: [A]%1$s[/A]</string>
+    <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Nearby places</string>
+    <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">This location will be opened using a third party maps provider outside the end-to-end encrypted MEGA platform.</string>
+    <string name="title_marker_maps" context="Title of the location marker set by the user">Gửi Vị Trí Nơi Đây</string>
+    <string name="no_places_found" context="Label shown when after a maps search and no places were found">No places were found</string>
+    <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">Định vị GPS bị tắt</string>
+    <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">Would you like to open the location settings?</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2348,6 +2389,9 @@
         <item context="version item" quantity="one">Tin nhắn đã được chuyển tiếp</item>
         <item context="version items" quantity="other">Tin nhắn đã được chuyển đi</item>
     </plurals>
+
+    <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Vị Trí Được Đánh Dấu</string>
+    <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">From File System</string>
 
     <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d tệp tin chưa được gửi tới %d cuộc chát thành công</item>
@@ -2361,7 +2405,7 @@
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d tin nhắn chưa được gửi tới %d cuộc chát thành công</item>
-        <item context="Plural of file. 2 files" quantity="other">%d tin nhắn chưa được gửi tới %d cuộc chát thành công</item>
+        <item context="Plural of file. 2 files" quantity="other">%d tin nhắn chưa được gửi thành công tới %d cuộc chát.</item>
     </plurals>
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">Nội dung chưa được gửi tới %d cuộc chát thành công</string>
@@ -2374,9 +2418,9 @@
 
     <string name="delete_versions" context="Action delete all file versions">Xoá các phiên bản cũ</string>
     <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Xóa các phiên bản cũ?</string>
-    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Please note that the current file will not be deleted.</string>
+    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Xin lưu ý rằng tệp tin hiện hành trong tài khoản sẽ không bị xóa đi.</string>
     <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Các phiên bản cũ đã được xóa.</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Các phiên bản cũ chưa xóa xong.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Không xóa được các phiên bản cũ.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
         <item context="version item" quantity="one">%d phiên bản đã được xóa thành công</item>
@@ -2388,23 +2432,23 @@
         <item context="version items" quantity="other">%d phiên bản chưa được xóa xong</item>
     </plurals>
 
-    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Bạn không có tên nào trong danh sách liên lạc. Xin mời bạn bè cùng tham gia sử dụng MEGA.</string>
 
-    <string name="title_tour_one" context="Title of first tour screen">You hold the keys</string>
-    <string name="content_tour_one" cotext="Content of first tour screen">Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.</string>
+    <string name="title_tour_one" context="Title of first tour screen">Chính bạn là người giữ chìa khóa</string>
+    <string name="content_tour_one" cotext="Content of first tour screen">Bảo mật là lý do chúng tôi tạo ra MEGA, các tệp tin của bạn được bảo vệ an toàn với chúng tôi với bộ máy mã hóa được hoạt động trơn tru, nơi chỉ bạn mới có thể truy cập các tệp tin của mình.</string>
     <string name="title_tour_two" cotext="Title of second tour screen">Cuộc chát được mã hóa</string>
-    <string name="content_tour_two" cotext="Content of second tour screen">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
-    <string name="title_tour_three" cotext="Title of third tour screen">Create your Network</string>
-    <string name="content_tour_three" cotext="Content of third tour screen">Add contacts, create a network, colaborate, make voice and video calls without ever leaving MEGA</string>
-    <string name="title_tour_four" cotext="Title of fourth tour screen">Your Photos in the Cloud</string>
-    <string name="content_tour_four" cotext="Content of fourth tour screen">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">Toàn bộ chát, tin nhắn, thoại hay video đều được mã hóa hoàn toàn và hoạt động với khả năng chia sẻ thông qua Ổ Mây.</string>
+    <string name="title_tour_three" cotext="Title of third tour screen">Tạo Kết Nối</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">Thêm tên liên lạc, tạo kết nối, cộng tác với nhau, trao đổi qua gọi thoại và video ngay trong MEGA</string>
+    <string name="title_tour_four" cotext="Title of fourth tour screen">Hình Ảnh được gửi lên Mây</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">Camera Uploads là tính năng thiết yếu cho mọi thiết bị di động, và MEGA có cung cấp. Tạo tài khoản ngay.</string>
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Nhập mật khẩu</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s là tệp tin PDF được bảo vệ với mật khẩu. Xin nhập mật khẩu để mở PDF này.</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Mật khẩu vừa nhập không đúng, xin thử lại.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">Mật khẩu vừa nhập không hợp lệ.</string>
 
-    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">It is not possible to open the file. It is an unknown file or has not been possible to unzip successfully.</string>
+    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">Không thể mở được tệp tin này. Dạng tệp không xác định được hoặc bị hư hỏng do quá trình giải nén không được thành công.</string>
 
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">Việc phát phim ảnh hay âm thanh không có khả thi khi có cuộc gọi đang diễn ra.</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Cuộc Gọi Đang Diễn Ra</string>
@@ -2415,7 +2459,7 @@
 
     <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the chat link once it has been removed.</string>
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Luân Phiên Mã Khóa sẽ không cho phép bạn đi vào liên kết tới chát mà bỏ qua việc tạo cuộc chát mới.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a chat link?</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Bạn có muốn tạo ra phòng chát mới và lấy đường liên kết vào phòng chát hay không?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Luân phiên mã khóa giúp cho việc an ninh được nâng cấp hơn, nhưng sẽ không cho phép bất kỳ ai tạo ra đường liên kết tới cuộc chát và người mới tham gia vào chát sẽ không thấy các tin nhắn diễn ra từ trước.</string>
 
@@ -2431,36 +2475,51 @@
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s tắt tiếng cuộc gọi này</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Đã tắt tiếng</string>
 
-    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">Already downloaded. Copied to selected path.</string>
+    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">Tệp tin đã được tải xuống từ trước. Bản sao đã được tạo ra ở vị trí đã chọn.</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Tham gia cuộc gọi</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">Để vào cuộc gọi này bạn cần phải kết thúc cuộc gọi hiện tại.</string>
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Nhập liên kết tới chát</string>
 
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
+    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">Mọi người có thể tham gia vào nhóm của bạn với đường liên kết này.</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Liên kết mới tới chát</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Điền tên nhóm</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">Để tạo ra liên kết tới chát, đặt tên cho nhóm trước.</string>
-    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
+    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Mời thêm tên liên lạc và để bắt đầu trò chuyện thông qua MEGA và được bảo mật mạnh mẽ.</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">Không có liên kết nào cả.</string>
-    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chat link deleted successfully.</string>
+    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Đường liên kết chát đã được xóa xong.</string>
 
-    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (ACCEPTED)</string>
-    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (DELETED)</string>
-    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (DENIED)</string>
-    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (IGNORED)</string>
-    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
-    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
+    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (CHẤP NHẬN)</string>
+    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (BỊ XÓA)</string>
+    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (TỪ CHỐI)</string>
+    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (BỎ QUA)</string>
+    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (ĐÃ NHẮC)</string>
+    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (ĐANG CHỜ)</string>
+
+    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Trượt để hủy bỏ</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
 
 	<plurals name="file_already_downloaded">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d tệp tin đã được tải xuống rồi.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d tệp tin đã được tải xuống rồi.&#160;</item>
 	</plurals>
 
 	<plurals name="file_pending_download">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d tệp tin đang chờ.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d tệp tin đang được chờ.</item>
 	</plurals>
+
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 </resources>

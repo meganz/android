@@ -8,7 +8,7 @@
 
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">/</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Evet</string>
-    <string name="general_no" context="Answer for confirmation dialog.">hayır</string>
+    <string name="general_no" context="Answer for confirmation dialog.">Hayır</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">İptal</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Şuraya taşı</string>
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Şuraya kopyala</string>
@@ -37,7 +37,6 @@
 
     <string name="general_retry" context="Button to try retry some action">Yeniden Dene</string>
     <string name="general_open_browser" context="Button to open the default web browser">Tarayıcıyı aç</string>
-
     <!--
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
     -->
@@ -103,7 +102,7 @@
     <string name="action_play" context="Search button">Oynat</string>
     <string name="action_pause" context="Search button">Duraklat</string>
     <string name="action_refresh" context="Menu item">Yenile</string>
-    <string name="action_sort_by" context="Menu item">SIRALA</string>
+    <string name="action_sort_by" context="Menu item">Göre Sırala</string>
     <string name="action_help" context="Menu item">Yardım</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Hesabı yükselt</string>
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Hesap yükseltiliyor</string>
@@ -166,6 +165,8 @@
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s indirilecek.</string>
     <string name="alert_no_app" context="Alert text before download">%s dosyasını açacak uygulama yok. İndirmeye devam etmek istiyor musunuz?</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">Tekrar gösterme</string>
+
+    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Mevcut giriş işlemini iptal etmek istediğinize emin misiniz?</string>
 
     <string name="login_text" context="Login button">Oturum Aç</string>
     <string name="email_text" context="email label">E-posta</string>
@@ -255,7 +256,7 @@
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">GİDEN</string>
 
     <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Gelen Paylaşımlar</string>
-	<string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Gelen paylaşımlar</string>
+    <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Gelen paylaşımlar</string>
     <!--
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
     -->
@@ -295,25 +296,25 @@
     <string name="file_properties_owner" context="shows the owner of an incoming shared folder">Sahip</string>
     <string name="contact_invite" context="positive button on dialog to invite a contact">Davet et</string>
     <string name="contact_reinvite" context="option to reinvite a contact">Tekrar Davet Et</string>
-	<string name="contact_ignore" context="option to ignore a contact invitation">Yoksay</string>
-	<string name="contact_decline" context="option to decline a contact invitation">Reddet</string>
-	<string name="contact_accept" context="option to accept a contact invitation">Kabul Et</string>
-	<string name="contact_properties_activity" context="title of the contact properties screen">Kişi bilgileri</string>	
-	<!--
+    <string name="contact_ignore" context="option to ignore a contact invitation">Yoksay</string>
+    <string name="contact_decline" context="option to decline a contact invitation">Reddet</string>
+    <string name="contact_accept" context="option to accept a contact invitation">Kabul Et</string>
+    <string name="contact_properties_activity" context="title of the contact properties screen">Kişi bilgileri</string>
+    <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Aşağıdaki butonu kullanarak yeni kişiler ekleyin</string>	
-	<!--
+    <string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Aşağıdaki butonu kullanarak yeni kişiler ekleyin</string>
+    <!--
     <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
 	-->
-	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Paylaşıma yeni kişi ekleyin</string>
-	
-	<string name="error_not_enough_free_space" context="Error message">Cihazınızda yeterli boş alan bulunmamaktadır</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Paylaşıma yeni kişi ekleyin</string>
 
-	<string name="option_link_without_key" context="Alert Dialog to get link">Anahtarı olmayan bağlantı</string>
-	<string name="option_decryption_key" context="Alert Dialog to get link">Şifre çözme anahtarı</string>
-	
-	<!--
+    <string name="error_not_enough_free_space" context="Error message">Cihazınızda yeterli boş alan bulunmamaktadır</string>
+
+    <string name="option_link_without_key" context="Alert Dialog to get link">Anahtarı olmayan bağlantı</string>
+    <string name="option_decryption_key" context="Alert Dialog to get link">Şifre çözme anahtarı</string>
+
+    <!--
     <string name="download_failed" context="Error message">Download failed</string>
     -->
     <!--
@@ -325,7 +326,7 @@
     <!--
 	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
 	-->
-	<string name="download_preparing_files" context="message before the download or upload start ">Dosyalar hazırlanıyor</string>
+    <string name="download_preparing_files" context="message before the download or upload start ">Dosyalar hazırlanıyor</string>
     <string name="download_began" context="message when the download starts">İndirme başladı</string>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -383,7 +384,7 @@
     -->
     <string name="context_download_to" context="Menu item">Şuraya kaydet</string>
     <string name="context_clear_rubbish" context="Menu option title">Çöp Kutusunu Temizle</string>
-    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">Çöp kutunuzdaki tüm öğeleri kalıcı olarak silmek üzeresiniz.</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">Çöp Kutunuzdaki tüm öğeleri kalıcı olarak kaldırmak üzeresiniz.</string>
 
     <!--<string name="context_send_link" context="get the link and send it">Send link</string>-->
 
@@ -451,7 +452,7 @@
     <string name="number_correctly_moved" context="success message when moving a node">%d öğe başarıyla taşındı</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d öğe başarıyla taşınamadı</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Çöp kutusuna başarıyla taşındı</string>
-    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d öğe çöp kutusuna başarıyla taşındı</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d öğe başarıyla Çöp Kutusuna taşındı</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">&#160; ve %d öğe başarıyla gönderilmedi</string>
     <string name="context_no_moved" context="error message">Hata. Taşınamadı</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Doğru bir şekilde paylaşıldı</string>
@@ -484,10 +485,10 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">Klasör artık paylaşılabilir değil</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Hata, klasör hala başka bir kişiyle paylaşılıyor</string>
     <string name="context_select_one_file" context="option available for just one file">Sadece bir dosya seçin</string>
-    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Çöp kutusu başarıyla boşaltıldı</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Çöp Kutusu başarıyla boşaltıldı</string>
     <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Hata. Çöp kutusu boşaltılmadı</string>
 
-    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">MEGA aboneliğinizi iptal etmek üzeresiniz. Eğer fikrinizi değiştirebileceğimiz birşey varsa lütfen söyleyin.</string>
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">MEGA aboneliğinizi iptal etmek üzeresiniz.Fikrinizi değiştirmek için yapabileceğimiz birşey varsa bizi bilgilendirin.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Buraya geri dönüt yazın</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Gönder</string>
     <!--
@@ -497,9 +498,9 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Aboneliğiniz iptal edilemedi. Lütfen iptaliniz için bir sebep girin</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">Klasör artık özel</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Paylaşım doğru bir şekilde kaldırıldı</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Yeni klasör</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Kişi ekle</string>
@@ -518,6 +519,7 @@
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
     <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Dosya Sisteminden Seç</string>
+    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Birini Seç</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -535,6 +537,10 @@
     <string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
     -->
     <string name="upload_prepare" context="Status text at the beginning of an upload">Dosya işleniyor</string>
+    <plurals name="upload_prepare" context="Status text at the beginning of an upload">
+        <item context="Status text at the beginning of an upload for 1 file" quantity="one">Dosya işleniyor</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Dosya işleniyor</item>
+    </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">Kaynak geçici olarak mevcut değil, lütfen daha sonra tekrar deneyin</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Seçili dosya açılamıyor</string>
     <string name="upload_began" context="when an upload starts, a message is shown to the user">Yükleme başladı</string>
@@ -636,6 +642,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Medya klasörleri dosyaları yükleniyor</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -643,11 +651,13 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Depolama</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Kilidi</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression is very power consuming, MEGA will remind you to charge your device if the videos to be compressed are larger than %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Gelişmiş</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Önbelleği temizle</string>
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Çevrimdışı Dosyaları Temizle</string>
 
+    <string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">İndirildiğinde dosyayı aç</string>
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Hesabınızı iptal edin</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Şu anda %s kullanılıyor</string>
@@ -691,6 +701,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Sadece şarj ederken</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Dosya adlarını cihazdaki gibi tut</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Yerel Kamera klasörü</string>
@@ -719,7 +730,10 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Gönder</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">10 başarısız denemeden sonra bütün yerel dosyalar silinecek ve hesaptan çıkış yapılacaktır</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Yanlış kod</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Hatalı PIN kodu, lütfen tekrar deneyin. %2d hakkınız kaldı</string>
+    <plurals name="pin_lock_incorrect_alert">
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Yanlış PIN kodu, lütfen tekrar deneyin. 1 denemeniz kaldı</item>
+        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Hatalı PIN kodu, lütfen tekrar deneyin. %2d hakkınız kaldı</item>
+    </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Kodları eşleşmiyor</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">PIN Kodunu girin</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">PIN Kodunu tekrar girin</string>
@@ -784,12 +798,12 @@
     <string name="sortby_date" context="category in sort by action">Tarih</string>
     <string name="sortby_creation_date" context="category in sort by action">Oluşturma Tarihi</string>
     <string name="sortby_modification_date" context="category in sort by action">Değiştirilme tarihi</string>
-    <string name="sortby_date_newest" context="sort files by date newest first">en yeni</string>
-    <string name="sortby_date_oldest" context="sort files by date oldest first">en eski</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">En Yeni</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">En Eski</string>
 
     <string name="sortby_size" context="category in sort by action">Boyut</string>
     <string name="sortby_size_largest_first" context="sort files by size largest first">en büyük</string>
-    <string name="sortby_size_smallest_first" context="sort files by size smallest first">en ufak</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">En Ufak</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">Aylık</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">Yıllık</string>
@@ -875,6 +889,7 @@
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Eposta doğrulaması</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Devam etmek için epostanızı kontrol edin</string>
+    <string name="general_text_error" context="Text to inform the user when an error occurs">Bir hata oluştu, lütfen tekrar deneyin.</string>
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Bu eylemi gerçekleştirebilmek için giriş yapmanız gerekiyor.</string>
@@ -988,8 +1003,10 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Dosya bağlantısı kullanılamıyor</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Dosya bağlantısı HK/KEKP ihlalinden dolayı kaldırıldı.</string>
 
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">Bu bağlantı bozulmuş. Erişmeye çalıştığınız bağlantı bulunmamaktadır.</string>
+
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Eposta onayı beklemede</string>
-    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Lütfen e-posta kutunuzu kontrol edin, ve hesabınızı doğrulamak için gönderilen bağlantıya tıklayın.</string>
+    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Lütfen e-postanızı kontrol edin ve hesabınızı onaylamak için bağlantıyı tıklayın.</string>
 
     <plurals name="general_num_items">
         <item context="Singular of items which contains a folder. 1 item" quantity="one">öğe</item>
@@ -1065,6 +1082,9 @@
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d kişi paylaşılan klasörden doğru bir şekilde kaldırıldı</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160; ve %d kişi başarıyla kaldırılmadı</string>
 
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
+
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Telefondan kişiler alınıyor&#8230;</string>
 
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d davet başarıyla gönderildi</string>
@@ -1135,7 +1155,7 @@
 
     <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">%s kişisini sohbetten çıkart?</string>
 
-    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Salt okunur</string>
+    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Sadece oku</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1203,14 +1223,14 @@
 
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Bu mesaj %1$s tarafından silindi</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Sohbet geçmişi temizlendi</string>
-    <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">Sohbet geçmişi %1$s tarafından silindi</string>
+    <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">Sohbet geçmişi %1$s tarafından temizlendi</string>
 
     <!--
     <string name="non_format_text_cleared_history" context="Text shown when a user cleared the history of a chat">%1$s cleared the chat history</string>
     -->
     <string name="non_format_message_permissions_changed" context="chat message when the permissions for a user has been changed">%1$s, %3$s tarafından %2$s olarak değiştirildi</string>
     <string name="non_format_message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">%1$s grup sohbetine %2$s tarafından davetiye ile eklendi</string>
-    <string name="non_format_message_remove_participant" context="chat message when a participant was removed from a group chat">%1$s grup sohbetinden %2$s tarafından çıkartıldı</string>
+    <string name="non_format_message_remove_participant" context="chat message when a participant was removed from a group chat">%1$s grup sohbetinden %2$s tarafından kaldırıldı.</string>
 
     <string name="non_format_change_title_messages" context="Message shown when a participant change the title of a group chat.">%1$s grup sohbetinin adını "%2$s" olarak değiştirdi</string>
 
@@ -1257,13 +1277,13 @@
     </plurals>
 
     <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]ve diğerleri yazıyor&#8230;[/A]</string>
-	<string name="label_more" context="button label more">Daha fazla</string>
-	<string name="label_close" context="button label Close">Kapat</string>
+    <string name="label_more" context="button label more">Daha fazla</string>
+    <string name="label_close" context="button label Close">Kapat</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">Genel</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Depolama</string>
-	<string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Depolama</string>
-	<string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Aktarma kotası</string>
-	<string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Aktarma kotası</string>
+    <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Depolama</string>
+    <string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Aktarma kotası</string>
+    <string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Aktarma kotası</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Tarife</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Depolama alanı</string>
@@ -1327,6 +1347,7 @@
         <item context="Plural" quantity="other">%2$d dosyadan %1$d tanesi</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Process is finishing&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Görüntüle</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Tüm aktarmaları duraklat</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Tüm aktarmaları sürdür</string>
@@ -1360,10 +1381,20 @@
         <item context="Plural" quantity="other">%2$d dosyadan %1$d tanesi yükleniyor</item>
     </plurals>
 
+	<plurals name="folder_upload_service_notification" context="Text of the notification shown when the folder upload service is running">
+		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">%2$d klasörüne %1$d yükleniyor</item>
+		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">%2$d klasörüne %1$d yükleniyor</item>
+	</plurals>
+
     <plurals name="upload_service_final_notification" context="Text of the notification shown when the upload service has finished">
         <item context="Singular" quantity="one">%1$d dosya yüklendi</item>
         <item context="Plural" quantity="other">%1$d dosya yüklendi</item>
     </plurals>
+
+	<plurals name="folder_upload_service_final_notification" context="Text of the notification shown when the folder upload service has finished">
+		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">%1$d klasörüne yüklendi</item>
+		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">%1$d klasörüne yüklendi</item>
+	</plurals>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">Toplam boyut: %1$s</string>
 
@@ -1413,7 +1444,7 @@
     </plurals>
 
     <string name="general_view" context="Menu option">Dosyaları görüntüle</string>
-    <string name="add_to_cloud" context="Menu option">Bulut Sürücüye ekle</string>
+    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Aktar</string>
     <string name="save_for_offline" context="Menu option">Çevrimdışı için kaydet</string>
 
     <string name="general_view_contacts" context="Menu option">Kişileri görüntüle</string>
@@ -1481,7 +1512,7 @@
     <string name="file_properties_shared_folder_public_link_name">Bağlantı</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Tam erişim</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Salt okunur</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Sadece oku</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Okuma ve yazma</string>
 
     <string name="attachment_uploading_state_uploading">Yükleniyor&#8230;</string>
@@ -1767,10 +1798,11 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Sohbet yüklüyor</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Sohbet medya kalitesi</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Quality</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload.">Orijinal</item>
-        <item context="the options of what to upload.">Orta</item>
+        <item context="the options of origin quality multimedia file to upload.">Orjinal kalite</item>
+        <item context="the options of medium quality multimedia file to  upload.">Orta kalite</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Cevapsız çağrı</string>
@@ -1812,17 +1844,19 @@
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">Sohbete gönder</string>
 
     <string name="remember_pwd_dialog_title" context="Title of the dialog 'Do you remember your password?'">Parolanızı hatırlıyor musunuz?</string>
+    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog 'Do you remember your password?' when logout">Çıkış yapmak üzeresiniz, lütfen hatırladığınızdan emin olmak için parolanızı test edin.\nParolanızı kaybederseniz, MEGA verilerinize erişimi kaybedersiniz.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog 'Do you remember your password?'">Lütfen hatırladığınızdan emin olmak için parolanızı test edin. Parolanızı kaybederseniz, MEGA verilerinize erişimi kaybedersiniz.</string>
     <string name="remember_pwd_dialog_do_not_show" context="'Do you remember your password?' dialog option that permits user do not show it again">Bir daha gösterme</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">Test parolası</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Parolanızı test edin</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Parola kabul edildi</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Yanlış parola!\nKurtarma Anahtarınızı mümkün olan en kısa sürede yedekleyin!</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Yanlış şifre. \nKurtarma Anahtarınızı en kısa sürede yedekleyin!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">Kurtarma Anahtarı dışarı aktarıldı</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">Kurtarma Anahtarı Çevrimdışı bölümüne MEGARecoveryKey.txt olarak dışa aktarıldı.\nNot: Oturumu kapatırsanız, lütfen güvenli bir yerde saklayın.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Çıkış yapmak üzeresiniz, lütfen hatırladığınızdan emin olmak için parolanızı test edin.\nParolanızı kaybederseniz, MEGA verilerinize erişimi kaybedersiniz.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Panoya kopyala</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Kurtarma Anahtarını Dışa Aktar</string>
+    <string name="proceed_to_logout" context="Option that permits user logout">Çıkış yap</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Kurtarma Anahtarı</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Dosya Sistemine Kaydet</string>
     <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Panoya kopyalandı</string>
@@ -1858,6 +1892,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Sunucular çok meşgul. Lütfen bekleyin.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Bu işlem beklenenden uzun sürüyor. Lütfen bekleyin.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit ">Çok fazla istek. Lütfen bekleyin.</string>
+    <string name="login_in_progress" context="message when previous login is being canceled">Giriş işlemi iptal ediliyor. Lütfen bekle&#8230;</string>
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Hata. Dosya bozuk veya mevcut değil.</string>
 
@@ -1968,8 +2003,6 @@
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Geçersiz mesaj biçimi</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Geçersiz mesaj imzası</string>
 
-    <string name="add_to_cloud_import" context="Menu option">Bulut Sürücüye ekle</string>
-
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">Medya akışı oluşturulurken hata oluştu</string>
 
     <string name="context_restore" context="Menu option to restore an item from the Rubbish bin">Geri yükle</string>
@@ -2033,7 +2066,7 @@
     <string name="text_confirmation_dialog_delete_versions" context="Text of the dialog to delete all the file versions of the account">Şu ana kadar oluşturulan tüm dosya sürüm geçmişlerini silmek üzeresiniz. Kişileriniz tarafından paylaşılan dosya sürümleri kendileri tarafından silinmelidir.\n\nDosyaların şimdiki sürümünün silinmeyeceğini unutmayın.</string>
 
     <string name="success_delete_versions" context="success message when deleting all the versions of the account">Dosya sürümleri başarıyla silindi</string>
-    <string name="error_delete_versions" context="error message when deleting all the versions of the account">Dosyalarınızın eski sürümleri silinirken hata oluştu, lütfen daha sonra tekrar deneyin.</string>
+    <string name="error_delete_versions" context="error message when deleting all the versions of the account">Dosyalarınızın tüm eski sürümlerini silmeye çalışırken bir hata oluştu, lütfen daha sonra tekrar deneyin.</string>
 
     <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">Dosya Sürümlendirme</string>
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Hesabınız için dosya sürümlemeyi etkinleştirin veya devre dışı bırakın.\nKişileriniz bu özelliği etkinleştirmiş ise dosya sürümü almaya devam edebilirsiniz.</string>
@@ -2078,7 +2111,7 @@
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Gönder&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Yükle&#8230;</string>
 
-	<string name="contact_info_button_more" context="More button in contact info page">Daha fazla</string>
+    <string name="contact_info_button_more" context="More button in contact info page">Daha fazla</string>
 
     <plurals name="plural_select_file" context="Section title to select a file to perform an action">
         <item context="one file" quantity="one">Dosya Seç</item>
@@ -2102,20 +2135,25 @@
 
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Sohbet etkinliği</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">Yeni mesajlarınız olabilir</string>
+    <string name="retrieving_message_title" context="When app is retrieving push message">Mesaj alınıyor</string>
 
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Çöp Kutusu Temizleme Zamanlayıcısı</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">Çöp Kutunuz otomatik olarak temizlendi.</string>
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">En düşük süre 7 gündür.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">En düşük süre 7 gündür ve sizin saklayabileceğiniz maksimum süre 30 gündür.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Daha eski dosyaları kaldır</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d gün</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notify me when size is larger than</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to compress are larger than</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Çöp Kovası Temizleme Planlayıcısını devre dışı bırakmak veya daha uzun bir saklama süresi ayarlamak için bir PRO planına abone olmanız gerekir.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">gün</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Sohbet Bağlantısı Al</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Sohbet bağlantısını al</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Sohbet Bağlantısını Yönet</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Şifrelenmiş Anahtar Döngüsü\'nü etkinleştir</string>
@@ -2126,7 +2164,7 @@
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">Sohbet Bağlantısını Sil</string>
 
-    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Sohbet Bağlantısı</string>
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Sohbet bağlantısı</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">Bu eylem diğer aktif oturumlardan çıkış yapacaktır.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Tüm diğer oturumları kapatmak istiyor musunuz?</string>
 
@@ -2233,6 +2271,15 @@
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Son görülmeyi göster</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Kişilerinizin MEGA\'daki son etkinlik zamanınızı görmesine izin verin.</string>
 
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video compression.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">The total size of the videos to compress exceeds %s, please plug in your device to continue.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
+	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
+
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d dosya</item>
         <item context="Plural of file. 2 files" quantity="other">%d dosya</item>
@@ -2283,10 +2330,9 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Fotoğraflara, medyaya ve dosyalara erişime izin verin.</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Fotoğrafları, medyaları ve dosyaları paylaşmak için MEGA\'nın izninize ihtiyacı var.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Kamerayı etkinleştir</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Belgeleri taramak, fotoğraf çekmek ve video görüşmeleri yapmak için kameranıza erişim izni verir.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Belgeleri taramak, fotoğraf çekmek ve görüntülü görüşmeler yapmak için kameranıza erişim izni verin.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Çağrıları etkinleştir</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Şifreli arama yapmak için mikrofonunuza erişim izni verin.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Şifreli aramalar yapabilmek için mikrofonunuza erişim izni verin.</string>
     <string name="general_enable_access" context="General enable access">Erişimi etkinleştir</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Paylaşılan Dosyalar</string>
 
@@ -2325,7 +2371,17 @@
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Gelen arama&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">Aranıyor&#8230;</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">Mesaj geçersiz üst veri içermekte</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">Mesaj geçersiz üst veri içermekte</string>
+
+    <string name="title_activity_maps" context="Title of the activity that sends a location">Konum Gönder</string>
+    <string name="current_location_label" context="Label layout on maps activity that permits send current location">Geçerli konumunuzu gönderin</string>
+    <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">Geçerli konumunuzu gönderin: [A]%1$s[/A]</string>
+    <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Yakın yerler</string>
+    <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">Bu konum, uçtan uca şifreli MEGA platformunun dışındaki bir üçüncü taraf harita sağlayıcısı kullanılarak açılacaktır.</string>
+    <string name="title_marker_maps" context="Title of the location marker set by the user">Bu Konumu Gönder</string>
+    <string name="no_places_found" context="Label shown when after a maps search and no places were found">Yer bulunamadı</string>
+    <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">GPS devre dışı</string>
+    <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">Konum ayarlarını açmak ister misiniz?</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2333,6 +2389,9 @@
         <item context="version item" quantity="one">Mesaj yönlendirildi</item>
         <item context="version items" quantity="other">Mesajlar yönlendirildi</item>
     </plurals>
+
+    <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Sabitlenmiş Konum</string>
+    <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">Sistem Dosyasından</string>
 
     <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d dosya %d sohbete gönderilmedi</item>
@@ -2346,7 +2405,7 @@
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d ileti %d sohbete gönderilmedi</item>
-        <item context="Plural of file. 2 files" quantity="other">%d ileti %d sohbete gönderilmedi</item>
+        <item context="Plural of file. 2 files" quantity="other">%d mesajları %d sohbetine gönderilemedi</item>
     </plurals>
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">İçerik %d sohbete gönderilmedi</string>
@@ -2355,13 +2414,13 @@
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Dosyalar hazırlanıyor</string>
     <string name="sent_as_message" context="Label indicating some content has been sent as message">Mesaj olarak gönderildi.</string>
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Hata. Dosya seçilen sohbetlerden hiçbirine gönderilmedi</string>
-    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[B]Öğe[/B] [A]Yok[/A]</string>
+    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]Hayır[/A] [B]Öğeler[/B]</string>
 
     <string name="delete_versions" context="Action delete all file versions">Eski sürümleri sil</string>
-    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Eski sürümler silinsin mi?</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Eski sürümleri sil?</string>
     <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Lütfen mevcut dosyanın silinmeyeceğini unutmayın.</string>
     <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Eski sürümler silindi.</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Eski sürümler silinmedi.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Eski sürümler silinemedi.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
         <item context="version item" quantity="one">%d sürümü başarıyla silindi</item>
@@ -2380,7 +2439,7 @@
     <string name="title_tour_two" cotext="Title of second tour screen">Şifreli konuşma</string>
     <string name="content_tour_two" cotext="Content of second tour screen">Bulut sürücünüzle ilişkilendirilmiş tümüyle şifrelenmiş sesli ve görüntülü aramalar, grup mesajlaşmaları ve dosya paylaşımı.</string>
     <string name="title_tour_three" cotext="Title of third tour screen">Ağınızı Oluşturun</string>
-    <string name="content_tour_three" cotext="Content of third tour screen">MEGA\'dan ayrılmadan kişiler ekleyin, ağ oluşturun, işbirliği yapın, sesli ve görüntülü aramalar yapın.</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">MEGA da Kişiler ekleyebilir, bir ağ oluşturabilir, konferans yapabilir ve hiç ayrılmadan. Sesli ve Görüntülü aramalar yapabilirsiniz.</string>
     <string name="title_tour_four" cotext="Title of fourth tour screen">Buluttaki Fotoğraflarınız</string>
     <string name="content_tour_four" cotext="Content of fourth tour screen">MEGA Kamera Yüklemelerinin her mobil cihaz için vazgeçilmez olduğunu unutmadı. Hesabınızı şimdi oluşturun.</string>
 
@@ -2389,6 +2448,8 @@
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Yanlış parola girdiniz, lütfen tekrar deneyin.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">Girdiğiniz parola geçerli değildir.</string>
 
+    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">Dosyayı açmak mümkün değildir. Bilinmeyen bir dosya türüdür ya da dosyayı başarıyla açmanız mümkün olmamıştır.</string>
+
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">Herhangi bir arama sürmekte iken medya dosyaları oynatılamaz.</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Devam eden Çağrı</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s grup araması başlattı. Katılmak için dokunun.</string>
@@ -2396,15 +2457,15 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] grup sohbetine katıldı.[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">Bu sohbete artık silmek üzere olduğunuz Sohbet Bağlantısı yoluyla erişilemez.</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">Bu sohbet bağlantısı kaldırıldıktan sonra artık erişilemez.</string>
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Şifreli Anahtar Döndürme, yeni grup sohbeti oluşturmadan Sohbet Bağlantısı almanıza izin vermez.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Yeni bir grup sohbeti oluşturmak ve Sohbet Bağlantısı almak ister misiniz?</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Yeni bir grup sohbeti oluşturmak ve bir sohbet bağlantısını almak ister misiniz?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Anahtar döngüsü biraz daha güvenli, fakat sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar eski mesajları göremez.</string>
 
     <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">Sohbete başarıyla katıldınız.</string>
 
-    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d / %2$d</string>
+    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%2$d / %1$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Ara&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Cevapla</string>
@@ -2414,10 +2475,51 @@
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s bu aramayı susturdu</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Sessiz</string>
 
+    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
+
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Çağrıya katıl</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">Bu aramaya katılmak için mevcut aramanızı sonlandırmanız gerekir.</string>
 
-    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
+    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Sohbet bağlantısını girin</string>
 
-    <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">People can join your group by using this link.</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Linki yapıştır</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Geçersiz dosya veya klasör bağlantısı</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Lütfen geçerli bir dosya veya klasör bağlantısı girin</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Lütfen geçerli bir sohbet linki girin</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">Bir sohbet bağlantısı yapıştırdınız.</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">Bir iletişim linki yapıştırdınız.</string>
+    <string name="action_open_contact_link" context="Menu item">İletişim bağlantısını aç</string>
+
+    <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">İnsanlar bu bağlantıyı kullanarak grubunuza katılabilir.</string>
+    <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Yeni Sohbet Bağlantısı</string>
+    <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Grup ismini girin</string>
+    <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">Bir sohbet bağlantısı oluşturmak için grubu adlandırmanız gerekir.</string>
+    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">MEGA\'nın şifreli sohbeti ile kişileri davet edin ve güvenli bir şekilde sohbet etmeye başlayın.</string>
+
+    <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">Sohbet bağlantısı yok.</string>
+    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Sohbet bağlantısı başarıyla silindi.</string>
+
+    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (KABUL EDİLDİ)</string>
+    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (SİLİNDİ)</string>
+    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (REDDEDİLDİ)</string>
+    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (YOKSAYDI)</string>
+    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (ANIMSATTI)</string>
+    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (BEKLEMEDE)</string>
+
+    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Kaydetmek, göndermek için serbest bırakmak için dokunun ve basılı tutun.</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">İptal etmek için kaydırın</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Bu sesli mesaj mevcut değil</string>
+
+	<plurals name="file_already_downloaded">
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d dosya zaten indirilmiş. &#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d dosya zaten indirilmiş. &#160;</item>
+	</plurals>
+
+	<plurals name="file_pending_download">
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d dosya beklemede.</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d dosya beklemede.</item>
+	</plurals>
+
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Devam eden bir arama varken sesli mesajları kaydetmek mümkün değildir.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Sesli mesaj yüklenmeye çalışılırken bir hata oluştu.</string>
 </resources>

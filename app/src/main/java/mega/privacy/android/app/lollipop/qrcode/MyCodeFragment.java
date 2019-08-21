@@ -60,6 +60,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 /**
  * Created by mega on 22/01/18.
@@ -130,22 +132,12 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
     }
 
-    public File queryIfQRExists (){
+    public File queryIfQRExists() {
         log("queryIfQRExists");
-
-        if (context.getExternalCacheDir() != null){
-            File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
-            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-        }
-        else{
-            File qrDir = context.getDir("qrMEGA", 0);
-            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-        }
-
-        if (qrFile.exists()){
+        qrFile = buildQrFile(context,myEmail + "QRcode.jpg");
+        if (isFileAvailable(qrFile)) {
             return qrFile;
         }
-
         return null;
     }
 
@@ -336,15 +328,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     public Bitmap setUserAvatar(){
         log("setUserAvatar");
 
-        File avatar = null;
-        if (context.getExternalCacheDir() != null){
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-        }
-        else{
-            avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-        }
+        File avatar = buildAvatarFile(context, myEmail + ".jpg");
         Bitmap bitmap = null;
-        if (avatar.exists()){
+        if (isFileAvailable(avatar)){
             if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
@@ -507,21 +493,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
             qrcode_link.setText(contactLink);
             qrCodeBitmap = createQRCode(queryQR(), setUserAvatar());
-            File qrCodeFile = null;
-            if (context.getExternalCacheDir() != null){
-                File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
-                if (qrDir != null){
-                    qrDir.mkdirs();
-                }
-                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
-            else{
-                File qrDir = context.getDir("qrMEGA", 0);
-                if (qrDir != null){
-                    qrDir.mkdirs();
-                }
-                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
+            File qrCodeFile = buildQrFile(context, myEmail + "QRcode.jpg");
 
             if (qrCodeFile != null) {
                 try {
@@ -557,16 +529,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     public void initDeleteQR(MegaRequest request, MegaError e){
         if (e.getErrorCode() == MegaError.API_OK){
             log("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
-            File qrCodeFile = null;
-            if (context.getExternalCacheDir() != null){
-                File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
-                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
-            else{
-                File qrDir = context.getDir("qrMEGA", 0);
-                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
-            if (qrCodeFile != null && qrCodeFile.exists()){
+            File qrCodeFile = buildQrFile(context, myEmail + "QRcode.jpg");
+            if (isFileAvailable(qrCodeFile)){
                 qrCodeFile.delete();
             }
             ((QRCodeActivity) context).showSnackbar(v, getResources().getString(R.string.qrcode_delete_successfully));

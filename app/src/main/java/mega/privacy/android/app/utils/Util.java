@@ -3,7 +3,6 @@ package mega.privacy.android.app.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -13,7 +12,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -26,20 +24,17 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.StatFs;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Images;
-import android.provider.MediaStore.Video;
+
+import android.support.v4.app.ActivityCompat;
+
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -57,19 +52,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.URLConnection;
-import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -95,7 +80,6 @@ import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -113,8 +97,9 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
 public class Util {
-	
-	public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 300;
+
+    public static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd HH.mm.ss";
+    public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 1000;
 	
 	public static float dpWidthAbs = 360;
 	public static float dpHeightAbs = 592;
@@ -125,17 +110,6 @@ public class Util {
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = false;
 
-	public static String mainDIR = "/MEGA";
-	public static String offlineDIR = "MEGA/MEGA Offline";
-	public static String downloadDIR ="MEGA/MEGA Downloads";
-	public static String temporalPicDIR ="MEGA/MEGA AppTemp";
-	public static String profilePicDIR ="MEGA/MEGA Profile Images";
-	public static String logDIR = "MEGA/MEGA Logs";
-	public static String advancesDevicesDIR = "MEGA/MEGA Temp";
-	public static String chatTempDIR = "MEGA/MEGA Temp/Chat";
-	public static String oldMKFile = "/MEGA/MEGAMasterKey.txt";
-	public static String rKFile = "/MEGA/MEGARecoveryKey.txt";
-	
 	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
 	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
 	public static String base64EncodedPublicKey_3 = "55k9FIh3vDXXTHJn4oM9JwFwbcZf1zmVLyes5ld7+G15SZ7QmCchqfY4N/a/qVcGFsfwqm";
@@ -154,136 +128,17 @@ public class Util {
 	public static Context context;
 
 	public static HashMap<String, String> countryCodeDisplay;
-	
-	/*
-	 * Create progress dialog helper
-	 */
-	public static ProgressDialog createProgress(Context context, String message) {
-		ProgressDialog progress = new ProgressDialog(context);
-		progress.setMessage(message);
-		progress.setCancelable(false);
-		progress.setCanceledOnTouchOutside(false);
-		return progress;
-	}
-	
-	/*
-	 * Create progress dialog with resId
-	 */
-	public static ProgressDialog createProgress(Context context, int stringResId) {
-		return createProgress(context, context.getString(stringResId));
-	}
-	
-	public static void showErrorAlertDialogFinish(MegaError error, Activity activity) {
-		showErrorAlertDialog(error.getErrorString(), true, activity);
-	}
 
-	public static File createTemporalTextFile(String name, String data){
+    public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
+        String nodeFingerprint = node.getFingerprint();
+        String nodeOriginalFingerprint = node.getOriginalFingerprint();
 
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/";
-		File tempDownDirectory = new File(path);
-		if(!tempDownDirectory.exists()){
-			tempDownDirectory.mkdirs();
-		}
-
-		String fileName = name+".txt";
-		final File file = new File(path, fileName);
-
-		try
-		{
-			file.createNewFile();
-			FileOutputStream fOut = new FileOutputStream(file);
-			OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-			myOutWriter.append(data);
-
-			myOutWriter.close();
-
-			fOut.flush();
-			fOut.close();
-
-			return file;
-		}
-		catch (IOException e)
-		{
-			log("File write failed: " + e.toString());
-			return null;
-		}
-	}
-
-	public static File createTemporalURLFile(String name, String data){
-
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/";
-		File tempDownDirectory = new File(path);
-		if(!tempDownDirectory.exists()){
-			tempDownDirectory.mkdirs();
-		}
-
-		String fileName = name+".url";
-		final File file = new File(path, fileName);
-
-		try
-		{
-			file.createNewFile();
-			FileOutputStream fOut = new FileOutputStream(file);
-			OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-			myOutWriter.append(data);
-
-			myOutWriter.close();
-
-			fOut.flush();
-			fOut.close();
-
-			return file;
-		}
-		catch (IOException e)
-		{
-			log("File write failed: " + e.toString());
-			return null;
-		}
-	}
-
-	public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity){
-		if(activity == null){
-			return;
-		}
-
-		try{
-			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
-			dialogBuilder.setPositiveButton(
-					activity.getString(android.R.string.ok),
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-							if (finish) {
-								if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-									activity.finishAndRemoveTask();
-								}else{
-									activity.finish();
-								}
-							}
-						}
-					});
-			dialogBuilder.setOnCancelListener(new OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					if (finish) {
-						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							activity.finishAndRemoveTask();
-						}else{
-							activity.finish();
-						}
-					}
-				}
-			});
-
-
-			AlertDialog dialog = dialogBuilder.create();
-			dialog.show();
-			brandAlertDialog(dialog);
-		}catch(Exception ex){
-			Util.showToast(activity, message);
-		}
-	}
+        String fileFingerprint = megaApi.getFingerprint(localPath);
+        if (fileFingerprint != null) {
+            return fileFingerprint.equals(nodeFingerprint) || fileFingerprint.equals(nodeOriginalFingerprint);
+        }
+        return false;
+    }
 
 	/*
 	 * Build error dialog
@@ -363,18 +218,6 @@ public class Util {
 		}
 //		return true;
 	}
-	
-	public static int getFilesCount(File file) {
-		File[] files = file.listFiles();
-		int count = 0;
-		for (File f : files)
-			if (f.isDirectory())
-				count += getFilesCount(f)+1;
-			else
-				count++;
-
-		return count;
-	}
 
     public static String toCDATA(String src) {
         if (src != null) {
@@ -390,23 +233,9 @@ public class Util {
         }
         return src;
     }
-	
-	public static long getFreeExternalMemorySize() {
-		log("getFreeExternalMemorySize");
-        String secStore = System.getenv("SECONDARY_STORAGE");
-        File path = new File(secStore);
-        log("getFreeExternalMemorySize: "+path.getAbsolutePath());
-        
-        StatFs stat = new StatFs(path.getPath());
 
-        long blockSize = stat.getBlockSize();
-        long availableBlocks = stat.getAvailableBlocks();
-
-        return availableBlocks * blockSize;
-	}
-	
 	public static String getExternalCardPath() {
-		
+
         String secStore = System.getenv("SECONDARY_STORAGE");
         if (secStore == null){
         	return null;
@@ -547,13 +376,6 @@ public class Util {
 	}
 
 	/*
-	 * Show Toast message with resId
-	 */
-	public static void showToast(Context context, int resId) {
-		try { Toast.makeText(context, resId, Toast.LENGTH_LONG).show(); } catch(Exception ex) {};
-	}
-
-	/*
 	 * Show Toast message with String
 	 */
 	public static void showToast(Context context, String message) {
@@ -635,7 +457,7 @@ public class Util {
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
 	}
-	
+
 	static public boolean isOnline(Context context) {
 	    if(context == null) return true;
 		
@@ -675,112 +497,6 @@ public class Util {
 		
 		return sizeString;
 	}
-	
-	private static long getDirSize(File dir) {
-
-        long size = 0;
-        if(dir==null){
-        	return -1;
-        }
-        
-        File[] files = dir.listFiles();
-
-		if(files !=null){
-			for (File file : files) {
-				if (file.isFile()) {
-					size += file.length();
-				}
-				else{
-					size += getDirSize(file);
-				}
-			}
-			return size;
-		}
-		log("Files is NULL");
-        return size;
-    }
-	
-    private static void cleanDir(File dir, long bytes) {
-
-        long bytesDeleted = 0;
-        File[] files = dir.listFiles();
-
-        for (File file : files) {
-            bytesDeleted += file.length();
-            file.delete();
-
-            if (bytesDeleted >= bytes) {
-                break;
-            }
-        }
-    }
-    
-    private static void cleanDir(File dir) {
-        File[] files = dir.listFiles();
-
-		if(files !=null){
-			for (File file : files) {
-
-				if (file.isFile()) {
-					file.delete();
-				}
-				else{
-					cleanDir(file);
-					file.delete();
-				}
-			}
-		}
-		else{
-			log("Files is NULL");
-		}
-    }
-    
-    public static String getCacheSize(Context context){
-    	log("getCacheSize");
-    	File cacheIntDir = context.getCacheDir();
-    	File cacheExtDir = context.getExternalCacheDir();
-
-		if(cacheIntDir!=null){
-			log("Path to check internal: "+cacheIntDir.getAbsolutePath());
-		}
-    	long size = getDirSize(cacheIntDir)+getDirSize(cacheExtDir);    	
-    	
-    	String sizeCache = getSizeString(size);
-    	return sizeCache; 
-    }
-	
-    public static void clearCache(Context context){
-    	log("clearCache");
-    	File cacheIntDir = context.getCacheDir();
-    	File cacheExtDir = context.getExternalCacheDir();
-
-    	cleanDir(cacheIntDir);
-    	cleanDir(cacheExtDir);    	
-    }
-    
-    public static String getOfflineSize(Context context){
-    	log("getOfflineSize");
-    	File offline = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR);
-    	long size = 0;
-    	if(offline.exists()){
-    		size = getDirSize(offline);    	
-        	
-        	String sizeOffline = getSizeString(size);
-        	return sizeOffline; 
-    	}
-    	else{
-    		return getSizeString(0);
-    	}        	
-    }
-	
-    public static void clearOffline(Context context){
-    	log("clearOffline");
-    	File offline = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR);
-    	if(offline.exists()){
-        	cleanDir(offline);
-        	offline.delete();
-    	}
-    }
     
 	public static String getDateString(long date){
 		DateFormat datf = DateFormat.getDateTimeInstance();
@@ -837,9 +553,7 @@ public class Util {
 //		if (fileLogger) {
 //			//Send the log to a file
 //
-//			String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR + "/";
-//			//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
-//			File dirFile = new File(dir);
+//			File dirFile = buildExternalStorageFile(LOG_DIR);
 //			if (!dirFile.exists()) {
 //				dirFile.mkdirs();
 //				logFile = new File(dirFile, "log.txt");
@@ -868,22 +582,6 @@ public class Util {
 //			}
 //		}
 	}
-
-	public static boolean appendStringToFile(final String appendContents, final File file) {
-		boolean result = false;
-		try {
-			if (file != null && file.canWrite()) {
-				file.createNewFile(); // ok if returns false, overwrite
-				Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
-				out.write(appendContents);
-				out.close();
-				result = true;
-			}
-		} catch (IOException e) {
-			//   Log.e(Constants.LOG_TAG, "Error appending string data to file " + e.getMessage(), e);
-		}
-		return result;
-	}
 	
 	public static void brandAlertDialog(AlertDialog dialog) {
 	    try {
@@ -906,141 +604,7 @@ public class Util {
 	        ex.printStackTrace();
 	    }
 	}
-	
-	public static String getLocalFile(Context context, String fileName, long fileSize,
-			String destDir)
-	{
-		Cursor cursor = null;
-		try 
-		{
-			if(MimeTypeList.typeForName(fileName).isImage())
-			{
-				final String[] projection = { MediaStore.Images.Media.DATA };
-				final String selection = MediaStore.Images.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Images.Media.SIZE + " = ?";
-				final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
-				
-		        cursor = context.getContentResolver().query(
-		                        Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
-		                        selectionArgs, null);
-				if (cursor != null && cursor.moveToFirst()) {
-			        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-			        String path =  cursor.getString(dataColumn);
-			        cursor.close();
-			        cursor = null;
-			        if(new File(path).exists()){
-			        	return path;
-			        }
-				}
-				if(cursor != null) cursor.close();
-			
-				cursor = context.getContentResolver().query(
-	                    Images.Media.INTERNAL_CONTENT_URI, projection, selection,
-	                    selectionArgs, null);
-				if (cursor != null && cursor.moveToFirst()) {
-			        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-			        String path =  cursor.getString(dataColumn);
-			        cursor.close();
-			        cursor = null;
-			        if(new File(path).exists()) return path;
-				}
-				if(cursor != null) cursor.close();
-			}
-			else if(MimeTypeList.typeForName(fileName).isVideoReproducible())
-			{
-				final String[] projection = { MediaStore.Video.Media.DATA };
-				final String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Video.Media.SIZE + " = ?";
-				final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
-				
-		        cursor = context.getContentResolver().query(
-                        Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-				if (cursor != null && cursor.moveToFirst()) {
-			        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-			        String path =  cursor.getString(dataColumn);
-			        cursor.close();
-			        cursor = null;
-			        if(new File(path).exists()) return path;
-				}
-				if(cursor != null) cursor.close();
-			
-				cursor = context.getContentResolver().query(
-		                Video.Media.INTERNAL_CONTENT_URI, projection, selection,
-		                selectionArgs, null);
-				if (cursor != null && cursor.moveToFirst()) {
-			        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-			        String path =  cursor.getString(dataColumn);
-			        cursor.close();
-			        cursor = null;
-			        if(new File(path).exists()) return path;
-				}
-				if(cursor != null) cursor.close();
-			}
-			else if (MimeTypeList.typeForName(fileName).isAudio()) {
-				final String[] projection = { MediaStore.Audio.Media.DATA };
-				final String selection = MediaStore.Audio.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Audio.Media.SIZE + " = ?";
-				final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
 
-				cursor = context.getContentResolver().query(
-						Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
-						selectionArgs, null);
-				if (cursor != null && cursor.moveToFirst()) {
-					int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
-					String path =  cursor.getString(dataColumn);
-					cursor.close();
-					cursor = null;
-					if(new File(path).exists()) return path;
-				}
-				if(cursor != null) cursor.close();
-
-				cursor = context.getContentResolver().query(
-						Video.Media.INTERNAL_CONTENT_URI, projection, selection,
-						selectionArgs, null);
-				if (cursor != null && cursor.moveToFirst()) {
-					int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
-					String path =  cursor.getString(dataColumn);
-					cursor.close();
-					cursor = null;
-					if(new File(path).exists()) return path;
-				}
-				if(cursor != null) cursor.close();
-			}
-		} catch (Exception e) 
-		{
-			if(cursor != null) cursor.close();
-		}
-		
-		//Not found, searching in the download folder
-		if(destDir != null)
-		{
-			File file = new File(destDir, fileName);
-			if(file.exists() && (file.length() == fileSize))
-				return file.getAbsolutePath();
-		}
-		return null;
-	}
-	
-	/*
-	 * Check is file belongs to the app
-	 */
-	public static boolean isLocal(Context context, File file) {
-		File tmp = null;
-		if (context.getExternalCacheDir() != null){
-			tmp = new File (context.getExternalCacheDir(), "tmp");
-		}
-		else{
-			tmp = context.getDir("tmp", 0);
-		}
-			
-		return file.getAbsolutePath().contains(tmp.getParent());
-	}
-	
-	/*
-	 * Check is file belongs to the app and temporary
-	 */
-	public static boolean isLocalTemp(Context context, File file) {
-		return isLocal(context, file) && file.getAbsolutePath().endsWith(".tmp");
-	}
-	
 	/*
 	 * Get localized progress size
 	 */
@@ -1077,78 +641,6 @@ public class Util {
 		return sb;
 	}
 	
-	/*
-	 * Delete file if it belongs to the app
-	 */
-	public static void deleteIfLocal(Context context, File file) {
-		if (isLocal(context, file) && file.exists()) {
-			log("delete");
-			file.delete();
-		}
-	}
-	
-	public static void copyFile(File source, File dest) throws IOException{
-		log("copyFile");
-
-		if (!source.getAbsolutePath().equals(dest.getAbsolutePath())){
-			FileChannel inputChannel = null;
-			FileChannel outputChannel = null;
-			FileInputStream inputStream = new FileInputStream(source);
-			FileOutputStream outputStream = new FileOutputStream(dest);
-			inputChannel = inputStream.getChannel();
-			outputChannel = outputStream.getChannel();
-			outputChannel.transferFrom(inputChannel, 0, inputChannel.size());    
-			inputChannel.close();
-			outputChannel.close();
-			inputStream.close();
-			outputStream.close();
-		}
-	}
-	
-	/*
-	 * Start activity to open URL
-	 */
-	public static void openUrl(Context context, String url) {
-		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-		context.startActivity(intent);
-	}
-	
-	public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
-		
-		if (f != null){
-			log("deleteFolderAndSubfolders: "+ f.getAbsolutePath());
-			if (f.isDirectory()) {
-				if (f.listFiles() != null){
-					for (File c : f.listFiles()){
-						deleteFolderAndSubfolders(context, c);
-					}
-				}
-			}
-			
-			if (!f.delete()){
-				throw new FileNotFoundException("Failed to delete file: " + f);
-			}
-			else{
-				try {
-					Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-					File fileToDelete = new File(f.getAbsolutePath());
-					Uri contentUri;
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-						contentUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", fileToDelete);
-					}
-					else{
-						contentUri = Uri.fromFile(fileToDelete);
-					}
-					mediaScanIntent.setData(contentUri);
-					mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-					context.sendBroadcast(mediaScanIntent);
-				}
-				catch (Exception e){ log ("Exception while deleting media scanner file: " + e.getMessage()); }
-		    
-			}
-		}
-	}
-	
 	public static String getSpeedString (long speed){
 		String speedString = "";
 		double speedDouble = 0;
@@ -1177,114 +669,20 @@ public class Util {
 		
 		return speedString;
 	}
-	
-	public static String getPhotoSyncName (long timeStamp, String fileName){
-		String photoSyncName = null;
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(timeStamp);
-		
-		String extension = "";
-		String[] s = fileName.split("\\.");
-		if (s != null){
-			if (s.length > 0){
-				extension = s[s.length-1];
-			}
-		}
-				
-		String year;
-		String month;
-		String day;
-		String hour;
-		String minute;
-		String second;
-		
-		year = cal.get(Calendar.YEAR) + "";
-		month = (cal.get(Calendar.MONTH)+1) + "";
-		if ((cal.get(Calendar.MONTH) + 1) < 10){
-			month = "0" + month;
-		}
-		
-		day = cal.get(Calendar.DAY_OF_MONTH) + "";
-		if (cal.get(Calendar.DAY_OF_MONTH) < 10){
-			day = "0" + day;
-		}
-		
-		hour = cal.get(Calendar.HOUR_OF_DAY) + "";
-		if (cal.get(Calendar.HOUR_OF_DAY) < 10){
-			hour = "0" + hour;
-		}
-		
-		minute = cal.get(Calendar.MINUTE) + "";
-		if (cal.get(Calendar.MINUTE) < 10){
-			minute = "0" + minute;
-		}
-		
-		second = cal.get(Calendar.SECOND) + "";
-		if (cal.get(Calendar.SECOND) < 10){
-			second = "0" + second;
-		}
 
-		photoSyncName = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + "." + extension;
-		
-		return photoSyncName;
+
+
+	public static String getPhotoSyncName (long timeStamp, String fileName){
+        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
+        return sdf.format(new Date(timeStamp)) + fileName.substring(fileName.lastIndexOf('.'));
 	}
 	
 	public static String getPhotoSyncNameWithIndex (long timeStamp, String fileName, int photoIndex){
-		
-		if (photoIndex == 0){
-			return getPhotoSyncName(timeStamp, fileName);
-		}
-		
-		String photoSyncName = null;
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(timeStamp);
-		
-		String extension = "";
-		String[] s = fileName.split("\\.");
-		if (s != null){
-			if (s.length > 0){
-				extension = s[s.length-1];
-			}
-		}
-				
-		String year;
-		String month;
-		String day;
-		String hour;
-		String minute;
-		String second;
-		
-		year = cal.get(Calendar.YEAR) + "";
-		month = (cal.get(Calendar.MONTH)+1) + "";
-		if ((cal.get(Calendar.MONTH) + 1) < 10){
-			month = "0" + month;
-		}
-		
-		day = cal.get(Calendar.DAY_OF_MONTH) + "";
-		if (cal.get(Calendar.DAY_OF_MONTH) < 10){
-			day = "0" + day;
-		}
-		
-		hour = cal.get(Calendar.HOUR_OF_DAY) + "";
-		if (cal.get(Calendar.HOUR_OF_DAY) < 10){
-			hour = "0" + hour;
-		}
-		
-		minute = cal.get(Calendar.MINUTE) + "";
-		if (cal.get(Calendar.MINUTE) < 10){
-			minute = "0" + minute;
-		}
-		
-		second = cal.get(Calendar.SECOND) + "";
-		if (cal.get(Calendar.SECOND) < 10){
-			second = "0" + second;
-		}
-
-		photoSyncName = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + "_" + photoIndex + "." + extension;
-		
-		return photoSyncName;
+        if(photoIndex == 0) {
+            return getPhotoSyncName(timeStamp, fileName);
+        }
+        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
+        return sdf.format(new Date(timeStamp)) + "_" + photoIndex + fileName.substring(fileName.lastIndexOf('.'));
 	}
 	
 	public static int getNumberOfNodes (MegaNode parent, MegaApiAndroid megaApi){
@@ -1822,18 +1220,6 @@ public class Util {
 		return px*myWidthPx/360; //Based on Eduardo's measurements		
 		
 	}
-	
-	public static boolean isVideoFile(String path) {
-		log("isVideoFile: "+path);
-		try{
-			String mimeType = URLConnection.guessContentTypeFromName(path);
-		    return mimeType != null && mimeType.indexOf("video") == 0;
-		}
-		catch(Exception e){
-			log("Exception: "+e.getMessage());
-			return false;
-		}	    
-	}
 
 	/*
 	 * Validate email
@@ -1905,25 +1291,6 @@ public class Util {
 			return pInfo.versionCode;
 		} catch (PackageManager.NameNotFoundException e) {
 			return 0;
-		}
-	}
-
-	public static boolean isFile (String path){
-		if (path == null) {
-			path = "";
-		}
-		String fixedName = path.trim().toLowerCase();
-		String extension = null;
-		int index = fixedName.lastIndexOf(".");
-		if((index != -1) && ((index+1)<fixedName.length())) {
-			extension = fixedName.substring(index + 1);
-		}
-
-		if(extension!=null){
-			return true;
-		}
-		else{
-			return false;
 		}
 	}
 
@@ -2218,26 +1585,6 @@ public class Util {
 		return defaultAvatar;
 	}
 
-	public static String getDownloadLocation (Context context) {
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-        MegaPreferences prefs = dbH.getPreferences();
-
-        if (prefs != null){
-            log("prefs != null");
-            if (prefs.getStorageAskAlways() != null){
-                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-                    log("askMe==false");
-                    if (prefs.getStorageDownloadLocation() != null){
-                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                            return prefs.getStorageDownloadLocation();
-                        }
-                    }
-                }
-            }
-        }
-        return Util.downloadDIR;
-    }
-
     public static boolean askMe (Context context) {
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		MegaPreferences prefs = dbH.getPreferences();
@@ -2296,6 +1643,58 @@ public class Util {
         return rootView;
     }
 
+	/**
+	 * This method formats the coordinates of a location in degrees, minutes and seconds
+	 * and returns a string with it
+	 *
+	 * @param latitude latitude of the location to format
+	 * @param longitude longitude of the location to format
+	 * @return string with the location formatted in degrees, minutes and seconds
+	 */
+	public static String convertToDegrees(float latitude, float longitude) {
+        StringBuilder builder = new StringBuilder();
+
+		formatCoordinate(builder, latitude);
+        if (latitude < 0) {
+            builder.append("S ");
+        } else {
+            builder.append("N ");
+        }
+
+		formatCoordinate(builder, longitude);
+        if (longitude < 0) {
+            builder.append("W");
+        } else {
+            builder.append("E");
+        }
+
+        return builder.toString();
+    }
+
+	/**
+	 * This method formats a coordinate in degrees, minutes and seconds
+	 *
+	 * @param builder StringBuilder where the string formatted it's going to be built
+	 * @param coordinate coordinate to format
+	 */
+	private static void formatCoordinate (StringBuilder builder, float coordinate) {
+		String degrees = Location.convert(Math.abs(coordinate), Location.FORMAT_SECONDS);
+		String[] degreesSplit = degrees.split(":");
+		builder.append(degreesSplit[0]);
+		builder.append("°");
+		builder.append(degreesSplit[1]);
+		builder.append("'");
+
+		try {
+			builder.append(Math.round(Float.parseFloat(degreesSplit[2].replace(",", "."))));
+		} catch (Exception e) {
+			log("Error rounding seconds in coordinates: " + e.toString());
+			builder.append(degreesSplit[2]);
+		}
+
+		builder.append("''");
+	}
+
 	public static void hideKeyboard(Activity activity, int flag){
 
 		View v = activity.getCurrentFocus();
@@ -2311,9 +1710,66 @@ public class Util {
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
 		}
+
+	}
+
+	public static boolean isPermissionGranted(Context context, String permission){
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+	/**
+	 * This method detects whether the android device is tablet
+	 *
+	 * @param context the passed Activity to be detected
+	 */
+	public static boolean isTablet(Context context) {
+		return (context.getResources().getConfiguration().screenLayout
+				& Configuration.SCREENLAYOUT_SIZE_MASK)
+				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
+	}
+
+	/**
+	 * This method detects whether the url matches certain URL regular expressions
+	 * @param url the passed url to be detected
+	 * @param regexs the array of URL regular expressions
+	 */
+
+	public static boolean matchRegexs(String url, String[] regexs) {
+		if (url == null) {
+			return false;
+		}
+		for (String regex : regexs) {
+			if (url.matches(regex)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static void log(String message) {
 		log("Util", message);
 	}
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static void showKeyboardDelayed(final View view) {
+        log("showKeyboardDelayed");
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }, 50);
+    }
 }

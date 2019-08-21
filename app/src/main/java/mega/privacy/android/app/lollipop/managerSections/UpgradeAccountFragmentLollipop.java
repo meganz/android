@@ -111,6 +111,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	Context context;
 
+	private final static int TYPE_TERA_BYTE = 0;
+	private final static int TYPE_GIGA_BYTE = 1;
+
+	private final static int TYPE_STORAGE_LABEL = 0;
+	private final static int TYPE_TRANSFER_LABEL = 1;
 
 	@Override
 	public void onDestroy(){
@@ -316,33 +321,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionPro1.setText(resultA);
 
-					String textToShowB = "[A] "+(account.getStorage() / 1024)+" TB [/A] "+getString(R.string.label_storage_upgrade_account);
-					try{
-						textToShowB = textToShowB.replace("[A]", "<font color=\'#000000\'>");
-						textToShowB = textToShowB.replace("[/A]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned resultB = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
-					}else {
-						resultB = Html.fromHtml(textToShowB);
-					}
-					storageSectionPro1.setText(resultB);
+					storageSectionPro1.setText(generateByteString(account.getStorage(), TYPE_TERA_BYTE, TYPE_STORAGE_LABEL));
 
-
-					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
-					try{
-						textToShowC = textToShowC.replace("[A]", "<font color=\'#000000\'>");
-						textToShowC = textToShowC.replace("[/A]", "</font>");
-					}catch (Exception e){}
-					Spanned resultC = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						resultC = Html.fromHtml(textToShowC,Html.FROM_HTML_MODE_LEGACY);
-					}else {
-						resultC = Html.fromHtml(textToShowC);
-					}
-					bandwidthSectionPro1.setText(resultC);
+					bandwidthSectionPro1.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
 
 				} else if (account.getLevel() == Constants.PRO_II && account.getMonths() == 1) {
 					log("PRO2: " + account.getStorage());
@@ -378,33 +359,10 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionPro2.setText(resultA);
 
-					String textToShowB = "[A] "+(sizeTranslation(account.getStorage(), 0))+" TB [/A] "+getString(R.string.label_storage_upgrade_account);
-					try{
-						textToShowB = textToShowB.replace("[A]", "<font color=\'#000000\'>");
-						textToShowB = textToShowB.replace("[/A]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned resultB = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
-					}else {
-						resultB = Html.fromHtml(textToShowB);
-					}
-					storageSectionPro2.setText(resultB);
+					storageSectionPro2.setText(generateByteString(account.getStorage(), TYPE_TERA_BYTE, TYPE_STORAGE_LABEL));
 
 
-					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
-					try{
-						textToShowC = textToShowC.replace("[A]", "<font color=\'#000000\'>");
-						textToShowC = textToShowC.replace("[/A]", "</font>");
-					}catch (Exception e){}
-					Spanned resultC = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						resultC = Html.fromHtml(textToShowC,Html.FROM_HTML_MODE_LEGACY);
-					}else {
-						resultC = Html.fromHtml(textToShowC);
-					}
-					bandwidthSectionPro2.setText(resultC);
+					bandwidthSectionPro2.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
 
 				} else if (account.getLevel() == Constants.PRO_III && account.getMonths() == 1) {
 					log("PRO3: " + account.getStorage());
@@ -440,33 +398,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionPro3.setText(resultA);
 
-					String textToShowB = "[A] "+(sizeTranslation(account.getStorage(), 0))+" TB [/A] "+getString(R.string.label_storage_upgrade_account);
-					try{
-						textToShowB = textToShowB.replace("[A]", "<font color=\'#000000\'>");
-						textToShowB = textToShowB.replace("[/A]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned resultB = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
-					}else {
-						resultB = Html.fromHtml(textToShowB);
-					}
-					storageSectionPro3.setText(resultB);
+					storageSectionPro3.setText(generateByteString(account.getStorage(), TYPE_TERA_BYTE, TYPE_STORAGE_LABEL));
 
-
-					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
-					try{
-						textToShowC = textToShowC.replace("[A]", "<font color=\'#000000\'>");
-						textToShowC = textToShowC.replace("[/A]", "</font>");
-					}catch (Exception e){}
-					Spanned resultC = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						resultC = Html.fromHtml(textToShowC,Html.FROM_HTML_MODE_LEGACY);
-					}else {
-						resultC = Html.fromHtml(textToShowC);
-					}
-					bandwidthSectionPro3.setText(resultC);
+					bandwidthSectionPro3.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
 
 				} else if (account.getLevel() == Constants.PRO_LITE && account.getMonths() == 1) {
 					log("Lite: " + account.getStorage());
@@ -501,33 +435,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionLite.setText(resultA);
 
-					String textToShowB = "[A] "+account.getStorage()+" GB [/A] "+getString(R.string.label_storage_upgrade_account);
-					try{
-						textToShowB = textToShowB.replace("[A]", "<font color=\'#000000\'>");
-						textToShowB = textToShowB.replace("[/A]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned resultB = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
-					}else {
-						resultB = Html.fromHtml(textToShowB);
-					}
-					storageSectionLite.setText(resultB);
+					storageSectionLite.setText(generateByteString(account.getStorage(), TYPE_GIGA_BYTE, TYPE_STORAGE_LABEL));
 
-
-					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
-					try{
-						textToShowC = textToShowC.replace("[A]", "<font color=\'#000000\'>");
-						textToShowC = textToShowC.replace("[/A]", "</font>");
-					}catch (Exception e){}
-					Spanned resultC = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						resultC = Html.fromHtml(textToShowC,Html.FROM_HTML_MODE_LEGACY);
-					}else {
-						resultC = Html.fromHtml(textToShowC);
-					}
-					bandwidthSectionLite.setText(resultC);
+					bandwidthSectionLite.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
 
 				}
 			}
@@ -841,22 +751,54 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		pro3TransparentLayout.setVisibility(View.VISIBLE);
 	}
 
-	public String sizeTranslation(long size, int type) {
+	private Spanned generateByteString(long bytes, int type, int labelType) {
+		String textToShow = new StringBuilder().append("[A] ")
+											   .append(sizeTranslation(bytes, type))
+											   .append(" ")
+											   .append(sizeUnit(type))
+											   .append(" [/A] ")
+											   .append(storageOrTransferLabel(labelType))
+											   .toString();
+
+		try {
+			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[/A]", "</font>");
+		} catch (NullPointerException ex) {
+			log("NullPointerException happens when getting the storage string" + ex);
+		}
+
+		Spanned result = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textToShow);
+		}
+		return result;
+	}
+
+	private String sizeTranslation(long size, int type) {
 		log("sizeTranslation");
 
-		switch(type){
-			case 0:{
-				//From GB to TB
-				if(size!=1024){
-					size=size/1024;
-				}
-								
-				String value = new DecimalFormat("#").format(size);			
-				return value;
-			}
+		if (type == TYPE_TERA_BYTE) {
+			size = size / 1024;
 		}
-		return null;
-	      
+		String value = new DecimalFormat("#").format(size);
+		return value;
+	}
+
+	private String storageOrTransferLabel(int labelType) {
+		switch (labelType) {
+			case TYPE_STORAGE_LABEL:
+				return getString(R.string.label_storage_upgrade_account);
+			case TYPE_TRANSFER_LABEL:
+				return getString(R.string.label_transfer_quota_upgrade_account);
+			default:
+				return "";
+		}
+	}
+
+	private String sizeUnit(int type) {
+		return type == 0 ? getString(R.string.label_file_size_tera_byte) : getString(R.string.label_file_size_giga_byte);
 	}
 
 	@Override

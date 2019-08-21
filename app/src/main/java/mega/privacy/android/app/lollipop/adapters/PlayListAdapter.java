@@ -33,6 +33,8 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
+
 /**
  * Created by mega on 24/04/18.
  */
@@ -175,17 +177,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
         if (adapterType == Constants.OFFLINE_ADAPTER){
             offNode = (MegaOffline) getItem(position);
-            if(offNode.getOrigin()==MegaOffline.INCOMING){
-                String handleString = offNode.getHandleIncoming();
-                mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+offNode.getPath() + "/" + offNode.getName());
-            }
-            else if(offNode.getOrigin()==MegaOffline.INBOX){
-                String handleString = offNode.getHandleIncoming();
-                mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/"+offNode.getPath() + "/" + offNode.getName());
-            }
-            else{
-                mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + offNode.getPath() + "/" + offNode.getName());
-            }
+            mediaFile = getOfflineFile(context, offNode);
         }
         else if (adapterType == Constants.ZIP_ADAPTER) {
             zipFile = (File) getItem(position);

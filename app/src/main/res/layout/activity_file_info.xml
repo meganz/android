@@ -29,7 +29,7 @@
                 app:collapsedTitleTextAppearance="@style/ToolbarTitle"
                 app:expandedTitleTextAppearance="@style/ToolbarTitle.CollapsingToolbar"
                 app:expandedTitleGravity="start|top"
-                app:expandedTitleMarginTop="86dp"
+                app:expandedTitleMarginTop="65dp"
                 app:expandedTitleMarginStart="72dp"
                 app:expandedTitleMarginBottom="14dp"
                 app:maxLines="2"
