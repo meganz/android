@@ -31,12 +31,9 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
-import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRoom;
 
 public class BaseActivity extends AppCompatActivity {
@@ -81,7 +78,6 @@ public class BaseActivity extends AppCompatActivity {
         checkMegaApiObjects();
 
         retryConnectionsAndSignalPresence();
-        JobUtil.startCameraUploadService(this);
     }
 
     @Override

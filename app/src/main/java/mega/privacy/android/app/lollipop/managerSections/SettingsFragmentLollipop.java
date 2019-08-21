@@ -2709,7 +2709,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	private void setupLocalPathForCameraUpload(){
-		String cameraFolderLocation = getLocalDCIMFolderPath();
+	    String cameraFolderLocation = prefs.getCamSyncLocalPath();
+        if(TextUtils.isEmpty(cameraFolderLocation)) {
+            cameraFolderLocation = getLocalDCIMFolderPath();
+        }
 		if (camSyncLocalPath != null) {
 			if (!isExternalSDCard) {
 				File checkFile = new File(camSyncLocalPath);
@@ -2777,7 +2780,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			//Check if the node exists in MEGA
 			String secHandle = prefs.getMegaHandleSecondaryFolder();
 			if (secHandle != null) {
-				if (TextUtils.isEmpty(secHandle)) {
+				if (!TextUtils.isEmpty(secHandle)) {
 					log("handleSecondaryMediaFolder NOT empty");
 					handleSecondaryMediaFolder = Long.valueOf(secHandle);
 					if (handleSecondaryMediaFolder != -1) {
