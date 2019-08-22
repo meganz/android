@@ -51,6 +51,7 @@ import mega.privacy.android.app.utils.ImageProcessor;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
@@ -208,6 +209,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public void onDestroy() {
         log("onDestroy()");
         super.onDestroy();
+        TL.log(this, "@#@", "onDestroy");
         isServiceRunning = false;
         if(receiver != null) {
             unregisterReceiver(receiver);
@@ -246,6 +248,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public int onStartCommand(Intent intent,int flags,int startId) {
         log("public int onStartCommand(Intent intent, int flags, int startId)");
         initService();
+        TL.log(this, "@#@", "onStartCommand");
         isServiceRunning = true;
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
         startForeground(notificationId,mNotification);
@@ -516,6 +519,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         
         totalUploaded = 0;
+        TL.log(this, "@#@", cameraFiles.size());
         prepareUpload(cameraFiles,mediaFilesSecondary,primaryVideos,secondaryVideos);
     }
     
@@ -1318,6 +1322,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     
     public static void log(String message) {
         Util.log("CameraUploadsService",message);
+//        TL.log("@@","@#@",message);
     }
     
     @Override
@@ -1456,6 +1461,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             updateUpload();
         } else if (request.getType() == MegaRequest.TYPE_RENAME) {
             //No need to handle anything
+        } else if(request.getType() == MegaRequest.TYPE_SET_ATTR_NODE) {
+            TL.log(this, "@#@", e.getErrorCode());
+            TL.log(this, "@#@", request.getNodeHandle());
+            TL.log(this, "@#@", request.getText());
         }
     }
     
@@ -2070,40 +2079,36 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private MegaNode getPossibleNodeFromCloud(String localFingerPrint, MegaNode uploadNode) {
         log("getPossibleNodeFromCloud");
-        MegaNode nodeFP = megaApi.getNodeByFingerprint(localFingerPrint, uploadNode);
-        if (nodeFP != null) {
-            // the desired node
-            log("found node with same fingerprint in the same folder!");
-            return nodeFP;
-        } else {
-            // search all the places to find out a node which has the given fingerprint.
-            ArrayList<MegaNode> possibleNodeListFP = megaApi.getNodesByFingerprint(localFingerPrint);
-            if (possibleNodeListFP != null && possibleNodeListFP.size() > 0) {
-                // the node has the given fingerprint but doesn't belong to uploadNode folder.
-                nodeFP = possibleNodeListFP.get(0);
-                if (nodeFP != null) {
-                    log("found node with same fingerprint in other folder!");
-                    return nodeFP;
-                }
-            }
-        }
+        long targetFolderHanlde = uploadNode.getHandle();
+        MegaNode preferNode = null;
 
         MegaNodeList possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, uploadNode);
-        MegaNode nodeFPO = getFirstNodeFromList(possibleNodeListFPO);
-        if (nodeFPO != null) {
-            log("found node with same original fingerprint in the same folder!");
-            return nodeFPO;
+        if(possibleNodeListFPO != null && possibleNodeListFPO.size() > 0) {
+            // the desired node, do nothing.
+            log("found node with same fingerprint in the same folder!");
+            return getFirstNodeFromList(possibleNodeListFPO);
         }
 
         possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, null);
-        nodeFPO = getFirstNodeFromList(possibleNodeListFPO);
-        if (nodeFPO != null) {
-            log("found node with same original fingerprint in the other folder!");
-            return nodeFPO;
+        if(possibleNodeListFPO != null && possibleNodeListFPO.size() > 0) {
+            // node with same fingerprint but in different folder, copy.
+            preferNode =  getFirstNodeFromList(possibleNodeListFPO);
+        }
+
+        MegaNode nodeFP = megaApi.getNodeByFingerprint(localFingerPrint, uploadNode);
+        if (nodeFP != null) {
+            if(nodeFP.getParentHandle() == targetFolderHanlde) {
+                // the desired node, do nothing.
+                log("found node with same fingerprint in the same folder!");
+                return nodeFP;
+            } else {
+                // node with same fingerprint but in different folder, copy.
+                preferNode = nodeFP;
+            }
         }
 
         log("no possibile node found");
-        return null;
+        return preferNode;
     }
 
     private MegaNode getFirstNodeFromList(MegaNodeList megaNodeList) {
