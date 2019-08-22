@@ -79,8 +79,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private SparseBooleanArray selectedItems;
 
     RecyclerView listFragment;
-    //	ImageView emptyImageViewFragment;
-//	TextView emptyTextViewFragment;
     boolean incoming = false;
     boolean inbox = false;
     DatabaseHandler dbH = null;
@@ -96,6 +94,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         public ImageView savedOffline;
         public ImageView publicLinkImage;
+        public ImageView takenDownImage;
         public TextView textViewFileName;
         public TextView textViewFileSize;
         public long document;
@@ -492,32 +491,35 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (viewType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
             log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_LIST");
 
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list,parent,false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list, parent, false);
             ViewHolderBrowserList holderList = new ViewHolderBrowserList(v);
-            holderList.itemLayout = (RelativeLayout)v.findViewById(R.id.file_list_item_layout);
-            holderList.imageView = (ImageView)v.findViewById(R.id.file_list_thumbnail);
-            holderList.savedOffline = (ImageView)v.findViewById(R.id.file_list_saved_offline);
+            holderList.itemLayout = v.findViewById(R.id.file_list_item_layout);
+            holderList.imageView = v.findViewById(R.id.file_list_thumbnail);
+            holderList.savedOffline = v.findViewById(R.id.file_list_saved_offline);
 
-            holderList.publicLinkImage = (ImageView)v.findViewById(R.id.file_list_public_link);
-            holderList.permissionsIcon = (ImageView)v.findViewById(R.id.file_list_incoming_permissions);
+            holderList.publicLinkImage = v.findViewById(R.id.file_list_public_link);
+            holderList.takenDownImage = v.findViewById(R.id.file_list_taken_down);
+            holderList.permissionsIcon = v.findViewById(R.id.file_list_incoming_permissions);
 
-            holderList.versionsIcon = (ImageView) v.findViewById(R.id.file_list_versions_icon);
+            holderList.versionsIcon = v.findViewById(R.id.file_list_versions_icon);
 
-            holderList.textViewFileName = (TextView)v.findViewById(R.id.file_list_filename);
+            holderList.textViewFileName = v.findViewById(R.id.file_list_filename);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                holderList.textViewFileName.setMaxWidth(Util.scaleWidthPx(275,outMetrics));
+                holderList.textViewFileName.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
             } else {
-                holderList.textViewFileName.setMaxWidth(Util.scaleWidthPx(210,outMetrics));
+                holderList.textViewFileName.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
             }
 
-            holderList.textViewFileSize = (TextView)v.findViewById(R.id.file_list_filesize);
+            holderList.textViewFileSize = v.findViewById(R.id.file_list_filesize);
 
-            holderList.threeDotsLayout = (RelativeLayout)v.findViewById(R.id.file_list_three_dots_layout);
+            holderList.threeDotsLayout = v.findViewById(R.id.file_list_three_dots_layout);
 
             holderList.savedOffline.setVisibility(View.INVISIBLE);
 
             holderList.publicLinkImage.setVisibility(View.INVISIBLE);
+
+            holderList.takenDownImage.setVisibility(View.GONE);
 
             holderList.textViewFileSize.setVisibility(View.VISIBLE);
 
@@ -533,37 +535,38 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         } else if (viewType == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_GRID");
 
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid_new,parent,false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid_new, parent, false);
             MegaNodeAdapter.ViewHolderBrowserGrid holderGrid = new MegaNodeAdapter.ViewHolderBrowserGrid(v);
 
             holderGrid.folderLayout = v.findViewById(R.id.item_file_grid_folder);
             holderGrid.fileLayout = v.findViewById(R.id.item_file_grid_file);
-            holderGrid.itemLayout = (RelativeLayout)v.findViewById(R.id.file_grid_item_layout);
-            holderGrid.imageViewThumb = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
-            holderGrid.imageViewIcon = (ImageView)v.findViewById(R.id.file_grid_icon);
-            holderGrid.fileGridIconForFile = (ImageView)v.findViewById(R.id.file_grid_icon_for_file);
-            holderGrid.thumbLayout = (RelativeLayout)v.findViewById(R.id.file_grid_thumbnail_layout);
-            holderGrid.thumbLayoutForFile = (RelativeLayout)v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
-            holderGrid.textViewFileName = (TextView)v.findViewById(R.id.file_grid_filename);
-            holderGrid.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
-            holderGrid.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
-            holderGrid.textViewFileSize = (TextView)v.findViewById(R.id.file_grid_filesize);
-            holderGrid.imageButtonThreeDots = (ImageButton)v.findViewById(R.id.file_grid_three_dots);
-            holderGrid.savedOffline = (ImageView)v.findViewById(R.id.file_grid_saved_offline);
-            holderGrid.separator = (View)v.findViewById(R.id.file_grid_separator);
-            holderGrid.publicLinkImage = (ImageView)v.findViewById(R.id.file_grid_public_link);
-            holderGrid.imageViewVideoIcon = (ImageView)v.findViewById(R.id.file_grid_video_icon);
-            holderGrid.videoDuration = (TextView)v.findViewById(R.id.file_grid_title_video_duration);
-            holderGrid.videoInfoLayout = (RelativeLayout)v.findViewById(R.id.item_file_videoinfo_layout);
-            holderGrid.fileGridSelected = (ImageView)v.findViewById(R.id.file_grid_selected);
+            holderGrid.itemLayout = v.findViewById(R.id.file_grid_item_layout);
+            holderGrid.imageViewThumb = v.findViewById(R.id.file_grid_thumbnail);
+            holderGrid.imageViewIcon = v.findViewById(R.id.file_grid_icon);
+            holderGrid.fileGridIconForFile = v.findViewById(R.id.file_grid_icon_for_file);
+            holderGrid.thumbLayout = v.findViewById(R.id.file_grid_thumbnail_layout);
+            holderGrid.thumbLayoutForFile = v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
+            holderGrid.textViewFileName = v.findViewById(R.id.file_grid_filename);
+            holderGrid.textViewFileNameForFile = v.findViewById(R.id.file_grid_filename_for_file);
+            holderGrid.imageButtonThreeDotsForFile = v.findViewById(R.id.file_grid_three_dots_for_file);
+            holderGrid.textViewFileSize = v.findViewById(R.id.file_grid_filesize);
+            holderGrid.imageButtonThreeDots = v.findViewById(R.id.file_grid_three_dots);
+            holderGrid.savedOffline = v.findViewById(R.id.file_grid_saved_offline);
+            holderGrid.separator = v.findViewById(R.id.file_grid_separator);
+            holderGrid.publicLinkImage = v.findViewById(R.id.file_grid_public_link);
+            holderGrid.takenDownImage = v.findViewById(R.id.file_grid_taken_down);
+            holderGrid.imageViewVideoIcon = v.findViewById(R.id.file_grid_video_icon);
+            holderGrid.videoDuration = v.findViewById(R.id.file_grid_title_video_duration);
+            holderGrid.videoInfoLayout = v.findViewById(R.id.item_file_videoinfo_layout);
+            holderGrid.fileGridSelected = v.findViewById(R.id.file_grid_selected);
             holderGrid.bottomContainer = v.findViewById(R.id.grid_bottom_container);
             holderGrid.bottomContainer.setTag(holderGrid);
             holderGrid.bottomContainer.setOnClickListener(this);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(70,outMetrics));
+                holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(70, outMetrics));
             } else {
-                holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(130,outMetrics));
+                holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(130, outMetrics));
             }
             if (holderGrid.textViewFileSize != null) {
                 holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
@@ -573,6 +576,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             holderGrid.savedOffline.setVisibility(View.INVISIBLE);
             holderGrid.publicLinkImage.setVisibility(View.GONE);
+            holderGrid.takenDownImage.setVisibility(View.GONE);
 
             holderGrid.itemLayout.setTag(holderGrid);
             holderGrid.itemLayout.setOnClickListener(this);
@@ -628,6 +632,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
         } else {
             holder.publicLinkImage.setVisibility(View.INVISIBLE);
+        }
+
+        if (node.isTakenDown()) {
+            holder.takenDownImage.setVisibility(View.VISIBLE);
+        } else {
+            holder.takenDownImage.setVisibility(View.GONE);
         }
 
         if (node.isFolder()) {
@@ -877,6 +887,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.publicLinkImage.setVisibility(View.INVISIBLE);
         }
 
+        if (node.isTakenDown()) {
+            holder.takenDownImage.setVisibility(View.VISIBLE);
+            holder.publicLinkImage.setVisibility(View.GONE);
+        } else {
+            holder.takenDownImage.setVisibility(View.GONE);
+        }
+
         if (node.isFolder()) {
 
             log("Node is folder");
@@ -923,6 +940,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
                 holder.publicLinkImage.setVisibility(View.INVISIBLE);
 
+                if (node.isTakenDown()) {
+                    holder.takenDownImage.setVisibility(View.VISIBLE);
+                } else {
+                    holder.takenDownImage.setVisibility(View.GONE);
+                }
                 if (node.isInShare()) {
                     setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
                 }
