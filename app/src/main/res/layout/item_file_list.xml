@@ -114,6 +114,20 @@
 			android:layout_marginRight="6dp"
 			android:layout_marginLeft="6dp"/>
 
+		<ImageView
+			android:id="@+id/file_list_taken_down"
+			android:layout_width="16dp"
+			android:layout_height="16dp"
+			android:src="@drawable/ic_taken_down"
+			android:background="@null"
+			android:alpha="0.35"
+			android:layout_centerVertical="true"
+			android:layout_toRightOf="@+id/file_list_filename"
+			android:layout_marginTop="6dp"
+			android:layout_marginRight="6dp"
+			android:layout_marginLeft="6dp"
+			android:visibility="gone"/>
+
 	</RelativeLayout>
 
 	<RelativeLayout
