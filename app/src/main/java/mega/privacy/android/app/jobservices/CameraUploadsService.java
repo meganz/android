@@ -51,7 +51,6 @@ import mega.privacy.android.app.utils.ImageProcessor;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
@@ -209,7 +208,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public void onDestroy() {
         log("onDestroy()");
         super.onDestroy();
-        TL.log(this, "@#@", "onDestroy");
         isServiceRunning = false;
         if(receiver != null) {
             unregisterReceiver(receiver);
@@ -248,7 +246,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public int onStartCommand(Intent intent,int flags,int startId) {
         log("public int onStartCommand(Intent intent, int flags, int startId)");
         initService();
-        TL.log(this, "@#@", "onStartCommand");
         isServiceRunning = true;
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
         startForeground(notificationId,mNotification);
@@ -519,7 +516,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         
         totalUploaded = 0;
-        TL.log(this, "@#@", cameraFiles.size());
         prepareUpload(cameraFiles,mediaFilesSecondary,primaryVideos,secondaryVideos);
     }
     
@@ -1459,12 +1455,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 dbH.deleteSyncRecordByFingerprint(fingerPrint,fingerPrint,isSecondary);
             }
             updateUpload();
-        } else if (request.getType() == MegaRequest.TYPE_RENAME) {
-            //No need to handle anything
-        } else if(request.getType() == MegaRequest.TYPE_SET_ATTR_NODE) {
-            TL.log(this, "@#@", e.getErrorCode());
-            TL.log(this, "@#@", request.getNodeHandle());
-            TL.log(this, "@#@", request.getText());
         }
     }
     
