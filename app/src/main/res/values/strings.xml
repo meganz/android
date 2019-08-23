@@ -2229,6 +2229,11 @@
     <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been taken down.[/C]</string>
     <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been taken down.[/C]</string>
 
+    <string name="message_file_takedown_pop_out_notification" context="title of file takedown notification">The file has been the subject of a takedown notice</string>
+    <string name="message_folder_takedown_pop_out_notification" context="title of folder takedown notification">The folder has been the subject of a takedown notice</string>
+    <string name="dispute_takendown" context="option to dispute taken down file or folder">Dispute Takedown</string>
+    <string name=
+
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
     <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>
 

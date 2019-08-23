@@ -2,12 +2,16 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -40,6 +44,7 @@ import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
 import mega.privacy.android.app.lollipop.ContactSharedFolderFragment;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -1275,6 +1280,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (n == null) {
             return;
         }
+
+        if (n.isTakenDown()) {
+            showTakendownDialog(n.isFolder());
+            return;
+        }
+
         switch (v.getId()) {
             case R.id.grid_bottom_container:
             case R.id.file_list_three_dots_layout:
@@ -1457,11 +1468,33 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         this.listFragment = listFragment;
     }
 
-    private static void log(String log) {
-        Util.log("MegaNodeAdapter",log);
+    private void showTakendownDialog(boolean isFolder) {
+        log("show takendown dialog");
+        int alertMessageID = isFolder ? R.string.message_folder_takedown_pop_out_notification : R.string.message_file_takedown_pop_out_notification;
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(context.getString(R.string.general_error_word))
+               .setMessage(context.getString(alertMessageID))
+               .setCancelable(false)
+               .setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int i) {
+                       dialog.dismiss();
+                   }
+               })
+               .setPositiveButton(R.string.dispute_takendown, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialogInterface, int i) {
+                       log("open dispute web");
+                       String url = "https://mega.nz/dispute";
+                       Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                       openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                       openTermsIntent.setData(Uri.parse(url));
+                       context.startActivity(openTermsIntent);
+                   }
+               }).show();
     }
 
-    public void allowMultiselect() {
-
+    private static void log(String log) {
+        Util.log("MegaNodeAdapter",log);
     }
 }
