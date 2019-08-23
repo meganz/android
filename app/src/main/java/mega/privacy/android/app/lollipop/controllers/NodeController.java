@@ -15,7 +15,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
-import android.widget.Toast;
 
 import java.io.File;
 import java.net.URLDecoder;
@@ -934,20 +933,28 @@ public class NodeController {
                 if(node != null){
                     log("node NOT null");
                     Map<MegaNode, String> dlFiles = new HashMap();
+                    Map<Long, String> targets = new HashMap();
                     if (node.getType() == MegaNode.TYPE_FOLDER) {
                         log("MegaNode.TYPE_FOLDER");
                         if (downloadToSDCard) {
-                            sdCardOperator.buildFileStructure(dlFiles,parentPath,megaApi,node);
+                            sdCardOperator.buildFileStructure(targets, parentPath, megaApi, node);
+                            getDlList(dlFiles, node, new File(downloadRoot, node.getName()));
                         } else {
                             getDlList(dlFiles, node, new File(parentPath, node.getName()));
                         }
                     } else {
                         log("MegaNode.TYPE_FILE");
-                        dlFiles.put(node, parentPath);
+                        if (downloadToSDCard) {
+                            targets.put(node.getHandle(), parentPath);
+                            dlFiles.put(node, downloadRoot);
+                        } else {
+                            dlFiles.put(node, parentPath);
+                        }
                     }
 
                     for (MegaNode document : dlFiles.keySet()) {
                         String path = dlFiles.get(document);
+                        String targetPath = targets.get(document.getHandle());
                         log("path of the file: "+path);
                         numberOfNodesToDownload++;
 
@@ -974,9 +981,9 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
                             service.putExtra(DownloadService.EXTRA_URL, url);
                             if(downloadToSDCard) {
-                                service.putExtra(DownloadService.EXTRA_PATH, downloadRoot);
+                                service.putExtra(DownloadService.EXTRA_PATH, path);
                                 service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
-                                service.putExtra(DownloadService.EXTRA_TARGET_ROOT, path);
+                                service.putExtra(DownloadService.EXTRA_TARGET_PATH, targetPath);
                             } else {
                                 service.putExtra(DownloadService.EXTRA_PATH, path);
                             }
@@ -1217,7 +1224,7 @@ public class NodeController {
             openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
             openFolderIntent.setData(Uri.parse(url));
-            ((ManagerActivityLollipop) context).startActivity(openFolderIntent);
+            context.startActivity(openFolderIntent);
             return Constants.FOLDER_LINK;
         }
         else if (AndroidMegaRichLinkMessage.isChatLink(url)) {
@@ -1948,7 +1955,6 @@ public class NodeController {
         boolean downloadToSDCard = false;
         String downloadRoot = null;
         SDCardOperator sdCardOperator = null;
-//        DownloadInfo downloadInfo = new DownloadInfo(url,highPriority, size, hashes);
         try {
             sdCardOperator = new SDCardOperator(context);
         } catch (SDCardOperator.SDCardException e) {
@@ -2044,7 +2050,7 @@ public class NodeController {
                         if(downloadToSDCard) {
                             service.putExtra(DownloadService.EXTRA_PATH, downloadRoot);
                             service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
-                            service.putExtra(DownloadService.EXTRA_TARGET_ROOT, path);
+                            service.putExtra(DownloadService.EXTRA_TARGET_PATH, path);
                         }else{
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                         }

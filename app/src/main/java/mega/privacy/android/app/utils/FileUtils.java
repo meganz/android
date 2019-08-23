@@ -43,6 +43,24 @@ public class FileUtils {
 
     public static final String RK_FILE = File.separator + "MEGA" + File.separator + "MEGARecoveryKey.txt";
 
+    public static void deleteFolder(File target) {
+        if (target == null) {
+            return;
+        }
+        File[] fs = target.listFiles();
+        if(fs != null) {
+            for (File f : fs) {
+                if (f.isFile()) {
+                    f.delete();
+                } else {
+                    deleteFolder(f);
+                }
+            }
+        } else {
+            target.delete();
+        }
+    }
+
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
 
         if (f == null) return;

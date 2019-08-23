@@ -30,6 +30,8 @@ public class SDCardOperator {
 
     private String downloadRoot;
 
+    public final static String TEMP = "temp";
+
     private String sdCardRoot;
 
     private String targetRoot;
@@ -55,7 +57,7 @@ public class SDCardOperator {
         //package cache folder on sd card.
         File[] fs = context.getExternalCacheDirs();
         if (fs.length > 1 && fs[1] != null) {
-            downloadRoot = fs[1].getAbsolutePath();
+            downloadRoot = fs[1].getAbsolutePath() + File.separator + System.currentTimeMillis();
         } else {
             throw new SDCardException("No sd card installed!");
         }
@@ -112,7 +114,7 @@ public class SDCardOperator {
         return targetPath + File.separator + source.getName();
     }
 
-    public void buildFileStructure(Map<MegaNode, String> dlList, String parent, MegaApiJava api, MegaNode node) {
+    public void buildFileStructure(Map<Long, String> dlList, String parent, MegaApiJava api, MegaNode node) {
         if (node.isFolder()) {
             createFolder(parent, node.getName());
             parent += (File.separator + node.getName());
@@ -123,7 +125,7 @@ public class SDCardOperator {
                     if (child.isFolder()) {
                         buildFileStructure(dlList, parent, api, child);
                     } else {
-                        dlList.put(child, parent);
+                        dlList.put(child.getHandle(), parent);
                     }
                 }
             }

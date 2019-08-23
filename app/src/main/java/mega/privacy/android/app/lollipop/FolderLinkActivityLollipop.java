@@ -26,6 +26,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.util.LongSparseArray;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -81,8 +82,10 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DownloadInfo;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -95,7 +98,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
 
-public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener{
+public class FolderLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener{
 
 	public static ImageView imageDrag;
 	
@@ -758,214 +761,149 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
     	folderLinkActivity = this;
     	log("onResume");
 	}
+
+	public void toSelectFolder(long [] hashes, long size, String sdRoot, String prompt) {
+        Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+        intent.setClass(this, FileStorageActivityLollipop.class);
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+        if(sdRoot != null) {
+            intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT, sdRoot);
+        }
+        if(prompt != null) {
+            intent.putExtra(FileStorageActivityLollipop.EXTRA_PROMPT, prompt);
+        }
+        startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+    }
+
+    private void showSelectDownloadLocationDialog(final long [] hashes, final long size) {
+        Dialog downloadLocationDialog;
+        String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
+        android.support.v7.app.AlertDialog.Builder b = new android.support.v7.app.AlertDialog.Builder(this);
+        b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+
+        b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0: {
+                        toSelectFolder(hashes, size, null,null);
+                        break;
+                    }
+                    case 1: {
+                        SDCardOperator sdCardOperator = null;
+                        try {
+                            sdCardOperator = new SDCardOperator(FolderLinkActivityLollipop.this);
+                        } catch (SDCardOperator.SDCardException e) {
+                            e.printStackTrace();
+                            log(e.getMessage());
+                            toSelectFolder(hashes, size, null,null);
+                        }
+                        if(sdCardOperator != null) {
+                            String sdCardRoot = sdCardOperator.getSDCardRoot();
+                            //don't use DocumentFile
+                            if (sdCardOperator.canWriteWithFile()) {
+                                log("can operate sd card with file.");
+                                toSelectFolder(hashes, size, sdCardRoot,null);
+                            } else {
+                                setDownloadInfo(new DownloadInfo(false, size, hashes));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    try {
+                                        sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                                        log("operate sd card with document file.");
+                                        toSelectFolder(hashes, size, sdCardRoot,null);
+                                    } catch (SDCardOperator.SDCardException e) {
+                                        e.printStackTrace();
+                                        log(e.getMessage());
+                                        //request sd card root request and write permission.
+                                        SDCardOperator.requestSDCardPermission(sdCardRoot, FolderLinkActivityLollipop.this, (FolderLinkActivityLollipop.this));
+                                    }
+                                } else {
+                                    SDCardOperator.requestSDCardPermission(sdCardRoot, FolderLinkActivityLollipop.this, (FolderLinkActivityLollipop.this));
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+        b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        downloadLocationDialog = b.create();
+        downloadLocationDialog.show();
+        log("downloadLocationDialog shown");
+    }
 	
-	@SuppressLint("NewApi") public void onFileClick(ArrayList<Long> handleList){
-		long size = 0;
-		long[] hashes = new long[handleList.size()];
-		for (int i=0;i<handleList.size();i++){
-			hashes[i] = handleList.get(i);
-			MegaNode n = megaApiFolder.getNodeByHandle(hashes[i]);
-			if(n != null)
-			{
-				size += n.getSize();
-			}
-		}
-		
-		if (dbH == null){
-//			dbH = new DatabaseHandler(getApplicationContext());
-			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		}
+	@SuppressLint("NewApi")
+    public void onFileClick(ArrayList<Long> handleList){
+        long size = 0;
+        long[] hashes = new long[handleList.size()];
+        for (int i = 0; i < handleList.size(); i++) {
+            hashes[i] = handleList.get(i);
+            MegaNode n = megaApiFolder.getNodeByHandle(hashes[i]);
+            if (n != null) {
+                size += n.getSize();
+            }
+        }
+
+        if (dbH == null) {
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        }
 
 		boolean askMe = Util.askMe(this);
 		prefs = dbH.getPreferences();
 		downloadLocationDefaultPath = getDownloadLocation(this);
 
-		if (askMe){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				File[] fs = getExternalFilesDirs(null);
-				if (fs.length > 1){
-					if (fs[1] == null){
-						Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-						intent.setClass(this, FileStorageActivityLollipop.class);
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-						startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-					}
-					else{
-						Dialog downloadLocationDialog;
-						String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-				        AlertDialog.Builder b=new AlertDialog.Builder(this);
-	
-						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-						final long sizeFinal = size;
-						final long[] hashesFinal = new long[hashes.length];
-						for (int i=0; i< hashes.length; i++){
-							hashesFinal[i] = hashes[i];
-						}
-						
-						b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								switch(which){
-									case 0:{
-										Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
-										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
-										startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-										break;
-									}
-									case 1:{
-										File[] fs = getExternalFilesDirs(null);
-										if (fs.length > 1){
-											String path = fs[1].getAbsolutePath();
-											File defaultPathF = new File(path);
-											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
-
-											downloadTo(path, null, sizeFinal, hashesFinal);
-										}
-										break;
-									}
-								}
-							}
-						});
-						b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-							}
-						});
-						downloadLocationDialog = b.create();
-						downloadLocationDialog.show();
-					}
-				}
-				else{
-					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-					intent.setClass(this, FileStorageActivityLollipop.class);
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-				}
-			}
-			else{
-				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-				intent.setClass(this, FileStorageActivityLollipop.class);
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-			}
-		}
-		else{
-			downloadTo(downloadLocationDefaultPath, null, size, hashes);
-		}
+        if (askMe) {
+            File[] fs = getExternalFilesDirs(null);
+            if (fs.length > 1) {
+                if (fs[1] == null) {
+                    toSelectFolder(hashes,size,null,null);
+                } else {
+                    showSelectDownloadLocationDialog(hashes, size);
+                }
+            } else {
+                toSelectFolder(hashes,size,null,null);
+            }
+        } else {
+            downloadTo(downloadLocationDefaultPath, null, size, hashes);
+        }
 	}
 	
-	@SuppressLint("NewApi") public void onFolderClick(long handle, long size){
-		long[] hashes = new long[1];
+	@SuppressLint("NewApi")
+    public void onFolderClick(long handle, final long size){
+		final long[] hashes = new long[1];
 		
-		hashes[0] = handle;		
+		hashes[0] = handle;
 		
 		if (dbH == null){
-//			dbH = new DatabaseHandler(getApplicationContext());
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 
 		boolean askMe = Util.askMe(this);
 		String downloadLocationDefaultPath = getDownloadLocation(this);
 
-		if (askMe){
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				File[] fs = getExternalFilesDirs(null);
-				if (fs.length > 1){
-					if (fs[1] == null){
-						Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-						intent.setClass(this, FileStorageActivityLollipop.class);
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-						startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-					}
-					else{
-						Dialog downloadLocationDialog;
-						String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-				        AlertDialog.Builder b=new AlertDialog.Builder(this);
-	
-						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-						final long sizeFinal = size;
-						final long[] hashesFinal = new long[hashes.length];
-						for (int i=0; i< hashes.length; i++){
-							hashesFinal[i] = hashes[i];
-						}
-						
-						b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								switch(which){
-									case 0:{
-										Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
-										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
-										startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-										break;
-									}
-									case 1:{
-										File[] fs = getExternalFilesDirs(null);
-										if (fs.length > 1){
-											String path = fs[1].getAbsolutePath();
-											File defaultPathF = new File(path);
-											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
-											downloadTo(path, null, sizeFinal, hashesFinal);
-										}
-										break;
-									}
-								}
-							}
-						});
-						b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-							}
-						});
-						downloadLocationDialog = b.create();
-						downloadLocationDialog.show();
-					}
-				}
-				else{
-
-					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-					intent.setClass(this, FileStorageActivityLollipop.class);
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-				}
-			}
-			else{
-
-				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-				intent.setClass(this, FileStorageActivityLollipop.class);
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-			}
-		}
+        if (askMe) {
+            File[] fs = getExternalFilesDirs(null);
+            if (fs.length > 1) {
+                if (fs[1] == null) {
+                    toSelectFolder(hashes, size, null, null);
+                } else {
+                    showSelectDownloadLocationDialog(hashes, size);
+                }
+            } else {
+                toSelectFolder(hashes, size, null, null);
+            }
+        }
 		else{
-
 			downloadTo(downloadLocationDefaultPath, null, size, hashes);
 		}
 	}
@@ -976,8 +914,51 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+			    return;
 			}
 		}
+
+        boolean downloadToSDCard = false;
+        String downloadRoot = null;
+        SDCardOperator sdCardOperator = null;
+        try {
+            sdCardOperator = new SDCardOperator(this);
+        } catch (SDCardOperator.SDCardException e) {
+            e.printStackTrace();
+            log(e.getMessage());
+            // user uninstall the sd card. but default download location is still on the sd card
+            if (SDCardOperator.isSDCardPath(parentPath)) {
+                log("select new path as download location.");
+                toSelectFolder(hashes,size, null,getString(R.string.sdcard_unavailable));
+                return;
+            }
+        }
+        if(sdCardOperator != null && SDCardOperator.isSDCardPath(parentPath)) {
+            //user has installed another sd card.
+            if(sdCardOperator.isNewSDCardPath(parentPath)) {
+                log("new sd card, check permission.");
+                showSnackbar(Constants.SNACKBAR_TYPE,getString(R.string.old_sdcard_unavailable));
+                showSelectDownloadLocationDialog(hashes,size);
+                return;
+            }
+            if (!new File(parentPath).canWrite()) {
+                log("init sd card root with document file.");
+                downloadToSDCard = true;
+                downloadRoot = sdCardOperator.getDownloadRoot();
+                try {
+                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                } catch (SDCardOperator.SDCardException e) {
+                    e.printStackTrace();
+                    log(e.getMessage());
+                    //don't have permission with sd card root. need to request.
+                    String sdRoot = sdCardOperator.getSDCardRoot();
+                    setDownloadInfo(new DownloadInfo(false, size, hashes));
+                    //request SD card write permission.
+                    SDCardOperator.requestSDCardPermission(sdRoot, FolderLinkActivityLollipop.this, FolderLinkActivityLollipop.this);
+                    return;
+                }
+            }
+        }
 		
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
@@ -993,15 +974,27 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			MegaNode node = megaApiFolder.getNodeByHandle(hash);
 			if(node != null){
 				Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+				Map<Long, String> targets = new HashMap<>();
 				if (node.getType() == MegaNode.TYPE_FOLDER) {
-					getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
+                    if (downloadToSDCard) {
+                        sdCardOperator.buildFileStructure(targets, parentPath, megaApiFolder, node);
+                        getDlList(dlFiles, node, new File(downloadRoot, node.getName()));
+                    } else {
+                        getDlList(dlFiles, node, new File(parentPath, node.getName()));
+                    }
 				} else {
-					dlFiles.put(node, parentPath);
+                    log("MegaNode.TYPE_FILE");
+                    if (downloadToSDCard) {
+                        targets.put(node.getHandle(), parentPath);
+                        dlFiles.put(node, downloadRoot);
+                    } else {
+                        dlFiles.put(node, parentPath);
+                    }
 				}
 
 				for (MegaNode document : dlFiles.keySet()) {
-
 					String path = dlFiles.get(document);
+                    String targetPath = targets.get(document.getHandle());
 					log("path of the file: "+path);
 					numberOfNodesToDownload++;
 
@@ -1032,10 +1025,16 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						log("start service");
 						log("EXTRA_HASH: " + document.getHandle());
 						Intent service = new Intent(this, DownloadService.class);
-						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-						service.putExtra(DownloadService.EXTRA_URL, url);
-						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-						service.putExtra(DownloadService.EXTRA_PATH, path);
+                        if(downloadToSDCard) {
+                            service.putExtra(DownloadService.EXTRA_PATH, path);
+                            service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
+                            service.putExtra(DownloadService.EXTRA_TARGET_PATH, targetPath);
+                        } else {
+                            service.putExtra(DownloadService.EXTRA_PATH, path);
+                        }
+                        service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+                        service.putExtra(DownloadService.EXTRA_URL, url);
+                        service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
 						service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
 						startService(service);
 					}
@@ -1104,13 +1103,16 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            dbH.setStorageDownloadLocation(parentPath);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			log("URL: " + url + "___SIZE: " + size);
 	
 			downloadTo (parentPath, url, size, hashes);
-		}
+		} else if (requestCode == Constants.REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, null);
+        }
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 
 			if(!Util.isOnline(this)) {

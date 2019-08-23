@@ -87,7 +87,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_HASH = "DOCUMENT_HASH";
 	public static String EXTRA_URL = "DOCUMENT_URL";
 	public static String EXTRA_DOWNLOAD_TO_SDCARD = "download_to_sdcard";
-	public static String EXTRA_TARGET_ROOT = "download_root";
+	public static String EXTRA_TARGET_PATH = "target_path";
 	public static String EXTRA_PATH = "SAVE_PATH";
 	public static String EXTRA_FOLDER_LINK = "FOLDER_LINK";
 	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
@@ -239,7 +239,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		type = intent.getStringExtra(Constants.EXTRA_TRANSFER_TYPE);
 
         if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
-            targetPaths.put(hash, intent.getStringExtra(EXTRA_TARGET_ROOT));
+            targetPaths.put(hash, intent.getStringExtra(EXTRA_TARGET_PATH));
         }
 		Uri contentUri = null;
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
@@ -517,13 +517,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
         showCompleteNotification(handle);
 		//clear download cache folder
-        File [] fs = getExternalCacheDirs();
-        if(fs.length > 1 && fs[1] != null) {
-            log("clear download cache.");
-            for(File file : fs[1].listFiles()) {
-                file.delete();
-            }
-        }
+//        File [] fs = getExternalCacheDirs();
+//        if(fs.length > 1 && fs[1] != null) {
+//            log("clear download cache.");
+//            for(File file : fs[1].listFiles()) {
+//                file.delete();
+//            }
+//        }
 		isForeground = false;
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
@@ -1848,7 +1848,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					if (currentDir.isDirectory()){
 						currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName()));
 						log("node.getName(): " + node.getName());
-
 					}
 					else{
 						currentFile = currentDir;
