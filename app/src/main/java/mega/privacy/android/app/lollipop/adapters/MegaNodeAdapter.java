@@ -622,8 +622,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (node.isTakenDown()) {
+            holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
             holder.takenDownImage.setVisibility(View.VISIBLE);
         } else {
+            holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.black));
             holder.takenDownImage.setVisibility(View.GONE);
         }
 
@@ -875,9 +877,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (node.isTakenDown()) {
+            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
             holder.takenDownImage.setVisibility(View.VISIBLE);
             holder.publicLinkImage.setVisibility(View.GONE);
         } else {
+            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
             holder.takenDownImage.setVisibility(View.GONE);
         }
 
@@ -927,8 +931,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.publicLinkImage.setVisibility(View.INVISIBLE);
 
                 if (node.isTakenDown()) {
+                    holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
                     holder.takenDownImage.setVisibility(View.VISIBLE);
                 } else {
+                    holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
                     holder.takenDownImage.setVisibility(View.GONE);
                 }
                 if (node.isInShare()) {
