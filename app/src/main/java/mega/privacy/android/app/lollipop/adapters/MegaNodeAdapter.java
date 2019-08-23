@@ -64,31 +64,28 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
 
-    Context context;
-    MegaApiAndroid megaApi;
+    private Context context;
+    private MegaApiAndroid megaApi;
 
-    //	int positionClicked;
-    ArrayList<MegaNode> nodes;
+    private ArrayList<MegaNode> nodes;
 
-    Object fragment;
-    long parentHandle = -1;
-    DisplayMetrics outMetrics;
+    private Object fragment;
+    private long parentHandle = -1;
+    private DisplayMetrics outMetrics;
 
     private int placeholderCount;
 
     private SparseBooleanArray selectedItems;
 
-    RecyclerView listFragment;
-    boolean incoming = false;
-    boolean inbox = false;
-    DatabaseHandler dbH = null;
-    boolean multipleSelect;
-    int type = Constants.FILE_BROWSER_ADAPTER;
-    int adapterType;
+    private RecyclerView listFragment;
+    private DatabaseHandler dbH = null;
+    private boolean multipleSelect;
+    private int type = Constants.FILE_BROWSER_ADAPTER;
+    private int adapterType;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
 
-        public ViewHolderBrowser(View v) {
+        private ViewHolderBrowser(View v) {
             super(v);
         }
 
@@ -416,7 +413,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         switch (type) {
             case Constants.FILE_BROWSER_ADAPTER: {
-//				((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);
                 break;
             }
             case Constants.CONTACT_FILE_ADAPTER: {
@@ -424,7 +420,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 break;
             }
             case Constants.RUBBISH_BIN_ADAPTER: {
-//				((ManagerActivityLollipop) context).setParentHandleRubbish(parentHandle);
                 break;
             }
             case Constants.FOLDER_LINK_ADAPTER: {
@@ -436,29 +431,22 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 break;
             }
             case Constants.OUTGOING_SHARES_ADAPTER: {
-//				((ManagerActivityLollipop) context).setParentHandleOutgoing(parentHandle);
                 break;
             }
             case Constants.INCOMING_SHARES_ADAPTER: {
-                incoming = true;
-//				((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
                 break;
             }
             case Constants.INBOX_ADAPTER: {
                 log("onCreate INBOX_ADAPTER");
-                inbox = true;
                 ((ManagerActivityLollipop)context).setParentHandleInbox(parentHandle);
                 break;
             }
             default: {
-                //			((ManagerActivityLollipop) context).setParentHandleCloud(parentHandle);
                 break;
             }
         }
 
         this.listFragment = recyclerView;
-//		this.emptyImageViewFragment = emptyImageView;
-//		this.emptyTextViewFragment = emptyTextView;
         this.type = type;
 
         if (megaApi == null) {
@@ -470,7 +458,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     public void setNodes(ArrayList<MegaNode> nodes) {
         this.nodes = insertPlaceHolderNode(nodes);
         log("setNodes size: "+this.nodes.size());
-//		contentTextFragment.setText(getInfoFolder(node));
         notifyDataSetChanged();
     }
 
@@ -905,7 +892,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.imageView.setLayoutParams(params);
 
             holder.textViewFileSize.setVisibility(View.VISIBLE);
-//			holder.propertiesText.setText(R.string.general_folder_info);
             holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node,context));
 
             holder.versionsIcon.setVisibility(View.GONE);
@@ -1036,7 +1022,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
         } else {
             log("Node is file");
-//			holder.propertiesText.setText(R.string.general_file_info);
             long nodeSize = node.getSize();
             holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 
@@ -1223,17 +1208,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
-//	public boolean isEnabled(int position) {
-//		// if (position == 0){
-//		// return false;
-//		// }
-//		// else{
-//		// return true;
-//		// }
-//		return super.isEnabled(position);
-//	}
-
-
     private String getItemNode(int position) {
         if (nodes.get(position) != null) {
             return nodes.get(position).getName();
@@ -1401,7 +1375,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         ViewHolderBrowser holder = (ViewHolderBrowser)view.getTag();
         int currentPosition = holder.getAdapterPosition();
-//        Toast.makeText(context,"pos:" + currentPosition ,Toast.LENGTH_SHORT ).show();
         if (type == Constants.RUBBISH_BIN_ADAPTER) {
             ((RubbishBinFragmentLollipop)fragment).activateActionMode();
             ((RubbishBinFragmentLollipop)fragment).itemClick(currentPosition,null,null);
