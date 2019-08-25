@@ -1282,7 +1282,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (n.isTakenDown()) {
-            showTakendownDialog(n.isFolder());
+            showTakendownDialog(n.isFolder(), v, currentPosition);
             return;
         }
 
@@ -1299,45 +1299,48 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
             case R.id.file_list_item_layout:
             case R.id.file_grid_item_layout: {
-                int[] screenPosition = new int[2];
-                ImageView imageView;
-                if (adapterType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
-                    imageView = (ImageView)v.findViewById(R.id.file_list_thumbnail);
-                } else {
-                    imageView = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
-                }
-                imageView.getLocationOnScreen(screenPosition);
-
-                int[] dimens = new int[4];
-                dimens[0] = screenPosition[0];
-                dimens[1] = screenPosition[1];
-                dimens[2] = imageView.getWidth();
-                dimens[3] = imageView.getHeight();
-                if (type == Constants.RUBBISH_BIN_ADAPTER) {
-                    ((RubbishBinFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
-                } else if (type == Constants.INBOX_ADAPTER) {
-                    ((InboxFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
-                } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                    ((IncomingSharesFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
-                } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                    ((OutgoingSharesFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
-                } else if (type == Constants.CONTACT_FILE_ADAPTER) {
-                    ((ContactFileListFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
-                } else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
-                    ((ContactSharedFolderFragment) fragment).itemClick(currentPosition, dimens, imageView);
-                }else if (type == Constants.FOLDER_LINK_ADAPTER) {
-                    ((FolderLinkActivityLollipop)context).itemClick(currentPosition,dimens,imageView);
-                } else if (type == Constants.SEARCH_ADAPTER) {
-                    ((SearchFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
-                } else {
-                    log("layout FileBrowserFragmentLollipop!");
-                    ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
-                }
+                fileClicked(currentPosition, v);
                 break;
             }
         }
     }
 
+    private void fileClicked(int currentPosition, View view) {
+        int[] screenPosition = new int[2];
+        ImageView imageView;
+        if (adapterType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
+            imageView = view.findViewById(R.id.file_list_thumbnail);
+        } else {
+            imageView = view.findViewById(R.id.file_grid_thumbnail);
+        }
+        imageView.getLocationOnScreen(screenPosition);
+
+        int[] dimens = new int[4];
+        dimens[0] = screenPosition[0];
+        dimens[1] = screenPosition[1];
+        dimens[2] = imageView.getWidth();
+        dimens[3] = imageView.getHeight();
+        if (type == Constants.RUBBISH_BIN_ADAPTER) {
+            ((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+        } else if (type == Constants.INBOX_ADAPTER) {
+            ((InboxFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+        } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
+            ((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+        } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
+            ((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+        } else if (type == Constants.CONTACT_FILE_ADAPTER) {
+            ((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+        } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
+            ((ContactSharedFolderFragment) fragment).itemClick(currentPosition, dimens, imageView);
+        } else if (type == Constants.FOLDER_LINK_ADAPTER) {
+            ((FolderLinkActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
+        } else if (type == Constants.SEARCH_ADAPTER) {
+            ((SearchFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+        } else {
+            log("layout FileBrowserFragmentLollipop!");
+            ((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+        }
+    }
 
     private void threeDotsClicked(int currentPosition,MegaNode n) {
         log("onClick: file_list_three_dots: " + currentPosition);
@@ -1468,7 +1471,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         this.listFragment = listFragment;
     }
 
-    private void showTakendownDialog(boolean isFolder) {
+    private void showTakendownDialog(boolean isFolder, final View view, final int currentPosition) {
         log("show takendown dialog");
         int alertMessageID = isFolder ? R.string.message_folder_takedown_pop_out_notification : R.string.message_file_takedown_pop_out_notification;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -1481,7 +1484,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                        dialog.dismiss();
                    }
                })
-               .setPositiveButton(R.string.dispute_takendown, new DialogInterface.OnClickListener() {
+               .setPositiveButton(R.string.dispute_takendown_file, new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialogInterface, int i) {
                        log("open dispute web");
@@ -1490,6 +1493,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                        openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                        openTermsIntent.setData(Uri.parse(url));
                        context.startActivity(openTermsIntent);
+                   }
+               })
+               .setNeutralButton(R.string.open_takendown_file, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialogInterface, int i) {
+                       fileClicked(currentPosition, view);
                    }
                }).show();
     }
