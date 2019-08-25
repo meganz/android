@@ -51,7 +51,7 @@ public class DownloadableActivity extends PinActivityLollipop {
                 try {
                     SDCardOperator sdCardOperator = new SDCardOperator(this);
                     if (nC != null) {
-                        if(downloadInfo != null) {
+                        if (downloadInfo != null) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 nC.requestLocalFolder(downloadInfo, sdCardOperator.getSDCardRoot(), null);
                             } else {
@@ -64,22 +64,22 @@ public class DownloadableActivity extends PinActivityLollipop {
                         NodeController controller = new NodeController(this);
                         String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
                         //file link
-                        if(linkInfo != null) {
+                        if (linkInfo != null) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                controller.intentPickFolder(linkInfo.getNode(),linkInfo.getUrl(),sdCardOperator.getSDCardRoot());
+                                controller.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
                             } else {
                                 dbH.setStorageDownloadLocation(path);
-                                controller.downloadTo(linkInfo.getNode(),path,linkInfo.getUrl());
+                                controller.downloadTo(linkInfo.getNode(), path, linkInfo.getUrl());
                             }
                         } else {
                             //folder link
-                            if(this instanceof FolderLinkActivityLollipop) {
+                            if (this instanceof FolderLinkActivityLollipop) {
                                 FolderLinkActivityLollipop activity = (FolderLinkActivityLollipop) this;
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    activity.toSelectFolder(downloadInfo.getHashes(),downloadInfo.getSize(),sdCardOperator.getSDCardRoot(),null);
+                                    activity.toSelectFolder(downloadInfo.getHashes(), downloadInfo.getSize(), sdCardOperator.getSDCardRoot(), null);
                                 } else {
                                     dbH.setStorageDownloadLocation(path);
-                                    activity.downloadTo(path,null,downloadInfo.getSize(),downloadInfo.getHashes());
+                                    activity.downloadTo(path, null, downloadInfo.getSize(), downloadInfo.getHashes());
                                 }
                             }
                         }

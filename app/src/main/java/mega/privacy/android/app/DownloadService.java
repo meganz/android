@@ -121,7 +121,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	File currentFile;
 	File currentDir;
-	private Map<Long,String> targetPaths = new HashMap<>();
+	private Map<String,String> targetPaths = new HashMap<>();
 	MegaNode currentDocument;
 
 	DatabaseHandler dbH = null;
@@ -238,9 +238,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
 		type = intent.getStringExtra(Constants.EXTRA_TRANSFER_TYPE);
 
-        if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
-            targetPaths.put(hash, intent.getStringExtra(EXTRA_TARGET_PATH));
-        }
 		Uri contentUri = null;
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
             contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
@@ -366,6 +363,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         else{
             log("currentDir is File");
             currentFile = currentDir;
+        }
+        if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
+            targetPaths.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_PATH));
         }
 
         log("dir: " + currentDir.getAbsolutePath() + " file: " + currentDocument.getName() + "  Size: " + currentDocument.getSize());
@@ -1547,7 +1547,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					log("DOWNLOADFILE: " + transfer.getPath());
-                    String targetPath = targetPaths.get(transfer.getNodeHandle());
+                    String targetPath = targetPaths.get(transfer.getPath());
                     if (targetPath != null) {
                         try {
                             SDCardOperator sdCardOperator = new SDCardOperator(this);
