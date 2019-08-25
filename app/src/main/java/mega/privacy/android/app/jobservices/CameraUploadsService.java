@@ -1318,7 +1318,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     
     public static void log(String message) {
         Util.log("CameraUploadsService",message);
-//        TL.log("@@","@#@",message);
     }
     
     @Override
