@@ -259,7 +259,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
                     }
                     else{
-//                        nodeThumb.setImageResource(R.drawable.ic_folder_list);
                         if(((ManagerActivityLollipop) context).isCameraUploads(node)){
                             nodeThumb.setImageResource(R.drawable.ic_folder_image_list);
                         }else{
@@ -738,7 +737,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         int accessLevel = megaApi.getAccess(node);
                         log("Node: " + node.getName() + " " + accessLevel);
-//                        optionOpenFolder.setVisibility(View.GONE);
                         optionDownload.setVisibility(View.VISIBLE);
                         if (availableOffline(context, node)) {
                             optionOfflineText.setText(getString(R.string.context_delete_offline));
@@ -939,18 +937,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             dialog.setContentView(contentView);
 
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-//            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-//            final NodeOptionsBottomSheetDialogFragment thisclass = this;
             mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-//            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//                mBehavior.setPeekHeight((heightDisplay / 2) * 2);
-//            }
-//            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//            }
 
             mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                 @Override
@@ -962,41 +950,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                 @Override
                 public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-//                    if(slideOffset> 0 && !heightseted){
-//                        log("HeightReal is "+ heightReal);
-//                        if(context instanceof CustomHeight){
-//                            height = ((CustomHeight) context).getHeightToPanel(thisclass);
-//                        }
-//                        log("Height is "+height);
-//                        if(height != -1 && heightReal != -1){
-//                            heightseted = true;
-//                            int numSons = 0;
-//                            int num = items_layout.getChildCount();
-//                            for(int i=0; i<num; i++){
-//                                View v = items_layout.getChildAt(i);
-//                                if(v.getVisibility() == View.VISIBLE){
-//                                    numSons++;
-//                                }
-//                            }
-//                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
-//
-//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-//                                params.height = height;
-//                                bottomSheet.setLayoutParams(params);
-//                            }
-//                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
-//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-//                                params.height = height;
-//                                bottomSheet.setLayoutParams(params);
-//                            }
-//                            if(heightReal > height){
-//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-//                                params.height = height;
-//                                bottomSheet.setLayoutParams(params);
-//                            }
-//                        }
-//                    }
-
                     if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
                         ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
                         if (getActivity() != null && getActivity().findViewById(R.id.toolbar) != null) {
@@ -1016,30 +969,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     }
                 }
             });
+
+            if (node.isTakenDown()) {
+                optionDownload.setVisibility(View.GONE);
+                optionOffline.setVisibility(View.GONE);
+            }
         } else {
             log("Node NULL");
         }
     }
-
-    //    private int getBottomSheetMaximumHeight() {
-//        // get toolbar height
-//        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-//        int toolbarHeight = toolbar.getHeight();
-//
-//        //get status bar height
-//        Rect rectangle = new Rect();
-//        Window window = getActivity().getWindow();
-//        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
-//        int windowHeight = rectangle.bottom;
-//
-//        // material design recommended bottomsheet padding from actionbar
-//        final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8, getContext().getResources().getDisplayMetrics());
-//
-//        // maximum height of the bottomsheet
-////        return windowHeight - toolbarHeight - rectangle.top - padding;
-//        return toolbarHeight + rectangle.top + padding;
-//
-//    }
 
     @Override
     public void onClick(View v) {
@@ -1286,7 +1224,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
         }
 
-//        dismiss();
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }

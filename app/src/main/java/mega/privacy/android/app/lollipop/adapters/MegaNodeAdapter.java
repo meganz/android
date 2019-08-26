@@ -1281,11 +1281,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             return;
         }
 
-        if (n.isTakenDown()) {
-            showTakendownDialog(n.isFolder(), v, currentPosition);
-            return;
-        }
-
         switch (v.getId()) {
             case R.id.grid_bottom_container:
             case R.id.file_list_three_dots_layout:
@@ -1299,7 +1294,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
             case R.id.file_list_item_layout:
             case R.id.file_grid_item_layout: {
-                fileClicked(currentPosition, v);
+                if (n.isTakenDown()) {
+                    showTakendownDialog(n.isFolder(), v, currentPosition);
+                } else {
+                    fileClicked(currentPosition, v);
+                }
                 break;
             }
         }
