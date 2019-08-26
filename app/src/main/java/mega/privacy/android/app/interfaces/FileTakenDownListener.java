@@ -8,6 +8,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 
 public interface FileTakenDownListener {
+    /**
+     * The method of negative button event
+     */
     void fileTakenDownNegativeButtonProcess();
 
     class FileTakenDownNotificationHandler {
