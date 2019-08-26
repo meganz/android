@@ -428,7 +428,7 @@ public class NodeController {
             log("NOT askMe");
             File defaultPathF = new File(downloadLocationDefaultPath);
             defaultPathF.mkdirs();
-            checkSizeBeforeDownload(downloadLocationDefaultPath, null, size, hashes, highPriority);
+            checkSizeBeforeDownload(downloadLocationDefaultPath, null, null, size, hashes, highPriority);
         }
     }
 
@@ -460,7 +460,7 @@ public class NodeController {
     }
 
     //Old downloadTo
-    public void checkSizeBeforeDownload(String parentPath, String url, long size, long [] hashes, boolean highPriority){
+    public void checkSizeBeforeDownload(String parentPath, String uriString, String url, long size, long [] hashes, boolean highPriority){
         //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
         log("checkSizeBeforeDownload - parentPath: "+parentPath+ " url: "+url+" size: "+size);
         log("files to download: "+hashes.length);
@@ -515,7 +515,7 @@ public class NodeController {
 
         if(ask.equals("false")){
             log("SIZE: Do not ask before downloading");
-            checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+            checkInstalledAppBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
         }
         else{
             log("SIZE: Ask before downloading");
@@ -527,34 +527,34 @@ public class NodeController {
                 log("Show size confirmacion: " + sizeC);
                 //Show alert
                 if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, highPriority);
                 } else if (context instanceof FullScreenImageViewerLollipop) {
-                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, highPriority);
                 }
                 else if(context instanceof FileInfoActivityLollipop){
-                    ((FileInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+                    ((FileInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
-                    ((ContactFileListActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+                    ((ContactFileListActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
                 }
                 else if(context instanceof PdfViewerActivityLollipop){
-                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, highPriority);
                 }
                 else if(context instanceof AudioVideoPlayerLollipop){
-                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
                 }
                 else if(context instanceof ContactInfoActivityLollipop){
-                    ((ContactInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+                    ((ContactInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
                 }
             }
             else{
-                checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+                checkInstalledAppBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
             }
         }
     }
 
     //Old proceedToDownload
-    public void checkInstalledAppBeforeDownload(String parentPath, String url, long size, long [] hashes, boolean highPriority){
+    public void checkInstalledAppBeforeDownload(String parentPath, String uriString, String url, long size, long [] hashes, boolean highPriority){
         log("checkInstalledAppBeforeDownload");
         boolean confirmationToDownload = false;
         final String parentPathC = parentPath;
@@ -576,7 +576,7 @@ public class NodeController {
 
         if(ask.equals("false")){
             log("INSTALLED APP: Do not ask before downloading");
-            download(parentPathC, urlC, sizeC, hashesC, highPriority);
+            download(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
         }
         else{
             log("INSTALLED APP: Ask before downloading");
@@ -616,29 +616,29 @@ public class NodeController {
             if(confirmationToDownload){
                 //Show message
                 if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((ManagerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof FullScreenImageViewerLollipop){
-                    ((FullScreenImageViewerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((FullScreenImageViewerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof FileInfoActivityLollipop){
-                    ((FileInfoActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((FileInfoActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
-                    ((ContactFileListActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((ContactFileListActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof PdfViewerActivityLollipop){
-                    ((PdfViewerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((PdfViewerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof AudioVideoPlayerLollipop){
-                    ((AudioVideoPlayerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((AudioVideoPlayerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof ContactInfoActivityLollipop){
-                    ((ContactInfoActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((ContactInfoActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
             }
             else{
-                download(parentPathC, urlC, sizeC, hashesC, highPriority);
+                download(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
             }
         }
     }
@@ -670,7 +670,7 @@ public class NodeController {
         }
     }
 
-    public void download(String parentPath, String url, long size, long [] hashes, boolean highPriority){
+    public void download(String parentPath, String uriString, String url, long size, long [] hashes, boolean highPriority){
         log("download-----------");
         log("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
         log("files to download: "+hashes.length);
@@ -984,6 +984,7 @@ public class NodeController {
                                 service.putExtra(DownloadService.EXTRA_PATH, path);
                                 service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
                                 service.putExtra(DownloadService.EXTRA_TARGET_PATH, targetPath);
+                                service.putExtra(DownloadService.EXTRA_TARGET_URI, uriString);
                             } else {
                                 service.putExtra(DownloadService.EXTRA_PATH, path);
                             }

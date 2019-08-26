@@ -146,6 +146,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	boolean isLoggingIn = false;
 	private long lastUpdated;
 
+	private Intent intent;
+
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
@@ -233,7 +235,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
     protected void onHandleIntent(final Intent intent) {
         log("onHandleIntent");
-
+        this.intent = intent;
         long hash = intent.getLongExtra(EXTRA_HASH, -1);
         String url = intent.getStringExtra(EXTRA_URL);
         boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
@@ -1862,7 +1864,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						currentFile = currentDir;
 						log("CURREN");
 					}
-
+                    if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
+                        targetPaths.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_PATH));
+                        targetUris.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_URI));
+                    }
 					log("Public node download launched");
 					if(!wl.isHeld()) wl.acquire();
 					if(!lock.isHeld()) lock.acquire();

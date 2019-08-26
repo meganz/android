@@ -9810,7 +9810,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     	showSnackbar(type, fragmentContainer, s, idChat);
 	}
 
-	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
+	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, final String uriString, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
 		log("askConfirmationNoAppInstaledBeforeDownload");
 
 		final String parentPathC = parentPath;
@@ -9840,7 +9840,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if(dontShowAgain.isChecked()){
 							dbH.setAttrAskNoAppDownload("false");
 						}
-						nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
+						nC.download(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -9855,7 +9855,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 
-	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
+	public void askSizeConfirmationBeforeDownload(String parentPath, final String uriString,String url, long size, long [] hashes, final boolean highPriority){
 		log("askSizeConfirmationBeforeDownload");
 
 		final String parentPathC = parentPath;
@@ -9886,7 +9886,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if(dontShowAgain.isChecked()){
 							dbH.setAttrAskSizeDownload("false");
 						}
-						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+						nC.checkInstalledAppBeforeDownload(parentPathC,  uriString, urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -13915,7 +13915,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			boolean highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false);
 
-			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, highPriority);
+			nC.checkSizeBeforeDownload(parentPath, null,url, size, hashes, highPriority);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
 			log("Resfresh DONE onActivityResult");

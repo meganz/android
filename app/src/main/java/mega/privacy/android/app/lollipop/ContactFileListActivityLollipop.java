@@ -1066,7 +1066,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			if(nC==null){
 				nC = new NodeController(this);
 			}
-			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
+			nC.checkSizeBeforeDownload(parentPath,  null,url, size, hashes, false);
         } else if (requestCode == Constants.REQUEST_CODE_TREE) {
             onRequestSDCardWritePermission(intent, resultCode, nC);
         }
@@ -1698,7 +1698,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		}
 	}
 
-	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
+	public void askSizeConfirmationBeforeDownload(String parentPath, final String uriString, String url, long size, long [] hashes, final boolean highPriority){
 		log("askSizeConfirmationBeforeDownload");
 
 		final String parentPathC = parentPath;
@@ -1730,7 +1730,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 						if(nC==null){
 							nC = new NodeController(contactPropertiesMainActivity);
 						}
-						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+						nC.checkInstalledAppBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -1745,7 +1745,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		downloadConfirmationDialog.show();
 	}
 
-	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
+	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, final String uriString,String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
 		log("askConfirmationNoAppInstaledBeforeDownload");
 
 		final String parentPathC = parentPath;
@@ -1777,7 +1777,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 						if(nC==null){
 							nC = new NodeController(contactPropertiesMainActivity);
 						}
-						nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
+						nC.download(parentPathC, uriString,urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {

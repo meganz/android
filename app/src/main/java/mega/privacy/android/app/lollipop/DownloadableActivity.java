@@ -58,7 +58,7 @@ public class DownloadableActivity extends PinActivityLollipop {
                             } else {
                                 String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
                                 dbH.setStorageDownloadLocation(path);
-                                nC.checkSizeBeforeDownload(path, null, downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
+                                nC.checkSizeBeforeDownload(path, uriString,null, downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
                             }
                         } else if(linkInfo != null) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
