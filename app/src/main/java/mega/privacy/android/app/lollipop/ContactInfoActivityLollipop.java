@@ -1769,10 +1769,18 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	protected void onDestroy() {
 		super.onDestroy();
 
-		drawableArrow.setColorFilter(null);
-		drawableDots.setColorFilter(null);
-		drawableSend.setColorFilter(null);
-		drawableShare.setColorFilter(null);
+		if(drawableArrow != null) {
+            drawableArrow.setColorFilter(null);
+        }
+        if(drawableDots != null) {
+            drawableDots.setColorFilter(null);
+        }
+        if(drawableSend != null) {
+            drawableSend.setColorFilter(null);
+        }
+        if(drawableShare != null) {
+            drawableShare.setColorFilter(null);
+        }
 	}
 
 	public static void log(String message) {

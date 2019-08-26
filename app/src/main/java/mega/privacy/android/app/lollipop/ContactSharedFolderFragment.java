@@ -95,7 +95,9 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        handler.removeCallbacksAndMessages(null);
+        if(handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
     }
 
     private ArrayList<MegaNode> getNodeListToBeDisplayed(ArrayList<MegaNode> fullList) {
