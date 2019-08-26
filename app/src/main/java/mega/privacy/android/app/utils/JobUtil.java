@@ -74,13 +74,7 @@ public class JobUtil {
         log("startCameraUploadService isOverQuota:" + isOverQuota + ", hasStoragePermission:" + hasReadPermission);
         if (!CameraUploadsService.isServiceRunning && !isOverQuota && hasReadPermission) {
             Intent newIntent = new Intent(context,CameraUploadsService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                log("startCameraUploadService: starting on Oreo or above: ");
-                context.startForegroundService(newIntent);
-            } else {
-                log("startCameraUploadService: starting below Oreo  ");
-                context.startService(newIntent);
-            }
+            postIntent(context, newIntent);
         } else {
             log("startCameraUploadService: service not started because service is running ");
         }
@@ -95,14 +89,24 @@ public class JobUtil {
         log("stopRunningCameraUploadService");
         Intent stopIntent = new Intent(context,CameraUploadsService.class);
         stopIntent.setAction(CameraUploadsService.ACTION_STOP);
-        context.startService(stopIntent);
+        postIntent(context, stopIntent);
     }
 
     public static synchronized void cancelAllUploads(Context context) {
         log("stopRunningCameraUploadService");
         Intent stopIntent = new Intent(context,CameraUploadsService.class);
         stopIntent.setAction(CameraUploadsService.ACTION_CANCEL_ALL);
-        context.startService(stopIntent);
+        postIntent(context, stopIntent);
+    }
+
+    private static void postIntent(Context context, Intent intent){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            log("startCameraUploadService: starting on Oreo or above: ");
+            context.startForegroundService(intent);
+        } else {
+            log("startCameraUploadService: starting below Oreo  ");
+            context.startService(intent);
+        }
     }
     
     public static void rescheduleCameraUpload(final Context context) {
