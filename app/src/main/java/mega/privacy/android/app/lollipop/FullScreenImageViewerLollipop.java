@@ -2615,7 +2615,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				if (nC == null) {
 					nC = new NodeController(this);
 				}
-				nC.downloadTo(currentDocument, parentPath, url);
+				nC.downloadTo(currentDocument, parentPath, null, url);
 			}
 			else{
 				String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);

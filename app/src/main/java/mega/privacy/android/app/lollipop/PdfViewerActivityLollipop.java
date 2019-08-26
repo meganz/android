@@ -2381,7 +2381,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 if (nC == null) {
                     nC = new NodeController(this);
                 }
-                nC.downloadTo(currentDocument, parentPath, uri.toString());
+                nC.downloadTo(currentDocument, parentPath, null, uri.toString());
             }
             else if (type == Constants.FROM_CHAT) {
                 long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);

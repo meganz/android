@@ -1923,7 +1923,7 @@ public class NodeController {
             }
         }
         else{
-            downloadTo(document, downloadLocationDefaultPath, url);
+            downloadTo(document, downloadLocationDefaultPath, null, url);
         }
     }
 
@@ -1950,7 +1950,7 @@ public class NodeController {
         }
     }
 
-    public void downloadTo(MegaNode currentDocument, String parentPath, String url){
+    public void downloadTo(MegaNode currentDocument, String parentPath, String uriString, String url){
         log("downloadTo");
         boolean downloadToSDCard = false;
         String downloadRoot = null;
@@ -2051,6 +2051,7 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_PATH, downloadRoot);
                             service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
                             service.putExtra(DownloadService.EXTRA_TARGET_PATH, path);
+                            service.putExtra(DownloadService.EXTRA_TARGET_URI, uriString);
                         }else{
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                         }

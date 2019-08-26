@@ -874,7 +874,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                 toSelectFolder(hashes,size,null,null);
             }
         } else {
-            downloadTo(downloadLocationDefaultPath, null, size, hashes);
+            downloadTo(downloadLocationDefaultPath, null, null, size, hashes);
         }
 	}
 	
@@ -904,11 +904,11 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
             }
         }
 		else{
-			downloadTo(downloadLocationDefaultPath, null, size, hashes);
+			downloadTo(downloadLocationDefaultPath, null, null, size, hashes);
 		}
 	}
 	
-	public void downloadTo(String parentPath, String url, long size, long [] hashes){
+	public void downloadTo(String parentPath, String uriString, String url, long size, long [] hashes){
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -1029,6 +1029,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                             service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
                             service.putExtra(DownloadService.EXTRA_TARGET_PATH, targetPath);
+                            service.putExtra(DownloadService.EXTRA_TARGET_URI, uriString);
                         } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                         }
@@ -1109,7 +1110,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			log("URL: " + url + "___SIZE: " + size);
 	
-			downloadTo (parentPath, url, size, hashes);
+			downloadTo (parentPath, null, url, size, hashes);
 		} else if (requestCode == Constants.REQUEST_CODE_TREE) {
             onRequestSDCardWritePermission(intent, resultCode, null);
         }
@@ -1118,7 +1119,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 			if(!Util.isOnline(this)) {
 				try{
 					statusDialog.dismiss();
-				} catch(Exception ex) {};
+				} catch(Exception ex) {}
 
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;

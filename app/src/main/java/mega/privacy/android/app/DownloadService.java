@@ -88,6 +88,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_URL = "DOCUMENT_URL";
 	public static String EXTRA_DOWNLOAD_TO_SDCARD = "download_to_sdcard";
 	public static String EXTRA_TARGET_PATH = "target_path";
+	public static String EXTRA_TARGET_URI = "target_uri";
 	public static String EXTRA_PATH = "SAVE_PATH";
 	public static String EXTRA_FOLDER_LINK = "FOLDER_LINK";
 	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
@@ -122,6 +123,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	File currentFile;
 	File currentDir;
 	private Map<String,String> targetPaths = new HashMap<>();
+	private Map<String,String> targetUris = new HashMap<>();
 	MegaNode currentDocument;
 
 	DatabaseHandler dbH = null;
@@ -366,6 +368,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
         if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
             targetPaths.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_PATH));
+            targetUris.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_URI));
         }
 
         log("dir: " + currentDir.getAbsolutePath() + " file: " + currentDocument.getName() + "  Size: " + currentDocument.getSize());
@@ -1547,11 +1550,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					log("DOWNLOADFILE: " + transfer.getPath());
-                    String targetPath = targetPaths.get(transfer.getPath());
+                    String targetPath = targetPaths.get(path);
+                    String uri = targetUris.get(path);
                     if (targetPath != null) {
                         try {
                             SDCardOperator sdCardOperator = new SDCardOperator(this);
-                            sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                            if(uri != null) {
+                                sdCardOperator.initDocumentFileRoot(uri);
+                            } else {
+                                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                            }
+
                             File source = new File(path);
                             path = sdCardOperator.move(targetPath,source);
                             File newFile = new File(path);

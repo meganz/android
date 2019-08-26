@@ -41,6 +41,7 @@ public class DownloadableActivity extends PinActivityLollipop {
             return;
         }
         Uri treeUri = intent.getData();
+        String uriString = treeUri.toString();
         if (treeUri != null) {
             DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
             if (pickedDir.canWrite()) {
@@ -59,6 +60,14 @@ public class DownloadableActivity extends PinActivityLollipop {
                                 dbH.setStorageDownloadLocation(path);
                                 nC.checkSizeBeforeDownload(path, null, downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
                             }
+                        } else if(linkInfo != null) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                nC.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
+                            } else {
+                                String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
+                                dbH.setStorageDownloadLocation(path);
+                                nC.downloadTo(linkInfo.getNode(), path, uriString, linkInfo.getUrl());
+                            }
                         }
                     } else {
                         NodeController controller = new NodeController(this);
@@ -69,7 +78,7 @@ public class DownloadableActivity extends PinActivityLollipop {
                                 controller.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
                             } else {
                                 dbH.setStorageDownloadLocation(path);
-                                controller.downloadTo(linkInfo.getNode(), path, linkInfo.getUrl());
+                                controller.downloadTo(linkInfo.getNode(), path, uriString, linkInfo.getUrl());
                             }
                         } else {
                             //folder link
@@ -79,7 +88,7 @@ public class DownloadableActivity extends PinActivityLollipop {
                                     activity.toSelectFolder(downloadInfo.getHashes(), downloadInfo.getSize(), sdCardOperator.getSDCardRoot(), null);
                                 } else {
                                     dbH.setStorageDownloadLocation(path);
-                                    activity.downloadTo(path, null, downloadInfo.getSize(), downloadInfo.getHashes());
+                                    activity.downloadTo(path, uriString, null, downloadInfo.getSize(), downloadInfo.getHashes());
                                 }
                             }
                         }

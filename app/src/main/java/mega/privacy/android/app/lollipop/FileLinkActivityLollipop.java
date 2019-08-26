@@ -861,7 +861,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 			log("URL: " + url + "___SIZE: " + size);
 
 			NodeController nC = new NodeController(this);
-			nC.downloadTo(document, parentPath, url);
+			nC.downloadTo(document, parentPath, null, url);
         } else if (requestCode == Constants.REQUEST_CODE_TREE) {
             onRequestSDCardWritePermission(intent, resultCode, null);
         }
