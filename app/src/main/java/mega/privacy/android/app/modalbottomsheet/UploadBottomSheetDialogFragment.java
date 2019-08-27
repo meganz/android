@@ -28,6 +28,7 @@ import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -217,7 +218,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         intent.setClass(context,FileStorageActivityLollipop.class);
         if (fromSDCard) {
             File[] fs = context.getExternalFilesDirs(null);
-            String sdRoot = Util.getSDCardRoot(fs[1].getAbsolutePath());
+            String sdRoot = SDCardUtils.getSDCardRoot(fs[1]);
             intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
         }
 

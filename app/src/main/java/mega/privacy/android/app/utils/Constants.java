@@ -370,6 +370,11 @@ public class Constants {
     public static final int ERROR_LINK = -1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
+    public static final String CHAT_ID = "chatHandle";
+    public static final String CALL_ID = "callId";
+    public static final String CHAT_ID_IN_PROGRESS = "chatHandleInProgress";
+    public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
+    public static final String SECOND_CALL = "SECOND_CALL";
 
 	public static final String[] FILE_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#!.+$",

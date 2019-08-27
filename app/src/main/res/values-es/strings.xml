@@ -46,7 +46,7 @@
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importar</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Almacenamiento</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Cuota de transferencia</string>
-    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Hazte PRO</string>
+    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Ampliar cuenta</string>
     <!--
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>
     -->
@@ -104,8 +104,8 @@
     <string name="action_refresh" context="Menu item">Recargar</string>
     <string name="action_sort_by" context="Menu item">Ordenar por</string>
     <string name="action_help" context="Menu item">Ayuda</string>
-    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Hazte PRO</string>
-    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Realizando pago</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Ampliar cuenta</string>
+    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Ampliando cuenta</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Seleccionar todo</string>
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Deseleccionar</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Vista en miniatura</string>
@@ -280,9 +280,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Tamaño</string>
-    <string name="file_properties_info_modified" context="when was the file modified">Modificado</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Last Modified</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Añadido</string>
-    <string name="file_properties_info_created" context="when the file was created">Creado</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -632,7 +631,7 @@
     <string name="menu_take_picture" context="menu item">Hacer foto</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-fi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-fi o plan de datos</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o plan de datos</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">Aceptar</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Saltar</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Detener</string>
@@ -642,8 +641,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Subiendo archivos multimedia</string>
-	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
-	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Comprobando archivos para la subida</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Iniciando Subidas de la cámara</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -651,7 +650,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Almacenamiento</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Bloqueo con PIN</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compresión de vídeos consume mucha energía, por eso MEGA te recordará que cargues tu dispositivo si los videos a comprimir son superiores a %s.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compresión de vídeos consume mucha energía, por eso MEGA te recordará que enchufes tu dispositivo si los videos a comprimir son superiores a %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avanzado</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Borrar caché</string>
@@ -688,7 +687,7 @@
     <string name="settings_empty_folder" context="settings option">Elige carpeta</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-fi o plan de datos</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o plan de datos</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-fi</item>
     </string-array>
 
@@ -701,7 +700,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Solo cargando</string>
-    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Solo comprimir cargando</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Mantener los nombres originales de los archivos</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Carpeta de la cámara local</string>
@@ -826,7 +825,7 @@
 
     <string name="proceed_cc" context="Text of the button which proceeds the payment">Pagar</string>
 
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">El pago se ha realizado correctamente</string>
+    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Cuenta ampliada</string>
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Operación fallida. No se hizo ningún cargo a tu tarjeta de crédito.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">La información de la tarjeta de crédito no es correcta. No se hará ningún cargo a tu tarjeta de crédito.</string>
     <!--
@@ -921,8 +920,8 @@
     <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Tu Clave de recuperación se utilizará para restablecer la contraseña. Por favor, escribe tu nueva contraseña.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Recibirás un enlace de recuperación que te permitirá restablecer tu contraseña.</string>
 
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Hazte PRO</string>
-    <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Hazte PRO</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Ampliar</string>
+    <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Ampliar cuenta</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu nube [A]¡Obtén más espacio y más cuota de transferencia con una cuenta PRO!</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Se ha realizado una copia de seguridad de la Clave de recuperación en: %1s. [A]Mientras el archivo permanezca en esta ruta, lo encontrarás en la sección Sin conexión.[A]Aviso: Si cierras la sesión, la Clave se eliminará. Guárdala en un lugar seguro.</string>
 
@@ -1080,10 +1079,10 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">Se eliminarán %d contactos de la carpeta compartida.</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contactos eliminados de la carpeta compartida</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">No se han podido eliminar &#160;y %d contactos</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">No se han podido eliminar %d contactos</string>
 
-	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
-	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Se han actualizado los permisos para %d contactos</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">No se han podido actualizar los permisos para %d contactos</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Cargando los contactos del teléfono&#8230;</string>
 
@@ -1179,7 +1178,7 @@
 
     <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed">[/D][E]%3$s[/E] ha cambiado el permiso de [A]%1$s[/A][B] a [/B][C]%2$s[/C][D]</string>
     <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">[A]%1$s[/A][B] se ha unido al chat de grupo por invitación de [/B][C]%2$s[/C]</string>
-    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat">[/B][C]%2$s[/C] ha eliminado a [A]%1$s[/A][B] del chat</string>
+    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat">[A]%1$s[/A][B] fue eliminado del chat por [/B][C]%2$s[/C]</string>
 
     <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s[/A][B] ha cambiado el nombre del grupo a [/B] [C]“%2$s”[/C]</string>
 
@@ -1799,7 +1798,7 @@
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calidad multimedia del chat</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Calidad del vídeo</string>
-    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Subidas de la cámara necesita acceder a tus fotos y otros archivos multimedia del dispositivo. Ve a los ajustes y permite el acceso.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Calidad original</item>
         <item context="the options of medium quality multimedia file to  upload.">Calidad media</item>
@@ -1877,7 +1876,7 @@
         <item context="unread messages" quantity="other">%1$d chats no leídos</item>
     </plurals>
 
-    <string name="chat_loading_messages" context="Message shown when a chat is opened and the messages are being recovered">[A]Cargando[/A][B]Mensajes &#8230; [/B]</string>
+    <string name="chat_loading_messages" context="Message shown when a chat is opened and the messages are being recovered">[A]Cargando[/A] [B]Mensajes&#8230;[/B]</string>
 
     <string name="general_error_internal_node_not_found" context="Error message shown when opening a file link which doesn't exist">Carpeta o archivo no encontrado. ¿Has iniciado sesión con una cuenta diferente en tu navegador? Solo puedes acceder a archivos o carpetas desde la cuenta que tienes abierta en la aplicación en este momento</string>
 
@@ -2089,10 +2088,10 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Código no valido</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Tu Nube está casi llena. Hazte PRO y obtén hasta 8 TB de almacenamiento y 16 TB de cuota de transferencia.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Tu Nube está casi llena. Amplía tu cuenta y obtén hasta 8 TB de almacenamiento y 16 TB de cuota de transferencia.</string>
     <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Tu Nube está casi llena. Amplía tu cuenta y obtén hasta 8 TB de almacenamiento y 16 TB de cuota de transferencia.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Tu Nube está casi llena. Si necesitas más almacenamiento, ponte en contacto con el servicio de asistencia de MEGA para obtener un plan personalizado.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Tu Nube está llena. Hazte PRO y obtén hasta 8 TB de almacenamiento y 16 TB de cuota de transferencia.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Tu Nube está llena. Amplía tu cuenta y obtén hasta 8 TB de almacenamiento y 16 TB de cuota de transferencia.</string>
     <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Tu Nube está llena. Amplía tu cuenta y obtén hasta 8 TB de almacenamiento y 16 TB de cuota de transferencia.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Tu Nube está llena. Si necesitas más almacenamiento, ponte en contacto con el servicio de asistencia de MEGA para obtener un plan personalizado.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">Ver planes</string>
@@ -2142,7 +2141,7 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">El período mínimo es de 7 días.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">El período mínimo es de 7 días y el período máximo es de 30 días.</string>
-	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">El tamaño mínimo es %1$s y el tamaño máximo es %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Eliminar archivos anteriores a</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d días</string>
@@ -2150,7 +2149,7 @@
 
 	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Si los vídeos a comprimir son superiores a</string>
 
-    <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Para desactivar la limpieza automática de la papelera o establecer un período de retención más largo, hazte PRO.</string>
+    <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Para desactivar la limpieza automática de la papelera o establecer un período de retención más largo, amplía tu cuenta.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">días</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Obtén enlace de chat</string>
@@ -2273,11 +2272,11 @@
 
 	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">No hay suficiente espacio de almacenamiento</string>
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">No hay suficiente espacio de almacenamiento local para comprimir el vídeo.</string>
-	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">El tamaño es demasiado grande para efectuar la compresión.</string>
 	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">El tamaño total de los videos a comprimir excede de %s, por favor enchufa tu dispositivo para continuar.</string>
-	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
-	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
-	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Los cambios se aplicarán en el siguiente reinicio de las Subidas de la cámara</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s comprimido</string>
+	<string name="title_compress_video" context="notification title when compressing video">Comprimiendo videos %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Has seleccionado una carpeta no válida</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
@@ -2293,13 +2292,13 @@
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] ha añadido %2$s y %3$s[/B]</string>
 
     <plurals name="subtitle_notification_added_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">
-        <item context="Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]añadido %2$d archivo.[/B]</item>
-        <item context="Plural of file. 2 files" quantity="other">[A]%1$s [/A][B]añadido %2$d archivos.[/B]</item>
+        <item context="Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]ha añadido %2$d archivo.[/B]</item>
+        <item context="Plural of file. 2 files" quantity="other">[A]%1$s [/A][B]ha añadido %2$d archivos.[/B]</item>
     </plurals>
 
     <plurals name="subtitle_notification_deleted_items" context="Subtitle of the historic notification for deletions inside an existing shared folder">
-        <item context="Singular of item. 1 item" quantity="one">[A]%1$s [/A][B]eliminado %2$d elemento.[/B]</item>
-        <item context="Plural of item. 2 items" quantity="other">[A]%1$s [/A][B]eliminado %2$d elementos.[/B]</item>
+        <item context="Singular of item. 1 item" quantity="one">[A]%1$s [/A][B]ha eliminado %2$d elemento.[/B]</item>
+        <item context="Plural of item. 2 items" quantity="other">[A]%1$s [/A][B]ha eliminado %2$d elementos.[/B]</item>
     </plurals>
 
     <plurals name="subtitle_notification_added_folders" context="Subtitle of the historic notification for new additions inside an existing shared folder">
@@ -2470,8 +2469,6 @@
     <string name="hint_action_search" context="Hint of the Search view">Buscar&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Contestar</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignorar</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Iniciado llamada&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Iniciando videollamada&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s ha silenciado la llamada</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Silenciada</string>
 
@@ -2522,4 +2519,9 @@
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">No es posible grabar mensajes de voz si hay una llamada en curso.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">No se ha podido subir el mensaje de voz.</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Llamada entrante</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Cargando</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Por favor espera&#8230;</string>
 </resources>

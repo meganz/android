@@ -240,18 +240,9 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
-import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.createCacheFolders;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
-import static mega.privacy.android.app.utils.FileUtils.OLD_MK_FILE;
-import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
-import static mega.privacy.android.app.utils.FileUtils.buildExternalStorageFile;
-import static mega.privacy.android.app.utils.FileUtils.createTemporalTextFile;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
 
@@ -774,6 +765,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				actionType = intent.getIntExtra("actionType", -1);
 
 				if(actionType == Constants.GO_OFFLINE){
+				    //stop cu process
+                    JobUtil.stopRunningCameraUploadService(ManagerActivityLollipop.this);
 					showOfflineMode();
 				}
 				else if(actionType == Constants.GO_ONLINE){
@@ -3559,6 +3552,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
                                     dbH.setCamSyncEnabled(false);
+									if(sttFLol != null  && sttFLol.isResumed()){
+										sttFLol.disableCameraUpload();
+									}
+									if(cuFL != null && cuFL.isResumed()){
+										cuFL.resetSwitchButtonLabel();
+									}
                                 }
                             });
                     builder.setNegativeButton(getString(R.string.general_cancel), null);
@@ -17233,7 +17232,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						log("Pressed button positive to cancel transfer");
 						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-                        JobUtil.stopRunningCameraUploadService(ManagerActivityLollipop.this);
+                        cancelAllUploads(ManagerActivityLollipop.this);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -18275,35 +18274,31 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		if(call!=null){
-			if(call.getChatid() != -1){
-				if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
-					int callStatus = call.getStatus();
-					log("onChatCallUpdate:CHANGE_TYPE_STATUS: callStatus =  "+callStatus);
+		if (call == null || call.getChatid() == -1) return;
+		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
+			int callStatus = call.getStatus();
+			log("onChatCallUpdatecallStatus =  " + callStatus);
 
-					switch (callStatus) {
-						case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-						case MegaChatCall.CALL_STATUS_RING_IN:
-						case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-						case MegaChatCall.CALL_STATUS_DESTROYED:
-						case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
-							setCallBadge();
-							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-							if ((rChatFL != null) && (rChatFL.isVisible())){
-								rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
-							}
-
-							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-							if ((fbFLol != null) && (fbFLol.isVisible())){
-								fbFLol.showCallLayout();
-							}
-							break;
-						}
-
-						default:
-							break;
+			switch (callStatus) {
+				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+				case MegaChatCall.CALL_STATUS_RING_IN:
+				case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+				case MegaChatCall.CALL_STATUS_DESTROYED:
+				case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+					setCallBadge();
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+					if ((rChatFL != null) && (rChatFL.isVisible())) {
+						rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
 					}
+
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+					if ((fbFLol != null) && (fbFLol.isVisible())) {
+						fbFLol.showCallLayout();
+					}
+					break;
 				}
+				default:
+					break;
 			}
 		}
 	}
