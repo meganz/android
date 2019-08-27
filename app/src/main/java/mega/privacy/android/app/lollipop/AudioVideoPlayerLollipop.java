@@ -155,6 +155,10 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.ChatUtil.participatingInACall;
+import static mega.privacy.android.app.utils.Util.isChatEnabled;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface {
@@ -169,8 +173,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     int screenHeight;
     int placeholderCount;
 
-    private final String offLineDIR = mega.privacy.android.app.utils.Util.offlineDIR;
-    private final String oldMKFile = mega.privacy.android.app.utils.Util.oldMKFile;
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
 
     static AudioVideoPlayerLollipop audioVideoPlayerLollipop;
@@ -345,7 +347,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
 
-        downloadLocationDefaultPath = mega.privacy.android.app.utils.Util.getDownloadLocation(this);
+        downloadLocationDefaultPath = getDownloadLocation(this);
 
         draggableView.setViewAnimator(new ExitViewAnimator());
 
@@ -577,7 +579,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                if(isChatEnabled()){
                     if (megaChatApi == null){
                         megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                     }
@@ -780,7 +782,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
         log("onChatCallUpdate ");
-        if (player != null && player.getPlayWhenReady()) {
+        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)
+                && (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)
+                && player != null && player.getPlayWhenReady()) {
             player.setPlayWhenReady(false);
         }
     }
@@ -802,44 +806,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 for(int i=0; i<offList.size();i++){
                     MegaOffline checkOffline = offList.get(i);
-                    File offlineDirectory = null;
-                    if(checkOffline.getOrigin()==MegaOffline.INCOMING){
-                        log("isIncomingOffline");
-
-                        if (Environment.getExternalStorageDirectory() != null){
-                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-                            log("offlineDirectory: "+offlineDirectory);
-                        }
-                        else{
-                            offlineDirectory = getFilesDir();
-                        }
-                    }
-                    else if(checkOffline.getOrigin()==MegaOffline.INBOX){
-                        if (Environment.getExternalStorageDirectory() != null){
-                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
-                            log("offlineDirectory: "+offlineDirectory);
-                        }
-                        else{
-                            offlineDirectory = getFilesDir();
-                        }
-                    }
-                    else{
-                        log("NOT isIncomingOffline");
-                        if (Environment.getExternalStorageDirectory() != null){
-                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + checkOffline.getPath()+checkOffline.getName());
-                        }
-                        else{
-                            offlineDirectory = getFilesDir();
-                        }
-                    }
-
-                    if(offlineDirectory!=null){
-                        if (!offlineDirectory.exists()){
-                            log("Path to remove B: "+(offList.get(i).getPath()+offList.get(i).getName()));
-                            //dbH.removeById(offList.get(i).getId());
-                            offList.remove(i);
-                            i--;
-                        }
+                    File offlineFile = getOfflineFile(audioVideoPlayerLollipop, checkOffline);
+                    if (!isFileAvailable(offlineFile)) {
+                        offList.remove(i);
+                        i--;
                     }
                 }
 
@@ -847,21 +817,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if(!offList.isEmpty()) {
                         MegaOffline lastItem = offList.get(offList.size()-1);
                         if(!(lastItem.getHandle().equals("0"))){
-                            String path = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
-                            log("Export in: "+path);
-                            File file= new File(path);
-                            if(file.exists()){
-                                MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                            log("Export in: "+getExternalStoragePath(OLD_MK_FILE));
+                            File file= buildExternalStorageFile(OLD_MK_FILE);
+                            if(isFileAvailable(file)){
+                                MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
                                 offList.add(masterKeyFile);
                             }
                         }
                     }
                     else{
-                        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
-                        log("Export in: "+path);
-                        File file= new File(path);
-                        if(file.exists()){
-                            MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                        log("Export in: "+getExternalStoragePath(OLD_MK_FILE));
+                        File file= buildExternalStorageFile(OLD_MK_FILE);
+                        if(isFileAvailable(file)){
+                            MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
                             offList.add(masterKeyFile);
                         }
                     }
@@ -1165,13 +1133,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                     log("playerListener: onPlayerStateChanged: " + playbackState);
 
-                    if (playWhenReady && mega.privacy.android.app.utils.Util.isChatEnabled() && megaChatApi != null) {
-                        MegaHandleList handleList = megaChatApi.getChatCalls();
-                        if(handleList!=null && handleList.size()>0) {
-                            //Not allow to play content when a call is in progress
-                            player.setPlayWhenReady(false);
-                            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
-                        }
+                    if (playWhenReady && isChatEnabled() && megaChatApi != null && participatingInACall(megaChatApi)) {
+                        //Not allow to play content when a call is in progress
+                        player.setPlayWhenReady(false);
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
                     }
 
                     playbackStateSaved = playbackState;
@@ -2126,7 +2091,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 moveMenuItem.setVisible(true);
                 copyMenuItem.setVisible(true);
 
-                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                if(isChatEnabled()){
                     chatMenuItem.setVisible(true);
                 }
                 else{
@@ -2236,7 +2201,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             else if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
                 propertiesMenuItem.setVisible(true);
-                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                if(isChatEnabled()){
                     chatMenuItem.setVisible(true);
                 }
                 else{
@@ -2361,7 +2326,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                                     renameMenuItem.setVisible(true);
                                     moveMenuItem.setVisible(true);
                                     moveToTrashMenuItem.setVisible(true);
-                                    if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                                    if(isChatEnabled()){
                                         chatMenuItem.setVisible(true);
                                     }
                                     else{
@@ -2380,7 +2345,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }
                         else{
-                            if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                            if(isChatEnabled()){
                                 chatMenuItem.setVisible(true);
                             }
                             else{
@@ -2486,7 +2451,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 Uri newUri = uri;
                 if (uri.toString().contains(CacheFolderManager.VOICE_CLIP_FOLDER)) {
                     MegaNode file = megaApi.getNodeByHandle(handle);
-                    String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
                     if (localPath == null) break;
                     File voiceClipFile = new File(localPath);
                     newUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", voiceClipFile);
@@ -3521,6 +3486,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     protected void onStop() {
         super.onStop();
+        //pause either video or audio as per UX advise
+        if (player != null && player.getPlayWhenReady()) {
+            player.setPlayWhenReady(false);
+        }
         log("onStop");
     }
 
@@ -3547,10 +3516,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     protected void onPause() {
         super.onPause();
-        //pause either video or audio as per UX advise
-        if (player != null && player.getPlayWhenReady()) {
-            player.setPlayWhenReady(false);
-        }
         log("onPause");
     }
 
@@ -3612,7 +3577,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     setTitle(fileName);
 
                     boolean isOnMegaDownloads = false;
-                    String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
                     File f = new File(downloadLocationDefaultPath, file.getName());
                     if(f.exists() && (f.length() == file.getSize())){
                         isOnMegaDownloads = true;
@@ -4335,22 +4300,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 else {
                     mediaSourcePlaylist.clear();
                 }
-                downloadLocationDefaultPath = mega.privacy.android.app.utils.Util.getDownloadLocation(getApplicationContext());
+                downloadLocationDefaultPath = getDownloadLocation(getApplicationContext());
                 if (isOffline) {
                     for (int i = 0; i < mediaOffList.size(); i++) {
                         MegaOffline currentNode = mediaOffList.get(i);
                         mSource = null;
-                        if (currentNode.getOrigin() == MegaOffline.INCOMING) {
-                            String handleString = currentNode.getHandleIncoming();
-                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" + handleString + "/" + currentNode.getPath() + "/" + currentNode.getName());
-                        }
-                        else if (currentNode.getOrigin() == MegaOffline.INBOX) {
-                            String handleString = currentNode.getHandleIncoming();
-                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/" + currentNode.getPath() + "/" + currentNode.getName());
-                        }
-                        else {
-                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + currentNode.getPath() + "/" + currentNode.getName());
-                        }
+                        mediaFile = getOfflineFile(audioVideoPlayerLollipop, currentNode);
+
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && currentNode.getPath().contains(Environment.getExternalStorageDirectory().getPath())) {
                             mediaUri = FileProvider.getUriForFile(audioVideoPlayerLollipop, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                         }
@@ -4403,7 +4359,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         }
                         mSource = null;
                         boolean isOnMegaDownloads = false;
-                        localPath = mega.privacy.android.app.utils.Util.getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
+                        localPath = getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
                         File f = new File(downloadLocationDefaultPath, n.getName());
                         if (f.exists() && (f.length() == n.getSize())) {
                             isOnMegaDownloads = true;

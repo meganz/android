@@ -64,14 +64,13 @@ public abstract class RotatableFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         RotatableAdapter currentAdapter = getAdapter();
-        if(currentAdapter != null) {
+        if(currentAdapter != null){
             ArrayList<Integer> selectedItems = (ArrayList<Integer>) (currentAdapter.getSelectedItems());
             outState.putSerializable(SELECTED_ITEMS, selectedItems);
             outState.putInt(FOLDER_COUNT, currentAdapter.getFolderCount());
             outState.putInt(LAST_PLACE_HOLDER_COUNT, currentAdapter.getPlaceholderCount());
+            lastPlaceHolderCount = -1;
         }
-        selectedItems = null;
-        lastPlaceHolderCount = -1;
     }
 
     @Override

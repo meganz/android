@@ -22,6 +22,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+
 public class ContactFileBaseFragment extends Fragment{
     
     public static int REQUEST_CODE_GET = 1000;
@@ -41,7 +43,7 @@ public class ContactFileBaseFragment extends Fragment{
     protected int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
     protected DatabaseHandler dbH = null;
     protected MegaPreferences prefs = null;
-    protected String downloadLocationDefaultPath = Util.downloadDIR;
+    protected String downloadLocationDefaultPath;
     protected DisplayMetrics outMetrics;
     
     @Override
@@ -59,19 +61,8 @@ public class ContactFileBaseFragment extends Fragment{
         
         dbH = DatabaseHandler.getDbHandler(context);
         prefs = dbH.getPreferences();
-        if (prefs != null){
-            log("prefs != null");
-            if (prefs.getStorageAskAlways() != null){
-                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-                    log("askMe==false");
-                    if (prefs.getStorageDownloadLocation() != null){
-                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-                        }
-                    }
-                }
-            }
-        }
+
+        downloadLocationDefaultPath = getDownloadLocation(context);
         
         lastPositionStack = new Stack<>();
     

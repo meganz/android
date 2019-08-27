@@ -23,6 +23,7 @@ import java.util.List;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;
+import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -36,7 +37,6 @@ import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationContactsAdapter.ViewHolderPhoneContactsLollipop> implements MegaRequestListenerInterface {
 
@@ -282,7 +282,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         String email = contact.getDisplayInfo();
         File avatar = buildAvatarFile(context, email + IMAGE_EXTENSION);
         String path = avatar.getAbsolutePath();
-        if (isFileAvailable(avatar)) {
+        if (FileUtils.isFileAvailable(avatar)) {
             log("avatar exists in: " + avatar.getAbsolutePath());
             BitmapFactory.Options bOpts = new BitmapFactory.Options();
             Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);

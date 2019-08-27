@@ -25,6 +25,7 @@ import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
@@ -98,7 +99,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         setDefaultAvatar(megaContact, holder);
         File avatar = CacheFolderManager.buildAvatarFile(context, email + ".jpg");
         Bitmap bitmap;
-        if (CacheFolderManager.isFileAvailable(avatar)) {
+        if (FileUtils.isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);

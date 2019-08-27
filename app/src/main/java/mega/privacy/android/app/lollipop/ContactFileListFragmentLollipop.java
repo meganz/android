@@ -54,6 +54,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 
 public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
@@ -584,7 +586,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					mediaIntent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER);
 					imageDrag = imageView;
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -650,7 +652,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER);
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -707,7 +709,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					MegaNode file = contactNodes.get(position);
 
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
