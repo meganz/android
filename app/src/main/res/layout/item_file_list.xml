@@ -108,7 +108,8 @@
             android:layout_marginRight="6dp"
             android:layout_toEndOf="@+id/file_list_filename"
             android:background="@null"
-            android:src="@drawable/ic_taken_down"
+            android:src="@drawable/ic_input_warning"
+            android:tint="@color/login_warning"
             android:visibility="gone"
             tools:ignore="ContentDescription" />
 
