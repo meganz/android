@@ -255,9 +255,9 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     }
 
     private ArrayList<MegaContact> filterOut(MegaApiJava api, ArrayList<MegaContact> list) {
-        list = ContactsFilter.filterOutContacts(api, list);
-        list = ContactsFilter.filterOutPendingContacts(api, list);
-        list = ContactsFilter.filterOutMyself(api, list);
+        ContactsFilter.filterOutContacts(api, list);
+        ContactsFilter.filterOutPendingContacts(api, list);
+        ContactsFilter.filterOutMyself(api, list);
         Collections.sort(list, new Comparator<MegaContact>() {
 
             @Override
@@ -289,11 +289,13 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
             log("getMegaContacts request from server");
             api.getRegisteredContacts(getRequestParameter(getLocalContacts()), this);
         } else {
-            log("getMegaContacts load from database");
-            if (updater != null) {
-                ArrayList<MegaContact> list = dbH.getMegaContacts();
-                list = filterOut(api, list);
-                updater.onFinish(list);
+            if(!requestInProgress) {
+                log("getMegaContacts load from database");
+                if (updater != null) {
+                    ArrayList<MegaContact> list = dbH.getMegaContacts();
+                    list = filterOut(api, list);
+                    updater.onFinish(list);
+                }
             }
         }
     }
