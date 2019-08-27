@@ -908,7 +908,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		}
 	}
 	
-	public void downloadTo(String parentPath, String uriString, String url, long size, long [] hashes){
+	public void downloadTo(String parentPath, String uriString, String url, final long size, final long [] hashes){
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -929,7 +929,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
             // user uninstall the sd card. but default download location is still on the sd card
             if (SDCardOperator.isSDCardPath(parentPath)) {
                 log("select new path as download location.");
-                toSelectFolder(hashes,size, null,getString(R.string.sdcard_unavailable));
+                toSelectFolder(hashes,size, null,getString(R.string.no_external_SD_card_detected));
                 return;
             }
         }
@@ -938,7 +938,12 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
             if(sdCardOperator.isNewSDCardPath(parentPath)) {
                 log("new sd card, check permission.");
                 showSnackbar(Constants.SNACKBAR_TYPE,getString(R.string.old_sdcard_unavailable));
-                showSelectDownloadLocationDialog(hashes,size);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showSelectDownloadLocationDialog(hashes,size);
+                    }
+                }, 1500);
                 return;
             }
             if (!new File(parentPath).canWrite()) {

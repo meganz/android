@@ -1507,7 +1507,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
     }
 
     private void onCannotWriteOnSDCard() {
-        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.donot_support_write_on_sdcard), -1);
+        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
         new Handler().postDelayed(new Runnable() {
 
             @Override

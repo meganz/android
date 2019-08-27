@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -373,7 +374,7 @@ public class NodeController {
     }
 
     //Old onFileClick
-    public void prepareForDownloadLollipop(ArrayList<Long> handleList, final boolean highPriority){
+    private void prepareForDownloadLollipop(ArrayList<Long> handleList, final boolean highPriority){
         log("prepareForDownload: "+handleList.size()+" files to download");
         long size = 0;
         long[] hashes = new long[handleList.size()];
@@ -399,32 +400,29 @@ public class NodeController {
         boolean askMe = Util.askMe(context);
         String downloadLocationDefaultPath = getDownloadLocation(context);
 
-        if (askMe){
+        if (askMe) {
             log("askMe");
             File[] fs = context.getExternalFilesDirs(null);
-            final DownloadInfo downloadInfo = new DownloadInfo(highPriority,size,hashes);
-            if (fs.length > 1){
-                if (fs[1] == null){
+            final DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
+            if (fs.length > 1) {
+                if (fs[1] == null) {
                     requestLocalFolder(downloadInfo, null, null);
-                }
-                else{
+                } else {
                     // has sd card
                     try {
                         SDCardOperator sdCardOperator = new SDCardOperator(context);
-                        showSelectDownloadLocationDialog(downloadInfo,sdCardOperator);
+                        showSelectDownloadLocationDialog(downloadInfo, sdCardOperator);
                     } catch (SDCardOperator.SDCardException e) {
                         e.printStackTrace();
                         log(e.getMessage());
-                        //sd card is temporarily unavailable
+                        //sd card is unavailable
                         requestLocalFolder(downloadInfo, null, null);
                     }
                 }
+            } else {
+                requestLocalFolder(downloadInfo, null, null);
             }
-            else{
-                requestLocalFolder(downloadInfo,null,null);
-            }
-        }
-        else{
+        } else {
             log("NOT askMe");
             File defaultPathF = new File(downloadLocationDefaultPath);
             defaultPathF.mkdirs();
@@ -523,31 +521,25 @@ public class NodeController {
             //100MB=104857600
             //10MB=10485760
             //1MB=1048576
-            if(sizeC>104857600) {
+            if (sizeC > 104857600) {
                 log("Show size confirmacion: " + sizeC);
                 //Show alert
                 if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, highPriority);
+                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
                 } else if (context instanceof FullScreenImageViewerLollipop) {
-                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, highPriority);
-                }
-                else if(context instanceof FileInfoActivityLollipop){
+                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                } else if (context instanceof FileInfoActivityLollipop) {
                     ((FileInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
-                }
-                else if(context instanceof ContactFileListActivityLollipop){
+                } else if (context instanceof ContactFileListActivityLollipop) {
                     ((ContactFileListActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
-                }
-                else if(context instanceof PdfViewerActivityLollipop){
-                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, highPriority);
-                }
-                else if(context instanceof AudioVideoPlayerLollipop){
+                } else if (context instanceof PdfViewerActivityLollipop) {
+                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                } else if (context instanceof AudioVideoPlayerLollipop) {
                     ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
-                }
-                else if(context instanceof ContactInfoActivityLollipop){
+                } else if (context instanceof ContactInfoActivityLollipop) {
                     ((ContactInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
                 }
-            }
-            else{
+            } else {
                 checkInstalledAppBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
             }
         }
@@ -670,6 +662,42 @@ public class NodeController {
         }
     }
 
+    private class CopyFileThread implements Runnable {
+
+        private boolean copyToSDCard;
+
+        private String path;
+
+        private String targetPath;
+
+        private String fileName;
+
+        private SDCardOperator operator;
+
+        public CopyFileThread(boolean copyToSDCard, String path, String targetPath, String fileName, SDCardOperator operator) {
+            this.copyToSDCard = copyToSDCard;
+            this.path = path;
+            this.targetPath = targetPath;
+            this.fileName = fileName;
+            this.operator = operator;
+        }
+
+        @Override
+        public void run() {
+            log("Call to copyFile: localPath: " + path + " node name: " + fileName);
+            try{
+                if (copyToSDCard) {
+                    operator.moveFile(targetPath, new File(path));
+                } else {
+                    copyFile(new File(path), new File(targetPath, fileName));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                log(e.getMessage());
+            }
+        }
+    }
+
     public void download(String parentPath, String uriString, String url, long size, long [] hashes, boolean highPriority){
         log("download-----------");
         log("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
@@ -677,7 +705,7 @@ public class NodeController {
         boolean downloadToSDCard = false;
         String downloadRoot = null;
         SDCardOperator sdCardOperator = null;
-        DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
+        final DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
         try {
             sdCardOperator = new SDCardOperator(context);
         } catch (SDCardOperator.SDCardException e) {
@@ -686,7 +714,7 @@ public class NodeController {
             // user uninstall the sd card. but default download location is still on the sd card
             if (SDCardOperator.isSDCardPath(parentPath)) {
                 log("select new path as download location.");
-                requestLocalFolder(downloadInfo, null,context.getString(R.string.sdcard_unavailable));
+                requestLocalFolder(downloadInfo, null,context.getString(R.string.no_external_SD_card_detected));
                 return;
             }
         }
@@ -694,8 +722,14 @@ public class NodeController {
             //user has installed another sd card.
             if(sdCardOperator.isNewSDCardPath(parentPath)) {
                 log("new sd card, check permission.");
+                final SDCardOperator operator = sdCardOperator;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showSelectDownloadLocationDialog(downloadInfo, operator);
+                    }
+                }, 1500);
                 showSnackbar(Constants.SNACKBAR_TYPE,context.getString(R.string.old_sdcard_unavailable));
-                showSelectDownloadLocationDialog(downloadInfo, sdCardOperator);
                 return;
             }
             if (!new File(parentPath).canWrite()) {
@@ -751,14 +785,14 @@ public class NodeController {
                     if(localPath != null){
                         log("localPath != null");
                         try {
-                            //TODO should do it in a thread
-                            log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
-                            if(downloadToSDCard) {
-                                sdCardOperator.moveFile(parentPath,new File(localPath));
+                            final File file = new File(localPath);
+                            if (file.getParent().equals(parentPath)) {
+                                showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                             } else {
-                                copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+                                showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
+                                //copy file.
+                                new Thread(new CopyFileThread(downloadToSDCard,localPath,parentPath,tempNode.getName(),sdCardOperator)).start();
                             }
-
                             if(isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
                                 if (tempNode != null){
@@ -779,7 +813,6 @@ public class NodeController {
                         boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
                         if (!autoPlayEnabled) {
                             log("auto play disabled");
-                            Util.showSnackBar(context,Constants.SNACKBAR_TYPE,context.getString(R.string.general_already_downloaded),-1);
                             return;
                         }
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
@@ -1894,16 +1927,16 @@ public class NodeController {
             dbH = DatabaseHandler.getDbHandler(context);
         }
 
-        if (dbH.getCredentials() == null || dbH.getPreferences() == null){
+        if (dbH.getCredentials() == null || dbH.getPreferences() == null) {
             File[] fs = context.getExternalFilesDirs(null);
             if (fs.length > 1) {
                 if (fs[1] == null) {
-                    intentPickFolder(document, url,null);
+                    intentPickFolder(document, url, null);
                 } else {
                     showSelectDownloadLocationDialog(document, url);
                 }
             } else {
-                intentPickFolder(document, url,null);
+                intentPickFolder(document, url, null);
             }
             return;
         }
@@ -1911,19 +1944,18 @@ public class NodeController {
         boolean askMe = Util.askMe(context);
         String downloadLocationDefaultPath = getDownloadLocation(context);
 
-        if (askMe){
+        if (askMe) {
             File[] fs = context.getExternalFilesDirs(null);
             if (fs.length > 1) {
                 if (fs[1] == null) {
-                    intentPickFolder(document, url,null);
+                    intentPickFolder(document, url, null);
                 } else {
                     showSelectDownloadLocationDialog(document, url);
                 }
             } else {
-                intentPickFolder(document, url,null);
+                intentPickFolder(document, url, null);
             }
-        }
-        else{
+        } else {
             downloadTo(document, downloadLocationDefaultPath, null, url);
         }
     }
@@ -1951,7 +1983,7 @@ public class NodeController {
         }
     }
 
-    public void downloadTo(MegaNode currentDocument, String parentPath, String uriString, String url){
+    public void downloadTo(final MegaNode currentDocument, final String parentPath, String uriString, final String url){
         log("downloadTo");
         boolean downloadToSDCard = false;
         String downloadRoot = null;
@@ -1972,8 +2004,13 @@ public class NodeController {
             //user has installed another sd card.
             if(sdCardOperator.isNewSDCardPath(parentPath)) {
                 log("new sd card, check permission.");
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showSelectDownloadLocationDialog(currentDocument, url);
+                    }
+                }, 1500);
                 showSnackbar(Constants.SNACKBAR_TYPE,context.getString(R.string.old_sdcard_unavailable));
-                showSelectDownloadLocationDialog(currentDocument, url);
                 return;
             }
             if (!new File(parentPath).canWrite()) {
@@ -2003,27 +2040,18 @@ public class NodeController {
             availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
         }catch(Exception ex){}
 
-        MegaNode tempNode = currentDocument;
+        final MegaNode tempNode = currentDocument;
         if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
             log("is file");
-            String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+            final String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
             if(localPath != null){
-                File file = new File(localPath);
-                try {
-                    //TODO should do it in a thread
-                    log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
-                    if(downloadToSDCard) {
-                        sdCardOperator.moveFile(parentPath,new File(localPath));
-                    } else {
-                        copyFile(file, new File(parentPath, tempNode.getName()));
-                    }
-                }catch(Exception e) {}
-
-                if (file != null && file.getParent().equals(parentPath)) {
+                final File file = new File(localPath);
+                if (file.getParent().equals(parentPath)) {
                     showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
-                }
-                else {
+                } else {
                     showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
+                    //copy file.
+                    new Thread(new CopyFileThread(downloadToSDCard,localPath,parentPath,tempNode.getName(),sdCardOperator)).start();
                 }
 
             }
@@ -2048,12 +2076,12 @@ public class NodeController {
                         service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
                         service.putExtra(Constants.EXTRA_SERIALIZE_STRING, currentDocument.serialize());
                         service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-                        if(downloadToSDCard) {
+                        if (downloadToSDCard) {
                             service.putExtra(DownloadService.EXTRA_PATH, downloadRoot);
                             service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
                             service.putExtra(DownloadService.EXTRA_TARGET_PATH, path);
                             service.putExtra(DownloadService.EXTRA_TARGET_URI, uriString);
-                        }else{
+                        } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                         }
                         log("intent to DownloadService");

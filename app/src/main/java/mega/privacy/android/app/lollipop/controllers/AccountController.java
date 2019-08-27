@@ -457,6 +457,11 @@ public class AccountController implements View.OnClickListener{
         File externalCacheDir = context.getExternalCacheDir();
         removeFolder(context, externalCacheDir);
 
+        File [] downloadToSDCardCahce = context.getExternalCacheDirs();
+        if(downloadToSDCardCahce.length > 1) {
+            removeFolder(context, downloadToSDCardCahce[1]);
+        }
+
         File cacheDir = context.getCacheDir();
         removeFolder(context, cacheDir);
 

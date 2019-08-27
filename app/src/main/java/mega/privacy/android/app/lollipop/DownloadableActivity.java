@@ -36,7 +36,7 @@ public class DownloadableActivity extends PinActivityLollipop {
             if (resultCode != Activity.RESULT_OK) {
                 Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
             } else {
-                Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.donot_support_write_on_sdcard), -1);
+                Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
             }
             return;
         }
@@ -58,9 +58,9 @@ public class DownloadableActivity extends PinActivityLollipop {
                             } else {
                                 String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
                                 dbH.setStorageDownloadLocation(path);
-                                nC.checkSizeBeforeDownload(path, uriString,null, downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
+                                nC.checkSizeBeforeDownload(path, uriString, null, downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
                             }
-                        } else if(linkInfo != null) {
+                        } else if (linkInfo != null) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 nC.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
                             } else {
@@ -100,7 +100,7 @@ public class DownloadableActivity extends PinActivityLollipop {
             }
         } else {
             log("tree uri is null!");
-            Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.donot_support_write_on_sdcard), -1);
+            Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
         }
     }
 

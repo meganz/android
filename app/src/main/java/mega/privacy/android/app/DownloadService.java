@@ -521,14 +521,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			try{ wl.release(); } catch(Exception ex) {}
 
         showCompleteNotification(handle);
-		//clear download cache folder
-//        File [] fs = getExternalCacheDirs();
-//        if(fs.length > 1 && fs[1] != null) {
-//            log("clear download cache.");
-//            for(File file : fs[1].listFiles()) {
-//                file.delete();
-//            }
-//        }
 		isForeground = false;
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
@@ -1551,27 +1543,31 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER);
 					}
 
-					log("DOWNLOADFILE: " + transfer.getPath());
+					log("DOWNLOADFILE: " + path);
                     String targetPath = targetPaths.get(path);
                     String uri = targetUris.get(path);
+                    //need to move downloaded file to a location on sd card.
                     if (targetPath != null) {
+                        File source = new File(path);
                         try {
                             SDCardOperator sdCardOperator = new SDCardOperator(this);
-                            if(uri != null) {
+                            if (uri != null) {
                                 sdCardOperator.initDocumentFileRoot(uri);
                             } else {
                                 sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                             }
-
-                            File source = new File(path);
-                            path = sdCardOperator.move(targetPath,source);
+                            //new path, after moving to target location.
+                            path = sdCardOperator.move(targetPath, source);
                             File newFile = new File(path);
-                            if(newFile.exists() && newFile.length() == source.length()) {
-                                source.delete();
+                            if (newFile.exists() && newFile.length() == source.length()) {
+                                log("move to sd card successfully.");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                             log(e.getMessage());
+                        } finally {
+                            log("delete downloaded file.");
+                            source.delete();
                         }
                     }
 					//To update thumbnails for videos
