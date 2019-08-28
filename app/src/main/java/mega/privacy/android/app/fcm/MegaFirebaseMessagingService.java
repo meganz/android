@@ -20,7 +20,6 @@ package mega.privacy.android.app.fcm;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
 import android.os.PowerManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -45,6 +44,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
+    public static final String SILENT = "silent";
+    public static final String NO_BEEP = "1";
     MegaApplication app;
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
@@ -57,10 +58,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     boolean beep = false;
 
     String remoteMessageType = "";
-
-    private ChatAdvancedNotificationBuilder chatNotificationBuilder;
-
-    Handler h;
 
     PowerManager.WakeLock wl;
 
@@ -109,11 +106,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     private boolean shouldBeep(RemoteMessage message) {
         boolean beep;
         try{
-            String silent = message.getData().get("silent");
+            String silent = message.getData().get(SILENT);
             log("Silent payload: "+silent);
 
             if(silent!=null){
-                if(silent.equals("1")){
+                if(silent.equals(NO_BEEP)){
                     beep = false;
                 }
                 else{
