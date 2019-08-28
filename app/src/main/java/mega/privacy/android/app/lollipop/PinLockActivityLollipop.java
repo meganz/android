@@ -1577,9 +1577,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	@Override
 	protected void onPause() {
 		log("onPause");
-
 		MegaApplication.activityPaused();
-
 		super.onPause();
 	}
 

@@ -62,9 +62,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.THUMBNAIL_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 
 /*
@@ -1351,7 +1350,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			log("localPath no es nulo: " + localPath);
@@ -1389,7 +1388,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			ResizerParams params = new ResizerParams();
@@ -1407,7 +1406,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			log("localPath no es nulo: " + localPath);
@@ -1427,7 +1426,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			log("localPath no es nulo: " + localPath);
@@ -1446,7 +1445,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			log("localPath no es nulo: " + localPath);
@@ -1574,20 +1573,30 @@ public class ThumbnailUtilsLollipop {
 	
 	private static final String SELECTION = MediaColumns.DATA + "=?";
 	private static final String[] PROJECTION = { BaseColumns._ID };
-	public static Bitmap loadVideoThumbnail(String videoFilePath,  Context context) {
+	public static Bitmap loadVideoThumbnail(String videoFilePath, Context context) {
 		log("loadVideoThumbnail");
-	    Bitmap result = null;
-	    Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-	    String[] selectionArgs = { videoFilePath };
-	    ContentResolver cr = context.getContentResolver();
-	    Cursor cursor = cr.query(uri, PROJECTION, SELECTION, selectionArgs, null);
-	    if (cursor.moveToFirst()) {
-	        // it's the only & first thing in projection, so it is 0
-	        long videoId = cursor.getLong(0);
-	        result = MediaStore.Video.Thumbnails.getThumbnail(cr, videoId, Thumbnails.MICRO_KIND, null);
-	    }
-	    cursor.close();
-	    return result;
+		Bitmap result = null;
+		Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+		String[] selectionArgs = {videoFilePath};
+		ContentResolver cr = context.getContentResolver();
+		Cursor cursor = null;
+		try {
+			cursor = cr.query(uri, PROJECTION, SELECTION, selectionArgs, null);
+			if (cursor.moveToFirst()) {
+				// it's the only & first thing in projection, so it is 0
+				long videoId = cursor.getLong(0);
+				result = MediaStore.Video.Thumbnails.getThumbnail(cr, videoId, Thumbnails.MICRO_KIND, null);
+			}
+			cursor.close();
+			return result;
+		} catch (Exception ex) {
+			log("Exception is thrown, ex: " + ex.toString());
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		return null;
 	}
 
 	public interface ThumbnailInterface{

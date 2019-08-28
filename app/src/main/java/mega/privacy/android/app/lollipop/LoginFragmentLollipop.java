@@ -984,7 +984,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
 
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                            ((LoginActivityLollipop) context).startCameraSyncService(false, 5 * 60 * 1000);
+                            ((LoginActivityLollipop) context).startCameraUploadService(false, 5 * 60 * 1000);
                         }
 
                         log("Empty completed transfers data");
@@ -1048,7 +1048,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         if (prefs.getCamSyncEnabled() != null){
                             if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                    ((LoginActivityLollipop) context).startCameraUploadService(false, 30 * 1000);
                                 }
                             }
                         }
@@ -2091,13 +2091,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             if (prefs.getCamSyncEnabled() != null){
                                 if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
                                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                        ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                        ((LoginActivityLollipop) context).startCameraUploadService(false, 30 * 1000);
                                     }
                                 }
                             }
                             else{
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
+                                    ((LoginActivityLollipop) context).startCameraUploadService(true, 30 * 1000);
                                 }
                                 initialCam = true;
                             }

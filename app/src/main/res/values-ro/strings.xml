@@ -76,7 +76,7 @@
     <!--
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options</string>
     -->
-    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Dorești să trimiți o invitație la %s?</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Vrei să trimiți o invitație la %s?</string>
     <!--
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Remove these %d contacts?</string>
 
@@ -163,7 +163,7 @@
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s va fi descărcat.</string>
-    <string name="alert_no_app" context="Alert text before download">Nu există nicio aplicație care să deschidă fișierul %s. Dorești să continui cu descărcarea?</string>
+    <string name="alert_no_app" context="Alert text before download">Nu există nicio aplicație care să deschidă fișierul %s. Vrei să continui cu descărcarea?</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">Nu afișa din nou</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Sigur vrei să anulezi procesul actual de autentificare?</string>
@@ -215,7 +215,7 @@
     <string name="error_enter_userlastname" context="Warning dialog">Te rugăm să introduci numele.</string>
     <string name="error_short_password" context="when creating the account">Parola este prea scurtă</string>
     <string name="error_passwords_dont_match" context="when creating the account">Parolele nu se potrivesc</string>
-    <string name="error_email_registered" contect="when creating the account">Această adresă de e-mail este deja atribuită unui cont pe MEGA.</string>
+    <string name="error_email_registered" contect="when creating the account">Această adresă de e-mail a înregistrat deja un cont cu MEGA</string>
 
     <!--
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Confirmation required</string>
@@ -280,9 +280,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Mărime</string>
-    <string name="file_properties_info_modified" context="when was the file modified">Modificat</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Last Modified</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Adăugat</string>
-    <string name="file_properties_info_created" context="when the file was created">Creat</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -290,7 +289,7 @@
 
     <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permisiuni</string>
     <string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Permisiuni de partajare</string>
-    <string name="file_properties_shared_folder_change_permissions" context="menu item">Schimbă permisiunile</string>
+    <string name="file_properties_shared_folder_change_permissions" context="menu item">Modifică permisiunile</string>
     <string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">Partajat cu</string>
     <string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Trimite către</string>
     <string name="file_properties_owner" context="shows the owner of an incoming shared folder">Proprietar</string>
@@ -333,7 +332,7 @@
     -->
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">Apasă pentru anulare</string>
     <string name="download_touch_to_show" context="Hint how to cancel the download">Vezi transferurile</string>
-    <string name="error_file_size_greater_than_4gb" context="Warning message">Majoritatea dispozitivelor nu pot descărca fișiere mai mare de 4GB. Descărcarea ta probabil va eșua</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">Majoritatea dispozitivelor nu pot descărca fișiere mai mari de 4GB. Descărcarea ta probabil va eșua</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">Nu există nicio aplicație disponibilă pentru a executa acest fișier pe dispozitiv</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Partajează imaginea folosind</string>
@@ -488,7 +487,7 @@
     <string name="rubbish_bin_emptied" context="success message when emptying the RB">Coșul de gunoi golit cu succes</string>
     <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Eroare. Coșul de gunoi nu a fost golit</string>
 
-    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Ești pe cale de a anula abonamentul MEGA. Te rugăm să ne spui dacă există ceva ce putem face pentru a te răzgândi.</string>
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Ești pe cale să anulezi abonamentul MEGA. Te rugăm să ne spui dacă există ceva ce putem face pentru a te răzgândi.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Tastează feedbackul aici</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Trimite</string>
     <!--
@@ -498,9 +497,9 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Abonamentul tău nu a fost anulat. Te rugăm să furnizezi un motiv pentru anulare</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">Folderul este acum privat</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Partajare eliminată</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Folder nou</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Adaugă un contact</string>
@@ -539,7 +538,7 @@
     <string name="upload_prepare" context="Status text at the beginning of an upload">Se procesează fișierul</string>
     <plurals name="upload_prepare" context="Status text at the beginning of an upload">
         <item context="Status text at the beginning of an upload for 1 file" quantity="one">Se procesează fișierul</item>
-        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Se procesează fișierele</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">Resursă temporar indisponibilă, te rugăm să reîncerci mai târziu</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Nu se poate deschide fișierul selectat</string>
@@ -565,7 +564,7 @@
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
     -->
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Spațiu folosit</string>
-    <string name="my_account_change_password" context="menu item">Schimbă parola</string>
+    <string name="my_account_change_password" context="menu item">Modifică parola</string>
     <!--
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     -->
@@ -578,7 +577,7 @@
     <string name="my_account_last_session" context="when did the last session happen">Ultima sesiune</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Conexiuni</string>
 
-    <string name="my_account_changing_password" context="message displayed while the app is changing the password">Se schimbă parola</string>
+    <string name="my_account_changing_password" context="message displayed while the app is changing the password">Se modifică parola</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Parola actuală</string>
     <string name="my_account_change_password_newPassword1" context="when changing the password">Parolă nouă</string>
     <string name="my_account_change_password_newPassword2" context="when changing the password">Confirmă parola nouă</string>
@@ -632,7 +631,7 @@
     <string name="menu_take_picture" context="menu item">Realizează fotografie</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Doar Wi-Fi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi sau plan de date</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi sau plan de date</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">Ok</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Omite</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Oprește</string>
@@ -642,6 +641,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Încărcarea fișierelor din folderele media</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Se verifică fișierele care să fie încărcate</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Se inițializează încărcări cameră</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -649,6 +650,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Spațiu de stocare</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Blocare prin PIN</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Comprimarea video consumă multă energie, MEGA îți va solicita să încarci în mod activ dispozitivul dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avansat</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Șterge cache-ul</string>
@@ -685,7 +687,7 @@
     <string name="settings_empty_folder" context="settings option">Alege folderul</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi sau plan de date</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi sau plan de date</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Doar Wi-Fi</item>
     </string-array>
 
@@ -698,6 +700,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Doar când se încarcă</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Solicită-mi să încarc în mod activ dispozitivul</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Păstrează numele fișierelor precum în dispozitiv</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Folder local cameră</string>
@@ -727,7 +730,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Fișierele tale locale vor fi șterse și vei fi deconectat după 10 încercări eșuate</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Cod incorect</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Cod PIN greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Cod PIN greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Codurile PIN nu se potrivesc</string>
@@ -738,7 +741,7 @@
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">Toate datele tale locale vor fi șterse și vei fi deconectat în %1d secunde</string>
 
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Despre</string>
-    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Politică de confidențialitate</string>
+    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Politica de confidențialitate</string>
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Termenii de utilizare a serviciului</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versiunea aplicației</string>
@@ -746,18 +749,18 @@
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Versiunea SDK MEGAchat</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">Vezi codul sursă</string>
 
-    <string name="january">ianuarie</string>
-    <string name="february">februarie</string>
-    <string name="march">martie</string>
-    <string name="april">aprilie</string>
-    <string name="may">mai</string>
-    <string name="june">iunie</string>
-    <string name="july">iulie</string>
-    <string name="august">august</string>
-    <string name="september">septembrie</string>
-    <string name="october">octombrie</string>
-    <string name="november">noiembrie</string>
-    <string name="december">decembrie</string>
+    <string name="january">Ianuarie</string>
+    <string name="february">Februarie</string>
+    <string name="march">Martie</string>
+    <string name="april">Aprilie</string>
+    <string name="may">Mai</string>
+    <string name="june">Iunie</string>
+    <string name="july">Iulie</string>
+    <string name="august">August</string>
+    <string name="september">Septembrie</string>
+    <string name="october">Octombrie</string>
+    <string name="november">Noiembrie</string>
+    <string name="december">Decembrie</string>
 
     <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">Răsfoitor ZIP</string>
 
@@ -928,8 +931,8 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Eroare. Această adresă de e-mail este folosită deja.</string>
 
-    <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Acesta este ultimul pas pentru a-ți schimba e-mailul. Te rugăm să introduci parola mai jos.</string>
-    <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Schimbă e-mailul</string>
+    <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Acesta este ultimul pas pentru a-ți modifica e-mailul. Te rugăm să introduci parola mai jos.</string>
+    <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Modifică e-mailul</string>
 
     <!--
     <string name="success_changing_user_mail" context="Message when the user email has been changed successfully">Your email has been correctly updated.</string>
@@ -972,8 +975,8 @@
     <string name="number_correctly_delete_contact_request" context="success message when reinviting multiple contacts">%d cereri șterse cu succes.</string>
     <string name="number_no_delete_contact_request" context="error message when reinviting multiple contacts">%1$d cereri șterse cu succes, însă %2$d cereri nu au fost șterse.</string>
 
-    <string name="confirmation_delete_contact_request" context="confirmation message before removing a contact request.">Dorești să elimini cererea de invitație trimisă către %s?</string>
-    <string name="confirmation_remove_multiple_contact_request" context="confirmation message before removing mutiple contact request">Dorești să elimini aceste %d cereri de invitație?</string>
+    <string name="confirmation_delete_contact_request" context="confirmation message before removing a contact request.">Vrei să elimini cererea de invitație trimisă către %s?</string>
+    <string name="confirmation_remove_multiple_contact_request" context="confirmation message before removing mutiple contact request">Vrei să elimini aceste %d cereri de invitație?</string>
 
     <string name="number_correctly_invitation_reply_sent" context="success message when replying to multiple received request">%d răspunsuri ale cererilor trimise.</string>
     <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d răspunsuri ale cererilor trimise cu succes, însă %2$d nu au fost trimise.</string>
@@ -998,6 +1001,8 @@
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Linkul fișierului indisponibil</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Linkul fișierului a fost eliminat din cauza unei încălcări a ToS/AUP.</string>
+
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">Acest URL este corupt sau deformat. Linkul pe care încerci să îl accesezi nu există.</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Se așteaptă confirmarea e-mailului</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Te rugăm să verifici e-mailul și să dai clic pe link pentru a confirma contul.</string>
@@ -1074,7 +1079,10 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacte vor fi eliminate din folderul partajat.</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacte eliminate cu succes din folderul partajat</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;și %d contacte nu au fost eliminate cu succes</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacte nu au fost eliminate cu succes</string>
+
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Permisiuni actualizate cu succes pentru %d contacte</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Eșec la actualizarea permisiunilor pentru %d contacte</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Se încarcă contactele de pe telefon..</string>
 
@@ -1338,6 +1346,7 @@
         <item context="Plural" quantity="other">%1$d din %2$d fișiere</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Procesul se finalizează&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Vezi</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pune pe pauză toate transferurile</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Reia toate transferurile</string>
@@ -1788,7 +1797,8 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Încărcare pe chat</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calitatea media a chatului</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Calitate video</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Încărcări cameră are nevoie să îți acceseze fotografiile și alt conținut media de pe dispozitiv. Te rugăm să mergi la pagina de setări și să acorzi permisiunea.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Calitate originală</item>
         <item context="the options of medium quality multimedia file to  upload.">Calitate medie</item>
@@ -1945,9 +1955,9 @@
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Cod nevalid</string>
     <string name="lost_your_authenticator_device" context="When a user tries to login with Two-Factor Authentication and lost his device, button that permits get information about how login">Ți-ai pierdut dispozitivul pentru autentificare?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Verificare la autentificare</string>
-    <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">Autentificare în doi factori\nSchimbă parola</string>
+    <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">Autentificare în doi factori\nModifică parola</string>
     <string name="cancel_account_verification" context="Title of screen Cancel account verification with Two-Factor Authentication">Autentificare în doi factori\nAnulează contul</string>
-    <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">Autentificare în doi factori\nSchimbă e-mailul</string>
+    <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">Autentificare în doi factori\nModifică e-mailul</string>
     <string name="disable_2fa_verification" context="Title of screen Disable Two-Factor Authentication">Dezactivează autentificarea în doi factori</string>
     <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Ți-ai pierdut dispozitivul pentru autentificare?</string>
     <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">A apărut o eroare la încercarea de a dezactiva autentificarea în doi factori. Te rugăm să încerci din nou.</string>
@@ -1978,7 +1988,7 @@
     </plurals>
 
     <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Previzualizări îmbogățite ale URL-urilor</string>
-    <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">Dezactivezi definitiv previzualizările îmbogățite ale URL-urilor. Poți reactiva previzualizările îmbogățite ale URL-urilor din setări. Dorești să continui?</string>
+    <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">Dezactivezi definitiv previzualizările îmbogățite ale URL-urilor. Poți reactiva previzualizările îmbogățite ale URL-urilor din setări. Vrei să continui?</string>
 
     <string name="call_missed_messages" context="Message shown when a call ends.">[A]Apel ratat[/A]</string>
     <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Apelul a fost respins[/A]</string>
@@ -2041,7 +2051,7 @@
     <string name="contacts_list_empty_text_loading_share" context="Message shown while the contact list from the device and from MEGA is being read and then shown to the user">Se încarcă contactele&#8230;</string>
     <string name="title_new_group" context="Title of the screen New Group">Grup nou</string>
     <string name="subtitle_new_group" context="Subtitle of the screen New Group">Tastează numele grupului</string>
-    <string name="hint_type_group" context="Hint of edittext shown when it is creating a new group to guide user to type the name of the group">Numește grupul</string>
+    <string name="hint_type_group" context="Hint of edittext shown when it is creating a new group to guide user to type the name of the group">Denumește grupul</string>
     <string name="confirmation_delete_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">Elimini pe %s din acest chat?</string>
 
     <string name="settings_file_management_file_versions_title" context="Settings preference title to show file versions info of the account">Versiunile fișierelor</string>
@@ -2131,9 +2141,13 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Perioada minimă este de 7 zile.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Perioada minimă este de 7 zile și perioada maximă este de 30 de zile.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">Mărimea minimă este %1$s și mărimea maximă este %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Elimină fișierele mai vechi de</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d zile</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notifică-mă când mărimea este mai mare de</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Dacă videoclipurile spre comprimare sunt mai mari de</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Pentru a dezactiva planificatorul de golire a coșului de gunoi sau pentru a seta o perioadă de păstrare mai lungă, trebuie să te abonezi la un plan PRO.</string>
 
@@ -2256,6 +2270,15 @@
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Afișează văzut(ă) ultima dată&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Permite contactelor tale să vadă ultima dată când ai activ pe MEGA.</string>
 
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Spațiu de stocare insuficient</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Spațiu de stocare insuficient pentru a efecta comprimarea video.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Mărimea comprimării video este prea mare</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">Mărimea totală a videoclipurilor care urmează să fie comprimate depășește %s, te rugăm să pui dispozitivul la încărcare pentru a continua.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Această setare se va aplica data viitoare când rulează Încărcări cameră</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s a fost comprimat</string>
+	<string name="title_compress_video" context="notification title when compressing video">Se comprimă videoclipurile %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Folder nevalid selectat</string>
+
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d fișier</item>
         <item context="Plural of file. 2 files" quantity="other">%d fișiere</item>
@@ -2308,7 +2331,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Activează camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permite accesul la cameră pentru a scana documente, a realiza fotografii și a efectua apeluri video.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Activează apelurile</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permite accesul la microfon pentru a efectua apeluri criptate.</string>
     <string name="general_enable_access" context="General enable access">Activează accesul</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Fișiere partajate</string>
@@ -2447,8 +2469,6 @@
     <string name="hint_action_search" context="Hint of the Search view">Caută&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Răspunde</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignoră</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Pornește apelul audio&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Pornește apelul video&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s a amuțit acest apel</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Amuțit</string>
 
@@ -2459,13 +2479,13 @@
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Introdu linkul chatului</string>
 
-    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
-    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
-    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
-    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Lipește linkul</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Link nevalid al folderului sau fișierului</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Te rugăm să introduci un link valid al unui fișier sau folder</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Te rugăm să introduci un link valid al unui chat</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">Ai lipit un link de chat.</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">Ai lipit un link de contact.</string>
+    <string name="action_open_contact_link" context="Menu item">Deschide linkul de contact</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">Oamenii se pot alătura grupului folosind acest link.</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Link nou de chat</string>
@@ -2485,7 +2505,7 @@
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Atinge și ține pentru a înregistra, eliberează pentru a trimite</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Glisează pentru a anula</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">Acest clip vocal nu este disponibil</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Acest mesaj vocal nu este disponibil</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d fișier descărcat deja.&#160;</item>
@@ -2498,5 +2518,10 @@
 	</plurals>
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Nu este posibilă înregistrarea mesajelor vocale în timp ce există un apel în desfășurare.</string>
-    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">A apărut o eroare la încercarea de încărcare a mesajului vocal.</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Apel de intrare</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Se încarcă</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Te rugăm să astepți&#8230;</string>
 </resources>

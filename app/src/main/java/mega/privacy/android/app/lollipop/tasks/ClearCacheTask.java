@@ -7,6 +7,8 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+
 /*
  * Background task to clear cache
  */
@@ -21,8 +23,8 @@ public class ClearCacheTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
         log("doInBackground-Async Task ClearCacheTask");
 
-        Util.clearCache(context);
-        String size = Util.getCacheSize(context);
+        clearCache(context);
+        String size = getCacheSize(context);
         return size;
     }
 

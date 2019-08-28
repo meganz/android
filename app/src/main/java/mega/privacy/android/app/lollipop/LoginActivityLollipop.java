@@ -35,7 +35,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.BaseActivity;
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
@@ -58,6 +57,8 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 
 
@@ -473,27 +474,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
     }
 
-    public void stopCameraSyncService() {
-        log("stopCameraSyncService");
-        dbH.clearPreferences();
-        dbH.setFirstTime(false);
-//					dbH.setPinLockEnabled(false);
-//					dbH.setPinLockCode("");
-//					dbH.setCamSyncEnabled(false);
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            Intent stopIntent = null;
-            stopIntent = new Intent(this, CameraSyncService.class);
-            stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-            startService(stopIntent);
-        }
-    }
-
-    public void startCameraSyncService(boolean firstTimeCam, int time) {
-        log("startCameraSyncService");
-        Intent intent = null;
+    public void startCameraUploadService(boolean firstTimeCam, int time) {
+        log("startCameraUploadService");
         if (firstTimeCam) {
-            intent = new Intent(this, ManagerActivityLollipop.class);
+            Intent intent = new Intent(this, ManagerActivityLollipop.class);
             intent.putExtra("firstLogin", true);
             startActivity(intent);
             finish();
@@ -504,9 +488,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 @Override
                 public void run() {
                     log("Now I start the service");
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                        startService(new Intent(getApplicationContext(), CameraSyncService.class));
-                    }
+                    scheduleCameraUploadJob(LoginActivityLollipop.this);
                 }
             }, time);
         }
@@ -605,45 +587,23 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                     log("ACTION_CANCEL_CAM_SYNC");
                     String title = getString(R.string.cam_sync_syncing);
                     String text = getString(R.string.cam_sync_cancel_sync);
-
-                    Intent tempIntent = null;
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                        tempIntent = new Intent(this, CameraSyncService.class);
-                        tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-                    }
-
-                    final Intent cancelIntent = tempIntent;
-                    AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
-                            title, text, null);
+                    AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, title, text, null);
                     builder.setPositiveButton(getString(R.string.cam_sync_stop),
                             new DialogInterface.OnClickListener() {
+
+                                @Override
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                        startService(cancelIntent);
-                                    }
-                                    else {
-                                        if (megaApi != null) {
-                                            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, loginActivity);
-                                        }
-
-                                        if (dbH == null){
-                                            dbH = DatabaseHandler.getDbHandler(loginActivity);
-                                        }
-
-                                        dbH.setCamSyncEnabled(false);
-                                    }
-
-                                    Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
-                                    intent.setAction(SettingsFragmentLollipop.ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
-                                    intent.putExtra(SettingsFragmentLollipop.CAMERA_UPLOADS_STATUS, false);
-                                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                                    stopRunningCameraUploadService(LoginActivityLollipop.this);
+                                    dbH.setCamSyncEnabled(false);
                                 }
                             });
                     builder.setNegativeButton(getString(R.string.general_cancel), null);
                     final AlertDialog dialog = builder.create();
                     try {
                         dialog.show();
-                    } catch (Exception ex) { }
+                    } catch (Exception ex) {
+                        log(ex.toString());
+                    }
                 }
                 else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
                     showConfirmationCancelAllTransfers();

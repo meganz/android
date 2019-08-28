@@ -74,8 +74,8 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
 	
@@ -225,7 +225,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		infoEmail.setText(megaApi.getMyEmail());
 		infoEmail.setOnClickListener(this);
-        
+
         String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
 		addPhoneNumber = (TextView)v.findViewById(R.id.add_phone_number);
 		if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
@@ -234,7 +234,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
             addPhoneNumber.setText(R.string.add_phone_number_label);
             addPhoneNumber.setOnClickListener(this);
         }
-		
+
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
 
 		mkButton = (Button) v.findViewById(R.id.MK_button);
@@ -372,11 +372,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setMkButtonText(){
 		log("setMkButtonText");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-		log("Exists MK in: "+path);
-		File file= new File(path);
+		File file= buildExternalStorageFile(RK_FILE);
 		String mkButtonText;
-		if(file.exists()){
+		if(isFileAvailable(file)){
 			mkButtonText = getString(R.string.action_remove_master_key);
 		}
 		else{
@@ -587,10 +585,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.MK_button:{
 				log("Master Key button");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-				log("Exists MK in: "+path);
-				File file= new File(path);
-				if(file.exists()){
+				log("Exists MK in: "+getExternalStoragePath(RK_FILE));
+				File file= buildExternalStorageFile(RK_FILE);
+				if(isFileAvailable(file)){
 					((ManagerActivityLollipop)context).showConfirmationRemoveMK();
 				}
 				else{
@@ -696,7 +693,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
                 startActivity(intent);
                 break;
             }
-            
+
 		}
 	}
 
@@ -983,7 +980,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void onAbortCancel() {
 		log("onAbortCancel");
 	}
-	
+
 	public void updateAddPhoneNumberLabel(){
         log("updateAddPhoneNumberLabel");
         addPhoneNumber.setVisibility(View.GONE);
@@ -991,11 +988,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                
+
                 //work around - it takes time for megaApi.smsVerifiedPhoneNumber() to return value
                 String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
                 log("updateAddPhoneNumberLabel " + registeredPhoneNumber);
-                
+
                 if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
                     addPhoneNumber.setText(registeredPhoneNumber);
                     addPhoneNumber.setOnClickListener(null);
@@ -1003,6 +1000,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
                 }
             }
         }, 3000);
-        
+
     }
 }

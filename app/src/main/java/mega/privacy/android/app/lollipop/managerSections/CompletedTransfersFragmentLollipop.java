@@ -157,8 +157,8 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 
 	public void setCompletedTransfers(){
 		log("setCompletedTransfers");
-
-		tL = dbH.getCompletedTransfers();
+		tL.clear();
+		tL.addAll(dbH.getCompletedTransfers());
 
 		if(tL!=null){
 			if (tL.size() == 0){
