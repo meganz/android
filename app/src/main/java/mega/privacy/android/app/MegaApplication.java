@@ -167,6 +167,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private Vibrator vibrator = null;
 	private Timer ringerTimer = null;
 
+	private static MegaApplication singleApplicationInstance;
+
 	@Override
 	public void networkAvailable() {
 		log("Net available: Broadcast to ManagerActivity");
@@ -424,10 +426,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 	};
 
+	public static MegaApplication getInstance() {
+		return singleApplicationInstance;
+	}
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
+		singleApplicationInstance = this;
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
