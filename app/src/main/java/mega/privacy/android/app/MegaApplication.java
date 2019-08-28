@@ -163,7 +163,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	/*A/V Calls*/
 	private AudioManager audioManager;
 	private MediaPlayer thePlayer;
-	private Ringtone ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+	private Ringtone ringtone = null;
 	private Vibrator vibrator = null;
 	private Timer ringerTimer = null;
 
