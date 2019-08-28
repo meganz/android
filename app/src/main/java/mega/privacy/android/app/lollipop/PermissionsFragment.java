@@ -188,11 +188,15 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             }
         }
 
+        if (isAllowingAccessShown) {
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+        }
+
         if (numItems == 1){
             itemsLayout.setVisibility(View.GONE);
         }
         else {
-            itemsText.setText(getString(R.string.wizard_steps_indicator, 1, numItems));
+            itemsText.setText(getString(R.string.wizard_steps_indicator, currentPermission + 1, numItems));
         }
     }
 

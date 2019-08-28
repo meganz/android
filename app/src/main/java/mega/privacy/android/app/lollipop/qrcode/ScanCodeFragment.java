@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 //import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
@@ -450,24 +451,13 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             File avatar = null;
             if(context!=null){
                 log("context is not null");
-
-                if (context.getExternalCacheDir() != null){
-                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-                }
-                else{
-                    avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-                }
+                avatar = buildAvatarFile(context,myEmail + ".jpg");
             }
             else{
                 log("context is null!!!");
                 if(getActivity()!=null){
                     log("getActivity is not null");
-                    if (getActivity().getExternalCacheDir() != null){
-                        avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-                    }
-                    else{
-                        avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-                    }
+                    avatar = buildAvatarFile(getActivity(),myEmail + ".jpg");
                 }
                 else{
                     log("getActivity is ALSOOO null");

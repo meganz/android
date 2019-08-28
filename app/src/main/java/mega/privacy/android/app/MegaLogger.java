@@ -1,7 +1,5 @@
-
 package mega.privacy.android.app;
 
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -10,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import mega.privacy.android.app.utils.Util;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 /**
  * Used to display console log from app, SDK and chatSDK,
@@ -23,7 +21,7 @@ public abstract class MegaLogger {
     
     public MegaLogger(String fileName,boolean fileLogger) {
         logFile = null;
-        dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
+        dir = getExternalStoragePath(LOG_DIR);
         this.fileName = fileName;
         logToFile();
     }

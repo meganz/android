@@ -1,59 +1,25 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.RelativeLayout;
 
-public class OnDragTouchListener implements View.OnTouchListener{
-    /**
-     * Callback used to indicate when the drag is finished
-     */
-    public interface OnDragActionListener {
-        /**
-         * Called when drag event is started
-         *
-         * @param view The view dragged
-         */
-        void onDragStart(View view);
-
-        /**
-         * Called when drag event is completed
-         *
-         * @param view The view dragged
-         */
-        void onDragEnd(View view);
-    }
-
+public class OnDragTouchListener implements View.OnTouchListener {
     private View mView;
     private View mParent;
     private boolean isDragging;
     private boolean isInitialized = false;
-
     private int width;
-    private float xWhenAttached;
     private float maxLeft;
     private float maxRight;
     private float dX;
-
     private int height;
-    private float yWhenAttached;
     private float maxTop;
     private float maxBottom;
     private float dY;
-
     private OnDragActionListener mOnDragActionListener;
-
-    public OnDragTouchListener(View view) {
-        this(view, (View) view.getParent(), null);
-    }
 
     public OnDragTouchListener(View view, View parent) {
         this(view, parent, null);
-    }
-
-    public OnDragTouchListener(View view, OnDragActionListener onDragActionListener) {
-        this(view, (View) view.getParent(), onDragActionListener);
     }
 
     public OnDragTouchListener(View view, View parent, OnDragActionListener onDragActionListener) {
@@ -80,11 +46,8 @@ public class OnDragTouchListener implements View.OnTouchListener{
 
     public void updateViewBounds() {
         width = mView.getWidth();
-        xWhenAttached = mView.getX();
         dX = 0;
-
         height = mView.getHeight();
-        yWhenAttached = mView.getY();
         dY = 0;
     }
 
@@ -160,5 +123,24 @@ public class OnDragTouchListener implements View.OnTouchListener{
         dX = 0;
         dY = 0;
         isDragging = false;
+    }
+
+    /**
+     * Callback used to indicate when the drag is finished
+     */
+    public interface OnDragActionListener {
+        /**
+         * Called when drag event is started
+         *
+         * @param view The view dragged
+         */
+        void onDragStart(View view);
+
+        /**
+         * Called when drag event is completed
+         *
+         * @param view The view dragged
+         */
+        void onDragEnd(View view);
     }
 }

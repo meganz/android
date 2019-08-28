@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -39,6 +38,9 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 /**
  * Created by mega on 4/07/18.
@@ -244,15 +246,9 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
                 UserAvatarListenerShare listener = new UserAvatarListenerShare(mContext, holder);
 
-                File avatar = null;
-                if (mContext.getExternalCacheDir() != null){
-                    avatar = new File(mContext.getExternalCacheDir().getAbsolutePath(), mail + ".jpg");
-                }
-                else{
-                    avatar = new File(mContext.getCacheDir().getAbsolutePath(), mail + ".jpg");
-                }
+                File avatar = buildAvatarFile(mContext,mail + ".jpg");
                 Bitmap bitmap = null;
-                if (avatar.exists()){
+                if (isFileAvailable(avatar)){
                     if (avatar.length() > 0){
                         BitmapFactory.Options bOpts = new BitmapFactory.Options();
                         bOpts.inPurgeable = true;
@@ -260,33 +256,18 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                         bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                         if (bitmap == null) {
                             avatar.delete();
-                            if (mContext.getExternalCacheDir() != null){
-                                megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getExternalCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
-                            }
-                            else{
-                                megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
-                            }
+                            megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(),buildAvatarFile(mContext,mail + ".jpg").getAbsolutePath(),listener);
                         }
                         else{
                             holder.avatar.setImageBitmap(bitmap);
                         }
                     }
                     else{
-                        if (mContext.getExternalCacheDir() != null){
-                            megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getExternalCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
-                        }
-                        else{
-                            megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
-                        }
+                        megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(),buildAvatarFile(mContext,mail + ".jpg").getAbsolutePath(),listener);
                     }
                 }
                 else{
-                    if (mContext.getExternalCacheDir() != null){
-                        megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getExternalCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
-                    }
-                    else{
-                        megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
-                    }
+                    megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(),buildAvatarFile(mContext,mail + ".jpg").getAbsolutePath(),listener);
                 }
             }
         }
@@ -312,7 +293,6 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     public Bitmap setUserAvatar(ShareContactInfo contact){
         log("setUserAvatar");
 
-        File avatar = null;
         String mail = null;
 
         mail = ((AddContactActivityLollipop) mContext).getShareContactMail(contact);
@@ -321,14 +301,9 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             return createDefaultAvatar(mail, contact);
         }
 
-        if (mContext.getExternalCacheDir() != null){
-            avatar = new File(mContext.getExternalCacheDir().getAbsolutePath(), mail + ".jpg");
-        }
-        else{
-            avatar = new File(mContext.getCacheDir().getAbsolutePath(), mail + ".jpg");
-        }
+        File avatar = buildAvatarFile(mContext,mail + ".jpg");
         Bitmap bitmap = null;
-        if (avatar.exists()){
+        if (isFileAvailable(avatar)){
             if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;

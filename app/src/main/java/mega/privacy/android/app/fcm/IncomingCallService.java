@@ -8,14 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-
-import java.util.Timer;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -37,27 +34,30 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class IncomingCallService extends Service implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
+    public static final String NOTIFICATION_CHANNEL_ID = "10099";
+    public static final int notificationId = 1086;
+    private static final int STOP_SELF_AFTER = 60 * 1000;
     MegaApplication app;
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
-
     MegaChatApiAndroid megaChatApi;
     ChatSettings chatSettings;
-
     boolean isLoggingIn = false;
     boolean showMessageNotificationAfterPush = false;
     boolean beep = false;
     WifiManager.WifiLock lock;
     PowerManager.WakeLock wl;
 
-    private static final int STOP_SELF_AFTER = 60 * 1000;
+    protected static void log(String message) {
+        Util.log("IncomingCallService", message);
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         log("onCreateFCM");
 
-        app = (MegaApplication)getApplication();
+        app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
 
@@ -77,7 +77,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     public void onDestroy() {
         log("onDestroy incoming call foreground service");
         super.onDestroy();
-        if(wl != null){
+        if (wl != null) {
             log("wifi lock release");
             wl.release();
         }
@@ -91,23 +91,19 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     protected void stop() {
         stopForeground(true);
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        if(manager != null) {
+        if (manager != null) {
             manager.cancel(notificationId);
         }
         stopSelf();
     }
 
-    public static final String NOTIFICATION_CHANNEL_ID = "10099";
-    public static final int notificationId = 1086;
-
     public void createNotification() {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.ic_call_started)
-                .setAutoCancel(false);
-        NotificationManager mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+        mBuilder.setSmallIcon(R.drawable.ic_call_started).setAutoCancel(true);
+        NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,"NOTIFICATION_CHANNEL_NAME",importance);
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "NOTIFICATION_CHANNEL_NAME", importance);
             mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
             if (mNotificationManager != null) {
                 mNotificationManager.createNotificationChannel(notificationChannel);
@@ -115,22 +111,22 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
         }
         if (mNotificationManager != null) {
             Notification notification = mBuilder.build();
-            startForeground(notificationId,notification);
+            startForeground(notificationId, notification);
         }
     }
 
     @Override
-    public int onStartCommand(Intent intent,int flags,int startId) {
-        ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         log("network available: " + (cm.getActiveNetworkInfo() != null));
         if (cm.getActiveNetworkInfo() != null) {
             log(cm.getActiveNetworkInfo().getState() + "");
             log(cm.getActiveNetworkInfo().getDetailedState() + "");
         }
-        WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        lock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF,"MegaIncomingCallWifiLock");
-        PowerManager pm = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,":MegaIncomingCallPowerLock");
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        lock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "MegaIncomingCallWifiLock");
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaIncomingCallPowerLock");
         if (!wl.isHeld()) {
             wl.acquire();
         }
@@ -179,7 +175,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
             if (Util.isChatEnabled()) {
                 if (megaChatApi == null) {
-                    megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+                    megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                 }
 
                 int ret = megaChatApi.getInitState();
@@ -190,7 +186,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE) {
                         log("condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaChatApi.enableGroupChatCalls(true);
 
                     } else if (ret == MegaChatApi.INIT_ERROR) {
                         log("condition ret == MegaChatApi.INIT_ERROR");
@@ -206,27 +201,26 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                         megaChatApi.logout(this);
                     } else {
                         log("Chat correctly initialized");
-                        megaChatApi.enableGroupChatCalls(true);
                     }
                 }
             }
 
-            megaApi.fastLogin(gSession,this);
+            megaApi.fastLogin(gSession, this);
         }
     }
 
     @Override
-    public void onRequestStart(MegaApiJava api,MegaRequest request) {
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
         log("onRequestStart: " + request.getRequestString());
     }
 
     @Override
-    public void onRequestUpdate(MegaApiJava api,MegaRequest request) {
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
         log("onRequestUpdate: " + request.getRequestString());
     }
 
     @Override
-    public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         log("onRequestFinish: " + request.getRequestString());
 
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
@@ -259,22 +253,22 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     }
 
     @Override
-    public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
         log("onRequestTemporary: " + request.getRequestString());
     }
 
     @Override
-    public void onRequestStart(MegaChatApiJava api,MegaChatRequest request) {
+    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
     }
 
     @Override
-    public void onRequestUpdate(MegaChatApiJava api,MegaChatRequest request) {
+    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
 
     }
 
     @Override
-    public void onRequestFinish(MegaChatApiJava api,MegaChatRequest request,MegaChatError e) {
+    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         log("onRequestFinish: " + request.getRequestString() + " result: " + e.getErrorString());
 
         if (request.getType() == MegaChatRequest.TYPE_CONNECT) {
@@ -285,7 +279,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                 log("Connected to chat!");
                 if (showMessageNotificationAfterPush) {
                     showMessageNotificationAfterPush = false;
-                    log("Call to pushReceived");
                     megaChatApi.pushReceived(beep);
                     beep = false;
                 } else {
@@ -300,11 +293,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     }
 
     @Override
-    public void onRequestTemporaryError(MegaChatApiJava api,MegaChatRequest request,MegaChatError e) {
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
-    }
-
-    protected static void log(String message) {
-        Util.log("IncomingCallService",message);
     }
 }

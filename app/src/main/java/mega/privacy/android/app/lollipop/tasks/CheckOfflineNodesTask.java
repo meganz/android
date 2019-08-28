@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +10,9 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 /*
 	 * Background task to verify the offline nodes
@@ -30,50 +32,18 @@ public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
 
         ArrayList<MegaOffline> offlineNodes = dbH.getOfflineFiles();
 
-        File file=new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
+        File file = getOfflineFolder(context, OFFLINE_DIR);
 
-        if(file.exists()){
+        if(isFileAvailable(file)){
 
             for(int i=0; i<offlineNodes.size();i++){
                 MegaOffline mOff = offlineNodes.get(i);
-                if(mOff.getOrigin()==MegaOffline.INCOMING){
-                    File fileToCheck=new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ "/" + mOff.getHandleIncoming() + mOff.getPath()+ mOff.getName());
-                    log("Check the INCOMING file: "+fileToCheck.getAbsolutePath());
-                    if(!fileToCheck.exists()){
-                        log("The INCOMING file NOT exists!");
-                        //Remove from the DB
-                        int removed = dbH.deleteOfflineFile(mOff);
-                        log("INCOMING File removed: "+removed);
-                    }
-                    else{
-                        log("The INCOMING file exists!");
-                    }
-                }
-                else if(mOff.getOrigin()==MegaOffline.INBOX){
-                    File fileToCheck=new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ "/in" + mOff.getPath()+ mOff.getName());
-                    log("Check the INCOMING file: "+fileToCheck.getAbsolutePath());
-                    if(!fileToCheck.exists()){
-                        log("The INCOMING file NOT exists!");
-                        //Remove from the DB
-                        int removed = dbH.deleteOfflineFile(mOff);
-                        log("INCOMING File removed: "+removed);
-                    }
-                    else{
-                        log("The INCOMING file exists!");
-                    }
-                }
-                else{
-                    File fileToCheck=new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ mOff.getPath()+ mOff.getName());
-                    log("Check the file: "+fileToCheck.getAbsolutePath());
-                    if(!fileToCheck.exists()){
-                        log("The file NOT exists!");
-                        //Remove from the DB
-                        int removed = dbH.deleteOfflineFile(mOff);
-                        log("File removed: "+removed);
-                    }
-                    else{
-                        log("The file exists!");
-                    }
+                File fileToCheck = getOfflineFile(context, mOff);
+                if (!isFileAvailable(fileToCheck)) {
+                    int removed = dbH.deleteOfflineFile(mOff);
+                    log("File removed: "+removed);
+                } else {
+                    log("The file exists!");
                 }
             }
             //Check no empty folders
@@ -86,32 +56,12 @@ public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
                     if(children.size()<1){
                         log("Delete the empty folder: "+mOff.getName());
                         dbH.deleteOfflineFile(mOff);
-                        if(mOff.getOrigin()==MegaOffline.INCOMING){
-                            File folderToDelete = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ "/" + mOff.getHandleIncoming() + mOff.getPath()+ mOff.getName());
-                            try {
-                                Util.deleteFolderAndSubfolders(context, folderToDelete);
-                            } catch (IOException e) {
-                                log("IOException incoming mOff");
-                                e.printStackTrace();
-                            }
-                        }
-                        if(mOff.getOrigin()==MegaOffline.INBOX){
-                            File folderToDelete = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ "/in" + mOff.getPath()+ mOff.getName());
-                            try {
-                                Util.deleteFolderAndSubfolders(context, folderToDelete);
-                            } catch (IOException e) {
-                                log("IOException incoming mOff");
-                                e.printStackTrace();
-                            }
-                        }
-                        else{
-                            File folderToDelete = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ mOff.getPath()+ mOff.getName());
-                            try {
-                                Util.deleteFolderAndSubfolders(context, folderToDelete);
-                            } catch (IOException e) {
-                                log("IOException NOT incoming mOff");
-                                e.printStackTrace();
-                            }
+                        File folderToDelete = getOfflineFile(context, mOff);
+                        try {
+                            deleteFolderAndSubfolders(context, folderToDelete);
+                        } catch (IOException e) {
+                            log("IOException mOff");
+                            e.printStackTrace();
                         }
                     }
                 }

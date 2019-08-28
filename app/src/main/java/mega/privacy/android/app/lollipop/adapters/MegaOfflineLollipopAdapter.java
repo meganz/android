@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
@@ -47,8 +46,11 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
-public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener {
+
+public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener, RotatableAdapter {
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -115,7 +117,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		public View folderLayout;
 		public View fileLayout;
 		public ImageView imageViewIcon;
-		public RelativeLayout thumbLayoutForFile;
+		public RelativeLayout thumbLayoutForFile, bottomContainer;
 		public ImageButton imageButtonThreeDotsForFile;
 		public TextView textViewFileNameForFile;
 		public ImageView fileGridSelected;
@@ -298,14 +300,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 	}
 
-	boolean isRKSavedForOffline (MegaOffline currentNode) {
-		if(currentNode.getHandle().equals("0")){
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-			File file= new File(path);
-			if(file.exists()){
-				return true;
-			}
+	private boolean isRKSavedForOffline (MegaOffline currentNode) {
+		if(currentNode.getHandle().equals("0") && isFileAvailable(buildExternalStorageFile(RK_FILE))){
+			return true;
 		}
+
     	return false;
 	}
 
@@ -373,13 +372,28 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		return selectedItems.size();
 	}
 
+	@Override
+	public int getFolderCount() {
+		return folderCount;
+	}
+
+	@Override
+	public int getPlaceholderCount() {
+		return placeholderCount;
+	}
+
+	@Override
 	public List<Integer> getSelectedItems() {
-		log("getSelectedItems");
-		List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-		for (int i = 0; i < selectedItems.size(); i++) {
-			items.add(selectedItems.keyAt(i));
+		if (selectedItems != null) {
+			log("getSelectedItems");
+			List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+			for (int i = 0; i < selectedItems.size(); i++) {
+				items.add(selectedItems.keyAt(i));
+			}
+			return items;
+		} else {
+			return null;
 		}
-		return items;
 	}	
 	
 	/*
@@ -423,32 +437,15 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	public void setNodes(ArrayList<MegaOffline> mOffList){
 		log("setNodes");
 		String pathNav = fragment.getPathNavigation();
-		if(pathNav!=null){		
-			if (pathNav.equals("/")){
-				if (mOffList != null){
-					if(!mOffList.isEmpty()) {
-						log("List not empty");
-						MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-						if(!(lastItem.getHandle().equals("0"))){
-							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-							log("Export in: "+path);
-							File file= new File(path);
-							if(file.exists()){
-								MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
-								mOffList.add(masterKeyFile);
-							}
-						}	
-					}
-					else{
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-						log("Export in: "+path);
-						File file= new File(path);
-						if(file.exists()){
-							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
-							mOffList.add(masterKeyFile);
-						}
-					}
-				}						
+		if (pathNav != null && pathNav.equals("/") && mOffList != null) {
+			if (!mOffList.isEmpty()) {
+				log("List not empty");
+				MegaOffline lastItem = mOffList.get(mOffList.size() - 1);
+				if (!(lastItem.getHandle().equals("0"))) {
+					addMasterKeyAsOffline(mOffList);
+				}
+			} else {
+				addMasterKeyAsOffline(mOffList);
 			}
 		}		
 		
@@ -456,6 +453,14 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		((OfflineFragmentLollipop) fragment).addSectionTitle(this.mOffList);
 		positionClicked = -1;	
 		notifyDataSetChanged();
+	}
+
+	private void addMasterKeyAsOffline(ArrayList<MegaOffline> mOffList) {
+		log("Export in: " + getExternalStoragePath(RK_FILE));
+		if (isFileAvailable(buildExternalStorageFile(RK_FILE))) {
+			MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(RK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
+			mOffList.add(masterKeyFile);
+		}
 	}
 	
 	@Override
@@ -518,6 +523,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			
 			holder.imageViewIcon = (ImageView)v.findViewById(R.id.offline_grid_icon);
 			holder.thumbLayoutForFile = (RelativeLayout)v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
+			holder.bottomContainer = v.findViewById(R.id.offline_grid_bottom_container);
+            holder.bottomContainer.setOnClickListener(this);
+            holder.bottomContainer.setTag(holder);
 			holder.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
 			holder.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
 			holder.fileGridSelected = (ImageView)v.findViewById(R.id.file_grid_selected);
@@ -615,50 +623,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.itemLayout.setVisibility(View.INVISIBLE);
 			return;
 		}
-//		if(currentNode.getHandle().equals("0")){
-//			//The node is the MasterKey File
-//			holder.textViewFileName.setText(currentNode.getName());
-//
-//			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-//			File file= new File(path);
-//			long nodeSize;
-//			if(file.exists()){
-//				nodeSize = file.length();
-//				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-//			}
-//			holder.iconView.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
-//			holder.iconView.setVisibility(View.VISIBLE);
-//			holder.imageView.setVisibility(View.GONE);
-//			holder.imageButtonThreeDots.setTag(holder);
-//			holder.imageButtonThreeDots.setOnClickListener(this);
-//
-//			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
-//			holder.separator.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-//
-////			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-//			return;
-//		}
+		
+		File currentFile = getOfflineFile(context, currentNode);
 
-		String path=null;
-		
-		if(currentNode.getOrigin()==MegaOffline.INCOMING){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
-		}
-		else if(currentNode.getOrigin()==MegaOffline.INBOX){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
-		}
-		else{
-			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-		}	
-		
-		File currentFile = null;
-		if (Environment.getExternalStorageDirectory() != null){
-			currentFile = new File(path + currentNode.getPath()+currentNode.getName());
-		}
-		else{
-			currentFile = context.getFilesDir();
-		}
-		
 		holder.currentPath = currentFile.getAbsolutePath();
 		holder.currentHandle = currentNode.getHandle();
 
@@ -800,12 +767,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		if(currentNode.getHandle().equals("0")){
 			//The node is the MasterKey File
 			holder.textViewFileName.setText(currentNode.getName());
-			
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-			File file= new File(path);
+
 			long nodeSize;
-			if(file.exists()){
-				nodeSize = file.length();
+			File fileRK = buildExternalStorageFile(RK_FILE);
+			if(isFileAvailable(fileRK)){
+				nodeSize = fileRK.length();
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			}			
 			holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
@@ -816,25 +782,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			return;
 		}
 		
-		String path=null;
-		
-		if(currentNode.getOrigin()==MegaOffline.INCOMING){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
-		}
-		else if(currentNode.getOrigin()==MegaOffline.INBOX){
-			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
-		}
-		else{
-			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-		}	
-		
-		File currentFile = null;
-		if (Environment.getExternalStorageDirectory() != null){
-			currentFile = new File(path + currentNode.getPath()+currentNode.getName());
-		}
-		else{
-			currentFile = context.getFilesDir();
-		}
+		File currentFile = getOfflineFile(context, currentNode);
 		
 		holder.currentPath = currentFile.getAbsolutePath();
 		holder.currentHandle = currentNode.getHandle();
@@ -1015,7 +963,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	@Override
 	public int getItemCount() {
 		log("getItemCount");
-		return mOffList.size() - placeholderCount;
+		return mOffList.size();
 	}
 
 	public int getItemCountWithoutRK(){
@@ -1114,7 +1062,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				dimens[3] = imageView.getHeight();
 				fragment.itemClick(currentPosition, dimens, imageView);
 				break;
-			}			
+			}
+            case R.id.offline_grid_bottom_container:
 			case R.id.offline_list_three_dots_layout:
             case R.id.file_grid_three_dots_for_file:
 			case R.id.offline_grid_three_dots:{

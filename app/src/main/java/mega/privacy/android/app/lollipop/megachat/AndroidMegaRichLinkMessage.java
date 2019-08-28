@@ -171,6 +171,14 @@ public class AndroidMegaRichLinkMessage {
         return false;
     }
 
+    public static boolean isContactLink(String url) {
+        if (url != null && (url.matches("^https://mega\\.co\\.nz/C!.+$") || url.matches("^https://mega\\.nz/C!.+$"))) {
+            log("IS contact link found");
+            return true;
+        }
+        return false;
+    }
+
     public boolean isChat() {
         return isChat;
     }

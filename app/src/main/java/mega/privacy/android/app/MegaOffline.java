@@ -4,21 +4,21 @@ import mega.privacy.android.app.utils.Util;
 
 public class MegaOffline {
 	
-	public static String FOLDER = "1";
-	public static String FILE = "0";
+	public static final String FOLDER = "1";
+	public static final String FILE = "0";
 
-	public static int INCOMING = 1;
-	public static int INBOX = 2;
-	public static int OTHER = 0;
+	public static final int INCOMING = 1;
+	public static final int INBOX = 2;
+	public static final int OTHER = 0;
 	
-	int id = -1;	
-	String handle = "";
-	String path = "";
-	String name = "";
-	int parentId = -1;
-	String type = "";	
-	int origin = OTHER;
-	String handleIncoming = "";
+	private int id = -1;
+	private String handle = "";
+	private String path = "";
+	private String name = "";
+	private int parentId = -1;
+	private String type = "";
+	private int origin = OTHER;
+	private String handleIncoming = "";
 	
 	public MegaOffline(String handle, String path, String name, int parentId, String type, int origin, String handleIncoming) {
 		this.handle = handle;
@@ -63,14 +63,6 @@ public class MegaOffline {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public int getparentId() {
-		return parentId;
-	}
-
-	public void setparentId(int parentId) {
-		this.parentId = parentId;
 	}
 
 	public String getType() {

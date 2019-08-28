@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
+
 import java.io.File;
+
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
@@ -13,6 +15,9 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
@@ -95,16 +100,9 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
     }
 
     private Bitmap getBitmap(String email) {
-        File avatar;
+        File avatar = buildAvatarFile(context, email + ".jpg");
         Bitmap bitmap;
-
-        if (context.getExternalCacheDir() != null){
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-        }
-        else{
-            avatar = new File(context.getCacheDir().getAbsolutePath(), email + ".jpg");
-        }
-        if (avatar.exists()){
+        if (isFileAvailable(avatar)){
             if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
