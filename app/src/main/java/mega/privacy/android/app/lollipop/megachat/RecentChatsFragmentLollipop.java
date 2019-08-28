@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -77,6 +76,8 @@ import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 public class RecentChatsFragmentLollipop extends RotatableFragment implements View.OnClickListener, MegaContactGetter.MegaContactUpdater {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
+    private static final String COLOR_START = "\'#000000\'";
+    private static final String COLOR_END = "\'#7a7a7a\'";
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -616,8 +617,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         if (context instanceof ArchivedChatsActivity) {
             textToShow = context.getString(R.string.recent_chat_empty).toUpperCase();
-            colorStart = "\'#7a7a7a\'";
-            colorEnd = "\'#000000\'";
+            colorStart = COLOR_END;
+            colorEnd = COLOR_START;
             result = getSpannedMessageForEmptyChat(textToShow, colorStart, colorEnd);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -633,8 +634,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         } else {
             textToShow = context.getString(R.string.context_empty_chat_recent);
-            colorStart = "\'#000000\'";
-            colorEnd = "\'#7a7a7a\'";
+            colorStart = COLOR_START;
+            colorEnd = COLOR_END;
             result = getSpannedMessageForEmptyChat(textToShow, colorStart, colorEnd);
 
             emptyTextViewInvite.setText(result);
@@ -677,9 +678,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         try {
             textToShow = textToShow.replace("[A]", "<br />");
-            textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[B]", "<font color=" + COLOR_START + ">");
             textToShow = textToShow.replace("[/B]", "</font>");
-            textToShow = textToShow.replace("[C]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[C]", "<font color=" + COLOR_END + ">");
             textToShow = textToShow.replace("[/C]", "</font>");
 
         } catch (Exception e) {
@@ -725,9 +726,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         String textToShow = String.format(context.getString(R.string.context_empty_chat_recent));
 
         try {
-            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[A]", "<font color=" + COLOR_START + ">");
             textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[B]", "<font color=" + COLOR_END + ">");
             textToShow = textToShow.replace("[/B]", "</font>");
         } catch (Exception e) {
         }
@@ -746,9 +747,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         String textToShowB = String.format(context.getString(R.string.recent_chat_loading_conversations));
         try {
-            textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
+            textToShowB = textToShowB.replace("[A]", "<font color=" + COLOR_END + ">");
             textToShowB = textToShowB.replace("[/A]", "</font>");
-            textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
+            textToShowB = textToShowB.replace("[B]", "<font color=" + COLOR_START + ">");
             textToShowB = textToShowB.replace("[/B]", "</font>");
         } catch (Exception e) {
         }
@@ -2060,9 +2061,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 String textToShow = String.format(context.getString(R.string.recent_chat_empty));
 
                 try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=" + COLOR_START + ">");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=" + COLOR_END + ">");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 } catch (Exception e) {
                 }

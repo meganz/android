@@ -5,8 +5,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
-import java.util.Objects;
-
 import mega.privacy.android.app.utils.contacts.ContactWithEmail;
 
 public class InvitationContactInfo implements Parcelable, ContactWithEmail {
