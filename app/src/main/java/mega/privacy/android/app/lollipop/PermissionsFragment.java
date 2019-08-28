@@ -201,9 +201,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
     public void setNextPermission() {
         if (items != null && items.length > 0) {
-            for (int i = 0;
-                 i < numItems;
-                 i++) {
+            for (int i = 0; i < numItems; i++) {
                 if (items[i] == currentPermission) {
                     if (i + 1 < numItems) {
                         permissionsPosition++;

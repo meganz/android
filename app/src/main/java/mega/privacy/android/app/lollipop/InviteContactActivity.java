@@ -940,23 +940,24 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         if (contactsEmailsSelected.size() > 0) {
             //phone contact will be invited once email done
             inviteEmailContacts(contactsEmailsSelected);
-        }else if(contactsPhoneSelected.size() > 0){
+        } else if (contactsPhoneSelected.size() > 0) {
             invitePhoneContacts(contactsPhoneSelected);
             finish();
-        }else {
+        } else {
             finish();
         }
     }
 
     private void invitePhoneContacts(ArrayList<String> phoneNumbers) {
         log("invitePhoneContacts");
-        String recipents = "smsto:";
+        StringBuilder recipents = new StringBuilder("smsto:");
         for (String phone : phoneNumbers) {
-            recipents += (phone + ";");
+            recipents.append(phone);
+            recipents.append(";");
             log("setResultPhoneContacts: " + phone);
         }
         String smsBody = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
-        Intent smsIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse(recipents));
+        Intent smsIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse(recipents.toString()));
         smsIntent.putExtra("sms_body", smsBody);
         startActivity(smsIntent);
     }
