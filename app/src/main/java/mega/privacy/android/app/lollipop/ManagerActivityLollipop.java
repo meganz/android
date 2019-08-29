@@ -7835,6 +7835,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setStatusMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
+					searchMenuItem.setVisible(false);
 				}
 				return true;
 			}
