@@ -1541,7 +1541,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                         if (sdCardOperator != null) {
                             String sdCardRoot = sdCardOperator.getSDCardRoot();
                             //don't use DocumentFile
-                            if(sdCardOperator.canWriteWithFile()) {
+                            if(sdCardOperator.canWriteWithFile(sdCardRoot)) {
                                 log("can operate sd card with file.");
                                 toSelectFolder(sdCardRoot);
                             } else {

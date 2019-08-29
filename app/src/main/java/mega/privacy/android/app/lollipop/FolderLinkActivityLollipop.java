@@ -804,7 +804,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                         if(sdCardOperator != null) {
                             String sdCardRoot = sdCardOperator.getSDCardRoot();
                             //don't use DocumentFile
-                            if (sdCardOperator.canWriteWithFile()) {
+                            if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
                                 log("can operate sd card with file.");
                                 toSelectFolder(hashes, size, sdCardRoot,null);
                             } else {
@@ -946,7 +946,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                 }, 1500);
                 return;
             }
-            if (!new File(parentPath).canWrite()) {
+            if (!sdCardOperator.canWriteWithFile(parentPath)) {
                 log("init sd card root with document file.");
                 downloadToSDCard = true;
                 downloadRoot = sdCardOperator.getDownloadRoot();

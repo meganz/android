@@ -26,6 +26,7 @@ import nz.mega.sdk.MegaNode;
 
 public class SDCardOperator {
 
+    public static final String TEST = "test";
     private Context context;
 
     private String downloadRoot;
@@ -101,12 +102,18 @@ public class SDCardOperator {
         return !path.startsWith(Environment.getExternalStorageDirectory().toString());
     }
 
-    public boolean canWriteWithFile() {
-        return new File(sdCardRoot).canWrite();
-    }
-
-    public boolean isSDCardAvailable() {
-        return sdCardRootDocument != null && sdCardRootDocument.canWrite();
+    public boolean canWriteWithFile(String target) {
+        boolean canWrite = new File(target).canWrite();
+        if(!canWrite) {
+            return false;
+        }
+        // test if really can write on this path.
+        canWrite = new File(target, TEST).mkdir();
+        if(!canWrite) {
+            return false;
+        } else {
+            return new File(target, TEST).delete();
+        }
     }
 
     public String move(String targetPath, File source) throws IOException {

@@ -732,7 +732,7 @@ public class NodeController {
                 showSnackbar(Constants.SNACKBAR_TYPE,context.getString(R.string.old_sdcard_unavailable));
                 return;
             }
-            if (!new File(parentPath).canWrite()) {
+            if (!sdCardOperator.canWriteWithFile(parentPath)) {
                 log("init sd card root with document file.");
                 downloadToSDCard = true;
                 downloadRoot = sdCardOperator.getDownloadRoot();
@@ -1095,7 +1095,7 @@ public class NodeController {
                         String sdCardRoot = sdCardOperator.getSDCardRoot();
                         DownloadLinkInfo linkInfo = new DownloadLinkInfo(document, url);
                         //don't use DocumentFile
-                        if (sdCardOperator.canWriteWithFile()) {
+                        if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
                             log("can operate sd card with file.");
                             intentPickFolder(document, url, sdCardRoot);
                         } else {
@@ -1151,7 +1151,7 @@ public class NodeController {
                     case 1: {
                         String sdCardRoot = sdCardOperator.getSDCardRoot();
                         //don't use DocumentFile
-                        if (sdCardOperator.canWriteWithFile()) {
+                        if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
                             log("can operate sd card with file.");
                             requestLocalFolder(downloadInfo, sdCardRoot, null);
                         } else {
@@ -2013,7 +2013,7 @@ public class NodeController {
                 showSnackbar(Constants.SNACKBAR_TYPE,context.getString(R.string.old_sdcard_unavailable));
                 return;
             }
-            if (!new File(parentPath).canWrite()) {
+            if (!sdCardOperator.canWriteWithFile(parentPath)) {
                 log("init sd card root with document file.");
                 downloadToSDCard = true;
                 downloadRoot = sdCardOperator.getDownloadRoot();
