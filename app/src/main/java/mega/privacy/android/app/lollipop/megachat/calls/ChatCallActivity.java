@@ -83,9 +83,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.ChatUtil.showErrorAlertDialogGroupCall;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
@@ -590,7 +591,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 this.startService(intentService);
             }
 
-            ((MegaApplication) getApplication()).checkAudioManager();
+            ((MegaApplication) getApplication()).initializeAudioManager();
 
             int callStatus = callChat.getStatus();
             log("The status of the callChat is: " + callStatus);
@@ -688,7 +689,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         log("onKeyDown");
-        ((MegaApplication) getApplication()).checkAudioManager();
+        ((MegaApplication) getApplication()).initializeAudioManager();
         if (getCall() == null) return true;
         int value;
 
@@ -702,7 +703,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     } else {
                         value = AudioManager.STREAM_VOICE_CALL;
                     }
-                    ((MegaApplication) getApplication()).setAudioManagerValues(value, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                    ((MegaApplication) getApplication()).updateStreamVolume(value, AudioManager.ADJUST_RAISE);
                     return true;
 
                 } catch (SecurityException e) {
@@ -719,7 +720,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     } else {
                         value = AudioManager.STREAM_VOICE_CALL;
                     }
-                    ((MegaApplication) getApplication()).setAudioManagerValues(value, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                    ((MegaApplication) getApplication()).updateStreamVolume(value, AudioManager.ADJUST_LOWER);
                     return true;
 
                 } catch (SecurityException e) {
@@ -1052,7 +1053,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             mSensorManager.unregisterListener(this);
             mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
-        ((MegaApplication) getApplication()).checkAudioManager();
+        ((MegaApplication) getApplication()).initializeAudioManager();
 
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
@@ -2023,7 +2024,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
         }
-        ((MegaApplication) getApplication()).audioManagerStatus(callChat);
+
+        ((MegaApplication) getApplication()).setAudioManagerValues(callChat);
 
     }
 

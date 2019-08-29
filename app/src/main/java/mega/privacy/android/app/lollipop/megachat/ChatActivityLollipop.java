@@ -7943,7 +7943,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         ChatUtil.activateChrono(false, subtitleChronoCall, call);
 
         log("hideCallInProgressLayout");
-        if (callInProgressLayout.getVisibility() == View.GONE) return;
+
+        if (callInProgressLayout == null || callInProgressLayout.getVisibility() == View.GONE) return;
         callInProgressLayout.setVisibility(View.GONE);
         callInProgressLayout.setOnClickListener(null);
         setSubtitleVisibility();

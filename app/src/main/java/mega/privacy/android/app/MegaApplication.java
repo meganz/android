@@ -4,10 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -16,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -45,11 +43,10 @@ import org.webrtc.ContextUtils;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -64,7 +61,6 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
-import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -97,16 +93,17 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Util.toCDATA;
+import static mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
+import static mega.privacy.android.app.utils.Util.toCDATA;
 
 
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
 	final private static int INITIAL_SOUND_LEVEL = 10;
+	final private static int MINIMUM_SOUND_LEVEL = 1;
+
 	static final public String USER_AGENT = "MEGAAndroid/3.6.4_249";
 
 	DatabaseHandler dbH;
@@ -161,11 +158,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private BroadcastReceiver logoutReceiver;
 
 	/*A/V Calls*/
-	private AudioManager audioManager;
-	private MediaPlayer thePlayer;
-	private Ringtone ringtone = null;
+	private AudioManager audioManager = null;
+	private MediaPlayer mediaPlayer = null;
 	private Vibrator vibrator = null;
-	private Timer ringerTimer = null;
 
 	@Override
 	public void networkAvailable() {
@@ -1574,27 +1569,24 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		log("onChatCallUpdate: callId "+call+", call.getStatus " + call.getStatus());
 		stopService(new Intent(this, IncomingCallService.class));
 
-		if (call.getStatus() >= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-			clearIncomingCallNotification(call.getId());
-		}
-
-		if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS || call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION || call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
-			stopAudioSignals();
-		}
-
-
 		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
 
 			int callStatus = call.getStatus();
+			if (call.getStatus() >= MegaChatCall.CALL_STATUS_JOINING) {
+				stopAudioSignals();
+				clearIncomingCallNotification(call.getId());
+			}
+
 			switch (callStatus) {
 				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 				case MegaChatCall.CALL_STATUS_RING_IN:
 				case MegaChatCall.CALL_STATUS_JOINING:
 				case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
-					audioManagerStatus(call);
-
 					if (megaChatApi != null) {
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
+						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
+							setAudioManagerValues(call);
+						}
 						if (listAllCalls != null) {
 							if (listAllCalls.size() == 1) {
 								log("onChatCallUpdate:One call");
@@ -1849,90 +1841,92 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 	}
 
-	public void audioManagerStatus(MegaChatCall call) {
+	public void initializeAudioManager() {
+		if (audioManager != null) return;
+		audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+	}
+
+	public void setAudioManagerValues(MegaChatCall call) {
+		initializeAudioManager();
+		if (audioManager == null) return;
+		stopAudioSignals();
 		int callStatus = call.getStatus();
 		if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-			log("audioManagerStatus:REQUEST_SENT");
+			log("outgoingCallSound:REQUEST_SENT");
 			outgoingCallSound();
-			setAudioManagerValues(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME, AudioManager.FLAG_VIBRATE);
+
 		} else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-			log("audioManagerStatus:RING_IN");
-			updateRingingStatus();
+			log("outgoingCallSound:RING_IN");
+			incomingCallSound();
+			checkVibration();
 		}
 	}
 
 	private void outgoingCallSound() {
-		if (thePlayer != null && thePlayer.isPlaying()) return;
-		log("outgoingCallSound");
-		checkAudioManager();
+		if (mediaPlayer != null && mediaPlayer.isPlaying()) return;
+		initializeAudioManager();
 		if (audioManager == null) return;
+		log("outgoingCallSound");
+
 		if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT || audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE || audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0) {
 			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, INITIAL_SOUND_LEVEL, 0);
 		} else {
 			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamVolume(AudioManager.STREAM_MUSIC), 0);
 		}
 
-		thePlayer = MediaPlayer.create(getApplicationContext(), R.raw.outgoing_voice_video_call);
-		thePlayer.setLooping(true);
-		thePlayer.start();
+		mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.outgoing_voice_video_call);
+		mediaPlayer.setLooping(true);
+		log("outgoingCallSound: start Sound");
+		mediaPlayer.start();
 	}
 
-	public void checkAudioManager() {
-		if (audioManager != null) return;
-		audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-	}
+	private void incomingCallSound() {
+		if (mediaPlayer != null && mediaPlayer.isPlaying()) return;
 
-	public void setAudioManagerValues(int streamType, int direction, int flags) {
-		log("setAudioManagerValues");
-		checkAudioManager();
+		initializeAudioManager();
 		if (audioManager == null) return;
-		audioManager.adjustStreamVolume(streamType, direction, flags);
-		if (streamType == AudioManager.STREAM_RING) {
-			updateRingingStatus();
+		log("incomingCallSound");
+
+		Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+		if (ringtoneUri == null) return;
+		mediaPlayer = new MediaPlayer();
+		mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
+
+		try {
+			mediaPlayer.setDataSource(getApplicationContext(), ringtoneUri);
+			mediaPlayer.prepare();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
+		mediaPlayer.setLooping(true);
+		log("incomingCallSound - start Sound");
+		mediaPlayer.start();
+
 	}
 
-	private void updateRingingStatus() {
-		log("updateRingingStatus");
-		checkAudioManager();
-		if (audioManager == null) return;
+	private void checkVibration() {
+		log("checkVibration");
 
-		incomingCallSound();
 		if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT) {
-			stopIncomingCallVibration();
+			if (vibrator == null || !vibrator.hasVibrator()) return;
+			stopVibration();
 			return;
 		}
+
 		if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
-			startIncomingCallVibration();
+			startVibration();
 			return;
 		}
+
 		if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0) {
 			return;
 		}
-		startIncomingCallVibration();
+
+		startVibration();
 	}
 
-
-	private void incomingCallSound() {
-		log("incomingCallSound");
-
-		stopRingtone();
-		ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
-
-		cancelRingerTimer();
-		ringerTimer = new Timer();
-
-		MyRingerTask myRingerTask = new MyRingerTask();
-		ringerTimer.schedule(myRingerTask, 0, 500);
-	}
-
-	private void stopIncomingCallVibration() {
-		if (vibrator == null || !vibrator.hasVibrator()) return;
-		log("stopIncomingCallVibration");
-		cancelVibrator();
-	}
-
-	private void startIncomingCallVibration() {
+	private void startVibration() {
 		if (vibrator != null) return;
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		if (vibrator == null || !vibrator.hasVibrator()) return;
@@ -1941,52 +1935,34 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		vibrator.vibrate(pattern, 0);
 	}
 
-	private void stopAudioSignals() {
-		log("stopAudioSignals");
-		stopThePlayer();
-		stopRingtone();
-		cancelRingerTimer();
-		cancelVibrator();
+
+	public void updateStreamVolume(int streamType, int direction) {
+		initializeAudioManager();
+		if (audioManager == null) return;
+		log("updateStreamVolume");
+		audioManager.adjustStreamVolume(streamType, direction, AudioManager.FLAG_SHOW_UI);
 	}
 
-	private void stopThePlayer() {
+	private void stopAudioSignals() {
+		log("stopAudioSignals");
+		stopSound();
+		stopVibration();
+	}
+
+	private void stopSound() {
 		try {
-			if (thePlayer != null) {
-				thePlayer.stop();
-				thePlayer.reset();
-				thePlayer.release();
-				thePlayer = null;
+			if (mediaPlayer != null) {
+				mediaPlayer.stop();
+				mediaPlayer.reset();
+				mediaPlayer.release();
+				mediaPlayer = null;
 			}
 		} catch (Exception e) {
 			log("Exception stopping player");
 		}
 	}
 
-	private void stopRingtone() {
-		try {
-			if (ringtone != null) {
-				ringtone.stop();
-				ringtone = null;
-			}
-		} catch (Exception e) {
-			log("Exception stopping ringtone");
-
-		}
-	}
-
-	private void cancelRingerTimer() {
-		try {
-			if (ringerTimer != null) {
-				ringerTimer.cancel();
-				ringerTimer = null;
-			}
-		} catch (Exception e) {
-			log("Exception canceling ringing time");
-
-		}
-	}
-
-	private void cancelVibrator() {
+	private void stopVibration() {
 		try {
 			if (vibrator != null && vibrator.hasVibrator()) {
 				vibrator.cancel();
@@ -1994,15 +1970,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			}
 		} catch (Exception e) {
 			log("Exception canceling vibrator");
-		}
-	}
-
-	private class MyRingerTask extends TimerTask {
-		@Override
-		public void run() {
-			if (ringtone != null && !ringtone.isPlaying()) {
-				ringtone.play();
-			}
 		}
 	}
 
