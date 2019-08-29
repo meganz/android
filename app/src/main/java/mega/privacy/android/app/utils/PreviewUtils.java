@@ -23,6 +23,9 @@ public class PreviewUtils {
 	public static File previewDir;
 	public static PreviewCache previewCache = new PreviewCache();
 
+	//10mb
+	private static final long THRESHOLD = 10 * 1024 * 1024;
+
 	/*
 	 * Get preview folder
 	 */	
@@ -114,7 +117,6 @@ public class PreviewUtils {
             //half of the screen size.
             inSampleSize = calculateInSampleSize(bOpts,size.x / 2,size.y / 2);
         }
-        inSampleSize = calculateInSampleSizeBySize(bmpFile, inSampleSize);
         log("inSampleSize: " + inSampleSize);
         bOpts.inJustDecodeBounds = false;
         bOpts.inSampleSize = inSampleSize;
@@ -122,18 +124,41 @@ public class PreviewUtils {
         return BitmapFactory.decodeFile(bmpFile.getAbsolutePath(),bOpts);
     }
 
-    public static int calculateInSampleSizeBySize(File bmpFile, int inSampleSize) {
-        while (!testAllocation(bmpFile,inSampleSize)) {
-            inSampleSize *= 2;
+    public static Bitmap getPreviewFromFolderFullImage(MegaNode node, Context context){
+        Bitmap bmp = previewCache.get(node.getHandle());
+        if(bmp == null) {
+            File previewDir = getPreviewFolder(context);
+            File preview = new File(previewDir, node.getBase64Handle()+".jpg");
+            if (preview.exists()){
+                if (preview.length() > 0){
+                    bmp = getBitmapForCacheFullImage(preview, context);
+                    if (bmp == null) {
+                        preview.delete();
+                    }
+                    else{
+                        previewCache.put(node.getHandle(), bmp);
+                    }
+                }
+            }
         }
-        return inSampleSize;
+        return bmp;
     }
 
-    public static boolean testAllocation(File bmpFile, int inSampleSize) {
-        long toAllocate = bmpFile.length() / (inSampleSize * inSampleSize);
-        long free = Runtime.getRuntime().freeMemory();
-        log(toAllocate + "/" + free);
-        return toAllocate < free;
+    public static Bitmap getBitmapForCacheFullImage(File bmpFile, Context context) {
+	    if(!testAllocation()) {
+            return null;
+        } else {
+	        return getBitmapForCache(bmpFile, context);
+        }
+    }
+
+    public static boolean testAllocation() {
+	    Runtime runtime = Runtime.getRuntime();
+        long usedMemInMB = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
+        long maxHeapSizeInMB = runtime.maxMemory() / 1048576L;
+        long availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB;
+        log("maxHeapSizeInMB " + maxHeapSizeInMB + " availHeapSizeInMB is " + availHeapSizeInMB + " usedMemInMB is" + usedMemInMB);
+        return runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory()) > THRESHOLD;
     }
 
 	/*code from developer.android, https://developer.android.com/topic/performance/graphics/load-bitmap.html*/
