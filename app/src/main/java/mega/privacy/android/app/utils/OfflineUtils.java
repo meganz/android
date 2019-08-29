@@ -581,11 +581,8 @@ public class OfflineUtils {
 
         String nodePath = File.separator;
         MegaApiAndroid megaApi;
-        if (context instanceof Activity) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        } else {
-            megaApi = MegaApplication.getInstance().getMegaApi();
-        }
+
+        megaApi = MegaApplication.getInstance().getMegaApi();
 
         if (megaApi == null || megaApi.getRootNode() == null) return;
 
