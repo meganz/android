@@ -3304,22 +3304,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 nC.downloadTo(currentDocument, parentPath, uri.toString());
             }
             else if (adapterType == Constants.FROM_CHAT) {
-                long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-                if (hashes != null) {
-                    ArrayList<MegaNode> megaNodes = new ArrayList<>();
-                    for (int i=0; i<hashes.length; i++) {
-                        MegaNode node = megaApi.getNodeByHandle(hashes[i]);
-                        if (node != null) {
-                            megaNodes.add(node);
-                        }
-                        else {
-                            log("Node NULL, not added");
-                        }
-                    }
-                    if (megaNodes.size() > 0) {
-                        chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-                    }
-                }
+                chatC.prepareForDownload(intent, parentPath);
             }
             else {
                 String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
