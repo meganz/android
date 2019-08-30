@@ -1573,20 +1573,30 @@ public class ThumbnailUtilsLollipop {
 	
 	private static final String SELECTION = MediaColumns.DATA + "=?";
 	private static final String[] PROJECTION = { BaseColumns._ID };
-	public static Bitmap loadVideoThumbnail(String videoFilePath,  Context context) {
+	public static Bitmap loadVideoThumbnail(String videoFilePath, Context context) {
 		log("loadVideoThumbnail");
-	    Bitmap result = null;
-	    Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-	    String[] selectionArgs = { videoFilePath };
-	    ContentResolver cr = context.getContentResolver();
-	    Cursor cursor = cr.query(uri, PROJECTION, SELECTION, selectionArgs, null);
-	    if (cursor.moveToFirst()) {
-	        // it's the only & first thing in projection, so it is 0
-	        long videoId = cursor.getLong(0);
-	        result = MediaStore.Video.Thumbnails.getThumbnail(cr, videoId, Thumbnails.MICRO_KIND, null);
-	    }
-	    cursor.close();
-	    return result;
+		Bitmap result = null;
+		Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+		String[] selectionArgs = {videoFilePath};
+		ContentResolver cr = context.getContentResolver();
+		Cursor cursor = null;
+		try {
+			cursor = cr.query(uri, PROJECTION, SELECTION, selectionArgs, null);
+			if (cursor.moveToFirst()) {
+				// it's the only & first thing in projection, so it is 0
+				long videoId = cursor.getLong(0);
+				result = MediaStore.Video.Thumbnails.getThumbnail(cr, videoId, Thumbnails.MICRO_KIND, null);
+			}
+			cursor.close();
+			return result;
+		} catch (Exception ex) {
+			log("Exception is thrown, ex: " + ex.toString());
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		return null;
 	}
 
 	public interface ThumbnailInterface{

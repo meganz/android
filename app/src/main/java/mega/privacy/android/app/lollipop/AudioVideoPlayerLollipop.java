@@ -155,6 +155,8 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.ChatUtil.participatingInACall;
+import static mega.privacy.android.app.utils.Util.isChatEnabled;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 
@@ -577,7 +579,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                if(isChatEnabled()){
                     if (megaChatApi == null){
                         megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                     }
@@ -780,7 +782,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
         log("onChatCallUpdate ");
-        if (player != null && player.getPlayWhenReady()) {
+        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)
+                && (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)
+                && player != null && player.getPlayWhenReady()) {
             player.setPlayWhenReady(false);
         }
     }
@@ -1129,13 +1133,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                     log("playerListener: onPlayerStateChanged: " + playbackState);
 
-                    if (playWhenReady && mega.privacy.android.app.utils.Util.isChatEnabled() && megaChatApi != null) {
-                        MegaHandleList handleList = megaChatApi.getChatCalls();
-                        if(handleList!=null && handleList.size()>0) {
-                            //Not allow to play content when a call is in progress
-                            player.setPlayWhenReady(false);
-                            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
-                        }
+                    if (playWhenReady && isChatEnabled() && megaChatApi != null && participatingInACall(megaChatApi)) {
+                        //Not allow to play content when a call is in progress
+                        player.setPlayWhenReady(false);
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
                     }
 
                     playbackStateSaved = playbackState;
@@ -2090,7 +2091,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 moveMenuItem.setVisible(true);
                 copyMenuItem.setVisible(true);
 
-                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                if(isChatEnabled()){
                     chatMenuItem.setVisible(true);
                 }
                 else{
@@ -2200,7 +2201,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             else if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
                 propertiesMenuItem.setVisible(true);
-                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                if(isChatEnabled()){
                     chatMenuItem.setVisible(true);
                 }
                 else{
@@ -2325,7 +2326,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                                     renameMenuItem.setVisible(true);
                                     moveMenuItem.setVisible(true);
                                     moveToTrashMenuItem.setVisible(true);
-                                    if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                                    if(isChatEnabled()){
                                         chatMenuItem.setVisible(true);
                                     }
                                     else{
@@ -2344,7 +2345,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }
                         else{
-                            if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                            if(isChatEnabled()){
                                 chatMenuItem.setVisible(true);
                             }
                             else{
@@ -3485,6 +3486,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     protected void onStop() {
         super.onStop();
+        //pause either video or audio as per UX advise
+        if (player != null && player.getPlayWhenReady()) {
+            player.setPlayWhenReady(false);
+        }
         log("onStop");
     }
 
@@ -3511,10 +3516,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     protected void onPause() {
         super.onPause();
-        //pause either video or audio as per UX advise
-        if (player != null && player.getPlayWhenReady()) {
-            player.setPlayWhenReady(false);
-        }
         log("onPause");
     }
 
