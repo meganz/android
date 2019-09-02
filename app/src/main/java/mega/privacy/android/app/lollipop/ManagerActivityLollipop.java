@@ -67,7 +67,6 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Display;
@@ -196,14 +195,13 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.ProgressDialogUtil;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -243,10 +241,9 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
-import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
 
@@ -769,6 +766,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				actionType = intent.getIntExtra("actionType", -1);
 
 				if(actionType == Constants.GO_OFFLINE){
+				    //stop cu process
+                    JobUtil.stopRunningCameraUploadService(ManagerActivityLollipop.this);
 					showOfflineMode();
 				}
 				else if(actionType == Constants.GO_ONLINE){
@@ -1903,7 +1902,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		cC = new ContactController(this);
 		aC = new AccountController(this);
 
-        CacheFolderManager.createCacheFolders(this);
+        createCacheFolders(this);
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -2349,13 +2348,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		///Check the MK file
 		int versionApp = Util.getVersion(this);
 		log("-------------------Version app: "+versionApp);
-		final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-		final File fMKOld = new File(pathOldMK);
-		if (fMKOld != null) {
-			if (fMKOld.exists()) {
-				log("Old MK file need to be renamed!");
-				aC.renameMK();
-			}
+		final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
+		if (isFileAvailable(fMKOld)) {
+			log("Old MK file need to be renamed!");
+			aC.renameMK();
 		}
 
 		rootNode = megaApi.getRootNode();
@@ -3557,6 +3553,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
                                     dbH.setCamSyncEnabled(false);
+									if(sttFLol != null  && sttFLol.isResumed()){
+										sttFLol.disableCameraUpload();
+									}
+									if(cuFL != null && cuFL.isResumed()){
+										cuFL.resetSwitchButtonLabel();
+									}
                                 }
                             });
                     builder.setNegativeButton(getString(R.string.general_cancel), null);
@@ -7225,10 +7227,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					int index = viewPagerMyAccount.getCurrentItem();
 					if(index==0){
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-						log("Exists MK in: "+path);
-						File file= new File(path);
-						if(file.exists()){
+						if(isFileAvailable(buildExternalStorageFile(RK_FILE))){
 							removeMK.setVisible(true);
 							exportMK.setVisible(false);
 						}
@@ -7836,6 +7835,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setStatusMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
+					searchMenuItem.setVisible(false);
 				}
 				return true;
 			}
@@ -11136,12 +11136,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void takePicture(){
 		log("takePicture");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-        File newFolder = new File(path);
-        newFolder.mkdirs();
-
-        String file = path + "/picture.jpg";
-        File newFile = new File(file);
+        File newFile = buildTempFile(this, "picture.jpg");
         try {
         	newFile.createNewFile();
         } catch (IOException e) {}
@@ -11190,13 +11185,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void takeProfilePicture(){
-		log("takeProfilePicture");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR;
-		File newFolder = new File(path);
-		newFolder.mkdirs();
-
-		String file = path + "/picture.jpg";
-		File newFile = new File(file);
+		File newFile = buildTempFile(this, "picture.jpg");
 		try {
 			newFile.createNewFile();
 		} catch (IOException e) {}
@@ -13617,12 +13606,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				Intent service = new Intent(this, DownloadService.class);
 				service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
 				service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR + "/";
-				File tempDownDirectory = new File(path);
-				if(!tempDownDirectory.exists()){
-					tempDownDirectory.mkdirs();
-				}
-				service.putExtra(DownloadService.EXTRA_PATH, path);
+				File tempFolder = getCacheFolder(this, TEMPORAL_FOLDER);
+				if (!isFileAvailable(tempFolder)) {
+				    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
+				    return;
+                }
+				service.putExtra(DownloadService.EXTRA_PATH, tempFolder.getAbsolutePath());
 				startService(service);
 			}
 		}
@@ -14013,17 +14002,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
 			log("TAKE_PHOTO_CODE");
 			if(resultCode == Activity.RESULT_OK){
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
-				File imgFile = new File(filePath);
+				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
+				if (!isFileAvailable(imgFile)) {
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
+					return;
+				}
 
 				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
 				log("Taken picture Name: "+name);
-				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/"+name;
-				log("----NEW Name: "+newPath);
-				File newFile = new File(newPath);
+				File newFile = buildTempFile(this, name);
 				imgFile.renameTo(newFile);
 
-				uploadTakePicture(newPath);
+				uploadTakePicture(newFile.getAbsolutePath());
 			}
 			else{
 				log("TAKE_PHOTO_CODE--->ERROR!");
@@ -14035,8 +14025,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(resultCode == Activity.RESULT_OK){
 
 				String myEmail =  megaApi.getMyUser().getEmail();
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";
-				File imgFile = new File(filePath);
+				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
+				if (!isFileAvailable(imgFile)) {
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1);
+					return;
+				}
 
                 File qrFile = buildQrFile(this,myEmail + "QRcode.jpg");
                 File newFile = buildAvatarFile(this,myEmail + "Temp.jpg");
@@ -14181,7 +14174,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String[] split = Util.rKFile.split("/");
+				String[] split = RK_FILE.split(File.separator);
 				String path = parentPath+"/"+split[split.length-1];
 				log("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
@@ -14191,7 +14184,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.REQUEST_SAVE_MK_FROM_OFFLINE && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String[] split = Util.rKFile.split("/");
+				String[] split = RK_FILE.split(File.separator);
 				String path = parentPath+"/"+split[split.length-1];
 				log("REQUEST_SAVE_MK_FROM_OFFLINE:path to download: "+path);
 				AccountController ac = new AccountController(this);
@@ -15150,13 +15143,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         } else {
                             log("ERROR! Destination PATH is NULL");
                         }
-
-
-//						String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/"+name;
-//						log("----NEW Name: "+newPath);
-//						File newFile = new File(newPath);
-//						MegaUtilsAndroid.createAvatar(imgFile, newFile);
-
 					}
 					else{
 						log("The chosen avatar path is NULL");
@@ -15272,7 +15258,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	private void createFile(String name, String data, MegaNode parentNode){
 
-		File file = Util.createTemporalTextFile(name, data);
+		File file = createTemporalTextFile(this, name, data);
 		if(file!=null){
 			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_began), -1);
 
@@ -17254,7 +17240,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Pressed button positive to cancel transfer");
 						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-                        JobUtil.stopRunningCameraUploadService(ManagerActivityLollipop.this);
+                        cancelAllUploads(ManagerActivityLollipop.this);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -18296,35 +18282,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		if(call!=null){
-			if(call.getChatid() != -1){
-				if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
-					int callStatus = call.getStatus();
-					log("onChatCallUpdate:CHANGE_TYPE_STATUS: callStatus =  "+callStatus);
+		if (call == null || call.getChatid() == -1) return;
+		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
+			int callStatus = call.getStatus();
+			log("onChatCallUpdatecallStatus =  " + callStatus);
 
-					switch (callStatus) {
-						case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-						case MegaChatCall.CALL_STATUS_RING_IN:
-						case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-						case MegaChatCall.CALL_STATUS_DESTROYED:
-						case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
-							setCallBadge();
-							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-							if ((rChatFL != null) && (rChatFL.isVisible())){
-								rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
-							}
-
-							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-							if ((fbFLol != null) && (fbFLol.isVisible())){
-								fbFLol.showCallLayout();
-							}
-							break;
-						}
-
-						default:
-							break;
+			switch (callStatus) {
+				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+				case MegaChatCall.CALL_STATUS_RING_IN:
+				case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+				case MegaChatCall.CALL_STATUS_DESTROYED:
+				case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+					setCallBadge();
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+					if ((rChatFL != null) && (rChatFL.isVisible())) {
+						rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
 					}
+
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+					if ((fbFLol != null) && (fbFLol.isVisible())) {
+						fbFLol.showCallLayout();
+					}
+					break;
 				}
+				default:
+					break;
 			}
 		}
 	}

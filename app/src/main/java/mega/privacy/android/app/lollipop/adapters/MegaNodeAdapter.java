@@ -48,7 +48,6 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.OfflineUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -56,6 +55,9 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
@@ -367,6 +369,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      */
     public int getFolderCount(ArrayList<MegaNode> nodes) {
         int folderCount = 0;
+        if (nodes == null) return folderCount;
         for (MegaNode node : nodes) {
             if (node == null) {
                 continue;
@@ -726,7 +729,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.fileGridIconForFile.setVisibility(View.VISIBLE);
             holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 
-            if (Util.isVideoFile(node.getName())) {
+            if (isVideoFile(node.getName())) {
                 holder.videoInfoLayout.setVisibility(View.VISIBLE);
                 holder.videoDuration.setVisibility(View.GONE);
                 log(node.getName() + " DURATION: " + node.getDuration());
@@ -804,17 +807,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         //Check if is an offline file to show the red arrow
-        boolean availableOffline = false;
-        if (incoming) {
-            availableOffline = OfflineUtils.availableOffline(Constants.INCOMING_SHARES_ADAPTER, node, context, megaApi);
-        }
-        else if (inbox){
-            availableOffline = OfflineUtils.availableOffline(Constants.INBOX_ADAPTER, node, context, megaApi);
-        }
-        else {
-            availableOffline = OfflineUtils.availableOffline(Constants.GENERAL_OTHERS_ADAPTER, node, context, megaApi);
-        }
-        if (availableOffline) {
+        if (availableOffline(context, node)) {
             holder.savedOffline.setVisibility(View.VISIBLE);
         }
         else {
@@ -1201,17 +1194,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         //Check if is an offline file to show the red arrow
-        boolean availableOffline = false;
-        if (incoming) {
-            availableOffline = OfflineUtils.availableOffline(Constants.INCOMING_SHARES_ADAPTER, node, context, megaApi);
-        }
-        else if (inbox){
-            availableOffline = OfflineUtils.availableOffline(Constants.INBOX_ADAPTER, node, context, megaApi);
-        }
-        else {
-            availableOffline = OfflineUtils.availableOffline(Constants.GENERAL_OTHERS_ADAPTER, node, context, megaApi);
-        }
-        if (availableOffline) {
+        if (availableOffline(context, node)) {
             holder.savedOffline.setVisibility(View.VISIBLE);
         }
         else {

@@ -15,7 +15,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
@@ -51,8 +50,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 /*
  * Service to Upload files
@@ -457,18 +457,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mNotificationManager.cancel(notificationIdForFolderUpload);
         stopSelf();
         log("after stopSelf");
+
         if (Util.isPermissionGranted(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-            File f = new File(pathSelfie);
-            //Delete recursively all files and folder
-            if (f.exists()) {
-                if (f.isDirectory()) {
-                    if (f.list() != null && f.list().length <= 0) {
-                        f.delete();
-                    }
-                }
-            }
+			deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
         }
+
 	}
 
     private void notifyNotification(String notificationTitle,String size,int notificationId,String channelId,String channelName) {
@@ -663,7 +656,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         String logMessage = isFolderTransfer ? "updateProgressNotificationForFolderUpload: " : "updateProgressNotificationForFileUpload: ";
         log(logMessage + progressPercent + " " + message);
         String actionString = isOverquota == 0 ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
-        String info = Util.getProgressSize(UploadService.this,inProgress,total);
+        String info = getProgressSize(UploadService.this,inProgress,total);
 
         if(isFolderTransfer){
             notifyProgressNotification(progressPercent,message,info,actionString,notificationIdForFolderUpload,notificationChannelIdForFolderUpload,notificationChannelNameForFolderUpload);
@@ -769,7 +762,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 totalFileUploadsCompleted++;
                 mapProgressFileTransfers.put(transfer.getTag(), transfer);
                 if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-                    String size = Util.getSizeString(transfer.getTotalBytes());
+                    String size = getSizeString(transfer.getTotalBytes());
                     AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
                     dbH.setCompletedTransfer(completedTransfer);
                 }
@@ -781,14 +774,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 releaseLocks();
 				UploadService.this.cancel();
 				log("after cancel");
-				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-				File f = new File(pathSelfie);
-				//Delete recursively all files and folder
-				if (f.isDirectory()) {
-					if(f.list().length<=0){
-						f.delete();
-					}
-				}
+				deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
 
 			} else {
 				if (error.getErrorCode() == MegaError.API_OK) {
@@ -798,7 +784,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     }else{
                         totalFileUploadsCompletedSuccessfully++;
                     }
-					if (Util.isVideoFile(transfer.getPath())) {
+					if (isVideoFile(transfer.getPath())) {
 						log("Is video!!!");
 
 						File previewDir = PreviewUtils.getPreviewFolder(this);
@@ -812,9 +798,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 						if (node != null) {
 							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-							retriever.setDataSource(transfer.getPath());
+							String location = null;
+							try {
+								retriever.setDataSource(transfer.getPath());
+								location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+							} catch (Exception ex) {
+								log("Exception is thrown, ex: " + ex.toString());
+							}
 
-							String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
 							if(location!=null){
 								log("Location: "+location);
 
@@ -959,15 +950,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     localFile.delete();
                 }
 
+                File tempPic = getCacheFolder(getApplicationContext(), TEMPORAL_FOLDER);
 				log("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
-				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-				if (transfer.getPath() != null) {
-					if (transfer.getPath().startsWith(pathSelfie)) {
+				if (isFileAvailable(tempPic) && transfer.getPath() != null) {
+					if (transfer.getPath().startsWith(tempPic.getAbsolutePath())) {
 						File f = new File(transfer.getPath());
 						f.delete();
 					}
 				} else {
-					log("transfer.getPath() is NULL");
+					log("transfer.getPath() is NULL or temporal folder unavailable");
 				}
 
 				if (transfersCopy.isEmpty() && totalFileUploadsCompleted==totalFileUploads && transfersCount == 0) {

@@ -80,6 +80,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
 
@@ -802,27 +803,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-			if (hashes != null) {
-				ArrayList<MegaNode> megaNodes = new ArrayList<>();
-				for (int i=0; i<hashes.length; i++) {
-					MegaNode node = megaApi.getNodeByHandle(hashes[i]);
-					if (node != null) {
-						megaNodes.add(node);
-					}
-					else {
-						log("Node NULL, not added");
-					}
-				}
-				if (megaNodes.size() > 0) {
-					chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-				}
-			}
-
-//			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-//			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-//			log("URL: " + url + "___SIZE: " + size);
-//			downloadTo (parentPath, url, size, hashes);
+            chatC.prepareForDownload(intent, parentPath);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
@@ -913,10 +894,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
 				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					log("ISFILE");
-					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+					String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
 					if(localPath != null){	
 						try { 
-							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
+							copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 						}
 						catch(Exception e) {}
 
