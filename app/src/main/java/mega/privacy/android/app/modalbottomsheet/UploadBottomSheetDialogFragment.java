@@ -12,6 +12,11 @@ import android.widget.LinearLayout;
 
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.utils.Util;
 

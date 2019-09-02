@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -38,9 +39,6 @@ public class VideoDownsampling {
 
     private int mWidth = 1280;
     private int mHeight = 720;
-
-    private static final int MEDIUM_WIDTH = 1280;
-    private static final int MEDIUM_HEIGHT = 720;
 
     static Context context;
 
@@ -275,14 +273,20 @@ public class VideoDownsampling {
     private void resetWidthAndHeight(String mInputFile) {
         MediaMetadataRetriever m = new MediaMetadataRetriever();
         m.setDataSource(mInputFile);
-
-        int rotation = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
-        if (rotation == 90 || rotation == 270) {
-            mWidth = MEDIUM_HEIGHT;
-            mHeight = MEDIUM_WIDTH;
+        Bitmap thumbnail = m.getFrameAtTime();
+        int inputWidth = thumbnail.getWidth(), inputHeight = thumbnail.getHeight();
+        if (inputWidth > inputHeight) {
+            if (mWidth < mHeight) {
+                int w = mWidth;
+                mWidth = mHeight;
+                mHeight = w;
+            }
         } else {
-            mWidth = MEDIUM_WIDTH;
-            mHeight = MEDIUM_HEIGHT;
+            if (mWidth > mHeight) {
+                int w = mWidth;
+                mWidth = mHeight;
+                mHeight = w;
+            }
         }
     }
 

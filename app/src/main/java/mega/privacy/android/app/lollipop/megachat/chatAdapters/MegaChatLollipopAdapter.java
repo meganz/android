@@ -51,8 +51,6 @@ import com.shockwave.pdfium.PdfiumCore;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -96,11 +94,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.VOICE_CLIP_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
@@ -4754,13 +4749,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contactManagementMessageLayout.setVisibility(View.GONE);
             holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
+
             holder.contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
 
             if (messages.get(position - 1).isShowAvatar()) {
                 ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
                 setContactAvatar(((ViewHolderMessageChat) holder), userHandle, ((ViewHolderMessageChat) holder).fullNameTitle);
             } else {
-                ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.GONE);
+                holder.layoutAvatarMessages.setVisibility(View.GONE);
             }
 
             if (message.isEdited()) {
@@ -7425,7 +7421,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public boolean isMultipleSelect() {
-        log("isMultipleSelect");
         return multipleSelect;
     }
 
@@ -7448,14 +7443,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("delete pos: " + pos);
             selectedItems.delete(pos);
         } else {
-            log("PUT pos: " + pos);
+            log("put pos: " + pos);
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
-        if (selectedItems.size() <= 0){
+        if (selectedItems.size() == 0){
             ((ChatActivityLollipop) context).hideMultipleSelect();
         }
-//        ((ChatActivityLollipop) context).hideMultipleSelect();
     }
 
     public void selectAll() {
@@ -7583,16 +7577,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void removeMessage(int position, ArrayList<AndroidMegaChatMessage> messages) {
-        log("removeMessage: size: " + messages.size());
         this.messages = messages;
-        notifyItemRemoved(position);
 
-        if (position == messages.size()) {
-            log("No need to update more");
-        } else {
-            log("Update until end");
+        notifyItemRemoved(position);
+        if (position != messages.size()) {
             int itemCount = messages.size() - position;
-            log("itemCount: " + itemCount);
             notifyItemRangeChanged(position, itemCount);
         }
     }
@@ -8481,7 +8470,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return "";
     }
 
-    public void checkItem (View v, ViewHolderMessageChat holder, int[] screenPosition, int[] dimens) {
+    private void checkItem (View v, ViewHolderMessageChat holder, int[] screenPosition, int[] dimens) {
 
         ImageView imageView = null;
 

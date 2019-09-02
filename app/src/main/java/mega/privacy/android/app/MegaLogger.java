@@ -1,6 +1,5 @@
 package mega.privacy.android.app;
 
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -12,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import mega.privacy.android.app.utils.Util;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 /**
  * Used to display console log from app, SDK and chatSDK,
@@ -28,7 +27,7 @@ public abstract class MegaLogger {
     public MegaLogger(String fileName, boolean fileLogger) {
         simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logFile = null;
-        dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
+        dir = getExternalStoragePath(LOG_DIR);
         this.fileName = fileName;
         fileLogQueue = new ConcurrentLinkedDeque<>();
         logToFile();
