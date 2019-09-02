@@ -209,9 +209,11 @@
     <string name="name_text" context="Name of the user">Name</string>
     <string name="lastname_text" context="Last name of the user">Last Name</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA’s [A]Terms of Service[/A]</string>
+    <string name="top" context="text placed on the checkbox to make sure user agree that understand the danger of losing password">I understand that [B]if I lose my password, I may lose my data[/B]. Read more about [A]MEGA’s end-to-end encryption[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
 
     <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service</string>
+    <string name="create_account_no_top" context="warning dialog, for user do not tick checkbox of understanding the danger of losing password">You need to agree that you understand the danger of losing your password</string>
     <string name="error_enter_username" context="Warning dialog">Please enter your name</string>
     <string name="error_enter_userlastname" context="Warning dialog">Please enter your last name.</string>
     <string name="error_short_password" context="when creating the account">Password is too short</string>

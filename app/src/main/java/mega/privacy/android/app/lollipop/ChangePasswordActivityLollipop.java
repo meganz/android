@@ -19,7 +19,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.Html;
 import android.text.InputType;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -32,8 +34,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -79,6 +81,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private TextView title;
 	private String linkToReset;
 	private String mk;
+
+    private CheckBox chkTOP;
 
 	private ActionBar aB;
 	Toolbar tB;
@@ -248,6 +252,31 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				
 		changePasswordButton = (Button) findViewById(R.id.action_change_password);
 		changePasswordButton.setOnClickListener(this);
+
+        TextView top = findViewById(R.id.top);
+
+        String textToShowTOP = getString(R.string.top);
+        try{
+            textToShowTOP = textToShowTOP.replace("[B]", "<font color=\'#00BFA5\'>");
+            textToShowTOP = textToShowTOP.replace("[/B]", "</font>");
+            textToShowTOP = textToShowTOP.replace("[A]", "<u>");
+            textToShowTOP = textToShowTOP.replace("[/A]", "</u>");
+        }
+        catch (Exception e){}
+
+        Spanned resultTOP;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            resultTOP = Html.fromHtml(textToShowTOP,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            resultTOP = Html.fromHtml(textToShowTOP);
+        }
+
+        top.setText(resultTOP);
+
+        top.setOnClickListener(this);
+
+        chkTOP = findViewById(R.id.change_pwd_chkTOP);
+        chkTOP.setOnClickListener(this);
 		
 		progress = new ProgressDialog(this);
 		progress.setMessage(getString(R.string.my_account_changing_password));
@@ -886,6 +915,22 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 				break;
 			}
+            case R.id.top:
+                log("Show top");
+                hidePasswordIfVisible();
+                try {
+                    Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    openTermsIntent.setData(Uri.parse(Constants.URL_E2EE));
+                    startActivity(openTermsIntent);
+                }
+                catch (Exception e){
+                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                    viewIntent.setData(Uri.parse(Constants.URL_E2EE));
+                    startActivity(viewIntent);
+                }
+
+                break;
 //			case R.id.cancel_change_password:{
 //				changePasswordActivity.finish();
 //				break;
@@ -1171,6 +1216,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				return false;
 			}
 		}
+		if(!chkTOP.isChecked()) {
+            showSnackbar(getString(R.string.create_account_no_top));
+            return false;
+        }
 		return true;
 	}
 
