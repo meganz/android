@@ -82,6 +82,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private String linkToReset;
 	private String mk;
 
+	// TOP for 'terms of password'
     private CheckBox chkTOP;
 
 	private ActionBar aB;
@@ -256,13 +257,14 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
         TextView top = findViewById(R.id.top);
 
         String textToShowTOP = getString(R.string.top);
-        try{
-            textToShowTOP = textToShowTOP.replace("[B]", "<font color=\'#00BFA5\'>");
-            textToShowTOP = textToShowTOP.replace("[/B]", "</font>");
-            textToShowTOP = textToShowTOP.replace("[A]", "<u>");
-            textToShowTOP = textToShowTOP.replace("[/A]", "</u>");
+        try {
+            textToShowTOP = textToShowTOP.replace("[B]", "<font color=\'#00BFA5\'>")
+                    .replace("[/B]", "</font>")
+                    .replace("[A]", "<u>")
+                    .replace("[/A]", "</u>");
+        } catch (Exception e) {
+            log(e.getMessage());
         }
-        catch (Exception e){}
 
         Spanned resultTOP;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -275,7 +277,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
         top.setOnClickListener(this);
 
-        chkTOP = findViewById(R.id.change_pwd_chkTOP);
+        chkTOP = findViewById(R.id.chk_top);
         chkTOP.setOnClickListener(this);
 		
 		progress = new ProgressDialog(this);

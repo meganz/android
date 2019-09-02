@@ -62,6 +62,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     private ScrollView scrollView;
 
     private CheckBox chkTOS;
+    //TOP for 'terms of password'
     private CheckBox chkTOP;
 
     private MegaApiAndroid megaApi;
@@ -321,17 +322,17 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         tos.setOnClickListener(this);
 
-        //TODO top
         TextView top = v.findViewById(R.id.top);
 
         String textToShowTOP = context.getString(R.string.top);
-        try{
-            textToShowTOP = textToShowTOP.replace("[B]", "<font color=\'#00BFA5\'>");
-            textToShowTOP = textToShowTOP.replace("[/B]", "</font>");
-            textToShowTOP = textToShowTOP.replace("[A]", "<u>");
-            textToShowTOP = textToShowTOP.replace("[/A]", "</u>");
+        try {
+            textToShowTOP = textToShowTOP.replace("[B]", "<font color=\'#00BFA5\'>")
+                    .replace("[/B]", "</font>")
+                    .replace("[A]", "<u>")
+                    .replace("[/A]", "</u>");
+        } catch (Exception e) {
+            log(e.getMessage());
         }
-        catch (Exception e){}
 
         Spanned resultTOP;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -341,13 +342,12 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
 
         top.setText(resultTOP);
-
         top.setOnClickListener(this);
 
         chkTOS = (CheckBox) v.findViewById(R.id.create_account_chkTOS);
         chkTOS.setOnClickListener(this);
 
-        chkTOP = v.findViewById(R.id.create_account_chkTOP);
+        chkTOP = v.findViewById(R.id.chk_top);
         chkTOP.setOnClickListener(this);
 
         bRegister = (Button) v.findViewById(R.id.button_create_account_create);
@@ -574,7 +574,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 break;
             case R.id.top:
-                log("Show top");
+                log("Show terms of password");
                 hidePasswordIfVisible();
                 try {
                     Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
