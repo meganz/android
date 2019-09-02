@@ -51,7 +51,9 @@ import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
 
 public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener, RotatableAdapter {
-	
+
+	private final int LARGE_IMAGE_WIDTH = 48;
+	private final int SHORT_IMAGE_WIDTH = 36;
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	
@@ -172,21 +174,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			log("OfflineThumbnailAsyncTask::onPostExecute");
 			if (thumb != null){
 				if (holder.currentPath.compareTo(currentPath) == 0){
-					if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-						params1.setMargins(left, 0, 0, 0);
-
-						holder.imageView.setLayoutParams(params1);
-
-					}else if(getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID){
-						holder.iconView.setVisibility(View.GONE);
-						holder.imageView.setVisibility(View.VISIBLE);
-						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 2);
-					}
-					holder.imageView.setImageBitmap(thumb);
+					setThumbnail(holder, thumb);
 					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 					holder.imageView.startAnimation(fadeInAnimation);
 					notifyItemChanged(holder.getAdapterPosition());
@@ -597,14 +585,37 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			onBindViewHolderGrid(holderGrid, position);
 		}
 	}
+
+	private String getFolderInfo(File file) {
+		int folders = 0;
+		int files = 0;
+
+		File[] fList = file.listFiles();
+		if (fList == null) return " ";
+
+		String info = "";
+		for (File f : fList) {
+			if (f.isDirectory()) {
+				folders++;
+			} else {
+				files++;
+			}
+		}
+
+		if (folders > 0) {
+			info = folders + " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
+			if (files > 0) {
+				info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+			}
+		} else {
+			info = files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
+		}
+
+		return info;
+	}
 	
 	public void onBindViewHolderGrid (ViewHolderOfflineGrid holder, int position){
 		log("onBindViewHolderGrid");
-	
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
 	    
 		holder.currentPosition = position;
 
@@ -623,39 +634,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		holder.currentHandle = currentNode.getHandle();
 
 		holder.textViewFileName.setText(currentNode.getName());
-		
-		int folders=0;
-		int files=0;
+
 		if (currentFile.isDirectory()){
-			
-			File[] fList = currentFile.listFiles();
-
-			if(fList != null){
-				for (File f : fList){
-
-					if (f.isDirectory()){
-						folders++;
-					}
-					else{
-						files++;
-					}
-				}
-
-				String info = "";
-				if (folders > 0){
-					info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
-					if (files > 0){
-						info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
-					}
-				}
-				else {
-					info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
-				}
-				holder.textViewFileSize.setText(info);
-
-			}else{
-				holder.textViewFileSize.setText(" ");
-			}
+			holder.textViewFileSize.setText(getFolderInfo(currentFile));
 		}
 		else{
 			long nodeSize = currentFile.length();
@@ -674,8 +655,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 			holder.itemLayout.setVisibility(View.VISIBLE);
 			holder.folderLayout.setVisibility(View.GONE);
-//			holder.imageViewThumb.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
-//			holder.imageViewThumb.setVisibility(View.GONE);
 			holder.fileLayout.setVisibility(View.VISIBLE);
 			holder.textViewFileName.setVisibility(View.VISIBLE);
 			holder.textViewFileSize.setVisibility(View.GONE);
@@ -693,29 +672,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
 				holder.fileGridSelected.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
             }
-			if (MimeTypeThumbnail.typeForName(currentNode.getName()).isImage() || MimeTypeThumbnail.typeForName(currentNode.getName()).isPdf()
-					|| MimeTypeThumbnail.typeForName(currentNode.getName()).isVideo() || MimeTypeList.typeForName(currentNode.getName()).isAudio()){
-				Bitmap thumb = null;
-								
-				if (currentFile.exists()){
-					thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
-					if (thumb != null){
-						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 2);
-						holder.imageView.setImageBitmap(thumb);
-						holder.imageView.setVisibility(View.VISIBLE);
-						holder.iconView.setVisibility(View.GONE);
 
-					}
-					else{
-						try{
-							new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
-						}
-						catch(Exception e){
-							//Too many AsyncTasks
-						}
-					}
-				}
-			}
+            checkThumbnail(currentNode, currentFile, holder);
 		}else{
 			holder.itemLayout.setVisibility(View.VISIBLE);
 			holder.folderLayout.setVisibility(View.VISIBLE);
@@ -746,11 +704,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	
 	public void onBindViewHolderList (ViewHolderOfflineList holder, int position){
 		log("onBindViewHolderList");
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-	    
 		holder.currentPosition = position;
 				
 		MegaOffline currentNode = (MegaOffline) getItem(position);
@@ -779,116 +732,77 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		holder.currentHandle = currentNode.getHandle();
 
 		holder.textViewFileName.setText(currentNode.getName());
-		
-		int folders=0;
-		int files=0;
-		if (currentFile.isDirectory()){
 
+		setImageViewParams(holder.imageView, LARGE_IMAGE_WIDTH, 0);
+
+		if (currentFile.isDirectory()) {
 			log("Directory offline");
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(0, 0, 0, 0);
+			holder.textViewFileSize.setText(getFolderInfo(currentFile));
 
-			holder.imageView.setLayoutParams(params);
-			
-			File[] fList = currentFile.listFiles();
-			if(fList != null){
-				for (File f : fList){
-
-					if (f.isDirectory()){
-						folders++;
-					}
-					else{
-						files++;
-					}
-				}
-
-				String info = "";
-				if (folders > 0){
-					info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
-					if (files > 0){
-						info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
-					}
-				}
-				else {
-					info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
-				}
-				holder.textViewFileSize.setText(info);
-			}else{
-				holder.textViewFileSize.setText(" ");
-
-			}
-
-			RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-			paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(0, 0, 0, 0);
-			holder.imageView.setLayoutParams(paramsMultiselect);
-
-			if (multipleSelect && isItemChecked(position)) {
-				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-				holder.imageView.setImageResource(R.drawable.ic_select_folder);
-			}
-			else {
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageView.setImageResource(R.drawable.ic_folder_list);
-			}
-
-		}
-		else{
+		} else {
 			log("File offline");
 			long nodeSize = currentFile.length();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+		}
 
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(0, 0, 0, 0);
-
-			holder.imageView.setLayoutParams(params);
-
-			if (multipleSelect && isItemChecked(position)) {
-				log("multiselect");
-				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-				holder.imageView.setImageResource(R.drawable.ic_select_folder);
-			}
-			else{
-				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+		if (multipleSelect && isItemChecked(position)) {
+			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+			holder.imageView.setImageResource(R.drawable.ic_select_folder);
+		} else {
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
+			if (currentFile.isDirectory()) {
+				holder.imageView.setImageResource(R.drawable.ic_folder_list);
+			} else {
 				holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
-
 				log("Check the thumb");
-				if (MimeTypeList.typeForName(currentNode.getName()).isImage() || MimeTypeList.typeForName(currentNode.getName()).isPdf()
-						|| MimeTypeList.typeForName(currentNode.getName()).isVideo() || MimeTypeList.typeForName(currentNode.getName()).isAudio()){
-					Bitmap thumb = null;
-
-					if (currentFile.exists()){
-						thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
-						if (thumb != null){
-							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-							params1.setMargins(left, 0, 0, 0);
-
-							holder.imageView.setLayoutParams(params1);
-							holder.imageView.setImageBitmap(thumb);
-						}
-						else{
-							try{
-								new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
-							}
-							catch(Exception e){
-								//Too many AsyncTasks
-							}
-						}
-					}
-				}
+				checkThumbnail(currentNode, currentFile, holder);
 			}
 		}
 
 		holder.threeDotsLayout.setTag(holder);
 		holder.threeDotsLayout.setOnClickListener(this);
+	}
+
+	private void setImageViewParams(ImageView image, int value, int marginLeft) {
+		int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, context.getResources().getDisplayMetrics());
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) image.getLayoutParams();
+		params.width = params.height = size;
+		params.setMargins(marginLeft, 0, 0, 0);
+		image.setLayoutParams(params);
+	}
+
+	private void checkThumbnail(MegaOffline currentNode, File currentFile, ViewHolderOffline holder) {
+		if (!currentFile.exists()
+				|| (!MimeTypeList.typeForName(currentNode.getName()).isImage() && !MimeTypeList.typeForName(currentNode.getName()).isPdf()
+				&& !MimeTypeList.typeForName(currentNode.getName()).isVideo() && !MimeTypeList.typeForName(currentNode.getName()).isAudio()))
+			return;
+
+		Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
+		if (thumb == null) {
+			try {
+				new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
+			} catch (Exception e) {
+				//Too many AsyncTasks
+				e.printStackTrace();
+				log("Exception trying to get thumbnail");
+			}
+			return;
+		}
+
+		setThumbnail(holder, thumb);
+	}
+
+	private void setThumbnail(ViewHolderOffline holder, Bitmap thumb) {
+		if (getAdapterType() == ITEM_VIEW_TYPE_LIST) {
+			int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+			setImageViewParams(holder.imageView, SHORT_IMAGE_WIDTH, left);
+		} else if (getAdapterType() == ITEM_VIEW_TYPE_GRID) {
+			holder.iconView.setVisibility(View.GONE);
+			holder.imageView.setVisibility(View.VISIBLE);
+			thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 2);
+		}
+
+		holder.imageView.setImageBitmap(thumb);
 	}
 
 	
@@ -923,19 +837,17 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 		return getAdapterType();
 	}
- 
+
 	public Object getItem(int position) {
 		log("getItem");
 
-		return mOffList.get(position);
+		if (position >= 0 && mOffList != null && position < mOffList.size()) {
+			return mOffList.get(position);
+		}
+
+		return null;
 	}
 
-	public MegaOffline getItemOff(int position) {
-		log("getItemOff");
-
-		return mOffList.get(position);
-	}
-	
     @Override
     public long getItemId(int position) {
     	log("getItemId");
