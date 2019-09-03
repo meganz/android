@@ -39,9 +39,20 @@
 			android:entries="@array/settings_camera_upload_file_upload_entries"
 			android:entryValues="@array/settings_camera_upload_file_upload_values" />
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
+		<android.support.v7.preference.ListPreference
+			android:key="settings_video_upload_quality"
+			android:title="@string/settings_video_upload_quality"
+			android:entries="@array/settings_chat_upload_quality_entries"
+			android:entryValues="@array/settings_video_upload_quality_values" />
+
+		<android.support.v7.preference.SwitchPreferenceCompat
 			android:key="settings_camera_upload_charging"
-			android:title="@string/settings_camera_upload_charging" />
+			android:title="@string/settings_camera_upload_require_plug_in"
+			android:defaultValue="true"/>
+
+		<android.support.v7.preference.Preference
+			android:key="video_compression_queue_size"
+			android:title="@string/settings_video_compression_queue_size_title" />
 
 		<mega.privacy.android.app.components.TwoLineCheckPreference
 			android:key="settings_keep_file_names"

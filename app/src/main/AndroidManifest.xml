@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
-    android:installLocation="internalOnly"
-    android:versionCode="246"
-    android:versionName="3.6.3 (246)" >
+    android:installLocation="internalOnly">
 
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
@@ -36,6 +34,7 @@
     <uses-permission android:name="android.permission.FLAG_SHOW_WHEN_LOCKED" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
     <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
 
@@ -61,16 +60,10 @@
         </activity>
 
         <activity
-            android:name="WebViewActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop" >
-        </activity>
-
-        <activity
             android:name="mega.privacy.android.app.lollipop.WebViewActivityLollipop"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
-            android:launchMode="singleTop">
-        </activity>
+            android:launchMode="singleTop" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ManagerActivityLollipop"
@@ -431,11 +424,6 @@
         </activity>
 
         <service
-            android:name="CameraSyncService"
-            android:exported="false" >
-        </service>
-
-        <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
             android:exported="false" >
         </service>
@@ -485,8 +473,11 @@
 		<service android:name=".fcm.IncomingMessageService"/>
         <service
             android:name=".jobservices.CameraUploadsService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="false" />
+	    <service
+		    android:name=".jobservices.CameraUploadStarterService"
+		    android:permission="android.permission.BIND_JOB_SERVICE"
+		    android:exported="false" />
         <service android:name=".fcm.IncomingCallService" android:exported="true"/>
         <receiver
             android:name="mega.privacy.android.app.receivers.CustomInstallReferrerReceiver"
@@ -521,9 +512,6 @@
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
             </intent-filter>
         </receiver>
 
