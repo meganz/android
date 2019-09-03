@@ -645,6 +645,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 
 		holder.iconView.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
+		holder.imageView.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
 		holder.imageView.setVisibility(View.GONE);
 		holder.iconView.setVisibility(View.VISIBLE);
 
@@ -793,6 +794,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
 	private void setThumbnail(ViewHolderOffline holder, Bitmap thumb) {
+		if (holder == null) return;
+
 		if (getAdapterType() == ITEM_VIEW_TYPE_LIST) {
 			int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
 			setImageViewParams(holder.imageView, SHORT_IMAGE_WIDTH, left);
