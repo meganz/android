@@ -104,8 +104,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private static int MAX_WIDTH_FILENAME_PORT = 180;
 
     //margins of management message and hour
-    private static int MANAGEMENT_MESSAGE_LAND = 28;
-    private static int MANAGEMENT_MESSAGE_PORT = 48;
+    private final static int MANAGEMENT_MESSAGE_LAND = 28;
+    private final static int MANAGEMENT_MESSAGE_PORT = 48;
 
     //margins of management message and hour in a CALL
     private static int MANAGEMENT_MESSAGE_CALL_LAND = 40;
@@ -119,16 +119,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private static int CONTACT_MESSAGE_LAND = 28;
     private static int CONTACT_MESSAGE_PORT = 48;
 
-    private static int MAX_WIDTH_NAME_LAND = 280;
-    private static int MAX_WIDTH_NAME_PORT = 160;
+    private final static int MAX_WIDTH_NAME_LAND = 280;
+    private final static int MAX_WIDTH_NAME_PORT = 160;
 
-    private static int MAX_WIDTH_MESSAGE_LAND = 310;
-    private static int MAX_WIDTH_MESSAGE_PORT = 275;
+    private final static int MAX_WIDTH_MESSAGE_LAND = 310;
+    private final static int MAX_WIDTH_MESSAGE_PORT = 275;
 
-    private static final int TYPE_HEADER = 0;
-    private static final int TYPE_ITEM = 1;
+    private final static int TYPE_HEADER = 0;
+    private final static int TYPE_ITEM = 1;
 
-    private static final int LAYOUT_WIDTH = 330;
+    private final static int LAYOUT_WIDTH = 330;
 
     Context context;
     private int positionClicked;

@@ -82,6 +82,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public static final int ADAPTER_RECENT_CHATS = 0;
 	public static final int ADAPTER_ARCHIVED_CHATS = 1;
 
+	private static final String SPACE = " ";
+
 	Context context;
 	int positionClicked;
 	ArrayList<MegaChatListItem> chats;
@@ -194,7 +196,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(itemType == ITEM_VIEW_TYPE_NORMAL) {
 			((ViewHolderNormalChatList)holder).imageView.setImageBitmap(null);
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(" ");
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(SPACE);
 
 			MegaChatListItem chat = (MegaChatListItem) getItem(position);
 
@@ -259,13 +261,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if (!multipleSelect) {
 					//Multiselect OFF
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-
-					if (chat.getTitle().length() > 0){
-						String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
-						((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-					}
-
-					createGroupChatAvatar(holder);
+					createGroupChatAvatar(holder, chat.getTitle());
 				} else {
 					log("Multiselect ON");
 
@@ -279,13 +275,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					else{
 						log("NOT selected");
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-
-						if (chat.getTitle().length() > 0){
-							String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
-							((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-						}
-
-						createGroupChatAvatar(holder);
+						createGroupChatAvatar(holder, chat.getTitle());
 					}
 				}
 			}
@@ -607,7 +597,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	}
 
-	public void createGroupChatAvatar(ViewHolderChatList holder){
+	public void createGroupChatAvatar(ViewHolderChatList holder, String chatTitle){
 		log("createGroupChatAvatar()");
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -628,23 +618,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
-		float density  = context.getResources().getDisplayMetrics().density;
 
-		String firstLetter = ((ViewHolderNormalChatList)holder).contactInitialLetter.getText().toString();
-
-		if(firstLetter.trim().isEmpty()){
+		String firstLetter = ChatUtil.getFirstLetter(chatTitle);
+		if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
 			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.INVISIBLE);
-		}
-		else{
-			if(firstLetter.equals("(")){
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.INVISIBLE);
-			}
-			else{
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setTextSize(24);
-			}
+		}else {
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -681,16 +662,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		boolean setInitialByMail = false;
 
-		if (((ViewHolderNormalChatList)holder).fullName != null){
-			if (((ViewHolderNormalChatList)holder).fullName.trim().length() > 0){
-				String firstLetter = ((ViewHolderNormalChatList)holder).fullName.charAt(0) + "";
-				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
-			}else{
-				setInitialByMail=true;
-			}
+		if (((ViewHolderNormalChatList)holder).fullName != null && ((ViewHolderNormalChatList)holder).fullName.trim().length() > 0){
+			String firstLetter = ChatUtil.getFirstLetter(((ViewHolderNormalChatList)holder).fullName);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
+
 		}
 		else{
 			setInitialByMail=true;
@@ -706,6 +683,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			}
 		}
+
 		((ViewHolderNormalChatList)holder).contactInitialLetter.setTextSize(24);
 	}
 
@@ -1146,12 +1124,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).fullName = title;
 				}
 				else{
-					if (title.length() > 0){
-						String firstLetter = ChatUtil.getFirstLetter(title);
-						((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-					}
-
-					createGroupChatAvatar(holder);
+					createGroupChatAvatar(holder,title);
 				}
 			}
 		}

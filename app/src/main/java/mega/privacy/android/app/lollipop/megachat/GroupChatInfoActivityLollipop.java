@@ -20,6 +20,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -86,6 +87,8 @@ import nz.mega.sdk.MegaUser;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
 
+
+    private final static int MAX_LENGTH_CHAT_TITLE = 60;
     public long chatHandle;
     public long selectedHandleParticipant;
     private GroupChatInfoActivityLollipop groupChatInfoActivity;
@@ -1141,7 +1144,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             public void onClick(View v) {
                 log("OK BTTN CHANGE");
                 String title = input.getText().toString();
-                if (title.equals("") || title.isEmpty()) {
+                if (TextUtils.isEmpty(title)) {
                     log("input is empty");
                     input.setError(getString(R.string.invalid_string));
                     input.requestFocus();
@@ -1271,7 +1274,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             if (chatTitle == null) {
                 chatTitle = "";
-            } else if (!chatTitle.isEmpty() && chatTitle.length() > 60) {
+            } else if (!chatTitle.isEmpty() && chatTitle.length() > MAX_LENGTH_CHAT_TITLE) {
                 chatTitle = chatTitle.substring(0, 59) + "...";
             }
 
@@ -1413,7 +1416,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
         } else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE) {
             log("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!");
-            if (request.getFlag() == false) {
+            if (!request.getFlag()) {
                 if (request.getNumRetry() == 0) {
 //                    Query chat link
                     if (e.getErrorCode() == MegaChatError.ERROR_OK) {

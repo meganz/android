@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +17,24 @@ public final class EmojiManagerShortcodes {
     static List<EmojiShortcodes> emojiData;
 
     public static void initEmojiData(Context context) {
-        if (emojiData == null || emojiData.size() < 1)
+        if (emojiData == null || emojiData.size() < 1) {
+            BufferedReader reader = null;
             try {
                 Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setLenient().create();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(EMOJI_SHORTCODES)));
+                reader = new BufferedReader(new InputStreamReader(context.getAssets().open(EMOJI_SHORTCODES)));
                 emojiData = gson.fromJson(reader, new TypeToken<ArrayList<EmojiShortcodes>>() {
                 }.getType());
-                reader.close();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    if(reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        }
     }
 }
