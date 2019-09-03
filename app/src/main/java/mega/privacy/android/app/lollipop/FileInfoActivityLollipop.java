@@ -3038,15 +3038,15 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     		megaApi.removeRequestListener(this);
     	}
 
-        upArrow.setColorFilter(null);
-        drawableRemoveLink.setColorFilter(null);
-        drawableLink.setColorFilter(null);
-        drawableShare.setColorFilter(null);
-        drawableDots.setColorFilter(null);
-        drawableDownload.setColorFilter(null);
-        drawableLeave.setColorFilter(null);
-        drawableCopy.setColorFilter(null);
-        drawableChat.setColorFilter(null);
+    	if (upArrow != null) upArrow.setColorFilter(null);
+    	if (drawableRemoveLink != null) drawableRemoveLink.setColorFilter(null);
+        if (drawableLink != null) drawableLink.setColorFilter(null);
+        if (drawableShare != null) drawableShare.setColorFilter(null);
+        if (drawableDots != null) drawableDots.setColorFilter(null);
+        if (drawableDownload != null) drawableDownload.setColorFilter(null);
+        if (drawableLeave != null) drawableLeave.setColorFilter(null);
+        if (drawableCopy != null) drawableCopy.setColorFilter(null);
+        if (drawableChat != null) drawableChat.setColorFilter(null);
     }
 
 	public static void log(String message) {
