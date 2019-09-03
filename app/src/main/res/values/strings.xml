@@ -2524,4 +2524,6 @@
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Loading</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Please wait...</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>
