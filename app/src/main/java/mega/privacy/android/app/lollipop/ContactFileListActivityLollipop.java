@@ -1045,11 +1045,10 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent intent) {
-		if (intent == null) {
-			return;
-		}
-
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER	&& resultCode == RESULT_OK) {
+			if (intent == null) {
+				return;
+			}
 			log("local folder selected");
 			String parentPath = intent
 					.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
@@ -1062,8 +1061,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				nC = new NodeController(this);
 			}
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
-		} 
+		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
+			if (intent == null) {
+				return;
+			}
 			if (!Util.isOnline(this)) {
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
@@ -1106,17 +1108,19 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
-
+			if (intent == null) {
+				return;
+			}
 			if (!Util.isOnline(this)) {
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
-			
+
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 			moveToRubbish=false;
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
-			
+
 			ProgressDialog temp = null;
 			try{
 				temp = new ProgressDialog(this);
@@ -1127,13 +1131,15 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				return;
 			}
 			statusDialog = temp;
-			
+
 			for(int i=0; i<moveHandles.length;i++){
 				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
 			}
-		}		
+		}
 		else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
-			Uri uri = intent.getData();
+			if (intent == null) {
+				return;
+			}
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);
@@ -1146,16 +1152,18 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				return;
 			}
 			statusDialog = temp;
-		} 
+		}
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
-
+			if (intent == null) {
+				return;
+			}
 			if (!Util.isOnline(this)) {
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
 
 			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
-			final long folderHandle = intent.getLongExtra("SELECT", 0);			
+			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
 
@@ -1191,14 +1199,14 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 							}
 							break;
 						}
-						case 1:{	                    	
+						case 1:{
 							for (int i=0;i<selectedContacts.size();i++){
 								MegaUser user= megaApi.getContact(selectedContacts.get(i));
 								megaApi.share(parent, user, MegaShare.ACCESS_READWRITE,contactPropertiesMainActivity);
 							}
 							break;
 						}
-						case 2:{                   	
+						case 2:{
 							for (int i=0;i<selectedContacts.size();i++){
 								MegaUser user= megaApi.getContact(selectedContacts.get(i));
 								megaApi.share(parent, user, MegaShare.ACCESS_FULL,contactPropertiesMainActivity);
@@ -1217,7 +1225,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 		}
 		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
-
+			if (intent == null) {
+				return;
+			}
 			String folderPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_FILES);
 

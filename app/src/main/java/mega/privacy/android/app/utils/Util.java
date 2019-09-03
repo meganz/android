@@ -1802,7 +1802,10 @@ public class Util {
 		File newFile = buildTempFile(activity, "picture.jpg");
 		try {
 			newFile.createNewFile();
-		} catch (IOException e) {}
+		} catch (IOException e) {
+			e.printStackTrace();
+			log("IOException happens" + e.toString());
+		}
 
 		Uri outputFileUri;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
