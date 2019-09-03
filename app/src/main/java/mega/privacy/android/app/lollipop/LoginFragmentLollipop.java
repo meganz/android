@@ -2499,8 +2499,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 et_password.requestFocus();
             }
             else{
-                log("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError not API_OK "+error.getErrorCode());
-                ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
+                log("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError not API_OK " + error.getErrorCode());
+                LoginActivityLollipop loginActivityLollipop = (LoginActivityLollipop) context;
+                if (error.getErrorCode() == MegaError.API_ENOENT) {
+                    loginActivityLollipop.showSnackbar(getString(R.string.reg_link_expired));
+                } else {
+                    loginActivityLollipop.showSnackbar(error.getErrorString());
+                }
                 confirmLink = null;
             }
         }

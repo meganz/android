@@ -3,9 +3,11 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -23,6 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -46,7 +49,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -235,6 +237,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     boolean notChangePage = false;
     MegaNode currentDocument;
 
+    private BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                finish();
+            }
+        }
+    };
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -242,6 +253,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         super.onCreate(savedInstanceState);
 
         pdfViewerActivityLollipop = this;
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         final Intent intent = getIntent();
         if (intent == null){
@@ -2380,24 +2393,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     nC = new NodeController(this);
                 }
                 nC.downloadTo(currentDocument, parentPath, uri.toString());
-            }
-            else if (type == Constants.FROM_CHAT) {
-                long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-                if (hashes != null) {
-                    ArrayList<MegaNode> megaNodes = new ArrayList<>();
-                    for (int i=0; i<hashes.length; i++) {
-                        MegaNode node = megaApi.getNodeByHandle(hashes[i]);
-                        if (node != null) {
-                            megaNodes.add(node);
-                        }
-                        else {
-                            log("Node NULL, not added");
-                        }
-                    }
-                    if (megaNodes.size() > 0) {
-                        chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-                    }
-                }
+            } else if (type == Constants.FROM_CHAT) {
+                chatC.prepareForDownload(intent, parentPath);
             }
             else {
                 String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
@@ -2892,6 +2889,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
 
         super.onDestroy();
     }

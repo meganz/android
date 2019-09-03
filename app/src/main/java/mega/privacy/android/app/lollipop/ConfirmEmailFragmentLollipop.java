@@ -194,6 +194,7 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 				break;
 			}
 			case R.id.confirm_email_cancel:{
+				megaApi.cancelCreateAccount(this);
 				((LoginActivityLollipop)context).cancelConfirmationAccount();
 				break;
 			}

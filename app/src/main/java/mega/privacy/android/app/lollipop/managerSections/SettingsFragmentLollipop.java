@@ -28,6 +28,7 @@ import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.preference.SwitchPreferenceCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -597,36 +598,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
 				}
 
-				if (prefs.getCamSyncFileUpload() == null){
-					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-					fileUpload = getString(R.string.settings_camera_upload_only_photos);
-				}
-				else{
-					switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
-						case MegaPreferences.ONLY_PHOTOS:{
-							fileUpload = getString(R.string.settings_camera_upload_only_photos);
-							cameraUploadWhat.setValueIndex(0);
-							disableVideoQualitySettings();
-							break;
-						}
-						case MegaPreferences.ONLY_VIDEOS:{
-							fileUpload = getString(R.string.settings_camera_upload_only_videos);
-							cameraUploadWhat.setValueIndex(1);
-							break;
-						}
-						case MegaPreferences.PHOTOS_AND_VIDEOS:{
-							fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
-							cameraUploadWhat.setValueIndex(2);
-							break;
-						}
-						default:{
-							fileUpload = getString(R.string.settings_camera_upload_only_photos);
-							cameraUploadWhat.setValueIndex(0);
-                            disableVideoQualitySettings();
-							break;
-						}
-					}
-				}
+				setWhatToUploadForCameraUpload();
 
 				if (Boolean.parseBoolean(prefs.getCamSyncWifi())){
 					wifi = getString(R.string.cam_sync_wifi);
@@ -677,7 +649,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                     }
 
                 }else{
-				    disableVideoQualitySettings();
+					hideVideoQualitySettingsSection();
                     dbH.setCameraUploadVideoQuality(ORIGINAL);
                     dbH.setConversionOnCharging(false);
                     dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
@@ -1062,7 +1034,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			cameraUploadWhat.setSummary("");
 			cameraUploadCategory.removePreference(localCameraUploadFolder);
 			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-            disableVideoQualitySettings();
+			hideVideoQualitySettingsSection();
 			cameraUploadCategory.removePreference(keepFileNames);
 			cameraUploadCategory.removePreference(megaCameraFolder);
 			cameraUploadCategory.removePreference(cameraUploadHow);
@@ -1375,6 +1347,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 					fileUpload = getString(R.string.settings_camera_upload_only_photos);
 					cameraUploadWhat.setValueIndex(0);
+					resetVideoQualitySettings();
                     disableVideoQualitySettings();
 					break;
 				}
@@ -1382,6 +1355,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_VIDEOS);
 					fileUpload = getString(R.string.settings_camera_upload_only_videos);
 					cameraUploadWhat.setValueIndex(1);
+					resetVideoQualitySettings();
 					enableVideoQualitySettings();
 					break;
 				}
@@ -1389,6 +1363,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
 					fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
 					cameraUploadWhat.setValueIndex(2);
+					resetVideoQualitySettings();
                     enableVideoQualitySettings();
 					break;
 				}
@@ -1412,6 +1387,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                     dbH.setCameraUploadVideoQuality(MEDIUM);
                     prefs.setUploadVideoQuality(MEDIUM + "");
                     videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
+					resetVideoQualitySettings();
                     enableChargingSettings();
                     dbH.updateVideoState(SyncRecord.STATUS_TO_COMPRESS);
                     break;
@@ -2132,36 +2108,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             dbH.setAutoPlayEnabled(String.valueOf(isChecked));
 
         }
-		else{
-			log("Camera OFF");
-			secondaryUpload = false;
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-				Intent stopIntent = new Intent(context, CameraUploadsService.class);
-				stopIntent.setAction(CameraUploadsService.ACTION_STOP);
-				context.startService(stopIntent);
-			}
-			else {
-				dbH.setCamSyncEnabled(false);
-				dbH.setSecondaryUploadEnabled(false);
-				if (megaApi != null) {
-					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-				}
-			}
-
-			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
-            cameraUploadOn.setSummary("");
-			secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
-			cameraUploadCategory.removePreference(cameraUploadHow);
-			cameraUploadCategory.removePreference(cameraUploadWhat);
-			cameraUploadCategory.removePreference(localCameraUploadFolder);
-			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-			cameraUploadCategory.removePreference(cameraUploadCharging);
-			cameraUploadCategory.removePreference(keepFileNames);
-			cameraUploadCategory.removePreference(megaCameraFolder);
-			cameraUploadCategory.removePreference(secondaryMediaFolderOn);
-			cameraUploadCategory.removePreference(localSecondaryFolder);
-			cameraUploadCategory.removePreference(megaSecondaryFolder);
-		}
 		return true;
 	}
 
@@ -2707,132 +2653,241 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		return autoAccept;
 	}
 
-	public void enableCameraUpload(){
-        cameraUpload = true;
-        if (camSyncLocalPath!=null){
+	private String getLocalDCIMFolderPath(){
+		return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
+	}
 
-            if (!isExternalSDCard){
-                File checkFile = new File(camSyncLocalPath);
-                if(!checkFile.exists()){
-                    //Local path does not exist, then Camera folder by default
-                    log("local path not exist, default camera folder");
-                    File cameraDownloadLocation = null;
-                    if (Environment.getExternalStorageDirectory() != null){
-                        cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-                    }
+	private void setWhatToUploadForCameraUpload(){
+		if (prefs.getCamSyncFileUpload() == null){
+			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+			fileUpload = getString(R.string.settings_camera_upload_only_photos);
+			cameraUploadWhat.setValueIndex(0);
+		}
+		else{
+			switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
+				case MegaPreferences.ONLY_PHOTOS:{
+					fileUpload = getString(R.string.settings_camera_upload_only_photos);
+					cameraUploadWhat.setValueIndex(0);
+					disableVideoQualitySettings();
+					break;
+				}
+				case MegaPreferences.ONLY_VIDEOS:{
+					fileUpload = getString(R.string.settings_camera_upload_only_videos);
+					cameraUploadWhat.setValueIndex(1);
+					break;
+				}
+				case MegaPreferences.PHOTOS_AND_VIDEOS:{
+					fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
+					cameraUploadWhat.setValueIndex(2);
+					break;
+				}
+				default:{
+					fileUpload = getString(R.string.settings_camera_upload_only_photos);
+					cameraUploadWhat.setValueIndex(0);
+					disableVideoQualitySettings();
+					break;
+				}
+			}
+		}
+		cameraUploadWhat.setSummary(fileUpload);
+	}
 
-                    cameraDownloadLocation.mkdirs();
+	private void setupConnectionTypeForCameraUpload(){
+		if (prefs.getCamSyncWifi() == null){
+			dbH.setCamSyncWifi(true);
+			cameraUploadHow.setSummary(getString(R.string.cam_sync_wifi));
+			cameraUploadHow.setValueIndex(1);
+		}else{
+			if(Boolean.parseBoolean(prefs.getCamSyncWifi())){
+				cameraUploadHow.setSummary(getString(R.string.cam_sync_wifi));
+				cameraUploadHow.setValueIndex(1);
+			}else{
+				cameraUploadHow.setSummary(getString(R.string.cam_sync_data));
+				cameraUploadHow.setValueIndex(0);
+			}
+		}
+	}
 
-                    dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
-
-                    camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-                    localCameraUploadFolder.setSummary(camSyncLocalPath);
-                    localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
-                }
-            }
-            else{
-                Uri uri = Uri.parse(prefs.getUriExternalSDCard());
-
-                DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
-                String pickedDirName = pickedDir.getName();
-                if(pickedDirName!=null){
-                    camSyncLocalPath = pickedDir.getName();
-                    localCameraUploadFolder.setSummary(pickedDir.getName());
-                    localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
-                }
-                else{
-                    log("pickedDirNAme NULL");
-                }
-            }
+	private void setupLocalPathForCameraUpload(){
+	    String cameraFolderLocation = prefs.getCamSyncLocalPath();
+        if(TextUtils.isEmpty(cameraFolderLocation)) {
+            cameraFolderLocation = getLocalDCIMFolderPath();
         }
-        else{
-            log("local parh is NULL");
-            //Local path not valid = null, then Camera folder by default
-            File cameraDownloadLocation = null;
-            if (Environment.getExternalStorageDirectory() != null){
-                cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-            }
+		if (camSyncLocalPath != null) {
+			if (!isExternalSDCard) {
+				File checkFile = new File(camSyncLocalPath);
+				if (!checkFile.exists()) {
+					log("local path not exist, use default camera folder path");
+					camSyncLocalPath = cameraFolderLocation;
+				}
+			} else {
+				Uri uri = Uri.parse(prefs.getUriExternalSDCard());
+				DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
+				String pickedDirName = pickedDir.getName();
+				if (pickedDirName != null) {
+					camSyncLocalPath = pickedDirName;
+				} else {
+					log("pickedDirName is NULL");
+				}
+			}
+		} else {
+			log("local path is NULL");
+			dbH.setCameraFolderExternalSDCard(false);
+			isExternalSDCard = false;
+			camSyncLocalPath = cameraFolderLocation;
+		}
 
-            cameraDownloadLocation.mkdirs();
+		dbH.setCamSyncLocalPath(cameraFolderLocation);
+		localCameraUploadFolder.setSummary(camSyncLocalPath);
+		localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
+		File[] fs = context.getExternalFilesDirs(null);
+		if (fs.length == 1) {
+			cameraUploadCategory.addPreference(localCameraUploadFolder);
+			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+		} else {
+			if (fs.length > 1) {
+				if (fs[1] == null) {
+					cameraUploadCategory.addPreference(localCameraUploadFolder);
+					cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+				} else {
+					cameraUploadCategory.removePreference(localCameraUploadFolder);
+					cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
+				}
+			}
+		}
+	}
 
-            dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
-            dbH.setCameraFolderExternalSDCard(false);
-            isExternalSDCard = false;
+	private void setupVideoOptionsForCameraUpload(){
+		if (prefs.getCamSyncFileUpload() == null) {
+			disableVideoQualitySettings();
+		} else {
+			boolean isPhotoOnly = Integer.parseInt(prefs.getCamSyncFileUpload()) == MegaPreferences.ONLY_PHOTOS;
+			if (!isPhotoOnly) {
+				enableVideoQualitySettings();
+			}
+		}
+	}
 
-            camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-        }
+	private void setupSecondaryUpload(){
+		if (prefs.getSecondaryMediaFolderEnabled() == null) {
+			dbH.setSecondaryUploadEnabled(false);
+			secondaryUpload = false;
+		} else {
+			secondaryUpload = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+		}
 
-        if(camSyncHandle!=null){
-            if(camSyncHandle==-1){
-                camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
-            }
-        }
-        else{
-            camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
-        }
+		if (secondaryUpload) {
+			//Check if the node exists in MEGA
+			String secHandle = prefs.getMegaHandleSecondaryFolder();
+			if (secHandle != null) {
+				if (!TextUtils.isEmpty(secHandle)) {
+					log("handleSecondaryMediaFolder NOT empty");
+					handleSecondaryMediaFolder = Long.valueOf(secHandle);
+					if (handleSecondaryMediaFolder != -1) {
+						megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
+						if (megaNodeSecondaryMediaFolder != null) {
+							megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
+						} else {
+							megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
+						}
+					} else {
+						megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
+					}
+				} else {
+					log("handleSecondaryMediaFolder empty string");
+					megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
+				}
+			} else {
+				log("handleSecondaryMediaFolder Null");
+				dbH.setSecondaryFolderHandle(-1);
+				handleSecondaryMediaFolder = (long) -1;
+				megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
+			}
 
-        megaCameraFolder.setSummary(camSyncMegaPath);
+			//check if the local secondary folder exists
+			localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
+			if (localSecondaryFolderPath == null || localSecondaryFolderPath.equals("-1")) {
+				log("secondary ON: invalid localSecondaryFolderPath");
+				localSecondaryFolderPath = getString(R.string.settings_empty_folder);
+				Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
+			} else {
+				File checkSecondaryFile = new File(localSecondaryFolderPath);
+				if (!checkSecondaryFile.exists()) {
+					log("secondary ON: the local folder does not exist");
+					dbH.setSecondaryFolderPath("-1");
+					//If the secondary folder does not exist
+					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
+					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 
-        //upload photos only as default
-        dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-        fileUpload = getString(R.string.settings_camera_upload_only_photos);
-        cameraUploadWhat.setValueIndex(0);
+				}
+			}
 
-        disableVideoQualitySettings();
-        dbH.setCameraUploadVideoQuality(ORIGINAL);
-        dbH.setConversionOnCharging(false);
-        dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+			megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
+			localSecondaryFolder.setSummary(localSecondaryFolderPath);
+			secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_off));
+			cameraUploadCategory.addPreference(localSecondaryFolder);
+			cameraUploadCategory.addPreference(megaSecondaryFolder);
 
-        dbH.setCamSyncWifi(true);
-        wifi = getString(R.string.cam_sync_wifi);
-        cameraUploadHow.setValueIndex(1);
+		} else {
+			secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
+			cameraUploadCategory.removePreference(localSecondaryFolder);
+			cameraUploadCategory.removePreference(megaSecondaryFolder);
+		}
+	}
 
-        charging = true;
-        cameraUploadCharging.setChecked(charging);
+	private void setupPrimaryCloudFolder() {
+		if (camSyncHandle == null) {
+			camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
+		} else {
+			if (camSyncHandle == -1) {
+				camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
+			} else {
+				log("camSyncHandle is " + camSyncHandle);
+			}
+		}
+		megaCameraFolder.setSummary(camSyncMegaPath);
+	}
 
-        dbH.setCamSyncEnabled(true);
+	public void enableCameraUpload() {
+		cameraUpload = true;
+		prefs = dbH.getPreferences();
 
-        handler.postDelayed(new Runnable() {
+		//internet connect type
+		setupConnectionTypeForCameraUpload();
 
-            @Override
-            public void run() {
-                log("enableCameraUpload, Now I start the service");
-                JobUtil.startCameraUploadService(context);
-            }
-        }, 1 * 1000);
+		//upload type
+		setWhatToUploadForCameraUpload();
 
-        cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
-        cameraUploadHow.setSummary(wifi);
-        localCameraUploadFolder.setSummary(camSyncLocalPath);
-        localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
+		//video options
+		setupVideoOptionsForCameraUpload();
 
-        cameraUploadWhat.setSummary(fileUpload);
-        cameraUploadCategory.addPreference(cameraUploadHow);
-        cameraUploadCategory.addPreference(cameraUploadWhat);
-        cameraUploadCategory.addPreference(keepFileNames);
-        cameraUploadCategory.addPreference(megaCameraFolder);
-        cameraUploadCategory.addPreference(secondaryMediaFolderOn);
-        cameraUploadCategory.removePreference(localSecondaryFolder);
-        cameraUploadCategory.removePreference(megaSecondaryFolder);
+		//local primary folder
+		setupLocalPathForCameraUpload();
 
-        File[] fs = context.getExternalFilesDirs(null);
-        if (fs.length == 1){
-            cameraUploadCategory.addPreference(localCameraUploadFolder);
-            cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-        }
-        else{
-            if (fs.length > 1){
-                if (fs[1] == null){
-                    cameraUploadCategory.addPreference(localCameraUploadFolder);
-                    cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-                }
-                else{
-                    cameraUploadCategory.removePreference(localCameraUploadFolder);
-                    cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
-                }
-            }
-        }
-    }
+		//cloud primary folder
+		setupPrimaryCloudFolder();
+
+		//secondary upload
+		setupSecondaryUpload();
+
+		//set cu enabled and start the service
+		dbH.setCamSyncEnabled(true);
+		handler.postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				log("enableCameraUpload, Now I start the service");
+				JobUtil.startCameraUploadService(context);
+			}
+		}, 1000);
+
+		cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
+		cameraUploadCategory.addPreference(cameraUploadHow);
+		cameraUploadCategory.addPreference(cameraUploadWhat);
+		cameraUploadCategory.addPreference(keepFileNames);
+		cameraUploadCategory.addPreference(megaCameraFolder);
+		cameraUploadCategory.addPreference(secondaryMediaFolderOn);
+	}
 
     public void disableCameraUpload(){
         log("Camera OFF");
@@ -2850,8 +2905,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         },10 * 1000);
 
         dbH.setCamSyncEnabled(false);
-        dbH.setSecondaryUploadEnabled(false);
-        secondaryUpload = false;
         stopRunningCameraUploadService(context);
 
         cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
@@ -2861,7 +2914,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         cameraUploadCategory.removePreference(cameraUploadWhat);
         cameraUploadCategory.removePreference(localCameraUploadFolder);
         cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-        disableVideoQualitySettings();
+		hideVideoQualitySettingsSection();
         cameraUploadCategory.removePreference(keepFileNames);
         cameraUploadCategory.removePreference(megaCameraFolder);
         cameraUploadCategory.removePreference(secondaryMediaFolderOn);
@@ -2965,10 +3018,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
     }
 
     private boolean isQueueSizeValid(int size){
-	    if(size >= COMPRESSION_QUEUE_SIZE_MIN && size <= COMPRESSION_QUEUE_SIZE_MAX){
-	        return true;
-        }
-        return false;
+		return size >= COMPRESSION_QUEUE_SIZE_MIN && size <= COMPRESSION_QUEUE_SIZE_MAX;
     }
 
     private void resetSizeInput(EditText input){
@@ -2976,7 +3026,15 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         input.requestFocus();
     }
 
+	private void hideVideoQualitySettingsSection(){
+		cameraUploadCategory.removePreference(videoQuality);
+		cameraUploadCategory.removePreference(cameraUploadCharging);
+		cameraUploadCategory.removePreference(cameraUploadVideoQueueSize);
+	}
+
     private void disableVideoQualitySettings(){
+		prefs.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_MEDIUM));
+		dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
         cameraUploadCategory.removePreference(videoQuality);
         disableChargingSettings();
     }
@@ -2998,37 +3056,63 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         rescheduleCameraUpload(context);
     }
 
-    private void enableVideoQualitySettings(){
-	    cameraUploadCategory.addPreference(videoQuality);
-		prefs.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_MEDIUM));
+    private void resetVideoQualitySettings(){
 		dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
-		videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
-		videoQuality.setSummary(videoQuality.getEntry());
-		enableChargingSettings();
-    }
+		dbH.setConversionOnCharging(true);
+		dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+		String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, DEFAULT_CONVENTION_QUEUE_SIZE + getResources().getString(R.string.label_file_size_mega_byte));
+		cameraUploadCharging.setSummary(chargingHelper);
+	}
 
-    private void enableChargingSettings(){
-        charging = true;
-		dbH.setConversionOnCharging(charging);
+	private void enableVideoQualitySettings() {
+		prefs = dbH.getPreferences();
+		cameraUploadCategory.addPreference(videoQuality);
+		String uploadQuality = prefs.getUploadVideoQuality();
+		if (TextUtils.isEmpty(uploadQuality)) {
+			prefs.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_MEDIUM));
+			dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
+			videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
+			enableChargingSettings();
+		} else if (Integer.parseInt(uploadQuality) == MEDIUM) {
+			enableChargingSettings();
+			videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
+		} else if (Integer.parseInt(uploadQuality) == ORIGINAL) {
+			videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
+		}
+		videoQuality.setSummary(videoQuality.getEntry());
+	}
+
+	private void enableChargingSettings() {
+		prefs = dbH.getPreferences();
+		if (prefs.getConversionOnCharging() == null) {
+			dbH.setConversionOnCharging(true);
+			charging = true;
+		} else {
+			charging = Boolean.parseBoolean(prefs.getConversionOnCharging());
+		}
 		cameraUploadCharging.setChecked(charging);
 		cameraUploadCategory.addPreference(cameraUploadCharging);
-		enableVideoCompressionSizeSettings();
-    }
 
-    private void enableVideoCompressionSizeSettings(){
-        cameraUploadCategory.addPreference(cameraUploadVideoQueueSize);
+		if(charging){
+			enableVideoCompressionSizeSettings();
+		}
+	}
+
+	private void enableVideoCompressionSizeSettings() {
+		prefs = dbH.getPreferences();
+		cameraUploadCategory.addPreference(cameraUploadVideoQueueSize);
 
 		//convention queue size
 		String sizeInDB = prefs.getChargingOnSize();
 		int size;
-		if(sizeInDB == null){
+		if (sizeInDB == null) {
 			dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
 			size = DEFAULT_CONVENTION_QUEUE_SIZE;
-		}else{
+		} else {
 			size = Integer.parseInt(sizeInDB);
 		}
 		cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.label_file_size_mega_byte));
-    }
+	}
 
     private void enableVideoCompressionSizeSettingsAndRestartUpload(){
         enableVideoCompressionSizeSettings();
