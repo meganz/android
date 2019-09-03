@@ -1536,6 +1536,12 @@ public class Util {
 		}
 	}
 
+	public static void changeStatusBarColor(Context context, Window window, int color) {
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		window.setStatusBarColor(ContextCompat.getColor(context, color));
+	}
+
 	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
 		log("createDefaultAvatar color: '"+color+"' firstLetter: '"+firstLetter+"'");
 

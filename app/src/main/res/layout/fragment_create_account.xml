@@ -61,7 +61,7 @@
                             android:textSize="16sp"
                             android:imeOptions="actionNext"
                             android:inputType="text|textCapWords"
-                            android:hint="@string/name_text"
+                            android:hint="@string/first_name_text"
                             android:theme="@style/ColorControlStyle"/>
 
                     </android.support.design.widget.TextInputLayout>

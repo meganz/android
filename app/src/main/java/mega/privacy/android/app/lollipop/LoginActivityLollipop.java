@@ -57,6 +57,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
+import static mega.privacy.android.app.utils.Util.changeStatusBarColor;
 
 public class LoginActivityLollipop extends BaseActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
@@ -259,12 +260,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
-//				getFragmentManager()
-//						.beginTransaction()
-//						.attach(loginFragment)
-//						.commit();
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
             }
             case Constants.CHOOSE_ACCOUNT_FRAGMENT: {
@@ -278,10 +274,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                Window window = this.getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
             }
             case Constants.CREATE_ACCOUNT_FRAGMENT: {
@@ -295,11 +288,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 ft.replace(R.id.fragment_container_login, createAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                Window window = this.getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
 
             }
@@ -344,11 +333,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
 
-                Window window = this.getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
             }
         }
@@ -928,11 +913,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        Window window = getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         if (visibleFragment == Constants.LOGIN_FRAGMENT) {
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
+            changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color_secondary);
         }
     }
 
@@ -941,9 +923,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
             aB.hide();
         }
 
-        Window window = getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+        changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
     }
 }

@@ -98,6 +98,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Util.changeStatusBarColor;
 
 
 @SuppressLint("NewApi") 
@@ -318,10 +319,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			log("dbH.getCredentials() NOT null");
 
 			if (megaApi.getRootNode() == null){
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
+				changeStatusBarColor(this, this.getWindow(), R.color.transparent_black);
 
 				log("megaApi.getRootNode() == null");
 
@@ -504,10 +502,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+				changeStatusBarColor(this, this.getWindow(), R.color.lollipop_dark_primary_color);
 			}
 		}
 	}
@@ -618,10 +613,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 		tB  =(Toolbar) findViewById(R.id.toolbar);
 
-		Window window = getWindow();
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+		changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
 
 		loginVerificationLayout = (LinearLayout) findViewById(R.id.login_2fa);
 		loginVerificationLayout.setVisibility(View.GONE);
@@ -1576,10 +1568,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		aB.setDisplayShowHomeEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
 
-		Window window = getWindow();
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+		changeStatusBarColor(this, this.getWindow(), R.color.lollipop_dark_primary_color);
 	}
 
 	public void hideAB(){
@@ -1587,10 +1576,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			aB.hide();
 		}
 
-		Window window = getWindow();
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+		changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
 	}
 	
 	public void setParentHandle (long parentHandle){
@@ -1827,10 +1813,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 						MegaApplication.setLoggingIn(false);
                         afterFetchNodes();
 
-						Window window = this.getWindow();
-						window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-						window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-						window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+                        changeStatusBarColor(this, this.getWindow(), R.color.lollipop_dark_primary_color);
 					}
 					else{
 						log("Chat NOT enabled - readyToManager");
