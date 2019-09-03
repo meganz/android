@@ -217,7 +217,7 @@ public class MimeTypeList {
 	 * Check is MimeType of voice type
 	 */
 	public boolean isAudioVoiceClip() {
-		return type.startsWith("audio/") || extension.equals("m4a");
+		return extension.equals("m4a");
 	}
 
 	public boolean isAudioNotSupported() {
