@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/send_attachment_chat_bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:padding="0dp">
+
+        <!-- Title -->
+        <LinearLayout
+            android:id="@+id/send_attachment_chat_title_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/send_attachment_chat_title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:layout_marginLeft="18dp"
+                android:textColor="@color/transparent_black"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:id="@+id/send_attachment_chat_items_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <!--From Cloud-->
+                <LinearLayout
+                    android:id="@+id/send_attachment_chat_from_cloud_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/send_attachment_chat_from_cloud_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:layout_marginLeft="16dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_pick_cloud_drive"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/send_attachment_chat_from_cloud_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="32dp"
+                        android:text="@string/attachment_upload_panel_from_cloud"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+                <!--From Cloud-->
+                <LinearLayout
+                    android:id="@+id/send_attachment_chat_from_filesystem_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/send_attachment_chat_from_filesystem_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:layout_marginLeft="16dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_pick_file_system"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/send_attachment_chat_from_filesystem_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="32dp"
+                        android:text="@string/attachment_upload_panel_from_device"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+                <!--Contact-->
+                <LinearLayout
+                    android:id="@+id/send_attachment_chat_contact_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/send_attachment_chat_contact_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_send_contact"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/send_attachment_chat_contact_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="32dp"
+                        android:text="@string/attachment_upload_panel_contact"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+                <!--Location-->
+                <LinearLayout
+                    android:id="@+id/send_attachment_chat_location_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/send_attachment_chat_location_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:layout_marginLeft="16dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_outline_location"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/send_attachment_chat_location_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="32dp"
+                        android:text="@string/file_properties_info_location"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v4.widget.NestedScrollView>
+
+    </LinearLayout>
+</LinearLayout>

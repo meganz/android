@@ -88,6 +88,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
 
 	public static int NUMBER_MESSAGES_TO_LOAD = 20;
@@ -559,23 +561,10 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 							mediaIntent.putExtra("msgId", m.getMsgId());
 							mediaIntent.putExtra("chatId", chatId);
 
-							String downloadLocationDefaultPath = null;
 							mediaIntent.putExtra("FILENAME", node.getName());
 							MegaPreferences prefs = dbH.getPreferences();
-							if (prefs != null){
-								log("prefs != null");
-								if (prefs.getStorageAskAlways() != null){
-									if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-										log("askMe==false");
-										if (prefs.getStorageDownloadLocation() != null){
-											if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-												downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-											}
-										}
-									}
-								}
-							}
-							String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+							String downloadLocationDefaultPath = getDownloadLocation(this);
+							String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
 							File f = new File(downloadLocationDefaultPath, node.getName());
 							boolean isOnMegaDownloads = false;
 							if(f.exists() && (f.length() == node.getSize())){
@@ -679,24 +668,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 							pdfIntent.putExtra("msgId", m.getMsgId());
 							pdfIntent.putExtra("chatId", chatId);
 
-							String downloadLocationDefaultPath = null;
 							pdfIntent.putExtra("FILENAME", node.getName());
 							MegaPreferences prefs = dbH.getPreferences();
-							if (prefs != null){
-								log("prefs != null");
-								if (prefs.getStorageAskAlways() != null){
-									if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-										log("askMe==false");
-										if (prefs.getStorageDownloadLocation() != null){
-											if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-												downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-											}
-										}
-									}
-								}
-							}
+							String downloadLocationDefaultPath = getDownloadLocation(this);
 
-							String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+							String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
 							File f = new File(downloadLocationDefaultPath, node.getName());
 							boolean isOnMegaDownloads = false;
 							if(f.exists() && (f.length() == node.getSize())){
@@ -788,10 +764,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						log("show node attachment panel");
 						showNodeAttachmentBottomSheet(m, position);
 					}
-
-
 				}
-
 			}
 		}else{
 			log("DO NOTHING: Position ("+position+") is more than size in messages (size: "+messages.size()+")");
@@ -1327,22 +1300,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-			if (hashes != null) {
-				ArrayList<MegaNode> megaNodes = new ArrayList<>();
-				for (int i=0; i<hashes.length; i++) {
-					MegaNode node = megaApi.getNodeByHandle(hashes[i]);
-					if (node != null) {
-						megaNodes.add(node);
-					}
-					else {
-						log("Node NULL, not added");
-					}
-				}
-				if (megaNodes.size() > 0) {
-					chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-				}
-			}
+            chatC.prepareForDownload(intent, parentPath);
 		}
 	}
 

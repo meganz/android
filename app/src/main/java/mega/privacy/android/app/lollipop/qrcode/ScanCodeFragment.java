@@ -47,7 +47,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 //import me.dm7.barcodescanner.zxing.ZXingScannerView;
 

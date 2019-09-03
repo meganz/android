@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent_layout_maps"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    tools:context=".lollipop.megachat.MapsActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_maps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        app:titleTextAppearance="@style/ToolbarTitle"
+        app:popupTheme="@style/Theme.Megaactionbar"
+        app:theme="@style/Theme.Megaactionbar"
+        tools:context=".lollipop.megachat" />
+
+    <RelativeLayout
+        android:id="@+id/map_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_maps"
+        android:layout_marginBottom="72dp">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <ImageView
+            android:id="@+id/fullscreen_marker_icon_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/icon_marker_shadow"
+            android:layout_centerHorizontal="true"
+            android:layout_alignBottom="@+id/fullscreen_marker_icon"
+            android:paddingBottom="55dp"/>
+
+        <ImageView
+            android:id="@+id/fullscreen_marker_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_send_location"
+            android:tint="@color/dark_primary_color_secondary"
+            android:layout_centerInParent="true"
+            android:paddingBottom="24dp"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/set_fullscreen_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            app:fabCustomSize="45dp"
+            android:scaleType="center"
+            app:backgroundTint="@color/white"
+            android:alpha="0.9"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/my_location_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            app:fabCustomSize="45dp"
+            android:scaleType="center"
+            app:backgroundTint="@color/white"
+            android:alpha="0.9"/>
+
+        <ProgressBar
+            android:id="@+id/progressbar_maps"
+            style="?android:attr/progressBarStyleLargeInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/send_current_location_layout"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_alignParentBottom="true">
+
+        <ImageView
+            android:id="@+id/address_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:alpha="0.56"
+            android:src="@drawable/ic_location"/>
+
+        <TextView
+            android:id="@+id/address_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/name_my_account"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_toRightOf="@id/address_icon"/>
+
+        <TextView
+            android:id="@+id/address_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/mail_my_account"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_below="@id/address_name_label"
+            android:layout_alignLeft="@+id/address_name_label"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/send_current_location_layout_landscape"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/address_icon_landscape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_centerVertical="true"
+            android:alpha="0.56"
+            android:src="@drawable/ic_location"/>
+
+        <TextView
+            android:id="@+id/address_name_label_landscape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/name_my_account"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_toRightOf="@id/address_icon_landscape"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

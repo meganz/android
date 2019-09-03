@@ -3,19 +3,13 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-
 import java.nio.ByteBuffer;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
@@ -25,17 +19,16 @@ import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 public class BigCameraGroupCallFragment extends Fragment implements MegaChatVideoListenerInterface {
 
-    int width = 0;
-    int height = 0;
-    Bitmap bitmap;
-    MegaChatApiAndroid megaChatApi;
-    Context context;
-    long chatId;
-    long peerId;
-    long cliendId;
-
-    public TextureView myTexture;
-    MegaSurfaceRendererGroup renderer;
+    private TextureView myTexture;
+    private int width = 0;
+    private int height = 0;
+    private Bitmap bitmap;
+    private MegaChatApiAndroid megaChatApi;
+    private Context context;
+    private long chatId;
+    private long peerId;
+    private long cliendId;
+    private MegaSurfaceRendererGroup renderer;
 
     public static BigCameraGroupCallFragment newInstance(long chatId, long peerId, long cliendId) {
         log("newInstance");
@@ -43,18 +36,22 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
         Bundle args = new Bundle();
         args.putLong("chatId", chatId);
-        args.putLong("peerId",peerId);
-        args.putLong("cliendId",cliendId);
+        args.putLong("peerId", peerId);
+        args.putLong("cliendId", cliendId);
 
         f.setArguments(args);
         return f;
     }
 
+    private static void log(String log) {
+        Util.log("BigCameraGroupCallFragment", log);
+    }
+
     @Override
-    public void onCreate (Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         log("onCreate");
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
         }
 
         Bundle args = getArguments();
@@ -73,9 +70,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         if (!isAdded()) {
             return null;
         }
-
         View v = inflater.inflate(R.layout.fragment_camera_full_screen_big, container, false);
-        myTexture = (TextureView) v.findViewById(R.id.texture_view_video);
+        myTexture = v.findViewById(R.id.texture_view_video);
         myTexture.setAlpha(1.0f);
         myTexture.setRotation(0);
         myTexture.setVisibility(View.VISIBLE);
@@ -83,11 +79,11 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         this.height = 0;
         renderer = new MegaSurfaceRendererGroup(myTexture, peerId, cliendId);
 
-        if((peerId == megaChatApi.getMyUserHandle()) && (cliendId == megaChatApi.getMyClientidHandle(chatId))){
-            log("onCreateView() addChatLocalVideoListener  (LOCAL)  chatId: "+chatId);
+        if (peerId == megaChatApi.getMyUserHandle() && cliendId == megaChatApi.getMyClientidHandle(chatId)) {
+            log("onCreateView() addChatLocalVideoListener  (LOCAL)  chatId: " + chatId);
             megaChatApi.addChatLocalVideoListener(chatId, this);
-        }else{
-            log("onCreateView() addChatRemoteVideoListener chatId: "+chatId+" ( peerId = "+peerId+", clientId = "+cliendId+")");
+        } else {
+            log("onCreateView() addChatRemoteVideoListener chatId: " + chatId + " ( peerId = " + peerId + ", clientId = " + cliendId + ")");
             megaChatApi.addChatRemoteVideoListener(chatId, peerId, cliendId, this);
         }
         return v;
@@ -95,36 +91,31 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
-        if((width == 0) || (height == 0)){
-            return;
-        }
+        if ((width == 0) || (height == 0)) return;
 
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
 
-                int viewWidth = myTexture.getWidth();
-                int viewHeight = myTexture.getHeight();
-                if ((viewWidth != 0) && (viewHeight != 0)) {
-                    int holderWidth = viewWidth < width ? viewWidth : width;
-                    int holderHeight = holderWidth * viewHeight / viewWidth;
-                    if (holderHeight > viewHeight) {
-                        holderHeight = viewHeight;
-                        holderWidth = holderHeight * viewWidth / viewHeight;
-                    }
-                    this.bitmap = renderer.CreateBitmap(width, height);
-                }else{
-                    this.width = -1;
-                    this.height = -1;
+            int viewWidth = myTexture.getWidth();
+            int viewHeight = myTexture.getHeight();
+            if ((viewWidth != 0) && (viewHeight != 0)) {
+                int holderWidth = viewWidth < width ? viewWidth : width;
+                int holderHeight = holderWidth * viewHeight / viewWidth;
+                if (holderHeight > viewHeight) {
+                    holderHeight = viewHeight;
+                    holderWidth = holderHeight * viewWidth / viewHeight;
                 }
+                this.bitmap = renderer.CreateBitmap(width, height);
+            } else {
+                this.width = -1;
+                this.height = -1;
+            }
         }
 
-        if (bitmap != null) {
-            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-            // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
-            // The renderer has been modified a bit and an update of WebRTC could break our app
-            renderer.DrawBitmap(false, false);
-        }
+        if (bitmap == null) return;
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+        renderer.DrawBitmap(false, false);
     }
 
     @Override
@@ -134,38 +125,32 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         log("onDestroy");
         removeSurfaceView();
         super.onDestroy();
     }
 
-    public void removeSurfaceView(){
+    public void removeSurfaceView() {
         log("removeSurfaceView()");
-        if(myTexture.getParent()!=null){
-            if(myTexture.getParent().getParent()!=null){
-                log("removeSurfaceView() removeView chatId: "+chatId);
-                ((ViewGroup)myTexture.getParent()).removeView(myTexture);
-            }
+        if (myTexture.getParent() != null && myTexture.getParent().getParent() != null) {
+            log("removeSurfaceView() removeView chatId: " + chatId);
+            ((ViewGroup) myTexture.getParent()).removeView(myTexture);
         }
-        if(megaChatApi!=null){
-            if((peerId == megaChatApi.getMyUserHandle()) && (cliendId == megaChatApi.getMyClientidHandle(chatId))){
-                log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
-                megaChatApi.removeChatVideoListener(chatId, -1, -1,this);
-            }else{
-                log("removeSurfaceView() removeChatVideoListener chatId: "+chatId+" ( peerId = "+peerId+", clientId = "+cliendId+")");
-                megaChatApi.removeChatVideoListener(chatId, peerId, cliendId, this);
 
-            }
+        if (megaChatApi == null) return;
+        if (peerId == megaChatApi.getMyUserHandle() && cliendId == megaChatApi.getMyClientidHandle(chatId)) {
+            log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: " + chatId);
+            megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
+        } else {
+            log("removeSurfaceView() removeChatVideoListener chatId: " + chatId + " ( peerId = " + peerId + ", clientId = " + cliendId + ")");
+            megaChatApi.removeChatVideoListener(chatId, peerId, cliendId, this);
         }
     }
+
     @Override
     public void onResume() {
         log("onResume");
         super.onResume();
-    }
-
-    private static void log(String log) {
-        Util.log("BigCameraGroupCallFragment", log);
     }
 }

@@ -48,7 +48,6 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.OfflineUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -57,7 +56,10 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
+
+public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -135,6 +137,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView fileGridSelected;
     }
 
+    @Override
     public int getPlaceholderCount() {
         return placeholderCount;
     }
@@ -288,6 +291,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public void clearSelections() {
         log("clearSelections");
+        if(nodes == null){
+            return;
+        }
         for (int i = 0;i < nodes.size();i++) {
             if (isItemChecked(i)) {
                 //Exlude placeholder.
@@ -298,18 +304,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
-    //	public void clearSelections() {
-//		if(selectedItems!=null){
-//			selectedItems.clear();
-//			for (int i= 0; i<this.getItemCount();i++) {
-//				if (isItemChecked(i)) {
-//					toggleAllSelection(i);
-//				}
-//			}
-//		}
-//		notifyDataSetChanged();
-//	}
-//
     private boolean isItemChecked(int position) {
         return selectedItems.get(position);
     }
@@ -318,12 +312,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         return selectedItems.size();
     }
 
+    @Override
     public List<Integer> getSelectedItems() {
-        List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-        for (int i = 0;i < selectedItems.size();i++) {
-            items.add(selectedItems.keyAt(i));
+        if (selectedItems != null) {
+            List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+            for (int i = 0; i < selectedItems.size(); i++) {
+                items.add(selectedItems.keyAt(i));
+            }
+            return items;
+        } else {
+            return null;
         }
-        return items;
     }
 
     /*
@@ -357,15 +356,20 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         return nodes;
     }
 
-    /**
-     * In grid view.
-     * For folder count is odd. Insert null element as placeholder.
-     *
-     * @param nodes Origin nodes to show.
-     * @return Nodes list with placeholder.
+    /*
+     * The method to return how many folders in this adapter
      */
-    private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
+    @Override
+    public int getFolderCount() {
+        return getFolderCount(nodes);
+    }
+
+    /*
+     * The method to calculate how many nodes are folders in array list
+     */
+    public int getFolderCount(ArrayList<MegaNode> nodes) {
         int folderCount = 0;
+        if (nodes == null) return folderCount;
         for (MegaNode node : nodes) {
             if (node == null) {
                 continue;
@@ -374,6 +378,18 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 folderCount++;
             }
         }
+        return folderCount;
+    }
+
+    /**
+     * In grid view.
+     * For folder count is odd. Insert null element as placeholder.
+     *
+     * @param nodes Origin nodes to show.
+     * @return Nodes list with placeholder.
+     */
+    private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
+        int folderCount = getFolderCount(nodes);
         int spanCount = 2;
         if (listFragment instanceof NewGridRecyclerView) {
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
@@ -713,7 +729,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.fileGridIconForFile.setVisibility(View.VISIBLE);
             holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 
-            if (Util.isVideoFile(node.getName())) {
+            if (isVideoFile(node.getName())) {
                 holder.videoInfoLayout.setVisibility(View.VISIBLE);
                 holder.videoDuration.setVisibility(View.GONE);
                 log(node.getName() + " DURATION: " + node.getDuration());
@@ -791,17 +807,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         //Check if is an offline file to show the red arrow
-        boolean availableOffline = false;
-        if (incoming) {
-            availableOffline = OfflineUtils.availableOffline(Constants.INCOMING_SHARES_ADAPTER, node, context, megaApi);
-        }
-        else if (inbox){
-            availableOffline = OfflineUtils.availableOffline(Constants.INBOX_ADAPTER, node, context, megaApi);
-        }
-        else {
-            availableOffline = OfflineUtils.availableOffline(Constants.GENERAL_OTHERS_ADAPTER, node, context, megaApi);
-        }
-        if (availableOffline) {
+        if (availableOffline(context, node)) {
             holder.savedOffline.setVisibility(View.VISIBLE);
         }
         else {
@@ -1188,17 +1194,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         //Check if is an offline file to show the red arrow
-        boolean availableOffline = false;
-        if (incoming) {
-            availableOffline = OfflineUtils.availableOffline(Constants.INCOMING_SHARES_ADAPTER, node, context, megaApi);
-        }
-        else if (inbox){
-            availableOffline = OfflineUtils.availableOffline(Constants.INBOX_ADAPTER, node, context, megaApi);
-        }
-        else {
-            availableOffline = OfflineUtils.availableOffline(Constants.GENERAL_OTHERS_ADAPTER, node, context, megaApi);
-        }
-        if (availableOffline) {
+        if (availableOffline(context, node)) {
             holder.savedOffline.setVisibility(View.VISIBLE);
         }
         else {

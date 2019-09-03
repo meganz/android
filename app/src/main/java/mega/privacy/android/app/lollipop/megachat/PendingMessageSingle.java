@@ -13,8 +13,10 @@ public class PendingMessageSingle {
 
     long id;
     long chatId;
+
+    int type;
     long uploadTimestamp;
-    int state;
+    int state = 0;
     long tempIdKarere;
     String videoDownSampled;
     String filePath;
@@ -34,6 +36,7 @@ public class PendingMessageSingle {
         this.filePath = filePath;
         this.fingerprint = fingerprint;
         this.name = name;
+
     }
 
     public PendingMessageSingle(long id, long chatId, long uploadTimestamp, long tempIdKarere, String filePath, String fingerprint, String name, long nodeHandle, int transferTag, int state) {
@@ -48,6 +51,15 @@ public class PendingMessageSingle {
         this.name = name;
         this.transferTag = transferTag;
     }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
 
     public long getChatId() {
         return chatId;
