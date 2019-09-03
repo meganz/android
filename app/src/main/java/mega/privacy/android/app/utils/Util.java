@@ -640,7 +640,7 @@ public class Util {
 				Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 		return sb;
 	}
-	
+
 	public static String getSpeedString (long speed){
 		String speedString = "";
 		double speedDouble = 0;

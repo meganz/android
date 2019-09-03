@@ -172,36 +172,32 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                         }
                     }
                 }
-            }
-            else if(action==START_AUDIO_CALL){
+            } else if (action == START_AUDIO_CALL) {
                 log("Action: START_AUDIO_CALL");
-                if(context instanceof ContactInfoActivityLollipop){
-                    if (e.getErrorCode() != MegaError.API_OK){
+                if (context instanceof ContactInfoActivityLollipop) {
+                    if (e.getErrorCode() != MegaError.API_OK) {
                         ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
-                    }
-                    else{
+                    } else {
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
-                        if(chat!=null){
+                        if (chat != null) {
+                            ((MegaApplication) ((Activity) context).getApplication()).setSpeakerStatus(chat.getChatId(), false);
                             megaChatApi.startChatCall(chat.getChatId(), false, (ContactInfoActivityLollipop) context);
-                        }
-                        else{
+                        } else {
                             log("Chatroom not recovered");
                         }
                     }
                 }
-            }
-            else if(action==START_VIDEO_CALL){
+            } else if (action == START_VIDEO_CALL) {
                 log("Action: START_VIDEO_CALL");
-                if(context instanceof ContactInfoActivityLollipop){
-                    if (e.getErrorCode() != MegaError.API_OK){
+                if (context instanceof ContactInfoActivityLollipop) {
+                    if (e.getErrorCode() != MegaError.API_OK) {
                         ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
-                    }
-                    else{
+                    } else {
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
-                        if(chat!=null){
+                        if (chat != null) {
+                            ((MegaApplication) ((Activity) context).getApplication()).setSpeakerStatus(chat.getChatId(), true);
                             megaChatApi.startChatCall(chat.getChatId(), true, (ContactInfoActivityLollipop) context);
-                        }
-                        else{
+                        } else {
                             log("Chatroom not recovered");
                         }
                     }

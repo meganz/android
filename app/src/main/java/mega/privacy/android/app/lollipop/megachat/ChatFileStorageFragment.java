@@ -316,20 +316,27 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
                 String orderBy = MediaStore.Images.Media._ID + " DESC";
+                Cursor cursor = null;
+                try {
+                    cursor = context.getActivity().getContentResolver().query(uri, projection, "", null, orderBy);
 
-                Cursor cursor = context.getActivity().getContentResolver().query(uri, projection, "", null, orderBy);
+                    if (cursor != null) {
+                        int dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
 
-                if (cursor != null) {
-                    int dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+                        List<String> photoUris = new ArrayList<>(cursor.getCount());
+                        while (cursor.moveToNext()) {
+                            photoUris.add("file://" + cursor.getString(dataColumn));
+                            context.createImagesPath(cursor.getString(dataColumn));
+                        }
 
-                    List<String> photoUris = new ArrayList<>(cursor.getCount());
-                    while (cursor.moveToNext()) {
-                        photoUris.add("file://" + cursor.getString(dataColumn));
-                        context.createImagesPath(cursor.getString(dataColumn));
+                        return photoUris;
                     }
-                    cursor.close();
-
-                    return photoUris;
+                } catch (Exception ex) {
+                    log("Exception is thrown, ex: " + ex.toString());
+                } finally {
+                    if (cursor != null) {
+                        cursor.close();
+                    }
                 }
             }
             return null;

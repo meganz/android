@@ -182,6 +182,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
+	private TextView turnOnOff;
+	private RelativeLayout relativeLayoutTurnOnOff;
 
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
@@ -812,8 +814,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 			});
 
-			final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_list_browser_camera_upload_on_off);
-			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
+			relativeLayoutTurnOnOff = v.findViewById(R.id.relative_layout_file_list_browser_camera_upload_on_off);
+			turnOnOff = v.findViewById(R.id.file_list_browser_camera_upload_on_off);
 			relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
 			if (type == TYPE_CAMERA) {
 				turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
@@ -1004,8 +1006,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 			});
 
-			final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_grid_browser_camera_upload_on_off);
-			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
+			relativeLayoutTurnOnOff = v.findViewById(R.id.relative_layout_file_grid_browser_camera_upload_on_off);
+			turnOnOff = v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
 			relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
 			if (type == TYPE_CAMERA) {
 				turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
@@ -2672,4 +2674,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
             }
         },1000);
     }
+
+    public void resetSwitchButtonLabel(){
+		relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
+		turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
+	}
 }

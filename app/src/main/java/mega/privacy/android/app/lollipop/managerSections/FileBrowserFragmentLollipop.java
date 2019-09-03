@@ -12,7 +12,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -75,7 +74,6 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -559,56 +557,55 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 	@Override
 	public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
-		if(!isAdded()){
+		if (!isAdded()) {
 			return null;
 		}
 
 		log("fragment ADDED");
 
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		if (megaApi == null) {
+			megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
 		}
 
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
+		if (aB == null) {
+			aB = ((AppCompatActivity) context).getSupportActionBar();
 		}
 
-		if (megaApi.getRootNode() == null){
+		if (megaApi.getRootNode() == null) {
 			return null;
 		}
 
-		display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
+		display = ((Activity) context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
+		density = getResources().getDisplayMetrics().density;
 
-		if (((ManagerActivityLollipop)context).parentHandleBrowser == -1||((ManagerActivityLollipop)context).parentHandleBrowser ==megaApi.getRootNode().getHandle()){
-			log("After consulting... the parent keeps -1 or ROOTNODE: "+((ManagerActivityLollipop)context).parentHandleBrowser);
+		if (((ManagerActivityLollipop) context).parentHandleBrowser == -1 || ((ManagerActivityLollipop) context).parentHandleBrowser == megaApi.getRootNode().getHandle()) {
+			log("After consulting... the parent keeps -1 or ROOTNODE: " + ((ManagerActivityLollipop) context).parentHandleBrowser);
 
-			nodes = megaApi.getChildren(megaApi.getRootNode(), ((ManagerActivityLollipop)context).orderCloud);
+			nodes = megaApi.getChildren(megaApi.getRootNode(), ((ManagerActivityLollipop) context).orderCloud);
+		} else {
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleBrowser);
+
+			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop) context).orderCloud);
 		}
-		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
+		((ManagerActivityLollipop) context).setToolbarTitle();
+		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 
-			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-		}
-		((ManagerActivityLollipop)context).setToolbarTitle();
-		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-		if (((ManagerActivityLollipop)context).isList){
+		if (((ManagerActivityLollipop) context).isList) {
 			log("FileBrowserFragmentLollipop isList");
 
 			log("isList");
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
-			linearLayoutRecycler = (LinearLayout) v.findViewById(R.id.linear_layout_recycler);
-			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+			linearLayoutRecycler = v.findViewById(R.id.linear_layout_recycler);
+			recyclerView = v.findViewById(R.id.file_list_view_browser);
+			fastScroller = v.findViewById(R.id.fastscroll);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 
 			mLayoutManager = new LinearLayoutManager(context);
-            mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+			mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -620,13 +617,13 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 				}
 			});
 
-			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
-			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
+			emptyImageView = v.findViewById(R.id.file_list_empty_image);
+			emptyTextView = v.findViewById(R.id.file_list_empty_text);
+			emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
 
-			callInProgressLayout = (RelativeLayout) v.findViewById(R.id.call_in_progress_layout);
+			callInProgressLayout = v.findViewById(R.id.call_in_progress_layout);
 			callInProgressLayout.setOnClickListener(this);
-			callInProgressChrono = (Chronometer) v.findViewById(R.id.call_in_progress_chrono);
+			callInProgressChrono = v.findViewById(R.id.call_in_progress_chrono);
 			callInProgressLayout.setVisibility(View.GONE);
 			callInProgressChrono.setVisibility(View.GONE);
 
@@ -640,12 +637,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
             }
 
             adapter.setMultipleSelect(false);
-            
+
             recyclerView.setAdapter(adapter);
             fastScroller.setRecyclerView(recyclerView);
-            
+
             setNodes(nodes);
-            
+
             if (adapter.getItemCount() == 0) {
                 log("itemCount is 0");
                 recyclerView.setVisibility(View.GONE);
@@ -659,9 +656,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
             }
 
 			showCallLayout();
-
-
 			return v;
+
         } else {
             log("Grid View");
             log("FileBrowserFragmentLollipop isGrid");
@@ -688,7 +684,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
             emptyImageView = (ImageView)v.findViewById(R.id.file_grid_empty_image);
             emptyTextView = (LinearLayout)v.findViewById(R.id.file_grid_empty_text);
             emptyTextViewFirst = (TextView)v.findViewById(R.id.file_grid_empty_text_first);
-            
+
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context,this,nodes,((ManagerActivityLollipop)context).parentHandleBrowser,recyclerView,aB,Constants.FILE_BROWSER_ADAPTER,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
             } else {
@@ -1635,36 +1631,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 		}
 	}
 
-    public void showCallLayout(){
-        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop) && (megaChatApi!=null) &&(ChatUtil.participatingInACall(megaChatApi))){
-            log("showCallLayout");
-
-            if((callInProgressLayout!=null) && (callInProgressLayout.getVisibility() != View.VISIBLE)){
-                callInProgressLayout.setVisibility(View.VISIBLE);
-            }
-            if((callInProgressChrono!=null) && (callInProgressChrono.getVisibility() != View.VISIBLE)){
-                long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
-                if((megaChatApi!=null) && (chatId != -1)){
-                    MegaChatCall call = megaChatApi.getChatCall(chatId);
-                    if(call!=null){
-                        callInProgressChrono.setVisibility(View.VISIBLE);
-                        callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
-                        callInProgressChrono.start();
-                        callInProgressChrono.setFormat("%s");
-                    }
-                }
-            }
-
-        }else{
-            if(callInProgressChrono!=null){
-                callInProgressChrono.stop();
-                callInProgressChrono.setVisibility(View.GONE);
-            }
-            if(callInProgressLayout!=null){
-                callInProgressLayout.setVisibility(View.GONE);
-            }
-        }
-    }
+	public void showCallLayout() {
+		ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
+	}
 
 	//refresh list when item updated
 	public void refresh(long handle) {
