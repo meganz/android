@@ -412,6 +412,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
     }
 
+
     public void showCallLayout() {
         if (Util.isChatEnabled() && context instanceof ManagerActivityLollipop && megaChatApi != null && ChatUtil.participatingInACall(megaChatApi)) {
             log("showCallLayout");
@@ -1338,9 +1339,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void refreshNode(MegaChatListItem item) {
-        log("refreshNode -> showCallLayout");
-        //call in progress layout:
-        showCallLayout();
+        log("refreshNode");
+        ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         //elements of adapter
         long chatHandleToUpdate = item.getChatId();
@@ -1455,9 +1455,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (aB != null && aB.getTitle() != null) {
             aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
         }
-
-
-        showCallLayout();
+        ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         if (context instanceof ManagerActivityLollipop) {
             String searchQuery = ((ManagerActivityLollipop) context).searchQuery;
