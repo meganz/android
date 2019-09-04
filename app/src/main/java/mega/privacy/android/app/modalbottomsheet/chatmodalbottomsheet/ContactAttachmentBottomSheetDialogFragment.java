@@ -73,7 +73,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     public LinearLayout mainLinearLayout;
     public EmojiTextView titleNameContactChatPanel;
     public ImageView stateIcon;
-    public TextView titleMailContactChatPanel;
+    public EmojiTextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
     public EmojiTextView contactInitialLetter;
     LinearLayout optionView;
@@ -168,7 +168,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         stateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
         stateIcon.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
 
-        titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.contact_attachment_chat_mail_text);
+        titleMailContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_mail_text);
         contactImageView = (RoundedImageView) contentView.findViewById(R.id.contact_attachment_thumbnail);
         contactInitialLetter = contentView.findViewById(R.id.contact_attachment_initial_letter);
 
@@ -196,8 +196,10 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
             titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         }
-        titleNameContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
-        contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
+        titleNameContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+        contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+        titleMailContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+
 
 
         if (message != null) {

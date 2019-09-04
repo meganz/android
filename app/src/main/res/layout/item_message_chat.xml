@@ -1284,7 +1284,7 @@
                         rounded:border_width="0dp"
                         rounded:corner_radius="40dp" />
 
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/contact_initial_letter"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

@@ -226,7 +226,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 
 			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 
 		    holderList.itemLayout.setTag(holderList);
 		    holderList.itemLayout.setOnClickListener(this);
@@ -257,7 +257,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 			holderGrid.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 
-			holderGrid.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
+			holderGrid.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 
 
 			holderGrid.itemLayout.setTag(holderGrid);

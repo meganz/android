@@ -180,7 +180,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			}
 
 			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 
 		    holderList.itemLayout.setTag(holderList);
 		    holderList.itemLayout.setOnClickListener(this);
@@ -212,7 +212,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			}
 
 			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 
 		    holderGrid.itemLayout.setTag(holderGrid);
 		    holderGrid.itemLayout.setOnClickListener(this);
@@ -245,7 +245,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			}
 
 			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 
@@ -286,7 +286,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			}
 
 			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 

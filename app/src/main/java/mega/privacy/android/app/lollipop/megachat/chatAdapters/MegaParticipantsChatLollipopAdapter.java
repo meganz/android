@@ -158,7 +158,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 
 			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 
 			holderList.itemLayout.setOnClickListener(this);
 			holderList.itemLayout.setTag(holderList);

@@ -682,7 +682,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView nameContactText;
 
         RoundedImageView contactImageView;
-        TextView contactInitialLetter;
+        private EmojiTextView contactInitialLetter;
 
         RelativeLayout contentContactMessageLayout;
         EmojiTextView contentContactMessageText;
@@ -1013,6 +1013,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contactImageView = v.findViewById(R.id.contact_thumbnail);
             holder.contactInitialLetter = v.findViewById(R.id.contact_initial_letter);
+            holder.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
 
             holder.timeContactText = v.findViewById(R.id.contact_message_chat_time_text);
             holder.nameContactText = v.findViewById(R.id.contact_message_chat_name_text);
@@ -6856,11 +6857,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (name != null) {
             if (name.trim().length() > 0) {
-                String firstLetter = name.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                holder.contactInitialLetter.setText(firstLetter);
-                holder.contactInitialLetter.setTextColor(Color.WHITE);
-                holder.contactInitialLetter.setVisibility(View.VISIBLE);
+                String firstLetter = ChatUtil.getFirstLetter(name);
+                if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+                    holder.contactInitialLetter.setVisibility(View.INVISIBLE);
+                }else {
+                    holder.contactInitialLetter.setText(firstLetter);
+                    holder.contactInitialLetter.setTextColor(Color.WHITE);
+                    holder.contactInitialLetter.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
