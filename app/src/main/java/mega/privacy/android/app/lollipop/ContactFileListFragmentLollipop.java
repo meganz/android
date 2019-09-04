@@ -70,7 +70,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	FloatingActionButton fab;
 	Stack<Long> parentHandleStack = new Stack<Long>();
     int currNodePosition = -1;
-    
+
     public void setCurrNodePosition(int currNodePosition) {
         this.currNodePosition = currNodePosition;
     }
@@ -195,7 +195,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			boolean showRename = false;
 			boolean showMove = false;
 			boolean showTrash = false;
-			
+
 			// Rename
 			if(selected.size() == 1){
 				if ((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
@@ -205,15 +205,15 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 			if (selected.size() > 0) {
 				if ((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
-					showMove = true;	
+					showMove = true;
 				}
 			}
-			
+
 			if (selected.size() != 0) {
 				showMove = false;
 				// Rename
 				if(selected.size() == 1) {
-					
+
 					if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
 						showMove = true;
 						showRename = true;
@@ -221,13 +221,13 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
 						showMove = false;
 						showRename = false;
-					}		
+					}
 				}
 				else{
 					showRename = false;
 					showMove = false;
 				}
-				
+
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showMove = false;
@@ -244,21 +244,21 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						break;
 					}
 				}
-				
+
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-				}	
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
+				}
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
-			
+
 			menu.findItem(R.id.cab_menu_download).setVisible(true);
 			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
@@ -305,9 +305,14 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 				return null;
 			}
 
-			contactNodes = megaApi.getInShares(contact);
+			parentHandle = ((ContactFileListActivityLollipop) context).getParentHandle();
+			if (parentHandle != -1) {
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+				contactNodes = megaApi.getChildren(parentNode, orderGetChildren);
+			} else {
+				contactNodes = megaApi.getInShares(contact);
+			}
 
-			
 			listView = (RecyclerView) v.findViewById(R.id.contact_file_list_view_browser);
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
@@ -362,18 +367,18 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			}
 
 			if (adapter == null) {
-				adapter = new MegaNodeAdapter(context, this, contactNodes, -1,listView, aB,Constants.CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, contactNodes, parentHandle,listView, aB,Constants.CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 
 			} else {
 				adapter.setNodes(contactNodes);
-				adapter.setParentHandle(-1);
+				adapter.setParentHandle(parentHandle);
 			}
 
 			adapter.setMultipleSelect(false);
 
 			listView.setAdapter(adapter);
 		}
-        if(currNodePosition != -1 ) {
+        if(currNodePosition != -1 && parentHandle == -1 ) {
             itemClick(currNodePosition,null,null);
         }
 		return v;
@@ -398,7 +403,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			aB.setElevation(0);
 		}
 	}
-	
+
 	public void showOptionsPanel(MegaNode sNode){
 		log("showOptionsPanel");
 		((ContactFileListActivityLollipop)context).showOptionsPanel(sNode);
@@ -463,7 +468,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			}
 		}
 	}
-	
+
 	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 
 		if (adapter.isMultipleSelect()){
@@ -497,7 +502,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 				contactNodes = megaApi.getChildren(contactNodes.get(position));
 				adapter.setNodes(contactNodes);
 				listView.scrollToPosition(0);
-				
+
 				// If folder has no files
 				if (adapter.getItemCount() == 0) {
 					listView.setVisibility(View.GONE);
@@ -535,7 +540,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					emptyTextView.setVisibility(View.GONE);
 				}
 				showFabButton(n);
-			} 
+			}
 			else {
 				if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isImage()) {
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
@@ -550,7 +555,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					((ContactFileListActivityLollipop)context).startActivity(intent);
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 					imageDrag = imageView;
-				} 
+				}
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoReproducible()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
 					MegaNode file = contactNodes.get(position);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
@@ -882,15 +887,15 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			else{
 				adapter.setMultipleSelect(true);
 				adapter.selectAll();
-				
+
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 			}
-			
+
 			updateActionModeTitle();
 		}
 	}
 
-	private void updateActionModeTitle() {
+	protected void updateActionModeTitle() {
 		if (actionMode == null) {
 			return;
 		}
@@ -926,13 +931,13 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 		}
 		// actionMode.
 	}
-    
+
     public void clearSelections() {
         if(adapter != null && adapter.isMultipleSelect()){
             adapter.clearSelections();
         }
     }
-    
+
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
@@ -941,10 +946,10 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 		}
 	}
 
-	public void notifyDataSetChanged(){		
+	public void notifyDataSetChanged(){
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
-		}		
+		}
 	}
 
 	public void showFabButton(MegaNode node){
@@ -963,21 +968,21 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	public int getFabVisibility(){
 		return fab.getVisibility();
 	}
-    
+
     public void setParentHandle(long parentHandle) {
         this.parentHandle = parentHandle;
         if (adapter != null){
             adapter.setParentHandle(parentHandle);
         }
     }
-    
+
     public long getParentHandle() {
         return parentHandle;
     }
-    
+
     public boolean isEmptyParentHandleStack() {
         return parentHandleStack.isEmpty();
     }
-	
+
 
 }
