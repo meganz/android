@@ -273,7 +273,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private EmojiTextView titleToolbar;
     MarqueeTextView individualSubtitleToobar;
-    TextView groupalSubtitleToolbar;
+    private EmojiTextView groupalSubtitleToolbar;
     LinearLayout subtitleCall;
     Chronometer subtitleChronoCall;
     LinearLayout participantsLayout;
@@ -594,6 +594,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         individualSubtitleToobar.setText("");
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
+        groupalSubtitleToolbar.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
         groupalSubtitleToolbar.setVisibility(View.GONE);
         subtitleCall.setVisibility(View.GONE);
         subtitleChronoCall.setVisibility(View.GONE);
@@ -1184,7 +1185,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 setPreviewersView();
-                log("************ 1 titleToolbar - "+chatRoom.getTitle());
                 titleToolbar.setText(chatRoom.getTitle());
                 setChatSubtitle();
 
@@ -5350,8 +5350,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Change of chat title");
             String newTitle = msg.getContent();
             if(newTitle!=null){
-                log("************ 2 titleToolbar - "+newTitle);
-
                 titleToolbar.setText(newTitle);
             }
         }
@@ -7627,8 +7625,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             activityVisible = true;
             showCallLayout(megaChatApi.getChatCall(idChat));
             if(aB != null && aB.getTitle() != null){
-                log("************ 3 titleToolbar - "+adjustForLargeFont(titleToolbar.getText().toString()));
-
                 titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
             }
         }

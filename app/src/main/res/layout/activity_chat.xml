@@ -102,7 +102,7 @@
                         android:textSize="12sp"
                         android:visibility="gone" />
 
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/groupal_subtitle_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

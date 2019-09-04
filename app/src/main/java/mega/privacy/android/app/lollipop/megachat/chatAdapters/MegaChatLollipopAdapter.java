@@ -635,9 +635,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout contentOwnMessageContactLayout;
         RelativeLayout contentOwnMessageContactLayoutAvatar;
         RoundedImageView contentOwnMessageContactThumb;
-        TextView contentOwnMessageContactName;
+        private EmojiTextView contentOwnMessageContactName;
         public TextView contentOwnMessageContactEmail;
-        TextView contentOwnMessageContactInitialLetter;
+        private EmojiTextView contentOwnMessageContactInitialLetter;
         RelativeLayout forwardOwnContact;
 
         ImageView iconOwnTypeDocLandPreview;
@@ -713,9 +713,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout forwardContactContact;
         RelativeLayout contentContactMessageContactLayoutAvatar;
         RoundedImageView contentContactMessageContactThumb;
-        TextView contentContactMessageContactName;
+        private EmojiTextView contentContactMessageContactName;
         public TextView contentContactMessageContactEmail;
-        TextView contentContactMessageContactInitialLetter;
+        private EmojiTextView contentContactMessageContactInitialLetter;
 
         RelativeLayout contentContactMessageVoiceClipLayout;
         ImageView contentContactMessageVoiceClipPlay;
@@ -966,6 +966,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageContactEmail = v.findViewById(R.id.content_own_message_contact_email);
 
             holder.contentOwnMessageContactInitialLetter = v.findViewById(R.id.content_own_message_contact_initial_letter);
+            holder.contentOwnMessageContactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
             holder.forwardOwnContact = v.findViewById(R.id.forward_own_contact);
             holder.forwardOwnContact.setTag(holder);
             holder.forwardOwnContact.setVisibility(View.GONE);
@@ -1129,6 +1130,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageContactName = v.findViewById(R.id.content_contact_message_contact_name);
             holder.contentContactMessageContactEmail = v.findViewById(R.id.content_contact_message_contact_email);
             holder.contentContactMessageContactInitialLetter = v.findViewById(R.id.content_contact_message_contact_initial_letter);
+            holder.contentContactMessageContactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 
             holder.iconContactTypeDocLandPreview = v.findViewById(R.id.contact_attachment_type_icon_lands);
             holder.iconContactTypeDocPortraitPreview = v.findViewById(R.id.contact_attachment_type_icon_portrait);
@@ -5811,6 +5813,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageContactName.setMaxWidth((int) width);
                 holder.contentOwnMessageContactEmail.setMaxWidth((int) width);
             }
+            holder.contentOwnMessageContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
 
             long userCount = message.getUsersCount();
 
@@ -5929,6 +5932,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageContactName.setMaxWidth((int) width);
                 holder.contentContactMessageContactEmail.setMaxWidth((int) width);
             }
+
+            holder.contentContactMessageContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+
+
 
             long userCount = message.getUsersCount();
 
@@ -6965,11 +6972,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if(userHandle!=null){
                 if (name != null) {
                     if (name.trim().length() > 0) {
-                        String firstLetter = name.charAt(0) + "";
-                        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                        holder.contentOwnMessageContactInitialLetter.setText(firstLetter);
-                        holder.contentOwnMessageContactInitialLetter.setTextColor(Color.WHITE);
-                        holder.contentOwnMessageContactInitialLetter.setVisibility(View.VISIBLE);
+
+                        String firstLetter = ChatUtil.getFirstLetter(name);
+                        if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+                            holder.contentOwnMessageContactInitialLetter.setVisibility(View.INVISIBLE);
+                        }else {
+                            holder.contentOwnMessageContactInitialLetter.setText(firstLetter);
+                            holder.contentOwnMessageContactInitialLetter.setTextColor(Color.WHITE);
+                            holder.contentOwnMessageContactInitialLetter.setVisibility(View.VISIBLE);
+                        }
+
                     }
                     holder.contentOwnMessageContactInitialLetter.setTextSize(24);
 
@@ -6977,13 +6989,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }else{
                 if (name != null) {
                     String firstLetter = userCount + "";
-
-//                    holder.contentOwnMessageContactInitialLetter.setText(name);
                     holder.contentOwnMessageContactInitialLetter.setText(firstLetter);
                     holder.contentOwnMessageContactInitialLetter.setTextColor(Color.WHITE);
                     holder.contentOwnMessageContactInitialLetter.setVisibility(View.VISIBLE);
                     holder.contentOwnMessageContactInitialLetter.setTextSize(24);
-
                 }
             }
 
@@ -6993,18 +7002,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if(userHandle!=null){
                 if (name != null) {
                     if (name.trim().length() > 0) {
-                        String firstLetter = name.charAt(0) + "";
-                        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                        holder.contentContactMessageContactInitialLetter.setText(firstLetter);
-                        holder.contentContactMessageContactInitialLetter.setTextColor(Color.WHITE);
-                        holder.contentContactMessageContactInitialLetter.setVisibility(View.VISIBLE);
+
+                        String firstLetter = ChatUtil.getFirstLetter(name);
+                        if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+                            holder.contentContactMessageContactInitialLetter.setVisibility(View.INVISIBLE);
+                        }else {
+                            holder.contentContactMessageContactInitialLetter.setText(firstLetter);
+                            holder.contentContactMessageContactInitialLetter.setTextColor(Color.WHITE);
+                            holder.contentContactMessageContactInitialLetter.setVisibility(View.VISIBLE);
+                        }
                     }
                     holder.contentContactMessageContactInitialLetter.setTextSize(24);
 
                 }
             }else{
                 if (name != null) {
-//                    holder.contentContactMessageContactInitialLetter.setText(name);
                     String firstLetter = userCount + "";
                     holder.contentContactMessageContactInitialLetter.setText(firstLetter);
                     holder.contentContactMessageContactInitialLetter.setTextColor(Color.WHITE);
