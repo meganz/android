@@ -132,6 +132,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	MegaPhotoSyncListAdapterLollipop adapterList;
 	MegaPhotoSyncGridTitleAdapterLollipop adapterGrid;
 	private MegaApiAndroid megaApi;
+	
+	private int orderBy = MegaApiJava.ORDER_MODIFICATION_DESC;
 
 //	long parentHandle = -1;
 //	private boolean firstTimeCam = false;
@@ -215,6 +217,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		return null;
 	}
+
+    public int getItemCount() {
+        if (adapterList != null) {
+            return adapterList.getItemCount();
+        }
+        if (adapterGrid != null) {
+            return adapterGrid.getItemCount();
+        }
+        return 0;
+    }
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -915,10 +927,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 
 			if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 			}
 			else{
-				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 				searchByDate = ((ManagerActivityLollipop)context).getTypeOfSearch();
 				nodes = searchDate(searchByDate,searchNodes);
 			}
@@ -1148,10 +1160,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			int countTitles = 0;
 
 			if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 			}
 			else{
-				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 				searchByDate = ((ManagerActivityLollipop)context).getTypeOfSearch();
 				nodes = searchDate(searchByDate,searchNodes);
 			}
@@ -1969,7 +1981,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			long cameraUploadHandle = getPhotoSyncHandle();
 			MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 			if (nps != null) {
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderBy);
 				setNodes(nodes);
 
 				((ManagerActivityLollipop)context).invalidateOptionsMenu();
@@ -2064,6 +2076,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		return photosyncHandle;
 	}
 
+	public void setOrderBy(int orderBy) {
+	    this.orderBy = orderBy;
+	    if (adapterGrid != null) {
+	        adapterGrid.setOrder(orderBy);
+        }
+    }
+	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 
