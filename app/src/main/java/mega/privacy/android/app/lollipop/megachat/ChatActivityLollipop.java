@@ -7916,9 +7916,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         callInProgressText.setText(text);
         ChatUtil.activateChrono(chrono, callInProgressChrono, call);
 
-        if (callInProgressLayout.getVisibility() == View.VISIBLE) return;
-        callInProgressLayout.setVisibility(View.VISIBLE);
-        callInProgressLayout.setOnClickListener(this);
+        if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
+            callInProgressLayout.setVisibility(View.VISIBLE);
+            callInProgressLayout.setOnClickListener(this);
+        }
     }
 
     private void hideCallInProgressLayout(MegaChatCall call) {
@@ -7927,11 +7928,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         ChatUtil.activateChrono(false, subtitleChronoCall, call);
 
         log("hideCallInProgressLayout");
-        if (callInProgressLayout.getVisibility() == View.GONE) return;
-        callInProgressLayout.setVisibility(View.GONE);
-        callInProgressLayout.setOnClickListener(null);
-        setSubtitleVisibility();
-
+        if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.GONE) {
+            callInProgressLayout.setVisibility(View.GONE);
+            callInProgressLayout.setOnClickListener(null);
+            setSubtitleVisibility();
+        }
     }
 
     @Override
