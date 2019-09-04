@@ -473,7 +473,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             case R.id.button_create_account_create:
                 hidePasswordIfVisible();
-                onCreateAccountClick(v);
+                submitForm();
                 break;
 
             case R.id.button_login_create:
@@ -530,10 +530,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 }
                 break;
         }
-    }
-
-    public void onCreateAccountClick (View v){
-        submitForm();
     }
 
     /*
@@ -786,9 +782,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         if(error == null || error.equals("")){
             return;
         }
-        Display  display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
+
         switch (editText.getId()){
             case R.id.create_account_email_text:{
                 userEmailLayout.setError(error);
@@ -825,9 +819,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     }
 
     private void quitError(EditText editText){
-        Display  display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
         switch (editText.getId()){
             case R.id.create_account_email_text:{
                 userEmailLayout.setError(null);

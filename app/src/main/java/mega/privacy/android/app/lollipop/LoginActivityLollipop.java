@@ -305,26 +305,14 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 break;
             }
             case Constants.CONFIRM_EMAIL_FRAGMENT: {
-
                 if (confirmEmailFragment == null) {
                     confirmEmailFragment = new ConfirmEmailFragmentLollipop();
-                    if ((passwdTemp != null) && (emailTemp != null)) {
-                        confirmEmailFragment.setEmailTemp(emailTemp);
-                        confirmEmailFragment.setPasswdTemp(passwdTemp);
-                        confirmEmailFragment.setFirstNameTemp(firstNameTemp);
-//						emailTemp = null;
-//						passwdTemp = null;
-//						nameTemp = null;
-                    }
-                } else {
-                    if ((passwdTemp != null) && (emailTemp != null)) {
-                        confirmEmailFragment.setEmailTemp(emailTemp);
-                        confirmEmailFragment.setPasswdTemp(passwdTemp);
-                        confirmEmailFragment.setFirstNameTemp(firstNameTemp);
-//						emailTemp = null;
-//						passwdTemp = null;
-//						nameTemp = null;
-                    }
+                }
+
+                if (passwdTemp != null && emailTemp != null) {
+                    confirmEmailFragment.setEmailTemp(emailTemp);
+                    confirmEmailFragment.setPasswdTemp(passwdTemp);
+                    confirmEmailFragment.setFirstNameTemp(firstNameTemp);
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -772,13 +760,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     public String getEmailTemp() {
         return this.emailTemp;
     }
-
-
-//	public void onNewIntent(Intent intent){
-//		if (intent != null && Constants.ACTION_CONFIRM.equals(intent.getAction())) {
-//			loginFragment.handleConfirmationIntent(intent);
-//		}
-//	}
 
     public static void log(String message) {
         Util.log("LoginActivityLollipop", message);
