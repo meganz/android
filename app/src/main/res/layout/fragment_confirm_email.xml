@@ -38,12 +38,25 @@
             android:src="@drawable/ic_awaiting_email"
             android:layout_below="@+id/confirm_email_awaiting"/>
 
+        <TextView
+            android:id="@+id/confirm_email_explanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm_email_explanation"
+            android:textSize="16sp"
+            android:textColor="@color/name_my_account"
+            android:layout_below="@id/confirm_email_icon"
+            android:layout_marginTop="12dp"
+            android:layout_marginLeft="26dp"
+            android:layout_marginRight="24dp"
+            android:fontFamily="Roboto"/>
+
         <RelativeLayout
             android:id="@+id/email_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/confirm_email_icon"
-            android:layout_marginTop="24dp"
+            android:layout_below="@+id/confirm_email_explanation"
+            android:layout_marginTop="36dp"
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp">
 
@@ -78,18 +91,6 @@
                 android:layout_alignBottom="@+id/confirm_email_new_email_layout"/>
 
         </RelativeLayout>
-
-        <!--<TextView-->
-            <!--android:id="@+id/confirm_email_explanation"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/confirm_email_explanation"-->
-            <!--android:textSize="16sp"-->
-            <!--android:textColor="@color/mail_my_account"-->
-            <!--android:layout_below="@id/confirm_email_awaiting"-->
-            <!--android:layout_marginTop="10dp"-->
-            <!--android:layout_marginLeft="26dp"-->
-            <!--android:layout_marginRight="56dp"/>-->
 
         <TextView
             android:id="@+id/confirm_email_misspelled"
