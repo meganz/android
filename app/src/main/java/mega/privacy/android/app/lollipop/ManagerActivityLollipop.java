@@ -2032,6 +2032,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				orderContacts = megaApi.ORDER_DEFAULT_ASC;
 				log("Preference orderContacts is NULL -> ORDER_DEFAULT_ASC");
 			}
+            if (prefs.getPreferredSortCameraUpload() != null) {
+                orderCamera = Integer.parseInt(prefs.getPreferredSortCameraUpload());
+                log("The orderCamera preference is: " + orderCamera);
+            } else {
+                log("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
+            }
 			if(prefs.getPreferredSortOthers()!=null){
 				orderOthers = Integer.parseInt(prefs.getPreferredSortOthers());
 				log("The orderOthers preference is: "+orderOthers);
@@ -12890,8 +12896,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void selectSortUploads(int orderCamera){
 		log("selectSortUploads");
 
-		this.orderCamera = orderCamera;
-
+        setOrderCamera(orderCamera);
 		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 		if (cuFL != null){
 			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuFL.getPhotoSyncHandle()), orderCamera);
@@ -17521,6 +17526,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		dbH.setPreferredSortContacts(String.valueOf(orderContacts));
 	}
+
+    public void setOrderCamera(int orderCamera) {
+        log("setOrderCamera");
+        this.orderCamera = orderCamera;
+        if (prefs != null) {
+            prefs.setPreferredSortCameraUpload(String.valueOf(orderCamera));
+        }
+        dbH.setPreferredSortCameraUpload(String.valueOf(orderCamera));
+    }
 
 	public int getOrderOthers() {
 		return orderOthers;

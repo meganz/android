@@ -55,6 +55,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -713,6 +715,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 				}
 			}
+            if (prefs.getPreferredSortCameraUpload() != null) {
+                orderBy = Integer.parseInt(prefs.getPreferredSortCameraUpload());
+                log("The orderCamera preference is: " + orderBy);
+            } else {
+                log("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
+            }
 		}
 
 		log("After recovering bundle type: "+type);
@@ -2653,7 +2661,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 			}
 		}
-		return nodesResult;
+        Collections.sort(nodesResult, new Comparator<MegaNode>() {
+            @Override
+            public int compare(MegaNode o1, MegaNode o2) {
+                long m1 = o1.getModificationTime();
+                long m2 = o2.getModificationTime();
+                if (orderBy == MegaApiJava.ORDER_MODIFICATION_ASC) {
+                    return (int) (m1 - m2);
+                } else {
+                    return (int) (m2 - m1);
+                }
+            }
+        });
+        return nodesResult;
 		//setNodes(nodesResult);
 	}
 
