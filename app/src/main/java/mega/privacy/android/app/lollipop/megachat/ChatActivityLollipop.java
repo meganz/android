@@ -2004,8 +2004,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             myAudioRecorder.reset();
             myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            myAudioRecorder.setOutputFile(outputFileVoiceNotes);
             myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            myAudioRecorder.setAudioEncodingBitRate(50000);
+            myAudioRecorder.setAudioSamplingRate(44100);
+            myAudioRecorder.setAudioChannels(1);
+            myAudioRecorder.setOutputFile(outputFileVoiceNotes);
             myAudioRecorder.prepare();
 
         } catch (IOException e) {
@@ -2045,6 +2048,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         myAudioRecorder.reset();
         myAudioRecorder.release();
         myAudioRecorder = null;
+        textChat.requestFocus();
     }
 
     /*
@@ -2060,6 +2064,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             ChatController.deleteOwnVoiceClip(this, outputFileName);
             outputFileVoiceNotes = null;
             setRecordingNow(false);
+            textChat.requestFocus();
 
         } catch (RuntimeException stopException) {
             log("Error canceling a recording");
@@ -2082,6 +2087,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             setRecordingNow(false);
             uploadPictureOrVoiceClip(outputFileVoiceNotes);
             outputFileVoiceNotes = null;
+            textChat.requestFocus();
         } catch (RuntimeException ex) {
             controlErrorRecording();
         }

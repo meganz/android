@@ -9568,14 +9568,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					return;
 				}
 
-				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-				if (fbFLol != null){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItemLollipop(drawerItem);
-				}
-				else{
-					super.onBackPressed();
-				}
+				drawerItem = DrawerItem.CLOUD_DRIVE;
+				selectDrawerItemLollipop(drawerItem);
+
 				return;
 			}
 		}
@@ -9766,10 +9761,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
 						parentHandleBrowser = rootHandle;
 						refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-						if (fbFLol != null) {
-							fbFLol.scrollToFirstPosition();
-						}
 					}
 				}
 				else {
@@ -9779,8 +9770,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case R.id.bottom_navigation_item_offline: {
-				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-				setBottomNavigationMenuItemChecked(OFFLINE_BNV);
+				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					if (!pathNavigationOffline.equals("/")){
+						pathNavigationOffline = "/";
+						refreshFragment(FragmentTag.OFFLINE.getTag());
+					}
+				} else {
+					drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+					setBottomNavigationMenuItemChecked(OFFLINE_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_camera_uploads: {
@@ -9789,15 +9787,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case R.id.bottom_navigation_item_shared_items: {
-				drawerItem = DrawerItem.SHARED_ITEMS;
-				setBottomNavigationMenuItemChecked(SHARED_BNV);
-
+				if (drawerItem == DrawerItem.SHARED_ITEMS) {
+					if (getTabItemShares() == 0 && parentHandleIncoming != -1) {
+						parentHandleIncoming = -1;
+						refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+					} else if (getTabItemShares() == 1 && parentHandleOutgoing != -1){
+						parentHandleOutgoing = -1;
+						refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+					}
+					if(sharesPageAdapter!=null){
+						sharesPageAdapter.notifyDataSetChanged();
+					}
+				} else {
+					drawerItem = DrawerItem.SHARED_ITEMS;
+					setBottomNavigationMenuItemChecked(SHARED_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_chat: {
 				drawerItem = DrawerItem.CHAT;
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-
 				break;
 			}
 		}
@@ -15177,11 +15186,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-						startForegroundService(intent);
-					} else {
-						startService(intent);
-					}
+					startService(intent);
 				}
 			}
 		}
