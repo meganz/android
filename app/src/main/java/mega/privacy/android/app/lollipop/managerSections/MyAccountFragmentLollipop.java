@@ -50,6 +50,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -86,7 +87,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	RelativeLayout avatarLayout;
 	RoundedImageView myAccountImage;
 
-	TextView nameView;
+	private EmojiTextView nameView;
 
 	TextView typeAccount;
 	TextView infoEmail;
@@ -212,8 +213,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
 		}
 
-		nameView = (TextView) v.findViewById(R.id.my_account_name);
+		nameView = v.findViewById(R.id.my_account_name);
+		nameView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
 		nameView.setOnClickListener(this);
+
 
 		editImageView = (ImageView) v.findViewById(R.id.my_account_edit_icon);
 		editImageView.setOnClickListener(this);
