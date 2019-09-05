@@ -27,7 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -36,6 +36,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -44,14 +45,12 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class CreateAccountFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface {
+public class CreateAccountFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, OnKeyboardVisibilityListener {
 
     private Context context;
 
     private Button bRegister;
     private Button bLogin;
-    private TextView createAccountTitle;
-    private TextView textAlreadyAccount;
     private TextInputLayout userNameLayout;
     private TextInputEditText userName;
     private ImageView userNameError;
@@ -67,7 +66,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     private TextInputLayout userPasswordConfirmLayout;
     private TextInputEditText userPasswordConfirm;
     private ImageView userPasswordConfirmError;
-    private ScrollView scrollView;
+    private RelativeLayout createAccountAndAcceptLayout;
 
     private CheckBox chkTOS;
     //TOP for 'terms of password'
@@ -103,6 +102,8 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             log("context is null");
             return;
         }
+
+        ((LoginActivityLollipop) context).setKeyboardVisibilityListener(this);
     }
 
 
@@ -118,9 +119,8 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 
-        scrollView = v.findViewById(R.id.scroll_view_account);
         createAccountLayout = v.findViewById(R.id.create_account_create_layout);
-        createAccountTitle = v.findViewById(R.id.create_account_text_view);
+        createAccountAndAcceptLayout = v.findViewById(R.id.create_account_and_accept_layout);
 
         userNameLayout = v.findViewById(R.id.create_account_name_text_layout);
         userName = v.findViewById(R.id.create_account_name_text);
@@ -332,8 +332,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         bRegister.setText(getString(R.string.create_account));
         bRegister.setOnClickListener(this);
 
-        textAlreadyAccount = (TextView) v.findViewById(R.id.text_already_account);
-
         bLogin = (Button) v.findViewById(R.id.button_login_create);
         bLogin.setOnClickListener(this);
 
@@ -345,7 +343,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.VISIBLE);
         creatingAccountLayout.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
         creatingAccountTextView.setVisibility(View.GONE);
         createAccountProgressBar.setVisibility(View.GONE);
 
@@ -579,10 +576,8 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     private void submitForm() {
         log("submit form!");
 
-//		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         dbH.clearCredentials();
-//        megaApi.localLogout();
 
         if (!validateForm()) {
             return;
@@ -591,18 +586,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(userEmail.getWindowToken(), 0);
 
-        if(!Util.isOnline(context))
-        {
-            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
-            return;
-        }
-
-        createAccountLayout.setVisibility(View.GONE);
-        creatingAccountLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-        creatingAccountTextView.setVisibility(View.GONE);
-        createAccountProgressBar.setVisibility(View.VISIBLE);
-
         if(!Util.isOnline(context)){
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
@@ -610,11 +593,10 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
-        log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
-        log("[CREDENTIALS]userPassword: _" + userPassword.getText().toString() +"_");
+        createAccountAndAcceptLayout.setVisibility(View.GONE);
+
         megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
     }
 
@@ -716,7 +698,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
         log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
@@ -744,7 +725,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                         ((LoginActivityLollipop) context).showSnackbar(getString(R.string.error_email_registered));
                         createAccountLayout.setVisibility(View.VISIBLE);
                         creatingAccountLayout.setVisibility(View.GONE);
-                        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                         creatingAccountTextView.setVisibility(View.GONE);
                         createAccountProgressBar.setVisibility(View.GONE);
                     }
@@ -758,7 +738,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                         ((LoginActivityLollipop) context).showFragment(Constants.LOGIN_FRAGMENT);
                         createAccountLayout.setVisibility(View.VISIBLE);
                         creatingAccountLayout.setVisibility(View.GONE);
-                        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                         creatingAccountTextView.setVisibility(View.GONE);
                         createAccountProgressBar.setVisibility(View.GONE);
                     }
@@ -894,6 +873,15 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 userPasswordError.setVisibility(View.GONE);
                 break;
             }
+        }
+    }
+
+    @Override
+    public void onVisibilityChanged(boolean visible) {
+        if (!visible && createAccountLayout.getVisibility() == View.VISIBLE) {
+            createAccountAndAcceptLayout.setVisibility(View.VISIBLE);
+        } else {
+            createAccountAndAcceptLayout.setVisibility(View.GONE);
         }
     }
 

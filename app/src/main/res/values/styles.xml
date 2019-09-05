@@ -94,10 +94,6 @@
         <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
 
-    <style name="Theme.Megaactionbar.changepassword" parent="Theme.Megaactionbar.Secondary">
-        <item name="colorControlNormal">@color/black</item>
-    </style>
-
     <style name="Theme.Megaactionbar.InfoScreens" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
 

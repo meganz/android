@@ -53,6 +53,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.Util.changeStatusBarColor;
+
 
 @SuppressLint("NewApi")
 public class ChangePasswordActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener{
@@ -1432,10 +1434,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			aB.hide();
 		}
 
-		Window window = getWindow();
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+		changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
 	}
 
 	@Override

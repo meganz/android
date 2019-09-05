@@ -87,7 +87,7 @@
                         android:id="@+id/login_password_text_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="24dp"
                         app:errorEnabled="true"
                         app:errorTextAppearance="@style/InputTextAppearanceError">
 
@@ -137,19 +137,21 @@
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"
                     android:layout_marginLeft="3dp"
-                    android:layout_marginTop="44dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="10dp"
                     android:paddingLeft="26dp"
                     android:paddingRight="26dp"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
                     style="@style/ButtonStyle"
                     android:elevation="8dp"/>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="34dp">
+
                     <ProgressBar
                         android:id="@+id/pb_login_in_progress"
                         style="?android:attr/progressBarStyleLargeInverse"
@@ -158,6 +160,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_marginLeft="3dp"
                         android:visibility="gone"/>
+
                     <TextView
                         android:id="@+id/text_login_tip"
                         android:layout_width="wrap_content"
@@ -168,7 +171,9 @@
                         android:textColor="@color/accentColor"
                         android:textSize="12sp"
                         android:visibility="gone"/>
+
                 </LinearLayout>
+
                 <TextView
                     android:id="@+id/button_forgot_pass"
                     android:layout_width="wrap_content"
@@ -186,7 +191,7 @@
             <LinearLayout
                 android:id="@+id/login_create_account_layout"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:background="@color/background_create_account"
                 android:gravity="center"
                 android:orientation="vertical" >
