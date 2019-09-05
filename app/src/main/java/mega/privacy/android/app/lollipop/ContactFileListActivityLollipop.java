@@ -199,7 +199,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void takePictureAndUpload() {
-
 		if (!Util.hasPermissions(this, Manifest.permission.CAMERA)) {
 			Util.requestPermission(this, Constants.REQUEST_CAMERA, Manifest.permission.CAMERA);
 			return;
@@ -368,9 +367,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			log("parentNode != null: " + parentNode.getName());
 			boolean exists = false;
 			ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
-			for (int i = 0;
-				 i < nL.size();
-				 i++) {
+			for (int i = 0; i < nL.size(); i++) {
 				if (title.compareTo(nL.get(i).getName()) == 0) {
 					exists = true;
 				}
@@ -397,9 +394,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				log("megaApi.getRootNode() != null");
 				boolean exists = false;
 				ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
-				for (int i = 0;
-					 i < nL.size();
-					 i++) {
+				for (int i = 0; i < nL.size(); i++) {
 					if (title.compareTo(nL.get(i).getName()) == 0) {
 						exists = true;
 					}
@@ -707,9 +702,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	public void leaveMultipleShares(ArrayList<Long> handleList) {
 
-		for (int i = 0;
-			 i < handleList.size();
-			 i++) {
+		for (int i = 0; i < handleList.size(); i++) {
 			MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
 			megaApi.remove(node);
 		}
@@ -719,9 +712,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		int numFolders = 0;
 		int numFiles = 0;
 
-		for (int i = 0;
-			 i < nodes.size();
-			 i++) {
+		for (int i = 0; i < nodes.size(); i++) {
 			MegaNode c = nodes.get(i);
 			if (c.isFolder()) {
 				numFolders++;
@@ -853,9 +844,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 							if (numParts == 1) {
 								input.setSelection(0, input.getText().length());
 							} else if (numParts > 1) {
-								for (int i = 0;
-									 i < (numParts - 1);
-									 i++) {
+								for (int i = 0; i < (numParts - 1); i++) {
 									lastSelectedPos += s[i].length();
 									lastSelectedPos++;
 								}
@@ -1020,9 +1009,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
-		for (int i = 0;
-			 i < handleList.size();
-			 i++) {
+		for (int i = 0; i < handleList.size(); i++) {
 			longArray[i] = handleList.get(i);
 		}
 		intent.putExtra("MOVE_FROM", longArray);
@@ -1034,9 +1021,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
 		long[] longArray = new long[handleList.size()];
-		for (int i = 0;
-			 i < handleList.size();
-			 i++) {
+		for (int i = 0; i < handleList.size(); i++) {
 			longArray[i] = handleList.get(i);
 		}
 		intent.putExtra("COPY_FROM", longArray);
@@ -1131,9 +1116,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 			statusDialog = temp;
 
-			for (int i = 0;
-				 i < moveHandles.length;
-				 i++) {
+			for (int i = 0; i < moveHandles.length; i++) {
 				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
 			}
 		} else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
@@ -1188,9 +1171,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 						switch (item) {
 							case 0: {
-								for (int i = 0;
-									 i < selectedContacts.size();
-									 i++) {
+								for (int i = 0; i < selectedContacts.size(); i++) {
 									MegaUser user = megaApi.getContact(selectedContacts.get(i));
 									log("user: " + user);
 									log("useremail: " + userEmail);
