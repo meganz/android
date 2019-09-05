@@ -323,6 +323,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			if (parentHandle != -1) {
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				contactNodes = megaApi.getChildren(parentNode, orderGetChildren);
+				((ContactFileListActivityLollipop)context).setTitleActionBar(parentNode.getName());
 			} else {
 				contactNodes = megaApi.getInShares(contact);
 			}
