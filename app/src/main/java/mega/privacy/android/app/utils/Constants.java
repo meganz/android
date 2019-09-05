@@ -445,6 +445,7 @@ public class Constants {
 	};
 
 	public static final String[] CONTACT_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/C!.+$",
 			"^https://mega\\.nz/C!.+$"
 	};
 

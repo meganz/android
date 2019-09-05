@@ -4,7 +4,6 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.net.Uri;
 import android.util.Patterns;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +11,12 @@ import java.util.regex.Matcher;
 
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.Constants.CHAT_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.FOLDER_DOWNLOAD_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
 
 public class AndroidMegaRichLinkMessage {
 
@@ -148,35 +153,19 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public static boolean isFolderLink(String url) {
-        if (url != null && (url.matches("^https://mega\\.co\\.nz/#F!.+$") || url.matches("^https://mega\\.nz/#F!.+$"))) {
-            log("folder link found");
-            return true;
-        }
-        return false;
+        return matchRegexs(url, FOLDER_DOWNLOAD_LINK_REGEXS);
     }
 
     public static boolean isFileLink(String url) {
-        if (url != null && (url.matches("^https://mega\\.co\\.nz/#!.+$") || url.matches("^https://mega\\.nz/#!.+$"))) {
-            log("IS file link found");
-            return true;
-        }
-        return false;
+        return matchRegexs(url, FILE_LINK_REGEXS);
     }
 
     public static boolean isChatLink(String url) {
-        if (url != null && (url.matches("^https://mega\\.co\\.nz/chat/.+$") || url.matches("^https://mega\\.nz/chat/.+$"))) {
-            log("IS chat link found");
-            return true;
-        }
-        return false;
+       return matchRegexs(url, CHAT_LINK_REGEXS);
     }
 
     public static boolean isContactLink(String url) {
-        if (url != null && (url.matches("^https://mega\\.co\\.nz/C!.+$") || url.matches("^https://mega\\.nz/C!.+$"))) {
-            log("IS contact link found");
-            return true;
-        }
-        return false;
+        return matchRegexs(url, CONTACT_LINK_REGEXS);
     }
 
     public boolean isChat() {
