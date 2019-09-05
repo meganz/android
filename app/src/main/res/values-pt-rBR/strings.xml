@@ -280,7 +280,7 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Tamanho</string>
-    <string name="file_properties_info_last_modified" context="When the file was last modified">Last Modified</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Última alteração</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Adicionado</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
@@ -650,7 +650,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Armazenamento</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Bloqueio com PIN</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">A compressão de vídeos consome muita bateria, por isso o MEGA mostrará um lembrete para que você conecte o seu dispositivo na tomada se o tamanho dos vídeos a serem comprimidos for superior a %s.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">A compressão de vídeos consome muita bateria. Por isso, o MEGA mostrará um lembrete para que você coloque o seu dispositivo para carregar se o tamanho dos vídeos a serem comprimidos for superior a %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avançado</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Deletar cache</string>
@@ -700,7 +700,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Somente quando estiver carregando</string>
-    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Solicitar conexão à tomada</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Solicitar carregar o dispositivo</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Manter o mesmo nome dos arquivos no dispositivo</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Pasta local da câmera</string>
@@ -2273,7 +2273,7 @@
 	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Não há espaço de armazenamento suficiente</string>
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Não há espaço de armazenamento suficiente para fazer a compressão de vídeos.</string>
 	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">O tamanho de compressão do vídeo é muito grande</string>
-	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">O tamanho total dos vídeos a serem comprimidos é superior a %s - conecte o seu dispositivo na tomada para continuar.</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">O tamanho total dos vídeos a serem comprimidos é superior a %s; para continuar, carregue o seu dispositivo.</string>
 	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Esta configuração entrará em vigor na próxima vez em que os Uploads da câmera forem executados</string>
 	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s comprimido</string>
 	<string name="title_compress_video" context="notification title when compressing video">Comprimindo vídeos %1$d/%2$d</string>
