@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
@@ -42,17 +43,22 @@ public abstract class RotatableFragment extends Fragment {
             if (selectedItems != null && selectedItems.size() > 0) {
                 activateActionMode();
                 for (int selectedItem : selectedItems) {
-                    if (((ManagerActivityLollipop) getActivity()).isList) {
-                        log(className, "selectedItem:" + selectedItem);
-                        multipleItemClick(selectedItem);
-                    } else {
-                        if (selectedItem < folderCount) {
-                            log(className, "list folder, selectedItem: " + selectedItem);
+                    Activity activity = getActivity();
+                    if (activity instanceof ManagerActivityLollipop) {
+                        if (((ManagerActivityLollipop) getActivity()).isList) {
+                            log(className, "selectedItem:" + selectedItem);
                             multipleItemClick(selectedItem);
                         } else {
-                            log(className, "file selection, selectedItem: " + selectedItem + "lastPlaceHolderCount:" + lastPlaceHolderCount + ". currentPlaceHolderCount: " + currentPlaceHolderCount);
-                            multipleItemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount));
+                            if (selectedItem < folderCount) {
+                                log(className, "list folder, selectedItem: " + selectedItem);
+                                multipleItemClick(selectedItem);
+                            } else {
+                                log(className, "file selection, selectedItem: " + selectedItem + "lastPlaceHolderCount:" + lastPlaceHolderCount + ". currentPlaceHolderCount: " + currentPlaceHolderCount);
+                                multipleItemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount));
+                            }
                         }
+                    } else {
+                        multipleItemClick(selectedItem);
                     }
                 }
             }

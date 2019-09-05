@@ -66,7 +66,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
-	MegaNodeAdapter adapter;
 	FloatingActionButton fab;
 	Stack<Long> parentHandleStack = new Stack<>();
     int currNodePosition = -1;

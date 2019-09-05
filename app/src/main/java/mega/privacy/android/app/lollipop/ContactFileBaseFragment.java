@@ -3,9 +3,9 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.util.DisplayMetrics;
 import android.view.Display;
 
@@ -16,6 +16,9 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
+import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -24,7 +27,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
 
-public class ContactFileBaseFragment extends Fragment{
+public class ContactFileBaseFragment extends RotatableFragment {
     
     public static int REQUEST_CODE_GET = 1000;
     public static int REQUEST_CODE_GET_LOCAL = 1003;
@@ -45,7 +48,8 @@ public class ContactFileBaseFragment extends Fragment{
     protected MegaPreferences prefs = null;
     protected String downloadLocationDefaultPath;
     protected DisplayMetrics outMetrics;
-    
+
+    protected MegaNodeAdapter adapter;
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("ContactFileBaseFragment onCreate");
@@ -152,5 +156,24 @@ public class ContactFileBaseFragment extends Fragment{
     
     public static void log(String log) {
         Util.log("ContactFileListFragmentLollipop", log);
+    }
+
+    @Override
+    protected RotatableAdapter getAdapter() {
+        return adapter;
+    }
+
+    @Override
+    public void activateActionMode() {
+        log("activateActionMode");
+    }
+
+    @Override
+    public void multipleItemClick(int position) {
+        adapter.toggleSelection(position);
+    }
+
+    @Override
+    protected void updateActionModeTitle() {
     }
 }
