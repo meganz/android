@@ -1333,7 +1333,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		if(importMessagesHandles.length==1){
 			for (int k = 0; k < importMessagesHandles.length; k++){
-				MegaChatMessage message = megaChatApi.getMessage(chatId, importMessagesHandles[k]);
+				MegaChatMessage message = megaChatApi.getMessageFromNodeHistory(chatId, importMessagesHandles[k]);
 				if(message!=null){
 
 					MegaNodeList nodeList = message.getMegaNodeList();
@@ -1369,7 +1369,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			MultipleRequestListener listener = new MultipleRequestListener(Constants.MULTIPLE_CHAT_IMPORT, this);
 
 			for (int k = 0; k < importMessagesHandles.length; k++){
-				MegaChatMessage message = megaChatApi.getMessage(chatId, importMessagesHandles[k]);
+				MegaChatMessage message = megaChatApi.getMessageFromNodeHistory(chatId, importMessagesHandles[k]);
 				if(message!=null){
 
 					MegaNodeList nodeList = message.getMegaNodeList();
