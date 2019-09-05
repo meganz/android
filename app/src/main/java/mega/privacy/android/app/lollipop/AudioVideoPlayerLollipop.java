@@ -336,6 +336,15 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
     };
 
+    private BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                finish();
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -346,6 +355,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         audioVideoPlayerLollipop = this;
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         downloadLocationDefaultPath = getDownloadLocation(this);
 
@@ -3307,22 +3317,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 nC.downloadTo(currentDocument, parentPath, null, uri.toString());
             }
             else if (adapterType == Constants.FROM_CHAT) {
-                long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-                if (hashes != null) {
-                    ArrayList<MegaNode> megaNodes = new ArrayList<>();
-                    for (int i=0; i<hashes.length; i++) {
-                        MegaNode node = megaApi.getNodeByHandle(hashes[i]);
-                        if (node != null) {
-                            megaNodes.add(node);
-                        }
-                        else {
-                            log("Node NULL, not added");
-                        }
-                    }
-                    if (megaNodes.size() > 0) {
-                        chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-                    }
-                }
+                chatC.prepareForDownload(intent, parentPath);
             }
             else {
                 String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
@@ -3489,6 +3484,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     @Override
     protected void onStop() {
         super.onStop();
+        //pause either video or audio as per UX advise
+        if (player != null && player.getPlayWhenReady()) {
+            player.setPlayWhenReady(false);
+        }
         log("onStop");
     }
 
@@ -3515,10 +3514,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     @Override
     protected void onPause() {
         super.onPause();
-        //pause either video or audio as per UX advise
-        if (player != null && player.getPlayWhenReady()) {
-            player.setPlayWhenReady(false);
-        }
         log("onPause");
     }
 
@@ -3551,6 +3546,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
 
         super.onDestroy();
     }
@@ -3825,6 +3821,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
 
             LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+
             setImageDragVisibility(View.VISIBLE);
         }
         else {

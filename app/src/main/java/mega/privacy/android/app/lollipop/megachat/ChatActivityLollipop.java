@@ -2004,8 +2004,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             myAudioRecorder.reset();
             myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            myAudioRecorder.setOutputFile(outputFileVoiceNotes);
             myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            myAudioRecorder.setAudioEncodingBitRate(50000);
+            myAudioRecorder.setAudioSamplingRate(44100);
+            myAudioRecorder.setAudioChannels(1);
+            myAudioRecorder.setOutputFile(outputFileVoiceNotes);
             myAudioRecorder.prepare();
 
         } catch (IOException e) {
@@ -2045,6 +2048,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         myAudioRecorder.reset();
         myAudioRecorder.release();
         myAudioRecorder = null;
+        textChat.requestFocus();
     }
 
     /*
@@ -2060,6 +2064,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             ChatController.deleteOwnVoiceClip(this, outputFileName);
             outputFileVoiceNotes = null;
             setRecordingNow(false);
+            textChat.requestFocus();
 
         } catch (RuntimeException stopException) {
             log("Error canceling a recording");
@@ -2082,6 +2087,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             setRecordingNow(false);
             uploadPictureOrVoiceClip(outputFileVoiceNotes);
             outputFileVoiceNotes = null;
+            textChat.requestFocus();
         } catch (RuntimeException ex) {
             controlErrorRecording();
         }
@@ -2744,26 +2750,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("Send location [longLatitude]: " + latitude + " [longLongitude]: " + longitude);
                 sendLocationMessage(longitude, latitude, encodedSnapshot);
             }
-        }
-        else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+        } else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             log("local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-            if (hashes != null) {
-                ArrayList<MegaNode> megaNodes = new ArrayList<>();
-                for (int i=0; i<hashes.length; i++) {
-                    MegaNode node = megaApi.getNodeByHandle(hashes[i]);
-                    if (node != null) {
-                        megaNodes.add(node);
-                    }
-                    else {
-                        log("Node NULL, not added");
-                    }
-                }
-                if (megaNodes.size() > 0) {
-                    chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-                }
-            }
+            chatC.prepareForDownload(intent, parentPath);
         }
         else{
             log("Error onActivityResult");
