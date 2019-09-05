@@ -8,9 +8,10 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 249
-        versionName "3.6.4 (249)"
+        versionCode 253
+        versionName "3.7.0 (253)"
         multiDexEnabled true
+        ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
     }
 
     sourceSets.main {
@@ -58,6 +59,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:exifinterface:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.google.android.gms:play-services-wallet:16.0.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'

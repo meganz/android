@@ -182,16 +182,14 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                        boolean isActivityVisible = MegaApplication.isActivityVisible();
                         boolean isIdle = pm.isDeviceIdleMode();
-                        log("isActivityVisible: " + isActivityVisible);
-                        log("isIdle: " + isIdle);
-                        if(!isActivityVisible || isIdle) {
+                        if ((!app.isActivityVisible() && megaApi.getRootNode() == null) || isIdle) {
                             log("launch foreground service!");
                             wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingCallLock:");
                             wl.acquire();
                             wl.release();
-                            startService(new Intent(this,IncomingCallService.class));
+                            log("startService-MegaFirebaseMessagingService:onMessageReceived ");
+                            startService(new Intent(this, IncomingCallService.class));
                             return;
                         }
                     }
@@ -223,6 +221,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         wl.acquire();
                         wl.release();
                         if((!app.isActivityVisible() && megaApi.getRootNode() == null )|| isIdle) {
+
                             log("launch foreground service!");
                             Intent intent = new Intent(this,IncomingMessageService.class);
                             intent.putExtra("remoteMessage", remoteMessage);
