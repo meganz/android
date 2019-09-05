@@ -3864,13 +3864,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("setDefaultAvatar");
 
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		String firstLetter = " ";
-		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
-			firstLetter = ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter();
-		}
-		if (firstLetter == null) {
+		String firstLetter = ChatUtil.getFirstLetter(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
 			firstLetter = " ";
 		}
+
 		nVPictureProfile.setImageBitmap(Util.createDefaultAvatar(color, firstLetter));
 	}
 

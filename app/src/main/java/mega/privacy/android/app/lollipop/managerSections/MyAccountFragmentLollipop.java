@@ -59,6 +59,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -785,7 +786,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
 
-		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, myAccountInfo.getFirstLetter()));
+		String firstLetter = ChatUtil.getFirstLetter(myAccountInfo.getFullName());
+		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+			firstLetter = " ";
+		}
+
+		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, firstLetter));
 
 	}
 
