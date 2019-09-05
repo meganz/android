@@ -70,7 +70,8 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     private ScrollView scrollView;
 
     private CheckBox chkTOS;
-    private TextView tos;
+    //TOP for 'terms of password'
+    private CheckBox chkTOP;
 
     private MegaApiAndroid megaApi;
 
@@ -299,8 +300,33 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         tos.setOnClickListener(this);
 
+        TextView top = v.findViewById(R.id.top);
+
+        String textToShowTOP = context.getString(R.string.top);
+        try {
+            textToShowTOP = textToShowTOP.replace("[B]", "<font color=\'#00BFA5\'>")
+                    .replace("[/B]", "</font>")
+                    .replace("[A]", "<u>")
+                    .replace("[/A]", "</u>");
+        } catch (Exception e) {
+            log(e.getMessage());
+        }
+
+        Spanned resultTOP;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            resultTOP = Html.fromHtml(textToShowTOP,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            resultTOP = Html.fromHtml(textToShowTOP);
+        }
+
+        top.setText(resultTOP);
+        top.setOnClickListener(this);
+
         chkTOS = (CheckBox) v.findViewById(R.id.create_account_chkTOS);
         chkTOS.setOnClickListener(this);
+
+        chkTOP = v.findViewById(R.id.chk_top);
+        chkTOP.setOnClickListener(this);
 
         bRegister = (Button) v.findViewById(R.id.button_create_account_create);
         bRegister.setText(getString(R.string.create_account));
@@ -503,7 +529,22 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 }
 
                 break;
+            case R.id.top:
+                log("Show terms of password");
+                hidePasswordIfVisible();
+                try {
+                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    openTermsIntent.setData(Uri.parse(Constants.URL_E2EE));
+                    startActivity(openTermsIntent);
+                }
+                catch (Exception e){
+                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                    viewIntent.setData(Uri.parse(Constants.URL_E2EE));
+                    startActivity(viewIntent);
+                }
 
+                break;
             case R.id.toggle_button_passwd:
                 if (passwdVisibility) {
                     toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
@@ -609,6 +650,9 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             return false;
         } else if (!chkTOS.isChecked()) {
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.create_account_no_terms));
+            return false;
+        } else if (!chkTOP.isChecked()) {
+            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.create_account_no_top));
             return false;
         }
         return true;

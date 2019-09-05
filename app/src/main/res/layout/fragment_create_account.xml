@@ -323,8 +323,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
-                    android:layout_marginBottom="31dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="36dp"
+                    android:layout_marginLeft="-4dp"
                     android:orientation="horizontal" >
 
                     <CheckBox
@@ -344,6 +345,14 @@
                         android:textSize="12sp" />
 
                 </LinearLayout>
+
+                <include
+                    layout="@layout/checkbox_top"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-4dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="30dp" />
 
                 <Button
                     android:id="@+id/button_create_account_create"
