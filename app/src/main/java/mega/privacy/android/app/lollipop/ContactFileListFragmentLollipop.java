@@ -68,9 +68,10 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	TextView emptyTextView;
 	MegaNodeAdapter adapter;
 	FloatingActionButton fab;
-	Stack<Long> parentHandleStack = new Stack<Long>();
+	Stack<Long> parentHandleStack = new Stack<>();
     int currNodePosition = -1;
 
+    private final static String PARENT_HANDLE_STACK = "parentHandleStack";
     public void setCurrNodePosition(int currNodePosition) {
         this.currNodePosition = currNodePosition;
     }
@@ -278,6 +279,19 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putSerializable(PARENT_HANDLE_STACK, parentHandleStack);
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		if (savedInstanceState != null) {
+			parentHandleStack = (Stack<Long>)(savedInstanceState.getSerializable(PARENT_HANDLE_STACK));
+		}
+	}
+	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		if (handler != null) {
@@ -396,6 +410,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	public void changeActionBarElevation(boolean whitElevation){
+		if (aB == null) return;
 		if (whitElevation) {
 			aB.setElevation(Util.px2dp(4, outMetrics));
 		}

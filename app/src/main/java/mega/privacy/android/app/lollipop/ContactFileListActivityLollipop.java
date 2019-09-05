@@ -583,6 +583,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			log("Shared Folders are:");
 			coordinatorLayout.setFitsSystemWindows(true);
 
+			cflF = (ContactFileListFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cflF");
+
 			if (cflF == null) {
 				cflF = new ContactFileListFragmentLollipop();
 			}
