@@ -269,11 +269,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         if(containerPasswordError.getVisibility() != View.INVISIBLE){
             enterPwdHint.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
             containerPasswordError.setVisibility(View.INVISIBLE);
-            if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                passwordEditText.setBackgroundDrawable(password_background);
-            } else{
-                passwordEditText.setBackground(password_background);
-            }
+            passwordEditText.setBackground(password_background);
             testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
             confirmPasswordButton.setEnabled(true);
             confirmPasswordButton.setAlpha(1F);
