@@ -36,10 +36,12 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -60,10 +62,10 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     private BottomSheetBehavior mBehavior;
 
     public LinearLayout mainLinearLayout;
-    public TextView titleNameContactPanel;
+    public EmojiTextView titleNameContactPanel;
     public TextView titleMailContactPanel;
     public RoundedImageView contactImageView;
-    public TextView avatarInitialLetter;
+    public EmojiTextView avatarInitialLetter;
     public LinearLayout optionInfoContact;
     public LinearLayout optionStartConversation;
     public LinearLayout optionSendFile;
@@ -147,10 +149,10 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
         items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout_bottom_sheet_contact);
 
-        titleNameContactPanel = (TextView) contentView.findViewById(R.id.contact_list_contact_name_text);
+        titleNameContactPanel = contentView.findViewById(R.id.contact_list_contact_name_text);
         titleMailContactPanel = (TextView) contentView.findViewById(R.id.contact_list_contact_mail_text);
         contactImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_contact_list_thumbnail);
-        avatarInitialLetter = (TextView) contentView.findViewById(R.id.sliding_contact_list_initial_letter);
+        avatarInitialLetter = contentView.findViewById(R.id.sliding_contact_list_initial_letter);
         optionInfoContact = (LinearLayout) contentView.findViewById(R.id.contact_list_info_contact_layout);
         optionStartConversation = (LinearLayout) contentView.findViewById(R.id.contact_list_option_start_conversation_layout);
         optionSendFile= (LinearLayout) contentView.findViewById(R.id.contact_list_option_send_file_layout);
@@ -166,6 +168,8 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         else{
             titleNameContactPanel.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
         }
+        titleNameContactPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+        avatarInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 
         optionInfoContact.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
@@ -416,14 +420,15 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         display.getMetrics(outMetrics);
 
         fullName = contact.getFullName();
-        String firstLetter = fullName.charAt(0) + "";
-        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-        avatarInitialLetter.setText(firstLetter);
-        avatarInitialLetter.setTextColor(Color.WHITE);
-        avatarInitialLetter.setVisibility(View.VISIBLE);
+        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            avatarInitialLetter.setVisibility(View.INVISIBLE);
+        }else {
+            avatarInitialLetter.setText(firstLetter);
+            avatarInitialLetter.setTextColor(Color.WHITE);
+            avatarInitialLetter.setVisibility(View.VISIBLE);
+        }
         avatarInitialLetter.setTextSize(22);
-
-        ////
     }
 
     @Override

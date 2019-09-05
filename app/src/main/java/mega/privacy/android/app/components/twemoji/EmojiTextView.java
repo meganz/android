@@ -94,18 +94,17 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
         EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
 
-        if (mContext == null || (mContext instanceof ContextWrapper && ((ContextWrapper) mContext).getBaseContext() == null))
+        if (mContext == null || (mContext instanceof ContextWrapper && ((ContextWrapper) mContext).getBaseContext() == null)) {
             super.setText(spannableStringBuilder, type);
-
-        if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof ManagerActivityLollipop || mContext instanceof ArchivedChatsActivity || mContext instanceof ChatExplorerActivity) {
+        } else if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof ManagerActivityLollipop || mContext instanceof ArchivedChatsActivity || mContext instanceof ChatExplorerActivity) {
             CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
             super.setText(textF, type);
-        }else if (mContext instanceof ContextWrapper && (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity)) {
+        } else if (mContext instanceof ContextWrapper && (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity)) {
             CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
             super.setText(textF, type);
+        } else {
+            super.setText(spannableStringBuilder, type);
         }
-
-        super.setText(spannableStringBuilder, type);
 
     }
 
