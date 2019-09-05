@@ -143,7 +143,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			
 			BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inJustDecodeBounds = true;
-			Bitmap thumb;
+			Bitmap thumb = null;
 			
 			ExifInterface exif;
 			int orientation = ExifInterface.ORIENTATION_NORMAL;
@@ -157,8 +157,14 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		    
 		    // Decode bitmap with inSampleSize set
 		    options.inJustDecodeBounds = false;
-		    
-		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+
+		    try {
+				thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+			} catch (OutOfMemoryError e){
+		    	e.printStackTrace();
+		    	log("OutOfMemoryError getting bitmap");
+			}
+
 			if (thumb != null){
 				thumb = Util.rotateBitmap(thumb, orientation);
 				long handle = Long.parseLong(holder.currentHandle);
