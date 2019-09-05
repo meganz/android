@@ -395,6 +395,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
         if(currNodePosition != -1 && parentHandle == -1 ) {
             itemClick(currNodePosition,null,null);
         }
+		showFabButton(megaApi.getNodeByHandle(parentHandle));
 		return v;
 	}
 
