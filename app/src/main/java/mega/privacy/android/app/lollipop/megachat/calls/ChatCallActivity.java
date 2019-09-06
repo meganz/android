@@ -440,6 +440,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         answerCallFAB.hide();
         videoFAB = findViewById(R.id.video_fab);
         videoFAB.setOnClickListener(this);
+        videoFAB.hide();
         rejectFAB = findViewById(R.id.reject_fab);
         rejectFAB.setOnClickListener(this);
         rejectFAB.hide();
@@ -2191,7 +2192,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         showInitialFABConfiguration();
                     }
                 } else {
-                    rejectFAB.hide();
+                    rejectFAB.show();
 
                 }
                 break;
