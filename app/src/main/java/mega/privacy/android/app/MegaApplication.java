@@ -16,7 +16,6 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -924,7 +923,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	}
 
 	public static void setOpenCallChatId(long value) {
-	    log("setOpenCallChatId: "+value);
+		log("setOpenCallChatId: " + value);
 		openCallChatId = value;
 	}
 
@@ -1570,7 +1569,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		log("onChatCallUpdate: callId "+call+", call.getStatus " + call.getStatus());
+		log("onChatCallUpdate: Call ID: " + call.getId() + ", Status " + call.getStatus());
 		stopService(new Intent(this, IncomingCallService.class));
 
 		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
@@ -1856,11 +1855,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		stopAudioSignals();
 		int callStatus = call.getStatus();
 		if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-			log("outgoingCallSound:REQUEST_SENT");
+			log("setAudioManagerValues:REQUEST_SENT");
 			outgoingCallSound();
 
 		} else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-			log("outgoingCallSound:RING_IN");
+			log("setAudioManagerValues:RING_IN");
 			incomingCallSound();
 			checkVibration();
 		}
@@ -1901,6 +1900,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			mediaPlayer.prepare();
 		} catch (IOException e) {
 			e.printStackTrace();
+			log("error preparing mediaPlayer");
 		}
 
 		mediaPlayer.setLooping(true);
@@ -1991,7 +1991,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void launchCallActivity(MegaChatCall call) {
 		log("launchCallActivity: " + call.getStatus());
 		MegaApplication.setShowPinScreen(false);
-//		MegaApplication.setOpenCallChatId(call.getChatid());
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra(Constants.CHAT_ID, call.getChatid());
 		i.putExtra(Constants.CALL_ID, call.getId());
