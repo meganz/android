@@ -158,6 +158,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         } else {
             log("Chat not enabled!");
         }
+
+        if(aB == null) {
+            aB = ((AppCompatActivity) context).getSupportActionBar();
+        }
+
     }
 
     public void checkScroll() {
@@ -1452,9 +1457,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
         lastFirstVisiblePosition = 0;
 
+        if(aB == null) {
+            aB = ((AppCompatActivity) context).getSupportActionBar();
+
+        }
         if (aB != null && aB.getTitle() != null) {
             aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
         }
+
         ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         if (context instanceof ManagerActivityLollipop) {
