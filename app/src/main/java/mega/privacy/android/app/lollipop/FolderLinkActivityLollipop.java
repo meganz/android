@@ -644,13 +644,25 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if (value.length() == 0) {
 						return true;
 					}
-					if(value.startsWith("!")){
-						log("Decryption key with exclamation!");
-						url=url+value;
+
+					if (url.contains("#F!")) {
+						// old folder link format
+						if (value.startsWith("!")) {
+							log("Decryption key with exclamation!");
+							url = url + value;
+						} else {
+							url = url + "!" + value;
+						}
+					} else if (url.contains("folder")) {
+						// new folder link format
+						if (value.startsWith("#")) {
+							log("Decryption key with hash!");
+							url = url + value;
+						} else {
+							url = url + "#" + value;
+						}
 					}
-					else{
-						url=url+"!"+value;
-					}
+
 					log("Folder link to import: "+url);
 					decryptionIntroduced=true;
 					megaApiFolder.loginToFolder(url, folderLinkActivity);
@@ -683,12 +695,22 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							askForDecryptionKeyDialog();
 							return;
 						}else{
-							if(value.startsWith("!")){
-								log("Decryption key with exclamation!");
-								url=url+value;
-							}
-							else{
-								url=url+"!"+value;
+							if (url.contains("#F!")) {
+								// old folder link format
+								if (value.startsWith("!")) {
+									log("Decryption key with exclamation!");
+									url = url + value;
+								} else {
+									url = url + "!" + value;
+								}
+							} else if (url.contains("folder")) {
+								// new folder link format
+								if (value.startsWith("#")) {
+									log("Decryption key with hash!");
+									url = url + value;
+								} else {
+									url = url + "#" + value;
+								}
 							}
 							log("Folder link to import: "+url);
 							decryptionIntroduced=true;

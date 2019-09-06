@@ -301,12 +301,22 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					if (value.length() == 0) {
 						return true;
 					}
-					if(value.startsWith("!")){
-						log("Decryption key with exclamation!");
-						url=url+value;
-					}
-					else{
-						url=url+"!"+value;
+					if (url.contains("#!")) {
+						// old folder link format
+						if (value.startsWith("!")) {
+							log("Decryption key with exclamation!");
+							url = url + value;
+						} else {
+							url = url + "!" + value;
+						}
+					} else if (url.contains("file")) {
+						// new folder link format
+						if (value.startsWith("#")) {
+							log("Decryption key with hash!");
+							url = url + value;
+						} else {
+							url = url + "#" + value;
+						}
 					}
 					log("File link to import: "+url);
 					decryptionIntroduced=true;
@@ -341,12 +351,22 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 							askForDecryptionKeyDialog();
 							return;
 						}else{
-							if(value.startsWith("!")){
-								log("Decryption key with exclamation!");
-								url=url+value;
-							}
-							else{
-								url=url+"!"+value;
+							if (url.contains("#!")) {
+								// old folder link format
+								if (value.startsWith("!")) {
+									log("Decryption key with exclamation!");
+									url = url + value;
+								} else {
+									url = url + "!" + value;
+								}
+							} else if (url.contains("file")) {
+								// new folder link format
+								if (value.startsWith("#")) {
+									log("Decryption key with hash!");
+									url = url + value;
+								} else {
+									url = url + "#" + value;
+								}
 							}
 							log("File link to import: "+url);
 							decryptionIntroduced=true;
