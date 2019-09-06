@@ -1289,13 +1289,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
 
-			if(Util.isChatEnabled() && chat != null && chat.isCallInProgress() && (megaChatApi != null) && (megaChatApi.getNumCalls() != 0)){
-				MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
-				if(call!=null){
-					return;
-				}
-			}
-
 			int messageType = chat.getLastMessageType();
 			log("MessageType: "+messageType);
 			String lastMessageString = chat.getLastMessage();
