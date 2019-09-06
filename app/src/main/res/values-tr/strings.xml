@@ -280,9 +280,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Boyut</string>
-    <string name="file_properties_info_modified" context="when was the file modified">Düzenlendi</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Last Modified</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Eklendi</string>
-    <string name="file_properties_info_created" context="when the file was created">Yaratıldı</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -632,7 +631,7 @@
     <string name="menu_take_picture" context="menu item">Fotoğraf çek</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Sadece Wi-Fi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi veya veri planı</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi or Mobil Veri</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">Tamam</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Atla</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Durdur</string>
@@ -642,8 +641,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Medya klasörleri dosyaları yükleniyor</string>
-	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
-	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Yüklenecek dosyaları kontrol et</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Kamera Yüklemelerini Başlat</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -651,7 +650,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Depolama</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Kilidi</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression is very power consuming, MEGA will remind you to charge your device if the videos to be compressed are larger than %s.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video sıkıştırma çok güç tüketir, sıkıştırılacak videolar %s büyükse MEGA size cihazınızı şarj etmenizi hatırlatır.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Gelişmiş</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Önbelleği temizle</string>
@@ -688,7 +687,7 @@
     <string name="settings_empty_folder" context="settings option">Klasör seçin</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi veya veri planı</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi or Mobil Veri</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Sadece Wi-Fi</item>
     </string-array>
 
@@ -701,7 +700,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Sadece şarj ederken</string>
-    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Bağlanmamı iste</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Dosya adlarını cihazdaki gibi tut</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Yerel Kamera klasörü</string>
@@ -1080,10 +1079,10 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d kişi paylaşılan klasörden kaldırıldı.</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d kişi paylaşılan klasörden doğru bir şekilde kaldırıldı</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160; ve %d kişi başarıyla kaldırılmadı</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d başarıyla kaldırılmadı</string>
 
-	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
-	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d kişileri için güncellemelerine başarıyla izinverildi</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d kişileri için izinler güncellenemedi</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Telefondan kişiler alınıyor&#8230;</string>
 
@@ -1347,7 +1346,7 @@
         <item context="Plural" quantity="other">%2$d dosyadan %1$d tanesi</item>
     </plurals>
 
-	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Process is finishing&#8230;</string>
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">İşlem bitiyor&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Görüntüle</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Tüm aktarmaları duraklat</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Tüm aktarmaları sürdür</string>
@@ -1798,8 +1797,8 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Sohbet yüklüyor</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Sohbet medya kalitesi</string>
-	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Quality</string>
-    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Kalitesi</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Kamera Yüklemeleri, fotoğraflarınıza ve cihazınızdaki diğer medyalara erişmesi için gereklidir. Lütfen ayarlar sayfasına gidin ve izin verin.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Orjinal kalite</item>
         <item context="the options of medium quality multimedia file to  upload.">Orta kalite</item>
@@ -2142,13 +2141,13 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">En düşük süre 7 gündür.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">En düşük süre 7 gündür ve sizin saklayabileceğiniz maksimum süre 30 gündür.</string>
-	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">Minimum boyut %1$s ve maksimum boyut %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Daha eski dosyaları kaldır</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d gün</string>
-	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notify me when size is larger than</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">boyutu daha büyük olduğunda bana bildir</string>
 
-	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to compress are larger than</string>
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Sıkıştırılacak videolar daha büyükse</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Çöp Kovası Temizleme Planlayıcısını devre dışı bırakmak veya daha uzun bir saklama süresi ayarlamak için bir PRO planına abone olmanız gerekir.</string>
 
@@ -2271,14 +2270,14 @@
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Son görülmeyi göster</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Kişilerinizin MEGA\'daki son etkinlik zamanınızı görmesine izin verin.</string>
 
-	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
-	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video compression.</string>
-	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
-	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">The total size of the videos to compress exceeds %s, please plug in your device to continue.</string>
-	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
-	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
-	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
-	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Yeterli depolama alanı yok</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Video sıkıştırma gerçekleştirmek için yeterli depolama alanı yok.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video sıkıştırma boyutu çok büyük</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">Sıkıştırılacak videoların toplam boyutu %s değerini aşıyor, devam etmek için lütfen cihazınızı takın.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Bu ayar, Kamera Yüklemeleri\'nin bir sonraki çalıştırılışında geçerli olacaktır.</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s sıkıştırıldı</string>
+	<string name="title_compress_video" context="notification title when compressing video">Videoları Sıkıştırma %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Geçersiz klasör seçildi</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d dosya</item>
@@ -2470,8 +2469,6 @@
     <string name="hint_action_search" context="Hint of the Search view">Ara&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Cevapla</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Yoksay</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Sesli arama başlatılıyor&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Video görüşmesi başlatılıyor&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s bu aramayı susturdu</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Sessiz</string>
 
@@ -2522,4 +2519,9 @@
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Devam eden bir arama varken sesli mesajları kaydetmek mümkün değildir.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Sesli mesaj yüklenmeye çalışılırken bir hata oluştu.</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Gelen çağrı</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Yükleniyor</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Lütfen bekleyin&#8230;</string>
 </resources>

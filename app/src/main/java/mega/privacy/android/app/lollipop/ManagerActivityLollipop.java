@@ -197,8 +197,8 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ProgressDialogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -243,6 +243,7 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
@@ -773,6 +774,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				actionType = intent.getIntExtra("actionType", -1);
 
 				if(actionType == Constants.GO_OFFLINE){
+				    //stop cu process
+                    JobUtil.stopRunningCameraUploadService(ManagerActivityLollipop.this);
 					showOfflineMode();
 				}
 				else if(actionType == Constants.GO_ONLINE){
@@ -3564,6 +3567,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
                                     dbH.setCamSyncEnabled(false);
+									if(sttFLol != null  && sttFLol.isResumed()){
+										sttFLol.disableCameraUpload();
+									}
+									if(cuFL != null && cuFL.isResumed()){
+										cuFL.resetSwitchButtonLabel();
+									}
                                 }
                             });
                     builder.setNegativeButton(getString(R.string.general_cancel), null);
@@ -7870,6 +7879,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setStatusMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
+					searchMenuItem.setVisible(false);
 				}
 				return true;
 			}
@@ -9602,14 +9612,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					return;
 				}
 
-				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-				if (fbFLol != null){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItemLollipop(drawerItem);
-				}
-				else{
-					super.onBackPressed();
-				}
+				drawerItem = DrawerItem.CLOUD_DRIVE;
+				selectDrawerItemLollipop(drawerItem);
+
 				return;
 			}
 		}
@@ -9799,10 +9804,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
 						parentHandleBrowser = rootHandle;
 						refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-						if (fbFLol != null) {
-							fbFLol.scrollToFirstPosition();
-						}
 					}
 				}
 				else {
@@ -9812,8 +9813,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case R.id.bottom_navigation_item_offline: {
-				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-				setBottomNavigationMenuItemChecked(OFFLINE_BNV);
+				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					if (!pathNavigationOffline.equals("/")){
+						pathNavigationOffline = "/";
+						refreshFragment(FragmentTag.OFFLINE.getTag());
+					}
+				} else {
+					drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+					setBottomNavigationMenuItemChecked(OFFLINE_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_camera_uploads: {
@@ -9822,15 +9830,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case R.id.bottom_navigation_item_shared_items: {
-				drawerItem = DrawerItem.SHARED_ITEMS;
-				setBottomNavigationMenuItemChecked(SHARED_BNV);
-
+				if (drawerItem == DrawerItem.SHARED_ITEMS) {
+					if (getTabItemShares() == 0 && parentHandleIncoming != -1) {
+						parentHandleIncoming = -1;
+						refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+					} else if (getTabItemShares() == 1 && parentHandleOutgoing != -1){
+						parentHandleOutgoing = -1;
+						refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+					}
+					if(sharesPageAdapter!=null){
+						sharesPageAdapter.notifyDataSetChanged();
+					}
+				} else {
+					drawerItem = DrawerItem.SHARED_ITEMS;
+					setBottomNavigationMenuItemChecked(SHARED_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_chat: {
 				drawerItem = DrawerItem.CHAT;
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-
 				break;
 			}
 		}
@@ -15230,11 +15249,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-						startForegroundService(intent);
-					} else {
-						startService(intent);
-					}
+					startService(intent);
 				}
 			}
 		}
@@ -17293,7 +17308,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Pressed button positive to cancel transfer");
 						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-                        JobUtil.stopRunningCameraUploadService(ManagerActivityLollipop.this);
+                        cancelAllUploads(ManagerActivityLollipop.this);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:

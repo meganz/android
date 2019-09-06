@@ -39,6 +39,8 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 
+import static mega.privacy.android.app.utils.ChatUtil.getMegaChatMessage;
+
 public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
@@ -101,10 +103,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             messageId = savedInstanceState.getLong("messageId", -1);
             log("Handle of the message: "+messageId);
             handle = savedInstanceState.getLong("handle", -1);
-            messageMega = megaChatApi.getMessage(chatId, messageId);
-            if(messageMega!=null){
-                message = new AndroidMegaChatMessage(messageMega);
-            }
         }
         else{
             log("Bundle NULL");
@@ -119,10 +117,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             }
 
             log("Id Chat and Message id: "+chatId+ "___"+messageId);
-            messageMega = megaChatApi.getMessage(chatId, messageId);
-            if(messageMega!=null){
-                message = new AndroidMegaChatMessage(messageMega);
-            }
+        }
+
+        messageMega = getMegaChatMessage(context, megaChatApi, chatId, messageId);
+
+        if(messageMega!=null){
+            message = new AndroidMegaChatMessage(messageMega);
         }
 
         chatC = new ChatController(context);
@@ -161,7 +161,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
         LinearLayout separatorRemove = (LinearLayout) contentView.findViewById(R.id.separator_remove);
 
-        if(message == null || message.getMessage() == null){
+        if (message == null || message.getMessage() == null) {
             return;
         }
 
