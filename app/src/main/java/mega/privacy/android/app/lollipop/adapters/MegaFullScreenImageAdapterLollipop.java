@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -104,7 +105,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			log("PreviewAsyncTask()-doInBackground");
 			handle = params[0];
 			MegaNode node = megaApi.getNodeByHandle(handle);
-			preview = PreviewUtils.getPreviewFromFolder(node, activity);
+			preview = PreviewUtils.getPreviewFromFolderFullImage(node, activity);
 			
 			if (preview != null){
 				return 0;
@@ -138,7 +139,12 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				
 				if (holderIsVisible){
 					PreviewUtils.previewCache.put(handle, preview);
-					visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
+                    if (preview != null) {
+                        visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
+                    } else {
+                        log("Preview can't be loaded. Device low memory.");
+                        Toast.makeText(context, R.string.not_load_preview_low_memory, Toast.LENGTH_SHORT).show();
+                    }
 					visibleImgs.get(position).progressBar.setVisibility(View.GONE);
 					visibleImgs.get(position).downloadProgressBar.setVisibility(View.GONE);
 				}
@@ -168,7 +174,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			if (node == null){
 				return 3;
 			}
-			preview = PreviewUtils.getPreviewFromFolder(node, activity);
+			preview = PreviewUtils.getPreviewFromFolderFullImage(node, activity);
 			
 			if (preview != null){
 				return 0;
@@ -184,7 +190,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 						boolean previewCreated = MegaUtilsAndroid.createPreview(destination, previewFile);
 						
 						if (previewCreated){
-							preview = PreviewUtils.getBitmapForCache(previewFile, activity);
+							preview = PreviewUtils.getBitmapForCacheFullImage(previewFile, activity);
 							destination.delete();
 							return 0;
 						}
@@ -228,10 +234,20 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					if(param == 0)
 					{
 						if (visibleImgs.get(position).isGIF){
-							visibleImgs.get(position).gifImgDisplay.setImageBitmap(preview);
+                            if (preview != null) {
+                                visibleImgs.get(position).gifImgDisplay.setImageBitmap(preview);
+                            } else {
+                                log("Preview can't be loaded. Device low memory.");
+                                Toast.makeText(context, R.string.not_load_preview_low_memory, Toast.LENGTH_SHORT).show();
+                            }
 						}
 						else {
-							visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
+                            if (preview != null) {
+                                visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
+                            } else {
+                                log("Preview can't be loaded. Device low memory.");
+                                Toast.makeText(context, R.string.not_load_preview_low_memory, Toast.LENGTH_SHORT).show();
+                            }
 						}
 					}
 					if (visibleImgs.get(position).isGIF){
@@ -298,8 +314,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					MegaNode node = megaApi.getNodeByHandle(handle);
 					File previewDir = PreviewUtils.getPreviewFolder(activity);
 					File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
-					Bitmap bitmap = PreviewUtils.getBitmapForCache(previewFile, activity);
-					visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
+					Bitmap bitmap = PreviewUtils.getBitmapForCacheFullImage(previewFile, activity);
+                    if (bitmap != null) {
+                        visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
+                    } else {
+                        log("Preview can't be loaded. Device low memory.");
+                        Toast.makeText(context, R.string.not_load_preview_low_memory, Toast.LENGTH_SHORT).show();
+                    }
 				}
 				
 				visibleImgs.get(position).progressBar.setVisibility(View.GONE);
@@ -781,9 +802,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					}
 					
 					if (holderIsVisible){
-						Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, activity);
-						PreviewUtils.previewCache.put(handle, bitmap);						
-						visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
+						Bitmap bitmap = PreviewUtils.getBitmapForCacheFullImage(preview, activity);
+                        if (bitmap != null) {
+                            visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
+                        } else {
+                            log("Preview can't be loaded. Device low memory.");
+                            Toast.makeText(context, R.string.not_load_preview_low_memory, Toast.LENGTH_SHORT).show();
+                        }
 						visibleImgs.get(position).progressBar.setVisibility(View.GONE);
 					}
 				}

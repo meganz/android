@@ -445,6 +445,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		for(int j=0; j<messageIds.length; j++){
 			MegaChatMessage message = megaChatApi.getMessage(chatId, messageIds[j]);
+			if(message==null){
+				message = megaChatApi.getMessageFromNodeHistory(chatId, messageIds[j]);
+			}
+
 			if(message!=null){
 				MegaNodeList list = message.getMegaNodeList();
 				if(list.size()==1){
@@ -803,27 +807,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-			if (hashes != null) {
-				ArrayList<MegaNode> megaNodes = new ArrayList<>();
-				for (int i=0; i<hashes.length; i++) {
-					MegaNode node = megaApi.getNodeByHandle(hashes[i]);
-					if (node != null) {
-						megaNodes.add(node);
-					}
-					else {
-						log("Node NULL, not added");
-					}
-				}
-				if (megaNodes.size() > 0) {
-					chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-				}
-			}
-
-//			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-//			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-//			log("URL: " + url + "___SIZE: " + size);
-//			downloadTo (parentPath, url, size, hashes);
+            chatC.prepareForDownload(intent, parentPath);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
