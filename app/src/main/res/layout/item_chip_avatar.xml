@@ -40,7 +40,6 @@
         android:textSize="12sp"
         android:singleLine="true"
         android:maxLines="1"
-        android:ellipsize="middle"
         android:maxWidth="60dp"
         android:gravity="center"
         android:textColor="@color/mail_my_account"

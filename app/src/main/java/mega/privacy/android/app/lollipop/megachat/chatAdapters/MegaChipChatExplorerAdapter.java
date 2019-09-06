@@ -358,8 +358,10 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-        String firstLetter = item.getTitle().charAt(0) + "";
-
+        String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
+        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            firstLetter = " ";
+        }
         log("Draw letter: "+firstLetter);
         Rect bounds = new Rect();
 
