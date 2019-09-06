@@ -164,6 +164,7 @@ public class Constants {
     public static final int COLOR_STATUS_BAR_SEARCH = 3;
     public static final int COLOR_STATUS_BAR_ZERO = 4;
     public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 5;
+    public static final int COLOR_STATUS_BAR_SMS_VERIFICATION = 6;
 
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";

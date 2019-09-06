@@ -363,7 +363,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     public enum FragmentTag {
 		CLOUD_DRIVE, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
-		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS;
+		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS,SMS_VERIFICATION;
 
 		public String getTag () {
 			switch (this) {
@@ -394,6 +394,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				case TURN_ON_NOTIFICATIONS: return "tonF";
 				case EXPORT_RECOVERY_KEY: return "eRKeyF";
 				case PERMISSIONS: return "pF";
+                case SMS_VERIFICATION: return "svF";
 			}
 			return null;
 		}
@@ -555,6 +556,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private TurnOnNotificationsFragment tonF;
 	private ExportRecoveryKeyFragment eRKeyF;
 	private PermissionsFragment pF;
+	private SMSVerificationFragment svF;
 
 	ProgressDialog statusDialog;
 
@@ -661,6 +663,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private long idJoinToChatLink = -1;
 
 	private boolean onAskingPermissionsFragment = false;
+	public boolean onAskingSMSVerificationFragment = false;
 
 	private BroadcastReceiver refreshAddPhoneNumberButtonReceiver = new BroadcastReceiver() {
         @Override
@@ -1793,6 +1796,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (onAskingPermissionsFragment && pF != null) {
 			getSupportFragmentManager().putFragment(outState, FragmentTag.PERMISSIONS.getTag(), pF);
 		}
+        outState.putBoolean("onAskingSMSVerificationFragment", onAskingSMSVerificationFragment);
+        svF = (SMSVerificationFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.SMS_VERIFICATION.getTag());
+        if (onAskingSMSVerificationFragment && svF != null) {
+            getSupportFragmentManager().putFragment(outState, FragmentTag.SMS_VERIFICATION.getTag(), svF);
+        }
 		outState.putFloat("elevation", abL.getElevation());
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
@@ -1875,6 +1883,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (onAskingPermissionsFragment) {
 				pF = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
 			}
+            onAskingSMSVerificationFragment = savedInstanceState.getBoolean("onAskingSMSVerificationFragment", false);
+            if (onAskingSMSVerificationFragment) {
+                svF = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
+            }
 			elevation = savedInstanceState.getFloat("elevation", 0);
 			storageState = savedInstanceState.getInt("storageState", -1);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
@@ -3119,7 +3131,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         showAddPhoneNumberInMenu();
 
         if (firstTimeAfterInstallation) {
-            askForAccess();
+            //haven't verified phone number
+            if(megaApi.smsVerifiedPhoneNumber() == null && !onAskingPermissionsFragment) {
+                askForSMSVerification();
+            } else {
+                askForAccess();
+            }
         }
 
 		if (openLinkDialogIsShown) {
@@ -3149,7 +3166,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	void askForAccess () {
+	private void askForSMSVerification() {
+        //If mobile device, only portrait mode is allowed
+        if (!Util.isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            log("mobile only portrait mode");
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
+        //don't show the dialog again.
+        shouldShowSMSDialog = false;
+        onAskingSMSVerificationFragment = true;
+        if (svF == null) {
+            svF = new SMSVerificationFragment();
+        }
+        replaceFragment(svF, FragmentTag.SMS_VERIFICATION.getTag());
+        tabLayoutContacts.setVisibility(View.GONE);
+        viewPagerContacts.setVisibility(View.GONE);
+        tabLayoutShares.setVisibility(View.GONE);
+        viewPagerShares.setVisibility(View.GONE);
+        tabLayoutMyAccount.setVisibility(View.GONE);
+        viewPagerMyAccount.setVisibility(View.GONE);
+        tabLayoutTransfers.setVisibility(View.GONE);
+        viewPagerTransfers.setVisibility(View.GONE);
+        abL.setVisibility(View.GONE);
+
+        fragmentContainer.setVisibility(View.VISIBLE);
+        drawerLayout.closeDrawer(Gravity.LEFT);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        supportInvalidateOptionsMenu();
+        hideFabButton();
+        showHideBottomNavigationView(true);
+    }
+
+	public void askForAccess () {
     	//If mobile device, only portrait mode is allowed
 		if (!Util.isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			log("mobile only portrait mode");
@@ -3191,6 +3240,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			showHideBottomNavigationView(true);
 		}
 	}
+
+	public void destroySMSVerificationFragment() {
+        //In mobile, allow all orientation after permission screen
+        if (!Util.isTablet(this)) {
+            log("mobile, all orientation");
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        }
+        onAskingSMSVerificationFragment = false;
+        svF = null;
+    }
 
 	public void destroyPermissionsFragment () {
 		//In mobile, allow all orientation after permission screen
@@ -9531,7 +9590,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return;
 		}
 
-		if (onAskingPermissionsFragment) {
+		if (onAskingPermissionsFragment || onAskingSMSVerificationFragment) {
 			return;
 		}
 
@@ -18319,6 +18378,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else if (option == Constants.COLOR_STATUS_BAR_ZERO) {
 				window.setStatusBarColor(0);
 			}
+            else if (option == Constants.COLOR_STATUS_BAR_SMS_VERIFICATION) {
+                window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_sms_verification));
+            }
 			else if (option == Constants.COLOR_STATUS_BAR_SEARCH_DELAY){
 				handler.postDelayed(new Runnable() {
 					@Override

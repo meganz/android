@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/image_permissions_layout"
+                android:layout_width="match_parent"
+                android:layout_height="218dp"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:layout_width="190dp"
+                    android:layout_height="190dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="90dp"
+                    android:src="@drawable/il_verify_phone_circle" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/sv_dialog_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/sv_dialog_msg"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="24dp"
+                    android:gravity="center"
+                    android:paddingBottom="16dp"
+                    android:text="@string/sms_add_phone_number_dialog_title"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/sv_dialog_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/invisible_view"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="24dp"
+                    android:gravity="center"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="16sp" />
+
+                <View
+                    android:id="@+id/invisible_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="92dp" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="52dp"
+            android:orientation="horizontal"
+            android:paddingBottom="62dp">
+
+            <Button
+                android:id="@+id/not_now_button_2"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_button_white"
+                android:elevation="0dp"
+                android:paddingLeft="16.5dp"
+                android:paddingTop="10dp"
+                android:paddingRight="16.5dp"
+                android:paddingBottom="10dp"
+                android:text="@string/button_not_now_rich_links"
+                android:textColor="@color/accentColor"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/enable_button"
+                style="@style/ButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:background="@drawable/background_accent_button"
+                android:paddingLeft="16.5dp"
+                android:paddingTop="10dp"
+                android:paddingRight="16.5dp"
+                android:paddingBottom="10dp"
+                android:text="@string/sms_add_phone_number_dialog_title"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
