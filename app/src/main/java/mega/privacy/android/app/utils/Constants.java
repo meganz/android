@@ -381,7 +381,9 @@ public class Constants {
 
 	public static final String[] FILE_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#!.+$",
-			"^https://mega\\.nz/#!.+$"
+			"^https://mega\\.nz/#!.+$",
+            "^https://mega\\.co\\.nz/file/.+#.*$",
+            "^https://mega\\.nz/file/.+#.*$",
 	};
 
 	public static final String[] CONFIRMATION_LINK_REGEXS = {
@@ -391,7 +393,9 @@ public class Constants {
 
 	public static final String[] FOLDER_DOWNLOAD_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#F!.+$",
-			"^https://mega\\.nz/#F!.+$"
+			"^https://mega\\.nz/#F!.+$",
+            "^https://mega\\.co\\.nz/folder/.+#.*$",
+            "^https://mega\\.nz/folder/.+#.*$"
 	};
 
 	public static final String[] CHAT_LINK_REGEXS = {
