@@ -99,7 +99,7 @@
 
     <string name="action_settings" context="Menu item">Settings</string>
     <string name="action_search" context="Search button">Search</string>
-    <string name="action_search_country" context="Search button">SELECT COUNTRY</string>
+    <string name="action_search_country" context="Select country page title">SELECT COUNTRY</string>
     <string name="action_play" context="Search button">Play</string>
     <string name="action_pause" context="Search button">Pause</string>
     <string name="action_refresh" context="Menu item">Refresh</string>

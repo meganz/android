@@ -243,6 +243,7 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.EXTRA_SHOULD_SHOW_SMS_DIALOG;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
@@ -437,7 +438,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	BottomNavigationViewEx bNV;
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
-    RelativeLayout accountInfoFrame;
+    private RelativeLayout accountInfoFrame;
 	TextView nVDisplayName;
 	TextView nVEmail;
 	RoundedImageView nVPictureProfile;
@@ -1729,7 +1730,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
 		outState.putBoolean("firstLogin", firstLogin);
-		outState.putBoolean("shouldShowSMSDialog", shouldShowSMSDialog);
+		outState.putBoolean(EXTRA_SHOULD_SHOW_SMS_DIALOG, shouldShowSMSDialog);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
@@ -2285,7 +2286,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
 
-		accountInfoFrame = (RelativeLayout) findViewById(R.id.navigation_drawer_account_view);
+		accountInfoFrame = findViewById(R.id.navigation_drawer_account_view);
         accountInfoFrame.setOnClickListener(this);
 
         nVDisplayName = (TextView) findViewById(R.id.navigation_drawer_account_information_display_name);
@@ -3012,8 +3013,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		}
 	        		else{
 						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
-                        shouldShowSMSDialog = getIntent().getBooleanExtra("shouldShowSMSDialog", shouldShowSMSDialog);
-						getIntent().removeExtra("shouldShowSMSDialog");
+                        shouldShowSMSDialog = getIntent().getBooleanExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, shouldShowSMSDialog);
+						getIntent().removeExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG);
                         if (firstLogin){
 							log("intent firstLogin==true");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
@@ -3033,8 +3034,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     getIntent().removeExtra("newAccount");
                     getIntent().removeExtra("upgradeAccount");
 					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
-                    shouldShowSMSDialog = intentRec.getBooleanExtra("shouldShowSMSDialog", shouldShowSMSDialog);
-					intentRec.removeExtra("shouldShowSMSDialog");
+                    shouldShowSMSDialog = intentRec.getBooleanExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, shouldShowSMSDialog);
+					intentRec.removeExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG);
                     if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
@@ -14922,7 +14923,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showSMSVerificationDialog() {
 	    log("showSMSVerificationDialog");
-//        shouldShowSMSDialog = false;
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);

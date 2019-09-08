@@ -70,6 +70,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.Constants.EXTRA_SHOULD_SHOW_SMS_DIALOG;
 import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
 
 /**
@@ -964,7 +965,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 }
                 if (url != null) {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    intent.putExtra("shouldShowSMSDialog",newAccount );
+                    intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG,newAccount );
                     log("URL: "+url+" seed: " + seed);
                     if (MegaApiUtils.isIntentAvailable(this, intent)) {
                         startActivity(intent);
@@ -987,7 +988,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 intent.setAction(Constants.ACTION_RECOVERY_KEY_EXPORTED);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("shouldShowSMSDialog",newAccount );
+                intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG,newAccount );
                 startActivity(intent);
                 finish();
                 break;
@@ -1254,7 +1255,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 newIntent.putExtra("parentPath", parentPath);
                 newIntent.putExtra("fromOffline", true);
                 newIntent.setAction(Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);
-                intent.putExtra("shouldShowSMSDialog",newAccount );
+                intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG,newAccount );
                 startActivity(newIntent);
             }
         }

@@ -37,114 +37,114 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
-	Context context;
-	ActionBar aB;
+	private Context context;
+	private ActionBar aB;
 
-	LinearLayout parentLinearLayout;
+	private LinearLayout parentLinearLayout;
 
-	DisplayMetrics outMetrics;
+	private DisplayMetrics outMetrics;
 	float density;
 
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
+	private MegaApiAndroid megaApi;
+	private MegaChatApiAndroid megaChatApi;
 
-	CardView inviteFriendsCard;
+	private CardView inviteFriendsCard;
 
-	RelativeLayout referralBonusesLayout;
+	private RelativeLayout referralBonusesLayout;
 
-    RelativeLayout registrationLayout;
-    RelativeLayout installAppLayout;
-    RelativeLayout installDesktopLayout;
-    RelativeLayout addPhoneLayout;
+	private RelativeLayout registrationLayout;
+	private RelativeLayout installAppLayout;
+	private RelativeLayout installDesktopLayout;
+    private RelativeLayout addPhoneLayout;
 
-	LinearLayout figuresInstallAppLayout;
-	TextView zeroFiguresInstallAppText;
+	private LinearLayout figuresInstallAppLayout;
+	private TextView zeroFiguresInstallAppText;
+	private long transferQuota = 0;
+	private TextView textUnlockedRewardTransfer;
 
-	LinearLayout figuresReferralBonusesLayout;
-	TextView zeroFiguresReferralBonusesText;
+	private LinearLayout figuresReferralBonusesLayout;
+	private TextView zeroFiguresReferralBonusesText;
 
-	LinearLayout figuresRegistrationLayout;
+	private LinearLayout figuresRegistrationLayout;
 
-	LinearLayout figuresInstallDesktopLayout;
-	TextView zeroFiguresInstallDesktopText;
+	private LinearLayout figuresInstallDesktopLayout;
+	private TextView zeroFiguresInstallDesktopText;
 
-	LinearLayout figuresAddPhoneLayout;
-	TextView zeroFiguresAddPhoneText;
+	private LinearLayout figuresAddPhoneLayout;
+	private TextView zeroFiguresAddPhoneText;
 
-	TextView titleCardInvite;
+	private TextView titleCardInvite;
 
-	ImageView installAppIcon;
-	ImageView installDesktopIcon;
-	ImageView registrationIcon;
-	ImageView addPhoneIcon;
-	ImageView referralBonusIcon;
+	private ImageView installAppIcon;
+	private ImageView installDesktopIcon;
+	private ImageView registrationIcon;
+	private ImageView addPhoneIcon;
+	private ImageView referralBonusIcon;
 
-	TextView figureUnlockedRewardStorage;
-	long storageQuota = 0;
-	TextView figureUnlockedRewardTransfer;
-	long transferQuota = 0;
-	TextView textUnlockedRewardTransfer;
+	private TextView figureUnlockedRewardStorage;
+	private long storageQuota = 0;
+	private TextView figureUnlockedRewardTransfer;
 
-	TextView titleReferralBonuses;
-	TextView figureReferralBonusesStorage;
-	TextView figureReferralBonusesTransfer;
-	long storageReferrals;
-	long transferReferrals;
-	TextView textReferralBonusesStorage;
-	TextView textReferralBonusesTransfer;
+	private TextView titleReferralBonuses;
+	private TextView figureReferralBonusesStorage;
+	private TextView figureReferralBonusesTransfer;
+	private long storageReferrals;
+	private long transferReferrals;
+	private TextView textReferralBonusesStorage;
+	private TextView textReferralBonusesTransfer;
 
-	TextView figureBaseQuotaStorage;
-	TextView figureBaseQuotaTransfer;
-	long storageBaseQuota;
-	long transferBaseQuota;
-	TextView textBaseQuotaStorage;
-	TextView textBaseQuotaTransfer;
+	private TextView figureBaseQuotaStorage;
+	private TextView figureBaseQuotaTransfer;
+	private TextView textBaseQuotaStorage;
+	private TextView textBaseQuotaTransfer;
+	private long storageBaseQuota;
+	private long transferBaseQuota;
 
-	TextView titleInstallApp;
-	TextView figureInstallAppStorage;
-	TextView figureInstallAppTransfer;
-	long storageInstallApp;
-	long transferInstallApp;
-	long daysLeftInstallApp;
+	private TextView titleInstallApp;
+	private TextView figureInstallAppStorage;
+	private TextView figureInstallAppTransfer;
+	private long storageInstallApp;
+	private long transferInstallApp;
+	private long daysLeftInstallApp;
 
-	TextView textInstallAppStorage;
-	TextView textInstallAppTransfer;
-	TextView daysLeftInstallAppText;
+	private TextView textInstallAppStorage;
+	private TextView textInstallAppTransfer;
+	private TextView daysLeftInstallAppText;
 
-    TextView titleAddPhone;
-    TextView figureAddPhoneStorage;
-    TextView figureAddPhoneTransfer;
-    long storageAddPhone;
-    long transferAddPhone;
-    long daysLeftAddPhone;
+	private TextView titleAddPhone;
+	private TextView figureAddPhoneStorage;
+	private TextView figureAddPhoneTransfer;
+	private long storageAddPhone;
+	private long transferAddPhone;
+	private long daysLeftAddPhone;
 
-    TextView textAddPhoneStorage;
-    TextView textAddPhoneTransfer;
-    TextView daysLeftAddPhoneText;
+	private TextView textAddPhoneStorage;
+	private TextView textAddPhoneTransfer;
+	private TextView daysLeftAddPhoneText;
 
-	TextView titleRegistration;
-	TextView figureRegistrationStorage;
-	TextView figureRegistrationTransfer;
-	long storageRegistration;
-	long transferRegistration;
-	long daysLeftRegistration;
+	private TextView titleRegistration;
+	private TextView figureRegistrationStorage;
+	private TextView figureRegistrationTransfer;
+	private long storageRegistration;
+	private long transferRegistration;
+	private long daysLeftRegistration;
 
-	TextView textRegistrationStorage;
-	TextView textRegistrationTransfer;
-	TextView daysLeftRegistrationText;
+	private TextView textRegistrationStorage;
+	private TextView textRegistrationTransfer;
+	private TextView daysLeftRegistrationText;
 
-	TextView titleInstallDesktop;
-	TextView figureInstallDesktopStorage;
-	TextView figureInstallDesktopTransfer;
-	long storageInstallDesktop;
-	long transferInstallDesktop;
-	long daysLeftInstallDesktop;
+	private TextView titleInstallDesktop;
+	private TextView figureInstallDesktopStorage;
+	private TextView figureInstallDesktopTransfer;
+	private long storageInstallDesktop;
+	private long transferInstallDesktop;
+	private long daysLeftInstallDesktop;
 
-	TextView textInstallDesktopStorage;
-	TextView textInstallDesktopTransfer;
-	TextView daysLeftInstallDesktopText;
+	private TextView textInstallDesktopStorage;
+	private TextView textInstallDesktopTransfer;
+	private TextView daysLeftInstallDesktopText;
 
-	Button inviteFriendsButton;
+	private Button inviteFriendsButton;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){

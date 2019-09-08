@@ -79,6 +79,7 @@ import nz.mega.sdk.MegaUser;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.Constants.EXTRA_SHOULD_SHOW_SMS_DIALOG;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener, AbortPendingTransferCallback {
 
@@ -2065,7 +2066,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         log("First time");
                         intent = new Intent(context,ManagerActivityLollipop.class);
                         intent.putExtra("firstLogin", true);
-                        intent.putExtra("shouldShowSMSDialog", true);
+                        intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, true);
                         if (action != null){
                             log("Action not NULL");
                             if (action.equals(Constants.ACTION_EXPORT_MASTER_KEY)){
@@ -2105,7 +2106,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         else{
                             intent = new Intent(context,ManagerActivityLollipop.class);
                             intent.putExtra("firstLogin", true);
-                            intent.putExtra("shouldShowSMSDialog", true);
+                            intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, true);
                             initialCam = true;
                         }
 
