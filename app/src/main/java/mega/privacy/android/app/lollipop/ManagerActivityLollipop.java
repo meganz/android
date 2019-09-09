@@ -15941,7 +15941,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				Util.showAlert(this, getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
 			}
-			else if(e.getErrorCode() == MegaError.API_EEXIST){
+			else if(e.getErrorCode() == MegaError.API_EEXIST || e.getErrorCode() == MegaError.API_EACCESS){
 				log("The new mail already exists");
 				Util.hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
