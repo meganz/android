@@ -379,6 +379,7 @@ public class Constants {
     public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
     public static final String SECOND_CALL = "SECOND_CALL";
 
+    public static final String SEPERATOR = "/";
     public static final String[] FILE_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#!.+$",
             "^https://mega\\.nz/#!.+$",

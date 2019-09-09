@@ -93,6 +93,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.Constants.SEPERATOR;
 import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener{
@@ -653,7 +654,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						} else {
 							url = url + "!" + value;
 						}
-					} else if (url.contains("folder")) {
+					} else if (url.contains(SEPERATOR + "folder" + SEPERATOR)) {
 						// new folder link format
 						if (value.startsWith("#")) {
 							log("Decryption key with hash!");
@@ -703,7 +704,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 								} else {
 									url = url + "!" + value;
 								}
-							} else if (url.contains("folder")) {
+							} else if (url.contains(SEPERATOR + "folder" + SEPERATOR)) {
 								// new folder link format
 								if (value.startsWith("#")) {
 									log("Decryption key with hash!");
