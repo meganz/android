@@ -245,9 +245,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Override
     public int onStartCommand(Intent intent,int flags,int startId) {
         log("public int onStartCommand(Intent intent, int flags, int startId)");
-        initService();
         isServiceRunning = true;
+        mContext = getApplicationContext();
+        mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
+        initService();
         startForeground(notificationId,mNotification);
         
         if (megaApi == null) {
@@ -1186,8 +1188,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } catch (Exception ex) {
             finish();
         }
-        
-        mContext = getApplicationContext();
+
         int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
         WifiManager wifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createWifiLock(wifiLockMode,"MegaDownloadServiceWifiLock");
@@ -1227,7 +1228,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         
         initDbH();
-        mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
         String previousIP = app.getLocalIpAddress();
         // the new logic implemented in NetworkStateReceiver
         String currentIP = Util.getLocalIpAddress(getApplicationContext());
