@@ -68,6 +68,7 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -121,6 +122,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	private SearchNodesTask searchNodesTask;
 	private RelativeLayout contentLayout;
 	private ProgressBar searchProgressBar;
+
+	private MegaCancelToken megaCancelToken;
 
 	@Override
 	protected RotatableAdapter getAdapter() {
@@ -695,7 +698,9 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	}
 
 	public void cancelPreviousAsyncTask() {
-		megaApi.cancelSearch();
+	    if (megaCancelToken != null && !megaCancelToken.isCancelled()) {
+            megaCancelToken.cancel();
+        }
 		if (searchNodesTask != null) {
 			searchNodesTask.cancel(true);
 		}
@@ -782,7 +787,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			if (query.isEmpty() || parentHandleSearch != -1) {
 				nodes = megaApi.getChildren(parent);
 			} else {
-				nodes = megaApi.search(parent, query, true, ((ManagerActivityLollipop) context).orderCloud);
+				megaCancelToken = new MegaCancelToken();
+				nodes = megaApi.search(parent, query, megaCancelToken,true, ((ManagerActivityLollipop) context).orderCloud);
 			}
 		}
 		log("Nodes found = " + nodes.size());

@@ -4601,8 +4601,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case SAVED_FOR_OFFLINE: {
 				aB.setSubtitle(null);
 
-				if(pathNavigationOffline!=null){
-
+				oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+				if (oFLol != null && oFLol.getSearchString() != null) {
+					String title = getString(R.string.action_search).toUpperCase() + ": " + oFLol.getSearchString();
+					aB.setTitle(title);
+					firstNavigationLevel = false;
+				} else if(pathNavigationOffline != null){
 					log("AFTER PathNavigation is: "+pathNavigationOffline);
 					if (pathNavigationOffline.equals("/")){
 						aB.setTitle(getString(R.string.section_saved_for_offline_new).toUpperCase());
@@ -6350,11 +6354,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (drawerItem == DrawerItem.CHAT) {
 					hideKeyboard(managerActivity, 0);
 				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-					searchQuery = "" + query;
-					addOfflineSearchPath(OFFLINE_SEARCH_QUERY + searchQuery);
 					hideKeyboard(managerActivity, 0);
-					setToolbarTitle();
-					supportInvalidateOptionsMenu();
+					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+					if (oFLol != null) {
+						addOfflineSearchPath(oFLol.getPathNavigation());
+						addOfflineSearchPath(OFFLINE_SEARCH_QUERY + searchQuery);
+						setToolbarTitle();
+						supportInvalidateOptionsMenu();
+					}
+					searchExpand = false;
 				} else {
 					searchQuery = "" + query;
 					setToolbarTitle();
@@ -6377,6 +6385,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						rChatFL.filterChats(newText);
 					}
 				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					if (!isOfflineSearchPathEmpty() && getOfflineSearchPath().contains(OFFLINE_SEARCH_QUERY)) return false;
+
 					searchQuery = newText;
 					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 					if (oFLol != null) {
@@ -6600,23 +6610,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 				log("onCreateOptionsMenuLollipop: in Offline");
-				//Show
-				if(!firstLogin){
-					thumbViewMenuItem.setVisible(true);
-				}else{
-					thumbViewMenuItem.setVisible(false);
-				}
 
-				oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-				if(oFLol != null && oFLol.getItemCountWithoutRK()>0){
-					sortByMenuItem.setVisible(true);
-					selectMenuItem.setVisible(true);
-				}
-				else{
+				if (searchExpand) {
+					openSearchView();
+					thumbViewMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
+				} else {
+					//Show
+					if(!firstLogin){
+						thumbViewMenuItem.setVisible(true);
+					}else{
+						thumbViewMenuItem.setVisible(false);
+					}
+
+					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+					if(oFLol != null && oFLol.getItemCountWithoutRK()>0){
+						sortByMenuItem.setVisible(true);
+						selectMenuItem.setVisible(true);
+					}
+					else{
+						sortByMenuItem.setVisible(false);
+						selectMenuItem.setVisible(false);
+					}
+					searchMenuItem.setVisible(true);
 				}
-				searchMenuItem.setVisible(true);
 
 				//Hide
 				searchByDate.setVisible(false);
@@ -18874,6 +18892,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (isOfflineSearchPathEmpty()) return null;
 
 		return offlineSearchPaths.get(offlineSearchPaths.size() - 1);
+	}
+
+	public String getInitialSearchPath() {
+		if (isOfflineSearchPathEmpty()) return null;
+
+		return offlineSearchPaths.get(0);
 	}
 
 	public void addOfflineSearchPath(String path) {

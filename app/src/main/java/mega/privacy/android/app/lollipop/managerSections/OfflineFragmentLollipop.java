@@ -556,6 +556,12 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 		});
 
+		String searchString = getSearchString();
+		if (searchString != null) {
+			filterOffline(searchString);
+			return v;
+		}
+
 		mOffList = dbH.findByPath(pathNavigation);
 
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -640,9 +646,13 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 				if (isSearching() && ((ManagerActivityLollipop) context).isOfflineSearchPathEmpty()) {
 					((ManagerActivityLollipop) context).setTextSubmitted();
+				}
+
+				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";
+
+				if (isSearching()) {
 					((ManagerActivityLollipop) context).addOfflineSearchPath(pathNavigation);
 				}
-				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";
 				
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
@@ -960,15 +970,26 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	public int onBackPressed() {
 		log("onBackPressed");
 
-		if (adapter == null || pathNavigation == null || pathNavigation.isEmpty() || pathNavigation.equals("/")) {
+		if (adapter == null || pathNavigation == null || pathNavigation.isEmpty() || (pathNavigation.equals("/") && !isSearching())) {
 			return 0;
 		}
 
 		if (isSearching()) {
-			pathNavigation = ((ManagerActivityLollipop) context).getOfflineSearchPath();
 			((ManagerActivityLollipop) context).removeOfflineSearchPath();
-			if (pathNavigation.contains(OFFLINE_SEARCH_QUERY)) {
+			String searchPath = getSearchString();
+			if (searchPath != null) {
+				((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
+				((ManagerActivityLollipop) context).setToolbarTitle();
+				pathNavigation = ((ManagerActivityLollipop) context).getInitialSearchPath();
+				((ManagerActivityLollipop) context).setPathNavigationOffline(pathNavigation);
+				filterOffline(searchPath);
+				return 1;
+			}
 
+			pathNavigation = ((ManagerActivityLollipop) context).getOfflineSearchPath();
+			if (((ManagerActivityLollipop) context).getOfflineSearchPath().equals(((ManagerActivityLollipop) context).getInitialSearchPath())) {
+				((ManagerActivityLollipop) context).removeOfflineSearchPath();
+				((ManagerActivityLollipop) context).searchQuery = null;
 			}
 		} else {
 			pathNavigation = pathNavigation.substring(0, pathNavigation.length() - 1);
@@ -997,7 +1018,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 			}
 		}
-		return 1;
+		return 2;
 	}
 	
 	public RecyclerView getRecyclerView(){
@@ -1021,6 +1042,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 		}
 
+		mOffList = megaOfflines;
 		if (adapter != null){
 			adapter.setNodes(megaOfflines);
 			setLayoutVisibility();
@@ -1156,14 +1178,17 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	private void orderNodes() {
+		orderNodes(mOffList);
+		setNodes(mOffList);
+	}
+
+	private void orderNodes(ArrayList<MegaOffline> offlineNodes) {
 		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortOfflineByNameDescending(mOffList);
+			sortOfflineByNameDescending(offlineNodes);
 		}
 		else{
-			sortOfflineByNameAscending(mOffList);
+			sortOfflineByNameAscending(offlineNodes);
 		}
-
-		setNodes(mOffList);
 	}
 
 	public String getPathNavigation() {
@@ -1189,7 +1214,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			filterOfflineTask.cancel(true);
 		}
 
-		setNodes(mOffList);
+		mOffList = dbH.findByPath(pathNavigation);
+		orderNodes();
 	}
 
 	private class FilterOfflineTask extends AsyncTask<String, Void, Void> {
@@ -1200,7 +1226,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		protected Void doInBackground(String... strings) {
 			String s = strings[0];
 			if (s.isEmpty()) {
-				filteredOffline = mOffList;
+				filteredOffline = dbH.findByPath(pathNavigation);
+				orderNodes(filteredOffline);
 				return null;
 			}
 
@@ -1208,12 +1235,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			if (!isFileAvailable(parentFile)) return null;
 
 			searchOfflineNodes(pathNavigation, strings[0], filteredOffline);
-
-			if (orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC) {
-				sortOfflineByNameDescending(filteredOffline);
-			} else {
-				sortOfflineByNameAscending(filteredOffline);
-			}
+			orderNodes(filteredOffline);
 
 			return null;
 		}
@@ -1259,6 +1281,15 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 
 		return false;
+	}
+
+	public String getSearchString() {
+		String path = ((ManagerActivityLollipop) context).getOfflineSearchPath();
+		if (isSearching() && !((ManagerActivityLollipop) context).isOfflineSearchPathEmpty() && path.contains(OFFLINE_SEARCH_QUERY)) {
+			return path.replace(OFFLINE_SEARCH_QUERY, "");
+		}
+
+		return null;
 	}
 
 	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
