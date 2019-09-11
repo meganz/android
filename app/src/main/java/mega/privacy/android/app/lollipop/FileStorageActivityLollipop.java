@@ -70,12 +70,15 @@ import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
+
 
 public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 	
 	public static String EXTRA_URL = "fileurl";
 	public static String EXTRA_SIZE = "filesize";
-	public static String EXTRA_DOCUMENT_HASHES = "document_hash";
+	public static String EXTRA_SERIALIZED_NODES = "serialized_nodes";
+    public static String EXTRA_DOCUMENT_HASHES = "document_hash";
 	public static String EXTRA_FROM_SETTINGS = "from_settings";
 	public static String EXTRA_CAMERA_FOLDER = "camera_folder";
 	public static String EXTRA_BUTTON_PREFIX = "button_prefix";
@@ -137,7 +140,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private String url;
 	private long size;
 	private long[] documentHashes;
-	
+	private ArrayList<String> serializedNodes;
+
 	FileStorageLollipopAdapter adapter;
 	Toolbar tB;
 	ActionBar aB;
@@ -384,6 +388,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		mode = Mode.getFromIntent(intent);
 		if (mode == Mode.PICK_FOLDER) {
 			documentHashes = intent.getExtras().getLongArray(EXTRA_DOCUMENT_HASHES);
+			serializedNodes = intent.getStringArrayListExtra(EXTRA_SERIALIZED_NODES);
 			url = intent.getExtras().getString(EXTRA_URL);
 			size = intent.getExtras().getLong(EXTRA_SIZE);
 			aB.setTitle(getString(R.string.general_select_to_download));
@@ -460,13 +465,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			root = new File(Environment.getExternalStorageDirectory().toString());
+			root = buildExternalStorageFile("");
 			if (root == null){
-				root = new File("/");
+				root = new File(File.separator);
 			}
 		}
 		else{
-			root = new File("/");
+			root = new File(File.separator);
 		}
 		//pick file from SD card
 		if(hasSDCard) {
@@ -478,7 +483,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if(!hasSDCard) {
             prefs = dbH.getPreferences();
             if (prefs == null){
-                path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
+                path = buildExternalStorageFile(DOWNLOAD_DIR);
             }
             else{
                 String lastFolder = prefs.getLastFolderUpload();
@@ -490,14 +495,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                     }
                 }
                 else{
-                    path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
+                    path = buildExternalStorageFile(DOWNLOAD_DIR);
                 }
                 if (cameraFolderSettings){
                     camSyncLocalPath = prefs.getCamSyncLocalPath();
                 }
             }
             if (path == null) {
-                path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
+                path = buildExternalStorageFile(DOWNLOAD_DIR);
             }
         } else {
 		    //always pick from SD card root
@@ -675,6 +680,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 					Intent intent = new Intent();
 					intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
 					intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);
+					intent.putStringArrayListExtra(EXTRA_SERIALIZED_NODES, serializedNodes);
 					intent.putExtra(EXTRA_URL, url);
 					intent.putExtra(EXTRA_SIZE, size);
 					setResult(RESULT_OK, intent);

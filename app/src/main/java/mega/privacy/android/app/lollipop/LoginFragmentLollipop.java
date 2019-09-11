@@ -982,7 +982,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
 
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                            ((LoginActivityLollipop) context).startCameraSyncService(false, 5 * 60 * 1000);
+                            ((LoginActivityLollipop) context).startCameraUploadService(false, 5 * 60 * 1000);
                         }
 
                         log("Empty completed transfers data");
@@ -1046,7 +1046,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         if (prefs.getCamSyncEnabled() != null){
                             if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                    ((LoginActivityLollipop) context).startCameraUploadService(false, 30 * 1000);
                                 }
                             }
                         }
@@ -2088,13 +2088,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             if (prefs.getCamSyncEnabled() != null){
                                 if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
                                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                        ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                        ((LoginActivityLollipop) context).startCameraUploadService(false, 30 * 1000);
                                     }
                                 }
                             }
                             else{
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
+                                    ((LoginActivityLollipop) context).startCameraUploadService(true, 30 * 1000);
                                 }
                                 initialCam = true;
                             }
@@ -2518,8 +2518,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 et_password.requestFocus();
             }
             else{
-                log("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError not API_OK "+error.getErrorCode());
-                ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
+                log("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError not API_OK " + error.getErrorCode());
+                LoginActivityLollipop loginActivityLollipop = (LoginActivityLollipop) context;
+                if (error.getErrorCode() == MegaError.API_ENOENT) {
+                    loginActivityLollipop.showSnackbar(getString(R.string.reg_link_expired));
+                } else {
+                    loginActivityLollipop.showSnackbar(error.getErrorString());
+                }
                 confirmLink = null;
             }
         }

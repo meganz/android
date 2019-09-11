@@ -15,7 +15,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
@@ -36,7 +35,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.CameraUploadImageProcessor;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -52,8 +50,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 /*
  * Service to Upload files
@@ -67,8 +66,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_LAST_MODIFIED = "MEGA_FILE_LAST_MODIFIED";
 	public static String EXTRA_NAME_EDITED = "MEGA_FILE_NAME_EDITED";
 	public static String EXTRA_SIZE = "MEGA_SIZE";
-	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
+	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
 
 	public static final int CHECK_FILE_TO_UPLOAD_UPLOAD = 1000;
 	public static final int CHECK_FILE_TO_UPLOAD_COPY = 1001;
@@ -181,7 +180,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
 	@Override
-	public int onStartCommand(final Intent intent,int flags,int startId) {
+	public int onStartCommand(Intent intent, int flags, int startId) {
 		log("onStartCommand");
 		canceled = false;
 
@@ -289,7 +288,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
 						log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
 						log("Return - file already uploaded");
-				        uploadedFileCount++;
 						return;
 
 					}
@@ -459,18 +457,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mNotificationManager.cancel(notificationIdForFolderUpload);
         stopSelf();
         log("after stopSelf");
+
         if (Util.isPermissionGranted(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-            File f = new File(pathSelfie);
-            //Delete recursively all files and folder
-            if (f.exists()) {
-                if (f.isDirectory()) {
-                    if (f.list() != null && f.list().length <= 0) {
-                        f.delete();
-                    }
-                }
-            }
+			deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
         }
+
 	}
 
     private void notifyNotification(String notificationTitle,String size,int notificationId,String channelId,String channelName) {
@@ -665,7 +656,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         String logMessage = isFolderTransfer ? "updateProgressNotificationForFolderUpload: " : "updateProgressNotificationForFileUpload: ";
         log(logMessage + progressPercent + " " + message);
         String actionString = isOverquota == 0 ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
-        String info = Util.getProgressSize(UploadService.this,inProgress,total);
+        String info = getProgressSize(UploadService.this,inProgress,total);
 
         if(isFolderTransfer){
             notifyProgressNotification(progressPercent,message,info,actionString,notificationIdForFolderUpload,notificationChannelIdForFolderUpload,notificationChannelNameForFolderUpload);
@@ -771,7 +762,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 totalFileUploadsCompleted++;
                 mapProgressFileTransfers.put(transfer.getTag(), transfer);
                 if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-                    String size = Util.getSizeString(transfer.getTotalBytes());
+                    String size = getSizeString(transfer.getTotalBytes());
                     AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
                     dbH.setCompletedTransfer(completedTransfer);
                 }
@@ -783,14 +774,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 releaseLocks();
 				UploadService.this.cancel();
 				log("after cancel");
-				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-				File f = new File(pathSelfie);
-				//Delete recursively all files and folder
-				if (f.isDirectory()) {
-					if(f.list().length<=0){
-						f.delete();
-					}
-				}
+				deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
 
 			} else {
 				if (error.getErrorCode() == MegaError.API_OK) {
@@ -800,33 +784,28 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     }else{
                         totalFileUploadsCompletedSuccessfully++;
                     }
-					if (Util.isVideoFile(transfer.getPath())) {
+					if (isVideoFile(transfer.getPath())) {
 						log("Is video!!!");
 
 						File previewDir = PreviewUtils.getPreviewFolder(this);
-						final File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 						File thumbDir = ThumbnailUtils.getThumbFolder(this);
-						final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-//						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-//						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-                        threadPool.execute(new Runnable() {
+						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
-                            @Override
-                            public void run() {
-                                File img = new File(transfer.getPath());
-                                if(!preview.exists()) {
-                                    CameraUploadImageProcessor.createVideoPreview(UploadService.this,img, preview);
-                                }
-                                CameraUploadImageProcessor.createVideoThumbnail(UploadService.this,api,transfer.getPath(),thumb);
-                            }
-                        });
 						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
 						if (node != null) {
 							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-							retriever.setDataSource(transfer.getPath());
+							String location = null;
+							try {
+								retriever.setDataSource(transfer.getPath());
+								location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+							} catch (Exception ex) {
+								log("Exception is thrown, ex: " + ex.toString());
+							}
 
-							String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
 							if(location!=null){
 								log("Location: "+location);
 
@@ -867,28 +846,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							else{
 								log("No location info");
 							}
-                            retriever.release();
-                        }
-                    } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
+						}
+					} else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
 						log("Is image!!!");
 
 						File previewDir = PreviewUtils.getPreviewFolder(this);
-						final File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 						File thumbDir = ThumbnailUtils.getThumbFolder(this);
-						final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-//						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-//						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-                        threadPool.execute(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                File img = new File(transfer.getPath());
-                                if(!preview.exists()) {
-                                    CameraUploadImageProcessor.createImagePreview(img, preview);
-                                }
-                                CameraUploadImageProcessor.createImageThumbnail(UploadService.this,api,transfer.getPath(),thumb);
-                            }
-                        });
+						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
 						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 						if (node != null) {
@@ -983,15 +950,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     localFile.delete();
                 }
 
+                File tempPic = getCacheFolder(getApplicationContext(), TEMPORAL_FOLDER);
 				log("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
-				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-				if (transfer.getPath() != null) {
-					if (transfer.getPath().startsWith(pathSelfie)) {
+				if (isFileAvailable(tempPic) && transfer.getPath() != null) {
+					if (transfer.getPath().startsWith(tempPic.getAbsolutePath())) {
 						File f = new File(transfer.getPath());
 						f.delete();
 					}
 				} else {
-					log("transfer.getPath() is NULL");
+					log("transfer.getPath() is NULL or temporal folder unavailable");
 				}
 
 				if (transfersCopy.isEmpty() && totalFileUploadsCompleted==totalFileUploads && transfersCount == 0) {
@@ -1013,7 +980,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             }
 
 			String appData = transfer.getAppData();
-            log("appData: " + appData);
+
 			if(appData!=null){
 				return;
 			}

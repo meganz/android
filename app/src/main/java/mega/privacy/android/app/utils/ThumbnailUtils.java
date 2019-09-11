@@ -30,9 +30,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static nz.mega.sdk.AndroidGfxProcessor.fixExifOrientation;
 import static nz.mega.sdk.AndroidGfxProcessor.isVideoFile;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.THUMBNAIL_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 
 
 /*

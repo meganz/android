@@ -8,7 +8,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -39,6 +38,7 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.utils.OfflineUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -404,40 +404,8 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	}
 
 	public File getOfflineFile (int position){
-
-		File file = null;
 		MegaOffline checkOffline = mOffList.get(position);
 
-		if(checkOffline.getOrigin()==MegaOffline.INCOMING){
-			log("isIncomingOffline");
-
-			if (Environment.getExternalStorageDirectory() != null){
-				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-				log("offlineDirectory: "+file);
-			}
-			else{
-				file = context.getFilesDir();
-			}
-		}
-		else if(checkOffline.getOrigin()==MegaOffline.INBOX){
-			if (Environment.getExternalStorageDirectory() != null){
-				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
-				log("offlineDirectory: "+file);
-			}
-			else{
-				file = context.getFilesDir();
-			}
-		}
-		else{
-			log("NOT isIncomingOffline");
-			if (Environment.getExternalStorageDirectory() != null){
-				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
-			}
-			else{
-				file = context.getFilesDir();
-			}
-		}
-
-		return file;
+		return OfflineUtils.getOfflineFile(context, checkOffline);
 	}
 }
