@@ -589,7 +589,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 this.startService(intentService);
             }
 
-            ((MegaApplication) getApplication()).initializeAudioManager();
+            ((MegaApplication) getApplication()).createChatAudioManager();
 
             int callStatus = callChat.getStatus();
             log("The status of the callChat is: " + callStatus);
@@ -684,52 +684,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        log("onKeyDown");
-        ((MegaApplication) getApplication()).initializeAudioManager();
-        if (getCall() == null) return true;
-        int value;
-
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_VOLUME_UP: {
-                try {
-                    if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-                        value = AudioManager.STREAM_RING;
-                    } else if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-                        value = AudioManager.STREAM_MUSIC;
-                    } else {
-                        value = AudioManager.STREAM_VOICE_CALL;
-                    }
-                    ((MegaApplication) getApplication()).updateStreamVolume(value, AudioManager.ADJUST_RAISE);
-                    return true;
-
-                } catch (SecurityException e) {
-                    return super.onKeyDown(keyCode, event);
-                }
-
-            }
-            case KeyEvent.KEYCODE_VOLUME_DOWN: {
-                try {
-                    if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-                        value = AudioManager.STREAM_RING;
-                    } else if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-                        value = AudioManager.STREAM_MUSIC;
-                    } else {
-                        value = AudioManager.STREAM_VOICE_CALL;
-                    }
-                    ((MegaApplication) getApplication()).updateStreamVolume(value, AudioManager.ADJUST_LOWER);
-                    return true;
-
-                } catch (SecurityException e) {
-                    return super.onKeyDown(keyCode, event);
-                }
-            }
-            default: {
-                return super.onKeyDown(keyCode, event);
-            }
-        }
-    }
     private void setAvatarLayout() {
         log("setAvatarLayout");
         setProfileAvatar(megaChatApi.getMyUserHandle());
@@ -1051,7 +1005,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             mSensorManager.unregisterListener(this);
             mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
-        ((MegaApplication) getApplication()).initializeAudioManager();
+        ((MegaApplication) getApplication()).createChatAudioManager();
 
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
