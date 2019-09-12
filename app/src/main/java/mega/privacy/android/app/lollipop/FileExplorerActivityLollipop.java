@@ -989,7 +989,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void isPendingToOpenSearchView () {
-		if (pendingToOpenSearchView) {
+		if (pendingToOpenSearchView && searchMenuItem != null) {
 			String query = querySearch;
 			searchMenuItem.expandActionView();
 			searchView.setQuery(query, false);

@@ -733,8 +733,10 @@ public class ChatExplorerFragment extends Fragment {
                     items.add(0, new ChatExplorerListItem(true, false));
                 }
 
-                for (int i=0; i<recents.size(); i++) {
-                    items.add(i, recents.get(i));
+                if (recents != null) {
+                    for (int i = 0; i < recents.size(); i++) {
+                        items.add(i, recents.get(i));
+                    }
                 }
 
                 if (adapterList == null){
