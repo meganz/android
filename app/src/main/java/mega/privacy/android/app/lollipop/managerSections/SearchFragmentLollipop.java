@@ -303,7 +303,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
-			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH_DELAY);
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
@@ -573,8 +573,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 
-		((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH);
-
 		View v;
 		if (((ManagerActivityLollipop)context).isList){
 			
@@ -787,7 +785,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			if (query.isEmpty() || parentHandleSearch != -1) {
 				nodes = megaApi.getChildren(parent);
 			} else {
-				megaCancelToken = new MegaCancelToken();
+				megaCancelToken = new MegaCancelToken().createInstance();
 				nodes = megaApi.search(parent, query, megaCancelToken,true, ((ManagerActivityLollipop) context).orderCloud);
 			}
 		}
@@ -867,12 +865,11 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-
 			}
 		}
 		else{
-			((ManagerActivityLollipop)context).setTextSubmitted();
 			log("nodes.size(): "+nodes.size());
+			((ManagerActivityLollipop) context).setTextSubmitted();
 			if (nodes.get(position).isFolder()){
 				log("is a folder");
 				((ManagerActivityLollipop)context).setParentHandleSearch(nodes.get(position).getHandle());
@@ -891,7 +888,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				}
 				log("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);
-
 				clickAction();
 			}
 			else{
