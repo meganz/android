@@ -23,7 +23,7 @@ import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 public class LocalCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface {
 
-    private SurfaceView localFullScreenSurfaceView;
+    private SurfaceView localFullScreenSurfaceView = null;
     private int width = 0;
     private int height = 0;
     private Bitmap bitmap;
@@ -84,23 +84,24 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
-
-            SurfaceHolder holder = localFullScreenSurfaceView.getHolder();
-            if (holder != null) {
-                int viewWidth = localFullScreenSurfaceView.getWidth();
-                int viewHeight = localFullScreenSurfaceView.getHeight();
-                if ((viewWidth != 0) && (viewHeight != 0)) {
-                    int holderWidth = viewWidth < width ? viewWidth : width;
-                    int holderHeight = holderWidth * viewHeight / viewWidth;
-                    if (holderHeight > viewHeight) {
-                        holderHeight = viewHeight;
-                        holderWidth = holderHeight * viewWidth / viewHeight;
+            if(localFullScreenSurfaceView != null) {
+                SurfaceHolder holder = localFullScreenSurfaceView.getHolder();
+                if (holder != null) {
+                    int viewWidth = localFullScreenSurfaceView.getWidth();
+                    int viewHeight = localFullScreenSurfaceView.getHeight();
+                    if ((viewWidth != 0) && (viewHeight != 0)) {
+                        int holderWidth = viewWidth < width ? viewWidth : width;
+                        int holderHeight = holderWidth * viewHeight / viewWidth;
+                        if (holderHeight > viewHeight) {
+                            holderHeight = viewHeight;
+                            holderWidth = holderHeight * viewWidth / viewHeight;
+                        }
+                        this.bitmap = localRenderer.CreateBitmap(width, height);
+                        holder.setFixedSize(holderWidth, holderHeight);
+                    } else {
+                        this.width = -1;
+                        this.height = -1;
                     }
-                    this.bitmap = localRenderer.CreateBitmap(width, height);
-                    holder.setFixedSize(holderWidth, holderHeight);
-                } else {
-                    this.width = -1;
-                    this.height = -1;
                 }
             }
         }
@@ -119,7 +120,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     @Override
     public void onDestroy() {
         log("onDestroy()");
-        removeSurfaceView();
+        this.removeSurfaceView();
         super.onDestroy();
     }
 
@@ -128,18 +129,22 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         log("onResume");
         this.width = 0;
         this.height = 0;
-        localFullScreenSurfaceView.setVisibility(View.VISIBLE);
+        if(localFullScreenSurfaceView != null) {
+            localFullScreenSurfaceView.setVisibility(View.VISIBLE);
+        }
 
         super.onResume();
     }
 
     public void removeSurfaceView() {
-        log("removeSurfaceView()");
-        if (localFullScreenSurfaceView.getParent() != null && localFullScreenSurfaceView.getParent().getParent() != null) {
-            log("removeSurfaceView() removeView chatId: " + chatId);
-            ((ViewGroup) localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
+        log("removeSurfaceView");
+        if(localFullScreenSurfaceView != null){
+            if (localFullScreenSurfaceView.getParent() != null && localFullScreenSurfaceView.getParent().getParent() != null) {
+                ((ViewGroup) localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
+            }
+            localFullScreenSurfaceView.setVisibility(View.GONE);
         }
-        localFullScreenSurfaceView.setVisibility(View.GONE);
+
         megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
     }
 }

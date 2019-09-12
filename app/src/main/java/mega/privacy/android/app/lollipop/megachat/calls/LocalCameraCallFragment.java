@@ -25,7 +25,7 @@ import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 public class LocalCameraCallFragment extends Fragment implements MegaChatVideoListenerInterface {
 
-    private SurfaceView localSurfaceView;
+    private SurfaceView localSurfaceView = null;
     private int width = 0;
     private int height = 0;
     private Bitmap bitmap;
@@ -57,7 +57,6 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         this.chatId = args.getLong("chatId", -1);
         log("onCreate() chatId: " + chatId);
         super.onCreate(savedInstanceState);
-        log("after onCreate called super");
     }
 
     @Override
@@ -89,23 +88,24 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
-
-            SurfaceHolder holder = localSurfaceView.getHolder();
-            if (holder != null) {
-                int viewWidth = localSurfaceView.getWidth();
-                int viewHeight = localSurfaceView.getHeight();
-                if ((viewWidth != 0) && (viewHeight != 0)) {
-                    int holderWidth = viewWidth < width ? viewWidth : width;
-                    int holderHeight = holderWidth * viewHeight / viewWidth;
-                    if (holderHeight > viewHeight) {
-                        holderHeight = viewHeight;
-                        holderWidth = holderHeight * viewWidth / viewHeight;
+            if(localSurfaceView!=null) {
+                SurfaceHolder holder = localSurfaceView.getHolder();
+                if (holder != null) {
+                    int viewWidth = localSurfaceView.getWidth();
+                    int viewHeight = localSurfaceView.getHeight();
+                    if ((viewWidth != 0) && (viewHeight != 0)) {
+                        int holderWidth = viewWidth < width ? viewWidth : width;
+                        int holderHeight = holderWidth * viewHeight / viewWidth;
+                        if (holderHeight > viewHeight) {
+                            holderHeight = viewHeight;
+                            holderWidth = holderHeight * viewWidth / viewHeight;
+                        }
+                        this.bitmap = localRenderer.CreateBitmap(width, height);
+                        holder.setFixedSize(holderWidth, holderHeight);
+                    } else {
+                        this.width = -1;
+                        this.height = -1;
                     }
-                    this.bitmap = localRenderer.CreateBitmap(width, height);
-                    holder.setFixedSize(holderWidth, holderHeight);
-                } else {
-                    this.width = -1;
-                    this.height = -1;
                 }
             }
         }
@@ -118,6 +118,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
     @Override
     public void onAttach(Context context) {
+        log("onAttach");
         super.onAttach(context);
         this.context = context;
     }
@@ -125,7 +126,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     @Override
     public void onDestroy() {
         log("onDestroy");
-        removeSurfaceView();
+        this.removeSurfaceView();
         super.onDestroy();
     }
 
@@ -134,13 +135,14 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         log("onResume()");
         this.width = 0;
         this.height = 0;
-        localSurfaceView.setVisibility(View.VISIBLE);
+        if(localSurfaceView != null) {
+            localSurfaceView.setVisibility(View.VISIBLE);
+        }
 
         super.onResume();
     }
 
     public void showMicro(boolean isShouldShown) {
-        log("showMicro");
         if (microIcon == null) return;
         if (isShouldShown) {
             microIcon.setVisibility(View.VISIBLE);
@@ -150,13 +152,12 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     }
 
     public void removeSurfaceView() {
-        log("removeSurfaceView()");
+        log("removeSurfaceView");
         if (microIcon != null) {
             microIcon.setVisibility(View.GONE);
         }
         if (localSurfaceView != null) {
             if (localSurfaceView.getParent() != null && localSurfaceView.getParent().getParent() != null) {
-                log("removeSurfaceView() removeView chatId: " + chatId);
                 ((ViewGroup) localSurfaceView.getParent()).removeView(localSurfaceView);
             }
             localSurfaceView.setVisibility(View.GONE);

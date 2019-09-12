@@ -2736,9 +2736,20 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void clearSurfacesViews() {
         log("clearSurfacesViews");
         removeLocalCameraFragment();
+        parentLocal.setVisibility(View.GONE);
+        fragmentContainerLocalCamera.setVisibility(View.GONE);
+
         removeLocalCameraFragmentFS();
+        parentLocalFS.setVisibility(View.GONE);
+        fragmentContainerLocalCameraFS.setVisibility(View.GONE);
+
         removeRemoteCameraFragmentFS();
+        parentRemoteFS.setVisibility(View.GONE);
+        fragmentContainerRemoteCameraFS.setVisibility(View.GONE);
+
         removeBigFragment();
+        fragmentBigCameraGroupCall.setVisibility(View.GONE);
+
     }
 
     private void clearHandlers() {

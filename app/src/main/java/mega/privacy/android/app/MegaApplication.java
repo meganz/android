@@ -1566,9 +1566,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 			int callStatus = call.getStatus();
 			if (call.getStatus() >= MegaChatCall.CALL_STATUS_JOINING) {
-				if(chatAudioManager!=null) {
-					chatAudioManager.stopAudioSignals();
-				}
+				removeChatAudioManager();
 				clearIncomingCallNotification(call.getId());
 			}
 
@@ -1579,12 +1577,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
 					if (megaChatApi != null) {
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
-						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
+						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN || callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT){
 							setAudioManagerValues(call);
 						}
-						if(callStatus == MegaChatCall.CALL_STATUS_JOINING || callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS){
-							removeChatAudioManager();
-						}
+
 						if (listAllCalls != null) {
 							if (listAllCalls.size() == 1) {
 								log("onChatCallUpdate:One call");
@@ -1855,7 +1851,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void setAudioManagerValues(MegaChatCall call){
 		createChatAudioManager();
 		if(chatAudioManager != null) {
-			chatAudioManager.setAudioManagerValues(call);
+			MegaHandleList listCallsRequest = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
+			MegaHandleList listCallsRing = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
+			chatAudioManager.setAudioManagerValues(call, listCallsRequest, listCallsRing);
 		}
 	}
 
