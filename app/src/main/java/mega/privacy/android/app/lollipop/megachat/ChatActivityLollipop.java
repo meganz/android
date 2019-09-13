@@ -2604,11 +2604,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     }
                 }
-                MegaChatMessage contactMessage = megaChatApi.attachContacts(idChat, handleList);
-                if(contactMessage!=null){
-                    AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(contactMessage);
-                    sendMessageToUI(androidMsgSent);
-                }
+                retryContactAttachment(handleList);
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
@@ -3277,10 +3273,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void sendContact(){
-        attachContact();
-    }
-
     public void sendFromCloud(){
         attachFromCloud();
     }
@@ -3351,11 +3343,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Online but not megaApi");
             Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
         }
-    }
-
-    public void attachContact(){
-        log("attachContact");
-        chooseContactsDialog();
     }
 
     public void attachPhotoVideo(){

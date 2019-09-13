@@ -14364,17 +14364,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-		int countChat = chatHandles.length;
-
-		for(int i=0;i<chatHandles.length;i++){
-			for(int j=0;j<userHandles.length;j++){
-				MegaHandleList handleList = MegaHandleList.createInstance();
-				handleList.addMegaHandle(userHandles[j]);
-				megaChatApi.attachContacts(chatHandles[i], handleList);
-			}
+		MegaHandleList handleList = MegaHandleList.createInstance();
+		for (long userHandle : userHandles) {
+			handleList.addMegaHandle(userHandle);
 		}
 
-		if(countChat==1){
+		for (long chatHandle : chatHandles) {
+			megaChatApi.attachContacts(chatHandle, handleList);
+		}
+
+		if (chatHandles.length == 1) {
 			showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatHandles[0]);
 		}
 		else{
