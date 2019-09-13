@@ -65,6 +65,7 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
+import static mega.privacy.android.app.utils.ChatUtil.getMegaChatMessage;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -274,7 +275,8 @@ public class ChatController {
 
     public void deleteMessageById(long messageId, long chatId) {
         log("deleteMessage");
-        MegaChatMessage message = megaChatApi.getMessage(chatId, messageId);
+        MegaChatMessage message = getMegaChatMessage(context, megaChatApi, chatId, messageId);
+
         if(message!=null){
             deleteMessage(message, chatId);
         }
@@ -1989,7 +1991,7 @@ public class ChatController {
     public void importNode(long idMessage, long idChat) {
         log("importNode");
         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-        MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
+        MegaChatMessage m = getMegaChatMessage(context, megaChatApi, idChat, idMessage);
 
         if(m!=null){
             AndroidMegaChatMessage aMessage = new AndroidMegaChatMessage(m);
@@ -2041,10 +2043,16 @@ public class ChatController {
     public void prepareMessageToForward(long idMessage, long idChat) {
         log("prepareMessageToForward");
         ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
-        MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
-        messagesSelected.add(m);
+        MegaChatMessage m = getMegaChatMessage(context, megaChatApi, idChat, idMessage);
 
-        prepareMessagesToForward(messagesSelected, idChat);
+        if(m!=null){
+            messagesSelected.add(m);
+
+            prepareMessagesToForward(messagesSelected, idChat);
+        }
+        else{
+            log("Message null");
+        }
     }
 
     public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat){
@@ -2063,6 +2071,7 @@ public class ChatController {
         for(int i=0; i<messagesSelected.size();i++){
             idMessages[i] = messagesSelected.get(i).getMsgId();
 
+            log("Type of message: "+ messagesSelected.get(i).getType());
             if((messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(messagesSelected.get(i).getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
                 if(messagesSelected.get(i).getUserHandle()!=megaChatApi.getMyUserHandle()){
                     //Node has to be imported

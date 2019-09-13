@@ -9428,6 +9428,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else{
 					super.onBackPressed();
 				}
+
 				return;
 			}
 		}
@@ -9637,8 +9638,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case R.id.bottom_navigation_item_offline: {
-				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-				setBottomNavigationMenuItemChecked(OFFLINE_BNV);
+				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					if (!pathNavigationOffline.equals("/")){
+						pathNavigationOffline = "/";
+						refreshFragment(FragmentTag.OFFLINE.getTag());
+					}
+				} else {
+					drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+					setBottomNavigationMenuItemChecked(OFFLINE_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_camera_uploads: {
@@ -9647,15 +9655,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case R.id.bottom_navigation_item_shared_items: {
-				drawerItem = DrawerItem.SHARED_ITEMS;
-				setBottomNavigationMenuItemChecked(SHARED_BNV);
-
+				if (drawerItem == DrawerItem.SHARED_ITEMS) {
+					if (getTabItemShares() == 0 && parentHandleIncoming != -1) {
+						parentHandleIncoming = -1;
+						refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+					} else if (getTabItemShares() == 1 && parentHandleOutgoing != -1){
+						parentHandleOutgoing = -1;
+						refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+					}
+					if(sharesPageAdapter!=null){
+						sharesPageAdapter.notifyDataSetChanged();
+					}
+				} else {
+					drawerItem = DrawerItem.SHARED_ITEMS;
+					setBottomNavigationMenuItemChecked(SHARED_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_chat: {
 				drawerItem = DrawerItem.CHAT;
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-
 				break;
 			}
 		}
@@ -14101,17 +14120,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-		int countChat = chatHandles.length;
-
-		for(int i=0;i<chatHandles.length;i++){
-			for(int j=0;j<userHandles.length;j++){
-				MegaHandleList handleList = MegaHandleList.createInstance();
-				handleList.addMegaHandle(userHandles[j]);
-				megaChatApi.attachContacts(chatHandles[i], handleList);
-			}
+		MegaHandleList handleList = MegaHandleList.createInstance();
+		for (long userHandle : userHandles) {
+			handleList.addMegaHandle(userHandle);
 		}
 
-		if(countChat==1){
+		for (long chatHandle : chatHandles) {
+			megaChatApi.attachContacts(chatHandle, handleList);
+		}
+
+		if (chatHandles.length == 1) {
 			showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatHandles[0]);
 		}
 		else{
@@ -14998,11 +15016,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-						startForegroundService(intent);
-					} else {
-						startService(intent);
-					}
+					startService(intent);
 				}
 			}
 		}

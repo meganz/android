@@ -445,6 +445,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		for(int j=0; j<messageIds.length; j++){
 			MegaChatMessage message = megaChatApi.getMessage(chatId, messageIds[j]);
+			if(message==null){
+				message = megaChatApi.getMessageFromNodeHistory(chatId, messageIds[j]);
+			}
+
 			if(message!=null){
 				MegaNodeList list = message.getMegaNodeList();
 				if(list.size()==1){

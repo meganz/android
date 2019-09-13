@@ -1168,13 +1168,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		log("onViewCreated");
-		listView = (RecyclerView) view.findViewById(R.id.list);
+		listView = view.findViewById(android.R.id.list);
 		if (((ManagerActivityLollipop) context).openSettingsStorage) {
-//			listView = (ListView) view.findViewById(android.R.id.list);
 			goToCategoryStorage();
-		}
-		else if (((ManagerActivityLollipop) context).openSettingsQR){
-//			listView = (ListView) view.findViewById(android.R.id.list);
+		} else if (((ManagerActivityLollipop) context).openSettingsQR) {
 			goToCategoryQR();
 		}
 		if (listView != null) {
@@ -1199,50 +1196,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 	}
 
-	public void goToCategoryStorage(){
+	public void goToCategoryStorage() {
 		log("goToCategoryStorage");
 		scrollToPreference(storageCategory);
-
-//		for (int i=0; i<getPreferenceScreen().getRootAdapter().getCount(); i++){
-//			if (getPreferenceScreen().getRootAdapter().getItem(i).equals(storageCategory)){
-//				((ManagerActivityLollipop) context).openSettingsStorage = false;
-//				if (listView != null) {
-//					listView.clearFocus();
-//					final int finalI = i;
-//					listView.postDelayed(new Runnable() {
-//						@Override
-//						public void run() {
-//							listView.setSelection(finalI);
-//							listView.smoothScrollToPositionFromTop(finalI, 0);
-//						}
-//					}, 200);
-//				}
-//				break;
-//			}
-//		}
 	}
 
-	public void goToCategoryQR(){
+	public void goToCategoryQR() {
 		log("goToCategoryQR");
 		scrollToPreference(qrCodeCategory);
-
-//		for (int i=0; i<getPreferenceScreen().getRootAdapter().getCount(); i++){
-//			if (getPreferenceScreen().getRootAdapter().getItem(i).equals(qrCodeCategory)){
-//				((ManagerActivityLollipop) context).openSettingsQR = false;
-//				if (listView != null) {
-//					listView.clearFocus();
-//					final int finalI = i;
-//					listView.postDelayed(new Runnable() {
-//						@Override
-//						public void run() {
-//							listView.setSelection(finalI);
-//							listView.smoothScrollToPositionFromTop(finalI, 0);
-//						}
-//					}, 200);
-//				}
-//				break;
-//			}
-//		}
 	}
 
 	@Override

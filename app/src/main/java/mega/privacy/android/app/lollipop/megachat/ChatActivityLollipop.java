@@ -2048,6 +2048,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         myAudioRecorder.reset();
         myAudioRecorder.release();
         myAudioRecorder = null;
+        textChat.requestFocus();
     }
 
     /*
@@ -2063,6 +2064,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             ChatController.deleteOwnVoiceClip(this, outputFileName);
             outputFileVoiceNotes = null;
             setRecordingNow(false);
+            textChat.requestFocus();
 
         } catch (RuntimeException stopException) {
             log("Error canceling a recording");
@@ -2085,6 +2087,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             setRecordingNow(false);
             uploadPictureOrVoiceClip(outputFileVoiceNotes);
             outputFileVoiceNotes = null;
+            textChat.requestFocus();
         } catch (RuntimeException ex) {
             controlErrorRecording();
         }
@@ -2601,11 +2604,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     }
                 }
-                MegaChatMessage contactMessage = megaChatApi.attachContacts(idChat, handleList);
-                if(contactMessage!=null){
-                    AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(contactMessage);
-                    sendMessageToUI(androidMsgSent);
-                }
+                retryContactAttachment(handleList);
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
@@ -3283,10 +3282,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void sendContact(){
-        attachContact();
-    }
-
     public void sendFromCloud(){
         attachFromCloud();
     }
@@ -3357,11 +3352,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Online but not megaApi");
             Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
         }
-    }
-
-    public void attachContact(){
-        log("attachContact");
-        chooseContactsDialog();
     }
 
     public void attachPhotoVideo(){
@@ -7941,9 +7931,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         callInProgressText.setText(text);
         ChatUtil.activateChrono(chrono, callInProgressChrono, call);
 
-        if (callInProgressLayout.getVisibility() == View.VISIBLE) return;
-        callInProgressLayout.setVisibility(View.VISIBLE);
-        callInProgressLayout.setOnClickListener(this);
+        if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
+            callInProgressLayout.setVisibility(View.VISIBLE);
+            callInProgressLayout.setOnClickListener(this);
+        }
     }
 
     private void hideCallInProgressLayout(MegaChatCall call) {
@@ -7952,11 +7943,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         ChatUtil.activateChrono(false, subtitleChronoCall, call);
 
         log("hideCallInProgressLayout");
-        if (callInProgressLayout.getVisibility() == View.GONE) return;
-        callInProgressLayout.setVisibility(View.GONE);
-        callInProgressLayout.setOnClickListener(null);
-        setSubtitleVisibility();
-
+        if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.GONE) {
+            callInProgressLayout.setVisibility(View.GONE);
+            callInProgressLayout.setOnClickListener(null);
+            setSubtitleVisibility();
+        }
     }
 
     @Override
