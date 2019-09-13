@@ -973,7 +973,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void restoreHeightAndWidth() {
-        if (peersOnCall.isEmpty()) return;
+        if (peersOnCall == null || peersOnCall.isEmpty()) return;
         log("restoreHeightAndWidth");
         for (InfoPeerGroupCall peer : peersOnCall) {
             if (peer.getListener() == null) break;
@@ -1056,8 +1056,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         destroyAdapters();
 
         clearArrays();
-        recyclerView.setAdapter(null);
-        bigRecyclerView.setAdapter(null);
+        if (recyclerView != null) {
+            recyclerView.setAdapter(null);
+        }
+        if (bigRecyclerView != null) {
+            bigRecyclerView.setAdapter(null);
+        }
         super.onDestroy();
     }
 
@@ -2736,19 +2740,27 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void clearSurfacesViews() {
         log("clearSurfacesViews");
         removeLocalCameraFragment();
-        parentLocal.setVisibility(View.GONE);
-        fragmentContainerLocalCamera.setVisibility(View.GONE);
+        if(parentLocal != null || fragmentContainerLocalCamera != null) {
+            parentLocal.setVisibility(View.GONE);
+            fragmentContainerLocalCamera.setVisibility(View.GONE);
+        }
 
         removeLocalCameraFragmentFS();
-        parentLocalFS.setVisibility(View.GONE);
-        fragmentContainerLocalCameraFS.setVisibility(View.GONE);
+        if(parentLocalFS != null || fragmentContainerLocalCameraFS != null) {
+            parentLocalFS.setVisibility(View.GONE);
+            fragmentContainerLocalCameraFS.setVisibility(View.GONE);
+        }
 
         removeRemoteCameraFragmentFS();
-        parentRemoteFS.setVisibility(View.GONE);
-        fragmentContainerRemoteCameraFS.setVisibility(View.GONE);
+        if(parentRemoteFS != null || fragmentContainerRemoteCameraFS != null) {
+            parentRemoteFS.setVisibility(View.GONE);
+            fragmentContainerRemoteCameraFS.setVisibility(View.GONE);
+        }
 
         removeBigFragment();
-        fragmentBigCameraGroupCall.setVisibility(View.GONE);
+        if(fragmentBigCameraGroupCall != null) {
+            fragmentBigCameraGroupCall.setVisibility(View.GONE);
+        }
 
     }
 
