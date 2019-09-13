@@ -1290,6 +1290,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			MegaChatListItem chat = chats.get(position);
 
 			int messageType = chat.getLastMessageType();
+			MegaChatMessage lastMessage = megaChatApi.getMessage(chat.getChatId(), chat.getLastMessageId());
 			log("MessageType: "+messageType);
 			String lastMessageString = chat.getLastMessage();
 
@@ -2458,6 +2459,69 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.error_meta_message_invalid));
 						}
 					}
+				}
+			} else if (messageType == MegaChatMessage.TYPE_CONTACT_ATTACHMENT && lastMessage != null && lastMessage.getUsersCount() > 1) {
+				long contactsCount = lastMessage.getUsersCount();
+				String contactAttachmentMessage = context.getString(R.string.contacts_sent, contactsCount);
+				Spannable myMessage = new SpannableString(contactAttachmentMessage);
+
+				if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {
+					Spannable me = new SpannableString(context.getString(R.string.word_me) + " ");
+					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+					myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					CharSequence indexedText = TextUtils.concat(me, myMessage);
+					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+					((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
+				} else if (chat.isGroup()) {
+					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
+					long lastMsgSender = chat.getLastMessageSender();
+
+					((ViewHolderNormalChatList) holder).currentPosition = position;
+					((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
+
+					String fullNameAction = "";
+					if (chatRoom != null) {
+						fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+						if (fullNameAction == null) {
+							fullNameAction = "";
+						}
+
+						if (fullNameAction.trim().length() <= 0) {
+							fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
+						}
+					}
+
+					if (fullNameAction.trim().length() <= 0 && fullNameAction.isEmpty() && !(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
+						fullNameAction = "Unknown name";
+						((ViewHolderNormalChatList) holder).nameRequestedAction = true;
+						((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
+
+						ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chat.isPreview());
+
+						megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+						megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+						megaChatApi.getUserEmail(lastMsgSender, listener);
+					}
+
+					Spannable name = new SpannableString(fullNameAction + ": ");
+					name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+					if (chat.getUnreadCount() == 0) {
+						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					} else {
+						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					}
+
+					((ViewHolderNormalChatList) holder).textViewContent.setText(TextUtils.concat(name, myMessage));
+				} else {
+					if (chat.getUnreadCount() == 0) {
+						((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+					} else {
+						((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+					}
+
+					((ViewHolderNormalChatList) holder).textViewContent.setText(contactAttachmentMessage);
 				}
 			}
 			else{
