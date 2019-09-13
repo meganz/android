@@ -243,9 +243,8 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
-import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
-import static mega.privacy.android.app.utils.Util.showSnackBar;
+import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -5280,61 +5279,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				tabLayoutMyAccount.setVisibility(View.VISIBLE);
 				viewPagerMyAccount.setVisibility(View.VISIBLE);
 
-				if (mTabsAdapterMyAccount == null){
+				if (mTabsAdapterMyAccount == null) {
 					log("mTabsAdapterMyAccount == null");
 
-					mTabsAdapterMyAccount = new MyAccountPageAdapter(getSupportFragmentManager(),this);
+					mTabsAdapterMyAccount = new MyAccountPageAdapter(getSupportFragmentManager(), this);
 					viewPagerMyAccount.setAdapter(mTabsAdapterMyAccount);
 					tabLayoutMyAccount.setupWithViewPager(viewPagerMyAccount);
-
-					log("The index of the TAB ACCOUNT is: " + indexAccount);
-					if(indexAccount!=-1) {
-						if (viewPagerMyAccount != null) {
-							switch (indexAccount){
-								case 0:{
-									viewPagerMyAccount.setCurrentItem(0);
-									log("General TAB");
-									break;
-								}
-								case 1:{
-									viewPagerMyAccount.setCurrentItem(1);
-									log("Storage TAB");
-									break;
-								}
-								default:{
-									viewPagerContacts.setCurrentItem(0);
-									log("Default general TAB");
-									break;
-								}
-							}
-						}
-					}
-					else{
-						//No bundle, no change of orientation
-						log("indexAccount is NOT -1");
-					}
-				}
-				else{
+				} else {
 					log("mTabsAdapterMyAccount NOT null");
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-
 					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
+				}
 
-					if(indexAccount!=-1) {
-						log("The index of the TAB MyAccount is: " + indexAccount);
-						if (viewPagerMyAccount != null) {
-							switch (indexAccount) {
-								case 1: {
-									viewPagerMyAccount.setCurrentItem(1);
-									log("Select Storage TAB");
-									break;
-								}
-								default: {
-									viewPagerMyAccount.setCurrentItem(0);
-									log("Select General TAB");
-									break;
-								}
-							}
+				log("The index of the TAB MyAccount is: " + indexAccount);
+				if (viewPagerMyAccount != null) {
+					switch (indexAccount) {
+						case 1: {
+							viewPagerMyAccount.setCurrentItem(1);
+							log("Select Storage TAB");
+							break;
+						}
+						default: {
+							viewPagerMyAccount.setCurrentItem(0);
+							updateLogoutWarnings();
+							log("Select General TAB");
+							break;
 						}
 					}
 				}
@@ -17393,6 +17362,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("tF is null!");
 				}
 			}
+		}
+
+		if (!existOngoingTransfers(megaApi)) {
+			updateLogoutWarnings();
+		}
+	}
+
+	private void updateLogoutWarnings() {
+		if (getMyAccountFragment() != null) {
+			maFLol.checkLogoutWarnings();
 		}
 	}
 

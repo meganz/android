@@ -644,6 +644,18 @@ public class OfflineUtils {
         return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
     }
 
+    public static boolean existsOffline(Context context) {
+        File offlineFolder = OfflineUtils.getOfflineFolder(context, OFFLINE_DIR);
+        if (isFileAvailable(offlineFolder)
+                && offlineFolder.length() > 0
+                && offlineFolder.listFiles() != null
+                && offlineFolder.listFiles().length > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static void log(String message) {
         Util.log("OfflineUtils", message);
     }

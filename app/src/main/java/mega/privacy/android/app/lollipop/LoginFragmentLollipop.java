@@ -52,7 +52,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
@@ -78,8 +77,9 @@ import nz.mega.sdk.MegaUser;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.Util.existOngoingTransfers;
 
-public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener, AbortPendingTransferCallback {
+public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
     private Context context;
     private AlertDialog insertMailDialog;
@@ -206,19 +206,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     @Override
-    public void onAbortConfirm() {
-        log("onAbortConfirm");
-        megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-        megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-        submitForm();
-    }
-
-    @Override
-    public void onAbortCancel() {
-        log("onAbortCancel");
-    }
-
-    @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
         super.onCreate(savedInstanceState);
@@ -316,7 +303,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    performLogin();
+                    submitForm();
                     return true;
                 }
                 return false;
@@ -1415,9 +1402,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         lastEmail = this.emailTemp;
         lastPassword = this.passwdTemp;
 
-//        this.emailTemp = null;
-//        this.passwdTemp = null;
-
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 
         if(!Util.isOnline(context))
@@ -1456,8 +1440,15 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void submitForm() {
+        if (!validateForm()) {
+            return;
+        }
 
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        performLogin();
+    }
+
+    private void performLogin() {
+
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 
         if(!Util.isOnline(context))
@@ -1649,6 +1640,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         } else if (passwordError != null) {
             et_password.requestFocus();
             return false;
+        } else if (existOngoingTransfers(megaApi)) {
+            showCancelTransfersDialog();
+            return false;
         }
         return true;
     }
@@ -1673,7 +1667,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void onLoginClick(View v){
-        performLogin();
+        submitForm();
     }
 
     public void onRegisterClick(View v){
@@ -3250,10 +3244,25 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         return false;
     }
 
-    private void performLogin(){
-        if (validateForm()) {
-            Util.checkPendingTransfer(megaApi, getContext(), this);
-        }
+    private void showCancelTransfersDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(R.string.login_warning_abort_transfers);
+        builder.setPositiveButton(R.string.login_text, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+                megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+                performLogin();
+            }
+        });
+        builder.setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+//                Hide dialog
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
     }
 
     private static void log(String log) {
