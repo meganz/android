@@ -111,8 +111,8 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_COPY_FOLDER;
 import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_MOVE_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.context;
 
 
@@ -902,36 +902,28 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
-	public void startCall(boolean startVideo){
+	public void startCall(boolean startVideo) {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
-		if(chatRoomTo!=null){
-			if(megaChatApi.getChatCall(chatRoomTo.getChatId())!=null){
+		if (chatRoomTo != null) {
+			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
 				Intent i = new Intent(this, ChatCallActivity.class);
-				i.putExtra("chatHandle", chatRoomTo.getChatId());
+				i.putExtra(Constants.CHAT_ID, chatRoomTo.getChatId());
 				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
+			} else {
+				((MegaApplication) getApplication()).setSpeakerStatus(chatRoomTo.getChatId(), startVideo);
+				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
 			}
-			else{
-				if(startVideo){
-					log("Start video call");
-					megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
-				}
-				else{
-					log("Start audio call");
-					megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
-				}
-			}
-		}
-		else{
+		} else {
 			//Create first the chat
 			ArrayList<MegaChatRoom> chats = new ArrayList<>();
 			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
 			usersNoChat.add(user);
 			CreateChatToPerformActionListener listener = null;
 
-			if(startVideo){
+			if (startVideo) {
 				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_VIDEO_CALL);
-			}else{
+			} else {
 				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_AUDIO_CALL);
 			}
 
@@ -1439,11 +1431,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			int countChat = chatHandles.length;
 			log("Selected: "+countChat+" chats to send");
 
-			for(int i=0;i<chatHandles.length;i++){
-
+			for (long chatHandle : chatHandles) {
 				MegaHandleList handleList = MegaHandleList.createInstance();
 				handleList.addMegaHandle(user.getHandle());
-				megaChatApi.attachContacts(chatHandles[i], handleList);
+				megaChatApi.attachContacts(chatHandle, handleList);
 			}
 
 			if(countChat==1){

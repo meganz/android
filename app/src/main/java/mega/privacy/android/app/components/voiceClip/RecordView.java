@@ -142,7 +142,7 @@ public class RecordView extends RelativeLayout {
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         startTime = 0;
-
+        isSwiped = false;
         slideToCancel = view.findViewById(R.id.slide_to_cancel);
         slideToCancel.setText(context.getString(R.string.slide_to_cancel).toUpperCase(Locale.getDefault()));
         slideToCancelLayout = view.findViewById(R.id.shimmer_layout);
@@ -340,55 +340,36 @@ public class RecordView extends RelativeLayout {
     }
 
     public void playSound(int type) {
-        log("playSound ");
+        log("playSound");
+        if (player == null) player = new MediaPlayer();
 
-        if (player == null) {
-            player = new MediaPlayer();
+        if (player == null || audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT || audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0 || updateSound(type) == null) {
+            typeStart(type);
+            return;
         }
 
-        if (type == 0) return;
-
         try {
-            if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT || audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0) {
-                typeStart(type);
-                return;
-            }
-
-            int volume_level1 = audioManager.getStreamVolume(AudioManager.STREAM_RING);
-            if (volume_level1 == 0) {
-                typeStart(type);
-                return;
-            }
-
             int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            int volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
             AssetFileDescriptor afd = updateSound(type);
-            if (afd == null) {
-                typeStart(type);
-                return;
-            }
-
-            if (player == null) {
-                typeStart(type);
-                return;
-            }
-
             player.reset();
             player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             afd.close();
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            float log1 = (float) (1 - Math.log(maxVolume - volume_level1) / Math.log(maxVolume));
-            player.setVolume(log1, log1);
+            float volume = (float) (1 - Math.log(maxVolume - volumeLevel / Math.log(maxVolume)));
+            player.setVolume(volume, volume);
             player.setLooping(false);
             player.prepare();
 
-
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
-            recordListenerOptions(FINISH_SOUND, 0);
+            typeStart(type);
             return;
         }
 
         player.start();
+
         if (type == Constants.TYPE_START_RECORD) {
             player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
@@ -397,9 +378,11 @@ public class RecordView extends RelativeLayout {
                     mp.reset();
                 }
             });
-        } else {
+        }
+        else {
             player.setOnCompletionListener(null);
         }
+
     }
 
     private void displaySlideToCancel() {
@@ -427,6 +410,8 @@ public class RecordView extends RelativeLayout {
         firstY = motionEvent.getRawY();
         lastX = motionEvent.getRawX();
         lastY = motionEvent.getRawY();
+        startTime = 0;
+        isSwiped = false;
 
         userBehaviour = UserBehaviour.NONE;
         basketInitialX = basketImg.getX() - 90;

@@ -280,9 +280,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Rozmiar</string>
-    <string name="file_properties_info_modified" context="when was the file modified">Zmodyfikowany</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Ostatnia zmiana</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Dodano</string>
-    <string name="file_properties_info_created" context="when the file was created">Utworzono</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -498,9 +497,9 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Twoja subskrypcja nie została anulowane. Prosimy o podane powodu anulowania</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">Then katalog jest teraz prywatny</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Udostępnienie zostało usunięte</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Nowy katalog</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Dodaj kontakt</string>
@@ -539,7 +538,7 @@
     <string name="upload_prepare" context="Status text at the beginning of an upload">Przetwarzanie pliku</string>
     <plurals name="upload_prepare" context="Status text at the beginning of an upload">
         <item context="Status text at the beginning of an upload for 1 file" quantity="one">Przetwarzanie pliku</item>
-        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Przetwarzanie plików</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">Źródło chwilowo jest niedostępne, spróbuj ponownie</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Nie można otworzyć wybranego pliku</string>
@@ -632,7 +631,7 @@
     <string name="menu_take_picture" context="menu item">Zrób zdjęcie</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Tylko Wi-Fi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi albo zwykły internet</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi lub mobilna transmisja danych</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Pomiń</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Wstrzymaj</string>
@@ -642,6 +641,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Wgrywanie plików</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Sprawdzanie plików do przesłania</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Inicjowanie przesyłania z kamery</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -649,6 +650,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Pojemności</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Zabezpieczenie PIN</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Kompresja wideo zużywa dużo energii; MEGA będzie wymagać aktywnego ładowania urządzenia, jeśli filmy do skompresowania są większe niż %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Zaawansowane</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Wyczyść pamięć podręczną</string>
@@ -685,7 +687,7 @@
     <string name="settings_empty_folder" context="settings option">Wybierz katalog</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi albo zwykły internet</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi lub mobilna transmisja danych</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Tylko Wi-Fi</item>
     </string-array>
 
@@ -698,6 +700,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Tylko gdy podłączone zasilanie</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Wymagaj ode mnie aktywnego ładowania mojego urządzenia</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Zachowaj nazwy plików tak jak na urządzeniu</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Lokalny katalog zdjęć</string>
@@ -727,7 +730,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Twoje lokalne pliki zostaną usunięte i zostaniesz wylogowany po 10 nieudanych próbach logowania</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Niepoprawny kod</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Błędny kod PIN, spróbuj ponownie. Została ci 1 próba</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">PIN nie jest prawidłowy, spróbuj ponownie. Masz jeszcze %2d próby.</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Kod PIN jest błędny</string>
@@ -999,6 +1002,8 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Link pliku jest niedostępny</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Plik został usunięty z powodu naruszenia regulaminu serwisu.</string>
 
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">Ten adres URL jest uszkodzony lub zdeformowany. Link, do którego próbujesz uzyskać dostęp, nie istnieje.</string>
+
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Oczekiwanie na potwierdzenia konta.</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Sprawdź pocztę i kliknij w link w celu weryfikacji.</string>
 
@@ -1074,7 +1079,10 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">Kontakty %d zostaną usunięte z udostępnionego katalogu.</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d usunięto prawidłowo z udostępnionego katalogu</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;and %d kontaktów nie zostało usunięte</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d kontaktów nie zostało pomyślnie usuniętych</string>
+
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Pomyślnie zaktualizowano uprawnienia dla kontaktów %d</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Nie można zaktualizować uprawnień do kontaktów %d</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Pobieranie kontaktów z telefonu&#8230;</string>
 
@@ -1338,6 +1346,7 @@
         <item context="Plural" quantity="other">%1$d of %2$d plików</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Proces się kończy&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Pokaż</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Wstrzymaj wszystkie operacje</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Wznów wszystkie transfery</string>
@@ -1469,7 +1478,7 @@
     <string name="alert_user_is_not_contact">Użytkownik nie jest Twoim kontaktem</string>
 
     <string name="camera_uploads_cellular_connection">Użyj połączenia 3G</string>
-    <string name="camera_uploads_upload_videos">Wgrywanie filmów</string>
+    <string name="camera_uploads_upload_videos">Wgraj filmy</string>
 
     <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Zdjęcie profilowe zostało zaktualizowane</string>
     <string name="error_changing_user_avatar_image_not_available" context="Message when an error ocurred when changing an user avatar">Błąd. Wybrany obraz nie istnieje</string>
@@ -1788,7 +1797,8 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Wgrywanie pliku</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Jakość plików</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Jakość wideo</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Przesyłanie z aparatu musi mieć dostęp do zdjęć i innych multimediów w urządzeniu. Przejdź do strony ustawień i udziel pozwolenia.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Oryginalna jakość</item>
         <item context="the options of medium quality multimedia file to  upload.">Średniej jakości</item>
@@ -2131,9 +2141,13 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Minimalny okres to 7 dni.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Minimalny okres to 7 dni, a maksymalny okres 30 dni.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">Minimalny rozmiar to %1$s, a maksymalny rozmiar to %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Usuń pliki starsze niż</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d dni</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Powiadamiaj mnie, gdy rozmiar jest większy niż</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Jeśli filmy do skompresowania są większe niż</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a PRO plan.</string>
 
@@ -2256,6 +2270,15 @@
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Pokaż Ostatnio widziany&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Pozwól swoim kontaktom zobaczyć ostatni raz, kiedy byłeś aktywny w MEGA.</string>
 
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Za mało miejsca do przechowywania</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Za mało miejsca do przechowywania kompresji wideo.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Rozmiar kompresji wideo jest zbyt duży</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">Całkowity rozmiar kompresowanych filmów przekracza %s, naładuj urządzenie, aby kontynuować.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">To ustawienie zacznie obowiązywać przy następnym uruchomieniu przesyłania z kamery</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s został skompresowany</string>
+	<string name="title_compress_video" context="notification title when compressing video">Kompresowanie filmów %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Wybrano nieprawidłowy folder</string>
+
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d  plik</item>
         <item context="Plural of file. 2 files" quantity="other">%d plików</item>
@@ -2308,7 +2331,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Włącz kamerę</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Umożliwia dostęp do aparatu w celu skanowania dokumentów, robienia zdjęć i wykonywania połączeń wideo.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Włącz połączenia</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Zezwalaj na dostęp do mikrofonu, aby wykonywać połączenia szyfrowane.</string>
     <string name="general_enable_access" context="General enable access">Włącz dostęp</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Udostępnione pliki</string>
@@ -2447,8 +2469,6 @@
     <string name="hint_action_search" context="Hint of the Search view">Szukaj&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Odpowiedź</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Zignorowane</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Rozpoczęcie połączenia audio&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Rozpoczęcie połączenia wideo&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s wyciszył to połączenie</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Wyciszony</string>
 
@@ -2459,13 +2479,13 @@
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Wpisz link do czatu</string>
 
-    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
-    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
-    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
-    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Wklej link</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Nieprawidłowy link do pliku lub folderu</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Wprowadź prawidłowy link do pliku lub folderu</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Wprowadź prawidłowy link do czatu</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">Wkleiłeś link do czatu.</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">Wkleiłeś link do kontaktu.</string>
+    <string name="action_open_contact_link" context="Menu item">Otwórz link do kontaktu</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">Ludzie mogą dołączyć do Twojej grupy za pomocą tego linku.</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Nowy link do czatu</string>
@@ -2484,8 +2504,8 @@
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (OCZEKUJĄCE)</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Dotknij i przytrzymaj, aby nagrać, zwolnij, aby wysłać.</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">Przesuń, aby anulować</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">Ten klip głosowy jest niedostępny</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Przesuń, aby anulować</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Ta wiadomość głosowa nie jest dostępna</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d plik już pobrany.&#160;</item>
@@ -2496,4 +2516,12 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d plik oczekuje.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d plików oczekuje.</item>
 	</plurals>
+
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Nie można nagrywać wiadomości głosowych podczas trwającego połączenia.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Wystąpił błąd podczas próby przesłania wiadomości głosowej.</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Nadchodzące połączenie</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Trwa ładowanie</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Proszę czekać&#8230;</string>
 </resources>

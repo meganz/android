@@ -64,8 +64,10 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.ChatUtil.getMegaChatMessage;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatController {
@@ -271,7 +273,9 @@ public class ChatController {
     }
 
     public void deleteMessageById(long messageId, long chatId) {
-        MegaChatMessage message = megaChatApi.getMessage(chatId, messageId);
+        log("deleteMessage");
+        MegaChatMessage message = getMegaChatMessage(context, megaChatApi, chatId, messageId);
+
         if(message!=null){
             deleteMessage(message, chatId);
         }
@@ -1413,17 +1417,11 @@ public class ChatController {
             MegaNode document = nodeList.get(i);
             if (document != null) {
                 document = authorizeNodeIfPreview(document, chatRoom);
-                if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(document, context));
-                }
-                else{
-                    destination = context.getFilesDir();
-                }
-
+                destination = getOfflineParentFile(context, Constants.FROM_OTHERS, document, null);
                 destination.mkdirs();
 
                 log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
-                if (destination.exists() && destination.isDirectory()){
+                if (isFileAvailable(destination) && destination.isDirectory()){
 
                     File offlineFile = new File(destination, document.getName());
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
@@ -1488,13 +1486,13 @@ public class ChatController {
         }
     }
 
-    void requestLocalFolder (long size, long[] hashes) {
+    void requestLocalFolder (long size, ArrayList<String> serializedNodes) {
         Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
         intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
         intent.setClass(context, FileStorageActivityLollipop.class);
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+        intent.putStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES,serializedNodes);
 
         if(context instanceof ChatActivityLollipop){
             ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
@@ -1545,28 +1543,45 @@ public class ChatController {
         prepareForDownloadVersions(nodeList);
     }
 
+    private ArrayList<String> serializeNodes(ArrayList<MegaNode> nodeList) {
+        ArrayList<String> serializedNodes = new ArrayList<>();
+        for(MegaNode node : nodeList) {
+            serializedNodes.add(node.serialize());
+        }
+        return serializedNodes;
+    }
+
+    private ArrayList<MegaNode> unSerializeNodes(ArrayList<String> serializedNodes) {
+        ArrayList<MegaNode> nodeList = new ArrayList<>();
+        if(serializedNodes != null) {
+            for(String nodeString : serializedNodes) {
+                nodeList.add(MegaNode.unserialize(nodeString));
+            }
+        }
+        return nodeList;
+    }
+
+    public void prepareForDownload(Intent intent, String parentPath) {
+        ArrayList<String> serializedNodes = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES);
+        ArrayList<MegaNode> megaNodes = unSerializeNodes(serializedNodes);
+        if (megaNodes.size() > 0) {
+            checkSizeBeforeDownload(parentPath, megaNodes);
+        }
+    }
+
     private void prepareForDownloadVersions(final ArrayList<MegaNode> nodeList){
         log("prepareForDownloadLollipop: "+nodeList.size()+" files to download, ");
         long size = 0;
-        long[] hashes = new long[nodeList.size()];
-        for (int i=0;i<nodeList.size();i++){
-            hashes[i] = nodeList.get(i).getHandle();
-            MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
-            if (nodeTemp != null){
-                if (nodeTemp.isFile()){
-                    size += nodeTemp.getSize();
-                }
-            }
-            else{
-                log("Error - nodeTemp is NULL");
-            }
-
+        for (int i = 0; i < nodeList.size(); i++) {
+            size += nodeList.get(i).getSize();
         }
-        log("Number of files: "+hashes.length);
+        log("Number of files: " + nodeList.size());
 
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
+
+        String downloadLocationDefaultPath = getDownloadLocation(context);
 
         if(!nodeList.isEmpty() && ChatUtil.isVoiceClip(nodeList.get(0).getName())){
             File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
@@ -1574,16 +1589,14 @@ public class ChatController {
             return;
         }
 
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
-
-
         boolean askMe = Util.askMe(context);
         if (askMe){
             log("askMe");
             File[] fs = context.getExternalFilesDirs(null);
+            final ArrayList<String> serializedNodes = serializeNodes(nodeList);
             if (fs.length > 1){
                 if (fs[1] == null){
-                    requestLocalFolder(size, hashes);
+                    requestLocalFolder(size, serializedNodes);
                 }
                 else{
                     Dialog downloadLocationDialog;
@@ -1592,10 +1605,6 @@ public class ChatController {
 
                     b.setTitle(context.getResources().getString(R.string.settings_storage_download_location));
                     final long sizeFinal = size;
-                    final long[] hashesFinal = new long[hashes.length];
-                    for (int i=0; i< hashes.length; i++){
-                        hashesFinal[i] = hashes[i];
-                    }
 
                     b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
 
@@ -1603,7 +1612,7 @@ public class ChatController {
                         public void onClick(DialogInterface dialog, int which) {
                             switch(which){
                                 case 0:{
-                                    requestLocalFolder(sizeFinal, hashesFinal);
+                                    requestLocalFolder(sizeFinal, serializedNodes);
                                     break;
                                 }
                                 case 1:{
@@ -1632,7 +1641,7 @@ public class ChatController {
                 }
             }
             else{
-                requestLocalFolder(size, hashes);
+                requestLocalFolder(size, serializedNodes);
             }
         }
         else{
@@ -1764,17 +1773,18 @@ public class ChatController {
                     tempNode = authorizeNodeIfPreview(tempNode, ((NodeAttachmentHistoryActivity) context).getChatRoom());
                 }
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-                    log("IsFile");
-                    String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+                    log("ISFILE");
+                    String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+
                     //Check if the file is already downloaded
                     MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
                     if(localPath != null){
                         log("localPath != null");
                         try {
                             log("download:Call to copyFile: localPath: ");
-                            Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
-                            
-                            if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
+                            copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+
+                            if(isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){
@@ -1987,7 +1997,7 @@ public class ChatController {
     public void importNode(long idMessage, long idChat) {
         log("importNode");
         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-        MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
+        MegaChatMessage m = getMegaChatMessage(context, megaChatApi, idChat, idMessage);
 
         if(m!=null){
             AndroidMegaChatMessage aMessage = new AndroidMegaChatMessage(m);
@@ -2039,10 +2049,16 @@ public class ChatController {
     public void prepareMessageToForward(long idMessage, long idChat) {
         log("prepareMessageToForward");
         ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
-        MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
-        messagesSelected.add(m);
+        MegaChatMessage m = getMegaChatMessage(context, megaChatApi, idChat, idMessage);
 
-        prepareMessagesToForward(messagesSelected, idChat);
+        if(m!=null){
+            messagesSelected.add(m);
+
+            prepareMessagesToForward(messagesSelected, idChat);
+        }
+        else{
+            log("Message null");
+        }
     }
 
     public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat){
@@ -2061,6 +2077,7 @@ public class ChatController {
         for(int i=0; i<messagesSelected.size();i++){
             idMessages[i] = messagesSelected.get(i).getMsgId();
 
+            log("Type of message: "+ messagesSelected.get(i).getType());
             if((messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(messagesSelected.get(i).getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
                 if(messagesSelected.get(i).getUserHandle()!=megaChatApi.getMyUserHandle()){
                     //Node has to be imported
