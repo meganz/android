@@ -5431,12 +5431,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
                 log("TRUNCATE MESSAGE");
                 clearHistory(androidMsg);
-
             }
             else{
 
                 disableMultiselection();
-
                 if(msg.isDeleted()){
                     log("Message deleted!!");
                 }
@@ -5590,12 +5588,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         adjustInfoToShow(indexToChange + 1);
                         setShowAvatar(indexToChange + 1);
                     }
-<<<<<<< HEAD
-                }else{
-=======
-                } else {
 
->>>>>>> develop
+                } else {
                     //Not first element
                     if (indexToChange == messages.size()) {
                         log("The last message removed, do not check more messages");
@@ -5607,20 +5601,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
             }
-<<<<<<< HEAD
-            adapter.removeMessage(indexToChange+1, messages);
-        }
-        else{
-            log("index not found");
-
-=======
-
-
             adapter.removeMessage(indexToChange + 1, messages);
             disableMultiselection();
         } else {
             log("index to change not found");
->>>>>>> develop
         }
     }
 
