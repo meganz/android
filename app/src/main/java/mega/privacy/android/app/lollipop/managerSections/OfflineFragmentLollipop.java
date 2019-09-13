@@ -617,6 +617,11 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 		}
 		else{
+
+			if (((ManagerActivityLollipop) context).isSearchViewExpanded() && !((ManagerActivityLollipop) context).isValidSearchQuery()) {
+				((ManagerActivityLollipop) context).setTextSubmitted();
+			}
+
 			MegaOffline currentNode = mOffList.get(position);
 			File currentFile=null;
 			
@@ -1275,8 +1280,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	private boolean isSearching() {
-		String query = ((ManagerActivityLollipop) context).searchQuery;
-		if (!((ManagerActivityLollipop) context).isOfflineSearchPathEmpty() || (query != null && !query.isEmpty())) {
+		if (!((ManagerActivityLollipop) context).isOfflineSearchPathEmpty() || ((ManagerActivityLollipop) context).isValidSearchQuery()) {
 			return true;
 		}
 

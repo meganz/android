@@ -6276,7 +6276,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		drawerItem = searchDrawerItem;
 		selectDrawerItemLollipop(drawerItem);
 		searchDrawerItem = null;
-		changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
 	}
 
 	@Override
@@ -18790,6 +18789,87 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public boolean isValidSearchQuery() {
+		if (searchQuery == null || searchQuery.isEmpty()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void openSearchNode(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
+		if (node.isFolder()) {
+			switch (drawerItem) {
+				case CLOUD_DRIVE: {
+					setParentHandleBrowser(node.getHandle());
+					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+					break;
+				}
+				case SHARED_ITEMS: {
+					if (viewPagerShares == null || sharesPageAdapter == null) break;
+
+					if (getTabItemShares() == 0) {
+						setParentHandleIncoming(node.getHandle());
+						increaseDeepBrowserTreeIncoming();
+						sharesPageAdapter.notifyDataSetChanged();
+					} else if (getTabItemShares() == 1) {
+						setParentHandleOutgoing(node.getHandle());
+						increaseDeepBrowserTreeOutgoing();
+						sharesPageAdapter.notifyDataSetChanged();
+					}
+
+					break;
+				}
+				case INBOX: {
+					setParentHandleInbox(node.getHandle());
+					refreshFragment(FragmentTag.INBOX.getTag());
+					break;
+				}
+			}
+		} else {
+			switch (drawerItem) {
+				case CLOUD_DRIVE: {
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+					if (fbFLol != null) {
+						fbFLol.openFile(node, position, screenPosition, imageView);
+					}
+					break;
+				}
+				case SHARED_ITEMS: {
+					if (viewPagerShares == null || sharesPageAdapter == null) break;
+
+					if (getTabItemShares() == 0) {
+						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+						if (inSFLol != null && inSFLol.isAdded()) {
+							inSFLol.openFile(node, position, screenPosition, imageView);
+						}
+					} else if (getTabItemShares() == 1) {
+						outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
+						if (outSFLol != null && outSFLol.isAdded()) {
+							outSFLol.openFile(node, position, screenPosition, imageView);
+						}
+					}
+					break;
+				}
+				case INBOX: {
+					iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
+					if (iFLol != null) {
+						iFLol.openFile(node, position, screenPosition, imageView);
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	public boolean isSearchViewExpanded() {
+		if (searchMenuItem != null) {
+			return searchMenuItem.isActionViewExpanded();
+		}
+
+		return false;
+	}
+
 	public void closeSearchView () {
 	    if (searchMenuItem != null && searchMenuItem.isActionViewExpanded()) {
 	        searchMenuItem.collapseActionView();
@@ -18798,6 +18878,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setTextSubmitted () {
 	    if (searchView != null) {
+	    	if (searchQuery == null || searchQuery.isEmpty()) {
+				searchExpand = false;
+				return;
+			}
 	        searchView.setQuery(searchQuery, true);
         }
     }

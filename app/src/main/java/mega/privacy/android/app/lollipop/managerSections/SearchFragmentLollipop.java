@@ -870,6 +870,13 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		else{
 			log("nodes.size(): "+nodes.size());
 			((ManagerActivityLollipop) context).setTextSubmitted();
+
+			if (!((ManagerActivityLollipop) context).isValidSearchQuery()) {
+				((ManagerActivityLollipop) context).closeSearchView();
+				((ManagerActivityLollipop) context).openSearchNode(nodes.get(position), position, screenPosition, imageView);
+				return;
+			}
+
 			if (nodes.get(position).isFolder()){
 				log("is a folder");
 				((ManagerActivityLollipop)context).setParentHandleSearch(nodes.get(position).getHandle());
