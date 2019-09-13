@@ -575,7 +575,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             callChat = megaChatApi.getChatCall(chatId);
             if (callChat == null) {
                 megaChatApi.removeChatCallListener(this);
-                ((MegaApplication) getApplication()).setSpeakerStatus(callChat.getChatid(), false);
                 finishActivity();
                 return;
             }
