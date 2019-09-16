@@ -7906,7 +7906,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void showCallInProgressLayout(String text, boolean chrono, MegaChatCall call) {
         log("showCallInProgressLayout");
-        callInProgressText.setText(text);
+        if (callInProgressText != null) {
+            callInProgressText.setText(text);
+        }
         ChatUtil.activateChrono(chrono, callInProgressChrono, call);
 
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
