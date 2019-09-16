@@ -13,7 +13,6 @@ import android.provider.MediaStore;
 
 import java.io.File;
 
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUtilsAndroid;
 

@@ -1,10 +1,12 @@
 package mega.privacy.android.app.lollipop;
 
 import android.os.Bundle;
+import android.os.Handler;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.PinUtil;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -15,6 +17,8 @@ public class PinActivityLollipop extends BaseActivity {
 	
 	private MegaApiAndroid megaApi;
 	private MegaChatApiAndroid megaChatApi;
+
+    private static long lastStart;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,7 @@ public class PinActivityLollipop extends BaseActivity {
 			}
 		}
 		PinUtil.pause(this);
+		lastStart = System.currentTimeMillis();
 		MegaApplication.activityPaused();
 		super.onPause();
 	}
@@ -73,5 +78,15 @@ public class PinActivityLollipop extends BaseActivity {
 		if(MegaApplication.isShowPinScreen()){
 			PinUtil.resume(this);
 		}
+
+		//if leave the APP then get back, should trigger camera upload.
+        if(System.currentTimeMillis() - lastStart > 1000) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    JobUtil.startCameraUploadService(PinActivityLollipop.this);
+                }
+            }, 3000);
+        }
 	}
 }
