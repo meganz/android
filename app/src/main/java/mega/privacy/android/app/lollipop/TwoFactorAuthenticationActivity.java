@@ -70,7 +70,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
-import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
 
 /**
  * Created by mega on 28/05/18.
@@ -1247,7 +1246,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             if (parentPath != null){
                 log("parentPath no NULL");
 
-                parentPath = parentPath + File.separator + RK_FILE;
+                parentPath = parentPath + File.separator + getString(R.string.general_rk);
 
                 Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
                 newIntent.putExtra("parentPath", parentPath);

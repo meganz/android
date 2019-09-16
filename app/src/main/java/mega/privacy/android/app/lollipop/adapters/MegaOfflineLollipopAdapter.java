@@ -424,9 +424,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
 	private void addMasterKeyAsOffline(ArrayList<MegaOffline> mOffList) {
-		log("Export in: " + getExternalStoragePath(RK_FILE));
-		if (isFileAvailable(buildExternalStorageFile(RK_FILE))) {
-			MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(RK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
+		if (isFileAvailable(buildExternalStorageFile(context.getString(R.string.general_rk)))) {
+			MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(context.getString(R.string.general_rk)), "MEGARecoveryKey.txt", 0, "0", 0, "0");
 			mOffList.add(masterKeyFile);
 		}
 	}

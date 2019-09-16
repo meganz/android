@@ -41,8 +41,6 @@ public class FileUtils {
 
     public static final String OLD_MK_FILE = MAIN_DIR + File.separator + "MEGAMasterKey.txt";
 
-    public static final String RK_FILE = "MEGARecoveryKey.txt";
-
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
 
         if (f == null) return;

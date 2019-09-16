@@ -14113,7 +14113,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String path = parentPath + File.separator + RK_FILE;
+				String path = parentPath + File.separator + getString(R.string.general_rk);
 
 				log("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);

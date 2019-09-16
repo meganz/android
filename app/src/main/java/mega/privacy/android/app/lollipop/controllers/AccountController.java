@@ -236,7 +236,7 @@ public class AccountController implements View.OnClickListener{
     public void renameMK(){
         log("renameMK");
         File oldMKF = buildExternalStorageFile(OLD_MK_FILE);
-        File newMKFile = new File(oldMKF.getParentFile(), RK_FILE);
+        File newMKFile = new File(oldMKF.getParentFile(), context.getString(R.string.general_rk));
 
         oldMKF.renameTo(newMKFile);
     }
