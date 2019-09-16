@@ -3260,7 +3260,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		if (importFileF) {
 			return (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag("chatExplorer");
 		}
-		else if(isChatFirst){
+
+		if (mTabsAdapterExplorer == null) return null;
+
+		if(isChatFirst){
 			c = (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
 		}
 		else{
@@ -3280,7 +3283,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		if (importFileF) {
 			return (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
 		}
-		else if (isChatFirst) {
+
+		if (mTabsAdapterExplorer == null) return null;
+
+		if (isChatFirst) {
 			iS =  (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
 		}
 		else {
@@ -3300,7 +3306,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		if (importFileF || tabShown == NO_TABS) {
 			return (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
 		}
-		else if (isChatFirst) {
+
+		if (mTabsAdapterExplorer == null) return null;
+
+		if (isChatFirst) {
 			cD = (CloudDriveExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
 		}
 		else {
