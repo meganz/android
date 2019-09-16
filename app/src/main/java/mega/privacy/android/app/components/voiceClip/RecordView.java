@@ -32,7 +32,9 @@ import java.util.Locale;
 import io.supercharge.shimmerlayout.ShimmerLayout;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
 
 public class RecordView extends RelativeLayout {
 
@@ -127,10 +129,6 @@ public class RecordView extends RelativeLayout {
         valueAnimator.start();
     }
 
-    public static void log(String message) {
-        Util.log("RecordView", message);
-    }
-
     private void init(Context context) {
         View view = View.inflate(context, R.layout.record_view_layout, null);
         addView(view);
@@ -159,7 +157,7 @@ public class RecordView extends RelativeLayout {
         cancelRecordLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                log("cancelRecordLayout:onClick -> hideViews");
+                LogUtil.logDebug("cancelRecordLayout:onClick -> hideViews");
                 hideViews();
             }
         });
@@ -189,7 +187,7 @@ public class RecordView extends RelativeLayout {
     }
 
     private void hideViews() {
-        log("hideViews");
+        LogUtil.logDebug("hideViews");
         slideToCancelLayout.setVisibility(GONE);
         cancelRecordLayout.setVisibility(GONE);
         startStopCounterTime(false);
@@ -220,7 +218,7 @@ public class RecordView extends RelativeLayout {
     }
 
     private void createAnimation(final boolean toOpen, int value, int duration) {
-        log("createAnimation");
+        LogUtil.logDebug("createAnimation");
 
         int prevHeight = layoutLock.getHeight();
         ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, value);
@@ -327,20 +325,19 @@ public class RecordView extends RelativeLayout {
     }
 
     public void startRecordingTime() {
-        log("StartRecordingTime");
+        LogUtil.logDebug("StartRecordingTime");
         slideToCancelLayout.setVisibility(VISIBLE);
         cancelRecordLayout.setVisibility(GONE);
         isSwiped = false;
 
         startStopCounterTime(true);
-        log("StartRecordingTime");
 
         handlerStartRecord.postDelayed(runStartRecord, 100); //500 milliseconds delay to record
         isPadlockShouldBeShown = true;
     }
 
     public void playSound(int type) {
-        log("playSound ");
+        LogUtil.logDebug("playSound ");
 
         if (player == null) {
             player = new MediaPlayer();
@@ -415,7 +412,7 @@ public class RecordView extends RelativeLayout {
     }
 
     protected void onActionDown(RelativeLayout recordBtnLayout, MotionEvent motionEvent) {
-        log("onActionDown()");
+        LogUtil.logDebug("onActionDown()");
 
         animationHelper.setStartRecorded(true);
         animationHelper.resetBasketAnimation();
@@ -453,7 +450,7 @@ public class RecordView extends RelativeLayout {
     }
 
     protected void onActionMove(RelativeLayout recordBtnLayout, MotionEvent motionEvent) {
-        log("onActionMove()");
+        LogUtil.logDebug("onActionMove()");
         if (isSwiped) return;
 
         UserBehaviour direction;
@@ -470,7 +467,7 @@ public class RecordView extends RelativeLayout {
 
         if (isRecordingNow && direction == UserBehaviour.CANCELING && (userBehaviour != UserBehaviour.CANCELING || ((motionEvent.getRawY() + (recordBtnLayout.getWidth() / 2)) > firstY)) && slideToCancelLayout.getVisibility() == VISIBLE && counterTime.getVisibility() == VISIBLE && recordListener != null) {
             if (slideToCancelLayout.getX() < counterTime.getLeft()) {
-                log("CANCELING ");
+                LogUtil.logDebug("CANCELING ");
                 isSwiped = true;
                 userBehaviour = UserBehaviour.CANCELING;
                 animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtnLayout, initialX);
@@ -492,7 +489,7 @@ public class RecordView extends RelativeLayout {
 
         } else if (isRecordingNow && direction == UserBehaviour.LOCKING && (userBehaviour != UserBehaviour.LOCKING || ((motionEvent.getRawX() + (recordBtnLayout.getWidth() / 2)) > firstX)) && layoutLock.getVisibility() == VISIBLE && isLockpadShown && recordListener != null) {
             if (((firstY - motionEvent.getRawY()) >= (layoutLock.getHeight() - (recordBtnLayout.getHeight() / 2)))) {
-                log("LOCKING");
+                LogUtil.logDebug("LOCKING");
                 userBehaviour = UserBehaviour.LOCKING;
                 recordListenerOptions(LOCK_RECORD, 0);
                 recordButtonTranslation(recordBtnLayout, 0, 0);
@@ -516,7 +513,7 @@ public class RecordView extends RelativeLayout {
     }
 
     protected void onActionCancel(RelativeLayout recordBtnLayout) {
-        log("onActionCancel()");
+        LogUtil.logDebug("onActionCancel()");
         userBehaviour = UserBehaviour.NONE;
         removeHandlerPadLock();
         isPadlockShouldBeShown = false;
@@ -533,7 +530,7 @@ public class RecordView extends RelativeLayout {
     }
 
     protected void onActionUp(RelativeLayout recordBtnLayout) {
-        log("onActionUp()");
+        LogUtil.logDebug("onActionUp()");
         userBehaviour = UserBehaviour.NONE;
         if (startTime == 0) {
             finalTime = 0;
@@ -552,14 +549,14 @@ public class RecordView extends RelativeLayout {
         startStopCounterTime(false);
 
         if (isLessThanOneSecond(finalTime / 1000) && !isSwiped) {
-            log("onActionUp:less than a second");
+            LogUtil.logDebug("Less than a second");
             startTime = 0;
             recordListenerOptions(LESS_SECOND_RECORD, 0);
             resetAnimationHelper();
             return;
         }
 
-        log("onActionUp:more than a second");
+        LogUtil.logDebug("More than a second");
         showLock(false);
         if (!isSwiped) {
             recordListenerOptions(FINISH_RECORD, finalTime);
@@ -620,5 +617,4 @@ public class RecordView extends RelativeLayout {
         LOCKING,
         NONE
     }
-
 }

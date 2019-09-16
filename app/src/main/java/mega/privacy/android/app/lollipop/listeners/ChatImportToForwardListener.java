@@ -9,7 +9,8 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
@@ -47,7 +48,7 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
-        log("Counter on onRequestTemporaryError: "+counter);
+        LogUtil.logWarning("Counter: " + counter);
 //			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
 //			if(node!=null){
 //				log("onRequestTemporaryError: "+node.getName());
@@ -61,14 +62,14 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish: "+e.getErrorCode());
+        LogUtil.logDebug("Error code: " + e.getErrorCode());
         counter--;
         if (e.getErrorCode() != MegaError.API_OK){
             error++;
         }
         int requestType = request.getType();
-        log("Counter on RequestFinish: "+counter);
-        log("Error on RequestFinish: "+error);
+        LogUtil.logDebug("Counter: " + counter);
+        LogUtil.logDebug("Error: " + error);
 //			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
 //			if(node!=null){
 //				log("onRequestTemporaryError: "+node.getName());
@@ -100,9 +101,5 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                     break;
             }
         }
-    }
-
-    private static void log(String log) {
-        Util.log("ChatImportToForwardListener", log);
     }
 }

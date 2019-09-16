@@ -16,7 +16,8 @@ import java.nio.ByteBuffer;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
@@ -33,7 +34,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     private MegaSurfaceRenderer localRenderer;
 
     public static LocalCameraCallFullScreenFragment newInstance(long chatId) {
-        log("newInstance");
+        LogUtil.logDebug("newInstance");
         LocalCameraCallFullScreenFragment f = new LocalCameraCallFullScreenFragment();
         Bundle args = new Bundle();
         args.putLong("chatId", chatId);
@@ -41,13 +42,9 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         return f;
     }
 
-    private static void log(String log) {
-        Util.log("LocalCameraCallFullScreenFragment", log);
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
         }
@@ -55,7 +52,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
         super.onCreate(savedInstanceState);
-        log("after onCreate called super");
+        LogUtil.logDebug("After onCreate called super");
     }
 
     @Override
@@ -70,7 +67,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         SurfaceHolder localSurfaceHolder = localFullScreenSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localFullScreenSurfaceView);
-        log("onCreateView() addChatLocalVideoListener chatId: " + chatId);
+        LogUtil.logDebug("addChatLocalVideoListener Chat ID: " + chatId);
         megaChatApi.addChatLocalVideoListener(chatId, this);
 
         return v;
@@ -118,14 +115,14 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
     @Override
     public void onDestroy() {
-        log("onDestroy()");
+        LogUtil.logDebug("onDestroy()");
         removeSurfaceView();
         super.onDestroy();
     }
 
     @Override
     public void onResume() {
-        log("onResume");
+        LogUtil.logDebug("onResume");
         this.width = 0;
         this.height = 0;
         localFullScreenSurfaceView.setVisibility(View.VISIBLE);
@@ -134,9 +131,9 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     }
 
     public void removeSurfaceView() {
-        log("removeSurfaceView()");
+        LogUtil.logDebug("removeSurfaceView()");
         if (localFullScreenSurfaceView.getParent() != null && localFullScreenSurfaceView.getParent().getParent() != null) {
-            log("removeSurfaceView() removeView chatId: " + chatId);
+            LogUtil.logDebug("removeView Chat ID: " + chatId);
             ((ViewGroup) localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
         }
         localFullScreenSurfaceView.setVisibility(View.GONE);

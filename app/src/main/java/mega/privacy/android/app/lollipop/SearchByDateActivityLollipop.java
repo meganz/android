@@ -29,6 +29,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -98,7 +99,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
     @SuppressLint("NewApi")
     @Override protected void onCreate(Bundle savedInstanceState) {
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         searchByDateActivity = this;
@@ -117,7 +118,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         }
 
         if(megaApi==null||megaApi.getRootNode()==null){
-            log("Refresh session - sdk");
+            LogUtil.logDebug("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
             intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -132,7 +133,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             }
 
             if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                log("Refresh session - karere");
+                LogUtil.logDebug("Refresh session - karere");
                 Intent intent = new Intent(this, LoginActivityLollipop.class);
                 intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -155,7 +156,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
         tB = (Toolbar) findViewById(R.id.toolbar_search);
         if(tB==null){
-            log("Tb is Null");
+            LogUtil.logError("Tb is Null");
             return;
         }
 
@@ -236,7 +237,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
     @Override
     public void onResume() {
-        log("onResume");
+        LogUtil.logDebug("onResume");
         super.onResume();
     }
 
@@ -251,10 +252,6 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {}
-
-    public static void log(String message) {
-        Util.log("SearchByDateActivityLollipop", message);
-    }
 
     @Override
     public void onClick(View v) {

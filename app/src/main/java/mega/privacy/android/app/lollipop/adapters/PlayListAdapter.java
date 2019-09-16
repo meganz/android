@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +26,7 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.PlaylistFragment;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -34,10 +34,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
-
-/**
- * Created by mega on 24/04/18.
- */
 
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHolderBrowser> implements View.OnClickListener, SectionTitleProvider {
 
@@ -130,26 +126,26 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     }
 
     public void setZipNodes (ArrayList<File> files) {
-        log("setZipNodes");
+        LogUtil.logDebug("setZipNodes");
         this.zipFiles = files;
         notifyDataSetChanged();
     }
 
     public void setOffNodes(ArrayList<MegaOffline> nodes) {
-        log("setOffNodes");
+        LogUtil.logDebug("setOffNodes");
         this.offNodes = nodes;
         notifyDataSetChanged();
     }
 
     public void setNodes(ArrayList<MegaNode> nodes) {
-        log("setNodes size: "+nodes.size());
+        LogUtil.logDebug("Size: " + nodes.size());
         this.nodes = nodes;
         notifyDataSetChanged();
     }
 
     @Override
     public PlayListAdapter.ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        LogUtil.logDebug("onCreateViewHolder");
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_playlist, parent, false);
         PlayListAdapter.ViewHolderBrowser holderList = new PlayListAdapter.ViewHolderBrowser(v);
@@ -168,7 +164,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolderBrowser holder, int position) {
-        log("onBindViewHolder");
+        LogUtil.logDebug("Position: " + position);
 
         MegaOffline offNode = null;
         File mediaFile = null;
@@ -264,14 +260,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         params.setMargins(0, 0, 0, 0);
         holder.imageView.setLayoutParams(params);
 
-        log("Check the thumb");
+        LogUtil.logDebug("Check the thumb");
 
         if (adapterType == Constants.OFFLINE_ADAPTER || adapterType == Constants.ZIP_ADAPTER){
 
         }
         else{
             if (node.hasThumbnail()) {
-                log("Node has thumbnail");
+                LogUtil.logDebug("Node has thumbnail");
                 RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
                 params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
                 params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -303,7 +299,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                     }
                 }
             } else {
-                log("Node NOT thumbnail");
+                LogUtil.logDebug("Node NOT thumbnail");
                 thumb = ThumbnailUtils.getThumbnailFromCache(node);
                 if (thumb != null) {
                     RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -498,9 +494,5 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
     public int getItemChecked (){
         return itemChecked;
-    }
-
-    private static void log(String log) {
-        Util.log("PlayListAdapter", log);
     }
 }

@@ -1,11 +1,11 @@
 package mega.privacy.android.app;
 
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
+
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
-
 
 public class PinUtil {
 	
@@ -16,18 +16,18 @@ public class PinUtil {
 	private static long lastPause;
 
 	public static void resume(Context context) {
-		log("resume");
+		LogUtil.logDebug("resume");
 //		dbH = new DatabaseHandler(context);
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
 		
 		if (shouldLock(context)){
 			lastLocked = context;
-			log("lastLocked " + context);
+			LogUtil.logDebug("lastLocked " + context);
 			showLock(context);
 		}
 		else{
-			log("lastLocked null");
+			LogUtil.logDebug("lastLocked null");
 			lastLocked = null;
 		}
 	}
@@ -40,7 +40,7 @@ public class PinUtil {
 					if (prefs.getPinLockCode() != null){
 						if (prefs.getPinLockCode().compareTo("") != 0){
 							long time = System.currentTimeMillis();
-							log("TIME: " + time + "__ lastPause: " + lastPause);
+							LogUtil.logDebug("TIME: " + time + " lastPause: " + lastPause);
 							if ((time - lastPause) > (1 * 1000)) { //1 es el maximo de segundos hasta que hace que pasó la última acción para que se bloquee
 								return true;
 							}
@@ -55,31 +55,27 @@ public class PinUtil {
 	
 	// Display lock screen
 	public static void showLock(Context context) {
-		log("showLock");
+		LogUtil.logDebug("showLock");
 		Intent intent = new Intent(context, PinLockActivityLollipop.class);
 		context.startActivity(intent);
 	}
 	
 	// Update time since last check
 	public static void update() {
-		log("update");
+		LogUtil.logDebug("update");
 		lastPause = System.currentTimeMillis();
-		log("lastPause = " + lastPause);
-		log("lastLocked = " + lastLocked);
+		LogUtil.logDebug("lastPause = " + lastPause);
+		LogUtil.logDebug("lastLocked = " + lastLocked);
 	}
 	
 	// Pause handler
 	public static void pause(Context context) {
 		if (lastLocked != context) {
 			update();
-			log("contexts not equal..." + "context: " + context + "___lastLocked: " + lastLocked);
+			LogUtil.logDebug("contexts not equal..." + "context: " + context + "___lastLocked: " + lastLocked);
 		}
 		else{
-			log("contexts equal..." + context);
+			LogUtil.logDebug("contexts equal..." + context);
 		}
-	}
-	
-	public static void log(String message) {
-		Util.log("PinUtil", message);
 	}
 }

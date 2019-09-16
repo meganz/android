@@ -39,6 +39,7 @@ import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -71,7 +72,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     SparseBooleanArray searchSelectedItems;
 
     public MegaListChatExplorerAdapter(Context _context, Object _fragment, ArrayList<ChatExplorerListItem> _items, RecyclerView _listView) {
-        log("new adapter");
+        LogUtil.logDebug("New adapter");
         this.context = _context;
         this.items = _items;
         this.fragment = _fragment;
@@ -189,7 +190,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
             if (chat != null) {
                 holder.email = megaChatApi.getContactEmail(chat.getPeerHandle());
-                log("email: "+holder.email);
+                LogUtil.logDebug("Email: " + holder.email);
             }
             else if (contact != null && contact.getMegaUser() != null) {
                 holder.email = contact.getMegaUser().getEmail();
@@ -215,40 +216,40 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 if (megaChatApi != null){
                     int userStatus = megaChatApi.getUserOnlineStatus(handle);
                     if(userStatus == MegaChatApi.STATUS_ONLINE){
-                        log("This user is connected");
+                        LogUtil.logDebug("This user is connected");
                         holder.stateIcon.setVisibility(View.VISIBLE);
                         holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
                         holder.lastSeenStateText.setText(context.getString(R.string.online_status));
                         holder.lastSeenStateText.setVisibility(View.VISIBLE);
                     }
                     else if(userStatus == MegaChatApi.STATUS_AWAY){
-                        log("This user is away");
+                        LogUtil.logDebug("This user is away");
                         holder.stateIcon.setVisibility(View.VISIBLE);
                         holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
                         holder.lastSeenStateText.setText(context.getString(R.string.away_status));
                         holder.lastSeenStateText.setVisibility(View.VISIBLE);
                     }
                     else if(userStatus == MegaChatApi.STATUS_BUSY){
-                        log("This user is busy");
+                        LogUtil.logDebug("This user is busy");
                         holder.stateIcon.setVisibility(View.VISIBLE);
                         holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
                         holder.lastSeenStateText.setText(context.getString(R.string.busy_status));
                         holder.lastSeenStateText.setVisibility(View.VISIBLE);
                     }
                     else if(userStatus == MegaChatApi.STATUS_OFFLINE){
-                        log("This user is offline");
+                        LogUtil.logDebug("This user is offline");
                         holder.stateIcon.setVisibility(View.VISIBLE);
                         holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
                         holder.lastSeenStateText.setText(context.getString(R.string.offline_status));
                         holder.lastSeenStateText.setVisibility(View.VISIBLE);
                     }
                     else if(userStatus == MegaChatApi.STATUS_INVALID){
-                        log("INVALID status: "+userStatus);
+                        LogUtil.logWarning("INVALID status: " + userStatus);
                         holder.stateIcon.setVisibility(View.GONE);
                         holder.lastSeenStateText.setVisibility(View.GONE);
                     }
                     else{
-                        log("This user status is: "+userStatus);
+                        LogUtil.logDebug("This user status is: " + userStatus);
                         holder.stateIcon.setVisibility(View.GONE);
                         holder.lastSeenStateText.setVisibility(View.GONE);
                     }
@@ -289,7 +290,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public void createGroupChatAvatar(ViewHolderChatExplorerList holder){
-        log("createGroupChatAvatar()");
+        LogUtil.logDebug("createGroupChatAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -316,7 +317,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             holder.initialLetter.setVisibility(View.INVISIBLE);
         }
         else{
-            log("Group chat initial letter is: "+firstLetter);
+            LogUtil.logDebug("Group chat initial letter is: " + firstLetter);
             if(firstLetter.equals("(")){
                 holder.initialLetter.setVisibility(View.INVISIBLE);
             }
@@ -330,7 +331,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public void setUserAvatar(ViewHolderChatExplorerList holder, String userHandle){
-		log("setUserAvatar ");
+        LogUtil.logDebug("setUserAvatar ");
 		createDefaultAvatar(holder, userHandle);
 
 		ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
@@ -349,7 +350,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 					avatar.delete();
 
 					if(megaApi==null){
-						log("setUserAvatar: megaApi is Null in Offline mode");
+                        LogUtil.logWarning("megaApi is Null in Offline mode");
 						return;
 					}
 
@@ -361,7 +362,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 			}else{
 
 				if(megaApi==null){
-					log("setUserAvatar: megaApi is Null in Offline mode");
+                    LogUtil.logWarning("megaApi is Null in Offline mode");
 					return;
 				}
 
@@ -370,7 +371,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 		}else{
 
 			if(megaApi==null){
-				log("setUserAvatar: megaApi is Null in Offline mode");
+                LogUtil.logWarning("megaApi is Null in Offline mode");
 				return;
 			}
 
@@ -379,7 +380,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 
     public void createDefaultAvatar(ViewHolderChatExplorerList holder, String userHandle){
-        log("createDefaultAvatar()");
+        LogUtil.logDebug("createDefaultAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -388,11 +389,11 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         String color = megaApi.getUserAvatarColor(userHandle);
         if(color!=null){
-            log("The color to set the avatar is "+color);
+            LogUtil.logDebug("The color to set the avatar is " + color);
             p.setColor(Color.parseColor(color));
         }
         else{
-            log("Default color to the avatar");
+            LogUtil.logDebug("Default color to the avatar");
             p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
@@ -430,8 +431,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         if(setInitialByMail){
             if (holder.email != null){
                 if (holder.email.length() > 0){
-                    log("email TEXT: " + holder.email);
-                    log("email TEXT AT 0: " + holder.email.charAt(0));
+                    LogUtil.logDebug("Email TEXT: " + holder.email);
+                    LogUtil.logDebug("Email TEXT AT 0: " + holder.email.charAt(0));
                     String firstLetter = holder.email.charAt(0) + "";
                     firstLetter = firstLetter.toUpperCase(Locale.getDefault());
                     holder.initialLetter.setText(firstLetter);
@@ -460,7 +461,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public int getPosition (ChatExplorerListItem item) {
-        log("getPosition");
+        LogUtil.logDebug("getPosition");
         return items.indexOf(item);
     }
 
@@ -503,7 +504,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public void updateItemContactStatus(int position){
-        log("updateContactStatus: "+position);
+        LogUtil.logDebug("position: " + position);
 
         notifyItemChanged(position);
     }
@@ -517,21 +518,21 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public void toggleSelection(int pos) {
-        log("toggleSelection");
+        LogUtil.logDebug("position: " + pos);
 
         if (selectedItems.get(pos, false)) {
-            log("delete pos: "+pos);
+            LogUtil.logDebug("Delete pos: " + pos);
             selectedItems.delete(pos);
         }
         else {
-            log("PUT pos: "+pos);
+            LogUtil.logDebug("PUT pos: " + pos);
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
 
         MegaListChatExplorerAdapter.ViewHolderChatExplorerList view = (MegaListChatExplorerAdapter.ViewHolderChatExplorerList) listView.findViewHolderForLayoutPosition(pos);
         if(view!=null){
-            log("Start animation: "+pos);
+            LogUtil.logDebug("Start animation: " + pos);
             Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
             flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
@@ -566,9 +567,5 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
     public void setSearchSelectedItems (SparseBooleanArray searchSelectedItems) {
         this.searchSelectedItems = searchSelectedItems;
-    }
-
-    private static void log(String log) {
-        Util.log("MegaListChatExplorerAdapter", log);
     }
 }

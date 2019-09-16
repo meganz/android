@@ -33,7 +33,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -45,6 +44,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -170,7 +170,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				log("onTextChanged: " + s.toString() + "_ " + start + "__" + before + "__" + count);
+				LogUtil.logDebug("Text changed: " + s.toString() + "_ " + start + "__" + before + "__" + count);
 				if (s != null){
 					if (s.length() > 0) {
 						String temp = s.toString();
@@ -268,19 +268,19 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		Intent intentReceived = getIntent();
 		if (intentReceived != null) {
-			log("There is an intent!");
+			LogUtil.logDebug("There is an intent!");
 			if(intentReceived.getAction()!=null){
 				if (getIntent().getAction().equals(Constants.ACTION_RESET_PASS_FROM_LINK)) {
-					log("ACTION_RESET_PASS_FROM_LINK");
+					LogUtil.logDebug("ACTION_RESET_PASS_FROM_LINK");
 					changePassword=false;
 					linkToReset = getIntent().getDataString();
 					if (linkToReset == null) {
-						log("link is NULL - close activity");
+						LogUtil.logWarning("link is NULL - close activity");
 						finish();
 					}
 					mk = getIntent().getStringExtra("MK");
 					if(mk==null){
-						log("MK is NULL - close activity");
+						LogUtil.logWarning("MK is NULL - close activity");
 						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					}
 
@@ -288,10 +288,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 				if (getIntent().getAction().equals(Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT)) {
 					changePassword=false;
-					log("ACTION_RESET_PASS_FROM_PARK_ACCOUNT");
+					LogUtil.logDebug("ACTION_RESET_PASS_FROM_PARK_ACCOUNT");
 					linkToReset = getIntent().getDataString();
 					if (linkToReset == null) {
-						log("link is NULL - close activity");
+						LogUtil.logWarning("link is NULL - close activity");
 						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					}
 					mk = null;
@@ -304,7 +304,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	@Override
 	public void onBackPressed() {
-		log("onBackPressed");
+		LogUtil.logDebug("onBackPressed");
 		if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
 			Intent intent = new Intent(this, TestPasswordActivity.class);
 			intent.putExtra("logout", getIntent().getBooleanExtra("logout", false));
@@ -740,7 +740,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	void permitVerify(){
-		log("permitVerify");
+		LogUtil.logDebug("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
 			Util.hideKeyboard(changePasswordActivity, 0);
 			if (sb.length()>0) {
@@ -753,7 +753,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			sb.append(fifthPin.getText());
 			sb.append(sixthPin.getText());
 			pin = sb.toString();
-			log("PIN: "+pin);
 			if (!isErrorShown && pin != null) {
 				verify2faProgressBar.setVisibility(View.VISIBLE);
 				changePassword(newPassword1View.getText().toString());
@@ -762,13 +761,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	void pasteClipboard() {
-		log("pasteClipboard");
+		LogUtil.logDebug("pasteClipboard");
 		pinLongClick = false;
 		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 		ClipData clipData = clipboard.getPrimaryClip();
 		if (clipData != null) {
 			String code = clipData.getItemAt(0).getText().toString();
-			log("code: "+code);
 			if (code != null && code.length() == 6) {
 				boolean areDigits = true;
 				for (int i=0; i<6; i++) {
@@ -821,24 +819,24 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 		switch(v.getId()){
 			case R.id.action_change_password: {
 				hidePasswordIfVisible();
 				if (changePassword) {
-					log("ok proceed to change");
+					LogUtil.logDebug("Ok proceed to change");
 					onChangePasswordClick();
 				} else {
-					log("reset pass on click");
+					LogUtil.logDebug("Reset pass on click");
 					if (linkToReset == null) {
-						log("link is NULL");
+						LogUtil.logWarning("link is NULL");
 						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					} else {
 						if (mk == null) {
-							log("proceed to park account");
+							LogUtil.logDebug("Proceed to park account");
 							onResetPasswordClick(false);
 						} else {
-							log("ok proceed to reset");
+							LogUtil.logDebug("Ok proceed to reset");
 							onResetPasswordClick(true);
 						}
 					}
@@ -1040,7 +1038,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	public void onResetPasswordClick(boolean hasMk){
-		log("onResetPasswordClick");
+		LogUtil.logDebug("hasMk: " + hasMk);
 
 		if(!Util.isOnline(this))
 		{
@@ -1071,7 +1069,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		progress.show();
 
 		if(hasMk){
-			log("reset with mk");
+			LogUtil.logDebug("Reset with mk");
 			megaApi.confirmResetPassword(linkToReset, newPassword, mk, this);
 		}
 		else{
@@ -1080,7 +1078,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 	
 	public void onChangePasswordClick(){
-		log("onChangePasswordClick");
+		LogUtil.logDebug("onChangePasswordClick");
 		if(!Util.isOnline(this))
 		{
 			showSnackbar(getString(R.string.error_server_connection_problem));
@@ -1205,7 +1203,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 	
 	private void changePassword (String newPassword){
-		log("changePassword");
+		LogUtil.logDebug("changePassword");
 
 		if (is2FAEnabled){
 			megaApi.multiFactorAuthChangePassword(null, newPassword, pin, this);
@@ -1219,17 +1217,17 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getName());
+		LogUtil.logDebug("onRequestStart: " + request.getName());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
+		LogUtil.logDebug("onRequestFinish");
 		
 		if (request.getType() == MegaRequest.TYPE_CHANGE_PW){
-			log("TYPE_CHANGE_PW");
+			LogUtil.logDebug("TYPE_CHANGE_PW");
 			if (e.getErrorCode() != MegaError.API_OK){
-				log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
+				LogUtil.logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
 
 				if (!is2FAEnabled) {
 					try {
@@ -1247,7 +1245,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					//Intent to MyAccount
 					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
 					if (e.getErrorCode() != MegaError.API_OK) {
-						log("Error, request: " + e.getErrorString());
+						LogUtil.logWarning("Error, request: " + e.getErrorString());
 						if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED) {
 							if (is2FAEnabled) {
 								verifyShowError();
@@ -1259,7 +1257,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					}
 					else {
 						resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
-						log("General Error");
+						LogUtil.logWarning("General Error");
 						resetPassIntent.putExtra("RESULT", -1);
 						startActivity(resetPassIntent);
 						finish();
@@ -1267,7 +1265,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 			}
 			else{
-				log("pass changed OK");
+				LogUtil.logDebug("Pass changed OK");
 				try{ 
 					progress.dismiss();
 				} catch(Exception ex) {};
@@ -1287,11 +1285,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK){
-			log("TYPE_CONFIRM_RECOVERY_LINK");
+			LogUtil.logDebug("TYPE_CONFIRM_RECOVERY_LINK");
 			if(megaApi.getRootNode()==null) {
-				log("Not logged in");
+				LogUtil.logDebug("Not logged in");
 				if (e.getErrorCode() != MegaError.API_OK){
-					log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
+					LogUtil.logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
 
 					try{
 						progress.dismiss();
@@ -1316,7 +1314,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					finish();
 				}
 				else{
-					log("pass changed");
+					LogUtil.logDebug("Pass changed");
 					try{
 						progress.dismiss();
 					} catch(Exception ex) {};
@@ -1332,10 +1330,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 			}
 			else {
-				log("Logged IN");
+				LogUtil.logDebug("Logged IN");
 
 				if (e.getErrorCode() != MegaError.API_OK){
-					log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
+					LogUtil.logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
 
 					try{
 						progress.dismiss();
@@ -1349,7 +1347,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					finish();
 				}
 				else{
-					log("pass changed");
+					LogUtil.logDebug("Pass changed");
 					try{
 						progress.dismiss();
 					} catch(Exception ex) {};
@@ -1380,7 +1378,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	private void setError(final EditText editText, String error){
-		log("setError");
+		LogUtil.logDebug("setError");
 		if(error == null || error.equals("")){
 			return;
 		}
@@ -1447,11 +1445,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError: " + request.getName());
-	}
-	
-	public static void log(String message) {
-		Util.log("ChangePasswordActivityLollipop", message);
+		LogUtil.logWarning("onRequestTemporaryError: " + request.getName());
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -48,14 +49,10 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     WifiManager.WifiLock lock;
     PowerManager.WakeLock wl;
 
-    protected static void log(String message) {
-        Util.log("IncomingCallService", message);
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
-        log("onCreateFCM");
+        LogUtil.logDebug("onCreateFCM");
 
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
@@ -75,14 +72,14 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
     @Override
     public void onDestroy() {
-        log("onDestroy incoming call foreground service");
+        LogUtil.logDebug("Incoming call foreground service");
         super.onDestroy();
         if (wl != null) {
-            log("wifi lock release");
+            LogUtil.logDebug("Wifi lock release");
             wl.release();
         }
         if (lock != null) {
-            log("wake lock release");
+            LogUtil.logDebug("Wake lock release");
             lock.release();
         }
         stop();
@@ -118,10 +115,10 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        log("network available: " + (cm.getActiveNetworkInfo() != null));
+        LogUtil.logDebug("Network available: " + (cm.getActiveNetworkInfo() != null));
         if (cm.getActiveNetworkInfo() != null) {
-            log(cm.getActiveNetworkInfo().getState() + "");
-            log(cm.getActiveNetworkInfo().getDetailedState() + "");
+            LogUtil.logDebug(cm.getActiveNetworkInfo().getState() + "");
+            LogUtil.logDebug(cm.getActiveNetworkInfo().getDetailedState() + "");
         }
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "MegaIncomingCallWifiLock");
@@ -135,27 +132,27 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
         }
 
         createNotification();
-        log("CALL notification");
+        LogUtil.logDebug("CALL notification");
         //Leave the flag showMessageNotificationAfterPush as it is
         //If true - wait until connection finish
         //If false, no need to change it
-        log("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
+        LogUtil.logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
         UserCredentials credentials = dbH.getCredentials();
         if (credentials == null) {
-            log("There are not user credentials");
+            LogUtil.logWarning("There are not user credentials");
         } else {
             String gSession = credentials.getSession();
             if (megaApi.getRootNode() == null) {
-                log("RootNode = null");
+                LogUtil.logWarning("RootNode = null");
                 performLoginProccess(gSession);
             } else {
-                log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
+                LogUtil.logDebug("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
                 int ret = megaChatApi.getInitState();
-                log("result of init ---> " + ret);
+                LogUtil.logDebug("result of init ---> " + ret);
                 int status = megaChatApi.getOnlineStatus();
-                log("online status ---> " + status);
+                LogUtil.logDebug("online status ---> " + status);
                 int connectionState = megaChatApi.getConnectionState();
-                log("connection state ---> " + connectionState);
+                LogUtil.logDebug("connection state ---> " + connectionState);
             }
         }
         return START_NOT_STICKY;
@@ -182,25 +179,25 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
                 if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
                     ret = megaChatApi.init(gSession);
-                    log("result of init ---> " + ret);
+                    LogUtil.logDebug("result of init ---> " + ret);
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE) {
-                        log("condition ret == MegaChatApi.INIT_NO_CACHE");
+                        LogUtil.logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
 
                     } else if (ret == MegaChatApi.INIT_ERROR) {
-                        log("condition ret == MegaChatApi.INIT_ERROR");
+                        LogUtil.logDebug("condition ret == MegaChatApi.INIT_ERROR");
                         if (chatSettings == null) {
-                            log("ERROR----> Switch OFF chat");
+                            LogUtil.logWarning("ERROR----> Switch OFF chat");
                             chatSettings = new ChatSettings();
                             chatSettings.setEnabled(false + "");
                             dbH.setChatSettings(chatSettings);
                         } else {
-                            log("ERROR----> Switch OFF chat");
+                            LogUtil.logWarning("ERROR----> Switch OFF chat");
                             dbH.setEnabledChat(false + "");
                         }
                         megaChatApi.logout(this);
                     } else {
-                        log("Chat correctly initialized");
+                        LogUtil.logDebug("Chat correctly initialized");
                     }
                 }
             }
@@ -211,25 +208,25 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart: " + request.getRequestString());
+        LogUtil.logDebug("onRequestStart: " + request.getRequestString());
     }
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        log("onRequestUpdate: " + request.getRequestString());
+        LogUtil.logDebug("onRequestUpdate: " + request.getRequestString());
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish: " + request.getRequestString());
+        LogUtil.logDebug("onRequestFinish: " + request.getRequestString());
 
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
             if (e.getErrorCode() == MegaError.API_OK) {
-                log("Fast login OK");
-                log("Calling fetchNodes from MegaFireBaseMessagingService");
+                LogUtil.logDebug("Fast login OK");
+                LogUtil.logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
                 megaApi.fetchNodes(this);
             } else {
-                log("ERROR: " + e.getErrorString());
+                LogUtil.logError("ERROR: " + e.getErrorString());
                 isLoggingIn = false;
                 MegaApplication.setLoggingIn(isLoggingIn);
                 return;
@@ -238,23 +235,23 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
             isLoggingIn = false;
             MegaApplication.setLoggingIn(isLoggingIn);
             if (e.getErrorCode() == MegaError.API_OK) {
-                log("OK fetch nodes");
+                LogUtil.logDebug("OK fetch nodes");
                 if (Util.isChatEnabled()) {
-                    log("Chat enabled-->connectInBackground");
+                    LogUtil.logDebug("Chat enabled-->connectInBackground");
 //                    MegaApplication.isFireBaseConnection=true;
                     megaChatApi.connectInBackground(this);
                 } else {
-                    log("Chat NOT enabled - sendNotification");
+                    LogUtil.logDebug("Chat NOT enabled - sendNotification");
                 }
             } else {
-                log("ERROR: " + e.getErrorString());
+                LogUtil.logError("ERROR: " + e.getErrorString());
             }
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestTemporary: " + request.getRequestString());
+        LogUtil.logWarning("onRequestTemporary: " + request.getRequestString());
     }
 
     @Override
@@ -269,26 +266,26 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish: " + request.getRequestString() + " result: " + e.getErrorString());
+        LogUtil.logDebug("onRequestFinish: " + request.getRequestString() + " result: " + e.getErrorString());
 
         if (request.getType() == MegaChatRequest.TYPE_CONNECT) {
 //            MegaApplication.isFireBaseConnection=false;
-            log("TYPE CONNECT");
+            LogUtil.logDebug("TYPE CONNECT");
             //megaChatApi.setBackgroundStatus(true, this);
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                log("Connected to chat!");
+                LogUtil.logDebug("Connected to chat!");
                 if (showMessageNotificationAfterPush) {
                     showMessageNotificationAfterPush = false;
                     megaChatApi.pushReceived(beep);
                     beep = false;
                 } else {
-                    log("Login do not started by CHAT message");
+                    LogUtil.logDebug("Login do not started by CHAT message");
                 }
             } else {
-                log("EEEERRRRROR WHEN CONNECTING" + e.getErrorString());
+                LogUtil.logError("ERROR WHEN CONNECTING" + e.getErrorString());
             }
         } else if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS) {
-            log("TYPE SETBACKGROUNDSTATUS");
+            LogUtil.logDebug("TYPE SETBACKGROUNDSTATUS");
         }
     }
 

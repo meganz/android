@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 
 public class MegaOffline {
 	
@@ -104,7 +105,7 @@ public class MegaOffline {
 			}
 		}
 		else{
-			log("isFolder type is NULL");
+			LogUtil.logDebug("isFolder type is NULL");
 		}
 		return false;
 	}
@@ -116,9 +117,4 @@ public class MegaOffline {
 	public void setOrigin(int origin) {
 		this.origin = origin;
 	}
-
-	private static void log(String log) {
-		Util.log("MegaOffline", log);
-	}
-
 }

@@ -219,8 +219,4 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener){
         this.mItemClickListener = mItemClickListener;
     }
-
-    private static void log(String log) {
-        Util.log("ImportFilesAdapter", log);
-    }
 }

@@ -38,13 +38,9 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.PlayListAdapter;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-
-/**
- * Created by mega on 24/04/18.
- */
 
 public class PlaylistFragment extends Fragment{
 
@@ -85,14 +81,14 @@ public class PlaylistFragment extends Fragment{
     ImageButton nextButton;
 
     public static PlaylistFragment newInstance() {
-        log("newInstance");
+        LogUtil.logDebug("newInstance");
         PlaylistFragment fragment = new PlaylistFragment();
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if (megaApi == null) {
@@ -111,7 +107,7 @@ public class PlaylistFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        LogUtil.logDebug("onCreateView");
 
         outMetrics = new DisplayMetrics();
         ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
@@ -281,7 +277,7 @@ public class PlaylistFragment extends Fragment{
     }
 
     public void itemClick(int position) {
-        log("item click position: " + position);
+        LogUtil.logDebug("Position: " + position);
         if (player != null && !((AudioVideoPlayerLollipop) context).isCreatingPlaylist()) {
             player.seekTo(position, 0);
         }
@@ -359,26 +355,26 @@ public class PlaylistFragment extends Fragment{
 
     @Override
     public void onPause() {
-        log("onPause");
+        LogUtil.logDebug("onPause");
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        log("onResume");
+        LogUtil.logDebug("onResume");
         super.onResume();
         ((AudioVideoPlayerLollipop) context).setPlaylistProgressBar((ProgressBar) v.findViewById(R.id.playlist_progress_bar));
     }
 
     @Override
     public void onDestroy() {
-        log("onDestroy");
+        LogUtil.logDebug("onDestroy");
         super.onDestroy();
     }
 
     @Override
     public void onAttach(Activity activity) {
-        log("onAttach1");
+        LogUtil.logDebug("onAttach");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -386,7 +382,7 @@ public class PlaylistFragment extends Fragment{
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach2");
+        LogUtil.logDebug("onAttach");
 
         super.onAttach(context);
         this.context = context;
@@ -413,9 +409,5 @@ public class PlaylistFragment extends Fragment{
 
     public void setSearchOpen(boolean searchOpen) {
         this.searchOpen = searchOpen;
-    }
-
-    public static void log(String message) {
-        Util.log("PlaylistFragment", message);
     }
 }

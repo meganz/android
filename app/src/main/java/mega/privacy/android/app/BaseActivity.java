@@ -31,11 +31,10 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRoom;
 
 public class BaseActivity extends AppCompatActivity {
@@ -50,7 +49,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
         checkMegaApiObjects();
@@ -64,7 +63,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        log("onPause");
+        LogUtil.logDebug("onPause");
 
         checkMegaApiObjects();
         super.onPause();
@@ -72,7 +71,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        log("onResume");
+        LogUtil.logDebug("onResume");
 
         super.onResume();
         Util.setAppFontSize(this);
@@ -84,7 +83,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        log("onDestroy");
+        LogUtil.logDebug("onDestroy");
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
@@ -97,7 +96,7 @@ public class BaseActivity extends AppCompatActivity {
      * or create them if necessary.
      */
     private void checkMegaApiObjects() {
-        log("checkMegaApiObjects");
+        LogUtil.logDebug("checkMegaApiObjects");
 
         if (megaApi == null){
             megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -121,7 +120,7 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                log("BROADCAST TO MANAGE A SSL VERIFICATION ERROR");
+                LogUtil.logDebug("BROADCAST TO MANAGE A SSL VERIFICATION ERROR");
                 if (sslErrorDialog != null && sslErrorDialog.isShowing()) return;
                 showSSLErrorDialog();
             }
@@ -135,7 +134,7 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                log("BROADCAST TO SEND SIGNAL PRESENCE");
+                LogUtil.logDebug("BROADCAST TO SEND SIGNAL PRESENCE");
                 if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending()==false){
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();
@@ -211,7 +210,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void retryConnectionsAndSignalPresence(){
-        log("retryConnectionsAndSignalPresence");
+        LogUtil.logDebug("retryConnectionsAndSignalPresence");
         try{
             if (megaApi != null){
                 megaApi.retryPendingConnections();
@@ -224,7 +223,7 @@ public class BaseActivity extends AppCompatActivity {
                     if(megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending() == false){
                         delaySignalPresence = false;
                         if(!(this instanceof ChatCallActivity) && megaChatApi.isSignalActivityRequired()){
-                            log("Send signal presence");
+                            LogUtil.logDebug("Send signal presence");
                             megaChatApi.signalPresenceActivity();
                         }
                     }
@@ -235,7 +234,7 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
         catch (Exception e){
-            log("retryConnectionsAndSignalPresence:Exception: " + e.getMessage());
+            LogUtil.logWarning("Exception", e);
         }
     }
 
@@ -289,7 +288,7 @@ public class BaseActivity extends AppCompatActivity {
      * @param idChat Chat ID. If this param has a valid value, different to -1, the function of Constants.MESSAGE_SNACKBAR_TYPE ends in the specified chat
      */
     public void showSnackbar (int type, View view, String s, long idChat) {
-        log("showSnackbar: "+s);
+        LogUtil.logDebug(("showSnackbar: " + s));
         Display  display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -367,7 +366,7 @@ public class BaseActivity extends AppCompatActivity {
      * @param fileHandle Handle of the file that has to be sent
      */
     public void sendFileToChatsFromContacts(Context context, ArrayList<MegaChatRoom> chats, long fileHandle){
-        log("sendFileToChatsFromContacts");
+        LogUtil.logDebug("sendFileToChatsFromContacts");
 
         MultipleAttachChatListener listener = null;
 
@@ -387,21 +386,13 @@ public class BaseActivity extends AppCompatActivity {
      * Method to refresh the account details info if necessary.
      */
     protected void refreshAccountInfo(){
-        log("refreshAccountInfo");
+        LogUtil.logDebug("refreshAccountInfo");
 
         //Check if the call is recently
-        log("Check the last call to getAccountDetails");
+        LogUtil.logDebug("Check the last call to getAccountDetails");
         if(DBUtil.callToAccountDetails(getApplicationContext())){
-            log("megaApi.getAccountDetails SEND");
+            LogUtil.logDebug("megaApi.getAccountDetails SEND");
             ((MegaApplication) getApplication()).askForAccountDetails();
         }
-    }
-
-    /**
-     * Local method to write a log message.
-     * @param message Text to write in the log message.
-     */
-    private void log(String message) {
-        Util.log("BaseActivityLollipop", message);
     }
 }

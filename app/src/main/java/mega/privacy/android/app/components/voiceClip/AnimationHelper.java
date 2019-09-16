@@ -16,7 +16,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -44,13 +45,9 @@ public class AnimationHelper {
         animatedVectorDrawable = AnimatedVectorDrawableCompat.create(context, R.drawable.recv_basket_animated);
     }
 
-    public static void log(String message) {
-        Util.log("AnimationHelper", message);
-    }
-
     @SuppressLint("RestrictedApi")
     public void animateBasket(float basketInitialX) {
-        log("animateBasket");
+        LogUtil.logDebug("animateBasket");
         isBasketAnimating = true;
         clearAlphaAnimation(false);
 
@@ -168,7 +165,7 @@ public class AnimationHelper {
      * Stop the current animation and revert views back to default state
      */
     public void resetBasketAnimation() {
-        log("resetBasketAnimation()");
+        LogUtil.logDebug("resetBasketAnimation()");
         if (!isBasketAnimating) return;
 
         resetAnimation(translateAnimation1);
@@ -188,7 +185,7 @@ public class AnimationHelper {
     }
 
     public void clearAlphaAnimation(boolean hideView) {
-        log("clearAlphaAnimation()");
+        LogUtil.logDebug("clearAlphaAnimation()");
         resetAnimation(alphaAnimation);
         clearAnimation(smallBlinkingMic);
         if (hideView) {
@@ -197,7 +194,7 @@ public class AnimationHelper {
     }
 
     public void animateSmallMicAlpha() {
-        log("animateSmallMicAlpha()");
+        LogUtil.logDebug("animateSmallMicAlpha()");
         alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
         alphaAnimation.setDuration(DURATION_BLINK_MICRO);
         alphaAnimation.setRepeatMode(Animation.REVERSE);

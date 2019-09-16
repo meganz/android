@@ -27,6 +27,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -72,13 +73,13 @@ WebView myWebView;
 		dbH = DatabaseHandler.getDbHandler(context);
 		
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 	}
 	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		LogUtil.logDebug("onCreateView");
 
 		DecimalFormat df = new DecimalFormat("#.##");  
 
@@ -107,7 +108,7 @@ WebView myWebView;
 //        webSettings.setJavaScriptEnabled(true);
 
 		if(DBUtil.callToPricing(context)){
-			log("megaApi.getPricing SEND");
+			LogUtil.logDebug("megaApi.getPricing SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}else{
 			getPaymentId();
@@ -121,7 +122,7 @@ WebView myWebView;
 	}
 
 	public void getPaymentId(){
-		log("getPaymentId");
+		LogUtil.logDebug("getPaymentId");
 		if(myAccountInfo==null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
@@ -145,7 +146,7 @@ WebView myWebView;
 					megaApi.getPaymentId(planHandle, lastPublicHandle, this);
 				}
 				megaApi.getPaymentId(planHandle, this);
-				log("megaApi.getPaymentId(" + planHandle + ", " + lastPublicHandle + ")");
+				LogUtil.logDebug("megaApi.getPaymentId(" + planHandle + ", " + lastPublicHandle + ")");
 			}
 		}
 	}
@@ -164,10 +165,10 @@ WebView myWebView;
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		
-		log("REQUEST: " + request.getName() + "__" + request.getRequestString());
+
+		LogUtil.logDebug("REQUEST: " + request.getName() + "__" + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
-			log("PAYMENT ID: " + request.getLink());
+			LogUtil.logDebug("PAYMENT ID: " + request.getLink());
 //			Toast.makeText(context, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
 
 			/*INICIO FORTUMO*/
@@ -206,10 +207,6 @@ WebView myWebView;
 		context = activity;
 		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}
-	
-	public static void log(String message) {
-		Util.log("CentiliFragment", message);
-	}
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
@@ -218,7 +215,7 @@ WebView myWebView;
 
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-		log("onUserAlertsUpdate");
+		LogUtil.logDebug("onUserAlertsUpdate");
 	}
 
 	@Override

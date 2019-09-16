@@ -39,6 +39,7 @@ import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -104,11 +105,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            log("context is null");
+            LogUtil.logWarning("context is null");
             return;
         }
     }
@@ -116,7 +117,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        LogUtil.logDebug("onCreateView");
 
         View v = inflater.inflate(R.layout.fragment_create_account, container, false);
 
@@ -212,7 +213,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                log("onTextChanged: " + s.toString() + "_ " + start + "__" + before + "__" + count);
+                LogUtil.logDebug("Text changed: " + s.toString() + "_ " + start + "__" + before + "__" + count);
                 if (s != null){
                     if (s.length() > 0) {
                         String temp = s.toString();
@@ -508,7 +509,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        LogUtil.logDebug("onClick");
 
         switch (v.getId()) {
             case R.id.create_account_chkTOS:
@@ -526,7 +527,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 break;
 
             case R.id.tos:
-                log("Show tos");
+                LogUtil.logDebug("Show ToS");
 //				Intent browserIntent = new Intent(Intent.ACTION_VIEW);
 //				browserIntent.setComponent(new ComponentName("com.android.browser", "com.android.browser.BrowserActivity"));
 //				browserIntent.setDataAndType(Uri.parse("http://www.google.es"), "text/html");
@@ -584,7 +585,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 	 * Registration form submit
 	 */
     private void submitForm() {
-        log("submit form!");
+        LogUtil.logDebug("submit form!");
 
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
@@ -620,8 +621,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
-        log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
-        log("[CREDENTIALS]userPassword: _" + userPassword.getText().toString() +"_");
         megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
     }
 
@@ -721,25 +720,23 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
-        log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
-        log("[CREDENTIALS]userPassword: _" + userPassword.getText().toString() +"_");
         megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
 //		megaApi.fastCreateAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), privateKey, userName.getText().toString().trim(), this);
     }
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart" + request.getRequestString());
+        LogUtil.logDebug("onRequestStart" + request.getRequestString());
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request,
                                 MegaError e) {
-        log("onRequestFinish");
+        LogUtil.logDebug("onRequestFinish");
 
         if (isAdded()) {
             if (e.getErrorCode() != MegaError.API_OK) {
-                log("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
+                LogUtil.logWarning("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
 
                 if (e.getErrorCode() == MegaError.API_EEXIST) {
                     try {
@@ -779,7 +776,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 if (dbH != null){
                     dbH.clearEphemeral();
 
-                    log("EphemeralCredentials: (" + request.getEmail() + "," + request.getPassword() + "," + request.getSessionKey() + "," + request.getName() + "," + request.getText() + ")");
                     EphemeralCredentials ephemeral = new EphemeralCredentials(request.getEmail(), request.getPassword(), request.getSessionKey(), request.getName(), request.getText());
 
                     dbH.saveEphemeral(ephemeral);
@@ -792,7 +788,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        log ("onRequestTemporaryError");
+        LogUtil.logWarning("onRequestTemporaryError");
     }
 
 
@@ -804,7 +800,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach");
+        LogUtil.logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
 
@@ -815,7 +811,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onAttach(Activity context) {
-        log("onAttach Activity");
+        LogUtil.logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
 
@@ -995,9 +991,5 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
             break;
         }
-    }
-
-    public static void log(String log) {
-        Util.log("CreateAccountFragmentLollipop", log);
     }
 }

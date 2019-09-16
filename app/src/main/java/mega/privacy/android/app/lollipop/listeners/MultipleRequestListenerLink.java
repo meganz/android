@@ -6,7 +6,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -84,7 +85,7 @@ public class MultipleRequestListenerLink implements MegaRequestListenerInterface
                             ((FileLinkActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message);
                         }
                     }else{
-                        log("OK");
+                        LogUtil.logDebug("OK");
                         if(elementToImport == FOLDER_LINK){
                             ((FolderLinkActivityLollipop) context).successfulCopy();
                         }else if(elementToImport == FILE_LINK){
@@ -97,9 +98,5 @@ public class MultipleRequestListenerLink implements MegaRequestListenerInterface
             default:
                 break;
         }
-    }
-
-    private static void log(String log) {
-        Util.log("MultipleRequestListenerLink", log);
     }
 }

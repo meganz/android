@@ -32,6 +32,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -129,12 +130,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		LogUtil.logDebug("onCreateView");
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -221,13 +222,13 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		//END -- PRO III ACCOUNT
 
 		setPricing();
-		log("setPricing ENDS");
+		LogUtil.logDebug("setPricing ENDS");
 		showAvailableAccount();
 
 		refreshAccountInfo();
 
 		int displayedAccountType = ((ManagerActivityLollipop)context).getDisplayedAccountType();
-		log("displayedAccountType: "+displayedAccountType);
+		LogUtil.logDebug("displayedAccountType: " + displayedAccountType);
 		if(displayedAccountType!=-1){
 			switch(displayedAccountType){
 				case Constants.PRO_LITE:{
@@ -249,28 +250,28 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			}
 		}
 
-		log("END onCreateView");
+		LogUtil.logDebug("END onCreateView");
 		return v;
 	}
 
 	public void refreshAccountInfo(){
-		log("refreshAccountInfo");
+		LogUtil.logDebug("refreshAccountInfo");
 
-		log("Check the last call to callToPricing");
+		LogUtil.logDebug("Check the last call to callToPricing");
 		if(DBUtil.callToPricing(context)){
-			log("megaApi.getPricing SEND");
+			LogUtil.logDebug("megaApi.getPricing SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}
 
-		log("Check the last call to callToPaymentMethods");
+		LogUtil.logDebug("Check the last call to callToPaymentMethods");
 		if(DBUtil.callToPaymentMethods(context)){
-			log("megaApi.getPaymentMethods SEND");
+			LogUtil.logDebug("megaApi.getPaymentMethods SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
 		}
 	}
 
 	public void setPricing() {
-		log("setPricing");
+		LogUtil.logDebug("setPricing");
 
 		DecimalFormat df = new DecimalFormat("#.##");
 
@@ -282,7 +283,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			ArrayList<Product> productAccounts = myAccountInfo.getProductAccounts();
 
 			if (productAccounts == null) {
-				log("productAccounts == null");
+				LogUtil.logDebug("productAccounts == null");
 				((MegaApplication) ((Activity) context).getApplication()).askForPricing();
 				return;
 			}
@@ -290,7 +291,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			for (int i = 0; i < productAccounts.size(); i++) {
 				Product account = productAccounts.get(i);
 				if (account.getLevel() == Constants.PRO_I && account.getMonths() == 1) {
-					log("PRO1: " + account.getStorage());
+					LogUtil.logDebug("PRO1: " + account.getStorage());
 
 					double price = account.getAmount() / 100.00;
 					String priceString = df.format(price);
@@ -326,7 +327,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					bandwidthSectionPro1.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
 
 				} else if (account.getLevel() == Constants.PRO_II && account.getMonths() == 1) {
-					log("PRO2: " + account.getStorage());
+					LogUtil.logDebug("PRO2: " + account.getStorage());
 
 					double price = account.getAmount() / 100.00;
 					String priceString = df.format(price);
@@ -365,7 +366,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					bandwidthSectionPro2.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
 
 				} else if (account.getLevel() == Constants.PRO_III && account.getMonths() == 1) {
-					log("PRO3: " + account.getStorage());
+					LogUtil.logDebug("PRO3: " + account.getStorage());
 
 					double price = account.getAmount() / 100.00;
 					String priceString = df.format(price);
@@ -403,7 +404,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					bandwidthSectionPro3.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
 
 				} else if (account.getLevel() == Constants.PRO_LITE && account.getMonths() == 1) {
-					log("Lite: " + account.getStorage());
+					LogUtil.logDebug("Lite: " + account.getStorage());
 
 					double price = account.getAmount() / 100.00;
 					String priceString = df.format(price);
@@ -443,7 +444,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			}
 
 			int displayedAccountType = ((ManagerActivityLollipop) context).getDisplayedAccountType();
-			log("displayedAccountType: " + displayedAccountType);
+			LogUtil.logDebug("displayedAccountType: " + displayedAccountType);
 			if (displayedAccountType != -1) {
 				switch (displayedAccountType) {
 					case Constants.PRO_LITE: {
@@ -465,19 +466,19 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 			}
 		} else {
-			log("MyAccountInfo is Null");
+			LogUtil.logWarning("MyAccountInfo is Null");
 		}
 	}
 	
 	public void showAvailableAccount(){
-		log("showAvailableAccount()");
+		LogUtil.logDebug("showAvailableAccount()");
 
 		if(myAccountInfo==null){
-			log("MyAccountInfo is NULL");
+			LogUtil.logWarning("MyAccountInfo is NULL");
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
-		log("showAvailableAccount: "+myAccountInfo.getAccountType());
+		LogUtil.logDebug("showAvailableAccount: " + myAccountInfo.getAccountType());
 
 		switch(myAccountInfo.getAccountType()){
 
@@ -501,13 +502,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	}
 
 	public void onUpgradeClick(int account){
-		log("onUpgradeClick: "+account);
+		LogUtil.logDebug("account: " + account);
 		RelativeLayout selectPaymentMethodClicked;
 
 		switch (account){
 			case Constants.PRO_LITE:{
-				log("onUpgradeClick:PRO_LITE ");
-
+				LogUtil.logDebug("PRO_LITE ");
 				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutLite;
 				break;
 			}
@@ -530,7 +530,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 
 		if (myAccountInfo.getPaymentBitSet() != null){
-			log("onUpgradeClick:myAccountInfo.getPaymentBitSet() != null");
+			LogUtil.logDebug("myAccountInfo.getPaymentBitSet() != null");
 
 			selectPaymentMethod = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_text_payment_method);
 			paymentTitle = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_text_payment_title);
@@ -681,12 +681,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			showPaymentMethods(account);
 
 			refreshAccountInfo();
-			log("END refreshAccountInfo");
+			LogUtil.logDebug("END refreshAccountInfo");
 			if (!myAccountInfo.isInventoryFinished()){
-				log("if (!myAccountInfo.isInventoryFinished())");
+				LogUtil.logDebug("if (!myAccountInfo.isInventoryFinished())");
 				googlePlayLayout.setVisibility(View.GONE);
 			}
-			log("Just before show the layout");
+			LogUtil.logDebug("Just before show the layout");
 
 			selectPaymentMethodClicked.setVisibility(View.VISIBLE);
 			semitransparentLayer.setVisibility(View.VISIBLE);
@@ -697,8 +697,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					new Handler().post(new Runnable() {
 						@Override
 						public void run() {
-							log("smeasure: "+pro2Layout.getTop());
-							log("scroll to: "+pro2Layout.getBottom());
+							LogUtil.logDebug("smeasure: " + pro2Layout.getTop());
+							LogUtil.logDebug("scroll to: " + pro2Layout.getBottom());
 							scrollView.smoothScrollTo(0, pro1Layout.getTop());
 
 						}
@@ -726,28 +726,28 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			}
 		}
 		else{
-			log("PaymentBitSet Null");
+			LogUtil.logWarning("PaymentBitSet Null");
 		}
 	}
 
 	private void hideProLite(){
-		log("hideProLite");
+		LogUtil.logDebug("hideProLite");
 		proLiteTransparentLayout.setVisibility(View.VISIBLE);
 
 	}
 
 	private void hideProI(){
-		log("hideProI");
+		LogUtil.logDebug("hideProI");
 		pro1TransparentLayout.setVisibility(View.VISIBLE);
 	}
 
 	private void hideProII(){
-		log("hideProII");
+		LogUtil.logDebug("hideProII");
 		pro2TransparentLayout.setVisibility(View.VISIBLE);
 	}
 
 	private void hideProIII(){
-		log("hideProIII");
+		LogUtil.logDebug("hideProIII");
 		pro3TransparentLayout.setVisibility(View.VISIBLE);
 	}
 
@@ -764,7 +764,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 		} catch (NullPointerException ex) {
-			log("NullPointerException happens when getting the storage string" + ex);
+			LogUtil.logError("NullPointerException happens when getting the storage string", ex);
 		}
 
 		Spanned result = null;
@@ -777,7 +777,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	}
 
 	private String sizeTranslation(long size, int type) {
-		log("sizeTranslation");
+		LogUtil.logDebug("size: " + size + ", type: " + type);
 
 		if (type == TYPE_TERA_BYTE) {
 			size = size / 1024;
@@ -807,12 +807,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		context = activity;
 	}
 	
-	public static void log(String log) {
-		Util.log("UpgradeAccountFragmentLollipop", log);
-	}
-
 	public void showNextPaymentFragment(int paymentM){
-		log("showNextPaymentFragment: paymentM: "+paymentM);
+		LogUtil.logDebug("paymentM: " + paymentM);
 
 		if(selectPaymentMethodLayoutLite.getVisibility()==View.VISIBLE){
 			parameterType=Constants.PRO_LITE;
@@ -830,7 +826,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			parameterType=0;
 		}
 		paymentMethod = paymentM;
-		log("showNextPaymentFragment: parameterType: "+parameterType);
+		LogUtil.logDebug("parameterType: " + parameterType);
 
 		((ManagerActivityLollipop)context).setSelectedAccountType(parameterType);
 		((ManagerActivityLollipop)context).setSelectedPaymentMethod(paymentMethod);
@@ -841,12 +837,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 
 		((ManagerActivityLollipop)context).setDisplayedAccountType(-1);
 		switch (v.getId()){
             case R.id.button_continue:{
-				log("Button button_continue pressed");
+				LogUtil.logDebug("Button button_continue pressed");
 				if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
 					//MONTHLY SUBSCRIPTION
 					switch (parameterType) {
@@ -1022,7 +1018,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
                 break;
             }
 			case R.id.button_cancel:{
-				log("button_cancel");
+				LogUtil.logDebug("button_cancel");
 				semitransparentLayer.setVisibility(View.GONE);
 				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
 				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
@@ -1031,7 +1027,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.semitransparent_layer:{
-				log("semitransparent_layer");
+				LogUtil.logDebug("semitransparent_layer");
 				semitransparentLayer.setVisibility(View.GONE);
 				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
 				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
@@ -1113,7 +1109,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	}
 
 	public void showPaymentMethods(int parameterType){
-		log("showPaymentMethods");
+		LogUtil.logDebug("parameterType: " + parameterType);
 
 		if(myAccountInfo==null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
@@ -1126,7 +1122,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
 		if (accounts == null){
-			log("accounts == null");
+			LogUtil.logWarning("accounts == null");
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 			return;
 		}
@@ -1135,14 +1131,14 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			case Constants.PRO_I:{
 				if (myAccountInfo.getPaymentBitSet() != null){
 					if (!myAccountInfo.isInventoryFinished()){
-						log("if (!myAccountInfo.isInventoryFinished())");
+						LogUtil.logDebug("if (!myAccountInfo.isInventoryFinished())");
 						googlePlayLayout.setVisibility(View.GONE);
 					}
 					else{
 						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							if ((myAccountInfo.getProIMonthly() != null) && (myAccountInfo.getProIYearly() != null)) {
-								log("PROI monthly: " + myAccountInfo.getProIMonthly().getOriginalJson());
-								log("PROI annualy: " + myAccountInfo.getProIYearly().getOriginalJson());
+								LogUtil.logDebug("PROI monthly: " + myAccountInfo.getProIMonthly().getOriginalJson());
+								LogUtil.logDebug("PROI annualy: " + myAccountInfo.getProIYearly().getOriginalJson());
 								googlePlayLayout.setVisibility(View.GONE);
 							}
 							else{
@@ -1168,7 +1164,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 				}
 				else{
-					log("not payment bit set received!!!");
+					LogUtil.logWarning("Not payment bit set received!!!");
 					selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
 					googlePlayLayout.setVisibility(View.GONE);
 					fortumoLayout.setVisibility(View.GONE);
@@ -1181,14 +1177,14 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 				if (myAccountInfo.getPaymentBitSet() != null){
 					if (!myAccountInfo.isInventoryFinished()){
-						log("if (!myAccountInfo.isInventoryFinished())");
+						LogUtil.logDebug("if (!myAccountInfo.isInventoryFinished())");
 						googlePlayLayout.setVisibility(View.GONE);
 					}
 					else{
 						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							if ((myAccountInfo.getProIIMonthly() != null) && (myAccountInfo.getProIIYearly() != null)) {
-								log("PROII monthly: " + myAccountInfo.getProIIMonthly().getOriginalJson());
-								log("PROII annualy: " + myAccountInfo.getProIIYearly().getOriginalJson());
+								LogUtil.logDebug("PROII monthly: " + myAccountInfo.getProIIMonthly().getOriginalJson());
+								LogUtil.logDebug("PROII annualy: " + myAccountInfo.getProIIYearly().getOriginalJson());
 								googlePlayLayout.setVisibility(View.GONE);
 							}
 							else{
@@ -1215,7 +1211,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 				}
 				else{
-					log("not payment bit set received!!!");
+					LogUtil.logWarning("Not payment bit set received!!!");
 				}
 
 				break;
@@ -1224,14 +1220,14 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 				if (myAccountInfo.getPaymentBitSet() != null){
 					if (!myAccountInfo.isInventoryFinished()){
-						log("if (!myAccountInfo.isInventoryFinished())");
+						LogUtil.logDebug("if (!myAccountInfo.isInventoryFinished())");
 						googlePlayLayout.setVisibility(View.GONE);
 					}
 					else{
 						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							if ((myAccountInfo.getProIIIMonthly() != null) && (myAccountInfo.getProIIIYearly() != null)) {
-								log("PROIII monthly: " + myAccountInfo.getProIIIMonthly().getOriginalJson());
-								log("PROIII annualy: " + myAccountInfo.getProIIIYearly().getOriginalJson());
+								LogUtil.logDebug("PROIII monthly: " + myAccountInfo.getProIIIMonthly().getOriginalJson());
+								LogUtil.logDebug("PROIII annualy: " + myAccountInfo.getProIIIYearly().getOriginalJson());
 								googlePlayLayout.setVisibility(View.GONE);
 							}
 							else{
@@ -1264,14 +1260,14 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 				if (myAccountInfo.getPaymentBitSet() != null){
 					if (!myAccountInfo.isInventoryFinished()){
-						log("if (!myAccountInfo.isInventoryFinished())");
+						LogUtil.logDebug("if (!myAccountInfo.isInventoryFinished())");
 						googlePlayLayout.setVisibility(View.GONE);
 					}
 					else {
 						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
 							if ((myAccountInfo.getProLiteMonthly() != null) && (myAccountInfo.getProLiteYearly() != null)) {
-								log("PRO Lite monthly: " + myAccountInfo.getProLiteMonthly().getOriginalJson());
-								log("PRO Lite annualy: " + myAccountInfo.getProLiteYearly().getOriginalJson());
+								LogUtil.logDebug("PRO Lite monthly: " + myAccountInfo.getProLiteMonthly().getOriginalJson());
+								LogUtil.logDebug("PRO Lite annualy: " + myAccountInfo.getProLiteYearly().getOriginalJson());
 								googlePlayLayout.setVisibility(View.GONE);
 							}
 							else{
@@ -1312,10 +1308,10 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 
 	public void setAccountDetails() {
-		log("setAccountDetails");
+		LogUtil.logDebug("setAccountDetails");
 
 		if ((getActivity() == null) || (!isAdded())) {
-			log("Fragment MyAccount NOT Attached!");
+			LogUtil.logWarning("Fragment MyAccount NOT Attached!");
 			return;
 		}
 
@@ -1499,7 +1495,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 
 	public void showmyF(int paymentMethod, int parameterType){
-		log("showmyF (method "+paymentMethod+", type "+parameterType+")");
+		LogUtil.logDebug("paymentMethod " + paymentMethod + ", type " + parameterType);
 
 		String priceMonthlyInteger = "";
 		String priceMonthlyDecimal = "";
@@ -1519,14 +1515,14 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
 		if (accounts == null){
-			log("accounts == null");
+			LogUtil.logWarning("accounts == null");
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 			return;
 		}
 
 		switch(parameterType){
 			case 1:{
-				log("case PRO I");
+				LogUtil.logDebug("case PRO I");
 
 				for (int i=0;i<accounts.size();i++){
 
@@ -1607,7 +1603,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 				switch (paymentMethod){
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						log("Pro I - PAYMENT_METHOD_FORTUMO");
+						LogUtil.logDebug("Pro I - PAYMENT_METHOD_FORTUMO");
 						creditCardLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -1620,7 +1616,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						log("Pro I - PAYMENT_METHOD_CENTILI");
+						LogUtil.logDebug("Pro I - PAYMENT_METHOD_CENTILI");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
@@ -1633,7 +1629,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-						log("Pro I - PAYMENT_METHOD_CREDIT_CARD");
+						LogUtil.logDebug("Pro I - PAYMENT_METHOD_CREDIT_CARD");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -1646,7 +1642,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						log("Pro I - PAYMENT_METHOD_GOOGLE_WALLET");
+						LogUtil.logDebug("Pro I - PAYMENT_METHOD_GOOGLE_WALLET");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -1677,7 +1673,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case 2:{
-				log(" case PRO II");
+				LogUtil.logDebug(" case PRO II");
 
 				for (int i=0;i<accounts.size();i++){
 
@@ -1759,7 +1755,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 				switch (paymentMethod){
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						log("Pro II - PAYMENT_METHOD_FORTUMO");
+						LogUtil.logDebug("Pro II - PAYMENT_METHOD_FORTUMO");
 						creditCardLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -1772,7 +1768,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						log("Pro II - PAYMENT_METHOD_CENTILI");
+						LogUtil.logDebug("Pro II - PAYMENT_METHOD_CENTILI");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
@@ -1785,7 +1781,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-						log("Pro II - PAYMENT_METHOD_CREDIT_CARD");
+						LogUtil.logDebug("Pro II - PAYMENT_METHOD_CREDIT_CARD");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -1798,7 +1794,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						log("Pro II - PAYMENT_METHOD_GOOGLE_WALLET");
+						LogUtil.logDebug("Pro II - PAYMENT_METHOD_GOOGLE_WALLET");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -1829,7 +1825,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case 3:{
-				log("case PRO III");
+				LogUtil.logDebug("case PRO III");
 
 				for (int i=0;i<accounts.size();i++){
 
@@ -1912,7 +1908,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 				switch (paymentMethod){
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						log("Pro III - PAYMENT_METHOD_FORTUMO");
+						LogUtil.logDebug("Pro III - PAYMENT_METHOD_FORTUMO");
 						creditCardLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -1925,7 +1921,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						log("Pro III - PAYMENT_METHOD_CENTILI");
+						LogUtil.logDebug("Pro III - PAYMENT_METHOD_CENTILI");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
@@ -1938,7 +1934,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-						log("Pro III - PAYMENT_METHOD_CREDIT_CARD");
+						LogUtil.logDebug("Pro III - PAYMENT_METHOD_CREDIT_CARD");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -1951,7 +1947,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						log("Pro III - PAYMENT_METHOD_GOOGLE_WALLET");
+						LogUtil.logDebug("Pro III - PAYMENT_METHOD_GOOGLE_WALLET");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -1981,7 +1977,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case 4:{
-				log("case LITE");
+				LogUtil.logDebug("case LITE");
 				for (int i=0;i<accounts.size();i++){
 
 					Product account = accounts.get(i);
@@ -2063,7 +2059,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 				switch (paymentMethod){
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						log("Lite - PAYMENT_METHOD_FORTUMO");
+						LogUtil.logDebug("Lite - PAYMENT_METHOD_FORTUMO");
 						creditCardLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -2077,7 +2073,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						log("Lite - PAYMENT_METHOD_CENTILI");
+						LogUtil.logDebug("Lite - PAYMENT_METHOD_CENTILI");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
@@ -2091,7 +2087,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-						log("Lite - PAYMENT_METHOD_CREDIT_CARD");
+						LogUtil.logDebug("Lite - PAYMENT_METHOD_CREDIT_CARD");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
@@ -2105,7 +2101,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						log("Lite - PAYMENT_METHOD_GOOGLE_WALLET");
+						LogUtil.logDebug("Lite - PAYMENT_METHOD_GOOGLE_WALLET");
 						fortumoLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);

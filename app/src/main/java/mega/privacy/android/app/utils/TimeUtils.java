@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import mega.privacy.android.app.R;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 
 public class TimeUtils implements Comparator<Calendar> {
@@ -208,7 +209,7 @@ public class TimeUtils implements Comparator<Calendar> {
         calYesterday.add(Calendar.DATE, -1);
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         long ts = calGreen.getTimeInMillis();
-        log("Ts last green: "+ts);
+        LogUtil.logDebug("Ts last green: " + ts);
         if(minutesAgo>=65535){
             String formattedDate = context.getString(R.string.last_seen_long_time_ago);
             return formattedDate;
@@ -298,9 +299,5 @@ public class TimeUtils implements Comparator<Calendar> {
                 return formattedDate;
             }
         }
-    }
-
-    private static void log(String message) {
-        Util.log("TimeUtils", message);
     }
 }

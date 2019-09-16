@@ -37,7 +37,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaContactRequestLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
@@ -66,7 +66,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	ArrayList<MegaContactRequest> contacts;
 
 	public void activateActionMode(){
-		log("activateActionMode");
+		LogUtil.logDebug("activateActionMode");
 		if (!adapterList.isMultipleSelect()){
 			adapterList.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -196,8 +196,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
+			LogUtil.logError("Invalidate error", e);
 			e.printStackTrace();
-			log("oninvalidate error");
 		}
 	}
 
@@ -205,7 +205,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		log("hideMultipleSelect");
+		LogUtil.logDebug("hideMultipleSelect");
 		if(adapterList!=null){
 			adapterList.setMultipleSelect(false);
 		}
@@ -231,7 +231,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	}
 
 	public void itemClick(int position) {
-		log("itemClick");
+		LogUtil.logDebug("Position: " + position);
 		if (adapterList.isMultipleSelect()){
 			adapterList.toggleSelection(position);
 			List<MegaContactRequest> users = adapterList.getSelectedRequest();
@@ -240,7 +240,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			}
 		}
 		else{
-			log("not multiple select - show menu");
+			LogUtil.logDebug("Not multiple select - show menu");
 			MegaContactRequest c = contacts.get(position);
 			((ManagerActivityLollipop) context).showReceivedRequestOptionsPanel(c);
 		}
@@ -249,7 +249,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	/////END Multiselect/////
 
 	public static ReceivedRequestsFragmentLollipop newInstance() {
-		log("newInstance");
+		LogUtil.logDebug("newInstance");
 		ReceivedRequestsFragmentLollipop fragment = new ReceivedRequestsFragmentLollipop();
 		return fragment;
 	}
@@ -257,7 +257,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -277,8 +277,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {                
-        log("onCreateView");
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+		LogUtil.logDebug("onCreateView");
 
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
@@ -331,8 +331,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			adapterList.setPositionClicked(-1);
 			listView.setAdapter(adapterList);
 						
-			if (adapterList.getItemCount() == 0){				
-				log("adapterList.getCount() == 0");
+			if (adapterList.getItemCount() == 0){
+				LogUtil.logDebug("adapterList.getCount() == 0");
 
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
@@ -361,7 +361,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 				emptyTextViewFirst.setText(result);
 			}
 			else{
-				log("adapterList.getCount() NOT = 0");
+				LogUtil.logDebug("adapterList.getCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
@@ -376,10 +376,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
     	}		
 
     }
-
-	private static void log(String log) {
-		Util.log("ReceivedRequestsFragmentLollipop", log);
-	}
 
 	public void updateView(){
 		contacts = megaApi.getIncomingContactRequests();
@@ -407,8 +403,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	
 		adapterList.setPositionClicked(-1);
 		
-		if (adapterList.getItemCount() == 0){				
-			log("adapterList.getCount() == 0");
+		if (adapterList.getItemCount() == 0){
+			LogUtil.logDebug("adapterList.getCount() == 0");
 			listView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
@@ -435,7 +431,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			emptyTextViewFirst.setText(result);
 		}
 		else{
-			log("adapterList.getCount() NOT = 0");
+			LogUtil.logDebug("adapterList.getCount() NOT = 0");
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);

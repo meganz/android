@@ -32,6 +32,7 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop.PhotoSyncHolder;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -252,12 +253,12 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 	boolean putOrDeletePosition (int pos) {
 		if (selectedItems.get(pos, false)) {
-			log("toggleSelection delete pos: "+pos);
+			LogUtil.logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 			return true;
 		}
 		else {
-			log("toggleSelection PUT pos: "+pos);
+			LogUtil.logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 			return false;
 		}
@@ -266,12 +267,12 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	void startAnimation (final int pos, final boolean delete) {
 		MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList view = (MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList)listFragment.findViewHolderForLayoutPosition(pos);
 		if (view != null) {
-			log("toggleSelection Start animation: " + pos);
+			LogUtil.logDebug("Start animation: " + pos);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
 				public void onAnimationStart(Animation animation) {
-					log("toggleSelection onAnimationStart");
+					LogUtil.logDebug("onAnimationStart");
 					if (!delete) {
 						notifyItemChanged(pos);
 					}
@@ -279,7 +280,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					log("toggleSelection onAnimationEnd");
+					LogUtil.logDebug("onAnimationEnd");
 					if (selectedItems.size() <= 0) {
 						((CameraUploadFragmentLollipop) fragment).hideMultipleSelect();
 					}
@@ -304,13 +305,13 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	}
 
 	public void toggleAllSelection(int pos) {
-		log("toggleAllSelection: " + pos);
+		LogUtil.logDebug("Position: " + pos);
 
 		startAnimation(pos, putOrDeletePosition(pos));
 	}
 	
 	public void toggleSelection(final int pos) {
-		log("toggleSelection");
+		LogUtil.logDebug("Position: " + pos);
 
 		startAnimation(pos, putOrDeletePosition(pos));
 	}
@@ -334,10 +335,6 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			}
 		}
 	}
-	
-	private static void log(String log) {
-		Util.log("MegaPhotoSyncListAdapter", log);
-	}
 
 	@Override
 	public int getItemCount() {
@@ -346,7 +343,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 	@Override
 	public void onBindViewHolder(ViewHolderPhotoSyncList holder, int position) {
-		log("onBindViewHolder");
+		LogUtil.logDebug("Position: " + position);
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
@@ -454,7 +451,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	}
 	@Override
 	public int getItemViewType(int position) {
-		log("getItemViewType: position"+position);
+		LogUtil.logDebug("Position: " + position);
 		PhotoSyncHolder psh = (PhotoSyncHolder) getItem(position);
 		if (psh.isNode){
 				return ITEM_VIEW_TYPE_NODE;
@@ -478,7 +475,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 	@Override
 	public ViewHolderPhotoSyncList onCreateViewHolder(ViewGroup parent, int viewType) {
-		log("onCreateViewHolder");
+		LogUtil.logDebug("onCreateViewHolder");
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();

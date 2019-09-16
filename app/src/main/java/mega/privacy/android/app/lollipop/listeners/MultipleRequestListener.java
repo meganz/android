@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -13,7 +12,8 @@ import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLolli
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -47,7 +47,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
-        log("Counter on onRequestTemporaryError: "+counter);
+        LogUtil.logWarning("Counter: " + counter);
 //			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
 //			if(node!=null){
 //				log("onRequestTemporaryError: "+node.getName());
@@ -61,7 +61,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
         if(counter>max_items){
             max_items=counter;
         }
-        log("Counter on RequestStart: "+counter);
+        LogUtil.logDebug("Counter: " + counter);
     }
 
     @Override
@@ -72,8 +72,8 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
             error++;
         }
         int requestType = request.getType();
-        log("Counter on RequestFinish: "+counter);
-        log("Error on RequestFinish: "+error);
+        LogUtil.logDebug("Counter: " + counter);
+        LogUtil.logDebug("Error: " + error);
 //			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
 //			if(node!=null){
 //				log("onRequestTemporaryError: "+node.getName());
@@ -82,7 +82,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
             switch (requestType) {
                 case  MegaRequest.TYPE_MOVE:{
                     if (actionListener== Constants.MULTIPLE_SEND_RUBBISH){
-                        log("move to rubbish request finished");
+                        LogUtil.logDebug("Move to rubbish request finished");
                         if(error>0){
                             message = context.getString(R.string.number_correctly_moved_to_rubbish, max_items-error) + context.getString(R.string.number_incorrectly_moved_to_rubbish, error);
                         }
@@ -99,7 +99,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         }
                     }
                     else if (actionListener== Constants.MULTIPLE_RESTORED_FROM_RUBBISH){
-                        log("restore nodes from rubbish request finished");
+                        LogUtil.logDebug("Restore nodes from rubbish request finished");
                         if(error>0){
                             message = context.getString(R.string.number_correctly_restored_from_rubbish, max_items-error) + context.getString(R.string.number_incorrectly_restored_from_rubbish, error);
                         }
@@ -112,7 +112,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         DBUtil.resetAccountDetailsTimeStamp(context);
                     }
                     else{
-                        log("move nodes request finished");
+                        LogUtil.logDebug("Move nodes request finished");
                         if(error>0){
                             message = context.getString(R.string.number_correctly_moved, max_items-error) + context.getString(R.string.number_incorrectly_moved, error);
                         }
@@ -124,9 +124,9 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     break;
                 }
                 case MegaRequest.TYPE_REMOVE:{
-                    log("remove multi request finish");
+                    LogUtil.logDebug("Remove multi request finish");
                     if (actionListener==Constants.MULTIPLE_LEAVE_SHARE){
-                        log("leave multi share");
+                        LogUtil.logDebug("Leave multi share");
                         if(error>0){
                             message = context.getString(R.string.number_correctly_leaved, max_items-error) + context.getString(R.string.number_no_leaved, error);
                         }
@@ -135,7 +135,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         }
                     }
                     else{
-                        log("multi remove");
+                        LogUtil.logDebug("Multi remove");
                         if(error>0){
                             message = context.getString(R.string.number_correctly_removed, max_items-error) + context.getString(R.string.number_no_removed, error);
                         }
@@ -151,7 +151,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     break;
                 }
                 case MegaRequest.TYPE_REMOVE_CONTACT:{
-                    log("multi contact remove request finish");
+                    LogUtil.logDebug("Multi contact remove request finish");
                     if(error>0){
                         message = context.getString(R.string.number_contact_removed, max_items-error) + context.getString(R.string.number_contact_not_removed, error);
                     }
@@ -164,7 +164,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                 }
                 case MegaRequest.TYPE_COPY:{
                     if (actionListener==Constants.MULTIPLE_CONTACTS_SEND_INBOX){
-                        log("send to inbox multiple contacts request finished");
+                        LogUtil.logDebug("Send to inbox multiple contacts request finished");
                         if(error>0){
                             message = context.getString(R.string.number_correctly_sent, max_items-error) + context.getString(R.string.number_no_sent, error);
                         }
@@ -173,7 +173,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         }
                     }
                     else if (actionListener==Constants.MULTIPLE_FILES_SEND_INBOX){
-                        log("send to inbox multiple files request finished");
+                        LogUtil.logDebug("Send to inbox multiple files request finished");
                         if(error>0){
                             message = context.getString(R.string.number_correctly_sent_multifile, max_items-error) + context.getString(R.string.number_no_sent_multifile, error);
                         }
@@ -191,7 +191,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         }
                     }
                     else{
-                        log("copy request finished");
+                        LogUtil.logDebug("Copy request finished");
                         if(error>0){
                             message = context.getString(R.string.number_correctly_copied, max_items-error) + context.getString(R.string.number_no_copied, error);
                         }
@@ -206,11 +206,11 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                 case MegaRequest.TYPE_INVITE_CONTACT:{
 
                     if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
-                        log("remind contact request finished");
+                        LogUtil.logDebug("Remind contact request finished");
                         message = context.getString(R.string.number_correctly_reinvite_contact_request, max_items);
                     }
                     else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE){
-                        log("delete contact request finished");
+                        LogUtil.logDebug("Delete contact request finished");
                         if(error>0){
                             message = context.getString(R.string.number_no_delete_contact_request, max_items-error, error);
                         }
@@ -219,7 +219,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         }
                     }
                     else if (request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD){
-                        log("invite contact request finished");
+                        LogUtil.logDebug("Invite contact request finished");
                         if(error>0){
                             message = context.getString(R.string.number_no_invite_contact_request, max_items-error, error);
                         }
@@ -230,7 +230,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     break;
                 }
                 case MegaRequest.TYPE_REPLY_CONTACT_REQUEST:{
-                    log("multiple reply request sent");
+                    LogUtil.logDebug("Multiple reply request sent");
 
                     if(error>0){
                         message = context.getString(R.string.number_incorrectly_invitation_reply_sent, max_items-error, error);
@@ -241,7 +241,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     break;
                 }
                 case MegaRequest.TYPE_SHARE:{
-                    log("multiple share request finished");
+                    LogUtil.logDebug("Multiple share request finished");
                     if(actionListener==Constants.MULTIPLE_REMOVE_SHARING_CONTACTS){
                         if(error>0){
                             message = context.getString(R.string.context_no_removed_sharing_contacts);
@@ -312,9 +312,5 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                 ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, message);
             }
         }
-    }
-
-    private static void log(String log) {
-        Util.log("MultipleRequestListener", log);
     }
 }

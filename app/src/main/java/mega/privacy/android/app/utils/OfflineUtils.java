@@ -43,7 +43,7 @@ public class OfflineUtils {
     private static final String DB_FOLDER = "1";
 
     public static void saveOffline (File destination, MegaNode node, Context context, Activity activity, MegaApiAndroid megaApi){
-        log("saveOffline");
+        LogUtil.logDebug("saveOffline");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -56,7 +56,7 @@ public class OfflineUtils {
 
         destination.mkdirs();
 
-        log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
+        LogUtil.logDebug("DESTINATION: " + destination.getAbsolutePath());
 
         double availableFreeSpace = Double.MAX_VALUE;
         try{
@@ -67,10 +67,10 @@ public class OfflineUtils {
 
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         if (node.getType() == MegaNode.TYPE_FOLDER) {
-            log("saveOffline:isFolder");
+            LogUtil.logDebug("Is Folder");
             getDlList(dlFiles, node, new File(destination, node.getName()), megaApi);
         } else {
-            log("saveOffline:isFile");
+            LogUtil.logDebug("Is File");
             dlFiles.put(node, destination.getAbsolutePath());
         }
 
@@ -121,20 +121,20 @@ public class OfflineUtils {
             return;
         }
 
-        log("removeOffline - file(type): " + mOffDelete.getName() + "(" + mOffDelete.getType() + ")");
+        LogUtil.logDebug("File(type): " + mOffDelete.getName() + "(" + mOffDelete.getType() + ")");
         ArrayList<MegaOffline> mOffListChildren;
 
         if (mOffDelete.getType().equals(MegaOffline.FOLDER)) {
-            log("Finding children... ");
+            LogUtil.logDebug("Finding children... ");
 
             //Delete children in DB
             mOffListChildren = dbH.findByParentId(mOffDelete.getId());
             if (mOffListChildren.size() > 0) {
-                log("Children: " + mOffListChildren.size());
+                LogUtil.logDebug("Children: " + mOffListChildren.size());
                 deleteChildrenDB(mOffListChildren, dbH);
             }
         } else {
-            log("NOT children... ");
+            LogUtil.logDebug("NOT children... ");
         }
 
         //remove red arrow from current item
@@ -149,7 +149,7 @@ public class OfflineUtils {
         try {
             deleteFolderAndSubfolders(context,offlineFile);
         } catch (Exception e) {
-            log("EXCEPTION: removeOffline - file " + e.toString());
+            LogUtil.logError("EXCEPTION: file", e);
         }
 
     }
@@ -174,7 +174,7 @@ public class OfflineUtils {
 
     public static void deleteChildrenDB(ArrayList<MegaOffline> mOffList, DatabaseHandler dbH){
 
-        log("deleteChildenDB");
+        LogUtil.logDebug("deleteChildenDB");
         MegaOffline mOffDelete=null;
 
         for(int i=0; i< mOffList.size(); i++){
@@ -195,29 +195,29 @@ public class OfflineUtils {
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 
         if(dbH.exists(node.getHandle())) {
-            log("Exists OFFLINE in the DB!!!");
+            LogUtil.logDebug("Exists OFFLINE in the DB!!!");
 
             MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
             if (offlineNode != null) {
                 File offlineFile = getOfflineFile(context, offlineNode);
-                log("YESS FOUND: " + node.getName());
+                LogUtil.logDebug("YES FOUND: " + node.getName());
 
                 if (isFileAvailable(offlineFile)) return true;
             }
 
         }
 
-        log("Not found offLineFile");
+        LogUtil.logDebug("Not found offline file");
         return false;
     }
 
     public static long findIncomingParentHandle(MegaNode nodeToFind, MegaApiAndroid megaApi){
-        log("findIncomingParentHandle");
+        LogUtil.logDebug("findIncomingParentHandle");
 
         MegaNode parentNodeI = megaApi.getParentNode(nodeToFind);
         long result=-1;
         if(parentNodeI==null){
-            log("findIncomingParentHandle A: "+nodeToFind.getHandle());
+            LogUtil.logDebug("A: " + nodeToFind.getHandle());
             return nodeToFind.getHandle();
         }
         else{
@@ -225,7 +225,7 @@ public class OfflineUtils {
             while(result==-1){
                 result=findIncomingParentHandle(parentNodeI, megaApi);
             }
-            log("findIncomingParentHandle B: "+nodeToFind.getHandle());
+            LogUtil.logDebug("B: " + nodeToFind.getHandle());
             return result;
         }
     }
@@ -310,7 +310,7 @@ public class OfflineUtils {
     }
 
     public static String getOfflineSize(Context context) {
-        log("getOfflineSize");
+        LogUtil.logDebug("getOfflineSize");
         File offline = getOfflineFolder(context, OFFLINE_DIR);
         long size;
         if (isFileAvailable(offline)) {
@@ -322,33 +322,33 @@ public class OfflineUtils {
     }
 
     public static void clearOffline(Context context) {
-        log("clearOffline");
+        LogUtil.logDebug("clearOffline");
         File offline = getOfflineFolder(context, OFFLINE_DIR);
         if (isFileAvailable(offline)) {
             try {
                 deleteFolderAndSubfolders(context, offline);
             } catch (IOException e) {
+                LogUtil.logError("Exception deleting offline folder", e);
                 e.printStackTrace();
-                log("Exception deleting offline folder");
             }
         }
     }
 
     public static void saveOffline(Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, MegaNode node, String path) {
-        log("saveOffline destination: " + path);
+        LogUtil.logDebug("Destination: " + path);
 
         File destination = new File(path);
         destination.mkdirs();
 
-        log("saveOffline: " + destination.getAbsolutePath());
-        log("Handle to save for offline : " + node.getHandle());
+        LogUtil.logDebug("Destination absolute path: " + destination.getAbsolutePath());
+        LogUtil.logDebug("Handle to save for offline: " + node.getHandle());
 
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         if (node.getType() == MegaNode.TYPE_FOLDER) {
-            log("saveOffline:isFolder");
+            LogUtil.logDebug("Is Folder");
             getDlList(dlFiles, node, new File(destination, node.getName()), megaApi);
         } else {
-            log("saveOffline:isFile");
+            LogUtil.logDebug("Is File");
             dlFiles.put(node, destination.getAbsolutePath());
         }
 
@@ -366,11 +366,11 @@ public class OfflineUtils {
     }
 
     public static void saveOfflineChatFile(DatabaseHandler dbH, MegaTransfer transfer) {
-        log("saveOfflineChatFile: " + transfer.getNodeHandle() + " " + transfer.getFileName());
+        LogUtil.logDebug("saveOfflineChatFile: " + transfer.getNodeHandle() + " " + transfer.getFileName());
 
         MegaOffline mOffInsert = new MegaOffline(Long.toString(transfer.getNodeHandle()), "/", transfer.getFileName(), -1, DB_FILE, 0, "-1");
         long checkInsert = dbH.setOfflineFile(mOffInsert);
-        log("Test insert Chat File: " + checkInsert);
+        LogUtil.logDebug("Test insert Chat File: " + checkInsert);
 
     }
 
@@ -391,7 +391,7 @@ public class OfflineUtils {
     }
 
     private static void insertDB(Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, ArrayList<MegaNode> nodesToDB, boolean fromInbox) {
-        log("insertDB");
+        LogUtil.logDebug("insertDB");
 
         MegaNode parentNode = null;
         MegaNode nodeToInsert = null;
@@ -412,7 +412,7 @@ public class OfflineUtils {
                 if (megaApi.getParentNode(nodeToInsert).getType() != MegaNode.TYPE_ROOT) {
 
                     parentNode = megaApi.getParentNode(nodeToInsert);
-                    log("PARENT NODE nooot ROOT");
+                    LogUtil.logDebug("PARENT NODE not ROOT");
 
                     path = getNodePath(context, nodeToInsert);
 
@@ -473,13 +473,13 @@ public class OfflineUtils {
 
             MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), parentId, fileOrFolder, origin, handleIncoming);
             long checkInsert = dbH.setOfflineFile(mOffInsert);
-            log("Test insert A: " + checkInsert);
+            LogUtil.logDebug("Test insert A: " + checkInsert);
         }
     }
 
     //Insert for incoming
     private static void insertIncomingParentDB(Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, MegaNode parentNode) {
-        log("insertIncomingParentDB");
+        LogUtil.logDebug("insertIncomingParentDB");
 
         String fileOrFolder = isFileOrFolder(parentNode);
         MegaOffline mOffParentParent = null;
@@ -520,11 +520,11 @@ public class OfflineUtils {
 
         MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), parentId, fileOrFolder, MegaOffline.INCOMING, handleIncoming);
         long checkInsert = dbH.setOfflineFile(mOffInsert);
-        log("Test insert B: " + checkInsert);
+        LogUtil.logDebug("Test insert B: " + checkInsert);
     }
 
     private static void insertParentDB(Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, MegaNode parentNode, boolean fromInbox) {
-        log("insertParentDB");
+        LogUtil.logDebug("insertParentDB");
 
         String fileOrFolder = isFileOrFolder(parentNode);
         int origin = comesFromInbox(fromInbox);
@@ -534,19 +534,19 @@ public class OfflineUtils {
         int parentId = -1;
 
         if (parentparentNode == null) {
-            log("return insertParentDB");
+            LogUtil.logWarning("return insertParentNode == null");
             return;
         }
 
         if (parentparentNode.getType() != MegaNode.TYPE_ROOT && parentparentNode.getHandle() != megaApi.getInboxNode().getHandle()) {
             mOffParentParent = dbH.findByHandle(parentparentNode.getHandle());
             if (mOffParentParent == null) {
-                log("mOffParentParent==null");
+                LogUtil.logWarning("mOffParentParent==null");
                 insertParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode), fromInbox);
                 //Insert the parent node
                 mOffParentParent = dbH.findByHandle(megaApi.getParentNode(parentNode).getHandle());
                 if (mOffParentParent == null) {
-                    log("call again");
+                    LogUtil.logDebug("call again");
                     insertParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode), fromInbox);
                     return;
                 } else {
@@ -559,7 +559,7 @@ public class OfflineUtils {
 
         MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), parentId, fileOrFolder, origin, "-1");
         long checkInsert = dbH.setOfflineFile(mOffInsert);
-        log("Test insert C: " + checkInsert);
+        LogUtil.logDebug("Test insert C: " + checkInsert);
     }
 
     /**
@@ -577,7 +577,7 @@ public class OfflineUtils {
      * @param context
      */
     public static void moveOfflineFiles(Context context) {
-        log("moveOfflineFiles");
+        LogUtil.logDebug("moveOfflineFiles");
 
         String nodePath = File.separator;
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -603,7 +603,7 @@ public class OfflineUtils {
                     || node.getSize() != oldOfflineFile.length()
                     || !node.getName().equals(oldOfflineFile.getName())
                     || !nodePath.equals(offlineNode.getPath())) {
-                log("moveOfflineFiles file not founded or not equal to the saved in database --> Remove");
+                LogUtil.logWarning("File not founded or not equal to the saved in database --> Remove");
                 deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
                 continue;
             }
@@ -611,7 +611,7 @@ public class OfflineUtils {
             File newOfflineFileDir = getOfflineFolder(context, getOfflinePath("", offlineNode));
             File newOfflineFile = getOfflineFile(context, offlineNode);
             if (!isFileAvailable(newOfflineFileDir) || newOfflineFile == null) {
-                log("moveOfflineFiles error creating new directory or creating new file");
+                LogUtil.logWarning("Error creating new directory or creating new file");
                 deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
                 continue;
             }
@@ -620,7 +620,7 @@ public class OfflineUtils {
                 copyFile(oldOfflineFile, newOfflineFile);
             } catch (IOException e) {
                 e.printStackTrace();
-                log("moveOfflineFiles error copying: " + offlineNode.getHandle() + " trace: " + e.getMessage());
+                LogUtil.logWarning("Error copying: " + offlineNode.getHandle(), e);
                 deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
                 continue;
             }
@@ -639,9 +639,5 @@ public class OfflineUtils {
     private static File findOldOfflineFile(MegaOffline offlineNode) {
         String path = getOldTempFolder(MAIN_DIR).getAbsolutePath() + File.separator;
         return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
-    }
-
-    public static void log(String message) {
-        Util.log("OfflineUtils", message);
     }
 }

@@ -16,17 +16,12 @@ import java.io.File;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-
-/**
- * Created by mega on 22/06/18.
- */
 
 public class UtilsModalBottomSheet {
 
@@ -49,7 +44,7 @@ public class UtilsModalBottomSheet {
         else {
             for (int i = 0; i < numOptions; i++) {
                 if (items_layout.getChildAt(i).getVisibility() == View.VISIBLE && peekHeight < heightScreen) {
-                    log("Child i: " + i + " is visible; peekHeight: " + peekHeight + " heightScreen: " + heightScreen + " heightChild: " + heightChild);
+                    LogUtil.logDebug("Child i: " + i + " is visible; peekHeight: " + peekHeight + " heightScreen: " + heightScreen + " heightChild: " + heightChild);
                     peekHeight += heightChild;
                     if (peekHeight >= heightScreen) {
                         if (items_layout.getChildAt(i + 2) != null) {
@@ -87,12 +82,12 @@ public class UtilsModalBottomSheet {
     }
 
     public static void openWith (MegaApiAndroid megaApi, Context context, MegaNode node) {
-        log("openWith");
+        LogUtil.logDebug("openWith");
 
         boolean isError = false;
 
         String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-        log("FILENAME: " + node.getName());
+        LogUtil.logDebug("FILENAME: " + node.getName());
 
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
         mediaIntent.putExtra("HANDLE", node.getHandle());
@@ -125,11 +120,11 @@ public class UtilsModalBottomSheet {
             activityManager.getMemoryInfo(mi);
 
             if(mi.totalMem> Constants.BUFFER_COMP){
-                log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
                 megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
             }
             else{
-                log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
                 megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
             }
 
@@ -154,9 +149,5 @@ public class UtilsModalBottomSheet {
                 Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    private static void log(String log) {
-        Util.log("UtilsModalBottomSheet", log);
     }
 }

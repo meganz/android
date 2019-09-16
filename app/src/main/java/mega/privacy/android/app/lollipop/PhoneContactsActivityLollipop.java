@@ -30,6 +30,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.PhoneContactsLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -79,10 +80,10 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
             	long id = c.getLong(c.getColumnIndex(ContactsContract.Data.CONTACT_ID));
                 String name = c.getString(c.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
 				String emailAddress = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-				log("ID: " + id + "___ NAME: " + name + "____ EMAIL: " + emailAddress);
+				LogUtil.logDebug("ID: " + id + "___ NAME: " + name + "____ EMAIL: " + emailAddress);
 
 				if ((!emailAddress.equalsIgnoreCase("")) && (emailAddress.contains("@")) && (!emailAddress.contains("s.whatsapp.net"))) {
-					log("VALID Contact: "+ name + " ---> "+ emailAddress);
+					LogUtil.logDebug("VALID Contact: "+ name + " ---> "+ emailAddress);
 					PhoneContactInfo contactPhone = new PhoneContactInfo(id, name, emailAddress, null);
 					contactList.add(contactPhone);
 				}
@@ -108,7 +109,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 		}
 
 		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
+			LogUtil.logDebug("Refresh session - sdk");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
 			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -123,7 +124,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 			}
 
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				log("Refresh session - karere");
+				LogUtil.logDebug("Refresh session - karere");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
 				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -232,7 +233,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 	 * Validate email
 	 */
 	private String getEmailError(String value) {
-		log("getEmailError");
+		LogUtil.logDebug("getEmailError");
 		if (value.length() == 0) {
 			return getString(R.string.error_enter_email);
 		}
@@ -248,7 +249,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 	}
 
 	public void itemClick(View view, int position) {
-		log("on item click");
+		LogUtil.logDebug("Position: " + position);
 
 		final PhoneContactInfo contact = (PhoneContactInfo) adapter.getItem(position);
 		if(contact == null)
@@ -278,7 +279,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 	}
 
 	public void inviteContact(String email){
-		log("inviteContact");
+		LogUtil.logDebug("inviteContact");
 		megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, this);
 	}
 
@@ -291,13 +292,13 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 				finish();
 			}
 		});
-		log("Showing alert dialog: " + message);
+		LogUtil.logDebug("Showing alert dialog: " + message);
 		bld.create().show();
 	}
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart");
+		LogUtil.logDebug("onRequestStart");
 	}
 
 	@Override
@@ -307,7 +308,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequest finished: "+request.getEmail());
+		LogUtil.logDebug("onRequest finished: " + request.getEmail());
 		if (e.getErrorCode() == MegaError.API_OK) {
 			showAlert(getString(R.string.context_contact_request_sent, request.getEmail()));
 		}
@@ -319,17 +320,12 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 			else{
 				showAlert(getString(R.string.general_error));
 			}
-			log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+			LogUtil.logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 		}
 	}
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestTemporaryError");
-	}
-
-
-	public static void log(String message) {
-		Util.log("PhoneContactsActivityLollipop", message);
+		LogUtil.logWarning("onRequestTemporaryError");
 	}
 }

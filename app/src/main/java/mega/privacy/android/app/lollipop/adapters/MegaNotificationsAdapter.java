@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -94,7 +95,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 	@Override
 	public ViewHolderNotifications onCreateViewHolder(ViewGroup parent, int viewType) {
-		log("onCreateViewHolder");
+		LogUtil.logDebug("onCreateViewHolder");
 
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_notification_list, parent, false);
 
@@ -124,15 +125,15 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 	@Override
 	public void onBindViewHolder(ViewHolderNotifications holder, int position) {
-		log("onBindViewHolder");
+		LogUtil.logDebug("Position: " + position);
 
 		MegaUserAlert alert = (MegaUserAlert) getItem(position);
 
 		int alertType = alert.getType();
 
 		String section = alert.getHeading();
-		log("****" + alert.getHeading()+ " " +alert.getTypeString() + " " + alert.getTitle() + " "+alert.getString(0));
-		log("****"+ alert.getTypeString() + ": " + alert.getNodeHandle() + " " + alert.getPath());
+		LogUtil.logDebug("****" + alert.getHeading()+ " " +alert.getTypeString() + " " + alert.getTitle() + " "+alert.getString(0));
+		LogUtil.logDebug("****" + alert.getTypeString() + ": " + alert.getNodeHandle() + " " + alert.getPath());
 
 		final LinearLayout.LayoutParams params;
 
@@ -1415,7 +1416,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 			}
 			else{
-				log("Last element of the notifications");
+				LogUtil.logDebug("Last element of the notifications");
 				LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)holder.separator.getLayoutParams();
 				textParams.setMargins(0, 0, 0, 0);
 				holder.separator.setLayoutParams(textParams);
@@ -1441,7 +1442,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
     }
 
 	public Object getItem(int position) {
-		log("getItem");
+		LogUtil.logDebug("Position: " + position);
 		return notifications.get(position);
 	}
 
@@ -1455,7 +1456,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 	}
 
 	public void setPositionClicked(int p) {
-		log("setPositionClicked: "+p);
+		LogUtil.logDebug("Position: " + p);
 		positionClicked = p;
 		notifyDataSetChanged();
 	}
@@ -1463,7 +1464,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 
 		ViewHolderNotifications holder = (ViewHolderNotifications) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
@@ -1472,7 +1473,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 			switch (v.getId()){
 				case R.id.notification_list_item_layout:{
-					log("notification_list_item_layout");
+					LogUtil.logDebug("notification_list_item_layout");
 					if (fragment != null){
 						fragment.itemClick(currentPosition);
 					}
@@ -1480,19 +1481,15 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 			}
 		} catch (IndexOutOfBoundsException e) {
-			log("EXCEPTION: "+e.getMessage());
+			LogUtil.logError("EXCEPTION" ,e);
 		}
 	}
 	
 	public void setNotifications (ArrayList<MegaUserAlert> notifications){
-		log("setNotifications");
+		LogUtil.logDebug("setNotifications");
 		this.notifications = notifications;
 		positionClicked = -1;
 		notifyDataSetChanged();
-	}
-
-	private static void log(String log) {
-		Util.log("MegaNotificationsAdapter", log);
 	}
 
 	public RecyclerView getListFragment() {

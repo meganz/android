@@ -26,6 +26,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -61,19 +62,19 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            LogUtil.logDebug("Bundle is NOT NULL");
             long handle = savedInstanceState.getLong("handle", -1);
-            log("Handle of the node: "+handle);
+            LogUtil.logDebug("Handle of the node: " + handle);
             node = megaApi.getNodeByHandle(handle);
         }
         else{
-            log("Bundle NULL");
+            LogUtil.logWarning("Bundle NULL");
             if(context instanceof VersionsFileActivity){
                 node = ((VersionsFileActivity) context).getSelectedNode();
             }
@@ -86,7 +87,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
     public void setupDialog(final Dialog dialog, int style) {
 
         super.setupDialog(dialog, style);
-        log("setupDialog");
+        LogUtil.logDebug("setupDialog");
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -117,7 +118,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
         nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
         if(node!=null) {
-            log("node is NOT null");
+            LogUtil.logDebug("Node is NOT null");
 
             nodeName.setText(node.getName());
 
@@ -126,7 +127,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
             nodeInfo.setText(fileInfo);
 
             if (node.hasThumbnail()) {
-                log("Node has thumbnail");
+                LogUtil.logDebug("Node has thumbnail");
                 RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
                 params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
                 params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -167,7 +168,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
         }
         else{
-            log("Node NULL");
+            LogUtil.logWarning("Node NULL");
         }
     }
 
@@ -177,9 +178,9 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
         switch(v.getId()){
 
             case R.id.option_download_layout:{
-                log("Download option");
+                LogUtil.logDebug("Download option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    LogUtil.logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
@@ -188,9 +189,9 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
                 break;
             }
             case R.id.option_revert_layout:{
-                log("Revert option");
+                LogUtil.logDebug("Revert option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    LogUtil.logWarning("The selected node is NULL");
                     return;
                 }
                 ((VersionsFileActivity) context).revertVersion();
@@ -198,9 +199,9 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
                 break;
             }
             case R.id.option_delete_layout:{
-                log("Delete option");
+                LogUtil.logDebug("Delete option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    LogUtil.logWarning("The selected node is NULL");
                     return;
                 }
                 ((VersionsFileActivity) context).showConfirmationRemoveVersion();
@@ -223,7 +224,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
     @Override
     public void onAttach(Activity activity) {
-        log("onAttach");
+        LogUtil.logDebug("onAttach");
         super.onAttach(activity);
         this.context = activity;
     }
@@ -237,14 +238,10 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        LogUtil.logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
-        log("Handle of the node: "+handle);
+        LogUtil.logDebug("Handle of the node: " + handle);
         outState.putLong("handle", handle);
-    }
-
-    private static void log(String log) {
-        Util.log("ContactFileListBottomSheetDialogFragment", log);
     }
 }

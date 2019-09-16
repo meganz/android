@@ -19,16 +19,12 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-
-/**
- * Created by mega on 12/01/18.
- */
 
 public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -50,22 +46,21 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log("onCreate");
-
+        LogUtil.logDebug("onCreate");
     }
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        LogUtil.logDebug("onClick");
         switch(v.getId()){
 
             case R.id.qr_code_saveTo_cloud_layout:{
-                log("option save to Cloud Drive");
+                LogUtil.logDebug("Option save to Cloud Drive");
                 saveToCloudDrive();
                 break;
             }
             case R.id.qr_code_saveTo_fileSystem_layout:{
-                log("option save to File System");
+                LogUtil.logDebug("Option save to File System");
                 saveToFileSystem();
                 break;
             }
@@ -143,9 +138,5 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
 
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, getContext(), 48));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-    }
-
-    public static void log(String message) {
-        Util.log("QRCodeSaveBottomSheetDialogFragment", message);
     }
 }

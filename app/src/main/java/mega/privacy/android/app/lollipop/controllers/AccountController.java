@@ -44,6 +44,7 @@ import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.JobUtil;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -67,7 +68,7 @@ public class AccountController implements View.OnClickListener{
     Button recoveryKeyExportedButton;
 
     public AccountController(Context context){
-        log("AccountController created");
+        LogUtil.logDebug("AccountController created");
         this.context = context;
 
         if (megaApi == null){
@@ -94,7 +95,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void deleteAccount(){
-        log("deleteAccount");
+        LogUtil.logDebug("deleteAccount");
         if (((ManagerActivityLollipop) context).is2FAEnabled()){
             ((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.CANCEL_ACCOUNT_2FA);
         }
@@ -104,31 +105,31 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void confirmDeleteAccount(String link, String pass){
-        log("confirmDeleteAccount");
+        LogUtil.logDebug("confirmDeleteAccount");
         megaApi.confirmCancelAccount(link, pass, (ManagerActivityLollipop)context);
     }
 
     public void confirmChangeMail(String link, String pass){
-        log("confirmChangeMail");
+        LogUtil.logDebug("confirmChangeMail");
         megaApi.confirmChangeEmail(link, pass, (ManagerActivityLollipop)context);
     }
 
     public boolean existsAvatar() {
         File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
         if (isFileAvailable(avatar)) {
-            log("avatar exists in: " + avatar.getAbsolutePath());
+            LogUtil.logDebug("Avatar exists in: " + avatar.getAbsolutePath());
             return true;
         }
         return false;
     }
 
     public void removeAvatar() {
-        log("removeAvatar");
+        LogUtil.logDebug("removeAvatar");
         File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
         File qrFile = buildQrFile(context,megaApi.getMyEmail() + "QRcode.jpg");
 
         if (isFileAvailable(avatar)) {
-            log("avatar to delete: " + avatar.getAbsolutePath());
+            LogUtil.logDebug("Avatar to delete: " + avatar.getAbsolutePath());
             avatar.delete();
         }
         if (isFileAvailable(qrFile)) {
@@ -138,7 +139,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void exportMK(String path, boolean fromOffline){
-        log("exportMK");
+        LogUtil.logDebug("exportMK");
         if (!Util.isOnline(context)){
             if (context instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
@@ -163,14 +164,14 @@ public class AccountController implements View.OnClickListener{
         BufferedWriter out;
         try {
             File mainDir = buildExternalStorageFile(MAIN_DIR);
-            log("Path main Dir: " + getExternalStoragePath(MAIN_DIR));
+            LogUtil.logDebug("Path main Dir: " + getExternalStoragePath(MAIN_DIR));
             mainDir.mkdirs();
 
             if (path == null){
                 path = getExternalStoragePath(RK_FILE);
                 pathNull = true;
             }
-            log("Export in: "+path);
+            LogUtil.logDebug("Export in: " + path);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -235,10 +236,10 @@ public class AccountController implements View.OnClickListener{
 
         }catch (FileNotFoundException e) {
             e.printStackTrace();
-            log("ERROR: " + e.getMessage());
+            LogUtil.logError("ERROR", e);
         }catch (IOException e) {
             e.printStackTrace();
-            log("ERROR: " + e.getMessage());
+            LogUtil.logError("ERROR", e);
         }
     }
 
@@ -270,7 +271,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void renameMK(){
-        log("renameMK");
+        LogUtil.logDebug("renameMK");
         File oldMKF = buildExternalStorageFile(OLD_MK_FILE);
         File newMKFile = buildExternalStorageFile(RK_FILE);
 
@@ -278,7 +279,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void copyMK(boolean logout){
-        log("copyMK");
+        LogUtil.logDebug("copyMK");
         String key = megaApi.exportMasterKey();
         if (context instanceof ManagerActivityLollipop) {
             if (key != null) {
@@ -319,7 +320,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void saveRkToFileSystem (boolean fromOffline) {
-        log("saveRkToFileSystem");
+        LogUtil.logDebug("saveRkToFileSystem");
         Intent intent = new Intent(context, FileStorageActivityLollipop.class);
         intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
@@ -340,7 +341,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void copyRkToClipboard () {
-        log("copyRkToClipboard");
+        LogUtil.logDebug("copyRkToClipboard");
         if (context instanceof  ManagerActivityLollipop) {
             copyMK(false);
         }
@@ -358,7 +359,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     public Bitmap createRkBitmap (){
-        log("createRkBitmap");
+        LogUtil.logDebug("createRkBitmap");
 
         Bitmap rKBitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888);
         String key = megaApi.exportMasterKey();
@@ -412,7 +413,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void removeMK() {
-        log("removeMK");
+        LogUtil.logDebug("removeMK");
         final File f = buildExternalStorageFile(RK_FILE);
         if (isFileAvailable(f)) {
             f.delete();
@@ -421,7 +422,7 @@ public class AccountController implements View.OnClickListener{
         //Check if old MK file exists
         final File fOldMK = buildExternalStorageFile(OLD_MK_FILE);
         if(isFileAvailable(fOldMK)){
-            log("The old file of MK was also removed");
+            LogUtil.logDebug("The old file of MK was also removed");
             fOldMK.delete();
         }
 
@@ -435,19 +436,19 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void killAllSessions(Context context){
-        log("killAllSessions");
+        LogUtil.logDebug("killAllSessions");
         megaApi.killSession(-1, (ManagerActivityLollipop) context);
     }
 
     static public void localLogoutApp(Context context){
-        log("localLogoutApp");
+        LogUtil.logDebug("localLogoutApp");
 
         try {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancelAll();
         }
         catch(Exception e){
-            log("EXCEPTION removing all the notifications");
+            LogUtil.logError("EXCEPTION removing all the notifications", e);
             e.printStackTrace();
         }
 
@@ -464,13 +465,13 @@ public class AccountController implements View.OnClickListener{
 
         final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
         if (isFileAvailable(fMKOld)){
-            log("Old MK file removed!");
+            LogUtil.logDebug("Old MK file removed!");
             fMKOld.delete();
         }
 
         final File fMK = buildExternalStorageFile(RK_FILE);
         if (isFileAvailable(fMK)){
-            log("MK file removed!");
+            LogUtil.logDebug("RK file removed!");
             fMK.delete();
         }
 
@@ -484,7 +485,7 @@ public class AccountController implements View.OnClickListener{
         }
         catch(IllegalStateException e){
             //If the application is in a state where the service can not be started (such as not in the foreground in a state when services are allowed) - included in API 26
-            log("Cancelling services not allowed by the OS: "+e.getMessage());
+            LogUtil.logWarning("Cancelling services not allowed by the OS", e);
         }
 
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
@@ -520,13 +521,13 @@ public class AccountController implements View.OnClickListener{
         try {
             deleteFolderAndSubfolders(context, folder);
         } catch (IOException e) {
-            log("Exception deleting" + folder.getName() + "directory");
+            LogUtil.logError("Exception deleting" + folder.getName() + "directory", e);
             e.printStackTrace();
         }
     }
 
     static public void logout(Context context, MegaApiAndroid megaApi) {
-        log("logout");
+        LogUtil.logDebug("logout");
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -554,7 +555,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     static public void logoutConfirmed(Context context){
-        log("logoutConfirmed");
+        LogUtil.logDebug("logoutConfirmed");
 
         localLogoutApp(context);
 
@@ -564,7 +565,7 @@ public class AccountController implements View.OnClickListener{
             PackageInfo p = m.getPackageInfo(s, 0);
             s = p.applicationInfo.dataDir;
         } catch (PackageManager.NameNotFoundException e) {
-            log("Error Package name not found " + e);
+            LogUtil.logDebug("Error Package name not found " + e);
         }
 
         File appDir = new File(s);
@@ -577,24 +578,24 @@ public class AccountController implements View.OnClickListener{
     }
 
     public int updateUserAttributes(String oldFirstName, String newFirstName, String oldLastName, String newLastName, String oldMail, String newMail){
-        log("updateUserAttributes");
+        LogUtil.logDebug("updateUserAttributes");
         MyAccountFragmentLollipop myAccountFragmentLollipop = ((ManagerActivityLollipop)context).getMyAccountFragment();
         if(!oldFirstName.equals(newFirstName)){
-            log("Changes in first name");
+            LogUtil.logDebug("Changes in first name");
             if(myAccountFragmentLollipop!=null){
                 count++;
                 megaApi.setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, newFirstName, (ManagerActivityLollipop)context);
             }
         }
         if(!oldLastName.equals(newLastName)){
-            log("Changes in last name");
+            LogUtil.logDebug("Changes in last name");
             if(myAccountFragmentLollipop!=null){
                 count++;
                 megaApi.setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, newLastName, (ManagerActivityLollipop)context);
             }
         }
         if(!oldMail.equals(newMail)){
-            log("Changes in mail, new mail: "+newMail);
+            LogUtil.logDebug("Changes in mail, new mail: " + newMail);
             if (((ManagerActivityLollipop) context).is2FAEnabled()){
                 ((ManagerActivityLollipop) context).setNewMail(newMail);
                 ((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.CHANGE_MAIL_2FA);
@@ -603,7 +604,7 @@ public class AccountController implements View.OnClickListener{
                 megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);
             }
         }
-        log("The number of attributes to change is: "+count);
+        LogUtil.logDebug("The number of attributes to change is: " + count);
         return count;
     }
 
@@ -613,10 +614,6 @@ public class AccountController implements View.OnClickListener{
 
     static public void setCount(int countUa) {
         count = countUa;
-    }
-
-    public static void log(String message) {
-        Util.log("AccountController", message);
     }
 
     @Override

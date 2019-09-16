@@ -11,7 +11,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
 
@@ -33,7 +33,7 @@ public class FillDBContactsTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        log("doInBackground-Async Task FillDBContactsTask");
+        LogUtil.logDebug("doInBackground-Async Task FillDBContactsTask");
 
         ArrayList<MegaUser> contacts = megaApi.getContacts();
 
@@ -46,9 +46,5 @@ public class FillDBContactsTask extends AsyncTask<String, Void, String> {
             megaApi.getUserAttribute(contacts.get(i), 2, listener);
         }
         return null;
-    }
-
-    public static void log(String message) {
-        Util.log("FillDBContactsTask", message);
     }
 }

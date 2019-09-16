@@ -2,22 +2,15 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.PixelFormat;
-import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.TextureView;
-import android.widget.RelativeLayout;
 
 import java.nio.ByteBuffer;
 
-import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
-
 
 public class GroupCallListener implements MegaChatVideoListenerInterface {
 
@@ -30,7 +23,7 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
     MegaSurfaceRendererGroup localRenderer = null;
 
     public GroupCallListener(Context context, TextureView myTexture, long peerid, long clientid, boolean isLocal) {
-        log("GroupCallListener");
+        LogUtil.logDebug("GroupCallListener");
         this.context = context;
         this.width = 0;
         this.height = 0;
@@ -101,10 +94,5 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
     public int getHeight() {
         return height;
     }
-
-    private static void log(String log) {
-        Util.log("GroupCallListener", log);
-    }
-
 }
 

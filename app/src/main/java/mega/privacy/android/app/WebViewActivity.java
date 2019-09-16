@@ -5,7 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.WebView;
 
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 
 
 public class WebViewActivity extends Activity{
@@ -14,7 +15,7 @@ public class WebViewActivity extends Activity{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		super.onCreate(savedInstanceState);
 
 	   	setContentView(R.layout.activity_fortumo_payment);
@@ -23,13 +24,9 @@ public class WebViewActivity extends Activity{
 		Intent intent = getIntent();
 		if (intent != null) {
 			String url = intent.getDataString();
-			log("URL: " + url);
+			LogUtil.logDebug("URL: " + url);
 			myWebView.getSettings().setJavaScriptEnabled(true);
 			myWebView.loadUrl(url);
 		}
-	}
-
-	public static void log(String message) {
-		Util.log("WebViewActivity", message);
 	}
 }

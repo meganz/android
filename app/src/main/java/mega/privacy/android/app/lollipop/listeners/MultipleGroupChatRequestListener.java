@@ -3,21 +3,16 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiJava;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 
 //Listener for  multiselect
 public class MultipleGroupChatRequestListener implements MegaChatRequestListenerInterface {
@@ -34,17 +29,13 @@ public class MultipleGroupChatRequestListener implements MegaChatRequestListener
     int max_items = 0;
     String message;
 
-    private static void log(String log) {
-        Util.log("MultipleGroupChatRequestListener", log);
-    }
-
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
         counter++;
         if(counter>max_items){
             max_items=counter;
         }
-        log("Counter on RequestStart: "+counter);
+        LogUtil.logDebug("Counter: " + counter);
     }
 
     @Override
@@ -59,8 +50,8 @@ public class MultipleGroupChatRequestListener implements MegaChatRequestListener
             error++;
         }
         int requestType = request.getType();
-        log("Counter on RequestFinish: "+counter);
-        log("Error on RequestFinish: "+error);
+        LogUtil.logDebug("Counter: " + counter);
+        LogUtil.logDebug("Error: " + error);
 //			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
 //			if(node!=null){
 //				log("onRequestTemporaryError: "+node.getName());
@@ -70,7 +61,7 @@ public class MultipleGroupChatRequestListener implements MegaChatRequestListener
 
                 case MegaChatRequest.TYPE_INVITE_TO_CHATROOM:{
 
-                    log("invite to chatRoom request finished");
+                    LogUtil.logDebug("Invite to chatRoom request finished");
                     if(error>0){
                         message = context.getString(R.string.number_no_add_participant_request, max_items-error, error);
                     }
@@ -97,6 +88,6 @@ public class MultipleGroupChatRequestListener implements MegaChatRequestListener
 
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("Counter on onRequestTemporaryError: "+counter);
+        LogUtil.logWarning("Counter: " + counter);
     }
 };

@@ -27,6 +27,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -46,7 +47,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
-        log("ContactSharedFolderFragment: onCreateView");
+        LogUtil.logDebug("ContactSharedFolderFragment: onCreateView");
         handler = new Handler();
         View v = null;
         if (userEmail != null) {
@@ -113,7 +114,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     }
     
     public void showOptionsPanel(MegaNode sNode) {
-        log("showOptionsPanel");
+        LogUtil.logDebug("Node handle: " + sNode.getHandle());
         ((ContactInfoActivityLollipop)context).showOptionsPanel(sNode);
     }
     
@@ -141,7 +142,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     }
     
     public void hideMultipleSelect() {
-        log("hideMultipleSelect");
+        LogUtil.logDebug("hideMultipleSelect");
         adapter.setMultipleSelect(false);
         if (actionMode != null) {
             actionMode.finish();
@@ -178,7 +179,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     public void itemClick(int position,int[] screenPosition,ImageView imageView) {
         
         if (adapter.isMultipleSelect()) {
-            log("multiselect ON");
+            LogUtil.logDebug("Multiselect ON");
             adapter.toggleSelection(position);
             
             List<MegaNode> selectedNodes = adapter.getSelectedNodes();
@@ -240,8 +241,8 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         try {
             actionMode.invalidate();
         } catch (NullPointerException e) {
+            LogUtil.logError("Invalidate error", e);
             e.printStackTrace();
-            log("oninvalidate error");
         }
         // actionMode.
     }
@@ -319,7 +320,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         
         @Override
         public void onDestroyActionMode(ActionMode arg0) {
-            log("onDestroyActionMode");
+            LogUtil.logDebug("onDestroyActionMode");
             clearSelections();
             adapter.setMultipleSelect(false);
             Util.changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 2);
@@ -413,7 +414,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     }
     
     public void activateActionMode(){
-        log("activateActionMode");
+        LogUtil.logDebug("activateActionMode");
         if (!adapter.isMultipleSelect()){
             adapter.setMultipleSelect(true);
             actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());

@@ -30,7 +30,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 public class MegaApiUtils {
 
     public static long getFolderSize(MegaNode parent, Context context) {
-        log("getFolderSize: "+parent.getName());
+        LogUtil.logDebug("getFolderSize: " + parent.getName());
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         long size = 0;
 //        File[] files = dir.listFiles();
@@ -47,7 +47,7 @@ public class MegaApiUtils {
     }
 
     public static String getInfoNodeOnlyFolders(ArrayList<MegaNode> nodes, Context context) {
-        log("getInfoNodeOnlyFolders");
+        LogUtil.logDebug("getInfoNodeOnlyFolders");
         int numFolders = nodes.size();
 
         String info = "";
@@ -62,7 +62,7 @@ public class MegaApiUtils {
     }
 
     public static String getInfoNode(ArrayList<MegaNode> nodes, Context context) {
-        log("getInfoNode");
+        LogUtil.logDebug("getInfoNode");
         int numFolders = 0;
         int numFiles = 0;
 
@@ -104,11 +104,11 @@ public class MegaApiUtils {
     }
 
     public static String getInfoFolder(MegaNode n, Context context) {
-        log("getInfoFolder");
+        LogUtil.logDebug("getInfoFolder");
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         int numFolders = megaApi.getNumChildFolders(n);
         int numFiles = megaApi.getNumChildFiles(n);
-        log("numFolders, numFiles: "+numFolders+ " " + numFiles);
+        LogUtil.logDebug("numFolders, numFiles: " + numFolders + " " + numFiles);
         String info = "";
         if (numFolders > 0) {
             info = numFolders
@@ -138,14 +138,14 @@ public class MegaApiUtils {
     }
 
     public static String getInfoFolder(MegaNode n, Context context, MegaApiAndroid megaApi) {
-        log("getInfoFolder with megaApi");
+        LogUtil.logDebug("getInfoFolder with megaApi");
         if(megaApi==null){
             return "";
         }
 
         int numFolders = megaApi.getNumChildFolders(n);
         int numFiles = megaApi.getNumChildFiles(n);
-        log("numFolders, numFiles: "+numFolders+ " " + numFiles);
+        LogUtil.logDebug("numFolders, numFiles: " + numFolders + " " + numFiles);
         String info = "";
         if (numFolders > 0) {
             info = numFolders
@@ -179,17 +179,17 @@ public class MegaApiUtils {
  * If there is an application that can manage the Intent, returns true. Otherwise, false.
  */
     public static boolean isIntentAvailable(Context ctx, Intent intent) {
-        log("isIntentAvailable");
+        LogUtil.logDebug("isIntentAvailable");
         final PackageManager mgr = ctx.getPackageManager();
         List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
         return list.size() > 0;
     }
 
     public static int calculateDeepBrowserTreeIncoming(MegaNode node, Context context){
-        log("calculateDeepBrowserTreeIncoming");
+        LogUtil.logDebug("calculateDeepBrowserTreeIncoming");
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         String path = megaApi.getNodePath(node);
-        log("The path is: "+path);
+        LogUtil.logDebug("The path is: " + path);
 
         Pattern pattern = Pattern.compile("/");
         int count = Util.countMatches(pattern, path);
@@ -198,7 +198,7 @@ public class MegaApiUtils {
     }
 
     public static String createStringTree (MegaNode node, Context context){
-        log("createStringTree");
+        LogUtil.logDebug("createStringTree");
         MegaApiAndroid megaApi = null;
         if (context instanceof Service){
             megaApi = ((MegaApplication) ((Service)context).getApplication()).getMegaApi();
@@ -207,7 +207,7 @@ public class MegaApiUtils {
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
         if(megaApi==null){
-            log("ERROR megaApi is null");
+            LogUtil.logError("ERROR megaApi is null");
             return null;
         }
 
@@ -258,7 +258,7 @@ public class MegaApiUtils {
             s="";
         }
 
-        log("createStringTree: "+s);
+        LogUtil.logDebug("createStringTree: " + s);
         return s;
     }
 
@@ -359,10 +359,4 @@ public class MegaApiUtils {
 
         return lastContacted;
     }
-
-    private static void log(String message) {
-
-        Util.log("MegaApiUtils", message);
-    }
-
 }

@@ -30,15 +30,12 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-
-/**
- * Created by mega on 20/02/18.
- */
 
 public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdapter.ViewHolderChips> implements View.OnClickListener{
 
@@ -74,7 +71,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
     @Override
     public ShareContactsAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        LogUtil.logDebug("onCreateViewHolder");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -102,7 +99,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
     @Override
     public void onBindViewHolder(ShareContactsAdapter.ViewHolderChips holder, int position) {
-        log("onBindViewHolderList");
+        LogUtil.logDebug("Position: " + position);
 
         ShareContactInfo contact = (ShareContactInfo) getItem(position);
         String[] s;
@@ -168,15 +165,15 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
     @Override
     public void onClick(View view) {
-        log("onClick");
+        LogUtil.logDebug("onClick");
 
         ShareContactsAdapter.ViewHolderChips holder = (ShareContactsAdapter.ViewHolderChips) view.getTag();
         if(holder!=null){
             int currentPosition = holder.getLayoutPosition();
-            log("onClick -> Current position: "+currentPosition);
+            LogUtil.logDebug("Current position: " + currentPosition);
 
             if(currentPosition<0){
-                log("Current position error - not valid value");
+                LogUtil.logError("Current position error - not valid value");
                 return;
             }
             switch (view.getId()) {
@@ -187,7 +184,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
             }
         }
         else{
-            log("Error. Holder is Null");
+            LogUtil.logError("Error. Holder is Null");
         }
     }
 
@@ -202,25 +199,25 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
     }
 
     public void setPositionClicked(int p) {
-        log("setPositionClicked: "+p);
+        LogUtil.logDebug("Position: " + p);
         positionClicked = p;
         notifyDataSetChanged();
     }
 
     public void setContacts (ArrayList<ShareContactInfo> contacts){
-        log("setContacts");
+        LogUtil.logDebug("setContacts");
         this.contacts = contacts;
 
         notifyDataSetChanged();
     }
 
     public Object getItem(int position) {
-        log("getItem");
+        LogUtil.logDebug("Position: " + position);
         return contacts.get(position);
     }
 
     public Bitmap setUserAvatar(ShareContactInfo contact){
-        log("setUserAvatar");
+        LogUtil.logDebug("setUserAvatar");
 
         File avatar = null;
         String mail = null;
@@ -256,7 +253,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
     }
 
     public Bitmap createDefaultAvatar(String mail, ShareContactInfo contact){
-        log("createDefaultAvatar()");
+        LogUtil.logDebug("createDefaultAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -278,11 +275,11 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
             color = megaApi.getUserAvatarColor(contact.getMegaContactAdapter().getMegaUser());
         }
         if(color!=null){
-            log("The color to set the avatar is "+color);
+            LogUtil.logDebug("The color to set the avatar is " + color);
             paintCircle.setColor(Color.parseColor(color));
         }
         else{
-            log("Default color to the avatar");
+            LogUtil.logDebug("Default color to the avatar");
             paintCircle.setColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
         }
         paintCircle.setAntiAlias(true);
@@ -314,7 +311,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         }
         String firstLetter = fullName.charAt(0) + "";
 
-        log("Draw letter: "+firstLetter);
+        LogUtil.logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -323,9 +320,5 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
 
         return defaultAvatar;
-    }
-
-    private static void log(String log) {
-        Util.log("ShareContactsAdapter", log);
     }
 }

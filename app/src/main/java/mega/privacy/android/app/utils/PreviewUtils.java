@@ -12,6 +12,7 @@ import android.view.Display;
 import java.io.File;
 
 import mega.privacy.android.app.PreviewCache;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -114,10 +115,10 @@ public class PreviewUtils {
             //half of the screen size.
             inSampleSize = calculateInSampleSize(bOpts,size.x / 2,size.y / 2);
         }
-        log("inSampleSize: " + inSampleSize);
+		LogUtil.logDebug("inSampleSize: " + inSampleSize);
         bOpts.inJustDecodeBounds = false;
         bOpts.inSampleSize = inSampleSize;
-        log("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
+		LogUtil.logDebug("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
         return BitmapFactory.decodeFile(bmpFile.getAbsolutePath(),bOpts);
     }
 
@@ -161,8 +162,4 @@ public class PreviewUtils {
 
 		return resizeBitmap;
 	}
-	
-	private static void log(String log) {
-		Util.log("PreviewUtils", log);
-	}	
 }

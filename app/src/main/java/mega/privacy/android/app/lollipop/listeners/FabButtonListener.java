@@ -8,7 +8,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
 
 public class FabButtonListener implements FloatingActionButton.OnClickListener{
 
@@ -16,23 +18,23 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
     ManagerActivityLollipop.DrawerItem drawerItem;
 
     public FabButtonListener(Context context){
-        log("FabButtonListener created");
+        LogUtil.logDebug("FabButtonListener created");
         this.context = context;
     }
 
     @Override
     public void onClick(View v) {
-        log("onClick FabButtonListener");
+        LogUtil.logDebug("FabButtonListener");
         switch(v.getId()) {
             case R.id.floating_button: {
-                log("Floating Button click!");
+                LogUtil.logDebug("Floating Button click!");
                 if(context instanceof ManagerActivityLollipop){
                     drawerItem = ((ManagerActivityLollipop)context).getDrawerItem();
                     switch (drawerItem){
                         case CLOUD_DRIVE:
                         case SEARCH:
                         case SHARED_ITEMS:{
-                            log("Cloud Drive SECTION");
+                            LogUtil.logDebug("Cloud Drive SECTION");
                             if(!Util.isOnline(context)){
                                 if(context instanceof ManagerActivityLollipop){
                                     ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
@@ -43,7 +45,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                             break;
                         }
                         case CONTACTS:{
-                            log("Add contacts");
+                            LogUtil.logDebug("Add contacts");
                             if(!Util.isOnline(context)){
                                 if(context instanceof ManagerActivityLollipop){
                                     ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
@@ -54,7 +56,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                             break;
                         }
                         case CHAT:{
-                            log("Create new chat");
+                            LogUtil.logDebug("Create new chat");
                             ((ManagerActivityLollipop)context).chooseAddContactDialog(true);
                             break;
                         }
@@ -75,26 +77,22 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                 break;
             }
             case R.id.main_fab_chat: {
-                log("Main FAB chat click!");
+                LogUtil.logDebug("Main FAB chat click!");
                 ((ManagerActivityLollipop)context).animateFABCollection();
                 break;
             }
             case R.id.first_fab_chat: {
-                log("Create new chat");
+                LogUtil.logDebug("Create new chat");
                 break;
             }
             case R.id.second_fab_chat: {
-                log("Second FAB chat click");
+                LogUtil.logDebug("Second FAB chat click");
                 break;
             }
             case R.id.third_fab_chat: {
-                log("Third FAB chat click");
+                LogUtil.logDebug("Third FAB chat click");
                 break;
             }
         }
-    }
-
-    public static void log(String message) {
-        Util.log("FabButtonListener", message);
     }
 }

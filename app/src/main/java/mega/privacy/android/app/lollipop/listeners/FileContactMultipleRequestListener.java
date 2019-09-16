@@ -3,9 +3,9 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -36,7 +36,7 @@ public class FileContactMultipleRequestListener implements MegaRequestListenerIn
         if (counter > max_items) {
             max_items = counter;
         }
-        log("Counter on RequestStart: " + counter);
+        LogUtil.logDebug("Counter: " + counter);
     }
     
     @Override
@@ -51,10 +51,10 @@ public class FileContactMultipleRequestListener implements MegaRequestListenerIn
             error++;
         }
         int requestType = request.getType();
-        log("Counter on RequestFinish: " + counter + ", Error on RequestFinish: " + error );
+        LogUtil.logDebug("Counter: " + counter + ", Error: " + error );
         if (counter == 0 && requestType == MegaRequest.TYPE_SHARE) {
             if (actionType == Constants.MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER) {
-                log("share request finished");
+                LogUtil.logDebug("Share request finished");
                 if (error > 0) {
                     message = context.getString(R.string.number_correctly_removed_from_shared,max_items - error) + context.getString(R.string.number_incorrectly_removed_from_shared,error);
                 } else {
@@ -77,10 +77,6 @@ public class FileContactMultipleRequestListener implements MegaRequestListenerIn
     
     @Override
     public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
-        log("Counter on onRequestTemporaryError: " + counter);
-    }
-    
-    private static void log(String log) {
-        Util.log("FileContactMultipleRequestListener",log);
+        LogUtil.logWarning("Counter: " + counter);
     }
 }

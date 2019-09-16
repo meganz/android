@@ -31,6 +31,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -85,7 +86,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
@@ -95,11 +96,10 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            LogUtil.logDebug("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong("chatId", -1);
-            log("Handle of the chat: "+chatId);
             messageId = savedInstanceState.getLong("messageId", -1);
-            log("Handle of the message: "+messageId);
+            LogUtil.logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
             handle = savedInstanceState.getLong("handle", -1);
             messageMega = megaChatApi.getMessage(chatId, messageId);
             if(messageMega!=null){
@@ -107,7 +107,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             }
         }
         else{
-            log("Bundle NULL");
+            LogUtil.logWarning("Bundle NULL");
 
             if(context instanceof ChatActivityLollipop){
                 chatId = ((ChatActivityLollipop) context).idChat;
@@ -118,7 +118,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                 messageId = ((NodeAttachmentHistoryActivity) context).selectedMessageId;
             }
 
-            log("Id Chat and Message id: "+chatId+ "___"+messageId);
+            LogUtil.logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
             messageMega = megaChatApi.getMessage(chatId, messageId);
             if(messageMega!=null){
                 message = new AndroidMegaChatMessage(messageMega);
@@ -134,7 +134,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     public void setupDialog(final Dialog dialog, int style) {
 
         super.setupDialog(dialog, style);
-        log("setupDialog");
+        LogUtil.logDebug("setupDialog");
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -166,11 +166,11 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         }
 
         if(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle() && messageMega.isDeletable()){
-            log("Message DELETABLE");
+            LogUtil.logDebug("Message DELETABLE");
             optionRemove.setVisibility(View.VISIBLE);
         }
         else{
-            log("Message NOT DELETABLE");
+            LogUtil.logDebug("Message NOT DELETABLE");
             optionRemove.setVisibility(View.GONE);
         }
 
@@ -192,7 +192,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         nodeIconLayout.setVisibility(View.GONE);
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            log("onCreate: Landscape configuration");
+            LogUtil.logDebug("Landscape configuration");
             nodeName.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
             nodeInfo.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
         }
@@ -204,7 +204,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         nodeList = message.getMessage().getMegaNodeList();
 
         if(nodeList == null || nodeList.size() == 0){
-            log("Error: nodeList is NULL or empty");
+            LogUtil.logWarning("Error: nodeList is NULL or empty");
             return;
         }
 
@@ -216,18 +216,18 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         }
 
         if (node == null) {
-            log("Error: node is NULL");
+            LogUtil.logWarning("Error: node is NULL");
             return;
         }
 
         if(handle == -1){
-            log("Panel shown from ChatActivity");
+            LogUtil.logDebug("Panel shown from ChatActivity");
             if(nodeList.size()==1){
-                log("one file included");
+                LogUtil.logDebug("One file included");
                 showSingleNodeSelected();
             }
             else{
-                log("Several nodes in the message");
+                LogUtil.logDebug("Several nodes in the message");
                 optionView.setVisibility(View.VISIBLE);
 
                 long totalSize = 0;
@@ -236,7 +236,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     MegaNode temp = nodeList.get(i);
                     if(!(megaChatApi.isRevoked(chatId, temp.getHandle()))){
                         count++;
-                        log("Node Name: "+temp.getName());
+                        LogUtil.logDebug("Node Name: " + temp.getName());
                         totalSize = totalSize + temp.getSize();
                     }
                 }
@@ -259,7 +259,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             }
         }
         else{
-            log("Panel shown from NodeAttachmenntActivity - always one file selected");
+            LogUtil.logDebug("Panel shown from NodeAttachmenntActivity - always one file selected");
             showSingleNodeSelected();
         }
 
@@ -291,7 +291,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
     private void showSingleNodeSelected() {
         if (node.hasThumbnail()) {
-            log("Node has thumbnail");
+            LogUtil.logDebug("Node has thumbnail");
             RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
             params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
             params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -311,7 +311,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             }
         }
         else {
-            log("Node has not thumbnail");
+            LogUtil.logDebug("Node has not thumbnail");
             nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
         }
 
@@ -349,9 +349,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     break;
                 }
                 case R.id.option_download_layout:{
-                    log("Download option");
+                    LogUtil.logDebug("Download option");
                     if(node==null){
-                        log("The selected node is NULL");
+                        LogUtil.logWarning("The selected node is NULL");
                         return;
                     }
 
@@ -360,9 +360,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     break;
                 }
                 case R.id.option_import_layout:{
-                    log("Import option");
+                    LogUtil.logDebug("Import option");
                     if(node==null){
-                        log("The selected node is NULL");
+                        LogUtil.logWarning("The selected node is NULL");
                         return;
                     }
 
@@ -371,9 +371,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     break;
                 }
                 case R.id.option_save_offline_layout:{
-                    log("Save for offline option");
+                    LogUtil.logDebug("Save for offline option");
                     if(node==null){
-                        log("The selected node is NULL");
+                        LogUtil.logWarning("The selected node is NULL");
                         return;
                     }
 
@@ -383,15 +383,15 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                         chatC.saveForOfflineWithAndroidMessages(messages, megaChatApi.getChatRoom(chatId));
                     }
                     else{
-                        log("Message is NULL");
+                        LogUtil.logWarning("Message is NULL");
                     }
 
                     break;
                 }
                 case R.id.option_remove_layout:{
-                    log("Remove option ");
+                    LogUtil.logDebug("Remove option ");
                     if(node==null){
-                        log("The selected node is NULL");
+                        LogUtil.logWarning("The selected node is NULL");
                         return;
                     }
 
@@ -399,7 +399,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                         chatC.deleteMessage(message.getMessage(), chatId);
                     }
                     else{
-                        log("Message is NULL");
+                        LogUtil.logWarning("Message is NULL");
                     }
 
                     break;
@@ -413,7 +413,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onAttach(Activity activity) {
-        log("onAttach");
+        LogUtil.logDebug("onAttach");
         super.onAttach(activity);
         this.context = activity;
     }
@@ -426,15 +426,11 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        LogUtil.logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
         outState.putLong("chatId", chatId);
         outState.putLong("messageId", messageId);
         outState.putLong("handle", handle);
-    }
-
-    private static void log(String log) {
-        Util.log("NodeAttachmentBottomSheetDialogFragment", log);
     }
 }

@@ -19,7 +19,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 
 public class TourFragmentLollipop extends Fragment implements View.OnClickListener{
 
@@ -36,11 +36,11 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            log("context is null");
+            LogUtil.logError("Context is null");
             return;
         }
     }
@@ -85,7 +85,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        LogUtil.logDebug("onCreateView");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
@@ -164,11 +164,11 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
         switch(v.getId()){
             case R.id.button_register_tour:
-                log("onRegisterClick");
+                LogUtil.logDebug("onRegisterClick");
                 ((LoginActivityLollipop)context).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT);
                 break;
             case R.id.button_login_tour:
-                log("onLoginClick");
+                LogUtil.logDebug("onLoginClick");
                 ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
                 break;
         }
@@ -176,20 +176,15 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach");
+        LogUtil.logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
     }
 
     @Override
     public void onAttach(Activity context) {
-        log("onAttach Activity");
+        LogUtil.logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
     }
-
-    public static void log(String message) {
-        Util.log("TourFragmentLollipop", message);
-    }
-
 }

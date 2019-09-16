@@ -28,8 +28,8 @@ import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.SDCardUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -110,7 +110,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         switch(v.getId()){
 
             case R.id.upload_from_device_layout:{
-                log("click upload from device");
+                LogUtil.logDebug("Upload from device");
 
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
@@ -129,7 +129,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
                 break;
             }
             case R.id.upload_from_system_layout:{
-                log("click upload from_system");
+                LogUtil.logDebug("Upload from_system");
                 final File[] fs = context.getExternalFilesDirs(null);
                 //has SD card
                 if (fs.length > 1) {
@@ -239,9 +239,5 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-    }
-
-    private static void log(String log) {
-        Util.log("UploadBottomSheetDialogFragment", log);
     }
 }

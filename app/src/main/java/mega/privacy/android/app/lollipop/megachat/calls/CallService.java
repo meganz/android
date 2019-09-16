@@ -29,9 +29,8 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
@@ -59,13 +58,9 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
     private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
 
-    public static void log(String log) {
-        Util.log("CallService", log);
-    }
-
     public void onCreate() {
         super.onCreate();
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
 
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
@@ -81,7 +76,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        log("onStartCommand");
+        LogUtil.logDebug("onStartCommand");
 
         if (intent == null) {
             stopSelf();
@@ -90,7 +85,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         Bundle extras = intent.getExtras();
         if (extras != null) {
             chatId = extras.getLong(Constants.CHAT_ID, -1);
-            log("Chat handle to call: " + chatId);
+            LogUtil.logDebug("Chat handle to call: " + chatId);
         }
 
         if (MegaApplication.getOpenCallChatId() != chatId) {
@@ -105,7 +100,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         if (call.getChatid() == chatId) {
             if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
                 int callStatus = call.getStatus();
-                log("onChatCallUpdate:STATUS: " + callStatus);
+                LogUtil.logDebug("STATUS: " + callStatus);
 
                 switch (callStatus) {
                     case MegaChatCall.CALL_STATUS_REQUEST_SENT:
@@ -130,7 +125,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     }
 
     private void updateNotificationContent(MegaChatCall call) {
-        log("updateNotification");
+        LogUtil.logDebug("updateNotification");
         Notification notif;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (call == null) {
@@ -163,7 +158,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     }
 
     private void showCallInProgressNotification() {
-        log("showCallInProgressNotification");
+        LogUtil.logDebug("showCallInProgressNotification");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
@@ -327,7 +322,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     }
 
     public Bitmap createDefaultAvatar(long userHandle, String fullName) {
-        log("createDefaultAvatar()");
+        LogUtil.logDebug("createDefaultAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -337,10 +332,10 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         if (userHandle != -1) {
             String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
             if (color != null) {
-                log("The color to set the avatar is " + color);
+                LogUtil.logDebug("The color to set the avatar is " + color);
                 paintCircle.setColor(Color.parseColor(color));
             } else {
-                log("Default color to the avatar");
+                LogUtil.logDebug("Default color to the avatar");
                 paintCircle.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
             }
         } else {
@@ -373,7 +368,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
 
                 if (!firstLetter.equals("(")) {
 
-                    log("Draw letter: " + firstLetter);
+                    LogUtil.logDebug("Draw letter: " + firstLetter);
                     Rect bounds = new Rect();
 
                     paintText.getTextBounds(firstLetter, 0, firstLetter.length(), bounds);
@@ -389,7 +384,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
 
     @Override
     public void onDestroy() {
-        log("onDestroy");
+        LogUtil.logDebug("onDestroy");
 
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);

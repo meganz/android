@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
@@ -21,7 +22,7 @@ public class MegaFileInfoSharedContactLollipopAdapter extends MegaSharedFolderLo
     
     @Override
     public void onClick(View v) {
-        log("onClick");
+        LogUtil.logDebug("onClick");
         
         ViewHolderShareList holder = (ViewHolderShareList) v.getTag();
         int currentPosition = holder.currentPosition;
@@ -46,20 +47,20 @@ public class MegaFileInfoSharedContactLollipopAdapter extends MegaSharedFolderLo
     }
     
     public void toggleSelection(int pos) {
-        log("toggleSelection");
+        LogUtil.logDebug("Position: " + pos);
         if (selectedItems.get(pos, false)) {
-            log("delete pos: "+pos);
+            LogUtil.logDebug("Delete pos: " + pos);
             selectedItems.delete(pos);
         }
         else {
-            log("PUT pos: "+pos);
+            LogUtil.logDebug("PUT pos: " + pos);
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
         
         MegaSharedFolderLollipopAdapter.ViewHolderShareList view = (MegaSharedFolderLollipopAdapter.ViewHolderShareList) listFragment.findViewHolderForLayoutPosition(pos);
         if(view!=null){
-            log("Start animation: "+pos);
+            LogUtil.logDebug("Start animation: " + pos);
             Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
             flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
@@ -84,22 +85,22 @@ public class MegaFileInfoSharedContactLollipopAdapter extends MegaSharedFolderLo
     }
     
     public void toggleAllSelection(int pos) {
-        log("toggleSelection: "+pos);
+        LogUtil.logDebug("Position: " + pos);
         final int positionToflip = pos;
         
         if (selectedItems.get(pos, false)) {
-            log("delete pos: "+pos);
+            LogUtil.logDebug("Delete pos: " + pos);
             selectedItems.delete(pos);
         }
         else {
-            log("PUT pos: "+pos);
+            LogUtil.logDebug("PUT pos: " + pos);
             selectedItems.put(pos, true);
         }
-        
-        log("adapter type is LIST");
+
+        LogUtil.logDebug("Adapter type is LIST");
         MegaSharedFolderLollipopAdapter.ViewHolderShareList view = (MegaSharedFolderLollipopAdapter.ViewHolderShareList) listFragment.findViewHolderForLayoutPosition(pos);
         if(view!=null){
-            log("Start animation: "+pos);
+            LogUtil.logDebug("Start animation: " + pos);
             Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
             flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
@@ -123,7 +124,7 @@ public class MegaFileInfoSharedContactLollipopAdapter extends MegaSharedFolderLo
             view.imageView.startAnimation(flipAnimation);
         }
         else{
-            log("NULL view pos: "+positionToflip);
+            LogUtil.logError("NULL view pos: " + positionToflip);
             notifyItemChanged(pos);
         }
     }

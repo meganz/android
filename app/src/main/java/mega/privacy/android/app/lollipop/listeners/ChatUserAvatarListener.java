@@ -10,7 +10,8 @@ import java.io.File;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -31,12 +32,12 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart()");
+        LogUtil.logDebug("onRequestStart()");
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish(): "+e.getErrorCode());
+        LogUtil.logDebug("Error code: " + e.getErrorCode());
 
         if (e.getErrorCode() == MegaError.API_OK){
             Bitmap bitmap;
@@ -53,7 +54,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                     }
                 }
                 else{
-                    log("Adapter cannot be updated - null");
+                    LogUtil.logWarning("Adapter cannot be updated - null");
                 }
             }
             else if (holder instanceof MegaListChatExplorerAdapter.ViewHolderChatExplorerList) {
@@ -68,7 +69,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                     }
                 }
                 else{
-                    log("Adapter cannot be updated - null");
+                    LogUtil.logWarning("Adapter cannot be updated - null");
                 }
             }
             else if (holder instanceof MegaChipChatExplorerAdapter.ViewHolderChips) {
@@ -83,7 +84,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                     }
                 }
                 else{
-                    log("Adapter cannot be updated - null");
+                    LogUtil.logWarning("Adapter cannot be updated - null");
                 }
             }
         }
@@ -91,7 +92,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
-        log("onRequestTemporaryError");
+        LogUtil.logWarning("onRequestTemporaryError");
     }
 
     @Override
@@ -119,9 +120,4 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
         return null;
     }
-
-    private static void log(String log) {
-        Util.log("ChatUserAvatarListener", log);
-    }
-
 }

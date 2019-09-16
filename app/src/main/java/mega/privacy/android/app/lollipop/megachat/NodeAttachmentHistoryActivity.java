@@ -64,6 +64,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -149,7 +150,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		super.onCreate(savedInstanceState);
 		
 		if (megaApi == null){
@@ -162,7 +163,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		}
 
 		if(megaChatApi==null||megaChatApi.getInitState()==MegaChatApi.INIT_ERROR||megaChatApi.getInitState()==MegaChatApi.INIT_NOT_DONE){
-			log("Refresh session - karere");
+			LogUtil.logDebug("Refresh session - karere");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
 			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -173,7 +174,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		chatC = new ChatController(this);
 
-		log("addChatListener");
+		LogUtil.logDebug("addChatListener");
 		megaChatApi.addChatListener(this);
 		megaChatApi.addNodeHistoryListener(chatId,this);
 
@@ -294,7 +295,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						int pos = mLayoutManager.findFirstVisibleItemPosition();
 
 						if(pos<=NUMBER_MESSAGES_BEFORE_LOAD&&getMoreHistory){
-							log("DE->loadAttachments:scrolling down");
+							LogUtil.logDebug("DE->loadAttachments:scrolling down");
 							isLoadingHistory = true;
 							stateHistory = megaChatApi.loadAttachments(chatId, NUMBER_MESSAGES_TO_LOAD);
 							getMoreHistory = false;
@@ -329,7 +330,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 				boolean resultOpen = megaChatApi.openNodeHistory(chatId, this);
 				if(resultOpen){
-					log("Node history opened correctly");
+					LogUtil.logDebug("Node history opened correctly");
 
 					messages = new ArrayList<MegaChatMessage>();
 
@@ -350,18 +351,18 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 					adapter.setMessages(messages);
 
 					isLoadingHistory = true;
-					log("A->loadAttachments");
+					LogUtil.logDebug("A->loadAttachments");
 					stateHistory = megaChatApi.loadAttachments(chatId, NUMBER_MESSAGES_TO_LOAD);
 				}
 			}
 			else{
-				log("ERROR: node is NULL");
+				LogUtil.logError("ERROR: node is NULL");
 			}
 		}
 	}
 	
 	public void showOptionsPanel(MegaChatMessage sMessage, int sPosition){
-		log("showOptionsPanel");
+		LogUtil.logDebug("showOptionsPanel");
 		if(sMessage!=null){
 			this.selectedMessage = sMessage;
 			this.selectedPosition = sPosition;
@@ -372,7 +373,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
     protected void onDestroy(){
-		log("onDestroy");
+		LogUtil.logDebug("onDestroy");
     	super.onDestroy();
 		if (megaChatApi != null) {
 			megaChatApi.removeChatListener(this);
@@ -456,7 +457,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void activateActionMode(){
-		log("activateActionMode");
+		LogUtil.logDebug("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = startSupportActionMode(new NodeAttachmentHistoryActivity.ActionBarCallBack());
@@ -471,7 +472,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 	
 	public void selectAll(){
-		log("selectAll");
+		LogUtil.logDebug("selectAll");
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
@@ -494,13 +495,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		return false;
 	}
 
-	public static void log(String log) {
-		Util.log("NodeAttachmentHistoryActivity", log);
-	}
-
-
 	public void itemClick(int position) {
-		log("itemClick");
+		LogUtil.logDebug("Position: " + position);
 		if(megaChatApi.isSignalActivityRequired()){
 			megaChatApi.signalPresenceActivity();
 		}
@@ -526,18 +522,18 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 						if (MimeTypeList.typeForName(node.getName()).isImage()){
 							if(node.hasPreview()){
-								log("Show full screen viewer");
+								LogUtil.logDebug("Show full screen viewer");
 								showFullScreenViewer(m.getMsgId());
 							}
 							else{
-								log("Image without preview - show node attachment panel for one node");
+								LogUtil.logDebug("Image without preview - show node attachment panel for one node");
 								showNodeAttachmentBottomSheet(m, position);
 							}
 						}
 						else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio() ){
-							log("itemClick:isFile:isVideoReproducibleOrIsAudio");
+							LogUtil.logDebug("isFile:isVideoReproducibleOrIsAudio");
 							String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-							log("itemClick:FILENAME: " + node.getName() + " TYPE: "+mimeType);
+							LogUtil.logDebug("FILE HANDLE: " + node.getHandle() + ", TYPE: "+mimeType);
 
 							Intent mediaIntent;
 							boolean internalIntent;
@@ -551,7 +547,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 								}
 							}
 							else {
-								log("itemClick:setIntentToAudioVideoPlayer");
+								LogUtil.logDebug("setIntentToAudioVideoPlayer");
 								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 								internalIntent=true;
 							}
@@ -570,15 +566,15 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 							if(f.exists() && (f.length() == node.getSize())){
 								isOnMegaDownloads = true;
 							}
-							log("isOnMegaDownloads: "+isOnMegaDownloads);
+							LogUtil.logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
 							if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
 								File mediaFile = new File(localPath);
 								//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-									log("itemClick:FileProviderOption");
+									LogUtil.logDebug("FileProviderOption");
 									Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 									if(mediaFileUri==null){
-										log("itemClick:ERROR:NULLmediaFileUri");
+										LogUtil.logError("ERROR: NULL media file Uri");
 										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 									else{
@@ -588,7 +584,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 								else{
 									Uri mediaFileUri = Uri.fromFile(mediaFile);
 									if(mediaFileUri==null){
-										log("itemClick:ERROR:NULLmediaFileUri");
+										LogUtil.logError("ERROR :NULL media file Uri");
 										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 									else{
@@ -598,13 +594,13 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 								mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							}
 							else {
-								log("itemClick:localPathNULL");
+								LogUtil.logWarning("Local Path NULL");
 								if (Util.isOnline(this)){
 									if (megaApi.httpServerIsRunning() == 0) {
 										megaApi.httpServerStart();
 									}
 									else{
-										log("itemClick:ERROR:httpServerAlreadyRunning");
+										LogUtil.logWarning("ERROR: HTTP server already running");
 									}
 
 									ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -612,11 +608,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 									activityManager.getMemoryInfo(mi);
 
 									if(mi.totalMem>Constants.BUFFER_COMP){
-										log("itemClick:total mem: "+mi.totalMem+" allocate 32 MB");
+										LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
 										megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 									}
 									else{
-										log("itemClick:total mem: "+mi.totalMem+" allocate 16 MB");
+										LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
 										megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 									}
 
@@ -627,12 +623,12 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 											mediaIntent.setDataAndType(parsedUri, mimeType);
 										}
 										else{
-											log("itemClick:ERROR:httpServerGetLocalLink");
+											LogUtil.logError("ERROR: HTTP server get local link");
 											showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 										}
 									}
 									else{
-										log("itemClick:ERROR:httpServerGetLocalLink");
+										LogUtil.logError("ERROR: HTTP server get local link");
 										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 								}
@@ -648,20 +644,20 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 								startActivity(mediaIntent);
 							}
 							else{
-								log("itemClick:externalIntent");
+								LogUtil.logDebug("External Intent");
 								if (MegaApiUtils.isIntentAvailable(this, mediaIntent)){
 									startActivity(mediaIntent);
 								}
 								else{
-									log("itemClick:noAvailableIntent");
+									LogUtil.logWarning("No available Intent");
 									showNodeAttachmentBottomSheet(m, position);
 								}
 							}
 						}
 						else if (MimeTypeList.typeForName(node.getName()).isPdf()){
-							log("itemClick:isFile:isPdf");
+							LogUtil.logDebug("isFile:isPdf");
 							String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-							log("itemClick:FILENAME: " + node.getName() + " TYPE: "+mimeType);
+							LogUtil.logDebug("FILE HANDLE: " + node.getHandle() + ", TYPE: "+mimeType);
 							Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 							pdfIntent.putExtra("inside", true);
 							pdfIntent.putExtra("adapterType", Constants.FROM_CHAT);
@@ -678,14 +674,14 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 							if(f.exists() && (f.length() == node.getSize())){
 								isOnMegaDownloads = true;
 							}
-							log("isOnMegaDownloads: "+isOnMegaDownloads);
+							LogUtil.logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
 							if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
 								File mediaFile = new File(localPath);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-									log("itemClick:FileProviderOption");
+									LogUtil.logDebug("File Provider Option");
 									Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 									if(mediaFileUri==null){
-										log("itemClick:ERROR:NULLmediaFileUri");
+										LogUtil.logError("ERROR: NULL media file Uri");
 										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 									else{
@@ -695,7 +691,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 								else{
 									Uri mediaFileUri = Uri.fromFile(mediaFile);
 									if(mediaFileUri==null){
-										log("itemClick:ERROR:NULLmediaFileUri");
+										LogUtil.logError("ERROR: NULL media file Uri");
 										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 									else{
@@ -705,23 +701,23 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 								pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							}
 							else {
-								log("itemClick:localPathNULL");
+								LogUtil.logWarning("Local Path NULL");
 								if (Util.isOnline(this)){
 									if (megaApi.httpServerIsRunning() == 0) {
 										megaApi.httpServerStart();
 									}
 									else{
-										log("itemClick:ERROR:httpServerAlreadyRunning");
+										LogUtil.logWarning("ERROR: HTTP server already running");
 									}
 									ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
 									ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
 									activityManager.getMemoryInfo(mi);
 									if(mi.totalMem>Constants.BUFFER_COMP){
-										log("itemClick:total mem: "+mi.totalMem+" allocate 32 MB");
+										LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
 										megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 									}
 									else{
-										log("itemClick:total mem: "+mi.totalMem+" allocate 16 MB");
+										LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
 										megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 									}
 									String url = megaApi.httpServerGetLocalLink(node);
@@ -731,12 +727,12 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 											pdfIntent.setDataAndType(parsedUri, mimeType);
 										}
 										else{
-											log("itemClick:ERROR:httpServerGetLocalLink");
+											LogUtil.logError("ERROR: HTTP server get local link");
 											showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 										}
 									}
 									else{
-										log("itemClick:ERROR:httpServerGetLocalLink");
+										LogUtil.logError("ERROR: HTTP server get local link");
 										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 								}
@@ -750,29 +746,29 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 								startActivity(pdfIntent);
 							}
 							else{
-								log("itemClick:noAvailableIntent");
+								LogUtil.logWarning("No svailable Intent");
 								showNodeAttachmentBottomSheet(m, position);
 							}
 							overridePendingTransition(0,0);
 						}
 						else{
-							log("NOT Image, pdf, audio or video - show node attachment panel for one node");
+							LogUtil.logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
 							showNodeAttachmentBottomSheet(m, position);
 						}
 					}
 					else{
-						log("show node attachment panel");
+						LogUtil.logDebug("Show node attachment panel");
 						showNodeAttachmentBottomSheet(m, position);
 					}
 				}
 			}
 		}else{
-			log("DO NOTHING: Position ("+position+") is more than size in messages (size: "+messages.size()+")");
+			LogUtil.logWarning("DO NOTHING: Position ("+position+") is more than size in messages (size: "+messages.size()+")");
 		}
 	}
 
 	public void showFullScreenViewer(long msgId){
-		log("showFullScreenViewer");
+		LogUtil.logDebug("Message ID: " + msgId);
 		int position = 0;
 		boolean positionFound = false;
 		List<Long> ids = new ArrayList<>();
@@ -807,7 +803,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 	
 	private void updateActionModeTitle() {
-		log("updateActionModeTitle");
+		LogUtil.logDebug("updateActionModeTitle");
 		if (actionMode == null) {
 			return;
 		}
@@ -818,7 +814,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			actionMode.invalidate();
 		} catch (Exception e) {
 			e.printStackTrace();
-			log("oninvalidate error");
+			LogUtil.logError("Invalidate error", e);
 		}
 	}
 	
@@ -879,7 +875,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void showConfirmationRemoveVersion(){
-		log("showConfirmationRemoveContact");
+		LogUtil.logDebug("showConfirmationRemoveContact");
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -903,7 +899,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void showConfirmationRemoveVersions(final List<MegaNode> removeNodes){
-		log("showConfirmationRemoveContactRequests");
+		LogUtil.logDebug("showConfirmationRemoveContactRequests");
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -939,7 +935,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		log("onSaveInstanceState");
+		LogUtil.logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 		if(chatRoom!=null){
 			outState.putLong("chatId", chatRoom.getChatId());
@@ -951,7 +947,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 		public void onLongPress(MotionEvent e) {
-			log("onLongPress -- RecyclerViewOnGestureListener");
+			LogUtil.logDebug("onLongPress -- RecyclerViewOnGestureListener");
 
 			View view = listView.findChildViewUnder(e.getX(), e.getY());
 			int position = listView.getChildLayoutPosition(view);
@@ -959,7 +955,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			if (!adapter.isMultipleSelect()){
 
 				if(position<0){
-					log("Position not valid: "+position);
+					LogUtil.logError("Position not valid: " + position);
 				}
 				else{
 					adapter.setMultipleSelect(true);
@@ -978,7 +974,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			log("onActionItemClicked");
+			LogUtil.logDebug("onActionItemClicked");
 			final ArrayList<MegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
 			switch (item.getItemId()) {
@@ -993,7 +989,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 					break;
 				}
 				case R.id.chat_cab_menu_forward: {
-					log("Forward message");
+					LogUtil.logDebug("Forward message");
 					clearSelections();
 					hideMultipleSelect();
 					forwardMessages(messagesSelected);
@@ -1037,7 +1033,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			log("onCreateActionMode");
+			LogUtil.logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.messages_node_history_action, menu);
 
@@ -1050,7 +1046,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
+			LogUtil.logDebug("onDestroyActionMode");
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			checkScroll();
@@ -1059,7 +1055,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			log("onPrepareActionMode");
+			LogUtil.logDebug("onPrepareActionMode");
 			List<MegaChatMessage> selected = adapter.getSelectedMessages();
 			if (selected.size() != 0) {
 //                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
@@ -1085,7 +1081,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 				}
 				else {
 
-					log("Chat with permissions");
+					LogUtil.logDebug("Chat with permissions");
 					if (Util.isOnline(nodeAttachmentHistoryActivity) && !chatC.isInAnonymousMode()) {
 						menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
 					} else {
@@ -1094,7 +1090,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 					if (selected.size() == 1) {
 						if (selected.get(0).getUserHandle() == megaChatApi.getMyUserHandle() && selected.get(0).isDeletable()) {
-							log("one message Message DELETABLE");
+							LogUtil.logDebug("One message - Message DELETABLE");
 							menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
 						} else {
 							menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
@@ -1117,7 +1113,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						}
 
 					} else {
-						log("Many items selected");
+						LogUtil.logDebug("Many items selected");
 						boolean showDelete = true;
 						boolean allNodeAttachments = true;
 
@@ -1178,7 +1174,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void showConfirmationDeleteMessages(final ArrayList<MegaChatMessage> messages, final MegaChatRoom chat){
-		log("showConfirmationDeleteMessages");
+		LogUtil.logDebug("Chat ID: " + chat.getChatId());
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -1215,13 +1211,13 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected){
-		log("forwardMessages");
+		LogUtil.logDebug("forwardMessages");
 		chatC.prepareMessagesToForward(messagesSelected, chatId);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		log("onActivityResult, resultCode: " + resultCode);
+		LogUtil.logDebug("Result Code: " + resultCode);
 		if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if(!Util.isOnline(this) || megaApi==null) {
 				try{
@@ -1251,10 +1247,10 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			showProgressForwarding();
 
 			long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
-			log("Send "+idMessages.length+" messages");
+			LogUtil.logDebug("Send " + idMessages.length + " messages");
 
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			log("Send to "+chatHandles.length+" chats");
+			LogUtil.logDebug("Send to " + chatHandles.length + " chats");
 
 			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
 
@@ -1287,18 +1283,18 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 				}
 				else {
 					int countChat = chatHandles.length;
-					log("Selected: " + countChat + " chats to send");
+					LogUtil.logDebug("Selected: " + countChat + " chats to send");
 
 					MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, chatId);
 					forwardChatProcessor.forward(chatRoom);
 				}
 			}
 			else {
-				log("Error on sending to chat");
+				LogUtil.logError("Error on sending to chat");
 			}
 		}
 		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			log("local folder selected");
+			LogUtil.logDebug("Local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			if (hashes != null) {
@@ -1309,7 +1305,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						megaNodes.add(node);
 					}
 					else {
-						log("Node NULL, not added");
+						LogUtil.logError("Node NULL, not added");
 					}
 				}
 				if (megaNodes.size() > 0) {
@@ -1320,7 +1316,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void showProgressForwarding(){
-		log("showProgressForwarding");
+		LogUtil.logDebug("showProgressForwarding");
 
 		statusDialog = new ProgressDialog(this);
 		statusDialog.setMessage(getString(R.string.general_forwarding));
@@ -1334,7 +1330,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void importNodes(final long toHandle, final long[] importMessagesHandles){
-		log("importNode: "+toHandle+ " -> "+ importMessagesHandles.length);
 		statusDialog = new ProgressDialog(this);
 		statusDialog.setMessage(getString(R.string.general_importing));
 		statusDialog.show();
@@ -1344,7 +1339,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		if(target == null){
 			target = megaApi.getRootNode();
 		}
-		log("TARGET: " + target.getName() + "and handle: " + target.getHandle());
+		LogUtil.logDebug("TARGET HANDLE: " + target.getHandle());
 
 		if(importMessagesHandles.length==1){
 			for (int k = 0; k < importMessagesHandles.length; k++){
@@ -1356,26 +1351,25 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 					for(int i=0;i<nodeList.size();i++){
 						MegaNode document = nodeList.get(i);
 						if (document != null) {
-							log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
+							LogUtil.logDebug("DOCUMENT HANDLE: " + document.getHandle());
 							document = chatC.authorizeNodeIfPreview(document, chatRoom);
 							if (target != null) {
 //                            MegaNode autNode = megaApi.authorizeNode(document);
 
 								megaApi.copyNode(document, target, this);
 							} else {
-								log("TARGET: null");
+								LogUtil.logError("TARGET: null");
 								showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 							}
 						}
 						else{
-							log("DOCUMENT: null");
+							LogUtil.logError("DOCUMENT: null");
 							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 						}
 					}
-
 				}
 				else{
-					log("MESSAGE is null");
+					LogUtil.logError("MESSAGE is null");
 					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
 			}
@@ -1392,22 +1386,22 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 					for(int i=0;i<nodeList.size();i++){
 						MegaNode document = nodeList.get(i);
 						if (document != null) {
-							log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
+							LogUtil.logDebug("DOCUMENT HANDLE: " + document.getHandle());
 							if (target != null) {
 //                            MegaNode autNode = megaApi.authorizeNode(document);
 
 								megaApi.copyNode(document, target, listener);
 							} else {
-								log("TARGET: null");
+								LogUtil.logError("TARGET: null");
 							}
 						}
 						else{
-							log("DOCUMENT: null");
+							LogUtil.logError("DOCUMENT: null");
 						}
 					}
 				}
 				else{
-					log("MESSAGE is null");
+					LogUtil.logError("MESSAGE is null");
 					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
 			}
@@ -1477,23 +1471,23 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
+		LogUtil.logDebug("onRequestFinish");
 		removeProgressDialog();
 
 		if(request.getType() == MegaRequest.TYPE_COPY){
 			if (e.getErrorCode() != MegaError.API_OK) {
 
-				log("e.getErrorCode() != MegaError.API_OK");
+				LogUtil.logDebug("e.getErrorCode() != MegaError.API_OK");
 
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					LogUtil.logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 					startActivity(intent);
 					finish();
 				}
 				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					LogUtil.logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
 					startActivity(intent);
@@ -1517,8 +1511,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public void onAttachmentLoaded(MegaChatApiJava api, MegaChatMessage msg) {
-		log("onAttachmentLoaded");
 		if(msg!=null){
+			LogUtil.logDebug("Message ID" + msg.getMsgId());
 			if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
 				MegaNodeList nodeList = msg.getMegaNodeList();
@@ -1526,28 +1520,27 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 					if (nodeList.size() == 1) {
 						MegaNode node = nodeList.get(0);
-						log("---Node Name: " + node.getName());
+						LogUtil.logDebug("Node Handle: " + node.getHandle());
 						bufferMessages.add(msg);
-						log("onMessageLoaded: Size of buffer: "+bufferMessages.size());
-						log("onMessageLoaded: Size of messages: "+messages.size());
+						LogUtil.logDebug("Size of buffer: " + bufferMessages.size());
+						LogUtil.logDebug("Size of messages: " + messages.size());
 					}
 				}
 			}
 		}
 		else{
-			log("onAttachmentLoaded: msg NULL: end of history");
+			LogUtil.logDebug("Message is NULL: end of history");
 			if((bufferMessages.size()+messages.size())>=NUMBER_MESSAGES_TO_LOAD){
 				fullHistoryReceivedOnLoad();
 				isLoadingHistory = false;
 			}
 			else{
-				log("onAttachmentLoaded:lessNumberReceived");
+				LogUtil.logDebug("Less Number Received");
 				if((stateHistory!=MegaChatApi.SOURCE_NONE)&&(stateHistory!=MegaChatApi.SOURCE_ERROR)){
-					log("But more history exists --> loadAttachments");
-					log("G->loadAttachments");
+					LogUtil.logDebug("But more history exists --> loadAttachments");
 					isLoadingHistory = true;
 					stateHistory = megaChatApi.loadAttachments(chatId, NUMBER_MESSAGES_TO_LOAD);
-					log("New state of history: "+stateHistory);
+					LogUtil.logDebug("New state of history: " + stateHistory);
 					getMoreHistory = false;
 					if(stateHistory==MegaChatApi.SOURCE_NONE || stateHistory==MegaChatApi.SOURCE_ERROR){
 						fullHistoryReceivedOnLoad();
@@ -1555,7 +1548,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 					}
 				}
 				else{
-					log("New state of history: "+stateHistory);
+					LogUtil.logDebug("New state of history: " + stateHistory);
 					fullHistoryReceivedOnLoad();
 					isLoadingHistory = false;
 				}
@@ -1564,10 +1557,10 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void fullHistoryReceivedOnLoad() {
-		log("fullHistoryReceivedOnLoad: "+messages.size());
+		LogUtil.logDebug("Messages size: " + messages.size());
 
 		if(bufferMessages.size()!=0) {
-			log("fullHistoryReceivedOnLoad:buffer size: " + bufferMessages.size());
+			LogUtil.logDebug("Buffer size: " + bufferMessages.size());
 			emptyLayout.setVisibility(View.GONE);
 			listView.setVisibility(View.VISIBLE);
 
@@ -1601,7 +1594,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			bufferMessages.clear();
 		}
 
-		log("fullHistoryReceivedOnLoad:getMoreHistoryTRUE");
+		LogUtil.logDebug("getMoreHistoryTRUE");
 		getMoreHistory = true;
 
         invalidateOptionsMenu();
@@ -1609,32 +1602,30 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public void onAttachmentReceived(MegaChatApiJava api, MegaChatMessage msg) {
-		log("onAttachmentReceived");
-
-		log("STATUS: "+msg.getStatus());
-		log("TEMP ID: "+msg.getTempId());
-		log("FINAL ID: "+msg.getMsgId());
-		log("TIMESTAMP: "+msg.getTimestamp());
-		log("TYPE: "+msg.getType());
+		LogUtil.logDebug("STATUS: " + msg.getStatus());
+		LogUtil.logDebug("TEMP ID: " + msg.getTempId());
+		LogUtil.logDebug("FINAL ID: " + msg.getMsgId());
+		LogUtil.logDebug("TIMESTAMP: " + msg.getTimestamp());
+		LogUtil.logDebug("TYPE: " + msg.getType());
 
 		int lastIndex = 0;
 		if(messages.size()==0){
 			messages.add(msg);
 		}
 		else{
-			log("status of message: "+msg.getStatus());
+			LogUtil.logDebug("Status of message: " + msg.getStatus());
 
 			while(messages.get(lastIndex).getMsgIndex()>msg.getMsgIndex()){
 				lastIndex++;
 			}
 
-			log("Append in position: "+lastIndex);
+			LogUtil.logDebug("Append in position: " + lastIndex);
 			messages.add(lastIndex, msg);
 		}
 
 		//Create adapter
 		if(adapter==null){
-			log("Create adapter");
+			LogUtil.logDebug("Create adapter");
 			adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
@@ -1648,9 +1639,9 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			listView.setAdapter(adapter);
 			adapter.setMessages(messages);
 		}else{
-			log("Update adapter with last index: "+lastIndex);
+			LogUtil.logDebug("Update adapter with last index: " + lastIndex);
 			if(lastIndex<0){
-				log("Arrives the first message of the chat");
+				LogUtil.logDebug("Arrives the first message of the chat");
 				adapter.setMessages(messages);
 			}
 			else{
@@ -1667,7 +1658,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public void onAttachmentDeleted(MegaChatApiJava api, long msgid) {
-		log("onAttachmentDeleted");
+		LogUtil.logDebug("Message ID: " + msgid);
 
 		int indexToChange = -1;
 
@@ -1686,7 +1677,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		if(indexToChange!=-1) {
 			messages.remove(indexToChange);
-			log("Removed index: " + indexToChange + " messages size: " + messages.size());
+			LogUtil.logDebug("Removed index: " + indexToChange + ", Messages size: " + messages.size());
 
 			adapter.removeMessage(indexToChange, messages);
 
@@ -1696,7 +1687,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			}
 		}
 		else{
-			log("Index to remove not found");
+			LogUtil.logWarning("Index to remove not found");
 		}
 
         invalidateOptionsMenu();
@@ -1704,7 +1695,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public void onTruncate(MegaChatApiJava api, long msgid) {
-		log("onTruncate");
+		LogUtil.logDebug("Message ID: " + msgid);
 		invalidateOptionsMenu();
 		messages.clear();
 		adapter.notifyDataSetChanged();
@@ -1713,7 +1704,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void showNodeAttachmentBottomSheet(MegaChatMessage message, int position){
-		log("showNodeAttachmentBottomSheet: "+position);
+		LogUtil.logDebug("Position: " + position);
 		//this.selectedPosition = position;
 		if(message!=null){
 			this.selectedMessageId = message.getMsgId();
@@ -1732,7 +1723,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
     }
 
 	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
-		log("askSizeConfirmationBeforeChatDownload");
+		LogUtil.logDebug("Size: " + size);
 
 		final String parentPathC = parentPath;
 		final ArrayList<MegaNode> nodeListC = nodeList;

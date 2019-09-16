@@ -15,7 +15,8 @@ import android.widget.TextView;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 
 public class SendAttachmentChatBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -29,10 +30,6 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BottomSheetDial
     private LinearLayout optionContactLayout;
     private LinearLayout optionLocationLayout;
     private int heightDisplay;
-
-    private static void log(String log) {
-        Util.log("SendAttachmentChatBottomSheetDialogFragment", log);
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,27 +71,27 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BottomSheetDial
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        LogUtil.logDebug("onClick");
 
         switch (v.getId()) {
 
             case R.id.send_attachment_chat_from_cloud_layout: {
-                log("cloud option click");
+                LogUtil.logDebug("Cloud option click");
                 ((ChatActivityLollipop) context).sendFromCloud();
                 break;
             }
             case R.id.send_attachment_chat_from_filesystem_layout: {
-                log("filesystem option click");
+                LogUtil.logDebug("Filesystem option click");
                 ((ChatActivityLollipop) context).sendFromFileSystem();
                 break;
             }
             case R.id.send_attachment_chat_contact_layout: {
-                log("contact option click");
+                LogUtil.logDebug("Contact option click");
                 ((ChatActivityLollipop) context).sendContact();
                 break;
             }
             case R.id.send_attachment_chat_location_layout: {
-                log("location option click");
+                LogUtil.logDebug("Location option click");
                 ((ChatActivityLollipop) context).sendLocation();
                 break;
             }

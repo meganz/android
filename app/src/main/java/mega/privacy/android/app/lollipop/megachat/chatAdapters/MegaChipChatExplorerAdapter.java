@@ -31,6 +31,7 @@ import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -87,7 +88,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     @Override
     public MegaChipChatExplorerAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        LogUtil.logDebug("onCreateViewHolder");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -115,7 +116,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     @Override
     public void onBindViewHolder(MegaChipChatExplorerAdapter.ViewHolderChips holder, int position) {
-        log("onBindViewHolderList");
+        LogUtil.logDebug("onBindViewHolderList");
 
         ChatExplorerListItem item = getItem(position);
         if (item.getChat() != null && item.getChat().isGroup()) {
@@ -160,15 +161,15 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     @Override
     public void onClick(View view) {
-        log("onClick");
+        LogUtil.logDebug("onClick");
 
         MegaChipChatExplorerAdapter.ViewHolderChips holder = (MegaChipChatExplorerAdapter.ViewHolderChips) view.getTag();
         if(holder!=null){
             int currentPosition = holder.getLayoutPosition();
-            log("onClick -> Current position: "+currentPosition);
+            LogUtil.logDebug("Current position: " + currentPosition);
 
             if(currentPosition<0){
-                log("Current position error - not valid value");
+                LogUtil.logWarning("Current position error - not valid value");
                 return;
             }
             switch (view.getId()) {
@@ -179,7 +180,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             }
         }
         else{
-            log("Error. Holder is Null");
+            LogUtil.logWarning("Error. Holder is Null");
         }
     }
 
@@ -190,13 +191,13 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     }
 
     public void setItems (ArrayList<ChatExplorerListItem> items){
-        log("setContacts");
+        LogUtil.logDebug("setContacts");
         this.items = items;
         notifyDataSetChanged();
     }
 
     public ChatExplorerListItem getItem(int position) {
-        log("getItem");
+        LogUtil.logDebug("position: " + position);
         return items.get(position);
     }
 
@@ -205,7 +206,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     }
 
     public void setUserAvatar(ViewHolderChips holder, ChatExplorerListItem item){
-        log("setUserAvatar");
+        LogUtil.logDebug("setUserAvatar");
 
         if (item.getChat() != null && item.getChat().isGroup()) {
             createGroupChatAvatar(holder, item);
@@ -246,7 +247,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                         avatar.delete();
 
                         if(megaApi==null){
-                            log("setUserAvatar: megaApi is Null in Offline mode");
+                            LogUtil.logWarning("megaApi is Null in Offline mode");
                             return;
                         }
 
@@ -257,7 +258,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                 }else{
 
                     if(megaApi==null){
-                        log("setUserAvatar: megaApi is Null in Offline mode");
+                        LogUtil.logWarning("megaApi is Null in Offline mode");
                         return;
                     }
 
@@ -266,7 +267,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             }else{
 
                 if(megaApi==null){
-                    log("setUserAvatar: megaApi is Null in Offline mode");
+                    LogUtil.logWarning("megaApi is Null in Offline mode");
                     return;
                 }
 
@@ -276,7 +277,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     }
 
     void createGroupChatAvatar(ViewHolderChips holder, ChatExplorerListItem item){
-        log("createGroupChatAvatar()");
+        LogUtil.logDebug("createGroupChatAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -305,7 +306,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
         String firstLetter = item.getTitle().charAt(0) + "";
 
-        log("Draw letter: "+firstLetter);
+        LogUtil.logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -317,7 +318,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     }
 
     public void createDefaultAvatar(ViewHolderChips holder, ChatExplorerListItem item){
-        log("createDefaultAvatar()");
+        LogUtil.logDebug("createDefaultAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -339,11 +340,11 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             color = megaApi.getUserAvatarColor(item.getContact().getMegaUser());
         }
         if(color!=null){
-            log("The color to set the avatar is "+color);
+            LogUtil.logDebug("The color to set the avatar is " + color);
             paintCircle.setColor(Color.parseColor(color));
         }
         else{
-            log("Default color to the avatar");
+            LogUtil.logDebug("Default color to the avatar");
             paintCircle.setColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
         }
         paintCircle.setAntiAlias(true);
@@ -358,7 +359,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
         String firstLetter = item.getTitle().charAt(0) + "";
 
-        log("Draw letter: "+firstLetter);
+        LogUtil.logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -367,9 +368,5 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
 
         holder.avatar.setImageBitmap(defaultAvatar);
-    }
-
-    private static void log(String log) {
-        Util.log("MegaChipChatExplorerAdapter", log);
     }
 }

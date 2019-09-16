@@ -61,6 +61,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -144,7 +145,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	private MegaUser userQuery;
 
 	public void activateActionMode(){
-		log("activateActionMode");
+		LogUtil.logDebug("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -165,7 +166,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
+				LogUtil.logDebug("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
 
 				myEmail = request.getEmail();
 				handleContactLink = request.getNodeHandle();
@@ -187,11 +188,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
 			if (e.getErrorCode() == MegaError.API_OK) {
-				log("Get user avatar OK");
+				LogUtil.logDebug("Get user avatar OK");
 				setAvatar();
 			}
 			else {
-				log("Get user avatal FAIL");
+				LogUtil.logWarning("Get user avatal FAIL");
 				setDefaultAvatar();
 			}
 		}
@@ -304,7 +305,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 				@Override
 				public void onDismiss(DialogInterface dialog) {
-					log("onDismiss");
+					LogUtil.logDebug("onDismiss");
 					inviteShown = false;
 				}
 			});
@@ -320,7 +321,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 		for (int i=0; i<contacts.size(); i++){
 			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-				log("Contact mail[i]="+i+":"+contacts.get(i).getEmail()+" contact mail request: "+myEmail);
+				LogUtil.logDebug("Contact[" + i + "] Handle: " +contacts.get(i).getHandle());
 				if (contacts.get(i).getEmail().equals(myEmail)){
 					isContact = true;
 					return contacts.get(i);
@@ -332,24 +333,24 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	}
 
 	public void setAvatar(){
-		log("updateAvatar");
+		LogUtil.logDebug("updateAvatar");
 		if (!isContact){
 			setDefaultAvatar();
 		}
 		else {
 			File avatar = null;
 			if(context!=null){
-				log("context is not null");
+				LogUtil.logDebug("Context is not null");
                 avatar = buildAvatarFile(context, myEmail + ".jpg");
 			}
 			else{
-				log("context is null!!!");
+				LogUtil.logWarning("context is null!!!");
 				if(getActivity()!=null){
-					log("getActivity is not null");
+					LogUtil.logDebug("getActivity is not null");
                     avatar = buildAvatarFile(getActivity(), myEmail + ".jpg");
 				}
 				else{
-					log("getActivity is ALSOOO null");
+					LogUtil.logWarning("getActivity is ALSO null");
 					return;
 				}
 			}
@@ -364,39 +365,38 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	}
 
 	public void setProfileAvatar(File avatar){
-		log("setProfileAvatar");
+		LogUtil.logDebug("setProfileAvatar");
 
 		Bitmap imBitmap = null;
 		if (avatar.exists()){
-			log("avatar path: "+avatar.getAbsolutePath());
 			if (avatar.length() > 0){
-				log("my avatar exists!");
+				LogUtil.logDebug("My avatar exists!");
 				BitmapFactory.Options bOpts = new BitmapFactory.Options();
 				bOpts.inPurgeable = true;
 				bOpts.inInputShareable = true;
 				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 				if (imBitmap == null) {
 					avatar.delete();
-					log("Call to getUserAvatar");
+					LogUtil.logDebug("Call to getUserAvatar");
 					setDefaultAvatar();
 				}
 				else{
-					log("Show my avatar");
+					LogUtil.logDebug("Show my avatar");
 					avatarImage.setImageBitmap(imBitmap);
 					initialLetterInvite.setVisibility(View.GONE);
 				}
 			}
 		}else{
-			log("my avatar NOT exists!");
-			log("Call to getUserAvatar");
-			log("DO NOT Retry!");
+			LogUtil.logDebug("My avatar NOT exists!");
+			LogUtil.logDebug("Call to getUserAvatar");
+			LogUtil.logDebug("DO NOT Retry!");
 			megaApi.getUserAvatar(myEmail, avatar.getPath(), this);
 //			setDefaultAvatar();
 		}
 	}
 
 	public void setDefaultAvatar(){
-		log("setDefaultAvatar");
+		LogUtil.logDebug("setDefaultAvatar");
 		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
@@ -405,11 +405,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		if (isContact && userQuery != null){
 			String color = megaApi.getUserAvatarColor(userQuery);
 			if(color!=null){
-				log("The color to set the avatar is "+color);
+				LogUtil.logDebug("The color to set the avatar is " + color);
 				p.setColor(Color.parseColor(color));
 			}
 			else{
-				log("Default color to the avatar");
+				LogUtil.logDebug("Default color to the avatar");
 				p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 			}
 		}
@@ -428,7 +428,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 		int avatarTextSize = getAvatarTextSize(density);
-		log("DENSITY: " + density + ":::: " + avatarTextSize);
+		LogUtil.logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
 		String fullName = "";
 		if(contactName.getText() != null){
 			fullName = contactName.getText().toString();
@@ -472,10 +472,10 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	}
 
 	public void invite (long handle){
-		log("invite");
+		LogUtil.logDebug("Handle: " + handle);
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		LayoutInflater inflater = getActivity().getLayoutInflater();
-		log("Handle: "+handle);
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -610,7 +610,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					ArrayList<Long> contactHandles = new ArrayList<>();
 
 					if(users.get(0)==null){
-						log("Selected contact NULL");
+						LogUtil.logWarning("Selected contact NULL");
 						break;
 					}
 					ArrayList<String> contactsNewGroup = new ArrayList<>();
@@ -668,7 +668,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
+			LogUtil.logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
@@ -731,7 +731,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		log("hideMultipleSelect");
+		LogUtil.logDebug("hideMultipleSelect");
 		if(adapter!=null){
 			adapter.setMultipleSelect(false);
 		}
@@ -785,14 +785,14 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			log("oninvalidate error");
+			LogUtil.logError("Invalidate error", e);
 		}
 	}
 		
 	//End Multiselect/////
 
 	public static ContactsFragmentLollipop newInstance() {
-		log("newInstance");
+		LogUtil.logDebug("newInstance");
 		ContactsFragmentLollipop fragment = new ContactsFragmentLollipop();
 		return fragment;
 	}
@@ -800,7 +800,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -812,7 +812,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 		}
 		else{
-			log("Chat not enabled!");
+			LogUtil.logWarning("Chat not enabled!");
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
@@ -852,7 +852,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		log("onCreateView");
+		LogUtil.logDebug("onCreateView");
 
 		if(myAccountInfo == null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
@@ -864,7 +864,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	    density  = getResources().getDisplayMetrics().density;
 
 		if (((ManagerActivityLollipop)context).isList()){
-			log("isList");
+			LogUtil.logDebug("isList View");
 			View v = inflater.inflate(R.layout.fragment_contactslist, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_list_view);
@@ -945,7 +945,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			return v;
 		}
 		else{
-			log("isGrid View");
+			LogUtil.logDebug("isGrid View");
 			View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_grid_view);
@@ -1040,7 +1040,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		visibleContacts.clear();
 
 		for (int i=0;i<contacts.size();i++){
-			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			LogUtil.logDebug("Contact: " + contacts.get(i).getHandle() + "_" + contacts.get(i).getVisibility());
 			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 
 				MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contacts.get(i).getHandle()+""));
@@ -1066,7 +1066,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				for (int i=0;i<visibleContacts.size();i++){
 					int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
 					if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-						log("Request last green for user");
+						LogUtil.logDebug("Request last green for user");
 						megaChatApi.requestLastGreen(visibleContacts.get(i).getMegaUser().getHandle(), null);
 					}
 				}
@@ -1081,10 +1081,10 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
     }
 
     public void itemClick(int position) {
-		log("itemClick");
+		LogUtil.logDebug("Position: " + position);
 
 		if (adapter.isMultipleSelect()){
-			log("multiselect ON");
+			LogUtil.logDebug("multiselect ON");
 			adapter.toggleSelection(position);
 
 			List<MegaUser> users = adapter.getSelectedUsers();
@@ -1100,7 +1100,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
     }
 	
 	public int onBackPressed(){
-		log("onBackPressed");
+		LogUtil.logDebug("onBackPressed");
 
 		if (adapter.isMultipleSelect()){
 			hideMultipleSelect();
@@ -1132,18 +1132,14 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
 	}
-	
-	private static void log(String log) {
-		Util.log("ContactsFragmentLollipop", log);
-	}
 
 	public void updateView () {
-		log("updateView");
+		LogUtil.logDebug("updateView");
 		setContacts(megaApi.getContacts());
 
 		if(adapter == null){
 			if (((ManagerActivityLollipop)context).isList()) {
-				log("isList");
+				LogUtil.logDebug("isList");
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
@@ -1155,7 +1151,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		}
 		
 		if (visibleContacts.size() == 0){
-			log("CONTACTS SIZE == 0");
+			LogUtil.logDebug("CONTACTS SIZE == 0");
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
@@ -1183,7 +1179,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 		}
 		else{
-			log("CONTACTS SIZE != 0 ---> "+visibleContacts.size());
+			LogUtil.logDebug("CONTACTS SIZE != 0 ---> "+visibleContacts.size());
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -1191,12 +1187,12 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	}
 	
 	public void updateShares(){
-		log("updateShares");
+		LogUtil.logDebug("updateShares");
 		adapter.notifyDataSetChanged();
 	}
 
 	public void contactPresenceUpdate(long userHandle, int status) {
-		log("contactPresenceUpdate: "+userHandle);
+		LogUtil.logDebug("User Handle: " + userHandle + ", Status: " + status);
 
 		int indexToReplace = -1;
 		ListIterator<MegaContactAdapter> itrReplace = visibleContacts.listIterator();
@@ -1205,7 +1201,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			if (contact != null) {
 				if (contact.getMegaUser().getHandle() == userHandle) {
 					if(status != MegaChatApi.STATUS_ONLINE && status != MegaChatApi.STATUS_BUSY && status != MegaChatApi.STATUS_INVALID){
-						log("Request last green for user");
+						LogUtil.logDebug("Request last green for user");
 						megaChatApi.requestLastGreen(userHandle, ((ManagerActivityLollipop)context));
 					}
 					else{
@@ -1219,13 +1215,13 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 		}
 		if (indexToReplace != -1) {
-			log("Index to replace: " + indexToReplace);
+			LogUtil.logDebug("Index to replace: " + indexToReplace);
 			adapter.updateContactStatus(indexToReplace);
 		}
 	}
 
 	public void contactLastGreenUpdate(long userHandle, int lastGreen) {
-		log("contactLastGreenUpdate: "+userHandle);
+		LogUtil.logDebug("User Handle: " + userHandle + ", Last green: " + lastGreen);
 
 		int state = megaChatApi.getUserOnlineStatus(userHandle);
 
@@ -1249,16 +1245,16 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 
 			if (indexToReplace != -1) {
-				log("Index to replace: " + indexToReplace);
+				LogUtil.logDebug("Index to replace: " + indexToReplace);
 				adapter.updateContactStatus(indexToReplace);
 			}
 
-			log("Date last green: "+formattedDate);
+			LogUtil.logDebug("Date last green: "+formattedDate);
 		}
 	}
 
 	public void sortBy(){
-		log("sortBy");
+		LogUtil.logDebug("sortBy");
 
 		if(((ManagerActivityLollipop)context).orderContacts == MegaApiJava.ORDER_DEFAULT_DESC){
 			Collections.sort(visibleContacts,  Collections.reverseOrder(new Comparator<MegaContactAdapter>(){

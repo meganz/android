@@ -27,6 +27,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -64,13 +65,13 @@ public class ReceivedRequestBottomSheetDialogFragment extends BottomSheetDialogF
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            LogUtil.logDebug("Bundle is NOT NULL");
             long handle = savedInstanceState.getLong("handle", -1);
-            log("Handle of the request: "+handle);
+            LogUtil.logDebug("Handle of the request: "+handle);
             request = megaApi.getContactRequestByHandle(handle);
         }
         else{
-            log("Bundle NULL");
+            LogUtil.logWarning("Bundle NULL");
             if(context instanceof ManagerActivityLollipop){
                 request = ((ManagerActivityLollipop) context).getSelectedRequest();
             }
@@ -131,7 +132,7 @@ public class ReceivedRequestBottomSheetDialogFragment extends BottomSheetDialogF
 
         }
         else{
-            log("Request NULL");
+            LogUtil.logWarning("Request NULL");
         }
 
     }
@@ -190,27 +191,27 @@ public class ReceivedRequestBottomSheetDialogFragment extends BottomSheetDialogF
         switch(v.getId()){
 
             case R.id.contact_list_option_accept_layout:{
-                log("click Accept");
+                LogUtil.logDebug("Click Accept");
                 if(request==null){
-                    log("Selected request NULL");
+                    LogUtil.logWarning("Selected request NULL");
                     return;
                 }
                 cC.acceptInvitationContact(request);
                 break;
             }
             case R.id.contact_list_option_ignore_layout:{
-                log("optionIgnore");
+                LogUtil.logDebug("Option Ignore");
                 if(request==null){
-                    log("Selected request NULL");
+                    LogUtil.logWarning("Selected request NULL");
                     return;
                 }
                 cC.ignoreInvitationContact(request);
                 break;
             }
             case R.id.contact_list_option_decline_layout:{
-                log("optionDecline");
+                LogUtil.logDebug("Option Decline");
                 if(request==null){
-                    log("Selected request NULL");
+                    LogUtil.logWarning("Selected request NULL");
                     return;
                 }
                 cC.declineInvitationContact(request);
@@ -238,14 +239,10 @@ public class ReceivedRequestBottomSheetDialogFragment extends BottomSheetDialogF
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        LogUtil.logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         long handle = request.getHandle();
-        log("Handle of the request: "+handle);
+        LogUtil.logDebug("Handle of the request: " + handle);
         outState.putLong("handle", handle);
-    }
-
-    private static void log(String log) {
-        Util.log("ReceivedRequestBottomSheetDialogFragment", log);
     }
 }

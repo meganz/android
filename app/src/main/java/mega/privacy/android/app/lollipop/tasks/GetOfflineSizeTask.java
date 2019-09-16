@@ -5,7 +5,8 @@ import android.os.AsyncTask;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 
@@ -21,7 +22,7 @@ public class GetOfflineSizeTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        log("doInBackground-Async Task GetOfflineSizeTask");
+        LogUtil.logDebug("doInBackground-Async Task GetOfflineSizeTask");
 
         String size = getOfflineSize(context);
         return size;
@@ -29,14 +30,10 @@ public class GetOfflineSizeTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String size) {
-        log("GetOfflineSizeTask::onPostExecute");
+        LogUtil.logDebug("GetOfflineSizeTask::onPostExecute");
         SettingsFragmentLollipop sttFLol = ((ManagerActivityLollipop)context).getSettingsFragment();
         if(sttFLol!=null){
             sttFLol.setOfflineSize(size);
         }
-    }
-
-    public static void log(String message) {
-        Util.log("GetOfflineSizeTask", message);
     }
 }

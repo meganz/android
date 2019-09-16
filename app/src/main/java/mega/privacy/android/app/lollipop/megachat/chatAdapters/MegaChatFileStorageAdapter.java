@@ -23,7 +23,8 @@ import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatFileStorageFragment;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 
 public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFileStorageAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener {
 
@@ -45,10 +46,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         this.dimPhotos = dimPhotos;
         dbH = DatabaseHandler.getDbHandler(context);
         this.aB = aB;
-    }
-
-    private static void log(String log) {
-        Util.log("MegaChatFileStorageAdapter", log);
     }
 
     public void toggleSelection(int pos) {
@@ -80,7 +77,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
             ((ChatFileStorageFragment) fragment).addPosition(pos);
 
         }
-        log("adapter type is GRID");
+        LogUtil.logDebug("Adapter type is GRID");
         if (selectedItems.size() <= 0) {
             ((ChatFileStorageFragment) fragment).hideMultipleSelect();
         }
@@ -224,12 +221,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public void onClick(View v) {
-        log("onClick()");
+        LogUtil.logDebug("onClick()");
         ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
         int currentPosition = holder.getAdapterPosition();
-        log("onClick -> Current position: " + currentPosition);
+        LogUtil.logDebug("Current position: " + currentPosition);
         if (currentPosition < 0) {
-            log("Current position error - not valid value");
+            LogUtil.logWarning("Current position error - not valid value");
             return;
         }
         if (!isMultipleSelect()) {
@@ -283,5 +280,4 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
             super(v);
         }
     }
-
 }

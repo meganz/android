@@ -33,10 +33,10 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatFileStorageAdapter;
 import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
 
 public class ChatFileStorageFragment extends BottomSheetDialogFragment{
@@ -84,7 +84,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         downloadLocationDefaultPath = getDownloadLocation(context);
 
         super.onCreate(savedInstanceState);
-        log("after onCreate called super");
+        LogUtil.logDebug("After onCreate called super");
     }
 
     @Override
@@ -94,7 +94,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             return null;
         }
 
-        log("fragment ADDED");
+        LogUtil.logDebug("Fragment ADDED");
 
         if (aB == null){
             aB = ((AppCompatActivity)context).getSupportActionBar();
@@ -199,7 +199,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void updateIconSend(boolean isVisible) {
-        log("updateIconSend() - " + isVisible);
+        LogUtil.logDebug("isVisible: " + isVisible);
         if (isVisible) {
             sendIcon.setVisibility(View.VISIBLE);
         } else {
@@ -208,14 +208,10 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void itemClick(int position) {
-        log("itemClick()");
+        LogUtil.logDebug("Position: " + position);
         if (adapter.isMultipleSelect()){
             adapter.toggleSelection(position);
         }
-    }
-
-    private static void log(String log) {
-        Util.log("ChatFileStorageFragment", log);
     }
 
     public RecyclerView getRecyclerView(){
@@ -255,7 +251,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void hideMultipleSelect() {
-        log("hideMultipleSelect");
+        LogUtil.logDebug("hideMultipleSelect");
         adapter.setMultipleSelect(false);
 
     }

@@ -10,6 +10,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
@@ -80,7 +81,7 @@ public class MyAccountInfo {
     public final int hasSessionsDetails = 0x020;
 
     public MyAccountInfo(Context context){
-        log("MyAccountInfo created");
+        LogUtil.logDebug("MyAccountInfo created");
 
         this.context = context;
 
@@ -94,10 +95,10 @@ public class MyAccountInfo {
     }
 
     public void setAccountDetails(int numDetails){
-        log("setAccountDetails");
+        LogUtil.logDebug("numDetails: " + numDetails);
 
         if(accountInfo==null){
-            log("Error because account info is NUll in setAccountDetails");
+            LogUtil.logError("Error because account info is NUll in setAccountDetails");
             return;
         }
 
@@ -199,7 +200,7 @@ public class MyAccountInfo {
 
         accountDetailsFinished = true;
 
-        log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; INVENTORYFINISHED: " + inventoryFinished);
+        LogUtil.logDebug("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; INVENTORYFINISHED: " + inventoryFinished);
     }
 
     public MegaAccountDetails getAccountInfo() {
@@ -209,10 +210,10 @@ public class MyAccountInfo {
     public void setAccountInfo(MegaAccountDetails accountInfo) {
 
         this.accountInfo = accountInfo;
-        log("***Renews ts: "+accountInfo.getSubscriptionRenewTime());
-        log("***Renews on: "+Util.getDateString(accountInfo.getSubscriptionRenewTime()));
-        log("***Expires ts:"+accountInfo.getProExpiration());
-        log("***Expires on: "+Util.getDateString(accountInfo.getProExpiration()));
+        LogUtil.logDebug("Renews ts: " + accountInfo.getSubscriptionRenewTime());
+        LogUtil.logDebug("Renews on: " + Util.getDateString(accountInfo.getSubscriptionRenewTime()));
+        LogUtil.logDebug("Expires ts: " + accountInfo.getProExpiration());
+        LogUtil.logDebug("Expires on: " + Util.getDateString(accountInfo.getProExpiration()));
     }
 
     public int getAccountType() {
@@ -325,16 +326,12 @@ public class MyAccountInfo {
     }
 
     public void setLastSessionFormattedDate(String lastSessionFormattedDate) {
-        log("setLastSessionFormattedDate: "+lastSessionFormattedDate);
+        LogUtil.logDebug("lastSessionFormattedDate: " + lastSessionFormattedDate);
         this.lastSessionFormattedDate = lastSessionFormattedDate;
     }
 
-    public static void log(String message) {
-        Util.log("MyAccountInfo", message);
-    }
-
     public void setFullName(){
-        log("setFullName");
+        LogUtil.logDebug("setFullName");
         if (firstNameText.trim().length() <= 0){
             fullName = lastNameText;
         }
@@ -343,7 +340,7 @@ public class MyAccountInfo {
         }
 
         if (fullName.trim().length() <= 0) {
-            log("Put email as fullname");
+            LogUtil.logDebug("Put email as fullname");
             String email = "";
             MegaUser user = megaApi.getMyUser();
             if (user != null) {
@@ -355,7 +352,7 @@ public class MyAccountInfo {
 
         if (fullName.trim().length() <= 0){
             fullName = context.getString(R.string.name_text)+" "+context.getString(R.string.lastname_text);
-            log("Full name set by default: "+fullName);
+            LogUtil.logDebug("Full name set by default: " + fullName);
         }
 
         firstLetter = fullName.charAt(0) + "";
@@ -363,7 +360,7 @@ public class MyAccountInfo {
     }
 
     public void setProductAccounts(MegaPricing p){
-        log("setProductAccounts");
+        LogUtil.logDebug("setProductAccounts");
 
         if(productAccounts==null){
             productAccounts = new ArrayList<Product>();
@@ -373,7 +370,7 @@ public class MyAccountInfo {
         }
 
         for (int i = 0; i < p.getNumProducts(); i++) {
-            log("p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
+            LogUtil.logDebug("p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
 
             Product account = new Product(p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
 
@@ -560,7 +557,7 @@ public class MyAccountInfo {
     }
 
     public void setCreateSessionTimeStamp(long createSessionTimeStamp) {
-        log("setCreateSessionTimeStamp: " + createSessionTimeStamp);
+        LogUtil.logDebug("createSessionTimeStamp: " + createSessionTimeStamp);
         this.createSessionTimeStamp = createSessionTimeStamp;
     }
 

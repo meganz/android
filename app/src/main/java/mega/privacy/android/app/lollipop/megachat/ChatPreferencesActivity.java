@@ -19,7 +19,7 @@ import android.widget.FrameLayout;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 
 public class ChatPreferencesActivity extends PinActivityLollipop {
 
@@ -30,7 +30,7 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
 
@@ -47,14 +47,14 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
 
         tB = (Toolbar) findViewById(R.id.toolbar_chat_settings);
         if(tB==null){
-            log("Tb is Null");
+            LogUtil.logError("Tb is Null");
             return;
         }
 
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        log("aB.setHomeAsUpIndicator_1");
+        LogUtil.logDebug("aB.setHomeAsUpIndicator");
         aB.setTitle(getString(R.string.section_chat));
         aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
@@ -67,22 +67,22 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
     }
 
     public void changeSound(String soundString){
-        log("Change sound");
+        LogUtil.logDebug("Sound string: " + soundString);
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.notification_sound_title));
 
         if (soundString == null){
-            log("NULL sound");
+            LogUtil.logWarning("NULL sound");
             Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
         }
         else if(soundString.equals("-1")){
-            log("Notification sound -1");
+            LogUtil.logWarning("Notification sound -1");
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
         }
         else if(soundString.isEmpty()){
-            log("Empty sound");
+            LogUtil.logWarning("Empty sound");
             Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
         }
@@ -97,11 +97,11 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
-        log("onActivityResult, resultCode: " + resultCode);
+        LogUtil.logDebug("Result code: " + resultCode);
 
         if (resultCode == RESULT_OK && requestCode == Constants.SELECT_NOTIFICATION_SOUND)
         {
-            log("Selected notification sound OK");
+            LogUtil.logDebug("Selected notification sound OK");
 
             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
 
@@ -116,7 +116,7 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        log("onOptionsItemSelectedLollipop");
+        LogUtil.logDebug("onOptionsItemSelectedLollipop");
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {
@@ -125,9 +125,4 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
         }
         return true;
     }
-
-    public static void log(String log) {
-        Util.log("ChatPreferencesActivity", log);
-    }
-
 }

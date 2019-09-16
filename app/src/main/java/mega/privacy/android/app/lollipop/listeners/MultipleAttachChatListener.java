@@ -10,7 +10,8 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -36,13 +37,9 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
         this.sendMultipleFiles = sendMultipleFiles;
     }
 
-    private static void log(String log) {
-        Util.log("MultipleAttachChatListener", log);
-    }
-
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-        log("onRequestStart");
+        LogUtil.logDebug("onRequestStart");
     }
 
     @Override
@@ -55,11 +52,11 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
         counter--;
         if (e.getErrorCode() != MegaError.API_OK){
             error++;
-            log("Attach node error: "+e.getErrorString()+"__"+e.getErrorCode());
+            LogUtil.logError("Attach node error: " + e.getErrorString() + "__" + e.getErrorCode());
         }
 
-        log("Counter on RequestFinish: "+counter);
-        log("Error on RequestFinish: "+error);
+        LogUtil.logDebug("Counter: " + counter);
+        LogUtil.logDebug("Error: " + error);
 
         if(counter==0){
             int success = max_items - error;
@@ -147,6 +144,6 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
 
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("Counter on onRequestTemporaryError: "+counter);
+        LogUtil.logWarning("Counter: " + counter);
     }
 };

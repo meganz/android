@@ -1,11 +1,10 @@
 package mega.privacy.android.app.lollipop;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaNode;
 
 
@@ -36,23 +35,18 @@ public class MegaMonthPicLollipop {
 	}
 
 	public long getPosition(long node){
-		log("node is "+node);
-		log("getPostion return null "+(nodesSite.get(new Long(node)) == null));
+		LogUtil.logDebug("Node is " + node);
+		LogUtil.logDebug("getPostion return null " + (nodesSite.get(new Long(node)) == null));
 		return nodesSite.get(new Long(node));
 	}
 
 	public long getPosition(Long node){
-		log("node is "+node);
-		log("getPostion return null "+(nodesSite.get(node) == null));
+		LogUtil.logDebug("Node is " + node);
+		LogUtil.logDebug("getPostion return null " + (nodesSite.get(node) == null));
 		return nodesSite.get(node);
 	}
 
 	public ArrayList<Long> getNodeHandles(){
 		return nodeHandles;
 	}
-
-	private static void log(String txt){
-		Util.log("MegaMonthPicLollipop", txt);
-	}
-	
 }

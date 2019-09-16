@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 
 public abstract class RotatableFragment extends Fragment {
 
@@ -22,35 +22,30 @@ public abstract class RotatableFragment extends Fragment {
 
     protected abstract void updateActionModeTitle();
 
-    private static void log(String tag, String log) {
-        Util.log(tag, log);
-    }
-
     private ArrayList<Integer> selectedItems;
 
     private int lastPlaceHolderCount;
 
     private void reDoTheSelectionAfterRotation() {
-        String className = this.getClass().getName();
-        log(className, "reselect items");
+        LogUtil.logDebug("Reselect items");
         RotatableAdapter adapter = getAdapter();
         if (adapter != null) {
             int folderCount = adapter.getFolderCount();
-            log(className, "folders: " + folderCount);
+            LogUtil.logDebug("Folders: " + folderCount);
             int currentPlaceHolderCount = adapter.getPlaceholderCount();
-            log(className, "place holder: " + currentPlaceHolderCount);
+            LogUtil.logDebug("Place holder: " + currentPlaceHolderCount);
             if (selectedItems != null && selectedItems.size() > 0) {
                 activateActionMode();
                 for (int selectedItem : selectedItems) {
                     if (((ManagerActivityLollipop) getActivity()).isList) {
-                        log(className, "selectedItem:" + selectedItem);
+                        LogUtil.logDebug("selectedItem:" + selectedItem);
                         multipleItemClick(selectedItem);
                     } else {
                         if (selectedItem < folderCount) {
-                            log(className, "list folder, selectedItem: " + selectedItem);
+                            LogUtil.logDebug("List folder, selectedItem: " + selectedItem);
                             multipleItemClick(selectedItem);
                         } else {
-                            log(className, "file selection, selectedItem: " + selectedItem + "lastPlaceHolderCount:" + lastPlaceHolderCount + ". currentPlaceHolderCount: " + currentPlaceHolderCount);
+                            LogUtil.logDebug("File selection, selectedItem: " + selectedItem + "lastPlaceHolderCount:" + lastPlaceHolderCount + ". currentPlaceHolderCount: " + currentPlaceHolderCount);
                             multipleItemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount));
                         }
                     }

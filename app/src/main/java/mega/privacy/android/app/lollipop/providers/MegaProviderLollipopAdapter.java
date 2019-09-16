@@ -31,6 +31,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -120,7 +121,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 
 	@Override
 	public ViewHolderLollipopProvider onCreateViewHolder(ViewGroup parent, int viewType) {
-		log("onCreateViewHolder");
+		LogUtil.logDebug("onCreateViewHolder");
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -154,7 +155,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 	
 	@Override
 	public void onBindViewHolder(ViewHolderLollipopProvider holder, int position) {
-		log("onBindViewHolder");		
+		LogUtil.logDebug("onBindViewHolder");
 		
 		holder.currentPosition = position;
 		
@@ -195,7 +196,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 								}
 							}
 							else{
-								log("The contactDB is null: ");
+								LogUtil.logWarning("The contactDB is null: ");
 								holder.textViewFileSize.setText(user.getEmail());
 							}
 						}
@@ -280,7 +281,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 //			holder.imageView.setLayoutParams(params3);
 
 			if(!multipleSelect){
-				log("Not multiselect");
+				LogUtil.logDebug("Not multiselect");
 				holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
 				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -355,7 +356,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 				}
 			}
 			else{
-				log("multiSelection ON");
+				LogUtil.logDebug("MultiSelection ON");
 				if(this.isItemChecked(position)){
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -440,7 +441,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 		ViewHolderLollipopProvider holder = (ViewHolderLollipopProvider) v.getTag();
 		
 		int currentPosition = holder.currentPosition;
@@ -480,16 +481,12 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		this.parentHandle = parentHandle;
 	}
 
-	private static void log(String log) {
-		Util.log("MegaProviderLollipopAdapter", log);
-	}
-
 	public boolean isMultipleSelect (){
 		return multipleSelect;
 	}
 
 	public void setMultipleSelect (boolean multipleSelect){
-		log("setMultipleSelect: "+multipleSelect);
+		LogUtil.logDebug("multipleSelect: " + multipleSelect);
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 		}
@@ -499,21 +496,21 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 	}
 
 	public void toggleAllSelection (int pos){
-		log("toggleAllSelection: "+pos);
+		LogUtil.logDebug("pos: " + pos);
 		final int positionToflip = pos;
 
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			LogUtil.logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			log("PUT pos: "+pos);
+			LogUtil.logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 		}
 
 		MegaProviderLollipopAdapter.ViewHolderLollipopProvider view = (MegaProviderLollipopAdapter.ViewHolderLollipopProvider) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view != null){
-			log("Start animation: "+pos+" multiselection state: "+isMultipleSelect());
+			LogUtil.logDebug("Start animation: " + pos + " multiselection state: " + isMultipleSelect());
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
@@ -531,7 +528,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 							((CloudDriveProviderFragmentLollipop) fragment).hideMultipleSelect();
 						}
 					}
-					log("toggleAllSelection: notified item changed");
+					LogUtil.logDebug("Notified item changed");
 					notifyItemChanged(positionToflip);
 				}
 
@@ -543,27 +540,27 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			view.imageView.startAnimation(flipAnimation);
 		}
 		else {
-			log("NULL view pos: "+positionToflip);
+			LogUtil.logWarning("NULL view pos: " + positionToflip);
 			notifyItemChanged(pos);
 		}
 	}
 
 	public void toggleSelection(int position) {
-		log("togleSelection: "+position);
+		LogUtil.logDebug("position: " + position);
 
 		if(selectedItems.get(position, false)){
-			log("delete pos: " +position);
+			LogUtil.logDebug("Delete pos: " + position);
 			selectedItems.delete(position);
 		}
 		else{
-			log("PUT pos: "+position);
+			LogUtil.logDebug("PUT pos: " + position);
 			selectedItems.put(position, true);
 		}
 		notifyItemChanged(position);
 
 		MegaProviderLollipopAdapter.ViewHolderLollipopProvider view = (MegaProviderLollipopAdapter.ViewHolderLollipopProvider) listFragment.findViewHolderForLayoutPosition(position);
 		if (view != null){
-			log("Start animation: "+position);
+			LogUtil.logDebug("Start animation: " + position);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
@@ -592,7 +589,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			view.imageView.startAnimation(flipAnimation);
 		}
 		else{
-			log("view is null - not animation");
+			LogUtil.logWarning("View is null - not animation");
 		}
 	}
 
@@ -643,7 +640,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 	}
 
 	public void clearSelections() {
-		log("clearSelections");
+		LogUtil.logDebug("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(isItemChecked(i)){
 				toggleAllSelection(i);
@@ -657,7 +654,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 
 	@Override
 	public boolean onLongClick(View view) {
-		log("OnLongClick");
+		LogUtil.logDebug("OnLongClick");
 
 		ViewHolderLollipopProvider holder = (ViewHolderLollipopProvider) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
@@ -673,5 +670,4 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 
 		return true;
 	}
-
 }

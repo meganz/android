@@ -7,7 +7,8 @@ import android.graphics.BitmapFactory;
 import java.io.File;
 
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -30,12 +31,12 @@ public class ChatParticipantAvatarListener implements MegaRequestListenerInterfa
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart()");
+        LogUtil.logDebug("onRequestStart()");
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish()");
+        LogUtil.logDebug("onRequestFinish()");
         if (e.getErrorCode() == MegaError.API_OK){
             boolean avatarExists = false;
 
@@ -79,25 +80,19 @@ public class ChatParticipantAvatarListener implements MegaRequestListenerInterfa
                     }
                 }
                 else{
-                    log("Handle do not match");
+                    LogUtil.logWarning("Handle do not match");
                 }
             }
         }
     }
 
     @Override
-    public void onRequestTemporaryError(MegaApiJava api,
-                                        MegaRequest request, MegaError e) {
-        log("onRequestTemporaryError");
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+        LogUtil.logWarning("onRequestTemporaryError");
     }
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
         // TODO Auto-generated method stub
     }
-
-    private static void log(String log) {
-        Util.log("ChatParticipantAvatarListener", log);
-    }
-
 }

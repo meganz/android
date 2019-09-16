@@ -26,25 +26,27 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaShare;
 
 public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomSheetDialogFragment {
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        log("ContactInfoBottomSheetDialogFragment onCreate");
+        LogUtil.logDebug("ContactInfoBottomSheetDialogFragment onCreate");
         super.onCreate(savedInstanceState);
     
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            LogUtil.logDebug("Bundle is NOT NULL");
             long handle = savedInstanceState.getLong("handle", -1);
-            log("Handle of the node: "+handle);
+            LogUtil.logDebug("Handle of the node: "+handle);
             node = megaApi.getNodeByHandle(handle);
         }
         else{
-            log("Bundle NULL");
+            LogUtil.logWarning("Bundle NULL");
             if(context instanceof ContactInfoActivityLollipop){
                 node = ((ContactInfoActivityLollipop) context).getSelectedNode();
             }
@@ -56,7 +58,7 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
     
     @Override
     public void setupDialog(final Dialog dialog,int style) {
-        log("setupDialog");
+        LogUtil.logDebug("setupDialog");
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -108,14 +110,14 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
         nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
     
         if(node!=null) {
-            log("node is NOT null");
+            LogUtil.logDebug("Node is NOT null");
         
             nodeName.setText(node.getName());
         
             boolean firstLevel = true;
-            log("First LEVEL is: "+firstLevel);
+            LogUtil.logDebug("First LEVEL is: " + firstLevel);
             long parentHandle = -1;
-            log("Parent handle is: "+parentHandle);
+            LogUtil.logDebug("Parent handle is: " + parentHandle);
             int accessLevel = megaApi.getAccess(node);
         
             if (node.isFolder()) {
@@ -125,22 +127,22 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
                 nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
             
                 if(firstLevel||parentHandle == -1){
-                    log("Fist level!!");
+                    LogUtil.logDebug("Fist level!!");
                     optionLeave.setVisibility(View.VISIBLE);
                 
                     switch (accessLevel) {
                         case MegaShare.ACCESS_FULL: {
-                            log("LEVEL 0 - access FULL");
+                            LogUtil.logDebug("LEVEL 0 - Access FULL");
                             nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
                             break;
                         }
                         case MegaShare.ACCESS_READ: {
-                            log("LEVEL 0 - access read");
+                            LogUtil.logDebug("LEVEL 0 - Access read");
                             nodeIcon.setImageResource(R.drawable.ic_shared_read);
                             break;
                         }
                         case MegaShare.ACCESS_READWRITE: {
-                            log("LEVEL 0 - readwrite");
+                            LogUtil.logDebug("LEVEL 0 - Access read & write");
                             nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
                         }
                     }
@@ -168,14 +170,14 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
                     break;
                 }
                 case MegaShare.ACCESS_READ: {
-                    log("read");
+                    LogUtil.logDebug("Access read");
                     optionRename.setVisibility(View.GONE);
                     optionRubbish.setVisibility(View.GONE);
                     optionMove.setVisibility(View.GONE);
                     break;
                 }
                 case MegaShare.ACCESS_READWRITE: {
-                    log("readwrite");
+                    LogUtil.logDebug("Access read & write");
                     optionMove.setVisibility(View.GONE);
                     optionRename.setVisibility(View.GONE);
                     optionRubbish.setVisibility(View.GONE);
@@ -243,8 +245,8 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
                             int windowHeight = rectangle.bottom;
                             int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, context.getResources().getDisplayMetrics());
                             int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
-                        
-                            log("bottomSheet.height: " + mainLinearLayout.getHeight() + " maxHeight: " + maxHeight);
+
+                            LogUtil.logDebug("bottomSheet.height: " + mainLinearLayout.getHeight() + " maxHeight: " + maxHeight);
                             if (mainLinearLayout.getHeight() > maxHeight) {
                                 params.height = maxHeight;
                                 bottomSheet.setLayoutParams(params);
@@ -255,7 +257,7 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
             });
         }
         else{
-            log("Node NULL");
+            LogUtil.logWarning("Node NULL");
         }
     }
     
@@ -265,9 +267,9 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
         switch(v.getId()){
             
             case R.id.option_download_layout:{
-                log("Download option");
+                LogUtil.logDebug("Download option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    LogUtil.logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
@@ -276,16 +278,16 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
                 break;
             }
             case R.id.option_properties_layout:{
-                log("Properties option");
+                LogUtil.logDebug("Properties option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    LogUtil.logWarning("The selected node is NULL");
                     return;
                 }
                 Intent i = new Intent(context, FileInfoActivityLollipop.class);
                 i.putExtra("handle", node.getHandle());
                 i.putExtra("from", Constants.FROM_INCOMING_SHARES);
                 boolean firstLevel = true;
-                log("onClick File Info: First LEVEL is: "+firstLevel);
+                LogUtil.logDebug("File Info: First LEVEL is: " + firstLevel);
                 i.putExtra("firstLevel", firstLevel);
                 
                 if (node.isFolder()) {
@@ -308,9 +310,9 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
                 break;
             }
             case R.id.option_leave_layout:{
-                log("Share with");
+                LogUtil.logDebug("Share with option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    LogUtil.logWarning("The selected node is NULL");
                     return;
                 }
                 ((ContactInfoActivityLollipop) context).showConfirmationLeaveIncomingShare(node);
@@ -318,18 +320,18 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
                 break;
             }
             case R.id.option_rename_layout:{
-                log("Rename option");
+                LogUtil.logDebug("Rename option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    LogUtil.logWarning("The selected node is NULL");
                     return;
                 }
                 ((ContactInfoActivityLollipop) context).showRenameDialog(node, node.getName());
                 break;
             }
             case R.id.option_move_layout:{
-                log("Move option");
+                LogUtil.logDebug("Move option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    LogUtil.logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
@@ -339,9 +341,9 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
                 break;
             }
             case R.id.option_copy_layout:{
-                log("Copy option");
+                LogUtil.logDebug("Copy option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    LogUtil.logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
@@ -351,9 +353,9 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
                 break;
             }
             case R.id.option_rubbish_bin_layout:{
-                log("Delete/Move to rubbish option");
+                LogUtil.logDebug("Delete/Move to rubbish option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    LogUtil.logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();

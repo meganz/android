@@ -34,6 +34,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -91,23 +92,23 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            LogUtil.logDebug("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong("chatId", -1);
-            log("Handle of the chat: "+chatId);
+            LogUtil.logDebug("Handle of the chat: " + chatId);
             participantHandle = savedInstanceState.getLong("participantHandle", -1);
-            log("Handle of the message: "+participantHandle);
+            LogUtil.logDebug("Handle of the participant: " + participantHandle);
 
             selectedChat = megaChatApi.getChatRoom(chatId);
         }
         else{
-            log("Bundle NULL");
+            LogUtil.logWarning("Bundle NULL");
 
             chatId = ((GroupChatInfoActivityLollipop) context).chatHandle;
             selectedChat = megaChatApi.getChatRoom(chatId);
-            log("Handle of the chat: "+chatId);
+            LogUtil.logDebug("Handle of the chat: " + chatId);
 
             participantHandle = ((GroupChatInfoActivityLollipop) context).selectedHandleParticipant;
-            log("Handle of the participant: "+participantHandle);
+            LogUtil.logDebug("Handle of the participant: " + participantHandle);
         }
     }
     @Override
@@ -163,7 +164,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         //////
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            log("onCreate: Landscape configuration");
+            LogUtil.logDebug("Landscape configuration");
             titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(270, outMetrics));
             titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(270, outMetrics));
         }
@@ -173,47 +174,47 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
 
         if(selectedChat==null){
-            log("Error. Selected chat is NULL");
+            LogUtil.logWarning("Error. Selected chat is NULL");
             return;
         }
 
         if(participantHandle==-1){
-            log("Error. Participant handle is -1");
+            LogUtil.logWarning("Error. Participant handle is -1");
             return;
         }
 
         int state = megaChatApi.getUserOnlineStatus(participantHandle);
         if(state == MegaChatApi.STATUS_ONLINE){
-            log("This user is connected");
+            LogUtil.logDebug("This user is connected");
             stateIcon.setVisibility(View.VISIBLE);
             stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
         }
         else if(state == MegaChatApi.STATUS_AWAY){
-            log("This user is away");
+            LogUtil.logDebug("This user is away");
             stateIcon.setVisibility(View.VISIBLE);
             stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
         }
         else if(state == MegaChatApi.STATUS_BUSY){
-            log("This user is busy");
+            LogUtil.logDebug("This user is busy");
             stateIcon.setVisibility(View.VISIBLE);
             stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
         }
         else if(state == MegaChatApi.STATUS_OFFLINE){
-            log("This user is offline");
+            LogUtil.logDebug("This user is offline");
             stateIcon.setVisibility(View.VISIBLE);
             stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
         }
         else if(state == MegaChatApi.STATUS_INVALID){
-            log("INVALID status: "+state);
+            LogUtil.logWarning("INVALID status: " + state);
             stateIcon.setVisibility(View.GONE);
         }
         else{
-            log("This user status is: "+state);
+            LogUtil.logDebug("This user status is: " + state);
             stateIcon.setVisibility(View.GONE);
         }
 
         if(participantHandle == megaApi.getMyUser().getHandle()){
-            log("Participant selected its me");
+            LogUtil.logDebug("Participant selected its me");
             ChatController chatC = new ChatController(context);
             String myFullName = chatC.getMyFullName();
 
@@ -284,14 +285,14 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionInvite.setVisibility(View.GONE);
                 }
                 else{
-                    log("Non contact");
+                    LogUtil.logDebug("Non contact");
                     optionContactInfoChat.setVisibility(View.GONE);
                     optionStartConversationChat.setVisibility(View.GONE);
                     optionInvite.setVisibility(View.VISIBLE);
                 }
             }
             else{
-                log("Non contact");
+                LogUtil.logDebug("Non contact");
                 optionContactInfoChat.setVisibility(View.GONE);
                 optionStartConversationChat.setVisibility(View.GONE);
                 optionInvite.setVisibility(View.VISIBLE);
@@ -300,7 +301,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             optionEditProfileChat.setVisibility(View.GONE);
             optionLeaveChat.setVisibility(View.GONE);
 
-            log("Other participant selected its me");
+            LogUtil.logDebug("Other participant selected its me");
             if(selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
                 optionChangePermissionsChat.setVisibility(View.VISIBLE);
                 optionRemoveParticipantChat.setVisibility(View.VISIBLE);
@@ -394,7 +395,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
         }
 
-        log("Set default avatar");
+        LogUtil.logDebug("Set default avatar");
         ////DEfault AVATAR
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -402,11 +403,11 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         p.setAntiAlias(true);
         String color = megaApi.getUserAvatarColor(userHandleEncoded);
         if(color!=null){
-            log("The color to set the avatar is "+color);
+            LogUtil.logDebug("The color to set the avatar is " + color);
             p.setColor(Color.parseColor(color));
         }
         else{
-            log("Default color to the avatar");
+            LogUtil.logDebug("Default color to the avatar");
             p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
@@ -455,7 +456,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         switch(v.getId()){
 
             case R.id.contact_info_group_participants_chat_layout: {
-                log("contact info participants panel");
+                LogUtil.logDebug("Contact info participants panel");
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra("name", selectedChat.getPeerEmailByHandle(participantHandle));
                 context.startActivity(i);
@@ -464,25 +465,25 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
 
             case R.id.start_chat_group_participants_chat_layout: {
-                log("start chat participants panel");
+                LogUtil.logDebug("Start chat participants panel");
                 ((GroupChatInfoActivityLollipop) context).startConversation(participantHandle);
                 break;
             }
 
             case R.id.change_permissions_group_participants_chat_layout: {
-                log("change permissions participants panel");
+                LogUtil.logDebug("Change permissions participants panel");
                 ((GroupChatInfoActivityLollipop) context).showChangePermissionsDialog(participantHandle, selectedChat);
                 break;
             }
 
             case R.id.remove_group_participants_chat_layout: {
-                log("remove participants panel");
+                LogUtil.logDebug("Remove participants panel");
                 ((GroupChatInfoActivityLollipop) context).showRemoveParticipantConfirmation(participantHandle, selectedChat);
                 break;
             }
 
             case R.id.edit_profile_group_participants_chat_layout: {
-                log("edit profile participants panel");
+                LogUtil.logDebug("Edit profile participants panel");
                 Intent editProfile = new Intent(context, ManagerActivityLollipop.class);
                 editProfile.setAction(Constants.ACTION_SHOW_MY_ACCOUNT);
                 startActivity(editProfile);
@@ -491,13 +492,13 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
 
             case R.id.leave_group_participants_chat_layout: {
-                log("leave chat participants panel");
+                LogUtil.logDebug("Leave chat participants panel");
                 ((GroupChatInfoActivityLollipop) context).showConfirmationLeaveChat(selectedChat);
                 break;
             }
 
             case R.id.invite_group_participants_chat_layout: {
-                log("invite contact participants panel");
+                LogUtil.logDebug("Invite contact participants panel");
                 ((GroupChatInfoActivityLollipop) context).inviteContact(selectedChat.getPeerEmailByHandle(participantHandle));
                 break;
             }
@@ -524,14 +525,10 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        LogUtil.logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
         outState.putLong("chatId", chatId);
         outState.putLong("participantHandle", participantHandle);
-    }
-
-    private static void log(String log) {
-        Util.log("ParticipantBottomSheetDialogFragment", log);
     }
 }

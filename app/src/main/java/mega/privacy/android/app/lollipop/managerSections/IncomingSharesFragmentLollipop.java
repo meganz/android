@@ -60,6 +60,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -123,7 +124,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public void updateScrollPosition(int position) {
-		log("updateScrollPosition");
+		LogUtil.logDebug("Position: " + position);
 		if (adapter != null) {
 			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
@@ -136,7 +137,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 
 
 	public ImageView getImageDrag(int position) {
-		log("getImageDrag");
+		LogUtil.logDebug("Position: " + position);
 		if (adapter != null) {
 			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
@@ -200,10 +201,10 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
             sections.put(folderCount, getString(R.string.general_files));
         }
 		if (headerItemDecoration == null) {
-			log("create new decoration");
+			LogUtil.logDebug("Create new decoration");
 			headerItemDecoration = new NewHeaderItemDecoration(context);
 		} else {
-			log("remove old decoration");
+			LogUtil.logDebug("Remove old decoration");
 			recyclerView.removeItemDecoration(headerItemDecoration);
 		}
 		headerItemDecoration.setType(type);
@@ -306,7 +307,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_send_to_chat:{
-					log("Send files to chat");
+					LogUtil.logDebug("Send files to chat");
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
 					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
@@ -452,7 +453,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public static IncomingSharesFragmentLollipop newInstance() {
-		log("newInstance");
+		LogUtil.logDebug("newInstance");
 		IncomingSharesFragmentLollipop fragment = new IncomingSharesFragmentLollipop();
 		return fragment;
 	}
@@ -469,7 +470,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 		lastPositionStack = new Stack<>();
 
 		super.onCreate(savedInstanceState);
-		log("onCreate");		
+		LogUtil.logDebug("onCreate");
 	}
 
 	public void checkScroll () {
@@ -485,7 +486,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		log("onCreateView: parentHandle is: "+((ManagerActivityLollipop)context).parentHandleIncoming);
+		LogUtil.logDebug("Parent Handle: "+((ManagerActivityLollipop)context).parentHandleIncoming);
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -537,13 +538,13 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			}
 
 			if (((ManagerActivityLollipop)context).parentHandleIncoming == -1){
-				log("ParentHandle -1");
+				LogUtil.logWarning("ParentHandle -1");
 				findNodes();
 				adapter.setParentHandle(-1);
 			}
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
-				log("ParentHandle to find children: "+((ManagerActivityLollipop)context).parentHandleIncoming);
+				LogUtil.logDebug("ParentHandle to find children: "+((ManagerActivityLollipop)context).parentHandleIncoming);
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType());
@@ -613,12 +614,12 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 				emptyTextView.setVisibility(View.GONE);
 			}
 
-			log("Deep browser tree: "+((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
+			LogUtil.logDebug("Deep browser tree: " + ((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
 
 			return v;
 		}
 		else{
-			log("Grid View");
+			LogUtil.logDebug("Grid View");
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
@@ -653,12 +654,12 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			}
 
 			if (((ManagerActivityLollipop)context).parentHandleIncoming == -1){
-				log("ParentHandle -1");
+				LogUtil.logWarning("ParentHandle == -1");
 				findNodes();
 			}
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
-				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleIncoming);
+				LogUtil.logDebug("ParentHandle: " + ((ManagerActivityLollipop)context).parentHandleIncoming);
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType());
@@ -735,10 +736,10 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public void refresh (){
-		log("refresh");
+		LogUtil.logDebug("refresh");
 		MegaNode parentNode = null;
 		if (((ManagerActivityLollipop)context).parentHandleIncoming == -1){
-			log("ParentHandle is -1");
+			LogUtil.logWarning("ParentHandle is -1");
 			findNodes();
 		}
 		else{
@@ -824,10 +825,10 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
     }
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
-    	log("itemClick");
+		LogUtil.logDebug("Position: " + position);
 
 		if (adapter.isMultipleSelect()){
-			log("multiselect ON");
+			LogUtil.logDebug("Multiselect ON");
 			adapter.toggleSelection(position);
 
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
@@ -838,7 +839,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 		else{
 			if (nodes.get(position).isFolder()){
 				((ManagerActivityLollipop)context).increaseDeepBrowserTreeIncoming();
-				log("Is folder deep: "+((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
+				LogUtil.logDebug("Is folder deep: " + ((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
 				MegaNode n = nodes.get(position);
 
 				int lastFirstVisiblePosition = 0;
@@ -848,12 +849,12 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 				else{
 					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
-						log("Completely -1 then find just visible position");
+						LogUtil.logWarning("Completely -1 then find just visible position");
 						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
-				log("Push to stack "+lastFirstVisiblePosition+" position");
+				LogUtil.logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
 				((ManagerActivityLollipop)context).parentHandleIncoming = n.getHandle();
@@ -960,7 +961,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 					MegaNode file = nodes.get(position);
 
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					log("FILENAME: " + file.getName());
+					LogUtil.logDebug("FILEHANDLE: " + file.getHandle());
 
 					Intent mediaIntent;
 					boolean internalIntent;
@@ -1025,11 +1026,11 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 						activityManager.getMemoryInfo(mi);
 
 						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
+							LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
 							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 						}
 						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
+							LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
 							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 						}
 
@@ -1060,7 +1061,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 					MegaNode file = nodes.get(position);
 
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+					LogUtil.logDebug("FILE HANDLE: " + file.getHandle() + ", TYPE: " + mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 
@@ -1093,11 +1094,11 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 						activityManager.getMemoryInfo(mi);
 
 						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
+							LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
 							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 						}
 						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
+							LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
 							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 						}
 
@@ -1121,7 +1122,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isURL()) {
-					log("Is URL file");
+					LogUtil.logDebug("Is URL file");
 					MegaNode file = nodes.get(position);
 
 					boolean isOnMegaDownloads = false;
@@ -1130,7 +1131,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 					if (f.exists() && (f.length() == file.getSize())) {
 						isOnMegaDownloads = true;
 					}
-					log("isOnMegaDownloads: " + isOnMegaDownloads);
+					LogUtil.logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
 						File mediaFile = new File(localPath);
 						InputStream instream = null;
@@ -1151,12 +1152,12 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 
 									String url = line2.replace("URL=", "");
 
-									log("Is URL - launch browser intent");
+									LogUtil.logDebug("Is URL - launch browser intent");
 									Intent i = new Intent(Intent.ACTION_VIEW);
 									i.setData(Uri.parse(url));
 									startActivity(i);
 								} else {
-									log("Not expected format: Exception on processing url file");
+									LogUtil.logWarning("Not expected format: Exception on processing url file");
 									Intent intent = new Intent(Intent.ACTION_VIEW);
 									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
@@ -1199,7 +1200,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 							try {
 								instream.close();
 							} catch (IOException e) {
-								log("EXCEPTION closing InputStream");
+								LogUtil.logError("EXCEPTION closing InputStream", e);
 							}
 						}
 					} else {
@@ -1226,10 +1227,10 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public void findNodes(){
-		log("findNodes");
+		LogUtil.logDebug("findNodes");
 		nodes=megaApi.getInShares();
 		for(int i=0;i<nodes.size();i++){
-			log("NODE: "+nodes.get(i).getName());
+			LogUtil.logDebug("NODE HANDLE: " + nodes.get(i).getHandle());
 		}
 
 		if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1239,7 +1240,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 		adapter.setNodes(nodes);
 
 		if (adapter.getItemCount() == 0){
-			log("adapter.getItemCount() = 0");
+			LogUtil.logDebug("adapter.getItemCount() = 0");
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
@@ -1292,7 +1293,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 
 		}
 		else{
-			log("adapter.getItemCount() != 0");
+			LogUtil.logDebug("adapter.getItemCount() != 0");
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -1300,7 +1301,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public void setOrderNodes(){
-		log("setOrderNodes: "+((ManagerActivityLollipop)context).parentHandleIncoming);
+		LogUtil.logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).parentHandleIncoming);
 
 		if(((ManagerActivityLollipop)context).parentHandleIncoming==-1){
 			if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1346,7 +1347,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
-		log("clearSelections");
+		LogUtil.logDebug("clearSelections");
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
@@ -1385,7 +1386,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			log("oninvalidate error");
+			LogUtil.logError("Invalidate error", e);
 		}
 	}	
 	
@@ -1393,7 +1394,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		log("hideMultipleSelect");
+		LogUtil.logDebug("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
@@ -1401,7 +1402,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	}
 	
 	public int onBackPressed(){
-		log("onBackPressed deepBrowserTree:"+((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
+		LogUtil.logDebug("deepBrowserTree:" + ((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
 
 		if (adapter == null){
 			return 0;
@@ -1428,7 +1429,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
 				//In the beginning of the navigation
 
-				log("deepBrowserTree==0");
+				LogUtil.logDebug("deepBrowserTree==0");
 				((ManagerActivityLollipop) context).parentHandleIncoming = -1;
 				((ManagerActivityLollipop) context).setToolbarTitle();
 				findNodes();
@@ -1437,9 +1438,9 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 				int lastVisiblePosition = 0;
 				if (!lastPositionStack.empty()) {
 					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack " + lastVisiblePosition + " position");
+					LogUtil.logDebug("Pop of the stack " + lastVisiblePosition + " position");
 				}
-				log("Scroll to " + lastVisiblePosition + " position");
+				LogUtil.logDebug("Scroll to " + lastVisiblePosition + " position");
 
 
 				if (lastVisiblePosition >= 0) {
@@ -1460,7 +1461,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 				return 3;
 			}
 			else if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming>0){
-				log("deepTree>0");
+				LogUtil.logDebug("deepTree>0");
 
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming));
 
@@ -1482,9 +1483,9 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 					int lastVisiblePosition = 0;
 					if(!lastPositionStack.empty()){
 						lastVisiblePosition = lastPositionStack.pop();
-						log("Pop of the stack "+lastVisiblePosition+" position");
+						LogUtil.logDebug("Pop of the stack "+lastVisiblePosition+" position");
 					}
-					log("Scroll to "+lastVisiblePosition+" position");
+					LogUtil.logDebug("Scroll to "+lastVisiblePosition+" position");
 
 					if(lastVisiblePosition>=0){
 
@@ -1501,7 +1502,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 				return 2;
 			}
 			else{
-				log("ELSE deepTree");
+				LogUtil.logDebug("ELSE deepTree");
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
@@ -1524,7 +1525,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes) {
-		log("setNodes");
+		LogUtil.logDebug("setNodes");
 		this.nodes = nodes;
 		if (((ManagerActivityLollipop)context).isList) {
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
@@ -1535,7 +1536,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	}
 	
 	public void sortByMailDescending(){
-		log("sortByNameDescending");
+		LogUtil.logDebug("sortByNameDescending");
 		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
 		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
 
@@ -1572,10 +1573,6 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 
 	public boolean isMultipleselect(){
 		return adapter.isMultipleSelect();
-	}
-	
-	private static void log(String log) {
-		Util.log("IncomingSharesFragmentLollipop", log);
 	}
 
 	public void visibilityFastScroller(){

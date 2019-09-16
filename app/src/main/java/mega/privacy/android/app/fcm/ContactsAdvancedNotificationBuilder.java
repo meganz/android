@@ -29,6 +29,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -81,11 +82,11 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public void showIncomingContactRequestNotification(){
-        log("showIncomingContactRequestNotification");
+        LogUtil.logDebug("showIncomingContactRequestNotification");
 
         ArrayList<MegaContactRequest> icr = megaApi.getIncomingContactRequests();
         if(icr==null){
-            log("Number of requests: NULL");
+            LogUtil.logWarning("Number of requests: NULL");
             return;
         }
 
@@ -110,22 +111,22 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
             String manufacturer = "xiaomi";
             if(!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
-                log("generateChatNotification:POST Android N");
+                LogUtil.logDebug("POST Android N");
                 newIncomingContactRequest(finalIcr);
             }
             else{
-                log("generateChatNotification:XIAOMI POST Android N");
+                LogUtil.logDebug("XIAOMI POST Android N");
                 generateIncomingNotificationPreN(finalIcr);
             }
         }
         else {
-            log("generateChatNotification:PRE Android N");
+            LogUtil.logDebug("PRE Android N");
             generateIncomingNotificationPreN(finalIcr);
         }
     }
 
     public void showAcceptanceContactRequestNotification(String email){
-        log("showAcceptanceContactRequestNotification");
+        LogUtil.logDebug("showAcceptanceContactRequestNotification");
 
         this.email = email;
         counter=0;
@@ -136,13 +137,13 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public void newIncomingContactRequest(ArrayList<MegaContactRequest> contacts){
-        log("newIncomingContactRequest: "+contacts.size());
+        LogUtil.logDebug("Number of incoming contact request: " + contacts.size());
 
         for(int i=contacts.size()-1;i>=0;i--)
         {
-            log("-----------------REQUEST: "+i);
+            LogUtil.logDebug("REQUEST: " + i);
             MegaContactRequest contactRequest = contacts.get(i);
-            log("user sent: "+contactRequest.getSourceEmail());
+            LogUtil.logDebug("User sent: " + contactRequest.getSourceEmail());
             if(i==0){
                 sendBundledNotificationIPC(contactRequest, true);
             }
@@ -153,28 +154,28 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public void newAcceptanceContactRequest(){
-        log("newAcceptanceContactRequest");
+        LogUtil.logDebug("newAcceptanceContactRequest");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
             String manufacturer = "xiaomi";
             if(!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
-                log("generateChatNotification:POST Android N");
+                LogUtil.logDebug("POST Android N");
                 sendBundledNotificationAPC();
             }
             else{
-                log("generateChatNotification:XIAOMI POST Android N");
+                LogUtil.logDebug("XIAOMI POST Android N");
                 showSimpleNotificationAPC();
             }
         }
         else {
-            log("generateChatNotification:PRE Android N");
+            LogUtil.logDebug("PRE Android N");
             showSimpleNotificationAPC();
         }
     }
 
     public void sendBundledNotificationIPC(MegaContactRequest crToShow, boolean beep) {
-        log("sendBundledNotificationIPC");
+        LogUtil.logDebug("sendBundledNotificationIPC");
 
         Notification notification = buildIPCNotification(crToShow, beep);
 
@@ -187,7 +188,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public void generateIncomingNotificationPreN(ArrayList<MegaContactRequest> icr){
-        log("generateIncomingNotificationPreN");
+        LogUtil.logDebug("generateIncomingNotificationPreN");
 
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -224,7 +225,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         for(int i=0;i<icr.size();i++)
         {
             MegaContactRequest contactRequest = icr.get(i);
-            log("user sent: "+contactRequest.getSourceEmail());
+            LogUtil.logDebug("User sent: " + contactRequest.getSourceEmail());
             inboxStyle.addLine(contactRequest.getSourceEmail());
         }
 
@@ -260,7 +261,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public void sendBundledNotificationAPC() {
-        log("sendBundledNotificationAPC");
+        LogUtil.logDebug("sendBundledNotificationAPC");
 
         Notification notification = buildAPCNotification();
 
@@ -272,14 +273,14 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public Notification buildIPCNotification(MegaContactRequest crToShow, boolean beep) {
-        log("buildIPCNotification");
+        LogUtil.logDebug("buildIPCNotification");
 
         String notificationContent;
         if(crToShow!=null){
             notificationContent = crToShow.getSourceEmail();
         }
         else{
-            log("Return because the request is NULL");
+            LogUtil.logError("Return because the request is NULL");
             return null;
         }
 
@@ -360,7 +361,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public Notification buildAPCNotification() {
-        log("buildAPCNotification");
+        LogUtil.logDebug("buildAPCNotification");
 
         String title = context.getString(R.string.title_acceptance_contact_request_notification);
         String fullName = "";
@@ -447,7 +448,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public Bitmap createDefaultAvatar(String email){
-        log("createDefaultAvatar()");
+        LogUtil.logDebug("createDefaultAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -458,11 +459,11 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         if(contact!=null){
             String color = megaApi.getUserAvatarColor(contact);
             if(color!=null){
-                log("The color to set the avatar is "+color);
+                LogUtil.logDebug("The color to set the avatar is " + color);
                 paintCircle.setColor(Color.parseColor(color));
             }
             else{
-                log("Default color to the avatar");
+                LogUtil.logDebug("Default color to the avatar");
                 paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         }
@@ -495,7 +496,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
                 if(!firstLetter.equals("(")){
 
-                    log("Draw letter: "+firstLetter);
+                    LogUtil.logDebug("Draw letter: " + firstLetter);
                     Rect bounds = new Rect();
 
                     paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -510,7 +511,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public Bitmap setUserAvatar(String contactMail){
-        log("setUserAvatar");
+        LogUtil.logDebug("setUserAvatar");
 
         File avatar = buildAvatarFile(context, contactMail + ".jpg");
         Bitmap bitmap = null;
@@ -638,7 +639,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public void showSimpleNotificationAPC(){
-        log("showSimpleNotificationAPC");
+        LogUtil.logDebug("showSimpleNotificationAPC");
     
         Intent myService = new Intent(context, IncomingMessageService.class);
         context.stopService(myService);
@@ -730,10 +731,6 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         }
     }
 
-    public static void log(String message) {
-        Util.log("ChatAdvancedNotificationBuilder", message);
-    }
-
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
@@ -746,7 +743,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish");
+        LogUtil.logDebug("onRequestFinish");
 
         counter++;
         if (e.getErrorCode() == MegaError.API_OK){

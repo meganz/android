@@ -31,6 +31,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.VersionsFileActivity;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -76,21 +77,21 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	}
 
 	public void toggleAllSelection(int pos) {
-		log("toggleAllSelection: "+pos);
+		LogUtil.logDebug("Position: " + pos);
 		final int positionToflip = pos;
 
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			LogUtil.logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			log("PUT pos: "+pos);
+			LogUtil.logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 		}
 
 		VersionsFileAdapter.ViewHolderVersion view = (VersionsFileAdapter.ViewHolderVersion) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
-			log("Start animation: "+pos+" multiselection state: "+isMultipleSelect());
+			LogUtil.logDebug("Start animation: " + pos + " multiselection state: " + isMultipleSelect());
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
@@ -100,12 +101,12 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					log("onAnimationEnd");
+					LogUtil.logDebug("onAnimationEnd");
 					if (selectedItems.size() <= 0){
-						log("toggleAllSelection: hideMultipleSelect");
+						LogUtil.logDebug("hideMultipleSelect");
 						((VersionsFileActivity) context).hideMultipleSelect();
 					}
-					log("toggleAllSelection: notified item changed");
+					LogUtil.logDebug("notified item changed");
 					notifyItemChanged(positionToflip);
 				}
 
@@ -117,28 +118,28 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 			view.imageView.startAnimation(flipAnimation);
 		}
 		else{
-			log("NULL view pos: "+positionToflip);
+			LogUtil.logWarning("NULL view pos: " + positionToflip);
 			notifyItemChanged(pos);
 		}
 
 	}
 
 	public void toggleSelection(int pos) {
-		log("toggleSelection: "+pos);
+		LogUtil.logDebug("Position: " + pos);
 
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			LogUtil.logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			log("PUT pos: "+pos);
+			LogUtil.logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
 
 		VersionsFileAdapter.ViewHolderVersion view = (VersionsFileAdapter.ViewHolderVersion) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
-			log("Start animation: "+pos);
+			LogUtil.logDebug("Start animation: " + pos);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
@@ -163,7 +164,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 		}
 		else{
-			log("view is null - not animation");
+			LogUtil.logWarning("View is null - not animation");
 		}
 	}
 
@@ -176,7 +177,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	}
 
 	public void clearSelections() {
-		log("clearSelections");
+		LogUtil.logDebug("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(isItemChecked(i)){
 				toggleAllSelection(i);
@@ -246,7 +247,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	}
 
 	public void setNodes(ArrayList<MegaNode> nodes) {
-		log("setNodes");
+		LogUtil.logDebug("setNodes");
 		this.nodes = nodes;
 //		contentTextFragment.setText(getInfoFolder(node));
 		notifyDataSetChanged();
@@ -254,7 +255,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 	@Override
 	public ViewHolderVersion onCreateViewHolder(ViewGroup parent, int viewType) {
-		log("onCreateViewHolder");
+		LogUtil.logDebug("onCreateViewHolder");
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -289,7 +290,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	
 	@Override
 	public void onBindViewHolder(ViewHolderVersion holder, int position) {
-		log("onBindViewHolder");
+		LogUtil.logDebug("Position: " + position);
 
 		MegaNode node = (MegaNode) getItem(position);
 		holder.document = node.getHandle();
@@ -331,15 +332,15 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		paramsLarge.setMargins(leftLarge, 0, 0, 0);
 
 		if (!multipleSelect) {
-			log("Not multiselect");
+			LogUtil.logDebug("Not multiselect");
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 			holder.imageView.setLayoutParams(paramsLarge);
 
-			log("Check the thumb");
+			LogUtil.logDebug("Check the thumb");
 
 			if (node.hasThumbnail()) {
-				log("Node has thumbnail");
+				LogUtil.logDebug("Node has thumbnail");
 
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
 				if (thumb != null) {
@@ -386,7 +387,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 					}
 				}
 			} else {
-				log("Node NOT thumbnail");
+				LogUtil.logDebug("Node NOT thumbnail");
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
 				if (thumb != null) {
 					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -426,7 +427,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 			}
 		}
 		else {
-			log("Multiselection ON");
+			LogUtil.logDebug("Multiselection ON");
 			if(this.isItemChecked(position)){
 				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 
@@ -436,11 +437,11 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 			else{
 				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 
-				log("Check the thumb");
+				LogUtil.logDebug("Check the thumb");
 				holder.imageView.setLayoutParams(paramsLarge);
 
 				if (node.hasThumbnail()) {
-					log("Node has thumbnail");
+					LogUtil.logDebug("Node has thumbnail");
 
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null) {
@@ -487,7 +488,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 						}
 					}
 				} else {
-					log("Node NOT thumbnail");
+					LogUtil.logDebug("Node NOT thumbnail");
 
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null) {
@@ -515,7 +516,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 							holder.imageView.setImageBitmap(thumb);
 
 						} else {
-							log("NOT thumbnail");
+							LogUtil.logDebug("NOT thumbnail");
 							holder.imageView.setLayoutParams(paramsLarge);
 							holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
@@ -560,14 +561,14 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 
 		ViewHolderVersion holder = (ViewHolderVersion) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
-		log("onClick -> Current position: "+currentPosition);
+		LogUtil.logDebug("Current position: " + currentPosition);
 
 		if(currentPosition<0){
-			log("Current position error - not valid value");
+			LogUtil.logError("Current position error - not valid value");
 			return;
 		}
 
@@ -576,7 +577,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		switch (v.getId()) {
 			case R.id.version_file_three_dots_layout:{
 
-				log("onClick: version_file_three_dots: "+currentPosition);
+				LogUtil.logDebug("version_file_three_dots: " + currentPosition);
 				if(!Util.isOnline(context)){
 					((VersionsFileActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
 					return;
@@ -639,16 +640,12 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	}
 
 	public void setMultipleSelect(boolean multipleSelect) {
-		log("setMultipleSelect: "+multipleSelect);
+		LogUtil.logDebug("multipleSelect: " + multipleSelect);
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 		}
 		if(this.multipleSelect){
 			selectedItems = new SparseBooleanArray();
 		}
-	}
-
-	private static void log(String log) {
-		Util.log("VersionsFileAdapter", log);
 	}
 }

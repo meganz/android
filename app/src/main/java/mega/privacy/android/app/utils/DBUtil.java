@@ -6,6 +6,7 @@ import android.content.Context;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import nz.mega.sdk.MegaApiAndroid;
 
 public class DBUtil {
 
@@ -13,7 +14,7 @@ public class DBUtil {
     static MegaAttributes attributes;
 
     public static boolean callToPricing (Context context){
-        log("callToPricing");
+        LogUtil.logDebug("callToPricing");
         dbH = DatabaseHandler.getDbHandler(context);
 
         if(dbH!=null){
@@ -22,40 +23,40 @@ public class DBUtil {
                 String oldTimestamp = attributes.getPricingTimeStamp();
                 if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
                     if(oldTimestamp.equals("-1")){
-                        log("First call!! - API call getPricing");
+                        LogUtil.logDebug("First call!! - API call getPricing");
                         return true;
                     }
                     else{
                         long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
-                        log("Last call made: "+ timestampMinDifference + " min ago");
+                        LogUtil.logDebug("Last call made: "+ timestampMinDifference + " min ago");
                         if(timestampMinDifference > Constants.PRICING_MIN_DIFFERENCE){
-                            log("API call getPricing");
+                            LogUtil.logDebug("API call getPricing");
                             return true;
                         }
                         else{
-                            log("NOT call getPricing");
+                            LogUtil.logDebug("NOT call getPricing");
                             return false;
                         }
                     }
                 }
                 else{
-                    log("Not valid value - API call getPricing");
+                    LogUtil.logDebug("Not valid value - API call getPricing");
                     return true;
                 }
             }
             else{
-                log("Attributes is NULL - API call getPricing");
+                LogUtil.logDebug("Attributes is NULL - API call getPricing");
                 return true;
             }
 
         }else{
-            log("DatabaseHandler is NULL - API call getPricing");
+            LogUtil.logDebug("DatabaseHandler is NULL - API call getPricing");
             return true;
         }
     }
 
     public static boolean callToPaymentMethods (Context context) {
-        log("callToPaymentMethods");
+        LogUtil.logDebug("callToPaymentMethods");
         dbH = DatabaseHandler.getDbHandler(context);
 
         if(dbH!=null){
@@ -64,34 +65,34 @@ public class DBUtil {
                 String oldTimestamp = attributes.getPaymentMethodsTimeStamp();
                 if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
                     long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
-                    log("Last call made: "+ timestampMinDifference + " min ago");
+                    LogUtil.logDebug("Last call made: "+ timestampMinDifference + " min ago");
                     if(timestampMinDifference > Constants.PAYMENT_METHODS_MIN_DIFFERENCE){
-                        log("API call getPaymentMethods");
+                        LogUtil.logDebug("API call getPaymentMethods");
                         return true;
                     }
                     else{
-                        log("NOT call getPaymentMethods");
+                        LogUtil.logDebug("NOT call getPaymentMethods");
                         return false;
                     }
                 }
                 else{
-                    log("Not valid value - API call getPaymentMethods");
+                    LogUtil.logDebug("Not valid value - API call getPaymentMethods");
                     return true;
                 }
             }
             else{
-                log("Attributes is NULL - API call getPaymentMethods");
+                LogUtil.logDebug("Attributes is NULL - API call getPaymentMethods");
                 return true;
             }
 
         }else{
-            log("DatabaseHandler is NULL - API call getPaymentMethods");
+            LogUtil.logDebug("DatabaseHandler is NULL - API call getPaymentMethods");
             return true;
         }
     }
 
     public static boolean callToAccountDetails (Context context) {
-        log("callToAccountDetails");
+        LogUtil.logDebug("callToAccountDetails");
         dbH = DatabaseHandler.getDbHandler(context);
 
         if(dbH!=null){
@@ -100,41 +101,41 @@ public class DBUtil {
                 String oldTimestamp = attributes.getAccountDetailsTimeStamp();
                 if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
                     long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
-                    log("Last call made: "+ timestampMinDifference + " min ago");
+                    LogUtil.logDebug("Last call made: "+ timestampMinDifference + " min ago");
                     if(timestampMinDifference > Constants.ACCOUNT_DETAILS_MIN_DIFFERENCE){
-                        log("API call getAccountDetails");
+                        LogUtil.logDebug("API call getAccountDetails");
                         return true;
                     }
                     else{
-                        log("NOT call getAccountDetails");
+                        LogUtil.logDebug("NOT call getAccountDetails");
                         return false;
                     }
                 }
                 else{
-                    log("Not valid value - API call getAccountDetails");
+                    LogUtil.logDebug("Not valid value - API call getAccountDetails");
                     return true;
                 }
             }
             else{
-                log("Attributes is NULL - API call getAccountDetails");
+                LogUtil.logDebug("Attributes is NULL - API call getAccountDetails");
                 return true;
             }
 
         }else{
-            log("DatabaseHandler is NULL - API call getAccountDetails");
+            LogUtil.logDebug("DatabaseHandler is NULL - API call getAccountDetails");
             return true;
         }
     }
 
     public static void resetAccountDetailsTimeStamp(Context context) {
-        log("resetAccountDetailsTimeStamp");
+        LogUtil.logDebug("resetAccountDetailsTimeStamp");
         dbH = DatabaseHandler.getDbHandler(context);
         if(dbH == null) return;
         dbH.resetAccountDetailsTimeStamp();
     }
 
     public static boolean callToExtendedAccountDetails (Context context) {
-        log("callToExtendedAccountDetails");
+        LogUtil.logDebug("callToExtendedAccountDetails");
         dbH = DatabaseHandler.getDbHandler(context);
 
         if(dbH!=null){
@@ -143,40 +144,40 @@ public class DBUtil {
                 String oldTimestamp = attributes.getExtendedAccountDetailsTimeStamp();
                 if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
                     if(oldTimestamp.equals("-1")){
-                        log("First call!! - API call getExtendedAccountDetails");
+                        LogUtil.logDebug("First call!! - API call getExtendedAccountDetails");
                         return true;
                     }
                     else{
                         long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
-                        log("Last call made: "+ timestampMinDifference + " min ago");
+                        LogUtil.logDebug("Last call made: "+ timestampMinDifference + " min ago");
                         if(timestampMinDifference > Constants.EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE){
-                            log("API call getExtendedAccountDetails");
+                            LogUtil.logDebug("API call getExtendedAccountDetails");
                             return true;
                         }
                         else{
-                            log("NOT call getExtendedAccountDetails");
+                            LogUtil.logDebug("NOT call getExtendedAccountDetails");
                             return false;
                         }
                     }
                 }
                 else{
-                    log("Not valid value - API call getExtendedAccountDetails");
+                    LogUtil.logDebug("Not valid value - API call getExtendedAccountDetails");
                     return true;
                 }
             }
             else{
-                log("Attributes is NULL - API call getExtendedAccountDetails");
+                LogUtil.logDebug("Attributes is NULL - API call getExtendedAccountDetails");
                 return true;
             }
 
         }else{
-            log("DatabaseHandler is NULL - API call getExtendedAccountDetails");
+            LogUtil.logDebug("DatabaseHandler is NULL - API call getExtendedAccountDetails");
             return true;
         }
     }
 
     public static boolean isSendOriginalAttachments (Context context){
-        log("isSendOriginalAttachments");
+        LogUtil.logDebug("isSendOriginalAttachments");
         dbH = DatabaseHandler.getDbHandler(context);
 
         if(dbH!=null){
@@ -201,9 +202,5 @@ public class DBUtil {
         else{
             return false;
         }
-    }
-
-    private static void log(String message) {
-        Util.log("DBUtil", message);
     }
 }

@@ -39,6 +39,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -84,7 +85,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	Handler handler;
 
 	public void activateActionMode(){
-		log("activateActionMode");
+		LogUtil.logDebug("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -103,7 +104,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			log("onActionItemClicked");
+			LogUtil.logDebug("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
 
 			switch(item.getItemId()){
@@ -123,7 +124,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			log("onCreateActionMode");
+			LogUtil.logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
 			Util.changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
@@ -132,7 +133,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
+			LogUtil.logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			Util.changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
@@ -140,7 +141,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			log("onPrepareActionMode");
+			LogUtil.logDebug("onPrepareActionMode");
 			List<MegaNode> selected = adapter.getSelectedNodes();
 
 			if (selected.size() != 0) {
@@ -188,7 +189,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 
 	public static CloudDriveExplorerFragmentLollipop newInstance() {
-		log("newInstance");
+		LogUtil.logDebug("newInstance");
 		CloudDriveExplorerFragmentLollipop fragment = new CloudDriveExplorerFragmentLollipop();
 		return fragment;
 	}
@@ -196,7 +197,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -219,7 +220,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		log("onCreateView");
+		LogUtil.logDebug("onCreateView");
 				
 		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -301,7 +302,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
 		if(chosenNode == null) {
-			log("chosenNode is NULL");
+			LogUtil.logWarning("chosenNode is NULL");
 		
 			if(megaApi.getRootNode()!=null){
 				parentHandle = megaApi.getRootNode().getHandle();
@@ -309,16 +310,16 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			}
 
 		}else if(chosenNode.getType() == MegaNode.TYPE_ROOT) {
-			log("chosenNode is ROOT");
+			LogUtil.logDebug("chosenNode is ROOT");
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(chosenNode);
 
 		}else {
-			log("ChosenNode not null and not ROOT");
+			LogUtil.logDebug("ChosenNode not null and not ROOT");
 			
 			MegaNode parentNode = megaApi.getParentNode(chosenNode);
 			if(parentNode!=null){
-				log("ParentNode NOT NULL");
+				LogUtil.logDebug("ParentNode NOT NULL");
 				MegaNode grandParentNode = megaApi.getParentNode(parentNode);
 				while(grandParentNode!=null){
 					parentNode=grandParentNode;
@@ -326,17 +327,17 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 				if(parentNode.getType() == MegaNode.TYPE_ROOT){
 					nodes = megaApi.getChildren(chosenNode);
-					log("chosenNode is: "+chosenNode.getName());
+					LogUtil.logDebug("chosenNode is: " + chosenNode.getName());
 				}
 				else{
-					log("Parent node exists but is not Cloud!");
+					LogUtil.logDebug("Parent node exists but is not Cloud!");
 					parentHandle = megaApi.getRootNode().getHandle();
 					nodes = megaApi.getChildren(megaApi.getRootNode());
 				}
 				
 			}
 			else{
-				log("parentNode is NULL");
+				LogUtil.logWarning("parentNode is NULL");
 				parentHandle = megaApi.getRootNode().getHandle();
 				nodes = megaApi.getChildren(megaApi.getRootNode());
 			}		
@@ -427,17 +428,17 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		if (adapter == null){
 			if(selectFile){
-				log("Mode SELECT FILE ON");
+				LogUtil.logDebug("Mode SELECT FILE ON");
 			}
 
 //			if(((FileExplorerActivityLollipop)context).multiselect){
 				adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
-				log("SetOnItemClickListener");
+			LogUtil.logDebug("SetOnItemClickListener");
 				adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
 
 					@Override
 					public void onItemClick(View view, int position) {
-						log("item click listener trigger!!");
+						LogUtil.logDebug("Item click listener trigger!!");
 						itemClick(view, position);
 					}
 				});
@@ -551,13 +552,13 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 
 		switch(v.getId()){
 			case R.id.action_text:{
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
 				if(((FileExplorerActivityLollipop)context).multiselect){
-					log("Send several files to chat");
+					LogUtil.logDebug("Send several files to chat");
 					if(adapter.getSelectedItemCount()>0){
 						long handles[] = adapter.getSelectedHandles();
 						((FileExplorerActivityLollipop) context).buttonClick(handles);
@@ -580,12 +581,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	}
 
 	public void navigateToFolder(long handle) {
-		log("navigateToFolder");
+		LogUtil.logDebug("Handle: " + handle);
 
 		int lastFirstVisiblePosition = 0;
 		lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 
-		log("Push to stack "+lastFirstVisiblePosition+" position");
+		LogUtil.logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 		lastPositionStack.push(lastFirstVisiblePosition);
 
 		parentHandle = handle;
@@ -636,7 +637,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	}
 
     public void itemClick(View view, int position) {
-		log("itemClick");
+		LogUtil.logDebug("Position: " + position);
 
 		if (nodes.get(position).isFolder()){
 			if(selectFile) {
@@ -652,7 +653,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			int lastFirstVisiblePosition = 0;
 			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 
-			log("Push to stack "+lastFirstVisiblePosition+" position");
+			LogUtil.logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 			lastPositionStack.push(lastFirstVisiblePosition);
 			
 //			String path=n.getName();
@@ -786,16 +787,16 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			if(selectFile)
 			{
 				if(((FileExplorerActivityLollipop)context).multiselect){
-					log("select file and allow multiselection");
+					LogUtil.logDebug("Select file and allow multiselection");
 
 					if (adapter.getSelectedItemCount() == 0) {
-						log("activate the actionMode");
+						LogUtil.logDebug("Activate the actionMode");
 						activateActionMode();
 						adapter.toggleSelection(position);
 						updateActionModeTitle();
 					}
 					else {
-						log("add to selectedNodes");
+						LogUtil.logDebug("Add to selectedNodes");
 						adapter.toggleSelection(position);
 
 						List<MegaNode> selectedNodes = adapter.getSelectedNodes();
@@ -808,7 +809,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				else{
 					//Send file
 					MegaNode n = nodes.get(position);
-					log("Selected node to send: "+n.getName());
+					LogUtil.logDebug("Selected node to send: " + n.getName());
 					if(nodes.get(position).isFile()){
 						MegaNode nFile = nodes.get(position);
 						((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
@@ -817,7 +818,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 			}
 			else{
-				log("Not select file enabled!");
+				LogUtil.logWarning("Not select file enabled!");
 			}
 		}
 
@@ -826,7 +827,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	}	
 
 	public int onBackPressed(){
-		log("onBackPressed");
+		LogUtil.logDebug("onBackPressed");
 		if(selectFile) {
 			if(((FileExplorerActivityLollipop)context).multiselect){
 				if(adapter.isMultipleSelect()){
@@ -919,9 +920,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
+				LogUtil.logDebug("Pop of the stack " + lastVisiblePosition + " position");
 			}
-			log("Scroll to "+lastVisiblePosition+" position");
+			LogUtil.logDebug("Scroll to " + lastVisiblePosition + " position");
 
 			if(lastVisiblePosition>=0){
 				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
@@ -941,9 +942,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	 * Disable nodes from the list
 	 */
 	public void setDisableNodes(ArrayList<Long> disabledNodes) {
-		log("setDisableNodes");
+		LogUtil.logDebug("Disabled nodes: " + disabledNodes.size());
 		if (adapter == null){
-			log("Adapter is NULL");
+			LogUtil.logWarning("Adapter is NULL");
 			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
 
 			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
@@ -963,17 +964,13 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		adapter.setSelectFile(selectFile);
 	}
 
-	private static void log(String log) {
-		Util.log("CloudDriveExplorerFragmentLollipop", log);
-	}
-	
 	public long getParentHandle(){
-		log("getParentHandle");
+		LogUtil.logDebug("getParentHandle");
 		return adapter.getParentHandle();
 	}
 	
 	public void setParentHandle(long parentHandle){
-		log("setParentHandle");
+		LogUtil.logDebug("Parent handle: " + parentHandle);
 		this.parentHandle = parentHandle;
 		if (adapter != null){
 			adapter.setParentHandle(parentHandle);
@@ -982,7 +979,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
-		log("setNodes");
+		LogUtil.logDebug("Nodes: " + nodes.size());
 		this.nodes = nodes;
 		if (adapter != null){
 			adapter.setNodes(nodes);
@@ -1045,7 +1042,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	}
 
 	public void selectAll(){
-		log("selectAll");
+		LogUtil.logDebug("selectAll");
 		if (adapter != null){
 			adapter.selectAll();
 
@@ -1073,7 +1070,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	}
 
 	private void updateActionModeTitle() {
-		log("updateActionModeTitle");
+		LogUtil.logDebug("updateActionModeTitle");
 
 		List<MegaNode> documents = adapter.getSelectedNodes();
 		int files = 0;
@@ -1107,8 +1104,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
+			LogUtil.logError("Invalidate error", e);
 			e.printStackTrace();
-			log("oninvalidate error");
 		}
 	}
 
@@ -1116,7 +1113,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		log("hideMultipleSelect");
+		LogUtil.logDebug("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		adapter.clearSelectedItems();
 		if (actionMode != null) {

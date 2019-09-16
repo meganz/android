@@ -10,7 +10,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 
 public class ContactsPageAdapter extends FragmentPagerAdapter {
 
@@ -24,7 +24,7 @@ public class ContactsPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        log("getItem: "+position);
+        LogUtil.logDebug("Position: " + position);
         switch (position){
             case 0: {
                 ContactsFragmentLollipop cF = (ContactsFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.CONTACTS.getTag());
@@ -77,9 +77,5 @@ public class ContactsPageAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return PAGE_COUNT;
-    }
-
-    private static void log(String log) {
-        Util.log("ContactsPageAdapter", log);
     }
 }

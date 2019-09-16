@@ -9,7 +9,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -19,10 +19,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
-
-/**
- * Created by mega on 19/09/18.
- */
 
 public class CopyAndSendToChatListener implements MegaRequestListenerInterface, MyChatFilesExisitListener<ArrayList<MegaNode>> {
 
@@ -69,17 +65,17 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart");
+        LogUtil.logDebug("onRequestStart");
     }
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        log("onRequestUpdate");
+        LogUtil.logDebug("onRequestUpdate");
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish");
+        LogUtil.logDebug("onRequestFinish");
         if (request.getType() == MegaRequest.TYPE_COPY){
             counter --;
             if (e.getErrorCode() == MegaError.API_OK){
@@ -92,23 +88,23 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
                 }
             }
             else {
-                log("MegaRequest.TYPE_COPY error: " +e.getErrorString());
+                LogUtil.logDebug("TYPE_COPY error: " + e.getErrorString());
             }
         } else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER
                 && CHAT_FOLDER.equals(request.getName())) {
             if (e.getErrorCode() == MegaError.API_OK){
-                log("create My Chat Files folder successfully and copy the reserved nodes");
+                LogUtil.logDebug("Create My Chat Files folder successfully and copy the reserved nodes");
                 handleStoredData();
             }
             else{
-                log("Cannot create My Chat Files"+e.getErrorCode()+" "+e.getErrorString());
+                LogUtil.logError("Cannot create My Chat Files" + e.getErrorCode() + " " + e.getErrorString());
             }
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestTemporaryError");
+        LogUtil.logWarning("onRequestTemporaryError");
     }
 
     @Override
@@ -125,9 +121,5 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
             }
         }
         preservedNotOwnerNode = null;
-    }
-
-    private static void log(String log) {
-        Util.log("CopyAndSendToChatListener", log);
     }
 }

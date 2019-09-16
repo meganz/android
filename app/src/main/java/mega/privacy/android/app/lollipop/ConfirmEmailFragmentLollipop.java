@@ -22,7 +22,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -49,7 +49,7 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 
 	@Override
 	public void onAttach(Activity context) {
-		log("onAttach Activity");
+		LogUtil.logDebug("onAttach Activity");
 		super.onAttach(context);
 		this.context = context;
 
@@ -60,18 +60,18 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		super.onCreate(savedInstanceState);
 
 		if(context==null){
-			log("context is null");
+			LogUtil.logDebug("Context is null");
 			return;
 		}
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		LogUtil.logDebug("onCreateView");
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -147,26 +147,22 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 		return this.firstNameTemp;
 	}
 
-	public static void log(String log) {
-		Util.log("ConfirmEmailFragmentLollipop", log);
-	}
-
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart - " + request.getRequestString());
+		LogUtil.logDebug("onRequestStart - " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		log("onRequestUpdate - " + request.getRequestString());
+		LogUtil.logDebug("onRequestUpdate - " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
+		LogUtil.logDebug("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
 
 		if (isAdded()) {
-			log("isAdded true");
+			LogUtil.logDebug("isAdded true");
 			if (e.getErrorCode() == MegaError.API_OK) {
 				((LoginActivityLollipop) context).showSnackbar(getString(R.string.confirm_email_misspelled_email_sent));
 			} else {
@@ -174,18 +170,18 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 			}
 		}
 		else{
-			log("isAdded false");
+			LogUtil.logDebug("isAdded false");
 		}
 	}
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestTemporaryError - " + request.getRequestString());
+		LogUtil.logWarning("onRequestTemporaryError - " + request.getRequestString());
 	}
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 
 		switch (v.getId()){
 			case R.id.confirm_email_new_email_resend:{

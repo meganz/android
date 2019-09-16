@@ -34,7 +34,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaContactsAttachedLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -85,7 +85,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		super.onCreate(savedInstanceState);
 		
 		if (megaApi == null){
@@ -97,7 +97,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		}
 
 		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
+			LogUtil.logDebug("Refresh session - sdk");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
 			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -106,7 +106,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			return;
 		}
 		if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-			log("Refresh session - karere");
+			LogUtil.logDebug("Refresh session - karere");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
 			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -125,7 +125,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		if (intent != null) {
 			chatId = intent.getLongExtra("chatId", -1);
 			messageId = intent.getLongExtra("messageId", -1);
-			log("Id Chat and Message id: "+chatId+ "___"+messageId);
+			LogUtil.logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
 			MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
 			if(messageMega!=null){
 				message = new AndroidMegaChatMessage(messageMega);
@@ -143,10 +143,8 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 					name = message.getMessage().getUserEmail(i);
 				}
 				String email = message.getMessage().getUserEmail(i);
-				log("Contact Name: " + name);
-
 				long handle = message.getMessage().getUserHandle(i);
-				log("Contact Name: " + name);
+				LogUtil.logDebug("Contact Handle: " + handle);
 				String handleString = megaApi.userHandleToBase64(handle);
 
 				MegaContactDB contactDB = new MegaContactDB(handleString, email, name, "");
@@ -196,7 +194,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 		//Check owner of the message
 		if(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
-			log("My message, show START CONVERSATION button");
+			LogUtil.logDebug("My message, show START CONVERSATION button");
 			actionButton.setText(R.string.group_chat_start_conversation_label);
 		}
 		else{
@@ -205,13 +203,13 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			for(int i=0; i<contacts.size();i++){
 				MegaUser checkContact =  megaApi.getContact(contacts.get(i).getMail());
 				if(checkContact==null){
-					log("NULL contact - The user "+contacts.get(i).getMail()+" is NOT my CONTACT");
+					LogUtil.logDebug("NULL contact - The user " + contacts.get(i).getHandle() + " is NOT my CONTACT");
 					inviteAction = true;
 					break;
 				}
 				else{
 					if(checkContact.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
-						log("The user "+checkContact.getEmail()+" is NOT my CONTACT");
+						LogUtil.logDebug("The user " + checkContact.getHandle() + " is NOT my CONTACT");
 						inviteAction = true;
 						break;
 					}
@@ -220,11 +218,11 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			}
 
 			if(inviteAction){
-				log("NOT my message, show INVITE button");
+				LogUtil.logDebug("NOT my message, show INVITE button");
 				actionButton.setText(R.string.menu_add_contact);
 			}
 			else{
-				log("NOT my message, show START CONVERSATION button");
+				LogUtil.logDebug("NOT my message, show START CONVERSATION button");
 				actionButton.setText(R.string.group_chat_start_conversation_label);
 			}
 		}
@@ -271,7 +269,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
     }
 
 	public void showOptionsPanel(String email){
-		log("showOptionsPanel");
+		LogUtil.logDebug("showOptionsPanel");
 		if(email!=null){
 			this.selectedEmail = email;
 			ContactAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
@@ -282,7 +280,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		if (request.getType() == MegaRequest.TYPE_SHARE) {
-			log("onRequestStart - Share");
+			LogUtil.logDebug("Share");
 		}
 	}
 
@@ -293,24 +291,24 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		log("onRequestFinish: " + request.getType() + "__" + request.getRequestString());
+		LogUtil.logDebug("onRequestFinish: " + request.getType() + "__" + request.getRequestString());
 
 		if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
-			log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
+			LogUtil.logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
 
 			if(request.getNumber()== MegaContactRequest.INVITE_ACTION_REMIND){
 				showSnackbar(getString(R.string.context_contact_invitation_resent));
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					log("OK INVITE CONTACT: "+request.getEmail());
+					LogUtil.logDebug("OK INVITE CONTACT: " + request.getEmail());
 					if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
 					{
 						showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
 					}
 				}
 				else{
-					log("Code: "+e.getErrorString());
+					LogUtil.logError("Code: " + e.getErrorString());
 					if(e.getErrorCode()==MegaError.API_EEXIST)
 					{
 						showSnackbar(getString(R.string.context_contact_already_invited, request.getEmail()));
@@ -322,7 +320,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 					else{
 						showSnackbar(getString(R.string.general_error));
 					}
-					log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+					LogUtil.logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 				}
 			}
 		}
@@ -332,15 +330,11 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError");
-	}
-	
-	public static void log(String log) {
-		Util.log("ContactAttachmentActivityLollipop", log);
+		LogUtil.logWarning("onRequestTemporaryError");
 	}
 
 	public void itemClick(int position) {
-		log("itemClick");
+		LogUtil.logDebug("Position: " + position);
 
 		MegaContactDB c = contacts.get(position);
 		if(c!=null){
@@ -353,12 +347,12 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 					this.startActivity(i);
 				}
 				else{
-					log("The user is not contact");
+					LogUtil.logDebug("The user is not contact");
 					showSnackbar(getString(R.string.alert_user_is_not_contact));
 				}
 			}
 			else{
-				log("The contact is null");
+				LogUtil.logError("The contact is null");
 			}
 		}
 	}
@@ -367,7 +361,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	public void onClick(View v) {
 		switch (v.getId()){		
 			case R.id.contact_attachment_chat_option_button:{
-				log("Click on ACTION button");
+				LogUtil.logDebug("Click on ACTION button");
 
 				if(inviteAction){
 					ArrayList<String> contactEmails = new ArrayList<>();
@@ -408,7 +402,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 				break;
 			}
 			case R.id.contact_attachment_chat_cancel_button: {
-				log("Click on Cancel button");
+				LogUtil.logDebug("Click on Cancel button");
 				finish();
 			}
 		}
@@ -431,16 +425,16 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	}
 
 	public void startConversation(long handle){
-		log("startConversation");
+		LogUtil.logDebug("Handle: " + handle);
 		MegaChatRoom chat = megaChatApi.getChatRoomByUser(handle);
 		MegaChatPeerList peers = MegaChatPeerList.createInstance();
 		if(chat==null){
-			log("No chat, create it!");
+			LogUtil.logDebug("No chat, create it!");
 			peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
 			megaChatApi.createChat(false, peers, this);
 		}
 		else{
-			log("There is already a chat, open it!");
+			LogUtil.logDebug("There is already a chat, open it!");
 			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 			intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
@@ -451,7 +445,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	}
 
 	public void startGroupConversation(ArrayList<Long> userHandles){
-		log("startGroupConversation");
+		LogUtil.logDebug("startGroupConversation");
 		MegaChatPeerList peers = MegaChatPeerList.createInstance();
 
 		for(int i=0;i<userHandles.size();i++){
@@ -464,7 +458,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-		log("onRequestStart: "+request.getRequestString());
+		LogUtil.logDebug("onRequestStart: " + request.getRequestString());
 	}
 
 	@Override
@@ -474,13 +468,12 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestFinish: "+request.getRequestString());
+		LogUtil.logDebug("onRequestFinish: " + request.getRequestString());
 
 		if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
-			log("Create chat request finish!!!");
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-
-				log("open new chat");
+			LogUtil.logDebug("Create chat request finish!!!");
+			if(e.getErrorCode()==MegaChatError.ERROR_OK) {
+				LogUtil.logDebug("Open new chat");
 				Intent intent = new Intent(this, ChatActivityLollipop.class);
 				intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 				intent.putExtra("CHAT_ID", request.getChatHandle());
@@ -490,7 +483,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 			}
 			else{
-				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
+				LogUtil.logError("ERROR WHEN CREATING CHAT " + e.getErrorString());
 				showSnackbar(getString(R.string.create_chat_error));
 			}
 		}

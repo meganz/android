@@ -21,6 +21,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -44,7 +45,7 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
     DisplayMetrics outMetrics;
 
     public static ExportRecoveryKeyFragment newInstance() {
-        log("newInstance");
+        LogUtil.logDebug("newInstance");
         ExportRecoveryKeyFragment fragment = new ExportRecoveryKeyFragment();
         return fragment;
     }
@@ -52,7 +53,7 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -66,7 +67,7 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        LogUtil.logDebug("onCreateView");
 
         View v = inflater.inflate(R.layout.export_mk_layout, container, false);
 
@@ -134,34 +135,30 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
 
     @Override
     public void onAttach(Activity activity) {
-        log("onAttach");
+        LogUtil.logDebug("onAttach");
         super.onAttach(activity);
         context = activity;
     }
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach context");
+        LogUtil.logDebug("onAttach context");
         super.onAttach(context);
         this.context = context;
-    }
-
-    private static void log(String log) {
-        Util.log("ExportRecoveryKeyFragment", log);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.copy_MK_button:{
-                log("Copy Master Key button");
+                LogUtil.logDebug("Copy Master Key button");
                 ((ManagerActivityLollipop)context).hideMKLayout();
                 AccountController aC = new AccountController(context);
                 aC.copyMK(false);
                 break;
             }
             case R.id.save_MK_button:{
-                log("Save Master Key button");
+                LogUtil.logDebug("Save Master Key button");
                 ((ManagerActivityLollipop)context).hideMKLayout();
                 AccountController aC = new AccountController(context);
                 aC.exportMK(null, false);

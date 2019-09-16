@@ -5,6 +5,7 @@ import android.os.Bundle;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.PinUtil;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -32,7 +33,7 @@ public class PinActivityLollipop extends BaseActivity {
 
 	@Override
 	protected void onPause() {
-		log("onPause");
+		LogUtil.logDebug("onPause");
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
@@ -49,7 +50,7 @@ public class PinActivityLollipop extends BaseActivity {
 	
 	@Override
 	protected void onResume() {
-		log("onResume");
+		LogUtil.logDebug("onResume");
 
 		super.onResume();
         Util.setAppFontSize(this);
@@ -72,9 +73,5 @@ public class PinActivityLollipop extends BaseActivity {
 		if(MegaApplication.isShowPinScreen()){
 			PinUtil.resume(this);
 		}
-	}
-
-	public static void log(String message) {
-		Util.log("PinActivityLollipop", message);
 	}
 }

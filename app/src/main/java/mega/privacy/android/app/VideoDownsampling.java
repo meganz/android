@@ -18,8 +18,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
+import nz.mega.sdk.MegaApiAndroid;
 
 public class VideoDownsampling {
 
@@ -76,7 +77,7 @@ public class VideoDownsampling {
     }
 
     public void changeResolution(File f, String inputFile, long idMessage) throws Throwable {
-        log("changeResolution");
+        LogUtil.logDebug("changeResolution");
 
         queue.add(new VideoUpload(f.getAbsolutePath(), inputFile, f.length(), idMessage));
 
@@ -114,7 +115,7 @@ public class VideoDownsampling {
         }
 
         public static void changeResolutionInSeparatedThread(VideoDownsampling changer) throws Throwable {
-            log("changeResolutionInSeparatedThread");
+            LogUtil.logDebug("changeResolutionInSeparatedThread");
             ChangerWrapper wrapper = new ChangerWrapper(changer);
             Thread th = new Thread(wrapper, ChangerWrapper.class.getSimpleName());
             th.start();
@@ -125,7 +126,7 @@ public class VideoDownsampling {
     }
 
     protected void prepareAndChangeResolution(VideoUpload video) throws Exception {
-        log("prepareAndChangeResolution");
+        LogUtil.logDebug("prepareAndChangeResolution");
         Exception exception = null;
         String mInputFile = video.original;
 
@@ -260,7 +261,7 @@ public class VideoDownsampling {
             }
         }
         if (exception != null){
-            log("VideoDownsampling Exception: "+exception.toString());
+            LogUtil.logError("Exception", exception);
             throw exception;
         }
         else{
@@ -350,7 +351,7 @@ public class VideoDownsampling {
                                   MediaCodec audioDecoder, MediaCodec audioEncoder,
                                   MediaMuxer muxer,
                                   InputSurface inputSurface, OutputSurface outputSurface, VideoUpload video) {
-        log("changeResolution");
+        LogUtil.logDebug("changeResolution");
         String mOutputFile = video.outFile;
 
         ByteBuffer[] videoDecoderInputBuffers = null;
@@ -617,9 +618,5 @@ public class VideoDownsampling {
             }
         }
         return null;
-    }
-
-    private static void log(String log) {
-        Util.log("VideoDownsampling", log);
     }
 }

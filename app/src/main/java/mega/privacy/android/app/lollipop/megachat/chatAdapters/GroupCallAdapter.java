@@ -34,6 +34,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.InfoPeerGroupCall;
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
 import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -70,7 +71,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isGrid) {
 
         if(peers!=null){
-            log("GroupCallAdapter(peers: "+peers.size()+")");
+            LogUtil.logDebug("peers: " + peers.size());
         }
         this.context = context;
         this.recyclerViewFragment = recyclerView;
@@ -83,9 +84,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             megaApi = app.getMegaApi();
         }
 
-        log("retryPendingConnections()");
         if (megaApi != null) {
-            log("---------retryPendingConnections");
+            LogUtil.logDebug("retryPendingConnections");
             megaApi.retryPendingConnections();
         }
 
@@ -131,7 +131,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     ViewHolderGroupCallGrid holderGrid = null;
 
     @Override public GroupCallAdapter.ViewHolderGroupCall onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder()");
+        LogUtil.logDebug("onCreateViewHolder()");
 
         display = ((ChatCallActivity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -185,7 +185,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     public void onBindViewHolderGrid (final ViewHolderGroupCallGrid holder, final int position){
-        log("onBindViewHolderGrid() - position: "+position);
+        LogUtil.logDebug("position: " + position);
 
         final InfoPeerGroupCall peer = getNodeAt(position);
         if (peer == null){
@@ -194,7 +194,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         holder.peerId = peer.getPeerId();
         int numPeersOnCall = getItemCount();
-        log("onBindViewHolderGrid() - (peerId = "+peer.getPeerId()+", clientId = "+peer.getClientId()+") of numPeersOnCall: "+numPeersOnCall);
+        LogUtil.logDebug("peerId = " + peer.getPeerId() + ", clientId = " + peer.getClientId() + ") of numPeersOnCall: " + numPeersOnCall);
 
 
         if(isGrid){
@@ -264,7 +264,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         holder.avatarInitialLetter.setText("");
 
         if(peer.isVideoOn()) {
-            log("(peerid = "+peer.getPeerId()+", clientId = "+peer.getClientId()+") VIDEO ON pos: "+position);
+            LogUtil.logDebug("(peerid = " + peer.getPeerId() + ", clientId = " + peer.getClientId() + ") VIDEO ON pos: " + position);
 
             holder.avatarMicroLayout.setVisibility(GONE);
             holder.microAvatar.setVisibility(View.GONE);
@@ -388,7 +388,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
             //Listener && SurfaceView
             if(peer.getListener() == null){
-                log("( peerId = "+peer.getPeerId()+", clientId = "+peer.getClientId()+") VIDEO ON- listener == null ");
+                LogUtil.logDebug("(peerId = " + peer.getPeerId() + ", clientId = " + peer.getClientId() + ") VIDEO ON- listener == null");
                 holder.parentSurfaceView.removeAllViews();
                 TextureView myTexture = new TextureView(context);
                 myTexture.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
@@ -421,7 +421,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
             }else{
 
-                log("(peerId = "+peer.getPeerId()+", clientId = "+peer.getClientId()+") VIDEO ON - listener != null");
+                LogUtil.logDebug("(peerId = " + peer.getPeerId() + ", clientId = " + peer.getClientId() + ") VIDEO ON - listener != null");
                 if(holder.parentSurfaceView.getChildCount() == 0){
                     if(peer.getListener().getSurfaceView().getParent()!=null){
                         if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
@@ -535,7 +535,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             }
 
         }else{
-            log("(peerId = "+peer.getPeerId()+", clientId = "+peer.getPeerId()+") VIDEO OFF");
+            LogUtil.logDebug("(peerId = " + peer.getPeerId() + ", clientId = " + peer.getPeerId() + ") VIDEO OFF");
             //Avatar:
             setProfile(peer.getPeerId(), peer.getName(), null, holder, position);
             holder.qualityLayout.setVisibility(GONE);
@@ -657,7 +657,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     //Group call: avatar
     public void setProfile(long peerId, String fullName, String peerEmail, ViewHolderGroupCall holder, int position) {
-        log("setProfile");
+        LogUtil.logDebug("setProfile");
 
         if(holder == null){
             holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
@@ -727,7 +727,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     //Group call: default my avatar
     private void createDefaultAvatar(ViewHolderGroupCall holder, long peerId, String peerName, String peerEmail){
-        log("createDefaultAvatar");
+        LogUtil.logDebug("createDefaultAvatar");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -821,7 +821,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     public void changesInAudio(int position, ViewHolderGroupCall holder){
-        log("changesInAudio");
+        LogUtil.logDebug("changesInAudio");
 
         if(holder == null){
             holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
@@ -906,7 +906,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     public void changesInGreenLayer(int position, ViewHolderGroupCall holder){
-        log("changesInGreenLayer()");
+        LogUtil.logDebug("changesInGreenLayer()");
         if(holder == null){
             holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
         }
@@ -933,7 +933,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     @Override
     public void resetSize(long peerid, long clientid) {
-        log("resetSize");
+        LogUtil.logDebug("Peer ID: " + peerid + ", Client ID: " + clientid);
         if(getItemCount()!=0){
 
            if((peers!=null)&&(peers.size()>0)){
@@ -953,7 +953,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     public void onDestroy(){
-        log("onDestroy()");
+        LogUtil.logDebug("onDestroy()");
         ViewHolderGroupCall holder = null;
         if((peers!=null)&&(peers.size()>0)) {
             for(int i=0; i<peers.size(); i++){
@@ -961,7 +961,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
                 }
                 if(holder!=null){
-                    log("onDestroy()  holder != null");
+                    LogUtil.logDebug("holder != null");
                     InfoPeerGroupCall peer = getNodeAt(i);
                     if (peer == null){
                         return;
@@ -994,7 +994,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     }
 
                 }else{
-                    log("onDestroy()  holder == null");
+                    LogUtil.logWarning("holder == null");
 
 //                notifyItemChanged(i);
                 }
@@ -1011,10 +1011,4 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     public void setPeers(ArrayList<InfoPeerGroupCall> peers) {
         this.peers = peers;
     }
-
-    private static void log(String log) {
-        Util.log("GroupCallAdapter", log);
-    }
-
-
 }

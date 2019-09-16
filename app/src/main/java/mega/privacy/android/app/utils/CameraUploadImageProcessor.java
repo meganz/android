@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 
 import java.io.File;
 
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUtilsAndroid;
 
@@ -23,30 +24,30 @@ public class CameraUploadImageProcessor {
     private static int PREVIEW_SIZE = 1000;
 
     public static void createImageThumbnail(Context context,MegaApiJava api,String localPath,File dst) {
-        log("createImageThumbnail for: " + localPath);
+        LogUtil.logDebug("Create image thumbnail for: " + localPath);
         boolean result = MegaUtilsAndroid.createThumbnail(new File(localPath),dst);
         if (!result) {
             Bitmap thumbnail = getImageThumbnailFromDB(context,localPath);
             if (thumbnail == null) {
-                log("create thumbnail use api");
+                LogUtil.logDebug("Create thumbnail using api");
                 api.createThumbnail(localPath,dst.getAbsolutePath());
             } else {
-                log("get from db is not null");
+                LogUtil.logDebug("Get from DB is not null");
                 nz.mega.sdk.AndroidGfxProcessor.saveBitmap(thumbnail,dst);
             }
         }
     }
 
     public static void createVideoThumbnail(Context context,MegaApiJava api,String localPath,File dst) {
-        log("createVideoThumbnail for: " + localPath);
+        LogUtil.logDebug("Create video thumbnail for: " + localPath);
         boolean result = MegaUtilsAndroid.createThumbnail(new File(localPath),dst);
         if (!result) {
             Bitmap thumbnail = getVideoThumbnailFromDB(context,localPath);
             if (thumbnail == null) {
-                log("create thumbnail use api");
+                LogUtil.logDebug("Create thumbnail using api");
                 api.createThumbnail(localPath,dst.getAbsolutePath());
             } else {
-                log("get from db is not null");
+                LogUtil.logDebug("Get from DB is not null");
                 nz.mega.sdk.AndroidGfxProcessor.saveBitmap(thumbnail,dst);
             }
         }
@@ -168,7 +169,7 @@ public class CameraUploadImageProcessor {
                 null);
         long id = 0;
         if (cursor != null && cursor.moveToFirst()) {
-            log(localPath + "'s id is " + id);
+            LogUtil.logDebug(localPath + "'s ID is " + id);
             id = cursor.getLong(cursor.getColumnIndex(_ID));
             cursor.close();
             return MediaStore.Video.Thumbnails.getThumbnail(resolver,id,MediaStore.Video.Thumbnails.MICRO_KIND,null);
@@ -185,15 +186,11 @@ public class CameraUploadImageProcessor {
                 null);
         long id = 0;
         if (cursor != null && cursor.moveToFirst()) {
-            log(localPath + "'s id is " + id);
+            LogUtil.logDebug(localPath + "'s ID is " + id);
             id = cursor.getLong(cursor.getColumnIndex(_ID));
             cursor.close();
             return MediaStore.Images.Thumbnails.getThumbnail(resolver,id,MediaStore.Images.Thumbnails.MICRO_KIND,null);
         }
         return null;
-    }
-
-    private static void log(String msg) {
-        Util.log("CameraUploadImageProcessor",msg);
     }
 }

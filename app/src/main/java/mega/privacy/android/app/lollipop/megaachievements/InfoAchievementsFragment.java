@@ -18,6 +18,7 @@ import java.util.Date;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -47,7 +48,7 @@ public class InfoAchievementsFragment extends Fragment{
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -57,7 +58,7 @@ public class InfoAchievementsFragment extends Fragment{
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		LogUtil.logDebug("onCreateView");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -80,7 +81,7 @@ public class InfoAchievementsFragment extends Fragment{
 				awardId = ((AchievementsActivity) context).megaAchievements.getAwardId(i);
 
 				rewardId = ((AchievementsActivity) context).megaAchievements.getRewardAwardId(awardId);
-				log("AWARD ID: " + awardId + " REWARD id: " + rewardId);
+				LogUtil.logDebug("AWARD ID: " + awardId + " REWARD id: " + rewardId);
 
 				long daysLeft= ((AchievementsActivity)context).megaAchievements.getAwardExpirationTs(i);
 
@@ -97,7 +98,7 @@ public class InfoAchievementsFragment extends Fragment{
 				break;
 			}
 			else{
-				log("No match for achievement award!");
+				LogUtil.logWarning("No match for achievement award!");
 			}
 
 		}
@@ -109,7 +110,7 @@ public class InfoAchievementsFragment extends Fragment{
             icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mobile_big));
 
 			if(awardId==-1){
-				log("No award for this achievement");
+				LogUtil.logWarning("No award for this achievement");
 				checkIcon.setVisibility(View.GONE);
 				title.setText(getString(R.string.figures_achievements_text, Util.getSizeString(installAppStorageValue), Util.getSizeString(installAppTransferValue)));
 				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
@@ -146,7 +147,7 @@ public class InfoAchievementsFragment extends Fragment{
 			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mega_big));
 
 			if(awardId==-1) {
-				log("No award for this achievement");
+				LogUtil.logWarning("No award for this achievement");
 				checkIcon.setVisibility(View.GONE);
 				title.setText(getString(R.string.figures_achievements_text, Util.getSizeString(installDesktopStorageValue), Util.getSizeString(installDesktopTransferValue)));
 				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
@@ -219,7 +220,7 @@ public class InfoAchievementsFragment extends Fragment{
 
 	@Override
 	public void onAttach(Activity activity) {
-		log("onAttach");
+		LogUtil.logDebug("onAttach");
 		super.onAttach(activity);
 		context = activity;
 		aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -227,13 +228,9 @@ public class InfoAchievementsFragment extends Fragment{
 
 	@Override
 	public void onAttach(Context context) {
-		log("onAttach context");
+		LogUtil.logDebug("onAttach context");
 		super.onAttach(context);
 		this.context = context;
 		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
-	}
-
-	public static void log(String log) {
-		Util.log("InfoAchievementsFragment", log);
 	}
 }

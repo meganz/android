@@ -43,6 +43,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.FileContactMultipleRequestListener;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -122,7 +123,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 
 	public void activateActionMode(){
-		log("activateActionMode");
+		LogUtil.logDebug("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = startSupportActionMode(new ActionBarCallBack());
@@ -133,7 +134,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			log("onActionItemClicked");
+			LogUtil.logDebug("onActionItemClicked");
 			final List<MegaShare> shares = adapter.getSelectedShares();
 			
 			switch(item.getItemId()){
@@ -157,7 +158,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
                                 temp.show();
                             }
                             catch(Exception e){
-                                log(e.getMessage());
+								LogUtil.logError("Exception", e);
                                 return;
                             }
                             statusDialog = temp;
@@ -169,7 +170,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 							} else if (shares.size() == 1) {
 								callback = FileContactListActivityLollipop.this;
 							} else {
-								log("Shares array is empty");
+								LogUtil.logWarning("Shares array is empty");
 								return;
 							}
 							controller.checkShares(shares, item, node, callback);
@@ -190,10 +191,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 						if(shares.size()!=0){
 
 							if (shares.size() > 1) {
-								log("Remove multiple contacts");
+								LogUtil.logDebug("Remove multiple contacts");
 								showConfirmationRemoveMultipleContactFromShare(shares);
 							} else {
-								log("Remove one contact");
+								LogUtil.logDebug("Remove one contact");
 								showConfirmationRemoveContactFromShare(shares.get(0).getUser());
 							}
 						}
@@ -216,7 +217,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			log("onCreateActionMode");
+			LogUtil.logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
 			fab.setVisibility(View.GONE);
@@ -227,7 +228,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
+			LogUtil.logDebug("onDestroyActionMode");
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
@@ -237,7 +238,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			log("onPrepareActionMode");
+			LogUtil.logDebug("onPrepareActionMode");
 			List<MegaShare> selected = adapter.getSelectedShares();
 			boolean deleteShare = false;
 			boolean permissions = false;
@@ -286,7 +287,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		super.onCreate(savedInstanceState);
 		
 		if (megaApi == null){
@@ -294,7 +295,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		}
 
 		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
+			LogUtil.logDebug("Refresh session - sdk");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
 			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -308,7 +309,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			}
 
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				log("Refresh session - karere");
+				LogUtil.logDebug("Refresh session - karere");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
 				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -383,7 +384,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			tempListContacts = megaApi.getPendingOutShares(node);
 
 			if(tempListContacts!=null && !tempListContacts.isEmpty()){
-				log("Size of pending out shares: "+tempListContacts);
+				LogUtil.logDebug("Size of pending out shares: " + tempListContacts);
 				listContacts.addAll(megaApi.getPendingOutShares(node));
 			}
 			
@@ -470,7 +471,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	
 	public void showOptionsPanel(MegaShare sShare){
-		log("showNodeOptionsPanel");
+		LogUtil.logDebug("showNodeOptionsPanel");
 		if(node!=null){
 			this.selectedShare = sShare;
 			FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
@@ -554,7 +555,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 	
 	public void selectAll(){
-		log("selectAll");
+		LogUtil.logDebug("selectAll");
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
@@ -580,14 +581,14 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		if (request.getType() == MegaRequest.TYPE_SHARE) {
-			log("onRequestStart - Share");
+			LogUtil.logDebug("onRequestStart - Share");
 		}
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		log("onRequestFinish: " + request.getType());
-		log("onRequestFinish: " + request.getRequestString());
+		LogUtil.logDebug("Request type: " + request.getType());
+		LogUtil.logDebug("Request string: " + request.getRequestString());
 		if(adapter!=null){
 			if(adapter.isMultipleSelect()){
 				adapter.clearSelections();
@@ -596,18 +597,17 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		}
 
 		if (request.getType() == MegaRequest.TYPE_SHARE){
-			log(" MegaRequest.TYPE_SHARE");
 
 			String message;
 			if (e.getErrorCode() == MegaError.API_OK){
                 if (removeShare) {
-                    log("OK onRequestFinish remove");
+					LogUtil.logDebug("OK remove");
                     removeShare = false;
                     adapter.setShareList(listContacts);
                     listView.invalidate();
                     message = getString(R.string.context_share_correctly_removed);
                 } else if (changeShare) {
-                    log("OK onRequestFinish change");
+					LogUtil.logDebug("OK change");
                     permissionsDialog.dismiss();
                     changeShare = false;
                     adapter.setShareList(listContacts);
@@ -619,11 +619,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			}
 			else{
                 if (removeShare) {
-                    log("ERROR onRequestFinish remove");
+					LogUtil.logWarning("ERROR remove");
                     removeShare = false;
                     message = getString(R.string.context_contact_not_removed);
                 } else if (changeShare) {
-                    log("ERROR onRequestFinish change");
+					LogUtil.logWarning("ERROR change");
                     changeShare = false;
                     message = getString(R.string.context_permissions_not_changed);
                 }else{
@@ -631,7 +631,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
                 }
 			}
             showSnackbar(Constants.SNACKBAR_TYPE,container,message);
-			log("Finish onRequestFinish");
+			LogUtil.logDebug("Finish onRequestFinish");
 		}
 		else if (request.getType() == MegaRequest.TYPE_EXPORT){
 			
@@ -651,15 +651,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError");
-	}
-	
-	public static void log(String log) {
-		Util.log("FileContactListActivityLollipop", log);
+		LogUtil.logWarning("onRequestTemporaryError");
 	}
 
 	public void itemClick(int position) {
-		log("itemClick");
+		LogUtil.logDebug("Position: " + position);
 
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
@@ -679,7 +675,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onBackPressed() {
-		log("onBackPressed");
+		LogUtil.logDebug("onBackPressed");
 		retryConnectionsAndSignalPresence();
 
 		if (adapter.getPositionClicked() != -1){
@@ -715,13 +711,13 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 	
 	private void updateActionModeTitle() {
-		log("updateActionModeTitle");
+		LogUtil.logDebug("updateActionModeTitle");
 		if (actionMode == null) {
 			return;
 		}
 		List<MegaShare> contacts = adapter.getSelectedShares();
 		if(contacts!=null){
-			log("Contacts selected: "+contacts.size());
+			LogUtil.logDebug("Contacts selected: " + contacts.size());
 		}
 
 		Resources res = getResources();
@@ -732,7 +728,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			log("oninvalidate error");
+			LogUtil.logError("Invalidate error", e);
 		}
 	}
 	
@@ -758,14 +754,14 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void removeFileContactShare(){
-		log("removeFileContactShare");
+		LogUtil.logDebug("removeFileContactShare");
 		notifyDataSetChanged();
 
 		showConfirmationRemoveContactFromShare(selectedShare.getUser());
 	}
 
 	public void changePermissions(){
-		log("changePermissions");
+		LogUtil.logDebug("changePermissions");
 		notifyDataSetChanged();
 		dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 		final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
@@ -914,11 +910,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			                    		MegaUser u = megaApi.getContact(emails.get(i));
 
 										if(u!=null){
-											log("Share: "+ node.getName() + " to "+ u.getEmail());
+											LogUtil.logDebug("Share: "+ node.getName() + " to "+ u.getEmail());
 											megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivityLollipop);
 										}
 										else{
-											log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+											LogUtil.logDebug("USER is NULL when sharing!->SHARE WITH NON CONTACT");
 											megaApi.share(node, emails.get(i), MegaShare.ACCESS_READ, fileContactListActivityLollipop);
 										}
 			                    	}
@@ -928,11 +924,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			                    	for (int i=0;i<emails.size();i++){
 			                    		MegaUser u = megaApi.getContact(emails.get(i));
 										if(u!=null){
-											log("Share: "+ node.getName() + " to "+ u.getEmail());
+											LogUtil.logDebug("Share: "+ node.getName() + " to "+ u.getEmail());
 											megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);
 										}
 										else{
-											log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+											LogUtil.logDebug("USER is NULL when sharing!->SHARE WITH NON CONTACT");
 											megaApi.share(node, emails.get(i), MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);
 										}
 			                    	}
@@ -942,11 +938,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			                    	for (int i=0;i<emails.size();i++){
 			                    		MegaUser u = megaApi.getContact(emails.get(i));
 										if(u!=null){
-											log("Share: "+ node.getName() + " to "+ u.getEmail());
+											LogUtil.logDebug("Share: "+ node.getName() + " to "+ u.getEmail());
 											megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivityLollipop);
 										}
 										else{
-											log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+											LogUtil.logDebug("USER is NULL when sharing!->SHARE WITH NON CONTACT");
 											megaApi.share(node, emails.get(i), MegaShare.ACCESS_FULL, fileContactListActivityLollipop);
 										}
 			                    	}
@@ -964,13 +960,13 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		log("onUserupdate");
+		LogUtil.logDebug("onUserupdate");
 
 	}
 
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-		log("onUserAlertsUpdate");
+		LogUtil.logDebug("onUserAlertsUpdate");
 	}
 
 	@Override
@@ -980,13 +976,13 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
-		log("onNodesUpdate");
+		LogUtil.logDebug("onNodesUpdate");
 
 		try {
 			statusDialog.dismiss();
 		}
 		catch (Exception ex) {
-			log("Error dismiss status dialog");
+			LogUtil.logError("Error dismiss status dialog", ex);
 		}
 
 		if (node.isFolder()){
@@ -1032,7 +1028,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void showConfirmationRemoveContactFromShare (final String email){
-		log("showConfirmationRemoveContactFromShare");
+		LogUtil.logDebug("showConfirmationRemoveContactFromShare");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -1057,7 +1053,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void showConfirmationRemoveMultipleContactFromShare (final List<MegaShare> contacts){
-		log("showConfirmationRemoveMultipleContactFromShare");
+		LogUtil.logDebug("showConfirmationRemoveMultipleContactFromShare");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -1104,7 +1100,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void removeMultipleShares(List<MegaShare> shares){
-		log("removeMultipleShares");
+		LogUtil.logDebug("Number of shared to remove: " + shares.size());
 		ProgressDialog temp = null;
 		try{
 			temp = new ProgressDialog(this);

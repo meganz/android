@@ -69,6 +69,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -163,10 +164,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
-	    	log("onLongPress");
+			LogUtil.logDebug("onLongPress");
 	    	
 			if (mode == Mode.PICK_FILE) {
-				log("Mode.PICK_FILE");
+				LogUtil.logDebug("Mode.PICK_FILE");
 				// handle long press
 				if (!adapter.isMultipleSelect()){
 					adapter.setMultipleSelect(true);
@@ -180,7 +181,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		log("onOptionsItemSelected");
+		LogUtil.logDebug("onOptionsItemSelected");
 
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
@@ -262,7 +263,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 			
 			if (!(mode.equals(Mode.PICK_FOLDER))) {
-				log("not Mode.PICK_FOLDER");
+				LogUtil.logDebug("Not Mode.PICK_FOLDER");
 				menu.findItem(R.id.cab_menu_create_folder).setVisible(false);
 			}
 			
@@ -271,7 +272,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 	
 	public void selectAll(){
-		log("selectAll");
+		LogUtil.logDebug("selectAll");
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
@@ -289,7 +290,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
-		log("onCreateOptionsMenuLollipop");
+		LogUtil.logDebug("onCreateOptionsMenuLollipop");
 		
 		
 		// Inflate the menu items for use in the action bar
@@ -318,7 +319,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-		log("onPrepareOptionsMenu");
+		LogUtil.logDebug("onPrepareOptionsMenu");
 		if (mode == Mode.PICK_FOLDER) {
 			menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
@@ -340,7 +341,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	@SuppressLint("NewApi") @Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 			if (!hasStoragePermission) {
@@ -542,7 +543,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 		path.mkdirs();
 		changeFolder(path);
-		log("Path to show: "+path);
+		LogUtil.logDebug("Path to show: " + path);
 	}
 
 	@Override
@@ -563,7 +564,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 */
 	@SuppressLint("NewApi")
 	private void changeFolder(File newPath) {
-		log("changeFolder: "+newPath);
+		LogUtil.logDebug("New path: " + newPath);
 		
 		setFiles(newPath);
 		path = newPath;
@@ -583,7 +584,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 * Update file list for new folder
 	 */
 	private void setFiles(File path) {
-		log("setFiles");
+		LogUtil.logDebug("setFiles");
 		List<FileDocument> documents = new ArrayList<FileDocument>();
 		if (!path.canRead()) {
 			Util.showErrorAlertDialog(getString(R.string.error_io_problem),
@@ -594,7 +595,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		if(files != null)
 		{
-			log("Number of files: "+files.length);
+			LogUtil.logDebug("Number of files: " + files.length);
 			for (File file : files) {
 				FileDocument document = new FileDocument(file);
 				if (document.isHidden()) {
@@ -605,13 +606,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			Collections.sort(documents, new CustomComparator());
 		}
 		if(documents.size()==0){
-			log("documents SIZE 0");
+			LogUtil.logDebug("Documents SIZE 0");
 			listView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 		}
 		else{
-			log("documents: "+documents.size());
+			LogUtil.logDebug("Documents: " + documents.size());
 			adapter.setFiles(documents);
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
@@ -620,9 +621,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	private void updateActionModeTitle() {
-		log("updateActionModeTitle");
+		LogUtil.logDebug("updateActionModeTitle");
 		if (actionMode == null) {
-			log("RETURN");
+			LogUtil.logWarning("RETURN");
 			return;
 		}
 		
@@ -658,8 +659,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
+			LogUtil.logError("Invalidate error", e);
 			e.printStackTrace();
-			log("oninvalidate error");
 		}
 	}
 
@@ -667,7 +668,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
-		log("clearSelections");
+		LogUtil.logDebug("clearSelections");
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
@@ -730,8 +731,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	@Override
-	public void onClick(View v) {		
-		log("onClick");
+	public void onClick(View v) {
+		LogUtil.logDebug("onClick");
 
 		switch (v.getId()) {
 			case R.id.file_storage_button:{
@@ -741,7 +742,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                     dbH.setLastUploadFolder(path.getAbsolutePath());
                 }
 				if (mode == Mode.PICK_FOLDER) {
-					log("Mode.PICK_FOLDER");
+					LogUtil.logDebug("Mode.PICK_FOLDER");
 					Intent intent = new Intent();
 					intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
 					intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);
@@ -751,7 +752,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 					finish();
 				}
 				else {
-					log("Mode.PICK_FILE");
+					LogUtil.logDebug("Mode.PICK_FILE");
 					if(adapter.getSelectedCount()<=0){
 						showSnackbar(viewContainer, getString(R.string.error_no_selection));
 						break;
@@ -768,7 +769,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 								if(document != null)
 								{
 									File file = document.getFile();
-									log("Add to files selected: "+file.getAbsolutePath());
+									LogUtil.logDebug("Add to files selected: " + file.getAbsolutePath());
 									files.add(file.getAbsolutePath());
 								}
 								
@@ -866,19 +867,15 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	public void itemClick(int position) {
-		log("itemClick: position: "+position);
+		LogUtil.logDebug("Position: " + position);
 
 		FileDocument document = adapter.getDocumentAt(position);
-		if(document == null)
-		{
+		if(document == null) {
 			return;
-		}
-		else{
-			log("El documento es: "+document.getName());
 		}
 		
 		if (adapter.isMultipleSelect()){
-			log("MULTISELECT ON");
+			LogUtil.logDebug("MULTISELECT ON");
 			adapter.toggleSelection(position);
 			List<FileDocument> selected = adapter.getSelectedDocuments();
 			if (selected.size() > 0){
@@ -893,7 +890,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 
-				log("Push to stack "+lastFirstVisiblePosition+" position");
+				LogUtil.logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
 				changeFolder(document.getFile());
@@ -920,7 +917,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 * activity
 	 */
 	private void setResultFiles(ArrayList<String> files) {
-		log("setResultFiles: "+files.size() + "files selected");
+		LogUtil.logDebug(files.size() + "files selected");
 		Intent intent = new Intent();
 		intent.putStringArrayListExtra(EXTRA_FILES, files);
 		intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
@@ -942,7 +939,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		log("hideMultipleSelect");
+		LogUtil.logDebug("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
@@ -951,7 +948,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	@Override
 	public void onBackPressed() {
-		log("onBackPressed");
+		LogUtil.logDebug("onBackPressed");
 		retryConnectionsAndSignalPresence();
 
 		// Finish activity if at the root
@@ -963,9 +960,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
+				LogUtil.logDebug("Pop of the stack " + lastVisiblePosition + " position");
 			}
-			log("Scroll to "+lastVisiblePosition+" position");
+			LogUtil.logDebug("Scroll to " + lastVisiblePosition + " position");
 
 			if(lastVisiblePosition>=0){
 				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
@@ -975,7 +972,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	
 	public void showNewFolderDialog(){
-		log("showNewFolderDialog");
+		LogUtil.logDebug("showNewFolderDialog");
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1149,7 +1146,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 * Create new folder and reload file list
 	 */
 	private void createFolder(String value) {
-		log(value + " Of value");
+		LogUtil.logDebug(value + " Of value");
 		File newFolder = new File(path, value);
 		newFolder.mkdir();
 		newFolder.setReadable(true, false);
@@ -1161,10 +1158,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(input);
 		return m.find();
-	}
-	
-	public static void log(String message) {
-		Util.log("FileStorageActivityLollipop", message);
 	}
 
 	@Override

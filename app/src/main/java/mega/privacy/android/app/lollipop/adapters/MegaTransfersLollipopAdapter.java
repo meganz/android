@@ -25,6 +25,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -88,7 +89,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
     @Override
 	public ViewHolderTransfer onCreateViewHolder(ViewGroup parent, int viewType) {
-    	log("onCreateViewHolder");
+		LogUtil.logDebug("onCreateViewHolder");
     	
     	ViewHolderTransfer holder;
     	
@@ -127,7 +128,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 	@Override
 	public void onBindViewHolder(ViewHolderTransfer holder, int position) {
-		log("onBindViewHolder: "+position);
+		LogUtil.logDebug("Position: " + position);
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
@@ -139,12 +140,12 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		MegaTransfer transfer = (MegaTransfer) getItem(position);
 
 		if(transfer==null){
-			log("The recovered transfer is NULL - do not update");
+			LogUtil.logWarning("The recovered transfer is NULL - do not update");
 			return;
 		}
 
 		String fileName = transfer.getFileName();
-		log("onBindViewHolder: "+fileName);
+		LogUtil.logDebug("Node Handle: " + transfer.getNodeHandle());
 		holder.textViewFileName.setText(fileName);
 
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
@@ -247,7 +248,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		}
 
 		int state = transfer.getState();
-		log("State of the transfer: "+state);
+		LogUtil.logDebug("State of the transfer: " + state);
 		switch (state){
 			case MegaTransfer.STATE_PAUSED:{
 				holder.textViewCompleted.setVisibility(View.VISIBLE);
@@ -266,7 +267,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.transferProgressBar.setVisibility(View.VISIBLE);
 				holder.transferProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
 				double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
-				log("Progress Value: "+ progressValue);
+				LogUtil.logDebug("Progress Value: " + progressValue);
 				holder.transferProgressBar.setProgress((int)progressValue);
 				holder.optionRemove.setVisibility(View.VISIBLE);
 				holder.optionPause.setImageResource(R.drawable.ic_pause_grey);
@@ -287,7 +288,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				break;
 			}
 			default:{
-				log("Default status");
+				LogUtil.logDebug("Default status");
 				holder.imageViewCompleted.setVisibility(View.VISIBLE);
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
@@ -316,7 +317,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		if(position>=0){
 			return tL.get(position);
 		}
-		log("getItem error: position NOT valid: "+position);
+		LogUtil.logError("Error: position NOT valid: " + position);
 		return null;
 	}
 	
@@ -335,7 +336,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 		
 		ViewHolderTransfer holder = (ViewHolderTransfer) v.getTag();
 		if(holder!=null){
@@ -343,14 +344,14 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 			switch(v.getId()){
 				case R.id.transfers_list_option_remove:{
-					log("click to cancel transfer");
+					LogUtil.logDebug("click to cancel transfer");
 					MegaTransfer t = (MegaTransfer) getItem(currentPosition);
 
 					((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t, true);
 					break;
 				}
 				case R.id.transfers_list_option_pause:{
-					log("click to pause/play transfer");
+					LogUtil.logDebug("click to pause/play transfer");
 					MegaTransfer t = (MegaTransfer) getItem(currentPosition);
 					((ManagerActivityLollipop) context).pauseIndividualTransfer(t);
 					break;
@@ -358,7 +359,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			}
 		}
 		else{
-			log("Holder is NULL- not action performed");
+			LogUtil.logWarning("Holder is NULL- not action performed");
 		}
 	}
 
@@ -368,7 +369,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	}
 
 	public void updateProgress(int position, MegaTransfer transfer) {
-		log("updateProgress");
+		LogUtil.logDebug("updateProgress");
 
 		try{
 			ViewHolderTransfer holder = (ViewHolderTransfer) listFragment.findViewHolderForAdapterPosition(position);
@@ -380,17 +381,17 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 					holder.imageViewCompleted.setVisibility(View.GONE);
 				}
 				double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
-				log("Progress Value: "+ progressValue);
+				LogUtil.logDebug("Progress Value: " + progressValue);
 				holder.transferProgressBar.setProgress((int)progressValue);
 
 			}
 			else{
-				log("Holder is NULL: "+position);
+				LogUtil.logWarning("Holder is NULL: " + position);
 				notifyItemChanged(position);
 			}
 		}
 		catch(IndexOutOfBoundsException e){
-			log("EXCEPTION:updateProgress: "+e.getMessage());
+			LogUtil.logError("EXCEPTION", e);
 		}
 	}
 	
@@ -416,9 +417,4 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			notifyDataSetChanged();
 		}
 	}
-	
-	private static void log(String log) {
-		Util.log("MegaTransfersLollipopAdapter", log);
-	}
-
 }

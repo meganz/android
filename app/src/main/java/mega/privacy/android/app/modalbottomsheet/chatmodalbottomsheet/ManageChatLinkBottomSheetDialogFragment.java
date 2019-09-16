@@ -18,7 +18,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 public class ManageChatLinkBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -83,7 +84,7 @@ public class ManageChatLinkBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        LogUtil.logDebug("onClick");
 
         switch(v.getId()){
 
@@ -113,9 +114,5 @@ public class ManageChatLinkBottomSheetDialogFragment extends BottomSheetDialogFr
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-    }
-
-    private static void log(String log) {
-        Util.log("ManageChatLinkBottomSheetDialogFragment", log);
     }
 }

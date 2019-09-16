@@ -9,6 +9,7 @@ import android.webkit.WebViewClient;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 
 
@@ -54,12 +55,8 @@ public class WebViewActivityLollipop extends Activity {
         Intent intent = getIntent();
         if (intent != null) {
             String url = intent.getDataString();
-            log("URL: " + url);
+            LogUtil.logDebug("URL: " + url);
             myWebView.loadUrl(url);
         }
-    }
-
-    public static void log(String message) {
-        Util.log("WebViewActivityLollipop", message);
     }
 }

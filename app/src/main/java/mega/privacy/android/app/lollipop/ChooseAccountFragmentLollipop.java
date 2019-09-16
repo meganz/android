@@ -28,6 +28,7 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -89,18 +90,18 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            log("context is null");
+            LogUtil.logWarning("Context is null");
             return;
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        LogUtil.logDebug("onCreateView");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         final DisplayMetrics outMetrics = new DisplayMetrics();
@@ -239,7 +240,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
 
     public void onFreeClick (View view){
-        log("onFreeClick");
+        LogUtil.logDebug("onFreeClick");
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
@@ -252,7 +253,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     public void onUpgrade1Click(View view) {
 //		((ManagerActivity)context).showpF(1, accounts);
-        log("onUpgrade1Click");
+        LogUtil.logDebug("onUpgrade1Click");
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
@@ -265,7 +266,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     public void onUpgrade2Click(View view) {
 //		((ManagerActivity)context).showpF(2, accounts);
-        log("onUpgrade2Click");
+        LogUtil.logDebug("onUpgrade2Click");
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
@@ -278,7 +279,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     public void onUpgrade3Click(View view) {
 //		((ManagerActivity)context).showpF(3, accounts);
-        log("onUpgrade3Click");
+        LogUtil.logDebug("onUpgrade3Click");
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
@@ -291,7 +292,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     public void onUpgradeLiteClick(View view){
 //		((ManagerActivity)context).showpF(4, accounts);
-        log("onUpgradeLiteClick");
+        LogUtil.logDebug("onUpgradeLiteClick");
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
@@ -318,7 +319,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
     }
 
     public void setPricingInfo(){
-        log("setPricingInfo");
+        LogUtil.logDebug("setPricingInfo");
 
         DecimalFormat df = new DecimalFormat("#.##");
         MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
@@ -328,7 +329,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         MegaPricing p = myAccountInfo.getPricing();
         if(p==null){
-            log("Return - getPricing NULL");
+            LogUtil.logWarning("Return - getPricing NULL");
             return;
         }
 
@@ -373,12 +374,12 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         //Pro
         for (int i=0;i<p.getNumProducts();i++){
-            log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
+            LogUtil.logDebug("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
 
             Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
 
             if(account.getLevel()==1&&account.getMonths()==1){
-                log("PRO1: "+account.getStorage());
+                LogUtil.logDebug("PRO1: " + account.getStorage());
                 double price = account.getAmount() / 100.00;
                 String priceString = df.format(price);
                 String[] s = priceString.split("\\.");
@@ -438,7 +439,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
             }
             else if(account.getLevel()==2&&account.getMonths()==1){
-                log("PRO2: "+account.getStorage());
+                LogUtil.logDebug("PRO2: " + account.getStorage());
 
                 double price = account.getAmount() / 100.00;
                 String priceString = df.format(price);
@@ -500,7 +501,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 bandwidthSectionPro2.setText(resultPro2Bandwidth );
             }
             else if(account.getLevel()==3&&account.getMonths()==1){
-                log("PRO3: "+account.getStorage());
+                LogUtil.logDebug("PRO3: " + account.getStorage());
 
                 double price = account.getAmount() / 100.00;
                 String priceString = df.format(price);
@@ -562,7 +563,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 bandwidthSectionPro3.setText(resultPro3Bandwidth);
             }
             else if (account.getLevel()==4&&account.getMonths()==1){
-                log("Lite: "+account.getStorage());
+                LogUtil.logDebug("Lite: " + account.getStorage());
 
                 double price = account.getAmount() / 100.00;
                 String priceString = df.format(price);
@@ -638,7 +639,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach");
+        LogUtil.logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
 
@@ -649,7 +650,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onAttach(Activity context) {
-        log("onAttach Activity");
+        LogUtil.logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
 
@@ -657,9 +658,4 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
     }
-
-    public static void log(String message) {
-        Util.log("ChooseAccountFragmentLollipop", message);
-    }
-
 }

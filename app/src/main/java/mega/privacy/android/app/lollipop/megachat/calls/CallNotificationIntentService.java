@@ -6,7 +6,7 @@ import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -32,10 +32,6 @@ public class CallNotificationIntentService extends IntentService implements Mega
         super("CallNotificationIntentService");
     }
 
-    public static void log(String log) {
-        Util.log("CallNotificationIntentService", log);
-    }
-
     public void onCreate() {
         super.onCreate();
 
@@ -46,7 +42,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        log("onHandleIntent");
+        LogUtil.logDebug("onHandleIntent");
 
         chatHandleToAnswer = intent.getExtras().getLong(Constants.CHAT_ID_TO_ANSWER, -1);
         chatHandleInProgress = intent.getExtras().getLong(Constants.CHAT_ID_IN_PROGRESS, -1);
@@ -54,7 +50,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
         clearIncomingCallNotification(chatHandleToAnswer);
 
         final String action = intent.getAction();
-        log("onHandleIntent:action: " + action);
+        LogUtil.logDebug("action: " + action);
         if (ANSWER.equals(action)) {
             megaChatApi.hangChatCall(chatHandleInProgress, this);
         } else if (IGNORE.equals(action)) {
@@ -66,7 +62,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
     }
 
     public void clearIncomingCallNotification(long chatHandleToAnswer) {
-        log("clearIncomingCallNotification:chatHandleToAnswer: " + chatHandleToAnswer);
+        LogUtil.logDebug("chatHandleToAnswer: " + chatHandleToAnswer);
 
         try {
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -79,7 +75,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             int notificationId = (notificationCallId).hashCode();
             notificationManager.cancel(notificationId);
         } catch (Exception e) {
-            log("clearIncomingCallNotification:EXCEPTION");
+            LogUtil.logError("EXCEPTION", e);
         }
     }
 
@@ -96,18 +92,18 @@ public class CallNotificationIntentService extends IntentService implements Mega
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
         if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
-            log("onRequestFinish:TYPE_HANG_CHAT_CALL");
+            LogUtil.logDebug("TYPE_HANG_CHAT_CALL");
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                log("onRequestFinish: TYPE_HANG_CHAT_CALL:OK: ");
+                LogUtil.logDebug("TYPE_HANG_CHAT_CALL:OK: ");
                 MegaApplication.setSpeakerStatus(chatHandleToAnswer, false);
                 megaChatApi.answerChatCall(chatHandleToAnswer, false, this);
             } else {
-                log("onRequestFinish:TYPE_HANG_CHAT_CALL:ERROR: " + e.getErrorCode());
+                LogUtil.logError("TYPE_HANG_CHAT_CALL:ERROR: " + e.getErrorCode());
             }
         } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
-            log("onRequestFinish:TYPE_ANSWER_CHAT_CALL");
+            LogUtil.logDebug("TYPE_ANSWER_CHAT_CALL");
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                log("onRequestFinish:TYPE_ANSWER_CHAT_CALL:OK");
+                LogUtil.logDebug("TYPE_ANSWER_CHAT_CALL:OK");
                 MegaApplication.setShowPinScreen(false);
                 Intent i = new Intent(this, ChatCallActivity.class);
                 i.putExtra(Constants.CHAT_ID, chatHandleToAnswer);
@@ -116,7 +112,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 this.startActivity(i);
                 stopSelf();
             } else {
-                log("onRequestFinish:TYPE_ANSWER_CHAT_CALL:ERROR: " + e.getErrorCode());
+                LogUtil.logError("TYPE_ANSWER_CHAT_CALL:ERROR: " + e.getErrorCode());
             }
         }
     }

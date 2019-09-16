@@ -32,6 +32,7 @@ import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -79,9 +80,9 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            LogUtil.logDebug("Bundle is NOT NULL");
             String email = savedInstanceState.getString("email");
-            log("Email of the contact: "+email);
+            LogUtil.logDebug("Email of the contact: " + email);
             if(email!=null){
                 contact = megaApi.getContact(email);
                 if(contact==null){
@@ -90,7 +91,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
             }
         }
         else{
-            log("Bundle NULL");
+            LogUtil.logWarning("Bundle NULL");
             if(context instanceof FileContactListActivityLollipop){
                 share = ((FileContactListActivityLollipop) context).getSelectedShare();
                 contact = ((FileContactListActivityLollipop) context).getSelectedContact();
@@ -143,7 +144,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
             fullName = getFullName(contact);
         }
         else{
-            log("Contact NULL");
+            LogUtil.logWarning("Contact NULL");
 //            nonContactEmail
             fullName = nonContactEmail;
         }
@@ -215,7 +216,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
             }
 
             if (fullName.trim().length() <= 0){
-                log("Put email as fullname");
+                LogUtil.logDebug("Put email as fullname");
                 String email = contact.getEmail();
                 String[] splitEmail = email.split("[@._]");
                 fullName = splitEmail[0];
@@ -264,14 +265,14 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         if (contact != null) {
             String color = megaApi.getUserAvatarColor(contact);
             if (color != null) {
-                log("The color to set the avatar is " + color);
+                LogUtil.logDebug("The color to set the avatar is " + color);
                 p.setColor(Color.parseColor(color));
             } else {
-                log("Default color to the avatar");
+                LogUtil.logDebug("Default color to the avatar");
                 p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         } else {
-            log("Contact is NULL");
+            LogUtil.logWarning("Contact is NULL");
             p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
@@ -318,7 +319,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         switch(v.getId()){
 
             case R.id.file_contact_list_option_permissions_layout:{
-                log("permissions layout");
+                LogUtil.logDebug("Permissions layout");
                 if(context instanceof FileContactListActivityLollipop){
                     ((FileContactListActivityLollipop)context).changePermissions();
                 }else if(context instanceof FileInfoActivityLollipop){
@@ -327,7 +328,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
                 break;
             }
             case R.id.file_contact_list_option_delete_layout:{
-                log("optionSendFile");
+                LogUtil.logDebug("Option delete");
                 if(context instanceof FileContactListActivityLollipop){
                     ((FileContactListActivityLollipop)context).removeFileContactShare();
                 }else if(context instanceof FileInfoActivityLollipop){
@@ -336,13 +337,13 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
                 break;
             }
             case R.id.file_contact_list_option_info_layout:{
-                log("optionSendFile");
+                LogUtil.logDebug("Option send file");
                 if(contact==null){
-                    log("Selected contact NULL");
+                    LogUtil.logWarning("Selected contact NULL");
                     return;
                 }
 
-                log("contact info participants panel");
+                LogUtil.logDebug("Contact info participants panel");
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra("name", share.getUser());
                 context.startActivity(i);
@@ -372,14 +373,10 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        LogUtil.logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         String email = contact.getEmail();
-        log("Email of the contact: "+email);
+        LogUtil.logDebug("Email of the contact: " + email);
         outState.putString("email", email);
-    }
-
-    private static void log(String log) {
-        Util.log("FileContactsListBottomSheetDialogFragment", log);
     }
 }

@@ -6,7 +6,10 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.support.v4.view.ViewPropertyAnimatorUpdateListener;
 import android.view.View;
-import mega.privacy.android.app.utils.Util;
+
+import mega.privacy.android.app.utils.LogUtil;
+
+import nz.mega.sdk.MegaApiAndroid;
 
 public abstract class ReturnOriginViewAnimator<D extends DraggableView> implements ViewAnimator<D> {
 
@@ -22,7 +25,7 @@ public abstract class ReturnOriginViewAnimator<D extends DraggableView> implemen
 
     @Override
     public boolean animateToOrigin(@NonNull final D draggableView, final int duration) {
-        log("animateToOrigin");
+        LogUtil.logDebug("animateToOrigin");
         draggableView.setAnimating(true);
 
         ViewCompat.animate(draggableView)
@@ -57,16 +60,12 @@ public abstract class ReturnOriginViewAnimator<D extends DraggableView> implemen
 
     @Override
     public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, Activity activity, int[] screenPosition, View currentView) {
-        log("animateExit");
+        LogUtil.logDebug("animateExit");
         return false;
     }
 
     @Override
     public void update(D draggableView, float percentX, float percentY) {
-        log("update");
-    }
-
-    public static void log(String message) {
-        Util.log("DraggableView: ReturnOriginViewAnimator", message);
+        LogUtil.logDebug("update");
     }
 }

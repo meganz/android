@@ -31,6 +31,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -68,7 +69,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onCreate() {
         super.onCreate();
-        log("onCreateFCM");
+        LogUtil.logDebug("onCreateFCM");
 
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
@@ -82,7 +83,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     @Override
     public void onDestroy() {
-        log("onDestroyFCM");
+        LogUtil.logDebug("onDestroyFCM");
         super.onDestroy();
     }
 
@@ -94,7 +95,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     // [START receive_message]
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        log("onMessageReceived");
+        LogUtil.logDebug("onMessageReceived");
         // [START_EXCLUDE]
         // There are two types of messages data messages and notification messages. Data messages are handled
         // here in onMessageReceived whether the app is in the foreground or background. Data messages are the type
@@ -106,123 +107,123 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         // [END_EXCLUDE]
 
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        log("From: " + remoteMessage.getFrom());
+        LogUtil.logDebug("From: " + remoteMessage.getFrom());
 
         remoteMessageType = remoteMessage.getData().get("type");
-    
-        log("getOriginalPriority is " + remoteMessage.getOriginalPriority() + " getPriority is " + remoteMessage.getPriority());
+
+        LogUtil.logDebug("getOriginalPriority is " + remoteMessage.getOriginalPriority() + " getPriority is " + remoteMessage.getPriority());
     
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
-            log("Message data payload: " + remoteMessage.getData());
+            LogUtil.logDebug("Message data payload: " + remoteMessage.getData());
             UserCredentials credentials = dbH.getCredentials();
             if (credentials == null) {
-                log("There are not user credentials");
+                LogUtil.logError("There are not user credentials");
                 return;
             }
             else{
 
                 if(remoteMessageType.equals("1")){
-                    log("show SharedFolder Notification");
+                    LogUtil.logDebug("Show SharedFolder Notification");
                     //Leave the flag showMessageNotificationAfterPush as it is
                     //If true - wait until connection finish
                     //If false, no need to change it
-                    log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
+                    LogUtil.logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
                     String gSession = credentials.getSession();
                     if (megaApi.getRootNode() == null) {
-                        log("RootNode = null");
+                        LogUtil.logWarning("RootNode = null");
                         performLoginProccess(gSession);
                     }
                     else{
-                        log("Awaiting info on listener");
+                        LogUtil.logDebug("Awaiting info on listener");
                         retryPendingConnections();
                     }
                 }
                 else if(remoteMessageType.equals("3")){
-                    log("show ContactRequest Notification");
+                    LogUtil.logDebug("Show ContactRequest Notification");
                     //Leave the flag showMessageNotificationAfterPush as it is
                     //If true - wait until connection finish
                     //If false, no need to change it
-                    log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
+                    LogUtil.logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
                     String gSession = credentials.getSession();
                     if (megaApi.getRootNode() == null) {
-                        log("RootNode = null");
+                        LogUtil.logWarning("RootNode = null");
                         performLoginProccess(gSession);
                     }
                     else{
-                        log("Awaiting info on listener");
+                        LogUtil.logDebug("Awaiting info on listener");
                         retryPendingConnections();
                     }
                 }
                 else if(remoteMessageType.equals("5")) {
-                    log("ACCEPTANCE notification");
+                    LogUtil.logDebug("ACCEPTANCE notification");
                     //Leave the flag showMessageNotificationAfterPush as it is
                     //If true - wait until connection finish
                     //If false, no need to change it
-                    log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
+                    LogUtil.logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
 
                     String email = remoteMessage.getData().get("email");
-                    log("Acceptance CR of: "+email);
+                    LogUtil.logDebug("Acceptance CR of: " + email);
 
                     if (megaApi.getRootNode() == null) {
-                        log("RootNode = null");
+                        LogUtil.logWarning("RootNode = null");
                         String gSession = credentials.getSession();
                         performLoginProccess(gSession);
                     }
                     else{
-                        log("Awaiting info on listener");
+                        LogUtil.logDebug("Awaiting info on listener");
                         retryPendingConnections();
                     }
                 }
                 else if(remoteMessageType.equals("4")) {
-                    log("CALL notification");
+                    LogUtil.logDebug("CALL notification");
                     //Leave the flag showMessageNotificationAfterPush as it is
                     //If true - wait until connection finish
                     //If false, no need to change it
-                    log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
+                    LogUtil.logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
                         boolean isIdle = pm.isDeviceIdleMode();
                         if ((!app.isActivityVisible() && megaApi.getRootNode() == null) || isIdle) {
-                            log("launch foreground service!");
+                            LogUtil.logDebug("Launch foreground service!");
                             wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingCallLock:");
                             wl.acquire();
                             wl.release();
-                            log("startService-MegaFirebaseMessagingService:onMessageReceived ");
+                            LogUtil.logDebug("Start Service");
                             startService(new Intent(this, IncomingCallService.class));
                             return;
                         }
                     }
                     String gSession = credentials.getSession();
                     if (megaApi.getRootNode() == null) {
-                        log("RootNode = null");
+                        LogUtil.logWarning("RootNode = null");
                         performLoginProccess(gSession);
                     } else {
-                        log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
+                        LogUtil.logDebug("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
 //                        String gSession = credentials.getSession();
                         int ret = megaChatApi.getInitState();
-                        log("result of init ---> " + ret);
+                        LogUtil.logDebug("result of init ---> " + ret);
                         int status = megaChatApi.getOnlineStatus();
-                        log("online status ---> " + status);
+                        LogUtil.logDebug("online status ---> " + status);
                         int connectionState = megaChatApi.getConnectionState();
-                        log("connection state ---> "+connectionState);
+                        LogUtil.logDebug("connection state ---> " + connectionState);
                         retryPendingConnections();
                     }
                 }
                 else if(remoteMessageType.equals("2")){
-                    log("CHAT notification");
+                    LogUtil.logDebug("CHAT notification");
     
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
                         boolean isIdle = pm.isDeviceIdleMode();
-                        log("isActivityVisible: " + app.isActivityVisible());
-                        log("isIdle: " + isIdle);
+                        LogUtil.logDebug("isActivityVisible: " + app.isActivityVisible());
+                        LogUtil.logDebug("isIdle: " + isIdle);
                         wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingMessageCallLock:");
                         wl.acquire();
                         wl.release();
                         if((!app.isActivityVisible() && megaApi.getRootNode() == null )|| isIdle) {
 
-                            log("launch foreground service!");
+                            LogUtil.logDebug("Launch foreground service!");
                             Intent intent = new Intent(this,IncomingMessageService.class);
                             intent.putExtra("remoteMessage", remoteMessage);
                             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -235,7 +236,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
 
                     if(app.isActivityVisible()){
-                        log("App on foreground --> return");
+                        LogUtil.logDebug("App on foreground --> return");
                         retryPendingConnections();
                         return;
                     }
@@ -244,7 +245,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                         try{
                             String silent = remoteMessage.getData().get("silent");
-                            log("Silent payload: "+silent);
+                            LogUtil.logDebug("Silent payload: " + silent);
 
                             if(silent!=null){
                                 if(silent.equals("1")){
@@ -255,21 +256,21 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                 }
                             }
                             else{
-                                log("NO DATA on the PUSH");
+                                LogUtil.logWarning("NO DATA on the PUSH");
                                 beep = true;
                             }
                         }
                         catch(Exception e){
-                            log("ERROR:remoteSilentParameter");
+                            LogUtil.logError("ERROR:remoteSilentParameter", e);
                             beep = true;
                         }
 
-                        log("notification should beep: "+ beep);
+                        LogUtil.logDebug("Notification should beep: "+ beep);
                         showMessageNotificationAfterPush = true;
 
                         String gSession = credentials.getSession();
                         if (megaApi.getRootNode() == null){
-                            log("RootNode = null");
+                            LogUtil.logWarning("RootNode = null");
 
                             performLoginProccess(gSession);
 
@@ -282,11 +283,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                         public void run() {
                                             boolean shown = ((MegaApplication) getApplication()).isChatNotificationReceived();
                                             if(!shown){
-                                                log("Show simple notification - no connection finished");
+                                                LogUtil.logDebug("Show simple notification - no connection finished");
                                                 chatNotificationBuilder.showSimpleNotification();
                                             }
                                             else{
-                                                log("Notification already shown");
+                                                LogUtil.logDebug("Notification already shown");
                                             }
                                         }
                                     },
@@ -297,8 +298,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             //Leave the flag showMessageNotificationAfterPush as it is
                             //If true - wait until connection finish
                             //If false, no need to change it
-                            log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
-                            log("(2)Call to pushReceived");
+                            LogUtil.logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
+                            LogUtil.logDebug("Call to pushReceived");
                             megaChatApi.pushReceived(beep);
                             beep = false;
 
@@ -311,11 +312,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                         public void run() {
                                             boolean shown = ((MegaApplication) getApplication()).isChatNotificationReceived();
                                             if(!shown){
-                                                log("Show simple notification - no connection finished");
+                                                LogUtil.logDebug("Show simple notification - no connection finished");
                                                 chatNotificationBuilder.showSimpleNotification();
                                             }
                                             else{
-                                                log("Notification already shown");
+                                                LogUtil.logDebug("Notification already shown");
                                             }
                                         }
                                     },
@@ -345,26 +346,26 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                 if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
                     ret = megaChatApi.init(gSession);
-                    log("result of init ---> " + ret);
+                    LogUtil.logDebug("result of init ---> " + ret);
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE) {
-                        log("condition ret == MegaChatApi.INIT_NO_CACHE");
+                        LogUtil.logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
 
                     } else if (ret == MegaChatApi.INIT_ERROR) {
-                        log("condition ret == MegaChatApi.INIT_ERROR");
+                        LogUtil.logDebug("condition ret == MegaChatApi.INIT_ERROR");
                         if (chatSettings == null) {
-                            log("ERROR----> Switch OFF chat");
+                            LogUtil.logWarning("ERROR----> Switch OFF chat");
                             chatSettings = new ChatSettings();
                             chatSettings.setEnabled(false+"");
                             dbH.setChatSettings(chatSettings);
                         } else {
-                            log("ERROR----> Switch OFF chat");
+                            LogUtil.logWarning("ERROR----> Switch OFF chat");
                             dbH.setEnabledChat(false + "");
                         }
                         megaChatApi.logout(this);
 
                     } else {
-                        log("Chat correctly initialized");
+                        LogUtil.logDebug("Chat correctly initialized");
                     }
                 }
             }
@@ -373,32 +374,28 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         }
     }
 
-    public static void log(String message) {
-        Util.log("MegaFirebaseMessagingService", "FCM " + message);
-    }
-
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart: " + request.getRequestString());
+        LogUtil.logDebug("onRequestStart: " + request.getRequestString());
     }
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        log("onRequestUpdate: " + request.getRequestString());
+        LogUtil.logDebug("onRequestUpdate: " + request.getRequestString());
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish: " + request.getRequestString());
+        LogUtil.logDebug("onRequestFinish: " + request.getRequestString());
 
         if (request.getType() == MegaRequest.TYPE_LOGIN){
             if (e.getErrorCode() == MegaError.API_OK) {
-                log("Fast login OK");
-                log("Calling fetchNodes from MegaFireBaseMessagingService");
+                LogUtil.logDebug("Fast login OK");
+                LogUtil.logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
                 megaApi.fetchNodes(this);
             }
             else{
-                log("ERROR: " + e.getErrorString());
+                LogUtil.logError("ERROR: " + e.getErrorString());
                 isLoggingIn = false;
                 MegaApplication.setLoggingIn(isLoggingIn);
                 return;
@@ -408,25 +405,25 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             isLoggingIn = false;
             MegaApplication.setLoggingIn(isLoggingIn);
             if (e.getErrorCode() == MegaError.API_OK){
-                log("OK fetch nodes");
+                LogUtil.logDebug("OK fetch nodes");
                 if (Util.isChatEnabled()) {
-                    log("Chat enabled-->connectInBackground");
+                    LogUtil.logDebug("Chat enabled-->connectInBackground");
 //                    MegaApplication.isFireBaseConnection=true;
                     megaChatApi.connectInBackground(this);
                 }
                 else{
-                    log("Chat NOT enabled - sendNotification");
+                    LogUtil.logWarning("Chat NOT enabled - sendNotification");
                 }
             }
             else {
-                log("ERROR: " + e.getErrorString());
+                LogUtil.logError("ERROR: " + e.getErrorString());
             }
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestTemporary: " + request.getRequestString());
+        LogUtil.logWarning("onRequestTemporary: " + request.getRequestString());
     }
 
     @Override
@@ -441,30 +438,30 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish: "+request.getRequestString()+ " result: "+e.getErrorString());
+        LogUtil.logDebug("onRequestFinish: " + request.getRequestString() +  " result: " + e.getErrorString());
 
         if(request.getType()==MegaChatRequest.TYPE_CONNECT){
 //            MegaApplication.isFireBaseConnection=false;
-            log("TYPE CONNECT");
+            LogUtil.logDebug("TYPE CONNECT");
             //megaChatApi.setBackgroundStatus(true, this);
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("Connected to chat!");
+                LogUtil.logDebug("Connected to chat!");
                 if(showMessageNotificationAfterPush){
                     showMessageNotificationAfterPush = false;
-                    log("Call to pushReceived");
+                    LogUtil.logDebug("Call to pushReceived");
                     megaChatApi.pushReceived(beep);
                     beep = false;
                 }
                 else{
-                    log("Login do not started by CHAT message");
+                    LogUtil.logDebug("Login do not started by CHAT message");
                 }
             }
             else{
-                log("EEEERRRRROR WHEN CONNECTING" + e.getErrorString());
+                LogUtil.logError("ERROR WHEN CONNECTING" + e.getErrorString());
             }
         }
         else if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS){
-            log("TYPE SETBACKGROUNDSTATUS");
+            LogUtil.logDebug("TYPE SETBACKGROUNDSTATUS");
         }
     }
 
@@ -474,7 +471,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     }
 
     public void retryPendingConnections(){
-        log("retryPendingConnections");
+        LogUtil.logDebug("retryPendingConnections");
         try{
             if (megaApi != null){
                 megaApi.retryPendingConnections();
@@ -486,8 +483,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 }
             }
         }
-        catch (Exception e){
-            log("retryPendingConnections:Exception: "+e.getMessage());
+        catch (Exception e) {
+            LogUtil.logError("Exception", e);
         }
     }
 }

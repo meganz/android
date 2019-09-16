@@ -54,6 +54,7 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
@@ -127,7 +128,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate()");
+		LogUtil.logDebug("onCreate()");
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		
@@ -150,7 +151,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 		if (dbH.getCredentials() != null) {
 			if (megaApi == null || megaApi.getRootNode() == null) {
-				log("Refresh session - sdk");
+				LogUtil.logDebug("Refresh session - sdk");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
 				intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
 				intent.setData(Uri.parse(url));
@@ -166,7 +167,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 
 				if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-					log("Refresh session - karere");
+					LogUtil.logDebug("Refresh session - karere");
 					Intent intent = new Intent(this, LoginActivityLollipop.class);
 					intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
 					intent.setData(Uri.parse(url));
@@ -234,7 +235,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			importLink(url);
 		}
 		else{
-			log("url NULL");
+			LogUtil.logWarning("url NULL");
 		}
 	}
 
@@ -257,7 +258,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		log("onOptionsItemSelected");
+		LogUtil.logDebug("onOptionsItemSelected");
 
 		int id = item.getItemId();
 		switch (id) {
@@ -269,7 +270,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				if(url!=null){
 					shareLink(url);
 				}else{
-					log("url NULL");
+					LogUtil.logWarning("url NULL");
 				}
 				break;
 			}
@@ -278,7 +279,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 		public void askForDecryptionKeyDialog(){
-		log("askForDecryptionKeyDialog");
+			LogUtil.logDebug("askForDecryptionKeyDialog");
 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
@@ -302,13 +303,13 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						return true;
 					}
 					if(value.startsWith("!")){
-						log("Decryption key with exclamation!");
+						LogUtil.logDebug("Decryption key with exclamation!");
 						url=url+value;
 					}
 					else{
 						url=url+"!"+value;
 					}
-					log("File link to import: "+url);
+					LogUtil.logDebug("File link to import: " + url);
 					decryptionIntroduced=true;
 					importLink(url);
 					decryptionKeyDialog.dismiss();
@@ -336,19 +337,19 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						String value = input.getText().toString().trim();
 
 						if (value.length() == 0) {
-							log("empty key, ask again!");
+							LogUtil.logWarning("Empty key, ask again!");
 							decryptionIntroduced=false;
 							askForDecryptionKeyDialog();
 							return;
 						}else{
 							if(value.startsWith("!")){
-								log("Decryption key with exclamation!");
+								LogUtil.logDebug("Decryption key with exclamation!");
 								url=url+value;
 							}
 							else{
 								url=url+"!"+value;
 							}
-							log("File link to import: "+url);
+							LogUtil.logDebug("File link to import: " + url);
 							decryptionIntroduced=true;
 							importLink(url);
 						}
@@ -366,7 +367,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	private void showKeyboardDelayed(final View view) {
-		log("showKeyboardDelayed");
+		LogUtil.logDebug("showKeyboardDelayed");
 		handler = new Handler();
 		handler.postDelayed(new Runnable() {
 			@Override
@@ -418,23 +419,19 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		megaApi.getPublicNode(url, this);
 	}
 
-	public static void log(String message) {
-		Util.log("FileLinkActivityLollipop", message);
-	}
-
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getRequestString());
+		LogUtil.logDebug("onRequestStart: " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		log("onRequestUpdate: " + request.getRequestString());
+		LogUtil.logDebug("onRequestUpdate: " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish: " + request.getRequestString()+ " code: "+e.getErrorCode());
+		LogUtil.logDebug("onRequestFinish: " + request.getRequestString()+ " code: "+e.getErrorCode());
 		if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE){
 			try { 
 				statusDialog.dismiss();	
@@ -445,7 +442,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				document = request.getPublicMegaNode();
 
 				if (document == null){
-					log("documment==null --> Intent to ManagerActivityLollipop");
+					LogUtil.logWarning("documment==null --> Intent to ManagerActivityLollipop");
 					boolean closedChat = MegaApplication.isClosedChat();
 					if(closedChat){
 						Intent backIntent = new Intent(this, ManagerActivityLollipop.class);
@@ -456,7 +453,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					return;
 				}
 
-				log("DOCUMENTNODEHANDLEPUBLIC: " + document.getHandle());
+				LogUtil.logDebug("DOCUMENTNODEHANDLEPUBLIC: " + document.getHandle());
 				if (dbH == null){
 					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
@@ -532,7 +529,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode());
+				LogUtil.logWarning("ERROR: " + e.getErrorCode());
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 				dialogBuilder.setCancelable(false);
 				if(e.getErrorCode() == MegaError.API_EBLOCKED){
@@ -541,7 +538,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 				else if(e.getErrorCode() == MegaError.API_EARGS){
 					if(decryptionIntroduced){
-						log("incorrect key, ask again!");
+						LogUtil.logWarning("Incorrect key, ask again!");
 						decryptionIntroduced=false;
 						askForDecryptionKeyDialog();
 						return;
@@ -566,7 +563,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					dialogBuilder.setMessage(getString(R.string.general_error_file_not_found));
 
 					if(e.getErrorCode() == MegaError.API_ETEMPUNAVAIL){
-						log("ERROR: "+MegaError.API_ETEMPUNAVAIL);
+						LogUtil.logWarning("ERROR: " + MegaError.API_ETEMPUNAVAIL);
 					}
 				}
 
@@ -623,11 +620,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			} catch(Exception ex){};
 
 			if (e.getErrorCode() != MegaError.API_OK) {
-				
-				log("e.getErrorCode() != MegaError.API_OK");
+
+				LogUtil.logDebug("e.getErrorCode() != MegaError.API_OK");
 				
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-					log("OVERQUOTA ERROR: "+e.getErrorCode());					
+					LogUtil.logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 					startActivity(intent);
@@ -636,7 +633,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
 
-					log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+					LogUtil.logWarning("PRE OVERQUOTA ERROR: " + e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
 					startActivity(intent);
@@ -665,7 +662,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError: " + request.getRequestString());
+		LogUtil.logWarning("onRequestTemporaryError: " + request.getRequestString());
 	}
 
 	@Override
@@ -696,10 +693,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	public void showFile(){
-		log("showFile");
+		LogUtil.logDebug("showFile");
 		String serializeString = document.serialize();
 		if(MimeTypeList.typeForName(document.getName()).isImage()){
-			log("showFile:image");
+			LogUtil.logDebug("Is image");
 			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 			intent.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
 			intent.putExtra("position", 0);
@@ -711,10 +708,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			startActivity(intent);
 
 		}else if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() ){
-			log("showFile:video");
+			LogUtil.logDebug("Is video");
 
 			String mimeType = MimeTypeList.typeForName(document.getName()).getType();
-			log("showFile:FILENAME: " + document.getName() + " TYPE: " + mimeType);
+			LogUtil.logDebug("NODE HANDLE: " + document.getHandle() + ", TYPE: " + mimeType);
 
 			Intent mediaIntent;
 			boolean internalIntent;
@@ -727,7 +724,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					opusFile = true;
 				}
 			} else {
-				log("showFile:setIntentToAudioVideoPlayer");
+				LogUtil.logDebug("setIntentToAudioVideoPlayer");
 				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 				mediaIntent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
 				mediaIntent.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
@@ -738,7 +735,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			if (megaApi.httpServerIsRunning() == 0) {
 				megaApi.httpServerStart();
 			} else {
-				log("showFile:ERROR:httpServerAlreadyRunning");
+				LogUtil.logWarning("ERROR: HTTP server already running");
 			}
 
 			ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -746,10 +743,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			activityManager.getMemoryInfo(mi);
 
 			if (mi.totalMem > Constants.BUFFER_COMP) {
-				log("showFile:total mem: " + mi.totalMem + " allocate 32 MB");
+				LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
 				megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 			} else {
-				log("showFile:total mem: " + mi.totalMem + " allocate 16 MB");
+				LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
 				megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 			}
 
@@ -759,11 +756,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				if (parsedUri != null) {
 					mediaIntent.setDataAndType(parsedUri, mimeType);
 				} else {
-					log("showFile:ERROR:httpServerGetLocalLink");
+					LogUtil.logWarning("ERROR: HTTP server get local link");
 					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 				}
 			} else {
-				log("showFile:ERROR:httpServerGetLocalLink");
+				LogUtil.logWarning("ERROR: HTTP server get local link");
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 			}
 
@@ -774,20 +771,20 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			if (internalIntent) {
 				startActivity(mediaIntent);
 			} else {
-				log("showFile:externalIntent");
+				LogUtil.logDebug("External Intent");
 				if (MegaApiUtils.isIntentAvailable(this, mediaIntent)) {
 					startActivity(mediaIntent);
 				} else {
-					log("showFile:noAvailableIntent");
+					LogUtil.logDebug("No Available Intent");
 					showSnackbar(Constants.SNACKBAR_TYPE, "NoApp available");
 				}
 			}
 
 		}else if(MimeTypeList.typeForName(document.getName()).isPdf()){
-			log("showFile:pdf");
+			LogUtil.logDebug("Is pdf");
 
 			String mimeType = MimeTypeList.typeForName(document.getName()).getType();
-			log("showFile:FILENAME: " + document.getName() + " TYPE: "+mimeType);
+			LogUtil.logDebug("NODE HANDLE: " + document.getHandle() + ", TYPE: " + mimeType);
 			Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 			pdfIntent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
 			pdfIntent.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
@@ -799,17 +796,17 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					megaApi.httpServerStart();
 				}
 				else{
-					log("showFile:ERROR:httpServerAlreadyRunning");
+					LogUtil.logWarning("ERROR: HTTP server already running");
 				}
 				ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
 				ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
 				activityManager.getMemoryInfo(mi);
 				if(mi.totalMem>Constants.BUFFER_COMP){
-					log("showFile:total mem: "+mi.totalMem+" allocate 32 MB");
+					LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
 					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 				}
 				else{
-					log("showFile:total mem: "+mi.totalMem+" allocate 16 MB");
+					LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
 					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 				}
 				String url = megaApi.httpServerGetLocalLink(document);
@@ -819,12 +816,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						pdfIntent.setDataAndType(parsedUri, mimeType);
 					}
 					else{
-						log("showFile:ERROR:httpServerGetLocalLink");
+						LogUtil.logDebug("ERROR: HTTP server get local link");
 						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 					}
 				}
 				else{
-					log("showFile:ERROR:httpServerGetLocalLink");
+					LogUtil.logDebug("ERROR: HTTP server get local link");
 					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 				}
 			}
@@ -838,10 +835,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				startActivity(pdfIntent);
 			}
 			else{
-				log("showFile:noAvailableIntent");
+				LogUtil.logWarning("No Available Intent");
 			}
 		}else{
-			log("none");
+			LogUtil.logWarning("none");
 		}
 	}
 	@Override
@@ -852,12 +849,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		}
 		
 		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			log("local folder selected");
+			LogUtil.logDebug("Local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-			log("URL: " + url + "___SIZE: " + size);
+			LogUtil.logDebug("URL: " + url + ", SIZE: " + size);
 
 			NodeController nC = new NodeController(this);
 			nC.downloadTo(document, parentPath, url);
@@ -890,15 +887,15 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 			if (document != null) {
 				if (target != null) {
-					log("Target node: " + target.getName());
+					LogUtil.logDebug("Target node: " + target.getHandle());
 					cont++;
 					importLinkMultipleListener = new MultipleRequestListenerLink(this, cont, cont, FILE_LINK);
 					megaApi.copyNode(document, target, importLinkMultipleListener);
 				} else {
-					log("TARGET == null");
+					LogUtil.logWarning("TARGET == null");
 				}
 			} else {
-				log("selected Node is NULL");
+				LogUtil.logWarning("Selected Node is NULL");
 				if (target != null) {
 					importClicked = true;
 				}
@@ -914,7 +911,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	
 	@SuppressLint("NewApi") 
 	public void downloadWithPermissions(){
-		log("downloadWithPermissions");
+		LogUtil.logDebug("downloadWithPermissions");
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
@@ -1101,7 +1098,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	public void shareLink(String link){
-		log("shareLink");
+		LogUtil.logDebug("Link: " + link);
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.setType("text/plain");
 		intent.putExtra(Intent.EXTRA_TEXT, link);

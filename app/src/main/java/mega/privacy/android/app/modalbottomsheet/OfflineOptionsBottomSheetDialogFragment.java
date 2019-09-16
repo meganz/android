@@ -36,6 +36,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -82,9 +83,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            LogUtil.logDebug("Bundle is NOT NULL");
             String handle = savedInstanceState.getString("handle");
-            log("Handle of the node offline: "+handle);
+            LogUtil.logDebug("Handle of the node offline: " + handle);
             if(handle.equals("0")){
                 //recovery key will have handle as 0 and have to be handled specifically
                 nodeOffline = new MegaOffline("0", getExternalStoragePath(RK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
@@ -93,7 +94,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             }
         }
         else{
-            log("Bundle NULL");
+            LogUtil.logWarning("Bundle NULL");
             if(context instanceof ManagerActivityLollipop){
                 nodeOffline = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
             }
@@ -181,7 +182,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 saveFilesystem.setVisibility(View.GONE);
                 separatorRK.setVisibility(View.GONE);
 
-                log("Set node info");
+                LogUtil.logDebug("Set node info");
                 file = getOfflineFile(context, nodeOffline);
                 if (file == null) return;
 
@@ -222,9 +223,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                     nodeInfo.setText(Util.getSizeString(nodeSize));
                 }
 
-                log("Set node thumb");
+                LogUtil.logDebug("Set node thumb");
                 if (file.isFile()){
-                    log("...........................Busco Thumb");
+                    LogUtil.logDebug("Search thumb");
                     if (MimeTypeList.typeForName(nodeOffline.getName()).isImage()){
                         Bitmap thumb = null;
                         if (file.exists()){
@@ -274,30 +275,30 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         switch(v.getId()){
 
             case R.id.option_delete_offline_layout:{
-                log("Delete Offline");
+                LogUtil.logDebug("Delete Offline");
                 if(context instanceof ManagerActivityLollipop){
                     ((ManagerActivityLollipop) context).showConfirmationRemoveFromOffline();
                 }
                 break;
             }
             case R.id.option_open_with_layout:{
-                log("Open with");
+                LogUtil.logDebug("Open with");
                 openWith();
                 break;
             }
             case R.id.option_print_offline_layout:{
-                log("Option print rK");
+                LogUtil.logDebug("Option print RK");
                 printRK();
                 break;
             }
             case R.id.option_save_offline_layout:{
-                log("Option save on filesystem");
+                LogUtil.logDebug("Option save on filesystem");
                 AccountController aC = new AccountController(getContext());
                 aC.saveRkToFileSystem(true);
                 break;
             }
             case R.id.option_copy_offline_layout:{
-                log("Option copy to clipboard");
+                LogUtil.logDebug("Option copy to clipboard");
                 if (Util.isOnline(context)){
                     AccountController aC = new AccountController(getContext());
                     aC.copyMK(false);
@@ -324,7 +325,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 line = br.readLine();
             }
             catch (IOException e) {
-                log("IOException: " + e.getMessage());
+                LogUtil.logError("IOException", e);
             }
             return line;
         }
@@ -385,7 +386,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
     }
 
     public void openWith () {
-        log("openWith");
+        LogUtil.logDebug("openWith");
         String type = MimeTypeList.typeForName(nodeOffline.getName()).getType();
 
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
@@ -422,14 +423,10 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        LogUtil.logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         String handle = nodeOffline.getHandle();
-        log("Handle of the node offline: "+handle);
+        LogUtil.logDebug("Handle of the node offline: " + handle);
         outState.putString("handle", handle);
-    }
-
-    private static void log(String log) {
-        Util.log("OfflineOptionsBottomSheetDialogFragment", log);
     }
 }

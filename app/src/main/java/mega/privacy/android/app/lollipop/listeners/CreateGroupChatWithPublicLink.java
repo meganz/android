@@ -10,7 +10,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -38,11 +39,11 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish: "+e.getErrorCode()+"_"+request.getRequestString());
+        LogUtil.logDebug("onRequestFinish: " + e.getErrorCode() + "_" + request.getRequestString());
 
         if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                log("Chat created - get link");
+                LogUtil.logDebug("Chat created - get link");
                 api.createChatLink(request.getChatHandle(), this);
             }
             else{
@@ -61,10 +62,10 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
             }
         }
         else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE) {
-            log("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!");
+            LogUtil.logDebug("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!");
             if (request.getFlag() == false) {
                if (request.getNumRetry() == 1) {
-                   log("Chat link exported!");
+                   LogUtil.logDebug("Chat link exported!");
 
                    if(context instanceof ManagerActivityLollipop){
                        Intent intent = new Intent(context, ChatActivityLollipop.class);
@@ -91,9 +92,5 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
-    }
-
-    private static void log(String log) {
-        Util.log("CreateGroupChatWithPublicLink", log);
     }
 }

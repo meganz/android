@@ -20,7 +20,7 @@ import android.widget.RelativeLayout;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
@@ -44,7 +44,7 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -55,7 +55,7 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		LogUtil.logDebug("onCreateView");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -66,7 +66,7 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 		density = ((Activity) context).getResources().getDisplayMetrics().density;
 
 		boolean enabledAchievements = megaApi.isAchievementsEnabled();
-		log("The achievements are: "+enabledAchievements);
+		LogUtil.logDebug("The achievements are: " + enabledAchievements);
 
 		View v = inflater.inflate(R.layout.fragment_referral_bonuses, container, false);
 
@@ -98,7 +98,7 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
 	@Override
 	public void onAttach(Activity activity) {
-		log("onAttach");
+		LogUtil.logDebug("onAttach");
 		super.onAttach(activity);
 		context = activity;
 		aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -106,7 +106,7 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
 	@Override
 	public void onAttach(Context context) {
-		log("onAttach context");
+		LogUtil.logDebug("onAttach context");
 		super.onAttach(context);
 		this.context = context;
 		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
@@ -114,17 +114,15 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 		switch (v.getId()) {
 
 			case R.id.referral_bonuses_layout:{
-				log("Go to section Referral bonuses");
-
+				LogUtil.logDebug("Go to section Referral bonuses");
 				break;
 			}
 			case R.id.card_view_invite_friends:{
-				log("Invite friends");
-
+				LogUtil.logDebug("Invite friends");
 				break;
 			}
 
@@ -132,12 +130,7 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 	}
 
 	public int onBackPressed(){
-		log("onBackPressed");
+		LogUtil.logDebug("onBackPressed");
 		return 0;
 	}
-
-	public static void log(String log) {
-		Util.log("ReferralBonusesFragment", log);
-	}
-
 }

@@ -40,7 +40,7 @@ public class ChatUtil {
 
     /*Method to know if i'm participating in any A/V call*/
     public static boolean participatingInACall(MegaChatApiAndroid megaChatApi) {
-        log("participatingInACall");
+        LogUtil.logDebug("participatingInACall");
         if (megaChatApi == null) return false;
         MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
         MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
@@ -48,41 +48,43 @@ public class ChatUtil {
         MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
 
         MegaHandleList listCalls = megaChatApi.getChatCalls();
-        log("participatingInACall: No calls in progress ");
 
+        if ((listCalls.size() - listCallsDestroy.size()) == 0) {
+            LogUtil.logDebug("No calls in progress");
+            return false;
+        }
 
-        if ((listCalls.size() - listCallsDestroy.size()) == 0) return false;
-        log("participatingInACall:There is some call in progress");
+        LogUtil.logDebug("There is some call in progress");
 
         if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsRingIn.size())) {
-            log("participatingInACall:I'm not participating in any of the calls there");
+            LogUtil.logDebug("I'm not participating in any of the calls there");
             return false;
         }
         if (listCallsRequestSent.size() > 0) {
-            log("participatingInACall: I'm doing a outgoing call");
+            LogUtil.logDebug("I'm doing a outgoing call");
             return true;
         }
-        log("participatingInACall:I'm in a call in progress");
+        LogUtil.logDebug("I'm in a call in progress");
         return true;
 
     }
 
     /*Method to know the chat id which A / V call I am participating in*/
     public static long getChatCallInProgress(MegaChatApiAndroid megaChatApi) {
-        log("getChatCallInProgress()");
+        LogUtil.logDebug("getChatCallInProgress()");
         long chatId = -1;
         if (megaChatApi != null) {
             MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
             if ((listCallsRequestSent != null) && (listCallsRequestSent.size() > 0)) {
-                log("getChatCallInProgress: Request Sent");
+                LogUtil.logDebug("Request Sent");
                 //Return to request sent
                 chatId = listCallsRequestSent.get(0);
             } else {
-                log("getChatCallInProgress: NOT Request Sent");
+                LogUtil.logDebug("NOT Request Sent");
                 MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
                 if ((listCallsInProgress != null) && (listCallsInProgress.size() > 0)) {
                     //Return to in progress
-                    log("getChatCallInProgress: In progress");
+                    LogUtil.logDebug("In progress");
                     chatId = listCallsInProgress.get(0);
                 }
             }
@@ -92,7 +94,7 @@ public class ChatUtil {
 
     /*Method to return to the call which I am participating*/
     public static void returnCall(Context context, MegaChatApiAndroid megaChatApi) {
-        log("returnCall()");
+        LogUtil.logDebug("returnCall()");
         if ((megaChatApi == null) || (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)) == null))
             return;
         long chatId = getChatCallInProgress(megaChatApi);
@@ -246,7 +248,7 @@ public class ChatUtil {
     }
 
     public static void showConfirmationRemoveChatLink(final Context context) {
-        log("showConfirmationRemoveChatLink");
+        LogUtil.logDebug("showConfirmationRemoveChatLink");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -353,10 +355,6 @@ public class ChatUtil {
         return finalTime;
     }
 
-
-    public static void log(String origin, String message) {
-        MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] " + origin + ": " + message, origin);
-    }
     /**
      * To detect whether My Chat Files folder exist or not.
      * If no, store the passed data and process after the folder is created
@@ -406,9 +404,4 @@ public class ChatUtil {
             Util.showToast(activity, message);
         }
     }
-
-    private static void log(String message) {
-        log("UtilChat", message);
-    }
-
 }

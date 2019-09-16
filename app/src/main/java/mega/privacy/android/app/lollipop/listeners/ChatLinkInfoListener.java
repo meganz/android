@@ -8,6 +8,7 @@ import java.io.File;
 
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -56,7 +57,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish()");
+        LogUtil.logDebug("onRequestFinish()");
         if (e.getErrorCode() == MegaError.API_OK){
 
             if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
@@ -105,7 +106,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
                         String url = richLinkMessage.getUrl();
                         String [] s = url.split("!");
-                        log("URL parts: "  + s.length);
+                        LogUtil.logDebug("URL parts: "  + s.length);
                         for (int i=0;i<s.length;i++){
                             switch (i){
                                 case 1:{
@@ -120,7 +121,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
                                 }
                                 case 3:{
                                     folderSubHandle = s[3];
-                                    log("URL_subhandle: " + folderSubHandle);
+                                    LogUtil.logDebug("URL_subhandle: " + folderSubHandle);
                                     break;
                                 }
                             }
@@ -148,7 +149,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
             }
         }
         else{
-            log("ERROR - Info of the public node not recovered");
+            LogUtil.logError("ERROR - Info of the public node not recovered");
 
             if (request.getType() == MegaRequest.TYPE_LOGIN) {
                 if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
@@ -194,10 +195,6 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
-    }
-
-    private static void log(String log) {
-        Util.log("ChatLinkInfoListener", log);
     }
 
     @Override

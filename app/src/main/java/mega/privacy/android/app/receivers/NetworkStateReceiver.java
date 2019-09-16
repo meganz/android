@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -44,7 +45,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
         MegaApplication mApplication = ((MegaApplication)context.getApplicationContext());
 
         if(ni != null && ni.getState() == NetworkInfo.State.CONNECTED) {
-            log("Network state: CONNECTED");
+            LogUtil.logDebug("Network state: CONNECTED");
 
             megaApi = mApplication.getMegaApi();
 
@@ -58,15 +59,15 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             String previousIP = mApplication.getLocalIpAddress();
             String currentIP = Util.getLocalIpAddress(context);
 
-            log("Previous IP: " + previousIP);
-            log("Current IP: " + currentIP);
+            LogUtil.logDebug("Previous IP: " + previousIP);
+            LogUtil.logDebug("Current IP: " + currentIP);
 
             mApplication.setLocalIpAddress(currentIP);
 
             if ((currentIP != null) && (currentIP.length() != 0) && (currentIP.compareTo("127.0.0.1") != 0))
             {
                 if ((previousIP == null) || (currentIP.compareTo(previousIP) != 0)) {
-                    log("Reconnecting...");
+                    LogUtil.logDebug("Reconnecting...");
                     megaApi.reconnect();
 
                     if (megaChatApi != null){
@@ -74,7 +75,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                     }
                 }
                 else{
-                    log("Retrying pending connections...");
+                    LogUtil.logDebug("Retrying pending connections...");
                     megaApi.retryPendingConnections();
 
                     if (megaChatApi != null){
@@ -86,7 +87,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             connected = true;
             scheduleCameraUploadJob(c);
         } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
-            log("Network state: DISCONNECTED");
+            LogUtil.logDebug("Network state: DISCONNECTED");
             mApplication.setLocalIpAddress(null);
             connected = false;
         }
@@ -121,9 +122,5 @@ public class NetworkStateReceiver extends BroadcastReceiver {
     public interface NetworkStateReceiverListener {
         public void networkAvailable();
         public void networkUnavailable();
-    }
-
-    public static void log(String message) {
-        Util.log("NetworkStateReceiver", message);
     }
 }

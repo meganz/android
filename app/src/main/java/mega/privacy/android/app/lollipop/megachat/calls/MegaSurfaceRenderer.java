@@ -28,7 +28,8 @@ import org.webrtc.Logging;
 
 import java.nio.ByteBuffer;
 
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 
 public class MegaSurfaceRenderer implements Callback {
 
@@ -50,7 +51,7 @@ public class MegaSurfaceRenderer implements Callback {
 
 
     public MegaSurfaceRenderer(SurfaceView view) {
-        log("MegaSurfaceRenderer() ");
+        LogUtil.logDebug("MegaSurfaceRenderer() ");
         surfaceHolder = view.getHolder();
         if (surfaceHolder == null)
             return;
@@ -60,13 +61,9 @@ public class MegaSurfaceRenderer implements Callback {
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
     }
 
-    private static void log(String log) {
-        Util.log("MegaSurfaceRendererGroup", log);
-    }
-
     // surfaceChanged and surfaceCreated share this function
     private void changeDestRect(int dstWidth, int dstHeight) {
-        log("changeDestRect(): dstWidth = " + dstWidth + ", dstHeight = " + dstHeight);
+        LogUtil.logDebug("dstWidth = " + dstWidth + ", dstHeight = " + dstHeight);
         surfaceWidth = dstWidth;
         surfaceHeight = dstHeight;
         dstRect.top = 0;
@@ -79,7 +76,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     private void adjustAspectRatio() {
-        log("adjustAspectRatio(): ");
+        LogUtil.logDebug("adjustAspectRatio()");
 
         if (bitmap != null && dstRect.height() != 0) {
             dstRect.top = 0;
@@ -110,7 +107,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-        log("surfaceCreated(): ");
+        LogUtil.logDebug("surfaceCreated()");
 
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas == null) return;
@@ -136,7 +133,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
-        log("surfaceChanged(): in_width = " + in_width + ", in_height = " + in_height);
+        LogUtil.logDebug("in_width = " + in_width + ", in_height = " + in_height);
 
         Logging.d(TAG, "ViESurfaceRender::surfaceChanged");
         changeDestRect(in_width, in_height);
@@ -154,7 +151,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        log("surfaceDestroyed():");
+        LogUtil.logDebug("surfaceDestroyed()");
 
         Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
         bitmap = null;
@@ -162,7 +159,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public Bitmap CreateBitmap(int width, int height) {
-        log("CreateBitmap(): width = " + width + ", height = " + height);
+        LogUtil.logDebug("width = " + width + ", height = " + height);
 
         Logging.d(TAG, "CreateByteBitmap " + width + ":" + height);
         if (bitmap == null) {
@@ -177,7 +174,7 @@ public class MegaSurfaceRenderer implements Callback {
         srcRect.bottom = height;
         srcRect.right = width;
 
-        log("CreateBitmap(): sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
+        LogUtil.logDebug("sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
         adjustAspectRatio();
 
         return bitmap;

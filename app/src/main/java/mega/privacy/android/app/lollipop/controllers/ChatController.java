@@ -49,6 +49,7 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -78,7 +79,7 @@ public class ChatController {
     MegaPreferences prefs = null;
 
     public ChatController(Context context){
-        log("ChatController created");
+        LogUtil.logDebug("ChatController created");
         this.context = context;
         if(context instanceof  MegaApplication){
             if (megaApi == null){
@@ -115,7 +116,7 @@ public class ChatController {
     }
 
     public void selectChatsToAttachContact(MegaUser contact){
-        log("selectChatsToAttachContact");
+        LogUtil.logDebug("selectChatsToAttachContact");
 
         long[] longArray = new long[1];
         longArray[0] = contact.getHandle();
@@ -159,12 +160,12 @@ public class ChatController {
     }
 
     public void clearHistory(MegaChatRoom chat){
-        log("clearHistory: "+chat.getTitle());
+        LogUtil.logDebug("Chat ID: " + chat.getChatId());
         clearHistory(chat.getChatId());
     }
 
     public void clearHistory(long chatId){
-        log("clearHistory: "+chatId);
+        LogUtil.logDebug("Chat ID: " + chatId);
         if(context instanceof ManagerActivityLollipop){
             megaChatApi.clearChatHistory(chatId, (ManagerActivityLollipop) context);
         }
@@ -182,14 +183,14 @@ public class ChatController {
     }
 
     public void archiveChat(long chatId){
-        log("archiveChat: "+chatId);
+        LogUtil.logDebug("Chat ID: " + chatId);
         if(context instanceof ManagerActivityLollipop){
             megaChatApi.archiveChat(chatId, true, (ManagerActivityLollipop) context);
         }
     }
 
     public void archiveChat(MegaChatListItem chatItem){
-        log("archiveChat: "+chatItem.getChatId());
+        LogUtil.logDebug("Chat ID: " + chatItem.getChatId());
         if(context instanceof ManagerActivityLollipop){
             if(chatItem.isArchived()){
                 megaChatApi.archiveChat(chatItem.getChatId(), false, (ManagerActivityLollipop) context);
@@ -209,7 +210,7 @@ public class ChatController {
     }
 
     public void archiveChat(MegaChatRoom chat){
-        log("archiveChat: "+chat.getChatId());
+        LogUtil.logDebug("Chat ID: " + chat.getChatId());
         if(context instanceof GroupChatInfoActivityLollipop){
 
             if(chat.isArchived()){
@@ -230,7 +231,7 @@ public class ChatController {
     }
 
     public void archiveChats(ArrayList<MegaChatListItem> chats){
-        log("archiveChats: "+chats.size());
+        LogUtil.logDebug("Chat ID: " + chats.size());
         if(context instanceof ManagerActivityLollipop){
             for(int i=0; i<chats.size(); i++){
                 if(chats.get(i).isArchived()){
@@ -254,7 +255,7 @@ public class ChatController {
     }
 
     public void deleteMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chat){
-        log("deleteMessages: "+messages.size());
+        LogUtil.logDebug("Messages to delete: " + messages.size());
         if(messages!=null){
             for(int i=0; i<messages.size();i++){
                 deleteMessage(messages.get(i), chat.getChatId());
@@ -263,7 +264,7 @@ public class ChatController {
     }
 
     public void deleteAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){
-        log("deleteMessages: "+messages.size());
+        LogUtil.logDebug("Messages to delete: " + messages.size());
         if(messages!=null){
             for(int i=0; i<messages.size();i++){
                 deleteMessage(messages.get(i).getMessage(), chat.getChatId());
@@ -272,7 +273,7 @@ public class ChatController {
     }
 
     public void deleteMessageById(long messageId, long chatId) {
-        log("deleteMessage");
+        LogUtil.logDebug("Message ID: " + messageId + ", Chat ID: " + chatId);
         MegaChatMessage message = megaChatApi.getMessage(chatId, messageId);
         if(message!=null){
             deleteMessage(message, chatId);
@@ -280,12 +281,12 @@ public class ChatController {
     }
 
     public void deleteMessage(MegaChatMessage message, long chatId) {
-        log("deleteMessage");
+        LogUtil.logDebug("Message ID: " + message.getMsgId() + ", Chat ID: " + chatId);
         MegaChatMessage messageToDelete;
         if (message == null) return;
 
         if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
-            log("deleteMessage:Delete node attachment message or voice clip message");
+            LogUtil.logDebug("Delete node attachment message or voice clip message");
             if (message.getType() == MegaChatMessage.TYPE_VOICE_CLIP && message.getMegaNodeList() != null && message.getMegaNodeList().size() > 0 && message.getMegaNodeList().get(0) != null) {
                 deleteOwnVoiceClip(context, message.getMegaNodeList().get(0).getName());
             }
@@ -293,10 +294,10 @@ public class ChatController {
             return;
         }
 
-        log("Delete normal message");
+        LogUtil.logDebug("Delete normal message");
         messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
         if (messageToDelete == null) {
-            log("The message cannot be deleted");
+            LogUtil.logWarning("The message cannot be deleted");
         }
     }
 
@@ -304,21 +305,21 @@ public class ChatController {
      * Delete a voice note from local storage
      */
     public static void deleteOwnVoiceClip(Context mContext, String nameFile) {
-        log("deleteOwnVoiceClip");
+        LogUtil.logDebug("deleteOwnVoiceClip");
         File localFile = buildVoiceClipFile(mContext, nameFile);
         if (!isFileAvailable(localFile)) return;
         localFile.delete();
     }
 
     public void alterParticipantsPermissions(long chatid, long uh, int privilege){
-        log("alterParticipantsPermissions: "+uh);
+        LogUtil.logDebug("Chat ID: " + chatid + ", User (uh): " + uh + ", Priv: " + privilege);
         megaChatApi.updateChatPermissions(chatid, uh, privilege, (GroupChatInfoActivityLollipop) context);
     }
 
     public void removeParticipant(long chatid, long uh){
-        log("removeParticipant: "+uh);
+        LogUtil.logDebug("Chat ID: " + chatid + ", User (uh): " + uh);
         if(context==null){
-            log("Context is NULL");
+            LogUtil.logWarning("Context is NULL");
         }
         megaChatApi.removeFromChat(chatid, uh, (GroupChatInfoActivityLollipop) context);
     }
@@ -337,7 +338,7 @@ public class ChatController {
     }
 
     public void muteChat(long chatHandle){
-        log("muteChat");
+        LogUtil.logDebug("Chat handle: " + chatHandle);
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
         if(chatPrefs==null){
 
@@ -352,7 +353,7 @@ public class ChatController {
     }
 
     public void muteChat(MegaChatListItem chat){
-        log("muteChatITEM");
+        LogUtil.logDebug("Chat ID:" + chat.getChatId());
         muteChat(chat.getChatId());
     }
 
@@ -364,12 +365,12 @@ public class ChatController {
     }
 
     public void unmuteChat(MegaChatListItem chat){
-        log("UNmuteChatITEM");
+        LogUtil.logDebug("Chat ID: " + chat.getChatId());
         unmuteChat(chat.getChatId());
     }
 
     public void unmuteChat(long chatHandle){
-        log("UNmuteChat");
+        LogUtil.logDebug("Chant handle: " + chatHandle);
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
         if(chatPrefs==null){
             chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), "");
@@ -386,7 +387,7 @@ public class ChatController {
     }
 
     public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
-        log("createSingleManagementString");
+        LogUtil.logDebug("Message ID: " + androidMessage.getMessage().getMsgId() + ", Chat ID: " + chatRoom.getChatId());
 
         String text = createManagementString(androidMessage.getMessage(), chatRoom);
         if((text!=null) && (!text.isEmpty())){
@@ -400,31 +401,31 @@ public class ChatController {
 
 
     public String createManagementString(MegaChatMessage message, MegaChatRoom chatRoom) {
-        log("createManagementString");
+        LogUtil.logDebug("MessageID: " + message.getMsgId() + ", Chat ID: " + chatRoom.getChatId());
         long userHandle = message.getUserHandle();
 
         if (message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) {
-            log("ALTER PARTICIPANT MESSAGE!!");
+            LogUtil.logDebug("ALTER PARTICIPANT MESSAGE!!");
 
             if (message.getHandleOfAction() == megaApi.getMyUser().getHandle()) {
-                log("me alter participant");
+                LogUtil.logDebug("Me alter participant");
 
                 StringBuilder builder = new StringBuilder();
                 builder.append(megaChatApi.getMyFullname() + ": ");
 
                 int privilege = message.getPrivilege();
-                log("Privilege of me: " + privilege);
+                LogUtil.logDebug("Privilege of me: " + privilege);
                 String textToShow = "";
                 String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
 
                 if(!fullNameAction.isEmpty()){
                     if (fullNameAction.trim().length() <= 0) {
-                        log("No name!");
+                        LogUtil.logWarning("No name!");
                         NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
                         if (nonContact != null) {
                             fullNameAction = nonContact.getFullName();
                         } else {
-                            log("Ask for name non-contact");
+                            LogUtil.logDebug("Ask for name non-contact");
                             fullNameAction = "Participant left";
 //                            log("1-Call for nonContactName: "+ message.getUserHandle());
 //                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
@@ -436,12 +437,12 @@ public class ChatController {
                 }
 
                 if (privilege != MegaChatRoom.PRIV_RM) {
-                    log("I was added");
+                    LogUtil.logDebug("I was added");
                     textToShow = String.format(context.getString(R.string.non_format_message_add_participant), megaChatApi.getMyFullname(), fullNameAction);
                 } else {
-                    log("I was removed or left");
+                    LogUtil.logDebug("I was removed or left");
                     if (message.getUserHandle() == message.getHandleOfAction()) {
-                        log("I left the chat");
+                        LogUtil.logDebug("I left the chat");
                         textToShow = String.format(context.getString(R.string.non_format_message_participant_left_group_chat), megaChatApi.getMyFullname());
 
                     } else {
@@ -453,10 +454,10 @@ public class ChatController {
                 return builder.toString();
 
             } else {
-                log("CONTACT Message type ALTER PARTICIPANTS");
+                LogUtil.logDebug("CONTACT Message type ALTER PARTICIPANTS");
 
                 int privilege = message.getPrivilege();
-                log("Privilege of the user: " + privilege);
+                LogUtil.logDebug("Privilege of the user: " + privilege);
 
                 String fullNameTitle = getFullName(message.getHandleOfAction(), chatRoom);
 
@@ -480,13 +481,13 @@ public class ChatController {
 
                 String textToShow = "";
                 if (privilege != MegaChatRoom.PRIV_RM) {
-                    log("Participant was added");
+                    LogUtil.logDebug("Participant was added");
                     if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
-                        log("By me");
+                        LogUtil.logDebug("By me");
                         textToShow = String.format(context.getString(R.string.non_format_message_add_participant), fullNameTitle, megaChatApi.getMyFullname());
                     } else {
 //                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getHandleOfAction()+"");
-                        log("By other");
+                        LogUtil.logDebug("By other");
                         String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
 
                         if(!fullNameAction.isEmpty()){
@@ -496,7 +497,7 @@ public class ChatController {
                                     fullNameAction = nonContact.getFullName();
                                 } else {
                                     fullNameAction = "Unknown name";
-                                    log("2-Call for nonContactName: " + message.getUserHandle());
+                                    LogUtil.logDebug("2-Call for nonContactName: " + message.getUserHandle());
 //                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                    megaChatApi.getUserFirstname(message.getUserHandle(), listener);
 //                                    megaChatApi.getUserLastname(message.getUserHandle(), listener);
@@ -510,18 +511,18 @@ public class ChatController {
                     }
                 }//END participant was added
                 else {
-                    log("Participant was removed or left");
+                    LogUtil.logDebug("Participant was removed or left");
                     if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
                         textToShow = String.format(context.getString(R.string.non_format_message_remove_participant), fullNameTitle, megaChatApi.getMyFullname());
                     } else {
 
                         if (message.getUserHandle() == message.getHandleOfAction()) {
-                            log("The participant left the chat");
+                            LogUtil.logDebug("The participant left the chat");
 
                             textToShow = String.format(context.getString(R.string.non_format_message_participant_left_group_chat), fullNameTitle);
 
                         } else {
-                            log("The participant was removed");
+                            LogUtil.logDebug("The participant was removed");
                             String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
 
                             if(!fullNameAction.isEmpty()){
@@ -531,7 +532,7 @@ public class ChatController {
                                         fullNameAction = nonContact.getFullName();
                                     } else {
                                         fullNameAction = "Unknown name";
-                                        log("4-Call for nonContactName: " + message.getUserHandle());
+                                        LogUtil.logDebug("4-Call for nonContactName: " + message.getUserHandle());
 //                                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
 //                                        megaChatApi.getUserLastname(message.getUserHandle(), listener);
@@ -551,11 +552,11 @@ public class ChatController {
 
             } //END CONTACT MANAGEMENT MESSAGE
         }else if (message.getType() == MegaChatMessage.TYPE_PRIV_CHANGE) {
-            log("PRIVILEGE CHANGE message");
+            LogUtil.logDebug("PRIVILEGE CHANGE message");
             if (message.getHandleOfAction() == megaApi.getMyUser().getHandle()) {
-                log("a moderator change my privilege");
+                LogUtil.logDebug("A moderator change my privilege");
                 int privilege = message.getPrivilege();
-                log("Privilege of the user: " + privilege);
+                LogUtil.logDebug("Privilege of the user: " + privilege);
 
                 StringBuilder builder = new StringBuilder();
                 builder.append(megaChatApi.getMyFullname() + ": ");
@@ -568,17 +569,17 @@ public class ChatController {
                 } else if (privilege == MegaChatRoom.PRIV_RO) {
                     privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
                 } else {
-                    log("Change to other");
+                    LogUtil.logDebug("Change to other");
                     privilegeString = "Unknow";
                 }
 
                 String textToShow = "";
 
                 if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
-                    log("I changed my Own permission");
+                    LogUtil.logDebug("I changed my own permission");
                     textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, megaChatApi.getMyFullname());
                 } else {
-                    log("I was change by someone");
+                    LogUtil.logDebug("My permission was changed by someone");
                     String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
 
                     if(!fullNameAction.isEmpty()){
@@ -588,7 +589,7 @@ public class ChatController {
                                 fullNameAction = nonContact.getFullName();
                             } else {
                                 fullNameAction = "Unknown name";
-                                log("5-Call for nonContactName: " + message.getUserHandle());
+                                LogUtil.logDebug("5-Call for nonContactName: " + message.getUserHandle());
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
 //                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
@@ -603,8 +604,8 @@ public class ChatController {
                 builder.append(textToShow);
                 return builder.toString();
             } else {
-                log("Participant privilege change!");
-                log("Message type PRIVILEGE CHANGE - Message ID: " + message.getMsgId());
+                LogUtil.logDebug("Participant privilege change!");
+                LogUtil.logDebug("Message type PRIVILEGE CHANGE - Message ID: " + message.getMsgId());
 
                 String fullNameTitle = getFullName(message.getHandleOfAction(), chatRoom);
 
@@ -615,7 +616,7 @@ public class ChatController {
                             fullNameTitle = nonContact.getFullName();
                         } else {
                             fullNameTitle = "Unknown name";
-                            log("6-Call for nonContactName: " + message.getUserHandle());
+                            LogUtil.logDebug("6-Call for nonContactName: " + message.getUserHandle());
 //                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
 //                            megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
 //                            megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
@@ -635,17 +636,17 @@ public class ChatController {
                 } else if (privilege == MegaChatRoom.PRIV_RO) {
                     privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
                 } else {
-                    log("Change to other");
+                    LogUtil.logDebug("Change to other");
                     privilegeString = "Unknow";
                 }
 
                 String textToShow = "";
                 if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
-                    log("The privilege was change by me");
+                    LogUtil.logDebug("The privilege was change by me");
                     textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), fullNameTitle, privilegeString, megaChatApi.getMyFullname());
 
                 } else {
-                    log("By other");
+                    LogUtil.logDebug("By other");
                     String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
 
                     if(!fullNameTitle.isEmpty()){
@@ -655,7 +656,7 @@ public class ChatController {
                                 fullNameAction = nonContact.getFullName();
                             } else {
                                 fullNameAction = "Unknown name";
-                                log("8-Call for nonContactName: " + message.getUserHandle());
+                                LogUtil.logDebug("8-Call for nonContactName: " + message.getUserHandle());
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
 //                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
@@ -670,17 +671,16 @@ public class ChatController {
                 return builder.toString();
             }
         }else {
-            log("other type of messages");
+            LogUtil.logDebug("Other type of messages");
             //OTHER TYPE OF MESSAGES
             if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
-                log("MY message!!:");
-                log("MY message handle!!: " + message.getMsgId());
+                LogUtil.logDebug("MY message ID: " + message.getMsgId());
 
                 StringBuilder builder = new StringBuilder();
                 builder.append(megaChatApi.getMyFullname() + ": ");
 
                 if (message.getType() == MegaChatMessage.TYPE_NORMAL) {
-                    log("Message type NORMAL: " + message.getMsgId());
+                    LogUtil.logDebug("Message type NORMAL");
 
                     String messageContent = "";
                     if (message.getContent() != null) {
@@ -688,12 +688,12 @@ public class ChatController {
                     }
 
                     if (message.isEdited()) {
-                        log("Message is edited");
+                        LogUtil.logDebug("Message is edited");
                         String textToShow = messageContent + " " + context.getString(R.string.edited_message_text);
                         builder.append(textToShow);
                         return builder.toString();
                     } else if (message.isDeleted()) {
-                        log("Message is deleted");
+                        LogUtil.logDebug("Message is deleted");
 
                         String textToShow = context.getString(R.string.text_deleted_message);
                         builder.append(textToShow);
@@ -704,7 +704,7 @@ public class ChatController {
                         return builder.toString();
                     }
                 }else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
-                    log("Message type TRUNCATE");
+                    LogUtil.logDebug("Message type TRUNCATE");
 
                     String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(megaChatApi.getMyFullname()));
                     try{
@@ -723,7 +723,7 @@ public class ChatController {
                     builder.append(result);
                     return builder.toString();
                 }else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
-                    log("Message type TITLE CHANGE - Message ID: " + message.getMsgId());
+                    LogUtil.logDebug("Message type TITLE CHANGE - Message ID: " + message.getMsgId());
 
                     String messageContent = message.getContent();
                     String textToShow = String.format(context.getString(R.string.non_format_change_title_messages), megaChatApi.getMyFullname(), messageContent);
@@ -850,7 +850,7 @@ public class ChatController {
                     return "";
                 }
             } else {
-                log("Contact message!!");
+                LogUtil.logDebug("Contact message!!");
 
                 String fullNameTitle = getFullName(userHandle, chatRoom);
 
@@ -881,13 +881,13 @@ public class ChatController {
                     }
 
                     if (message.isEdited()) {
-                        log("Message is edited");
+                        LogUtil.logDebug("Message is edited");
 
                         String textToShow = messageContent + " " + context.getString(R.string.edited_message_text);
                         builder.append(textToShow);
                         return builder.toString();
                     } else if (message.isDeleted()) {
-                        log("Message is deleted");
+                        LogUtil.logDebug("Message is deleted");
                         String textToShow = "";
                         if(chatRoom.isGroup()){
                             textToShow = String.format(context.getString(R.string.non_format_text_deleted_message_by), fullNameTitle);
@@ -905,14 +905,14 @@ public class ChatController {
 
                     }
                 } else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
-                    log("Message type TRUNCATE");
+                    LogUtil.logDebug("Message type TRUNCATE");
 
                     String textToShow = String.format(context.getString(R.string.non_format_history_cleared_by), fullNameTitle);
                     builder.append(textToShow);
                     return builder.toString();
 
                 } else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
-                    log("Message type CHANGE TITLE - Message ID: " + message.getMsgId());
+                    LogUtil.logDebug("Message type CHANGE TITLE - Message ID: " + message.getMsgId());
 
                     String messageContent = message.getContent();
 
@@ -1036,8 +1036,8 @@ public class ChatController {
                     return builder.toString();
                 }
                 else{
-                    log("Type message: " + message.getType());
-                    log("Message ID: " + message.getMsgId());
+                    LogUtil.logDebug("Message type: " + message.getType());
+                    LogUtil.logDebug("Message ID: " + message.getMsgId());
                     return "";
                 }
             }
@@ -1045,73 +1045,73 @@ public class ChatController {
     }
 
     public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
-        log("createManagementString");
+        LogUtil.logDebug("Message ID: " + androidMessage.getMessage().getMsgId() + ", Chat ID: " + chatRoom.getChatId());
 
         MegaChatMessage message = androidMessage.getMessage();
         return createManagementString(message, chatRoom);
     }
 
     public String getFirstName(long userHandle, MegaChatRoom chatRoom){
-        log("getFullName: "+userHandle);
+        LogUtil.logDebug("User handle: " + userHandle);
         int privilege = chatRoom.getPeerPrivilegeByHandle(userHandle);
-        log("privilege is: "+privilege);
+        LogUtil.logDebug("Privilege is: " + privilege);
         if(privilege==MegaChatRoom.PRIV_UNKNOWN||privilege==MegaChatRoom.PRIV_RM){
-            log("Not participant any more!");
+            LogUtil.logDebug("Not participant any more!");
             String handleString = megaApi.handleToBase64(userHandle);
             MegaUser contact = megaApi.getContact(handleString);
             if(contact!=null){
                 if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-                    log("Is contact!");
+                    LogUtil.logDebug("Is contact!");
                     return getContactFirstName(userHandle);
                 }
                 else{
-                    log("Old contact");
+                    LogUtil.logDebug("Old contact");
                     return getNonContactFirstName(userHandle);
                 }
             }
             else{
-                log("Non contact");
+                LogUtil.logDebug("Non contact");
                 return getNonContactFirstName(userHandle);
             }
         }
         else{
-            log("Is participant");
+            LogUtil.logDebug("Is participant");
             return getParticipantFirstName(userHandle, chatRoom);
         }
     }
 
     public String getFullName(long userHandle, long chatId){
-        log("getFullName with chatID: "+userHandle);
+        LogUtil.logDebug("User handle: "+ userHandle + ", Chat ID: " + chatId);
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
         if(chat!=null){
             return getFullName(userHandle, chat);
         }
         else{
-            log("Chat is NULL - error!");
+            LogUtil.logWarning("Chat is NULL - error!");
         }
         return "";
     }
 
     public String getFullName(long userHandle, MegaChatRoom chatRoom){
-        log("getFullName: "+userHandle);
+        LogUtil.logDebug("User Handle: " + userHandle + ",Chat ID: " + chatRoom.getChatId());
         int privilege = chatRoom.getPeerPrivilegeByHandle(userHandle);
-        log("privilege is: "+privilege);
+        LogUtil.logDebug("Privilege is: " + privilege);
         if(privilege==MegaChatRoom.PRIV_UNKNOWN||privilege==MegaChatRoom.PRIV_RM){
-            log("Not participant any more!");
+            LogUtil.logDebug("Not participant any more!");
             String handleString = MegaApiJava.userHandleToBase64(userHandle);
-            log("The user handle to find is: "+handleString);
+            LogUtil.logDebug("The user handle to find is: " + handleString);
             MegaUser contact = megaApi.getContact(handleString);
             if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-                log("Is contact!");
+                LogUtil.logDebug("Is contact!");
                 return getContactFullName(userHandle);
             }
             else{
-                log("Non contact");
+                LogUtil.logDebug("Non contact");
                 return getNonContactFullName(userHandle);
             }
         }
         else{
-            log("Is participant");
+            LogUtil.logDebug("Is participant");
             return getParticipantFullName(userHandle, chatRoom);
         }
     }
@@ -1132,8 +1132,8 @@ public class ChatController {
                     lastName="";
                 }
                 if (lastName.trim().length() <= 0){
-                    log("1- Full name empty");
-                    log("2-Put email as fullname");
+                    LogUtil.logWarning("Full name empty");
+                    LogUtil.logDebug("Put email as fullname");
                     String mail = contactDB.getMail();
                     if(mail==null){
                         mail="";
@@ -1158,10 +1158,10 @@ public class ChatController {
     }
 
     public String getContactFullName(long userHandle){
-        log("getContactFullName");
+        LogUtil.logDebug("User Handle: " + userHandle);
         MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
         if(contactDB!=null){
-            log("Contact DB found!");
+            LogUtil.logWarning("Contact DB found!");
             String name = contactDB.getName();
             String lastName = contactDB.getLastName();
 
@@ -1181,8 +1181,8 @@ public class ChatController {
             }
 
             if (fullName.trim().length() <= 0){
-                log("1- Full name empty");
-                log("2-Put email as fullname");
+                LogUtil.logWarning("Full name empty");
+                LogUtil.logDebug("Put email as fullname");
                 String mail = contactDB.getMail();
                 if(mail==null){
                     mail="";
@@ -1217,8 +1217,8 @@ public class ChatController {
                     lastName="";
                 }
                 if (lastName.trim().length() <= 0){
-                    log("1- Full name empty");
-                    log("2-Put email as fullname");
+                    LogUtil.logWarning("Full name empty");
+                    LogUtil.logDebug("Put email as fullname");
                     String mail = nonContact.getEmail();
                     if(mail==null){
                         mail="";
@@ -1262,7 +1262,7 @@ public class ChatController {
     }
 
     public String getParticipantFirstName(long userHandle, MegaChatRoom chatRoom){
-        log("getParticipantFirstName: "+userHandle);
+        LogUtil.logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
         String firstName = chatRoom.getPeerFirstnameByHandle(userHandle);
 
         if(firstName==null){
@@ -1275,8 +1275,8 @@ public class ChatController {
                 lastName="";
             }
             if (lastName.trim().length() <= 0){
-                log("1- Full name empty");
-                log("2-Put email as fullname");
+                LogUtil.logWarning("Full name empty");
+                LogUtil.logDebug("Put email as fullname");
                 String mail = chatRoom.getPeerEmailByHandle(userHandle);
                 if(mail==null){
                     mail="";
@@ -1299,14 +1299,14 @@ public class ChatController {
     }
 
     public String getParticipantFullName(long userHandle, MegaChatRoom chatRoom){
-        log("getParticipantFullName: "+userHandle);
+        LogUtil.logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
         String fullName = chatRoom.getPeerFullnameByHandle(userHandle);
 
         if(fullName!=null && !fullName.trim().isEmpty()) {
             return fullName;
         }
         else {
-            log("1-Put email as fullname");
+            LogUtil.logDebug("Put email as fullname");
             String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
             return participantEmail;
         }
@@ -1318,7 +1318,7 @@ public class ChatController {
 
         if(fullName!=null){
             if(fullName.isEmpty()){
-                log("1-Put MY email as fullname");
+                LogUtil.logDebug("Put MY email as fullname");
                 String myEmail = megaChatApi.getMyEmail();
                 String[] splitEmail = myEmail.split("[@._]");
                 fullName = splitEmail[0];
@@ -1326,7 +1326,7 @@ public class ChatController {
             }
             else{
                 if (fullName.trim().length() <= 0){
-                    log("2-Put MY email as fullname");
+                    LogUtil.logDebug("Put MY email as fullname");
                     String myEmail = megaChatApi.getMyEmail();
                     String[] splitEmail = myEmail.split("[@._]");
                     fullName = splitEmail[0];
@@ -1338,7 +1338,7 @@ public class ChatController {
             }
         }
         else{
-            log("3-Put MY  email as fullname");
+            LogUtil.logDebug("Put MY email as fullname");
             String myEmail = megaChatApi.getMyEmail();
             String[] splitEmail = myEmail.split("[@._]");
             fullName = splitEmail[0];
@@ -1347,7 +1347,7 @@ public class ChatController {
     }
 
     public void pickFileToSend(){
-        log("pickFileToSend");
+        LogUtil.logDebug("pickFileToSend");
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_MULTISELECT_FILE);
 //        ArrayList<String> longArray = new ArrayList<String>();
@@ -1359,14 +1359,14 @@ public class ChatController {
     }
 
     public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chatRoom){
-        log("saveForOffline - multiple messages");
+        LogUtil.logDebug("Save for offline multiple messages");
         for(int i=0; i<messages.size();i++){
             saveForOffline(messages.get(i).getMegaNodeList(), chatRoom);
         }
     }
 
     public void saveForOfflineWithAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chatRoom){
-        log("saveForOffline - multiple messages");
+        LogUtil.logDebug("Save for offline multiple messages");
         for(int i=0; i<messages.size();i++){
             saveForOffline(messages.get(i).getMessage().getMegaNodeList(), chatRoom);
         }
@@ -1411,12 +1411,12 @@ public class ChatController {
                 destination = getOfflineParentFile(context, Constants.FROM_OTHERS, document, null);
                 destination.mkdirs();
 
-                log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
+                LogUtil.logDebug("DESTINATION: " + destination.getAbsolutePath());
                 if (isFileAvailable(destination) && destination.isDirectory()){
 
                     File offlineFile = new File(destination, document.getName());
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
-                        log("File already exists!");
+                        LogUtil.logWarning("File already exists!");
                         showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists));
                     }
                     else{
@@ -1424,7 +1424,7 @@ public class ChatController {
                     }
                 }
                 else{
-                    log("Destination ERROR");
+                    LogUtil.logError("Destination ERROR");
                 }
             }
         }
@@ -1448,7 +1448,7 @@ public class ChatController {
             Intent service = new Intent(context, DownloadService.class);
             document = authorizeNodeIfPreview(document, chatRoom);
             String serializeString = document.serialize();
-            log("serializeString: "+serializeString);
+            LogUtil.logDebug("serializeString: " + serializeString);
             service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
@@ -1503,14 +1503,14 @@ public class ChatController {
     }
 
     private void filePathDefault(String path, final ArrayList<MegaNode> nodeList){
-        log("filePathDefault");
+        LogUtil.logDebug("filePathDefault");
         File defaultPathF = new File(path);
         defaultPathF.mkdirs();
         checkSizeBeforeDownload(path, nodeList);
     }
 
     public void prepareForChatDownload(ArrayList<MegaNodeList> list){
-        log("prepareForChatDownload 1");
+        LogUtil.logDebug("prepareForChatDownload");
         ArrayList<MegaNode> nodeList =  new ArrayList<>();
         MegaNodeList megaNodeList;
         for (int i= 0; i<list.size(); i++){
@@ -1528,14 +1528,14 @@ public class ChatController {
     }
 
     public void prepareForChatDownload(MegaNode node){
-        log("prepareForChatDownload - node ");
+        LogUtil.logDebug("Node: " + node.getHandle());
         ArrayList<MegaNode> nodeList = new ArrayList<>();
         nodeList.add(node);
         prepareForDownloadVersions(nodeList);
     }
 
     private void prepareForDownloadVersions(final ArrayList<MegaNode> nodeList){
-        log("prepareForDownloadLollipop: "+nodeList.size()+" files to download, ");
+        LogUtil.logDebug("Node list size: " + nodeList.size() + " files to download");
         long size = 0;
         long[] hashes = new long[nodeList.size()];
         for (int i=0;i<nodeList.size();i++){
@@ -1547,11 +1547,11 @@ public class ChatController {
                 }
             }
             else{
-                log("Error - nodeTemp is NULL");
+                LogUtil.logError("Error - nodeTemp is NULL");
             }
 
         }
-        log("Number of files: "+hashes.length);
+        LogUtil.logDebug("Number of files: " + hashes.length);
 
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
@@ -1567,7 +1567,7 @@ public class ChatController {
 
         boolean askMe = Util.askMe(context);
         if (askMe){
-            log("askMe");
+            LogUtil.logDebug("askMe");
             File[] fs = context.getExternalFilesDirs(null);
             if (fs.length > 1){
                 if (fs[1] == null){
@@ -1624,14 +1624,14 @@ public class ChatController {
             }
         }
         else{
-            log("NOT askMe");
+            LogUtil.logDebug("NOT askMe");
             filePathDefault(downloadLocationDefaultPath,nodeList);
         }
     }
 
     public void checkSizeBeforeDownload(String parentPath, ArrayList<MegaNode> nodeList){
         //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
-        log("checkSizeBeforeDownload -  size: "+nodeList.size());
+        LogUtil.logDebug("Node list size: " + nodeList.size());
 
         final String parentPathC = parentPath;
         long sizeTemp=0;
@@ -1646,7 +1646,7 @@ public class ChatController {
         }
 
         final long sizeC = sizeTemp;
-        log("the final size is: "+Util.getSizeString(sizeTemp));
+        LogUtil.logDebug("The final size is: " + Util.getSizeString(sizeTemp));
 
         //Check if there is available space
         double availableFreeSpace = Double.MAX_VALUE;
@@ -1655,10 +1655,10 @@ public class ChatController {
             availableFreeSpace = stat.getAvailableBytes();
         } catch (Exception ex) { }
 
-        log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
+        LogUtil.logDebug("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
         if(availableFreeSpace < sizeC) {
             showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
-            log("Not enough space");
+            LogUtil.logWarning("Not enough space");
             return;
         }
 
@@ -1679,13 +1679,13 @@ public class ChatController {
         }
 
         if (ask.equals("false")) {
-            log("SIZE: Do not ask before downloading");
+            LogUtil.logDebug("SIZE: Do not ask before downloading");
             download(parentPathC, nodeList);
         }
         else{
-            log("SIZE: Ask before downloading");
+            LogUtil.logDebug("SIZE: Ask before downloading");
             if (sizeC>104857600) {
-                log("Show size confirmation: "+sizeC);
+                LogUtil.logDebug("Show size confirmation: " + sizeC);
                 //Show alert
                 if (context instanceof ChatActivityLollipop) {
                     ((ChatActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
@@ -1710,7 +1710,7 @@ public class ChatController {
     }
 
     public void download(String parentPath, ArrayList<MegaNode> nodeList){
-        log("download() ");
+        LogUtil.logDebug("download()");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -1743,7 +1743,7 @@ public class ChatController {
 
         if (nodeList != null){
             if(nodeList.size() == 1){
-                log("hashes.length == 1");
+                LogUtil.logDebug("hashes.length == 1");
                 MegaNode tempNode = nodeList.get(0);
                 if (context instanceof ChatActivityLollipop) {
                     tempNode = authorizeNodeIfPreview(tempNode, ((ChatActivityLollipop) context).getChatRoom());
@@ -1752,36 +1752,36 @@ public class ChatController {
                     tempNode = authorizeNodeIfPreview(tempNode, ((NodeAttachmentHistoryActivity) context).getChatRoom());
                 }
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-                    log("ISFILE");
+                    LogUtil.logDebug("ISFILE");
                     String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
 
                     //Check if the file is already downloaded
                     MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
                     if(localPath != null){
-                        log("localPath != null");
+                        LogUtil.logDebug("localPath != null");
                         try {
-                            log("download:Call to copyFile: localPath: ");
+                            LogUtil.logDebug("Call to copyFile: localPath: ");
                             copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 
                             if(isVideoFile(parentPath+"/"+tempNode.getName())){
-                                log("Is video!!!");
+                                LogUtil.logDebug("Is video!!!");
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){
-                                        log("The video has not thumb");
+                                        LogUtil.logWarning("The video has not thumb");
                                         ThumbnailUtilsLollipop.createThumbnailVideo(context, localPath, megaApi, tempNode.getHandle());
                                     }
                                 }
                             }
                             else{
-                                log("NOT video!");
+                                LogUtil.logDebug("NOT video!");
                             }
                         }
                         catch(Exception e) {
-                            log("Exception!!");
+                            LogUtil.logError("Exception!!", e);
                         }
                         boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
                         if(!autoPlayEnabled){
-                            log("auto play disabled");
+                            LogUtil.logDebug("Auto play disabled");
                             Util.showSnackBar(context,Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded),-1);
                             return;
                         }
@@ -1789,7 +1789,7 @@ public class ChatController {
                         if(ChatUtil.isVoiceClip(nodeList.get(0).getName())) return;
 
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
-                            log("MimeTypeList ZIP");
+                            LogUtil.logDebug("MimeTypeList ZIP");
                             File zipFile = new File(localPath);
 
                             Intent intentZip = new Intent();
@@ -1801,7 +1801,7 @@ public class ChatController {
 
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
-                            log("download:Video/Audio file");
+                            LogUtil.logDebug("Video/Audio file");
                             if (context instanceof AudioVideoPlayerLollipop){
                                 ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                             }
@@ -1855,7 +1855,7 @@ public class ChatController {
                                         }
                                         intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                         if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
-                                            log("call to startActivity(intentShare)");
+                                            LogUtil.logDebug("Call to startActivity(intentShare)");
                                             context.startActivity(intentShare);
                                         }
                                     }
@@ -1863,7 +1863,7 @@ public class ChatController {
                             }
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
-                            log("Pdf file");
+                            LogUtil.logDebug("Pdf file");
                             if (context instanceof PdfViewerActivityLollipop){
                                 ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                             }
@@ -1885,7 +1885,7 @@ public class ChatController {
                             }
                         }
                         else {
-                            log("MimeTypeList other file");
+                            LogUtil.logDebug("MimeTypeList other file");
 
                             if(context instanceof ChatFullScreenImageViewer){
                                 ((ChatFullScreenImageViewer) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
@@ -1900,10 +1900,10 @@ public class ChatController {
                                     }
                                     viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     if (MegaApiUtils.isIntentAvailable(context, viewIntent)) {
-                                        log("if isIntentAvailable");
+                                        LogUtil.logDebug("IF isIntentAvailable");
                                         context.startActivity(viewIntent);
                                     } else {
-                                        log("ELSE isIntentAvailable");
+                                        LogUtil.logDebug("ELSE isIntentAvailable");
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                             intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -1912,7 +1912,7 @@ public class ChatController {
                                         }
                                         intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                         if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
-                                            log("call to startActivity(intentShare)");
+                                            LogUtil.logDebug("Call to startActivity(intentShare)");
                                             context.startActivity(intentShare);
                                         }
                                         showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
@@ -1927,7 +1927,7 @@ public class ChatController {
                         return;
                     }//localPath found
                     else{
-                        log("download:localPath is NULL");
+                        LogUtil.logWarning("localPath is NULL");
                     }
                 }
             }
@@ -1935,7 +1935,7 @@ public class ChatController {
             for (int i=0; i<nodeList.size();i++) {
                 MegaNode nodeToDownload = nodeList.get(i);
                 if(nodeToDownload != null){
-                    log("download:node NOT null is going to donwload");
+                    LogUtil.logDebug("Node NOT null is going to donwload");
                     Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
                     dlFiles.put(nodeToDownload, parentPath);
 
@@ -1957,7 +1957,7 @@ public class ChatController {
                             service.putExtra("fromMV", true);
                         }
 
-                        log("serializeString: "+serializeString);
+                        LogUtil.logDebug("serializeString: " + serializeString);
                         service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
                         service.putExtra(DownloadService.EXTRA_PATH, path);
                         service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
@@ -1967,14 +1967,14 @@ public class ChatController {
                     }
                 }
                 else {
-                    log("node NOT fOUND!!!!!");
+                    LogUtil.logWarning("Node NOT fOUND!!!!!");
                 }
             }
         }
     }
 
     public void importNode(long idMessage, long idChat) {
-        log("importNode");
+        LogUtil.logDebug("Message ID: " + idMessage + ", Chat ID: " + idChat);
         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
         MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
 
@@ -1984,12 +1984,12 @@ public class ChatController {
             importNodesFromAndroidMessages(messages);
         }
         else{
-            log("Message cannot be recovered - null");
+            LogUtil.logWarning("Message cannot be recovered - null");
         }
     }
 
     public void importNodesFromMessages(ArrayList<MegaChatMessage> messages){
-        log("importNodesFromMessages");
+        LogUtil.logDebug("importNodesFromMessages");
 
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
@@ -2006,7 +2006,7 @@ public class ChatController {
     }
 
     public void importNodesFromAndroidMessages(ArrayList<AndroidMegaChatMessage> messages){
-        log("importNodesFromAndroidMessages");
+        LogUtil.logDebug("importNodesFromAndroidMessages");
 
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
@@ -2026,7 +2026,7 @@ public class ChatController {
     }
 
     public void prepareMessageToForward(long idMessage, long idChat) {
-        log("prepareMessageToForward");
+        LogUtil.logDebug("Message ID: " + idMessage + ", Chat ID: " + idChat);
         ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
         MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
         messagesSelected.add(m);
@@ -2043,7 +2043,7 @@ public class ChatController {
     }
 
     public void prepareMessagesToForward(ArrayList<MegaChatMessage> messagesSelected, long idChat){
-        log ("prepareMessagesToForward");
+        LogUtil.logDebug("Number of messages: " + messagesSelected.size() + ",Chat ID: " + idChat);
 
         ArrayList<MegaChatMessage> messagesToImport = new ArrayList<>();
         long[] idMessages = new long[messagesSelected.size()];
@@ -2059,16 +2059,16 @@ public class ChatController {
         }
 
         if(messagesToImport.isEmpty()){
-            log("Proceed to forward");
+            LogUtil.logDebug("Proceed to forward");
             forwardMessages(messagesSelected, idChat);
         }
         else{
-            log("Proceed to import nodes to own Cloud");
+            LogUtil.logDebug("Proceed to import nodes to own Cloud");
             ChatImportToForwardListener listener = new ChatImportToForwardListener(Constants.MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
     
             MegaNode target = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
             if(target==null){
-                log("Error no chat folder - return");
+                LogUtil.logWarning("Error no chat folder - return");
                 return;
             }
 
@@ -2082,17 +2082,17 @@ public class ChatController {
                     for(int i=0;i<nodeList.size();i++){
                         MegaNode document = nodeList.get(i);
                         if (document != null) {
-                            log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
+                            LogUtil.logDebug("DOCUMENT: " + document.getHandle());
                             document = authorizeNodeIfPreview(document, megaChatApi.getChatRoom(idChat));
                             megaApi.copyNode(document, target, listener);
                         }
                         else{
-                            log("DOCUMENT: null");
+                            LogUtil.logWarning("DOCUMENT: null");
                         }
                     }
                 }
                 else{
-                    log("MESSAGE is null");
+                    LogUtil.logWarning("MESSAGE is null");
                     showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error));
                 }
             }
@@ -2100,7 +2100,7 @@ public class ChatController {
     }
 
     public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected, long idChat){
-        log ("forwardMessages");
+        LogUtil.logDebug("Number of messages: " + messagesSelected.size() + ", Chat ID: " + idChat);
 
         long[] idMessages = new long[messagesSelected.size()];
         for(int i=0; i<messagesSelected.size();i++){
@@ -2123,11 +2123,11 @@ public class ChatController {
         if (chatRoom != null && chatRoom.isPreview()) {
             MegaNode nodeAuthorized = megaApi.authorizeChatNode(node, chatRoom.getAuthorizationToken());
             if (nodeAuthorized != null) {
-                log("authorizeNodeIfPreview authorized");
+                LogUtil.logDebug("Authorized");
                 return nodeAuthorized;
             }
         }
-        log("authorizeNodeIfPreview NOT authorized");
+        LogUtil.logDebug("NOT authorized");
         return node;
     }
 
@@ -2145,9 +2145,5 @@ public class ChatController {
         }
 
         return false;
-    }
-
-    public static void log(String message) {
-        Util.log("ChatController", message);
     }
 }

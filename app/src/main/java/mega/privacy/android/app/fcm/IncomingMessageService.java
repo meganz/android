@@ -18,6 +18,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 
 public class IncomingMessageService extends IncomingCallService {
@@ -29,10 +30,10 @@ public class IncomingMessageService extends IncomingCallService {
     @Override
     public int onStartCommand(Intent intent,int flags,int startId) {
         ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        log("network available: " + (cm.getActiveNetworkInfo() != null));
+        LogUtil.logDebug("Network available: " + (cm.getActiveNetworkInfo() != null));
         if (cm.getActiveNetworkInfo() != null) {
-            log(cm.getActiveNetworkInfo().getState() + "");
-            log(cm.getActiveNetworkInfo().getDetailedState() + "");
+            LogUtil.logDebug(cm.getActiveNetworkInfo().getState() + "");
+            LogUtil.logDebug(cm.getActiveNetworkInfo().getDetailedState() + "");
         }
         
         PowerManager pm = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
@@ -77,7 +78,7 @@ public class IncomingMessageService extends IncomingCallService {
                 } else {
                     silent = "0"; //beep
                 }
-                log("Silent payload: " + silent);
+                LogUtil.logDebug("Silent payload: " + silent);
                 
                 if (silent != null) {
                     if (silent.equals("1")) {
@@ -86,28 +87,28 @@ public class IncomingMessageService extends IncomingCallService {
                         beep = true;
                     }
                 } else {
-                    log("NO DATA on the PUSH");
+                    LogUtil.logWarning("NO DATA on the PUSH");
                     beep = true;
                 }
             } catch (Exception e) {
-                log("ERROR:remoteSilentParameter");
+                LogUtil.logError("ERROR:remoteSilentParameter", e);
                 beep = true;
             }
-            
-            log("notification should beep: " + beep);
+
+            LogUtil.logDebug("Notification should beep: " + beep);
             showMessageNotificationAfterPush = true;
             
             UserCredentials credentials = dbH.getCredentials();
             String gSession = credentials.getSession();
             if (megaApi.getRootNode() == null) {
-                log("RootNode = null");
+                LogUtil.logWarning("RootNode = null");
                 performLoginProccess(gSession);
             } else {
                 //Leave the flag showMessageNotificationAfterPush as it is
                 //If true - wait until connection finish
                 //If false, no need to change it
-                log("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
-                log("(2)Call to pushReceived");
+                LogUtil.logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
+                LogUtil.logDebug("Call to pushReceived");
                 megaChatApi.pushReceived(beep);
                 beep = false;
             }
@@ -121,10 +122,10 @@ public class IncomingMessageService extends IncomingCallService {
                             stop();
                             boolean shown = ((MegaApplication)getApplication()).isChatNotificationReceived();
                             if (!shown) {
-                                log("Show simple notification - no connection finished");
+                                LogUtil.logDebug("Show simple notification - no connection finished");
                                 chatNotificationBuilder.showSimpleNotification();
                             } else {
-                                log("Notification already shown");
+                                LogUtil.logDebug("Notification already shown");
                             }
                         }
                     },

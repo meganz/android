@@ -17,7 +17,8 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -88,10 +89,6 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
         }
     }
 
-    private static void log(String log) {
-        Util.log("CreateChatToPerformActionListener", log);
-    }
-
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -104,16 +101,16 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish: "+e.getErrorCode());
+        LogUtil.logDebug("Error code: "+e.getErrorCode());
 
         if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
             if(action==SEND_FILE){
-                log("Action: SEND_FILE");
+                LogUtil.logDebug("Action: SEND_FILE");
                 counter--;
-                log("Counter after decrease: "+counter);
+                LogUtil.logDebug("Counter after decrease: " + counter);
                 if (e.getErrorCode() != MegaError.API_OK){
                     error++;
-                    log("ERROR creating chat");
+                    LogUtil.logError("ERROR creating chat");
                 }
                 else{
                     if(chats==null){
@@ -126,7 +123,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 }
 
                 if(counter==0){
-                    log("Counter is 0 - all requests processed");
+                    LogUtil.logDebug("Counter is 0 - all requests processed");
                     if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
                         //All send files fail
                         message = context.getResources().getString(R.string.number_no_sent, error);
@@ -173,7 +170,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     }
                 }
             } else if (action == START_AUDIO_CALL) {
-                log("Action: START_AUDIO_CALL");
+                LogUtil.logDebug("Action: START_AUDIO_CALL");
                 if (context instanceof ContactInfoActivityLollipop) {
                     if (e.getErrorCode() != MegaError.API_OK) {
                         ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
@@ -183,12 +180,12 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                             ((MegaApplication) ((Activity) context).getApplication()).setSpeakerStatus(chat.getChatId(), false);
                             megaChatApi.startChatCall(chat.getChatId(), false, (ContactInfoActivityLollipop) context);
                         } else {
-                            log("Chatroom not recovered");
+                            LogUtil.logWarning("Chatroom not recovered");
                         }
                     }
                 }
             } else if (action == START_VIDEO_CALL) {
-                log("Action: START_VIDEO_CALL");
+                LogUtil.logDebug("Action: START_VIDEO_CALL");
                 if (context instanceof ContactInfoActivityLollipop) {
                     if (e.getErrorCode() != MegaError.API_OK) {
                         ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
@@ -198,17 +195,17 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                             ((MegaApplication) ((Activity) context).getApplication()).setSpeakerStatus(chat.getChatId(), true);
                             megaChatApi.startChatCall(chat.getChatId(), true, (ContactInfoActivityLollipop) context);
                         } else {
-                            log("Chatroom not recovered");
+                            LogUtil.logWarning("Chatroom not recovered");
                         }
                     }
                 }
             }
             else if (action == SEND_FILES) {
                 counter--;
-                log("Counter after decrease: "+counter);
+                LogUtil.logDebug("Counter after decrease: " + counter);
                 if (e.getErrorCode() != MegaError.API_OK){
                     error++;
-                    log("ERROR creating chat");
+                    LogUtil.logError("ERROR creating chat");
                 }
                 else{
                     if(chats==null){
@@ -221,7 +218,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 }
 
                 if(counter==0){
-                    log("Counter is 0 - all requests processed");
+                    LogUtil.logDebug("Counter is 0 - all requests processed");
                     if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
                         //All send files fail; Show error
                         message = context.getResources().getQuantityString(R.plurals.num_files_not_send, handles.length, totalCounter);
@@ -239,10 +236,10 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
             }
             else if (action == SEND_CONTACTS) {
                 counter--;
-                log("Counter after decrease: "+counter);
+                LogUtil.logDebug("Counter after decrease: " + counter);
                 if (e.getErrorCode() != MegaError.API_OK){
                     error++;
-                    log("ERROR creating chat");
+                    LogUtil.logError("ERROR creating chat");
                 }
                 else{
                     if(chats==null){
@@ -255,7 +252,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 }
 
                 if(counter==0){
-                    log("Counter is 0 - all requests processed");
+                    LogUtil.logDebug("Counter is 0 - all requests processed");
                     if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
                         //All send contacts fail; Show error
                         message = context.getResources().getQuantityString(R.plurals.num_contacts_not_send, handles.length, totalCounter);
@@ -273,10 +270,10 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
             }
             else if (action == SEND_MESSAGES) {
                 counter--;
-                log("Counter after decrease: "+counter);
+                LogUtil.logDebug("Counter after decrease: " + counter);
                 if (e.getErrorCode() != MegaError.API_OK){
                     error++;
-                    log("ERROR creating chat");
+                    LogUtil.logError("ERROR creating chat");
                 }
                 else{
                     if(chats==null){
@@ -289,7 +286,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 }
 
                 if(counter==0){
-                    log("Counter is 0 - all requests processed");
+                    LogUtil.logDebug("Counter is 0 - all requests processed");
                     if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
                         //All send messages fail; Show error
                         message = context.getResources().getQuantityString(R.plurals.num_messages_not_send, handles.length, totalCounter);
@@ -313,10 +310,10 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
             }
             else if (action == SEND_FILE_EXPLORER_CONTENT) {
                 counter--;
-                log("Counter after decrease: "+counter);
+                LogUtil.logDebug("Counter after decrease: " + counter);
                 if (e.getErrorCode() != MegaError.API_OK){
                     error++;
-                    log("ERROR creating chat");
+                    LogUtil.logError("ERROR creating chat");
                 }
                 else{
                     if(chats==null){
@@ -329,7 +326,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 }
 
                 if(counter==0){
-                    log("Counter is 0 - all requests processed");
+                    LogUtil.logDebug("Counter is 0 - all requests processed");
                     if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
                         //All send messages fail; Show error
                         message = context.getResources().getString(R.string.content_not_send, totalCounter);

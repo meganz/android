@@ -60,6 +60,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -72,9 +73,6 @@ import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
 
-/**
- * Created by mega on 28/05/18.
- */
 
 public class TwoFactorAuthenticationActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface, View.OnLongClickListener, View.OnFocusChangeListener{
 
@@ -157,7 +155,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
 
         setContentView(R.layout.activity_two_factor_authentication);
 
@@ -180,7 +178,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
         tB = (Toolbar) findViewById(R.id.toolbar);
         if(tB==null){
-            log("Tb is Null");
+            LogUtil.logError("Tb is Null");
             return;
         }
 
@@ -193,7 +191,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         setTitle(getString(R.string.settings_2fa));
 
         if (savedInstanceState != null){
-            log("savedInstanceState No null");
+            LogUtil.logDebug("savedInstanceState No null");
             confirm2FAIsShown = savedInstanceState.getBoolean("confirm2FAIsShown", false);
             scanOrCopyIsShown = savedInstanceState.getBoolean("scanOrCopyIsShown", false);
             isEnabled2FA = savedInstanceState.getBoolean("isEnabled2FA", false);
@@ -642,10 +640,10 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         scrollContainerVerify.setVisibility(View.VISIBLE);
         scrollContainer2FAEnabled.setVisibility(View.GONE);
         if (seed != null){
-            log("seed no null");
+            LogUtil.logDebug("Seed not null");
             setSeed();
             if (qr != null){
-                log("qr no null");
+                LogUtil.logDebug("QR not null");
                 qrImage.setImageBitmap(qr);
             }
             else {
@@ -704,13 +702,13 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     void pasteClipboard() {
-        log("pasteClipboard");
+        LogUtil.logDebug("pasteClipboard");
         pinLongClick = false;
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clipData = clipboard.getPrimaryClip();
         if (clipData != null) {
             String code = clipData.getItemAt(0).getText().toString();
-            log("code: "+code);
+            LogUtil.logDebug("Code: "+code);
             if (code != null && code.length() == 6) {
                 boolean areDigits = true;
                 for (int i=0; i<6; i++) {
@@ -740,7 +738,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     void permitVerify(){
-        log("permitVerify");
+        LogUtil.logDebug("permitVerify");
         if (confirm2FAIsShown && firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1
                 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
             Util.hideKeyboard(this, 0);
@@ -754,7 +752,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             sb.append(fifthPin.getText());
             sb.append(sixthPin.getText());
             pin = sb.toString().trim();
-            log("PIN: "+pin);
+
             if (pin != null){
                 megaApi.multiFactorAuthEnable(pin, this);
             }
@@ -784,7 +782,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     void generate2FAQR (){
-        log("generate2FAQR");
+        LogUtil.logDebug("generate2FAQR");
 
         url = null;
         String myEmail = megaApi.getMyEmail();
@@ -883,7 +881,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        log("onSaveInstanceState");
+        LogUtil.logDebug("onSaveInstanceState");
 
         outState.putBoolean("confirm2FAIsShown", confirm2FAIsShown);
         outState.putBoolean("scanOrCopyIsShown", scanOrCopyIsShown);
@@ -895,9 +893,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         outState.putBoolean("isHelpDialogShown", isHelpDialogShown);
 
         if (scanOrCopyIsShown){
-            log("scanOrCopyIsShown");
+            LogUtil.logDebug("scanOrCopyIsShown");
             if (qr != null) {
-                log("QR no null");
+                LogUtil.logDebug("QR not null");
                 ByteArrayOutputStream qrOutputStream = new ByteArrayOutputStream();
                 qr.compress(Bitmap.CompressFormat.JPEG, 100, qrOutputStream);
                 byte[] qrByteArray = qrOutputStream.toByteArray();
@@ -964,7 +962,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 }
                 if (url != null) {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    log("URL: "+url+" seed: " + seed);
+                    LogUtil.logDebug("URL: " + url + ", Seed: " + seed);
                     if (MegaApiUtils.isIntentAvailable(this, intent)) {
                         startActivity(intent);
                     }
@@ -1038,7 +1036,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     void showAlertHelp () {
-        log("showAlertHelp");
+        LogUtil.logDebug("showAlertHelp");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -1066,7 +1064,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     void showAlertNotAppAvailable () {
-        log("showAlertNotAppAvailable");
+        LogUtil.logDebug("showAlertNotAppAvailable");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -1105,11 +1103,11 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish");
+        LogUtil.logDebug("onRequestFinish");
         if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET){
-            log("MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET");
+            LogUtil.logDebug("MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET");
             if (e.getErrorCode() == MegaError.API_OK){
-                log("MegaError.API_OK");
+                LogUtil.logDebug("MegaError.API_OK");
                 seed = request.getText();
                 if (seed != null){
 //                    seedText.setText(seed.toUpperCase());
@@ -1121,26 +1119,26 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 }
             }
             else {
-                log("e.getErrorCode(): " + e.getErrorCode());
+                LogUtil.logError("e.getErrorCode(): " + e.getErrorCode());
                 showSnackbar(getResources().getString(R.string.qr_seed_text_error));
             }
         }
         else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET){
-            log("TYPE_MULTI_FACTOR_AUTH_SET: "+e.getErrorCode());
+            LogUtil.logDebug("TYPE_MULTI_FACTOR_AUTH_SET: " + e.getErrorCode());
             if (request.getFlag() && e.getErrorCode() == MegaError.API_OK) {
-                log("Pin correct: Two-Factor Authentication enabled");
+                LogUtil.logDebug("Pin correct: Two-Factor Authentication enabled");
                 confirm2FAIsShown = false;
                 isEnabled2FA = true;
                 megaApi.isMasterKeyExported(this);
             }
             else if (e.getErrorCode() == MegaError.API_EFAILED){
-                log("Pin not correct: "+request.getPassword());
+                LogUtil.logWarning("Pin not correct: " + request.getPassword());
                 if (request.getFlag()){
                     showError();
                 }
             }
             else {
-                log("An error ocurred trying to enable Two-Factor Authentication");
+                LogUtil.logError("An error ocurred trying to enable Two-Factor Authentication");
                 showSnackbar(getString(R.string.error_enable_2fa));
             }
 
@@ -1148,13 +1146,13 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         }
         else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK){
             if (e.getErrorCode() == MegaError.API_OK){
-                log("TYPE_MULTI_FACTOR_AUTH_CHECK: "+request.getFlag());
+                LogUtil.logDebug("TYPE_MULTI_FACTOR_AUTH_CHECK: " + request.getFlag());
             }
         }
         else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER) {
-            log("TYPE_GET_ATTR_USER");
+            LogUtil.logDebug("TYPE_GET_ATTR_USER");
             if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-                log("TYPE_GET_ATTR_USER API_OK");
+                LogUtil.logDebug("TYPE_GET_ATTR_USER API_OK");
 
                 scrollContainer2FA.setVisibility(View.GONE);
                 scrollContainerVerify.setVisibility(View.GONE);
@@ -1170,7 +1168,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 }
             }
             else {
-                log("TYPE_GET_ATTR_USER error: " + e.getErrorString());
+                LogUtil.logError("TYPE_GET_ATTR_USER error: " + e.getErrorString());
             }
         }
     }
@@ -1226,7 +1224,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     void copySeed () {
-        log("copy seed");
+        LogUtil.logDebug("Copy seed");
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         if (seed != null) {
             ClipData clip = ClipData.newPlainText("seed", seed);
@@ -1242,10 +1240,10 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         super.onActivityResult(requestCode, resultCode, intent);
 
         if (requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
-            log("REQUEST_DOWNLOAD_FOLDER");
+            LogUtil.logDebug("REQUEST_DOWNLOAD_FOLDER");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
-                log("parentPath no NULL");
+                LogUtil.logDebug("parentPath no NULL");
                 String[] split = RK_FILE.split(File.separator);
                 parentPath = parentPath+"/"+split[split.length-1];
                 Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
@@ -1301,9 +1299,5 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 break;
             }
         }
-    }
-
-    public static void log(String message) {
-        Util.log("TwoFactorAuthenticationActivity", message);
     }
 }

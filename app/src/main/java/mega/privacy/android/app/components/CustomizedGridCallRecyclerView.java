@@ -5,8 +5,9 @@ import android.content.res.TypedArray;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
-import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.utils.Util;
+
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 
 public class CustomizedGridCallRecyclerView extends RecyclerView {
 
@@ -46,22 +47,22 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        log("onMeasure-> widthSpec: "+widthSpec+", heightSpec: "+heightSpec);
+        LogUtil.logDebug("onMeasure-> widthSpec: " + widthSpec + ", heightSpec: " + heightSpec);
         super.onMeasure(widthSpec, heightSpec);
         if(!isWrapContent){
-            log("columnWidth :"+columnWidth);
+            LogUtil.logDebug("columnWidth :" + columnWidth);
             if (columnWidth > 0) {
                 int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
-                log("spanCount: "+spanCount);
+                LogUtil.logDebug("spanCount: " + spanCount);
                 manager.setSpanCount(spanCount);
             }
         }else{
 
             ViewGroup.LayoutParams params = getLayoutParams();
-            log("columnWidth :"+columnWidth);
+            LogUtil.logDebug("columnWidth :" + columnWidth);
             if (columnWidth > 0) {
                 int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
-                log("spanCount: "+spanCount);
+                LogUtil.logDebug("spanCount: " + spanCount);
                 manager.setSpanCount(spanCount);
                 params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
                 setLayoutParams(params);
@@ -96,9 +97,5 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
     @Override
     public CustomizedGridLayoutManager getLayoutManager() {
         return manager;
-    }
-
-    private static void log(String txt){
-        Util.log("CustomizedGridCallRecyclerView", txt);
     }
 }

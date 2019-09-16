@@ -6,6 +6,8 @@ import android.os.Environment;
 import java.io.File;
 import java.io.IOException;
 
+import nz.mega.sdk.MegaApiAndroid;
+
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.getSizeString;
@@ -35,7 +37,7 @@ public final class CacheFolderManager {
     public static final String OLD_CHAT_TEMPORAL_DIR = "MEGA/MEGA Temp/Chat";
 
     public static File getCacheFolder(Context context, String folderName) {
-        log("create cache folder: " + folderName);
+        LogUtil.logDebug("Create cache folder: " + folderName);
         File cacheFolder;
         if (folderName.equals(CHAT_TEMPORAL_FOLDER)) {
             cacheFolder = new File(context.getFilesDir(), folderName);
@@ -73,7 +75,7 @@ public final class CacheFolderManager {
                         deleteFolderAndSubfolders(context, dir);
                     } catch (IOException e) {
                         e.printStackTrace();
-                        log("IOException deleting external cache");
+                        LogUtil.logError("IOException deleting external cache", e);
                     }
                 }
             }
@@ -83,9 +85,9 @@ public final class CacheFolderManager {
     private static void createCacheFolder(Context context, String name) {
         File file = getCacheFolder(context, name);
         if (isFileAvailable(file)) {
-            log(file.getName() + " folder created: " + file.getAbsolutePath());
+            LogUtil.logDebug(file.getName() + " folder created: " + file.getAbsolutePath());
         } else {
-            log("create " + name + " file failed");
+            LogUtil.logError("Create " + name + " file failed");
         }
     }
 
@@ -121,12 +123,12 @@ public final class CacheFolderManager {
     }
 
     public static String getCacheSize(Context context){
-        log("getCacheSize");
+        LogUtil.logDebug("getCacheSize");
         File cacheIntDir = context.getCacheDir();
         File cacheExtDir = context.getExternalCacheDir();
 
         if(cacheIntDir!=null){
-            log("Path to check internal: "+cacheIntDir.getAbsolutePath());
+            LogUtil.logDebug("Path to check internal: " + cacheIntDir.getAbsolutePath());
         }
         long size = getDirSize(cacheIntDir)+getDirSize(cacheExtDir);
 
@@ -134,14 +136,14 @@ public final class CacheFolderManager {
     }
 
     public static void clearCache(Context context){
-        log("clearCache");
+        LogUtil.logDebug("clearCache");
         File cacheIntDir = context.getCacheDir();
 
         try {
             deleteFolderAndSubfolders(context, cacheIntDir);
         } catch (IOException e) {
             e.printStackTrace();
-            log("Exception deleting private cache");
+            LogUtil.logError("Exception deleting private cache", e);
         }
 
         clearPublicCache(context);
@@ -177,16 +179,12 @@ public final class CacheFolderManager {
         try {
             deleteFolderAndSubfolders(context, oldTempFolder);
         } catch (IOException e) {
-            log("Exception deleting" + oldTempFolder.getName() + "directory");
+            LogUtil.logError("Exception deleting" + oldTempFolder.getName() + "directory", e);
             e.printStackTrace();
         }
     }
 
     public static File getOldTempFolder(String folderName) {
         return new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + folderName);
-    }
-
-    public static void log(String message) {
-        Util.log("CacheFolderManager", message);
     }
 }

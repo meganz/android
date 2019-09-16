@@ -10,7 +10,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
+import nz.mega.sdk.MegaApiAndroid;
 
 public class RecordButton extends AppCompatImageView implements View.OnTouchListener, View.OnClickListener {
     private RecordView recordView;
@@ -30,10 +31,6 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     public RecordButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
-    }
-
-    public static void log(String message) {
-        Util.log("RecordButton", message);
     }
 
     private void init(Context context, AttributeSet attrs) {
@@ -85,27 +82,27 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
-                log("onTouch() - ACTION_DOWN");
+                LogUtil.logDebug("onTouch() - ACTION_DOWN");
                 recordView.onActionDown((RelativeLayout) v.getParent(), event);
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
-                log("onTouch() - ACTION_MOVE");
+                LogUtil.logDebug("onTouch() - ACTION_MOVE");
                 recordView.onActionMove((RelativeLayout) v.getParent(), event);
                 break;
             }
             case MotionEvent.ACTION_UP: {
-                log("onTouch() - ACTION_UP");
+                LogUtil.logDebug("onTouch() - ACTION_UP");
                 recordView.onActionUp((RelativeLayout) v.getParent());
                 break;
             }
             case MotionEvent.ACTION_CANCEL: {
-                log("onTouch() - ACTION_CANCEL");
+                LogUtil.logDebug("onTouch() - ACTION_CANCEL");
                 recordView.onActionCancel((RelativeLayout) v.getParent());
                 break;
             }
             default: {
-                log("onTouch() - default");
+                LogUtil.logDebug("onTouch() - default");
                 break;
             }
         }
@@ -113,7 +110,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     }
 
     public void setOnRecordClickListener(OnRecordClickListener onRecordClickListener) {
-        log("setOnRecordClickListener");
+        LogUtil.logDebug("setOnRecordClickListener");
         this.onRecordClickListener = onRecordClickListener;
     }
 

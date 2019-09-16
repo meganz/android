@@ -56,6 +56,7 @@ import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -151,7 +152,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            log("onActionItemClicked");
+            LogUtil.logDebug("onActionItemClicked");
             List<MegaNode> documents = getSelectedDocuments();
 
             switch(item.getItemId()){
@@ -191,7 +192,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         //NodeController nC = new NodeController(context);
                         //nC.exportLink(documents.get(0));
                         if(documents.get(0)==null){
-                            log("The selected node is NULL");
+                            LogUtil.logWarning("The selected node is NULL");
                             break;
                         }
                         ((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
@@ -205,7 +206,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         //NodeController nC = new NodeController(context);
                         //nC.removeLink(documents.get(0));
                         if(documents.get(0)==null){
-                            log("The selected node is NULL");
+                            LogUtil.logWarning("The selected node is NULL");
                             break;
                         }
                         ((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
@@ -237,7 +238,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            log("onCreateActionMode");
+            LogUtil.logDebug("onCreateActionMode");
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_browser_action, menu);
             ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
@@ -254,7 +255,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            log("onDestroyActionMode");
+            LogUtil.logDebug("onDestroyActionMode");
             clearSelections();
             multipleSelect = false;
             actionMode = null;
@@ -276,10 +277,10 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            log("onPrepareActionMode");
+            LogUtil.logDebug("onPrepareActionMode");
             List<MegaNode> selected = getSelectedDocuments();
 
-            log("the num of items selected is "+selected.size());
+            LogUtil.logDebug("The num of items selected is " + selected.size());
 
             boolean showDownload = false;
             boolean showRename = false;
@@ -374,7 +375,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     @Override
     public ViewHolderPhotoTitleSyncGridTitle onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        LogUtil.logDebug("onCreateViewHolder");
 
         dbH = DatabaseHandler.getDbHandler(context);
         prefs = dbH.getPreferences();
@@ -401,16 +402,16 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         int padding = 0;
         if(numberOfCells == CameraUploadFragmentLollipop.GRID_LARGE){
-            log("numOfCells is GRID_LARGE");
+            LogUtil.logDebug("numOfCells is GRID_LARGE");
 
             padding = PADDING_GRID_LARGE;
         }
         else if (numberOfCells == CameraUploadFragmentLollipop.GRID_SMALL){
-            log("numOfCells is GRID_SMALL");
+            LogUtil.logDebug("numOfCells is GRID_SMALL");
             padding = PADDING_GRID_SMALL;
         }
         else{
-            log("numOfCells is "+numberOfCells);
+            LogUtil.logDebug("numOfCells is " + numberOfCells);
             padding = 2;
 //				iV.setPadding(padding, padding, padding, padding);
         }
@@ -457,7 +458,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 break;
             }
             case TYPE_NO_TYPE:
-                log("Error, NO TYPE");
+                LogUtil.logWarning("Error, NO TYPE");
                 break;
         }
 
@@ -611,7 +612,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             }
 
             if(n == null){
-                log("n is null");
+                LogUtil.logError("n is null");
                 return;
             }
 
@@ -675,7 +676,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 }
             }
             else{
-                log(n.getName()+" NO ThUMB!!");
+                LogUtil.logDebug(n.getHandle()+" NO ThUMB!!");
             }
 
         }
@@ -714,7 +715,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             }
 
             if(n == null){
-                log("n is null");
+                LogUtil.logError("n is null");
                 return;
             }
 
@@ -775,12 +776,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 }
             }
             else{
-                log(n.getName()+" NO ThUMB!!");
+                LogUtil.logDebug(n.getHandle()+" NO ThUMB!!");
             }
 
             if(numberOfColumns == CameraUploadFragmentLollipop.GRID_LARGE){
                 videoIcon.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                log(n.getName()+" DURATION: "+n.getDuration());
+                LogUtil.logDebug(n.getHandle() + " DURATION: " + n.getDuration());
                 int duration = n.getDuration();
                 if(duration>0){
                     int hours = duration / 3600;
@@ -795,7 +796,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         timeString = String.format("%d:%02d", minutes, seconds);
                     }
 
-                    log("The duration is: "+hours+" "+minutes+" "+seconds);
+                    LogUtil.logDebug("The duration is: " + hours + " " + minutes + " " + seconds);
 
                     videoDuration.setText(timeString);
                 }
@@ -866,16 +867,16 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 content_layout.setLayoutParams(params);
                 int padding = 0;
                 if(numberOfCells == CameraUploadFragmentLollipop.GRID_LARGE){
-                    log("numOfCells is GRID_LARGE");
+                    LogUtil.logDebug("numOfCells is GRID_LARGE");
 
                     padding = PADDING_GRID_LARGE;
                 }
                 else if (numberOfCells == CameraUploadFragmentLollipop.GRID_SMALL){
-                    log("numOfCells is GRID_SMALL");
+                    LogUtil.logDebug("numOfCells is GRID_SMALL");
                     padding = PADDING_GRID_SMALL;
                 }
                 else{
-                    log("numOfCells is "+numberOfCells);
+                    LogUtil.logDebug("numOfCells is " + numberOfCells);
                     padding = 2;
                 }
                 setMargins(padding);
@@ -1031,7 +1032,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void setContext(Context context) {
-        log("context has been updated, the action mode needs to be cleaned");
+        LogUtil.logDebug("Context has been updated, the action mode needs to be cleaned");
         this.context = context;
         actionMode = null;
     }
@@ -1092,7 +1093,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
      * Disable selection
      */
     public void hideMultipleSelect() {
-        log("hideMultipleSelect");
+        LogUtil.logDebug("hideMultipleSelect");
         this.multipleSelect = false;
 //        clearSelections();
 
@@ -1141,7 +1142,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void clearSelections() {
-        log("clearSelections");
+        LogUtil.logDebug("clearSelections");
         hideMultipleSelect();
 
         updateActionModeTitle();
@@ -1152,7 +1153,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 if (item.n != null) {
                     int index = nodes.indexOf(item.n);
                     if (checkedItems.get(index, false) == true) {
-                        log("isChecked: " + index);
+                        LogUtil.logDebug("isChecked: " + index);
                         checkedItems.append(index, false);
                         startAnimation(null, i, true);
                     }
@@ -1185,7 +1186,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void onNodeClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){
-        log("onNodeClick");
+        LogUtil.logDebug("Position in nodes: " + positionInNodes);
 
         if (!multipleSelect){
             MegaNode n = megaApi.getNodeByHandle(holder.getDocument());
@@ -1217,7 +1218,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             intent.putExtra("handlesNodesSearch",arrayHandles);
                         }
 
-                        log("Position in nodes: "+positionInNodes);
+                        LogUtil.logDebug("Position in nodes: " + positionInNodes);
                         if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
                             intent.putExtra("parentNodeHandle", -1L);
                         }
@@ -1233,7 +1234,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         MegaNode file = n;
 
                         String mimeType = MimeTypeThumbnail.typeForName(file.getName()).getType();
-                        log("FILENAME: " + file.getName());
+                        LogUtil.logDebug("File Handle: " + file.getHandle());
 
                         Intent mediaIntent;
                         boolean internalIntent;
@@ -1292,11 +1293,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             activityManager.getMemoryInfo(mi);
 
                             if(mi.totalMem>Constants.BUFFER_COMP){
-                                log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                                LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
                                 megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
                             }
                             else{
-                                log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                                LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
                                 megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                             }
 
@@ -1376,10 +1377,10 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         final int finalType = type;
         if ((holder != null && holder.click_icon != null) || view != null) {
             if ((holder != null && holder.click_icon != null)) {
-                log("Start animation: holderPosition: " + holder.getPositionOnAdapter());
+                LogUtil.logDebug("Start animation: holderPosition: " + holder.getPositionOnAdapter());
             }
             else {
-                log("Start animation: position: " + pos);
+                LogUtil.logDebug("Start animation: position: " + pos);
             }
             Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
             notifyItem(finalType, holder, pos);
@@ -1387,7 +1388,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
-                    log("onAnimationStart");
+                    LogUtil.logDebug("onAnimationStart");
                     if (!delete) {
                         notifyItem(finalType, holder, pos);
                     }
@@ -1395,7 +1396,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    log("onAnimationEnd");
+                    LogUtil.logDebug("onAnimationEnd");
                     if (delete) {
                         notifyItem(finalType, holder, pos);
                     }
@@ -1414,13 +1415,13 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             }
         }
         else {
-            log("view is null - not animation");
+            LogUtil.logWarning("View is null - not animation");
             notifyItem(finalType, holder, pos);
         }
     }
 
     public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
-        log("getPath");
+        LogUtil.logDebug("getPath");
         String path = null;
         if (destDir != null){
             File dir = new File(destDir);
@@ -1514,7 +1515,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void onNodeLongClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){
-        log("onNodeLongClick");
+        LogUtil.logDebug("Position in nodes: " + positionInNodes);
         if (!multipleSelect){
             clearSelections();
 
@@ -1533,20 +1534,20 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     private void newActionMode() {
-        log("force create new action mode");
+        LogUtil.logDebug("Force create new action mode");
         actionMode = ((AppCompatActivity) context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
     }
 
     private void updateActionModeTitle() {
 
-        log("updateActionModeTitle");
+        LogUtil.logDebug("updateActionModeTitle");
         if (actionMode == null){
-            log("actionMode null");
+            LogUtil.logError("actionMode null");
             return;
         }
 
         if (context == null){
-            log("context null");
+            LogUtil.logError("Context null");
             return;
         }
 
@@ -1579,7 +1580,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             actionMode.invalidate();
         } catch (NullPointerException e) {
             e.printStackTrace();
-            log("oninvalidate error");
+            LogUtil.logError("Invalidate error", e);
         }
 
 
@@ -1590,7 +1591,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
      * Get list of all selected documents
      */
     public List<MegaNode> getSelectedDocuments() {
-        log("getSelectedDocuments");
+        LogUtil.logDebug("getSelectedDocuments");
         ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
         for (int i = 0; i < checkedItems.size(); i++) {
             if (checkedItems.valueAt(i) == true) {
@@ -1613,7 +1614,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     private int getTypeOfPosition(int position){
         for(MegaMonthPicLollipop temp : monthPics){
-            log("size of temp: "+temp.nodeHandles);
+            LogUtil.logDebug("Size of temp: " + temp.nodeHandles);
             if(position == 0){
                 return TYPE_ITEM_TITLE;
             }
@@ -1635,7 +1636,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     private Object getItemOfPosition(int position){
         for(MegaMonthPicLollipop temp : monthPics){
             if(position == 0){
-                log("Title is "+temp.monthYearString);
+                LogUtil.logDebug("Title is " + temp.monthYearString);
                 return temp.monthYearString;
             }
             if(position > 0 && position < temp.nodeHandles.size() + 1){
@@ -1694,10 +1695,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 break;
         }
         return 0;
-    }
-    
-    private static void log(String log) {
-        Util.log("MegaPhotoSyncGridTitleAdapterLollipop", log);
     }
 
     public void refreshActionModeTitle() {

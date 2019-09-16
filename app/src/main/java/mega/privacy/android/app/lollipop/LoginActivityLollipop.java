@@ -40,6 +40,7 @@ import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -113,7 +114,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 actionType = intent.getIntExtra("actionType", -1);
 
                 if(actionType == Constants.UPDATE_GET_PRICING){
-                    log("BROADCAST TO UPDATE AFTER GET PRICING");
+                    LogUtil.logDebug("BROADCAST TO UPDATE AFTER GET PRICING");
                     //UPGRADE_ACCOUNT_FRAGMENT
 
                     if(chooseAccountFragment!=null && chooseAccountFragment.isAdded()){
@@ -121,7 +122,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                     }
                 }
                 else if(actionType == Constants.UPDATE_PAYMENT_METHODS){
-                    log("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
+                    LogUtil.logDebug("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
                 }
             }
         }
@@ -129,7 +130,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     @Override
     protected void onDestroy() {
-        log("onDestroy");
+        LogUtil.logDebug("onDestroy");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
         if (megaApi != null) {
             megaApi.removeGlobalListener(this);
@@ -141,7 +142,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
         super.onCreate(savedInstanceState);
         
         loginActivity = this;
@@ -174,13 +175,13 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
         intentReceived = getIntent();
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            LogUtil.logDebug("Bundle is NOT NULL");
             visibleFragment = savedInstanceState.getInt("visibleFragment", Constants.LOGIN_FRAGMENT);
         }
         else{
             if (intentReceived != null) {
                 visibleFragment = intentReceived.getIntExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
-                log("There is an intent! VisibleFragment: " + visibleFragment);
+                LogUtil.logDebug("There is an intent! VisibleFragment: " + visibleFragment);
             } else {
                 visibleFragment = Constants.LOGIN_FRAGMENT;
             }
@@ -242,11 +243,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     }
 
     public void showFragment(int visibleFragment) {
-        log("showFragment: " + visibleFragment);
+        LogUtil.logDebug("visibleFragment: " + visibleFragment);
         this.visibleFragment = visibleFragment;
         switch (visibleFragment) {
             case Constants.LOGIN_FRAGMENT: {
-                log("showLoginFragment");
+                LogUtil.logDebug("Show LOGIN_FRAGMENT");
                 if (loginFragment == null) {
                     loginFragment = new LoginFragmentLollipop();
                 }
@@ -268,7 +269,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 break;
             }
             case Constants.CHOOSE_ACCOUNT_FRAGMENT: {
-                log("Show CHOOSE_ACCOUNT_FRAGMENT");
+                LogUtil.logDebug("Show CHOOSE_ACCOUNT_FRAGMENT");
 
                 if (chooseAccountFragment == null) {
                     chooseAccountFragment = new ChooseAccountFragmentLollipop();
@@ -286,7 +287,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 break;
             }
             case Constants.CREATE_ACCOUNT_FRAGMENT: {
-                log("Show CREATE_ACCOUNT_FRAGMENT");
+                LogUtil.logDebug("Show CREATE_ACCOUNT_FRAGMENT");
                 if (createAccountFragment == null || cancelledConfirmationProcess) {
                     createAccountFragment = new CreateAccountFragmentLollipop();
                     cancelledConfirmationProcess = false;
@@ -305,7 +306,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
             }
             case Constants.TOUR_FRAGMENT: {
-                log("Show TOUR_FRAGMENT");
+                LogUtil.logDebug("Show TOUR_FRAGMENT");
 
                 if (tourFragment == null) {
                     tourFragment = new TourFragmentLollipop();
@@ -361,7 +362,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     }
 
     public void showAlertIncorrectRK() {
-        log("showAlertIncorrectRK");
+        LogUtil.logDebug("showAlertIncorrectRK");
         final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
 
         dialogBuilder.setTitle(getString(R.string.incorrect_MK_title));
@@ -381,7 +382,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     }
 
     public void showAlertLoggedOut() {
-        log("showAlertLoggedOut");
+        LogUtil.logDebug("showAlertLoggedOut");
         ((MegaApplication) getApplication()).setEsid(false);
         if(!isFinishing()){
             final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
@@ -403,13 +404,13 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     }
 
     public void showTransferOverquotaDialog() {
-        log("showTransferOverquotaDialog");
+        LogUtil.logDebug("showTransferOverquotaDialog");
 
         boolean show = true;
 
         if(alertDialogTransferOverquota!=null){
             if(alertDialogTransferOverquota.isShowing()){
-                log("change show to false");
+                LogUtil.logDebug("Change show to false");
                 show = false;
             }
         }
@@ -471,19 +472,19 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     }
 
     public void startCameraUploadService(boolean firstTimeCam, int time) {
-        log("startCameraUploadService");
+        LogUtil.logDebug("firstTimeCam: " + firstNameTemp + "time: " + time);
         if (firstTimeCam) {
             Intent intent = new Intent(this, ManagerActivityLollipop.class);
             intent.putExtra("firstLogin", true);
             startActivity(intent);
             finish();
         } else {
-            log("Enciendo el servicio de la camara");
+            LogUtil.logDebug("Start the Camera Uploads service");
             handler.postDelayed(new Runnable() {
 
                 @Override
                 public void run() {
-                    log("Now I start the service");
+                    LogUtil.logDebug("Now I start the service");
                     scheduleCameraUploadJob(LoginActivityLollipop.this);
                 }
             }, time);
@@ -491,7 +492,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     }
 
     public void showConfirmationCancelAllTransfers() {
-        log("showConfirmationCancelAllTransfers");
+        LogUtil.logDebug("showConfirmationCancelAllTransfers");
 
         setIntent(null);
         //Show confirmation message
@@ -500,14 +501,14 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        log("Pressed button positive to cancel transfer");
+                        LogUtil.logDebug("Pressed button positive to cancel transfer");
                         if (megaApi != null) {
                             megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
                             if (megaApiFolder != null) {
                                 megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
                             }
                         } else {
-                            log("megaAPI is null");
+                            LogUtil.logWarning("megaAPI is null");
                             if (megaApiFolder != null) {
                                 megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
                             }
@@ -533,7 +534,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     @Override
     public void onBackPressed() {
-        log("onBackPressed");
+        LogUtil.logDebug("onBackPressed");
         retryConnectionsAndSignalPresence();
 
         int valueReturn = -1;
@@ -572,7 +573,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     @Override
     public void onResume() {
-        log("onResume");
+        LogUtil.logDebug("onResume");
         super.onResume();
         Util.setAppFontSize(this);
         Intent intent = getIntent();
@@ -580,7 +581,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         if (intent != null) {
             if (intent.getAction() != null) {
                 if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
-                    log("ACTION_CANCEL_CAM_SYNC");
+                    LogUtil.logDebug("ACTION_CANCEL_CAM_SYNC");
                     String title = getString(R.string.cam_sync_syncing);
                     String text = getString(R.string.cam_sync_cancel_sync);
                     AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, title, text, null);
@@ -598,7 +599,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                     try {
                         dialog.show();
                     } catch (Exception ex) {
-                        log(ex.toString());
+                        LogUtil.logError("Exception", ex);
                     }
                 }
                 else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
@@ -619,7 +620,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     boolean loggerPermissionSDK = false;
 
     public void showConfirmationEnableLogsKarere() {
-        log("showConfirmationEnableLogsKarere");
+        LogUtil.logDebug("showConfirmationEnableLogsKarere");
 
         if (loginFragment != null) {
             loginFragment.numberOfClicksKarere = 0;
@@ -667,7 +668,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     }
 
     public void showConfirmationEnableLogsSDK() {
-        log("showConfirmationEnableLogsSDK");
+        LogUtil.logDebug("showConfirmationEnableLogsSDK");
 
         if (loginFragment != null) {
             loginFragment.numberOfClicksSDK = 0;
@@ -716,7 +717,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        log("onRequestPermissionsResult");
+        LogUtil.logDebug("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
             case Constants.REQUEST_WRITE_STORAGE:{
@@ -737,23 +738,23 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     }
 
     public void enableLogsSDK() {
-        log("enableLogsSDK");
+        LogUtil.logDebug("enableLogsSDK");
 
         dbH.setFileLoggerSDK(true);
         Util.setFileLoggerSDK(true);
         MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
         showSnackbar(getString(R.string.settings_enable_logs));
-        log("App Version: " + Util.getVersion(this));
+        LogUtil.logDebug("App Version: " + Util.getVersion(this));
     }
 
     public void enableLogsKarere() {
-        log("enableLogsKarere");
+        LogUtil.logDebug("enableLogsKarere");
 
         dbH.setFileLoggerKarere(true);
         Util.setFileLoggerKarere(true);
         MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
         showSnackbar(getString(R.string.settings_enable_logs));
-        log("App Version: " + Util.getVersion(this));
+        LogUtil.logDebug("App Version: " + Util.getVersion(this));
     }
 
     public void setWaitingForConfirmAccount(boolean waitingForConfirmAccount) {
@@ -807,10 +808,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 //		}
 //	}
 
-    public static void log(String message) {
-        Util.log("LoginActivityLollipop", message);
-    }
-
     @Override
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 
@@ -818,7 +815,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     @Override
     public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        log("onUserAlertsUpdate");
+        LogUtil.logDebug("onUserAlertsUpdate");
     }
 
     @Override
@@ -832,7 +829,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     @Override
     public void onAccountUpdate(MegaApiJava api) {
-        log("onAccountUpdate");
+        LogUtil.logDebug("onAccountUpdate");
 
         if (waitingForConfirmAccount) {
             waitingForConfirmAccount = false;
@@ -848,9 +845,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     @Override
     public void onEvent(MegaApiJava api, MegaEvent event) {
-        log("onEvent");
+        LogUtil.logDebug("onEvent");
         if(event.getType()==MegaEvent.EVENT_ACCOUNT_BLOCKED){
-            log("Event received: "+event.getText()+"_"+event.getNumber());
+            LogUtil.logDebug("Event received: " + event.getText() + "_" + event.getNumber());
             if(event.getNumber()==200){
                 accountBlocked = getString(R.string.account_suspended_multiple_breaches_ToS);
             }
@@ -862,17 +859,17 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart - " + request.getRequestString());
+        LogUtil.logDebug("onRequestStart - " + request.getRequestString());
     }
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        log("onRequestUpdate - " + request.getRequestString());
+        LogUtil.logDebug("onRequestUpdate - " + request.getRequestString());
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
+        LogUtil.logDebug("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
 
         if(request.getType() == MegaRequest.TYPE_LOGOUT){
 
@@ -896,13 +893,13 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 }
             }
             catch (Exception exc){
-                log("ExceptionManager");
+                LogUtil.logError("Exception", exc);
             }
         }
     }
 
     public void cancelConfirmationAccount(){
-        log("cancelConfirmationAccount");
+        LogUtil.logDebug("cancelConfirmationAccount");
         dbH.clearEphemeral();
         dbH.clearCredentials();
         cancelledConfirmationProcess = true;
@@ -915,12 +912,12 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestTemporaryError - " + request.getRequestString());
+        LogUtil.logWarning("onRequestTemporaryError - " + request.getRequestString());
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        log("onSaveInstanceState");
+        LogUtil.logDebug("onSaveInstanceState");
 
         super.onSaveInstanceState(outState);
 
@@ -929,7 +926,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     @Override
     protected void onPause() {
-        log("onPause");
+        LogUtil.logDebug("onPause");
         super.onPause();
     }
 

@@ -32,6 +32,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNotificationsAdapter;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -74,7 +75,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -102,7 +103,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        LogUtil.logDebug("onCreateView");
 
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -143,13 +144,13 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     }
 
     public static NotificationsFragmentLollipop newInstance() {
-        log("newInstance");
+        LogUtil.logDebug("newInstance");
         NotificationsFragmentLollipop fragment = new NotificationsFragmentLollipop();
         return fragment;
     }
 
     public void setNotifications(){
-        log("setNotifications");
+        LogUtil.logDebug("setNotifications");
 
         notifications = megaApi.getUserAlerts();
 
@@ -157,7 +158,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
         if(isAdded()) {
             if (adapterList == null){
-                log("adapterList is NULL");
+                LogUtil.logWarning("adapterList is NULL");
                 adapterList = new MegaNotificationsAdapter(context, this, notifications, listView);
 
             }
@@ -195,7 +196,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 emptyTextView.setText(result);
 
             } else {
-                log("number of notifications: "+notifications.size());
+                LogUtil.logDebug("Number of notifications: " + notifications.size());
                 listView.setVisibility(View.VISIBLE);
                 emptyLayout.setVisibility(View.GONE);
             }
@@ -205,7 +206,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     }
 
     public void addNotification(MegaUserAlert newAlert){
-        log("addNotification");
+        LogUtil.logDebug("addNotification");
         //Check scroll position
         boolean shouldScroll = false;
         if (!listView.canScrollVertically(-1)){
@@ -227,12 +228,12 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        LogUtil.logDebug("onClick");
 
         switch (v.getId()) {
             case R.id.empty_image_view_chat:{
                 numberOfClicks++;
-                log("Number of clicks: "+numberOfClicks);
+                LogUtil.logDebug("Number of clicks: " + numberOfClicks);
                 if (numberOfClicks >= 5){
                     numberOfClicks = 0;
 
@@ -244,7 +245,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     }
 
     public void itemClick(int position) {
-        log("itemClick: "+position);
+        LogUtil.logDebug("Position: " + position);
         MegaUserAlert notif = notifications.get(position);
 
         int alertType = notif.getType();
@@ -258,7 +259,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             {
                 MegaUser contact = megaApi.getContact(notif.getEmail());
                 if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-                    log("Go to contact info");
+                    LogUtil.logDebug("Go to contact info");
                     Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
                     intent.putExtra("name", notif.getEmail());
                     startActivity(intent);
@@ -268,7 +269,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                         for(int i = 0; i<contacts.size();i++){
                             MegaContactRequest c = contacts.get(i);
                             if(c.getSourceEmail().equals(notif.getEmail())){
-                                log("Go to Received requests");
+                                LogUtil.logDebug("Go to Received requests");
                                 ((ManagerActivityLollipop)context).navigateToContacts(2);
                                 break;
                             }
@@ -276,13 +277,13 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                     }
 
                 }
-                log("Request not found");
+                LogUtil.logWarning("Request not found");
                 break;
             }
             case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:{
                 MegaUser contact = megaApi.getContact(notif.getEmail());
                 if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-                    log("Go to contact info");
+                    LogUtil.logDebug("Go to contact info");
                     Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
                     intent.putExtra("name", notif.getEmail());
                     startActivity(intent);
@@ -296,13 +297,13 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:
             case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:
             case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU:{
-                log("Do not navigate");
+                LogUtil.logDebug("Do not navigate");
                 break;
             }
             case MegaUserAlert.TYPE_PAYMENT_SUCCEEDED:
             case MegaUserAlert.TYPE_PAYMENT_FAILED:
             case MegaUserAlert.TYPE_PAYMENTREMINDER:{
-                log("Go to My Account");
+                LogUtil.logDebug("Go to My Account");
                 ((ManagerActivityLollipop)context).navigateToMyAccount();
                 break;
             }
@@ -325,7 +326,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             case MegaUserAlert.TYPE_NEWSHAREDNODES:
             case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:
             case MegaUserAlert.TYPE_DELETEDSHARE:{
-                log("Go to open corresponding location");
+                LogUtil.logDebug("Go to open corresponding location");
                 if(notif.getNodeHandle()!=-1 && megaApi.getNodeByHandle(notif.getNodeHandle())!=null){
                     ((ManagerActivityLollipop)context).openLocation(notif.getNodeHandle());
                 }
@@ -350,21 +351,21 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     }
 
     public void updateNotifications(ArrayList<MegaUserAlert> updatedUserAlerts) {
-        log("updateNotifications");
+        LogUtil.logDebug("updateNotifications");
 
         if(!isAdded()){
-            log("return!");
+            LogUtil.logDebug("return!");
             return;
         }
 
         for(int i = 0;i<updatedUserAlerts.size();i++){
 
             if(updatedUserAlerts.get(i).isOwnChange()){
-                log("updateNotifications:isOwnChange");
+                LogUtil.logDebug("isOwnChange");
                 continue;
             }
 
-            log("User alert type: "+updatedUserAlerts.get(i).getType());
+            LogUtil.logDebug("User alert type: " + updatedUserAlerts.get(i).getType());
             long idToUpdate = updatedUserAlerts.get(i).getId();
             int indexToReplace = -1;
 
@@ -383,7 +384,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 }
             }
             if(indexToReplace!=-1){
-                log("Index to replace: "+indexToReplace);
+                LogUtil.logDebug("Index to replace: " + indexToReplace);
 
                 notifications.set(indexToReplace, updatedUserAlerts.get(i));
                 if(adapterList!=null){
@@ -404,9 +405,5 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             return adapterList.getItemCount();
         }
         return 0;
-    }
-
-    private static void log(String log) {
-        Util.log("NotificationsFragmentLollipop", log);
     }
 }

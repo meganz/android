@@ -31,6 +31,7 @@ import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -67,7 +68,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate()");
+		LogUtil.logDebug("onCreate");
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		
@@ -126,7 +127,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	}
 
 	public void askForPasswordDialog(){
-		log("askForPasswordDialog");
+		LogUtil.logDebug("askForPasswordDialog");
 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
@@ -194,7 +195,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	}
 
 	private void showKeyboardDelayed(final View view) {
-		log("showKeyboardDelayed");
+		LogUtil.logDebug("showKeyboardDelayed");
 		handler = new Handler();
 		handler.postDelayed(new Runnable() {
 			@Override
@@ -221,24 +222,20 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 		megaApi.decryptPasswordProtectedLink(url, value, openPasswordLinkActivity);
 	}
 
-	public static void log(String message) {
-		Util.log("OpenPasswordLinkActivity", message);
-	}
-
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getRequestString());
+		LogUtil.logDebug("onRequestStart: " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		log("onRequestUpdate: " + request.getRequestString());
+		LogUtil.logDebug("onRequestUpdate: " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestFinish: " + request.getRequestString());
+		LogUtil.logDebug("onRequestFinish: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_PASSWORD_LINK){
 			try { 
 				statusDialog.dismiss();	
@@ -251,7 +248,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 
 				// Folder Download link
 				if (decryptedLink != null && (url.matches("^https://mega.co.nz/#F!.+$") || decryptedLink.matches("^https://mega.nz/#F!.+$"))) {
-					log("folder link url");
+					LogUtil.logDebug("Folder link url");
 
 					Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
 					openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -262,7 +259,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 				}
 
 				else if (decryptedLink != null && (decryptedLink.matches("^https://mega.co.nz/#!.+$") || decryptedLink.matches("^https://mega.nz/#!.+$"))) {
-					log("open link url");
+					LogUtil.logDebug("Open link url");
 
 					Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
 					openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -273,7 +270,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode());
+				LogUtil.logError("ERROR: " + e.getErrorCode());
 				askForPasswordDialog();
 			}
 		}
@@ -283,7 +280,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError: " + request.getRequestString());
+		LogUtil.logWarning("onRequestTemporaryError: " + request.getRequestString());
 	}
 
 	@Override

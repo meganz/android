@@ -3,10 +3,7 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.ExifInterface;
-import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils.TruncateAt;
 import android.util.DisplayMetrics;
@@ -16,26 +13,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -97,7 +88,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
     @Override
 	public ViewHolderTransfer onCreateViewHolder(ViewGroup parent, int viewType) {
-    	log("onCreateViewHolder");
+		LogUtil.logDebug("onCreateViewHolder");
     	
     	ViewHolderTransfer holder;
     	
@@ -135,7 +126,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 	@Override
 	public void onBindViewHolder(ViewHolderTransfer holder, int position) {
-		log("onBindViewHolder: "+position);
+		LogUtil.logDebug("Position: " + position);
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
@@ -146,7 +137,6 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		AndroidCompletedTransfer transfer = (AndroidCompletedTransfer) getItem(position);
 
 		String fileName = transfer.getFileName();
-		log("onBindViewHolder: "+fileName);
 		holder.textViewFileName.setText(fileName);
 		holder.optionPause.setVisibility(View.GONE);
 		holder.optionRemove.setVisibility(View.GONE);
@@ -208,7 +198,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		}
 
 		int state = transfer.getState();
-		log("State of the transfer: "+state);
+		LogUtil.logDebug("State of the transfer: " + state);
 		switch (state){
 			case MegaTransfer.STATE_COMPLETED:{
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.title_tab_completed_transfers));
@@ -217,7 +207,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 				break;
 			}
 			default:{
-				log("Default status -- error, this should be completed state always");
+				LogUtil.logError("Default status -- error, this should be completed state always");
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				break;
@@ -259,7 +249,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 		
 //		ViewHolderTransfer holder = (ViewHolderTransfer) v.getTag();
 //		int currentPosition = holder.currentPosition;
@@ -285,9 +275,4 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 //		notifyItemRemoved(position);
 //		notifyItemRangeChanged(position,getItemCount());
 //	}
-
-	private static void log(String log) {
-		Util.log("MegaCompletedTransfersAdapter", log);
-	}
-
 }

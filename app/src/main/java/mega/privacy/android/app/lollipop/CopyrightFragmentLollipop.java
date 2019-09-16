@@ -18,7 +18,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 
 public class CopyrightFragmentLollipop extends Fragment implements View.OnClickListener {
@@ -38,11 +38,11 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            log("context is null");
+            LogUtil.logWarning("context is null");
             return;
         }
 
@@ -51,7 +51,7 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        LogUtil.logDebug("onCreateView");
 
         if(megaApi==null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -93,7 +93,7 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach");
+        LogUtil.logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
 
@@ -104,7 +104,7 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
 
     @Override
     public void onAttach(Activity context) {
-        log("onAttach Activity");
+        LogUtil.logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
 
@@ -112,9 +112,4 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
     }
-
-    public static void log(String message) {
-        Util.log("CopyrightFragmentLollipop", message);
-    }
-
 }

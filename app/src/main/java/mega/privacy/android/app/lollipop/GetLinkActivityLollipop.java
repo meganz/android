@@ -35,6 +35,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -84,7 +85,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		super.onCreate(savedInstanceState);
 
 		getLinkActivity = this;
@@ -103,7 +104,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
+			LogUtil.logDebug("Refresh session - sdk");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
 			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -118,7 +119,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				log("Refresh session - karere");
+				LogUtil.logDebug("Refresh session - karere");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
 				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -158,7 +159,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		fragmentContainer = (CoordinatorLayout) findViewById(R.id.get_link_coordinator_layout);
 		tB = (Toolbar) findViewById(R.id.toolbar_get_link);
 		if(tB==null){
-			log("Tb is Null");
+			LogUtil.logWarning("Tb is Null");
 		}
 
 		tB.setVisibility(View.GONE);
@@ -177,7 +178,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			ArrayList<MegaNode> nodeLinks = megaApi.getPublicLinks();
 			if(nodeLinks==null){
 				boolean showCopyright = Boolean.parseBoolean(dbH.getShowCopyright());
-				log("No public links: showCopyright = "+showCopyright);
+				LogUtil.logDebug("No public links: showCopyright = " + showCopyright);
 				if(showCopyright){
 					visibleFragment = Constants.COPYRIGHT_FRAGMENT;
 				}
@@ -188,7 +189,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				if(nodeLinks.size()==0){
 					boolean showCopyright = Boolean.parseBoolean(dbH.getShowCopyright());
-					log("No public links: showCopyright = "+showCopyright);
+					LogUtil.logDebug("No public links: showCopyright = " + showCopyright);
 					if(showCopyright){
 						visibleFragment = Constants.COPYRIGHT_FRAGMENT;
 					}
@@ -218,7 +219,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
     }
 
 	public void sendLink(String link){
-		log("sendLink");
+		LogUtil.logDebug("Link: " + link);
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.setType("text/plain");
 		intent.putExtra(Intent.EXTRA_TEXT, link);
@@ -226,7 +227,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void copyLink(String link){
-		log("copyLink");
+		LogUtil.logDebug("Link: " + link);
 		if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
 			android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 			clipboard.setText(link);
@@ -244,7 +245,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 
 	public void showSetPasswordDialog(final String password, final String link){
-		log("showSetPasswordDialog");
+		LogUtil.logDebug("showSetPasswordDialog");
 
 		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.overquota_alert_title));
@@ -381,9 +382,9 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				}
 
 				if(proceedInput1&&proceedInput2){
-					log("Check are equal");
+					LogUtil.logDebug("Check are equal");
 					if(value1.equals(value2)){
-						log("Proceed to set pass");
+						LogUtil.logDebug("Proceed to set pass");
 						getLinkFragment.processingPass();
 						megaApi.encryptLinkWithPassword(link, value2, getLinkActivity);
 						passwordDialog.dismiss();
@@ -396,19 +397,19 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 				else if(!proceedInput1&&proceedInput2){
-					log("Error on pass1");
+					LogUtil.logWarning("Error on pass1");
 					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					errorLayout1.setVisibility(View.VISIBLE);
 					input1.requestFocus();
 				}
 				else if(!proceedInput2&&proceedInput1){
-					log("Error on pass2");
+					LogUtil.logWarning("Error on pass2");
 					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					errorLayout2.setVisibility(View.VISIBLE);
 					input2.requestFocus();
 				}
 				else{
-					log("Error on both");
+					LogUtil.logWarning("Error on both");
 					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					errorLayout1.setVisibility(View.VISIBLE);
 					input1.requestFocus();
@@ -421,7 +422,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	private void showKeyboardDelayed(final View view) {
-		log("showKeyboardDelayed");
+		LogUtil.logDebug("showKeyboardDelayed");
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -432,11 +433,11 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showFragment(int visibleFragment){
-		log("showFragment: "+visibleFragment);
+		LogUtil.logDebug("visibleFragment: " + visibleFragment);
 		this.visibleFragment = visibleFragment;
 		switch (visibleFragment){
 			case Constants.GET_LINK_FRAGMENT:{
-				log("show GET_LINK_FRAGMENT");
+				LogUtil.logDebug("Show GET_LINK_FRAGMENT");
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					Window window = this.getWindow();
@@ -468,7 +469,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case Constants.COPYRIGHT_FRAGMENT:{
-				log("Show COPYRIGHT_FRAGMENT");
+				LogUtil.logDebug("Show COPYRIGHT_FRAGMENT");
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					Window window = this.getWindow();
@@ -495,7 +496,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onResume() {
-		log("onResume");
+		LogUtil.logDebug("onResume");
 		super.onResume();
 	}
 
@@ -511,10 +512,10 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
+		LogUtil.logDebug("onRequestFinish");
 
 		if (e.getErrorCode() == MegaError.API_OK) {
-			log("link: " + request.getLink());
+			LogUtil.logDebug("link: " + request.getLink());
 			
 			//for megaApi.encryptLinkWithPassword() case, request.getNodeHandle() returns -1 and cause selectedNode set to null
 			long handle = request.getNodeHandle();
@@ -530,7 +531,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		} else {
-			log("Error: " + e.getErrorString());
+			LogUtil.logWarning("Error: " + e.getErrorString());
 			showSnackbar(getString(R.string.context_no_link));
 		}
 	}
@@ -539,9 +540,4 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
 	}
-
-	public static void log(String message) {
-		Util.log("GetLinkActivityLollipop", message);
-	}
-
 }

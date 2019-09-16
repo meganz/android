@@ -46,7 +46,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -96,6 +95,7 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -122,7 +122,6 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
@@ -237,7 +236,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        LogUtil.logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
 
@@ -245,13 +244,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         final Intent intent = getIntent();
         if (intent == null){
-            log("intent null");
+            LogUtil.logWarning("Intent null");
             finish();
             return;
         }
         handler = new Handler();
         if (savedInstanceState != null) {
-            log("saveInstanceState");
+            LogUtil.logDebug("saveInstanceState");
             currentPage = savedInstanceState.getInt("currentPage");
             handle = savedInstanceState.getLong("HANDLE");
             pdfFileName = savedInstanceState.getString("pdfFileName");
@@ -267,9 +266,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             isDeleteDialogShow = false;
             handle = intent.getLongExtra("HANDLE", -1);
             uri = intent.getData();
-            log("URI pdf: "+uri);
+            LogUtil.logDebug("URI pdf: " + uri);
             if (uri == null){
-                log("uri null");
+                LogUtil.logError("Uri null");
                 finish();
                 return;
             }
@@ -301,10 +300,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if(serialize!=null) {
                 currentDocument = MegaNode.unserialize(serialize);
                 if (currentDocument != null) {
-                    log("currentDocument NOT NULL");
+                    LogUtil.logDebug("currentDocument NOT NULL");
                 }
                 else {
-                    log("currentDocument is NULL");
+                    LogUtil.logWarning("currentDocument is NULL");
                 }
             }
             isOffLine = false;
@@ -357,12 +356,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             }
                         }
                     } else {
-                        log("msgId or chatId null");
+                        LogUtil.logWarning("msgId or chatId null");
                     }
                 }
             }
 
-            log("Add transfer listener");
+            LogUtil.logDebug("Add transfer listener");
             megaApi.addTransferListener(this);
             megaApi.addGlobalListener(this);
 
@@ -381,11 +380,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     activityManager.getMemoryInfo(mi);
 
                     if (mi.totalMem > Constants.BUFFER_COMP) {
-                        log("Total mem: " + mi.totalMem + " allocate 32 MB");
+                        LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
                         megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
                     }
                     else {
-                        log("Total mem: " + mi.totalMem + " allocate 16 MB");
+                        LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
                         megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                     }
                 }
@@ -399,11 +398,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     activityManager.getMemoryInfo(mi);
 
                     if (mi.totalMem > Constants.BUFFER_COMP) {
-                        log("Total mem: " + mi.totalMem + " allocate 32 MB");
+                        LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
                         megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
                     }
                     else {
-                        log("Total mem: " + mi.totalMem + " allocate 16 MB");
+                        LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
                         megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                     }
                 }
@@ -428,14 +427,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
 
             if (isFolderLink){
-                log("Folder link node");
+                LogUtil.logDebug("Folder link node");
                 MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
                 if (currentDocumentAuth == null){
-                    log("CurrentDocumentAuth is null");
+                    LogUtil.logWarning("CurrentDocumentAuth is null");
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_streaming)+ ": node not authorized", -1);
                 }
                 else{
-                    log("CurrentDocumentAuth is not null");
+                    LogUtil.logDebug("CurrentDocumentAuth is not null");
                     String url;
                     if (dbH != null && dbH.getCredentials() != null) {
                         url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
@@ -449,7 +448,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 }
             }
 
-            log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
+            LogUtil.logDebug("Overquota delay: " + megaApi.getBandwidthOverquotaDelay());
             if(megaApi.getBandwidthOverquotaDelay()>0){
                 if(alertDialogTransferOverquota==null){
                     showTransferOverquotaDialog();
@@ -490,7 +489,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
         if(tB==null){
-            log("Tb is Null");
+            LogUtil.logWarning("Tb is Null");
             return;
         }
 
@@ -564,7 +563,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         uploadContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                log("onClick uploadContainer");
+                LogUtil.logDebug("onClick uploadContainer");
                 Intent intent1 = new Intent(PdfViewerActivityLollipop.this, FileExplorerActivityLollipop.class);
                 intent1.setAction(Intent.ACTION_SEND);
                 intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -604,7 +603,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         mWidthScale = (float) (screenWidth/4) / pdfView.getWidth();
                         mHeightScale = (float) (screenHeight/4) / pdfView.getHeight();
                     }
-                    log("mLeftDelta: "+mLeftDelta+" mTopDelta: "+mTopDelta+" mWidthScale: "+mWidthScale+" mHeightScale: "+mHeightScale);
+                    LogUtil.logDebug("mLeftDelta: " + mLeftDelta + " mTopDelta: " + mTopDelta +
+                            " mWidthScale: " + mWidthScale + " mHeightScale: " + mHeightScale);
                     runEnterAnimation();
 
                     return true;
@@ -685,10 +685,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        log("onNewIntent");
+        LogUtil.logDebug("onNewIntent");
 
         if (intent == null){
-            log("intent null");
+            LogUtil.logWarning("intent null");
             finish();
             return;
         }
@@ -717,10 +717,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 if(serialize!=null) {
                     currentDocument = MegaNode.unserialize(serialize);
                     if (currentDocument != null) {
-                        log("currentDocument NOT NULL");
+                        LogUtil.logDebug("currentDocument NOT NULL");
                     }
                     else {
-                        log("currentDocument is NULL");
+                        LogUtil.logWarning("currentDocument is NULL");
                     }
                 }
                 isOffLine = false;
@@ -743,7 +743,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             uri = intent.getData();
             if (uri == null){
-                log("uri null");
+                LogUtil.logError("Uri null");
                 finish();
                 return;
             }
@@ -773,16 +773,16 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             }
                         }
                         else {
-                            log("msgId or chatId null");
+                            LogUtil.logWarning("msgId or chatId null");
                         }
                     }
                 }
 
-                log("Add transfer listener");
+                LogUtil.logDebug("Add transfer listener");
                 megaApi.addTransferListener(this);
                 megaApi.addGlobalListener(this);
 
-                log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
+                LogUtil.logDebug("Overquota delay: " + megaApi.getBandwidthOverquotaDelay());
                 if(megaApi.getBandwidthOverquotaDelay()>0){
                     if(alertDialogTransferOverquota==null){
                         showTransferOverquotaDialog();
@@ -797,7 +797,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
             if(tB==null){
-                log("Tb is Null");
+                LogUtil.logWarning("Tb is Null");
                 return;
             }
 
@@ -855,7 +855,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             uploadContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    log("onClick uploadContainer");
+                    LogUtil.logDebug("onClick uploadContainer");
                     Intent intent1 = new Intent(PdfViewerActivityLollipop.this, FileExplorerActivityLollipop.class);
                     intent1.setAction(Intent.ACTION_SEND);
                     intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -892,7 +892,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         mWidthScale = (float) (screenWidth/4) / pdfView.getWidth();
                         mHeightScale = (float) (screenHeight/4) / pdfView.getHeight();
                     }
-                    log("mLeftDelta: "+mLeftDelta+" mTopDelta: "+mTopDelta+" mWidthScale: "+mWidthScale+" mHeightScale: "+mHeightScale);
+                    LogUtil.logDebug("mLeftDelta: " + mLeftDelta + " mTopDelta: " + mTopDelta + " mWidthScale: " + mWidthScale + " mHeightScale: " + mHeightScale);
                     runEnterAnimation();
 
                     return true;
@@ -903,7 +903,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        log("onSaveInstanceState");
+        LogUtil.logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
         outState.putInt("currentPage", currentPage);
@@ -924,12 +924,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        log("onUserAlertsUpdate");
+        LogUtil.logDebug("onUserAlertsUpdate");
     }
 
     @Override
     public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
-        log("onNodesUpdate");
+        LogUtil.logDebug("onNodesUpdate");
         if (megaApi.getNodeByHandle(handle) == null){
             return;
         }
@@ -980,7 +980,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         @Override
         protected void onPostExecute(InputStream inputStream) {
-            log("onPostExecute");
+            LogUtil.logDebug("onPostExecute");
             try {
                 pdfView.fromStream(inputStream)
                         .defaultPage(currentPage-1)
@@ -1014,12 +1014,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void loadStreamPDF() {
-        log("loadStreamPDF loading: "+loading);
+        LogUtil.logDebug("loading: " + loading);
         new LoadPDFStream().execute(uri.toString());
     }
 
     private void loadLocalPDF() {
-        log("loadLocalPDF loading: "+loading);
+        LogUtil.logDebug("loading: " + loading);
 
         progressBar.setVisibility(View.VISIBLE);
         try {
@@ -1130,10 +1130,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             catch(Exception ex){}
         }
 
-        log("intent processed!");
+        LogUtil.logDebug("Intent processed!");
 
         if (infos == null) {
-            log("Error infos is NULL");
+            LogUtil.logError("Error: infos is NULL");
             return;
         }
         else {
@@ -1153,7 +1153,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void backToCloud(long handle){
-        log("backToCloud: "+handle);
+        LogUtil.logDebug("Handle: "+handle);
         Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
         if(handle!=-1){
             startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1164,7 +1164,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public  void setToolbarVisibilityShow () {
-        log("setToolbarVisibilityShow");
+        LogUtil.logDebug("setToolbarVisibilityShow");
         toolbarVisible = true;
         aB.show();
         if(tB != null) {
@@ -1182,7 +1182,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void setToolbarVisibilityHide (long duration) {
-        log("setToolbarVisibilityHide");
+        LogUtil.logDebug("Duration: " + duration);
         toolbarVisible = false;
         if(tB != null) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -1232,7 +1232,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        log("onCreateOptionsMenu");
+        LogUtil.logDebug("onCreateOptionsMenu");
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_pdfviewer, menu);
@@ -1392,7 +1392,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 }
             }
             else if (type == Constants.FILE_LINK_ADAPTER) {
-                log("onCreateOptionsMenu FILE_LINK_ADAPTER");
+                LogUtil.logDebug("FILE_LINK_ADAPTER");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 shareMenuItem.setVisible(false);
@@ -1453,7 +1453,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
                 switch (accessLevel) {
                     case MegaShare.ACCESS_FULL: {
-                        log("access FULL");
+                        LogUtil.logDebug("Access FULL");
                         renameMenuItem.setVisible(true);
                         moveMenuItem.setVisible(true);
                         moveToTrashMenuItem.setVisible(true);
@@ -1461,9 +1461,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         break;
                     }
                     case MegaShare.ACCESS_READ:
-                        log("access read");
+                        LogUtil.logDebug("Access read");
                     case MegaShare.ACCESS_READWRITE: {
-                        log("readwrite");
+                        LogUtil.logDebug("Access read & write");
                         renameMenuItem.setVisible(false);
                         moveMenuItem.setVisible(false);
                         moveToTrashMenuItem.setVisible(false);
@@ -1620,7 +1620,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        log("onOptionsItemSelected");
+        LogUtil.logDebug("onOptionsItemSelected");
 
         int id = item.getItemId();
         switch(id) {
@@ -1708,7 +1708,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void importNode(){
-        log("importNode");
+        LogUtil.logDebug("importNode");
 
         Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
@@ -1716,7 +1716,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void showConfirmationDeleteNode(final long chatId, final MegaChatMessage message){
-        log("showConfirmationDeleteNode");
+        LogUtil.logDebug("showConfirmationDeleteNode");
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -1759,7 +1759,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void moveToTrash(){
-        log("moveToTrash");
+        LogUtil.logDebug("moveToTrash");
 
         moveToRubbish = false;
         if (!Util.isOnline(this)){
@@ -1845,7 +1845,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
 
     public void showCopy(){
-        log("showCopy");
+        LogUtil.logDebug("showCopy");
 
         ArrayList<Long> handleList = new ArrayList<Long>();
         handleList.add(handle);
@@ -1861,7 +1861,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void showMove(){
-        log("showMove");
+        LogUtil.logDebug("showMove");
 
         ArrayList<Long> handleList = new ArrayList<Long>();
         handleList.add(handle);
@@ -1887,7 +1887,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void showRenameDialog() {
-        log("showRenameDialog");
+        LogUtil.logDebug("showRenameDialog");
         final MegaNode node = megaApi.getNodeByHandle(handle);
 
         LinearLayout layout = new LinearLayout(this);
@@ -2098,7 +2098,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
         statusDialog = temp;
 
-        log("renaming " + node.getName() + " to " + newName);
+        LogUtil.logDebug("Renaming " + node.getName() + " to " + newName);
 
         megaApi.renameNode(node, newName, this);
     }
@@ -2209,14 +2209,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void showGetLinkActivity(){
-        log("showGetLinkActivity");
+        LogUtil.logDebug("showGetLinkActivity");
         Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
         linkIntent.putExtra("handle", handle);
         startActivity(linkIntent);
     }
 
     public void intentToSendFile(){
-        log("intentToSendFile");
+        LogUtil.logDebug("intentToSendFile");
 
         if(uri!=null){
             if (!isUrl){
@@ -2224,7 +2224,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 share.setType("application/pdf");
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    log("Use provider to share");
+                    LogUtil.logDebug("Use provider to share");
                     share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
                     share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
@@ -2244,15 +2244,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (pdfFileName != null && handle != -1 ) {
             file = megaApi.getNodeByHandle(handle);
             if (file != null){
-                log("Pdf File: "+pdfFileName+" node file: "+file.getName());
+                LogUtil.logDebug("Pdf File: " + pdfFileName + " node file: " + file.getName());
                 if (!pdfFileName.equals(file.getName())) {
-                    log("updateFile");
+                    LogUtil.logDebug("Update File");
 
                     pdfFileName = file.getName();
                     if (aB != null){
                         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
                         if(tB==null){
-                            log("Tb is Null");
+                            LogUtil.logError("Tb is Null");
                             return;
                         }
                         tB.setVisibility(View.VISIBLE);
@@ -2296,12 +2296,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
                         activityManager.getMemoryInfo(mi);
 
-                        if(mi.totalMem>Constants.BUFFER_COMP){
-                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                        if(mi.totalMem>Constants.BUFFER_COMP) {
+                            LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
                             megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                        }
-                        else{
-                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                        } else {
+                            LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
                             megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                         }
 
@@ -2318,7 +2317,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        log("-------------------onActivityResult " + requestCode + "____" + resultCode);
+        LogUtil.logDebug("onActivityResult: " + requestCode + "____" + resultCode);
         if (intent == null) {
             return;
         }
@@ -2326,10 +2325,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
             long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-            log("Send to "+(chatHandles.length+contactHandles.length)+" chats");
+            LogUtil.logDebug("Send to " + (chatHandles.length+contactHandles.length) + " chats");
 
             long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
-            log("Send "+nodeHandles.length+" nodes");
+            LogUtil.logDebug("Send " + nodeHandles.length + " nodes");
 
             if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
                 if (contactHandles != null && contactHandles.length > 0) {
@@ -2361,7 +2360,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         }
                     }
                     else{
-                        log("Error on sending to chat");
+                        LogUtil.logError("Error on sending to chat");
                     }
                 }
                 else {
@@ -2373,7 +2372,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-            log("local folder selected");
+            LogUtil.logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (type == Constants.FILE_LINK_ADAPTER){
                 if (nC == null) {
@@ -2391,7 +2390,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             megaNodes.add(node);
                         }
                         else {
-                            log("Node NULL, not added");
+                            LogUtil.logWarning("Node NULL, not added");
                         }
                     }
                     if (megaNodes.size() > 0) {
@@ -2403,7 +2402,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
                 long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
                 long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-                log("URL: " + url + "___SIZE: " + size);
+                LogUtil.logDebug("URL: " + url + "___SIZE: " + size);
 
                 if(nC==null){
                     nC = new NodeController(this, isFolderLink);
@@ -2465,11 +2464,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             for(int i=0; i<copyHandles.length;i++){
                 MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
                 if (cN != null){
-                    log("cN != null, i = " + i + " of " + copyHandles.length);
+                    LogUtil.logDebug("cN != null, i = " + i + " of " + copyHandles.length);
                     megaApi.copyNode(cN, parent, this);
                 }
                 else{
-                    log("cN == null, i = " + i + " of " + copyHandles.length);
+                    LogUtil.logWarning("cN == null, i = " + i + " of " + copyHandles.length);
                     try {
                         statusDialog.dismiss();
                         showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
@@ -2479,7 +2478,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
-            log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
+            LogUtil.logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
             if(!Util.isOnline(this)||megaApi==null) {
                 try{
@@ -2495,18 +2494,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if(target == null){
                 target = megaApi.getRootNode();
             }
-            log("TARGET: " + target.getName() + "and handle: " + target.getHandle());
+            LogUtil.logDebug("TARGET: " + target.getName() + "and handle: " + target.getHandle());
             if (nodeChat != null) {
-                log("DOCUMENT: " + nodeChat.getName() + "_" + nodeChat.getHandle());
+                LogUtil.logDebug("DOCUMENT: " + nodeChat.getName() + "_" + nodeChat.getHandle());
                 if (target != null) {
                     megaApi.copyNode(nodeChat, target, this);
                 } else {
-                    log("TARGET: null");
+                    LogUtil.logError("TARGET: null");
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
                 }
             }
             else{
-                log("DOCUMENT: null");
+                LogUtil.logError("DOCUMENT: null");
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
             }
         }
@@ -2514,7 +2513,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public void onPageChanged(int page, int pageCount) {
-        log("page: "+page);
+        LogUtil.logDebug("page: " + page + ", pageCount: " + pageCount);
         if (!notChangePage) {
             currentPage = page+1;
             actualPage.setText(String.valueOf(currentPage));
@@ -2527,21 +2526,21 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public void onPageError(int page, Throwable t) {
-        log("Cannot load page " + page);
+        LogUtil.logError("Cannot load page " + page);
     }
 
     @Override
     public void loadComplete(int nbPages) {
         totalPages.setText(""+nbPages);
         PdfDocument.Meta meta = pdfView.getDocumentMeta();
-        log("title = " + meta.getTitle());
-        log("author = " + meta.getAuthor());
-        log("subject = " + meta.getSubject());
-        log("keywords = " + meta.getKeywords());
-        log("creator = " + meta.getCreator());
-        log("producer = " + meta.getProducer());
-        log("creationDate = " + meta.getCreationDate());
-        log("modDate = " + meta.getModDate());
+        LogUtil.logDebug("Title = " + meta.getTitle());
+        LogUtil.logDebug("Author = " + meta.getAuthor());
+        LogUtil.logDebug("Subject = " + meta.getSubject());
+        LogUtil.logDebug("Keywords = " + meta.getKeywords());
+        LogUtil.logDebug("Creator = " + meta.getCreator());
+        LogUtil.logDebug("Producer = " + meta.getProducer());
+        LogUtil.logDebug("Creation Date = " + meta.getCreationDate());
+        LogUtil.logDebug("Mod. Date = " + meta.getModDate());
         printBookmarksTree(pdfView.getTableOfContents(), "-");
 
         handler.postDelayed(new Runnable() {
@@ -2556,7 +2555,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     public void printBookmarksTree(List<PdfDocument.Bookmark> tree, String sep) {
         for (PdfDocument.Bookmark b : tree) {
 
-            log(String.format("%s %s, p %d", sep, b.getTitle(), b.getPageIdx()));
+            LogUtil.logDebug(String.format("%s %s, p %d", sep, b.getTitle(), b.getPageIdx()));
 
             if (b.hasChildren()) {
                 printBookmarksTree(b.getChildren(), sep + "-");
@@ -2587,10 +2586,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         return result;
     }
 
-    public static void log(String log) {
-        Util.log("PdfViewerActivityLollipop", log);
-    }
-
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
@@ -2603,7 +2598,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish");
+        LogUtil.logDebug("onRequestFinish");
 
         MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
 
@@ -2629,7 +2624,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
                 dbH.clearCredentials();
 
-                log("Logged in with session");
+                LogUtil.logDebug("Logged in with session");
 
                 megaApi.fetchNodes(this);
             }
@@ -2665,26 +2660,26 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
                     if(chatEnabled){
 
-                        log("Chat enabled-->connect");
+                        LogUtil.logDebug("Chat enabled-->connect");
                         if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
-                            log("Connection goes!!!");
+                            LogUtil.logDebug("Connection goes!!!");
                             megaChatApi.connect(this);
                         }
                         else{
-                            log("Not launch connect: "+megaChatApi.getInitState());
+                            LogUtil.logDebug("Not launch connect: " + megaChatApi.getInitState());
                         }
                         MegaApplication.setLoggingIn(false);
                         download();
                     }
                     else{
 
-                        log("Chat NOT enabled - readyToManager");
+                        LogUtil.logWarning("Chat NOT enabled - readyToManager");
                         MegaApplication.setLoggingIn(false);
                         download();
                     }
                 }
                 else{
-                    log("chatSettings NULL - readyToManager");
+                    LogUtil.logWarning("chatSettings NULL - readyToManager");
                     MegaApplication.setLoggingIn(false);
                     download();
                 }
@@ -2719,7 +2714,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                 }
                 moveToRubbish = false;
-                log("move to rubbish request finished");
+                LogUtil.logDebug("Move to rubbish request finished");
             }
             else{
                 if (e.getErrorCode() == MegaError.API_OK){
@@ -2729,7 +2724,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 else{
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                 }
-                log("move nodes request finished");
+                LogUtil.logDebug("Move nodes request finished");
             }
         }
         else if (request.getType() == MegaRequest.TYPE_REMOVE){
@@ -2748,7 +2743,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             else{
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
             }
-            log("remove request finished");
+            LogUtil.logDebug("Remove request finished");
         }
         else if (request.getType() == MegaRequest.TYPE_COPY){
             try {
@@ -2760,14 +2755,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-                log("OVERQUOTA ERROR: "+e.getErrorCode());
+                LogUtil.logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
                 startActivity(intent);
                 finish();
             }
             else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-                log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+                LogUtil.logWarning("PRE OVERQUOTA ERROR: " + e.getErrorCode());
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
                 startActivity(intent);
@@ -2776,13 +2771,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             else{
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
             }
-            log("copy nodes request finished");
+            LogUtil.logDebug("Copy nodes request finished");
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestTemporaryError");
+        LogUtil.logWarning("onRequestTemporaryError");
     }
 
     @Override
@@ -2797,25 +2792,25 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish - MegaChatApi");
+        LogUtil.logDebug("onRequestFinish - MegaChatApi");
 
         if (request.getType() == MegaChatRequest.TYPE_CONNECT){
             MegaApplication.setLoggingIn(false);
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("Connected to chat!");
+                LogUtil.logDebug("Connected to chat!");
             }
             else{
-                log("ERROR WHEN CONNECTING " + e.getErrorString());
+                LogUtil.logError("ERROR WHEN CONNECTING " + e.getErrorString());
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("File sent correctly");
+                LogUtil.logDebug("File sent correctly");
                 successSent++;
             }
             else{
-                log("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
+                LogUtil.logError("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
                 errorSent++;
             }
 
@@ -2846,19 +2841,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     @Override
     protected void onStop() {
         super.onStop();
-        log("onStop");
+        LogUtil.logDebug("onStop");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        log("onStart");
+        LogUtil.logDebug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        log("onResume");
+        LogUtil.logDebug("onResume");
         if (!isOffLine && !fromChat && !isFolderLink
                 && type != Constants.FILE_LINK_ADAPTER
                 && type != Constants.ZIP_ADAPTER){
@@ -2872,12 +2867,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     @Override
     protected void onPause() {
         super.onPause();
-        log("onPause");
+        LogUtil.logDebug("onPause");
     }
 
     @Override
     protected void onDestroy() {
-        log("onDestroy()");
+        LogUtil.logDebug("onDestroy()");
 
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
@@ -2897,7 +2892,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void showTransferOverquotaDialog(){
-        log("showTransferOverquotaDialog");
+        LogUtil.logDebug("showTransferOverquotaDialog");
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(PdfViewerActivityLollipop.this);
 
@@ -2954,7 +2949,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void showUpgradeAccount(){
-        log("showUpgradeAccount");
+        LogUtil.logDebug("showUpgradeAccount");
         Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
         upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
         startActivity(upgradeIntent);
@@ -2980,7 +2975,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
             if (e.getValue() != 0) {
-                log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+                LogUtil.logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 
                 if(alertDialogTransferOverquota==null){
                     showTransferOverquotaDialog();
@@ -3004,18 +2999,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void openAdvancedDevices (long handleToDownload, boolean highPriority){
-        log("openAdvancedDevices");
+        LogUtil.logDebug("openAdvancedDevices");
 //		handleToDownload = handle;
         String externalPath = Util.getExternalCardPath();
 
         if(externalPath!=null){
-            log("ExternalPath for advancedDevices: "+externalPath);
+            LogUtil.logDebug("ExternalPath for advancedDevices: " + externalPath);
             MegaNode node = megaApi.getNodeByHandle(handleToDownload);
             if(node!=null){
 
 //				File newFile =  new File(externalPath+"/"+node.getName());
                 File newFile =  new File(node.getName());
-                log("File: "+newFile.getPath());
+                LogUtil.logDebug("File: " + newFile.getPath());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
 
                 // Filter to only show results that can be "opened", such as
@@ -3024,7 +3019,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
                 // Create a file with the requested MIME type.
                 String mimeType = MimeTypeList.getMimeType(newFile);
-                log("Mimetype: "+mimeType);
+                LogUtil.logDebug("Mimetype: " + mimeType);
                 intent.setType(mimeType);
                 intent.putExtra(Intent.EXTRA_TITLE, node.getName());
                 intent.putExtra("handleToDownload", handleToDownload);
@@ -3032,8 +3027,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 try{
                     startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
                 }
-                catch(Exception e){
-                    log("Exception in External SDCARD");
+                catch(Exception e) {
+                    LogUtil.logError("Exception in External SDCARD", e);
                     Environment.getExternalStorageDirectory();
                     Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
                     toast.show();
@@ -3041,7 +3036,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
         else{
-            log("No external SD card");
+            LogUtil.logWarning("No external SD card");
             Environment.getExternalStorageDirectory();
             Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
             toast.show();
@@ -3049,7 +3044,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
-        log("askSizeConfirmationBeforeChatDownload");
+        LogUtil.logDebug("askSizeConfirmationBeforeChatDownload");
 
         final String parentPathC = parentPath;
         final ArrayList<MegaNode> nodeListC = nodeList;
@@ -3093,7 +3088,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
-        log("askSizeConfirmationBeforeDownload");
+        LogUtil.logDebug("askSizeConfirmationBeforeDownload");
 
         final String parentPathC = parentPath;
         final String urlC = url;
@@ -3142,7 +3137,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
-        log("askConfirmationNoAppInstaledBeforeDownload");
+        LogUtil.logDebug("askConfirmationNoAppInstaledBeforeDownload");
 
         final String parentPathC = parentPath;
         final String urlC = url;

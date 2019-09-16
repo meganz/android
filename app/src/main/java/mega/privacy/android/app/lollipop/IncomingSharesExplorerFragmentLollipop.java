@@ -30,6 +30,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -65,7 +66,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	Stack<Integer> lastPositionStack;
 
 	public static IncomingSharesExplorerFragmentLollipop newInstance() {
-		log("newInstance");
+		LogUtil.logDebug("newInstance");
 		IncomingSharesExplorerFragmentLollipop fragment = new IncomingSharesExplorerFragmentLollipop();
 		return fragment;
 	}
@@ -73,7 +74,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		LogUtil.logDebug("onCreate");
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -90,7 +91,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		log("onCreateView");
+		LogUtil.logDebug("onCreateView");
 
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		
@@ -215,7 +216,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 
 
-		log("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
+		LogUtil.logDebug("deepBrowserTree value: " + ((FileExplorerActivityLollipop)context).deepBrowserTree);
 		if (((FileExplorerActivityLollipop)context).deepBrowserTree <= 0){
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
@@ -294,7 +295,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 	
 	public void findNodes(){
-		log("findNodes");
+		LogUtil.logDebug("findNodes");
 		((FileExplorerActivityLollipop)context).setDeepBrowserTree(0);
 
 		separator.setVisibility(View.GONE);
@@ -313,7 +314,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
 	public void findDisabledNodes (){
-		log("findDisabledNodes");
+		LogUtil.logDebug("findDisabledNodes");
 
 		ArrayList<Long> disabledNodes = new ArrayList<Long>();
 
@@ -358,10 +359,10 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
 	public void navigateToFolder(long handle) {
-		log("navigateToFolder");
+		LogUtil.logDebug("navigateToFolder");
 
 		((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
-		log("((FileExplorerActivityLollipop)context).deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
+		LogUtil.logDebug("((FileExplorerActivityLollipop)context).deepBrowserTree value: " + ((FileExplorerActivityLollipop)context).deepBrowserTree);
 		if (((FileExplorerActivityLollipop)context).deepBrowserTree <= 0){
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
@@ -380,7 +381,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		int lastFirstVisiblePosition = 0;
 		lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 
-		log("Push to stack "+lastFirstVisiblePosition+" position");
+		LogUtil.logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 		lastPositionStack.push(lastFirstVisiblePosition);
 
 		parentHandle = handle;
@@ -431,11 +432,11 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
     public void itemClick(View view, int position) {
-		log("------------------itemClick: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
+		LogUtil.logDebug("deepBrowserTree value: " + ((FileExplorerActivityLollipop)context).deepBrowserTree);
 		if (nodes.get(position).isFolder()){
 
 			((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
-			log("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
+			LogUtil.logDebug("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
 			if (((FileExplorerActivityLollipop)context).deepBrowserTree <= 0){
 				separator.setVisibility(View.GONE);
 				optionsBar.setVisibility(View.GONE);
@@ -454,7 +455,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			int lastFirstVisiblePosition = 0;
 			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 
-			log("Push to stack "+lastFirstVisiblePosition+" position");
+			LogUtil.logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 			lastPositionStack.push(lastFirstVisiblePosition);
 
 			parentHandle = nodes.get(position).getHandle();
@@ -525,7 +526,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			{
 				//Seleccionar el fichero para enviar...
 				MegaNode n = nodes.get(position);
-				log("Selected node to send: "+n.getName());
+				LogUtil.logDebug("Selected node to send: " + n.getHandle());
 				if(nodes.get(position).isFile()){
 					MegaNode nFile = nodes.get(position);
 					
@@ -545,7 +546,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	public int onBackPressed(){
 
-		log("deepBrowserTree "+((FileExplorerActivityLollipop)context).deepBrowserTree);
+		LogUtil.logDebug("deepBrowserTree " + ((FileExplorerActivityLollipop)context).deepBrowserTree);
 		((FileExplorerActivityLollipop)context).decreaseDeepBrowserTree();
 
 		if(((FileExplorerActivityLollipop)context).deepBrowserTree==0){
@@ -560,9 +561,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
+				LogUtil.logDebug("Pop of the stack " + lastVisiblePosition + " position");
 			}
-			log("Scroll to "+lastVisiblePosition+" position");
+			LogUtil.logDebug("Scroll to " + lastVisiblePosition + " position");
 
 			if(lastVisiblePosition>=0){
 				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
@@ -637,9 +638,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack "+lastVisiblePosition+" position");
+					LogUtil.logDebug("Pop of the stack " + lastVisiblePosition + " position");
 				}
-				log("Scroll to "+lastVisiblePosition+" position");
+				LogUtil.logDebug("Scroll to " + lastVisiblePosition + " position");
 
 				if(lastVisiblePosition>=0){
 					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
@@ -712,10 +713,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	 */
 	public void setDisableNodes(ArrayList<Long> disabledNodes) {
 		adapter.setDisableNodes(disabledNodes);
-	}
-	
-	private static void log(String log) {
-		Util.log("IncomingSharesExplorerFragmentLollipop", log);
 	}
 	
 	public long getParentHandle(){

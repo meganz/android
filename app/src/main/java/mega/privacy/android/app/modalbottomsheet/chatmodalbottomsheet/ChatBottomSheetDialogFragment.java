@@ -36,6 +36,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -100,12 +101,12 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            LogUtil.logDebug("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong("chatId", -1);
-            log("Handle of the chat: "+chatId);
+            LogUtil.logDebug("Handle of the chat: "+chatId);
         }
         else{
-            log("Bundle NULL");
+            LogUtil.logWarning("Bundle NULL");
             if(context instanceof ManagerActivityLollipop){
                 chatId = ((ManagerActivityLollipop) context).selectedChatItemId;
             }
@@ -238,7 +239,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 }
 
                 if(contact!=null){
-                    log("User email: "+contact.getEmail());
+                    LogUtil.logDebug("User email: " + contact.getEmail());
                     titleMailContactChatPanel.setText(contact.getEmail());
                     addAvatarChatPanel(contact.getEmail(), chat);
 
@@ -260,45 +261,45 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 int state = megaChatApi.getUserOnlineStatus(userHandle);
 
                 if(state == MegaChatApi.STATUS_ONLINE){
-                    log("This user is connected");
+                    LogUtil.logDebug("This user is connected");
                     iconStateChatPanel.setVisibility(View.VISIBLE);
                     iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
                 }
                 else if(state == MegaChatApi.STATUS_AWAY){
-                    log("This user is away");
+                    LogUtil.logDebug("This user is away");
                     iconStateChatPanel.setVisibility(View.VISIBLE);
                     iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
                 }
                 else if(state == MegaChatApi.STATUS_BUSY){
-                    log("This user is busy");
+                    LogUtil.logDebug("This user is busy");
                     iconStateChatPanel.setVisibility(View.VISIBLE);
                     iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
                 }
                 else if(state == MegaChatApi.STATUS_OFFLINE){
-                    log("This user is offline");
+                    LogUtil.logDebug("This user is offline");
                     iconStateChatPanel.setVisibility(View.VISIBLE);
                     iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
                 }
                 else if(state == MegaChatApi.STATUS_INVALID){
-                    log("INVALID status: "+state);
+                    LogUtil.logWarning("INVALID status: " + state);
                     iconStateChatPanel.setVisibility(View.GONE);
                 }
                 else{
-                    log("This user status is: "+state);
+                    LogUtil.logDebug("This user status is: " + state);
                     iconStateChatPanel.setVisibility(View.GONE);
                 }
             }
 
             chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
             if(chatPrefs!=null) {
-                log("Chat prefs exists!!!");
+                LogUtil.logDebug("Chat prefs exists!!!");
                 notificationsEnabled = true;
                 if (chatPrefs.getNotificationsEnabled() != null) {
                     notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
                 }
 
                 if (!notificationsEnabled) {
-                    log("Chat is MUTE");
+                    LogUtil.logDebug("Chat is MUTE");
                     optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
                     optionMuteChatText.setText(getString(R.string.general_unmute));
                 }
@@ -376,14 +377,14 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             if (contact != null) {
                 String color = megaApi.getUserAvatarColor(contact);
                 if (color != null) {
-                    log("The color to set the avatar is " + color);
+                    LogUtil.logDebug("The color to set the avatar is " + color);
                     p.setColor(Color.parseColor(color));
                 } else {
-                    log("Default color to the avatar");
+                    LogUtil.logDebug("Default color to the avatar");
                     p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
                 }
             } else {
-                log("Contact is NULL");
+                LogUtil.logWarning("Contact is NULL");
                 p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         }
@@ -438,9 +439,10 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         switch(v.getId()){
 
             case R.id.chat_list_info_chat_layout:{
-                log("click contact info");
+                LogUtil.logDebug("Contact info");
                 if(chat==null){
-                    log("Selected chat NULL");
+                    LogUtil.logWarning("Selected chat NULL");
+                    return;
                 }
 
                 if(chat.isGroup()){
@@ -462,26 +464,28 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 break;
             }
             case R.id.chat_list_leave_chat_layout:{
-                log("click leave chat");
+                LogUtil.logDebug("Click leave chat");
                 if(chat==null){
-                    log("Selected chat NULL");
+                    LogUtil.logWarning("Selected chat NULL");
+                    return;
                 }
-                log("Leave chat - Chat ID: " + chat.getChatId());
+                LogUtil.logDebug("Leave chat - Chat ID: " + chat.getChatId());
                 ((ManagerActivityLollipop)context).showConfirmationLeaveChat(chat);
                 break;
             }
             case R.id.chat_list_clear_history_chat_layout:{
-                log("click clear history chat");
+                LogUtil.logDebug("Click clear history chat");
                 if(chat==null){
-                    log("Selected chat NULL");
+                    LogUtil.logWarning("Selected chat NULL");
+                    return;
                 }
-                log("Clear chat - Chat ID: " + chat.getChatId());
+                LogUtil.logDebug("Clear chat - Chat ID: " + chat.getChatId());
                 ((ManagerActivityLollipop)context).showConfirmationClearChat(chat);
 
                 break;
             }
             case R.id.chat_list_mute_chat_layout:{
-                log("click mute chat");
+                LogUtil.logDebug("Click mute chat");
                 if(chatPrefs==null) {
 
                     if(notificationsEnabled){
@@ -508,7 +512,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             }
             case R.id.chat_list_archive_chat_layout:{
                 if(chat==null){
-                    log("Selected chat NULL");
+                    LogUtil.logDebug("Selected chat NULL");
+                    return;
                 }
 
                 ChatController chatC = new ChatController(context);
@@ -538,13 +543,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        LogUtil.logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
         outState.putLong("chatId", chatId);
-    }
-
-    private static void log(String log) {
-        Util.log("ChatBottomSheetDialogFragment", log);
     }
 }

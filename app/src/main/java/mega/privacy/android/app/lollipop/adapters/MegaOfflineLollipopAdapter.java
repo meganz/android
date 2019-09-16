@@ -42,6 +42,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -129,13 +130,13 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     	String currentPath;
     	
     	public OfflineThumbnailAsyncTask(ViewHolderOffline holder) {
-    		log("OfflineThumbnailAsyncTask::OfflineThumbnailAsyncTask");
+			LogUtil.logDebug("OfflineThumbnailAsyncTask::OfflineThumbnailAsyncTask");
 			this.holder = holder;
 		}
     	
 		@Override
 		protected Bitmap doInBackground(String... params) {
-			log("OfflineThumbnailAsyncTask::doInBackground");
+			LogUtil.logDebug("OfflineThumbnailAsyncTask::doInBackground");
 			currentPath = params[0];
 			File currentFile = new File(currentPath);
 			
@@ -169,7 +170,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 		@Override
 		protected void onPostExecute(Bitmap thumb){
-			log("OfflineThumbnailAsyncTask::onPostExecute");
+			LogUtil.logDebug("OfflineThumbnailAsyncTask::onPostExecute");
 			if (thumb != null){
 				if (holder.currentPath.compareTo(currentPath) == 0){
 					if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
@@ -197,12 +198,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
     boolean putOrDeletePosition (int pos) {
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			LogUtil.logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 			return true;
 		}
 		else {
-			log("PUT pos: "+pos);
+			LogUtil.logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 			return false;
 		}
@@ -218,7 +219,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 			MegaOfflineLollipopAdapter.ViewHolderOfflineList view = (MegaOfflineLollipopAdapter.ViewHolderOfflineList) listFragment.findViewHolderForLayoutPosition(pos);
 			if(view!=null){
-				log("Start animation: "+pos);
+				LogUtil.logDebug("Start animation: " + pos);
 				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 					@Override
@@ -249,7 +250,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 		}
 		else{
-			log("adapter type is GRID");
+			LogUtil.logDebug("Adapter type is GRID");
 			MegaOffline node = (MegaOffline) getItem(pos);
 			boolean isFile = false;
 			if (node != null) {
@@ -309,7 +310,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
     public void toggleSelection(int pos) {
-		log("toggleSelection");
+		LogUtil.logDebug("Position: " + pos);
         //Otherwise out of bounds exception happens.
         boolean a = pos >= folderCount;
         boolean b = getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
@@ -359,7 +360,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     }
 	
 	private boolean isItemChecked(int position) {
-		log("isItemChecked");
+		LogUtil.logDebug("Position: " + position);
 		if((selectedItems!=null)){
 			return selectedItems.get(position);
 		}else{
@@ -368,7 +369,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     }
 
 	public int getSelectedItemCount() {
-		log("getSelectedItemCount");
+		LogUtil.logDebug("getSelectedItemCount");
 		return selectedItems.size();
 	}
 
@@ -385,7 +386,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	@Override
 	public List<Integer> getSelectedItems() {
 		if (selectedItems != null) {
-			log("getSelectedItems");
+			LogUtil.logDebug("getSelectedItems");
 			List<Integer> items = new ArrayList<Integer>(selectedItems.size());
 			for (int i = 0; i < selectedItems.size(); i++) {
 				items.add(selectedItems.keyAt(i));
@@ -400,7 +401,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	 * Get list of all selected nodes
 	 */
 	public List<MegaOffline> getSelectedOfflineNodes() {
-		log("getSelectedOfflineNodes");
+		LogUtil.logDebug("getSelectedOfflineNodes");
 		ArrayList<MegaOffline> nodes = new ArrayList<MegaOffline>();
 		
 		for (int i = 0; i < selectedItems.size(); i++) {
@@ -415,7 +416,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 	
 	public MegaOfflineLollipopAdapter(OfflineFragmentLollipop _fragment, Context _context, ArrayList<MegaOffline> _mOffList, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, int getAdapterType) {
-		log("MegaOfflineListAdapter");
+		LogUtil.logDebug("MegaOfflineListAdapter");
 		this.fragment = _fragment;
 		this.context = _context;
 //		this.getAdapterType() =  getAdapterType();
@@ -435,11 +436,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     }
 	
 	public void setNodes(ArrayList<MegaOffline> mOffList){
-		log("setNodes");
+		LogUtil.logDebug("setNodes");
 		String pathNav = fragment.getPathNavigation();
 		if (pathNav != null && pathNav.equals("/") && mOffList != null) {
 			if (!mOffList.isEmpty()) {
-				log("List not empty");
+				LogUtil.logDebug("List not empty");
 				MegaOffline lastItem = mOffList.get(mOffList.size() - 1);
 				if (!(lastItem.getHandle().equals("0"))) {
 					addMasterKeyAsOffline(mOffList);
@@ -456,7 +457,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
 	private void addMasterKeyAsOffline(ArrayList<MegaOffline> mOffList) {
-		log("Export in: " + getExternalStoragePath(RK_FILE));
+		LogUtil.logDebug("Export in: " + getExternalStoragePath(RK_FILE));
 		if (isFileAvailable(buildExternalStorageFile(RK_FILE))) {
 			MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(RK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
 			mOffList.add(masterKeyFile);
@@ -465,7 +466,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	
 	@Override
 	public ViewHolderOffline onCreateViewHolder(ViewGroup parent, int viewType) {
-		log("onCreateViewHolder");
+		LogUtil.logDebug("onCreateViewHolder");
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -591,7 +592,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 	@Override
 	public void onBindViewHolder(ViewHolderOffline holder, int position) {
-		log("onBindViewHolder");
+		LogUtil.logDebug("Position: " + position);
 		if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 			ViewHolderOfflineList holderList = (ViewHolderOfflineList) holder;
 			onBindViewHolderList(holderList, position);
@@ -603,7 +604,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 	
 	public void onBindViewHolderGrid (ViewHolderOfflineGrid holder, int position){
-		log("onBindViewHolderGrid");
+		LogUtil.logDebug("Position: " + position);
 	
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -751,7 +752,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 	
 	public void onBindViewHolderList (ViewHolderOfflineList holder, int position){
-		log("onBindViewHolderList");
+		LogUtil.logDebug("Position: " + position);
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -793,7 +794,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		int files=0;
 		if (currentFile.isDirectory()){
 
-			log("Directory offline");
+			LogUtil.logDebug("Directory offline");
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -859,12 +860,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 		}
 		else{
-			log("File offline");
+			LogUtil.logDebug("File offline");
 			long nodeSize = currentFile.length();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 
 			if (!multipleSelect) {
-				log("Not multiselect");
+				LogUtil.logDebug("Not multiselect");
 
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
@@ -875,7 +876,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 				holder.imageView.setLayoutParams(params);
 
-				log("Check the thumb");
+				LogUtil.logDebug("Check the thumb");
 				if (MimeTypeList.typeForName(currentNode.getName()).isImage()){
 					Bitmap thumb = null;
 
@@ -903,7 +904,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				}
 			}
 			else{
-				log("multiselect ON");
+				LogUtil.logDebug("multiselect ON");
 				if(this.isItemChecked(position)){
 					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -925,7 +926,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 					holder.imageView.setLayoutParams(params);
 
-					log("Check the thumb");
+					LogUtil.logDebug("Check the thumb");
 					if (MimeTypeList.typeForName(currentNode.getName()).isImage()){
 						Bitmap thumb = null;
 
@@ -962,12 +963,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	
 	@Override
 	public int getItemCount() {
-		log("getItemCount");
+		LogUtil.logDebug("getItemCount");
 		return mOffList.size();
 	}
 
 	public int getItemCountWithoutRK(){
-		log("getItemCountWithoutRK");
+		LogUtil.logDebug("getItemCountWithoutRK");
 
 		ArrayList<MegaOffline> mOffListWithoutRK = new ArrayList<>();
 		for(MegaOffline item: mOffList){
@@ -987,36 +988,36 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	
 	@Override
 	public int getItemViewType(int position) {
-		log("getItemViewType");
+		LogUtil.logDebug("Position: " + position);
 
 		return getAdapterType();
 	}
  
 	public Object getItem(int position) {
-		log("getItem");
+		LogUtil.logDebug("Position: " + position);
 
 		return mOffList.get(position);
 	}
 
 	public MegaOffline getItemOff(int position) {
-		log("getItemOff");
+		LogUtil.logDebug("Position: " + position);
 
 		return mOffList.get(position);
 	}
 	
     @Override
     public long getItemId(int position) {
-    	log("getItemId");
+		LogUtil.logDebug("Position: " + position);
         return position;
     }    
     
     public int getPositionClicked (){
-    	log("getPositionClicked");
+		LogUtil.logDebug("getPositionClicked");
     	return positionClicked;
     }
     
     public void setPositionClicked(int p){
-    	log("setPositionClicked");
+		LogUtil.logDebug("Position: " + p);
     	positionClicked = p;
 		notifyDataSetChanged();
     }
@@ -1031,7 +1032,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 
 		ViewHolderOffline holder = (ViewHolderOffline) v.getTag();
 		
@@ -1069,7 +1070,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			case R.id.offline_grid_three_dots:{
 			    if(!isMultipleSelect()) {
                     if(context instanceof ManagerActivityLollipop){
-                        log("Connection! - ManagerActivity instance!");
+						LogUtil.logDebug("Connection! - ManagerActivity instance!");
                         ((ManagerActivityLollipop) context).showOptionsPanel(mOff);
                     }
                 } else {
@@ -1082,7 +1083,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 	@Override
 	public boolean onLongClick(View view) {
-		log("OnLongCLick");
+		LogUtil.logDebug("OnLongCLick");
 
 		ViewHolderOffline holder = (ViewHolderOffline) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
@@ -1100,7 +1101,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	 * Get document at specified position
 	 */
 	public MegaOffline getNodeAt(int position) {
-		log("getNodeAt");
+		LogUtil.logDebug("Position: " + position);
 		try {
 			if (mOffList != null) {
 				return mOffList.get(position);
@@ -1111,21 +1112,17 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
 	public boolean isMultipleSelect() {
-		log("isMultipleSelect");
+		LogUtil.logDebug("isMultipleSelect");
 		return multipleSelect;
 	}
 	
 	public void setMultipleSelect(boolean multipleSelect) {
-		log("setMultipleSelect: " + multipleSelect);
+		LogUtil.logDebug("multipleSelect: " + multipleSelect);
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 		}
 		if (this.multipleSelect) {
 			selectedItems = new SparseBooleanArray();
 		}
-	}
-
-	private static void log(String log) {
-		Util.log("MegaOfflineLollipopAdapter", log);
 	}
 }

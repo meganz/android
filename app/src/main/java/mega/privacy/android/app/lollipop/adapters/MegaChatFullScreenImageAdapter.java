@@ -42,6 +42,7 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -102,7 +103,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			}
 			else{
 				if (pendingPreviews.contains(node.getHandle())){
-					log("the preview is already downloaded or added to the list");
+					LogUtil.logDebug("The preview is already downloaded or added to the list");
 					return 1;
 				}
 				else{
@@ -135,7 +136,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			else if(param == 2){
 				if(megaApi!=null){
 					File previewFile = new File(PreviewUtils.getPreviewFolder(activity), node.getBase64Handle()+".jpg");
-					log("GET PREVIEW OF HANDLE: " + node.getHandle());
+					LogUtil.logDebug("GET PREVIEW OF HANDLE: " + node.getHandle());
 					pendingPreviews.add(node.getHandle());
 					megaApi.getPreview(node,  previewFile.getAbsolutePath(), megaFullScreenImageAdapter);
 				}
@@ -169,7 +170,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 					if (destination.length() == node.getSize()){
 						File previewDir = PreviewUtils.getPreviewFolder(activity);
 						File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
-						log("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
+						LogUtil.logDebug("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
 						boolean previewCreated = MegaUtilsAndroid.createPreview(destination, previewFile);
 
 						if (previewCreated){
@@ -188,11 +189,11 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				}
 
 				if (pendingFullImages.contains(node.getHandle())){
-					log("the image is already downloaded or added to the list - return 1");
+					LogUtil.logDebug("The image is already downloaded or added to the list - return 1");
 					return 1;
 				}
 				else{
-					log("return code 2");
+					LogUtil.logDebug("return code 2");
 					return 2;
 				}
 			}
@@ -222,7 +223,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				}
 			}
 			else if (param == 2){
-				log("There is no preview for this node");
+				LogUtil.logWarning("There is no preview for this node");
 			}
 		}
 	}
@@ -255,7 +256,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
-        log ("INSTANTIATE POSITION " + position);
+		LogUtil.logDebug ("INSTANTIATE POSITION: " + position);
 
 		MegaNode node = messages.get(position).getMegaNodeList().get(0);
 		
@@ -306,7 +307,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 
 			boolean isOnMegaDownloads = false;
 			String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
-			log("isOnMegaDownloads: "+isOnMegaDownloads+" nodeName: "+node.getName()+" localPath: "+localPath);
+			LogUtil.logDebug("isOnMegaDownloads: " + isOnMegaDownloads + ", Node Handle: " + node.getHandle());
 			if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))){
 
 				final ProgressBar pb = holder.progressBar;
@@ -338,11 +339,11 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				activityManager.getMemoryInfo(mi);
 
 				if(mi.totalMem>Constants.BUFFER_COMP){
-					log("Total mem: "+mi.totalMem+" allocate 32 MB");
+					LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
 					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 				}
 				else{
-					log("Total mem: "+mi.totalMem+" allocate 16 MB");
+					LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
 					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 				}
 
@@ -409,7 +410,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 					}
 					catch(Exception ex){
 						//Too many AsyncTasks
-						log("Too many AsyncTasks");
+						LogUtil.logError("Too many AsyncTasks", ex);
 					}
 				}
 			}
@@ -425,7 +426,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 					}
 					catch(Exception ex){
 						//Too many AsyncTasks
-						log("Too many AsyncTasks");
+						LogUtil.logError("Too many AsyncTasks", ex);
 					}
 				}
 			}
@@ -473,7 +474,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		visibleImgs.remove(position);
         ((ViewPager) container).removeView((RelativeLayout) object);
         System.gc();
-        log ("DESTROY POSITION " + position + " visibleImgs.size(): " + visibleImgs.size());
+		LogUtil.logDebug ("DESTROY POSITION " + position + " visibleImgs.size(): " + visibleImgs.size());
  
     }
 	
@@ -526,22 +527,18 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	public void setMenuVisible(boolean menuVisible) {
 		this.menuVisible = menuVisible;
 	}
-	
-	private static void log(String log) {
-		Util.log("MegaChatFullScreenImageAdapter", log);
-	}
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getRequestString());
-		log("onRequestStart: Node: " + request.getNodeHandle());
+		LogUtil.logDebug("onRequestStart: " + request.getRequestString());
+		LogUtil.logDebug("Node Handle: " + request.getNodeHandle());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		
-		log("onRequestFinish: " + request.getRequestString());
-		log("onRequestFinish: Node: " + request.getNodeHandle() + "_" + request.getName());
+
+		LogUtil.logDebug("onRequestFinish: " + request.getRequestString());
+		LogUtil.logDebug("Node Handle: " + request.getNodeHandle());
 
 		long handle = request.getNodeHandle();
 		String handleBase64 = MegaApiJava.handleToBase64(handle);
@@ -554,7 +551,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			
 			if (preview.exists()) {
 				if (preview.length() > 0) {
-					log("GET PREVIEW FINISHED. HANDLE: " + handle + " visibleImgs.size(): " + visibleImgs.size());
+					LogUtil.logDebug("GET PREVIEW FINISHED. HANDLE: " + handle + " visibleImgs.size(): " + visibleImgs.size());
 					int position = 0;
 					boolean holderIsVisible = false;
 					for(int i = 0; i < visibleImgs.size(); i++) {
@@ -576,13 +573,13 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			}
 		}
 		else{
-			log("ERROR FINISH: " + e.getErrorCode() + "_" + e.getErrorString());
+			LogUtil.logError("ERROR FINISH: " + e.getErrorCode() + "_" + e.getErrorString());
 			try{
 //				new PreviewDownloadAsyncTask().execute(node);
 			}
 			catch(Exception ex){
 				//Too many AsyncTasks
-				log("Too many AsyncTasks");
+				LogUtil.logError("Too many AsyncTasks", ex);
 			}
 		}
 	}
@@ -590,9 +587,9 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError: " + request.getRequestString());
-		log("Node: " + request.getNodeHandle() + "_" + request.getName());
-		log("ERROR: " + e.getErrorCode() + "_" + e.getErrorString());
+		LogUtil.logWarning("onRequestTemporaryError: " + request.getRequestString());
+		LogUtil.logWarning("Node Handle: " + request.getNodeHandle());
+		LogUtil.logError("ERROR: " + e.getErrorCode() + "_" + e.getErrorString());
 	}
 
 

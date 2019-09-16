@@ -52,6 +52,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 
@@ -118,7 +119,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		@Override
 		protected void onPostExecute(String info) {
 			//Open the file
-			log("onPostExecute");
+			LogUtil.logDebug("onPostExecute");
 			
 			if (temp.isShowing()){
 				try{
@@ -139,13 +140,13 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			if(folderzipped){
 				int index = pathZip.lastIndexOf("/");
 				destination = pathZip.substring(0, index+1);
-				log("Destination1: "+destination);
+				LogUtil.logDebug("Destination: " + destination);
 			}
 			else{
 				int index = pathZip.lastIndexOf(".");
 				destination = pathZip.substring(0, index);		
 				destination = destination +"/";
-				log("Destination2: "+destination);
+				LogUtil.logDebug("Destination: " + destination);
 				File f = new File(destination);
 				f.mkdirs();				
 			}								
@@ -229,14 +230,14 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 	};
 
 	public void updateScrollPosition(int position) {
-		log("updateScrollPosition");
+		LogUtil.logDebug("Position: " + position);
 		if (adapterList != null && mLayoutManager != null){
 			mLayoutManager.scrollToPosition(position);
 		}
 	}
 
 	public ImageView getImageDrag(int position) {
-		log("getImageDrag");
+		LogUtil.logDebug("Position: " + position);
 		if (adapterList != null && mLayoutManager != null){
 			View v = mLayoutManager.findViewByPosition(position);
 			if (v != null){
@@ -255,8 +256,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 	}
 
 	@SuppressLint("NewApi") @Override
-	public void onCreate (Bundle savedInstanceState){		
-		log("onCreate");
+	public void onCreate (Bundle savedInstanceState){
+		LogUtil.logDebug("onCreate");
 		
 		super.onCreate(savedInstanceState);
 		
@@ -367,8 +368,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 						}
 					}
 				} catch (IllegalArgumentException e) {
+					LogUtil.logError("Fails exploring zip", e);
 					e.printStackTrace();
-					log("zipEntries.nextElement() fails exploring zip");
 //					Add unknown element
 					zipNodes.add(new ZipEntry(getString(R.string.transfer_unknown)));
 				}
@@ -402,7 +403,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
-		log("OnOptionsItemSelected");
+		LogUtil.logDebug("OnOptionsItemSelected");
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
@@ -414,7 +415,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 	}
 	
 	public void openFile(int position) {
-		log("openFile");
+        LogUtil.logDebug("Position: " + position);
 		
 		if (dbH == null){
 //			dbH = new DatabaseHandler(getApplicationContext());
@@ -425,22 +426,22 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		
 		String absolutePath= downloadLocationDefaultPath+"/"+currentPath;
 		if(!folderzipped){
-			log("folderzipped = "+folderzipped);
+            LogUtil.logDebug("folderzipped = " + folderzipped);
 			int index = pathZip.lastIndexOf(".");
 			absolutePath = pathZip.substring(0, index);
 			absolutePath = absolutePath +"/"+currentPath;
 		}
 		else{
-			log("folderzipped = "+folderzipped);
+            LogUtil.logDebug("folderzipped = " + folderzipped);
 		}
-		
-		log("The absolutePath of the file to open is: "+absolutePath);
+
+        LogUtil.logDebug("The absolutePath of the file to open is: " + absolutePath);
 
 		File currentFile = new File(absolutePath);
 		ZipEntry currentNode = zipNodes.get(position);
 
 		if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
-			log("isImage");
+            LogUtil.logDebug("isImage");
 			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 			intent.putExtra("position", position);
 			intent.putExtra("adapterType", Constants.ZIP_ADAPTER);
@@ -453,7 +454,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			overridePendingTransition(0,0);
 		}
 		else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
-			log("Video file");
+            LogUtil.logDebug("Video file");
 
 			Intent mediaIntent;
 			boolean internalIntent;
@@ -511,7 +512,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 					}
 					intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					if (MegaApiUtils.isIntentAvailable(this, intentShare)) {
-						log("call to startActivity(intentShare)");
+                        LogUtil.logDebug("Call to startActivity(intentShare)");
 						startActivity(intentShare);
 					}
 				}
@@ -519,7 +520,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			overridePendingTransition(0,0);
 		}
 		else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
-			log("Pdf file");
+            LogUtil.logDebug("Pdf file");
 			Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 
 			pdfIntent.putExtra("inside", true);
@@ -539,7 +540,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			overridePendingTransition(0,0);
 		}
 		else{
-			log("NOT Image, video, audio or pdf");
+            LogUtil.logDebug("NOT Image, video, audio or pdf");
 			try {
 				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -579,15 +580,12 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 	
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-    	log("onSaveInstaceState");
+        LogUtil.logDebug("onSaveInstaceState");
     	super.onSaveInstanceState(outState);
-	}	
-	public static void log(String log) {
-		Util.log("ZipBrowserActivityLollipop", log);
 	}
 
 	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
-		log("itemClick: position: "+position);
+        LogUtil.logDebug("Position: " + position);
 		this.screenPosition = screenPosition;
 		this.imageDrag = imageView;
 
@@ -595,7 +593,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 
 		currentPath=currentNode.getName();
 
-		log("onItemClick, currentPath: "+currentPath);
+        LogUtil.logDebug("currentPath: " + currentPath);
 
 		if(currentNode.isDirectory()){
 			depth=depth+1;
@@ -613,7 +611,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 				File check = new File(checkFolder);
 
 				if(check.exists()){
-					log("Already unzipped");
+                    LogUtil.logDebug("Already unzipped");
 					openFile(position);
 				}
 				else{
@@ -635,7 +633,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 
 
 	private void listDirectory (String directory){
-		log("listDirectory: "+directory);
+        LogUtil.logDebug("Directory: " + directory);
 		
 		zipNodes.clear();
 
@@ -674,20 +672,19 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 					}
 				}
 			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-				log("zipEntries.nextElement() fails listing directory");
-				zipNodes.add(new ZipEntry(getString(R.string.transfer_unknown)));
+                LogUtil.logError("zipEntries.nextElement() fails listing directory", e);
+			    e.printStackTrace();
+                zipNodes.add(new ZipEntry(getString(R.string.transfer_unknown)));
 			}
 		}
 	}
 	
 	public void onBackPressed(){
 		
-		depth=depth-1;
-		
-		log("Depth: "+depth);
-		
-		log("onBackPressed, currentPath: "+currentPath);
+		depth = depth - 1;
+
+        LogUtil.logDebug("Depth: " + depth);
+        LogUtil.logDebug("currentPath: " + currentPath);
 		
 		if(depth<3){
 			super.onBackPressed();
@@ -757,7 +754,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 	}
 
 	public String countFiles(String directory){
-		log("countFiles: "+directory);
+        LogUtil.logDebug("Directory: " + directory);
 		
 		int index = pathZip.lastIndexOf("/");
 		String toEliminate = pathZip.substring(0, index+1);
@@ -788,8 +785,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 						}
 					}
 				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-					log("zipEntries.nextElement() fails counting files");
+					LogUtil.logError("zipEntries.nextElement() fails counting files", e);
+                    e.printStackTrace();
 				}
 			}
 		}
@@ -818,8 +815,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 						}
 					}
 				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-					log("zipEntries.nextElement() fails counting files");
+                    LogUtil.logError("zipEntries.nextElement() fails counting files", e);
+				    e.printStackTrace();
 				}
 			}
 		}

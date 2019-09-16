@@ -20,6 +20,7 @@ import java.util.zip.ZipEntry;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 
 
@@ -163,7 +164,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		LogUtil.logDebug("onClick");
 
 		ViewHolderBrowserList holder = (ViewHolderBrowserList) v.getTag();
 		if (holder.isUnknownFile) {
@@ -183,14 +184,9 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 			((ZipBrowserActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
 		}
 	}
-
-	private static void log(String log) {
-		Util.log("ZipListAdapter", log);
-	}
 	
 	public void setFolder(String folder){
-		log("setFolder: "+folder);
+		LogUtil.logDebug("folder: " + folder);
 		this.currentFolder=folder;
 	}
-
 }

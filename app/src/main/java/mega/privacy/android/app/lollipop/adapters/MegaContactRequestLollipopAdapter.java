@@ -34,6 +34,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -52,7 +53,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	Object fragment;
 
 	public MegaContactRequestLollipopAdapter(Context _context, Object _fragment, ArrayList<MegaContactRequest> _contacts, RecyclerView _listView, int type) {
-		log("new adapter");
+		LogUtil.logDebug("new adapter");
 		this.context = _context;
 		this.contacts = _contacts;
 		this.positionClicked = -1;
@@ -65,12 +66,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 		listFragment = _listView;
 		
-		if(contacts!=null)
-    	{
-    		log("Number of requests: "+contacts.size());
-    	}
-    	else{
-    		log("Number of requests: NULL");
+		if(contacts != null) {
+			LogUtil.logDebug("Number of requests: " + contacts.size());
+    	} else {
+			LogUtil.logWarning("Number of requests: NULL");
     	}
 	}
 	
@@ -99,8 +98,8 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
-		
-		log("Get the MegaContactRequest");
+
+		LogUtil.logDebug("Get the MegaContactRequest");
 		MegaContactRequest contact = (MegaContactRequest) getItem(position);
 
 						
@@ -108,14 +107,14 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		{
 			holder.contactMail = contact.getTargetEmail();
 			holder.textViewContactName.setText(contact.getTargetEmail());
-			log("--------------user target: "+contact.getTargetEmail());
+			LogUtil.logDebug("User target: " + contact.getTargetEmail());
 		}
 		else{
 			//Incoming request
 						
 			holder.contactMail = contact.getSourceEmail();
 			holder.textViewContactName.setText(contact.getSourceEmail());
-			log("--------------user source: "+contact.getSourceEmail());	
+			LogUtil.logDebug("User source: " + contact.getSourceEmail());
 			
 		}
 
@@ -123,14 +122,14 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			createDefaultAvatar(holder);
 		} else {
-			log("Multiselect ON");
+			LogUtil.logDebug("Multiselect ON");
 
 			if(this.isItemChecked(position)){
 				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 			}
 			else{
-				log("NOT selected");
+				LogUtil.logDebug("NOT selected");
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 
 				createDefaultAvatar(holder);
@@ -180,10 +179,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
 		
 	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density); 		
-	
+	    float scaleH = Util.getScaleH(outMetrics, density);
 
-		log("ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER");
+
+		LogUtil.logDebug("ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER");
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_incom_request_list, parent, false);
 		holder = new ViewHolderContactsRequestList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_request_list_item_layout);
@@ -191,10 +190,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_request_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			log("Landscape");
+			LogUtil.logDebug("Landscape");
 			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
 		}else{
-			log("Portrait");
+			LogUtil.logDebug("Portrait");
 			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
 		}
 		holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
@@ -209,7 +208,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 	
 	public void createDefaultAvatar(ViewHolderContactsRequestList holder){
-		log("createDefaultAvatar()");
+		LogUtil.logDebug("createDefaultAvatar()");
 		
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
@@ -233,7 +232,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	    float density  = context.getResources().getDisplayMetrics().density;
 	    
 	    int avatarTextSize = getAvatarTextSize(density);
-	    log("DENSITY: " + density + ":::: " + avatarTextSize);
+		LogUtil.logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
 	    if (holder.contactMail != null){
 		    if (holder.contactMail.length() > 0){
 		    	String firstLetter = holder.contactMail.charAt(0) + "";
@@ -277,12 +276,12 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
     }
  
 	public boolean isMultipleSelect() {
-		log("isMultipleSelect");
+		LogUtil.logDebug("isMultipleSelect");
 		return multipleSelect;
 	}
 	
 	public void setMultipleSelect(boolean multipleSelect) {
-		log("setMultipleSelect");
+		LogUtil.logDebug("multipleSelect: " + multipleSelect);
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 		}
@@ -293,20 +292,20 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 	
 	public void toggleSelection(int pos) {
-		log("toggleSelection");
+		LogUtil.logDebug("Position: " + pos);
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			LogUtil.logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			log("PUT pos: "+pos);
+			LogUtil.logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
 
 		MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList view = (MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
-			log("Start animation: "+pos);
+			LogUtil.logDebug("Start animation: " + pos);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
@@ -337,21 +336,21 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 
 	public void toggleAllSelection(int pos) {
-		log("toggleSelection: "+pos);
+		LogUtil.logDebug("Position: " + pos);
 		final int positionToflip = pos;
 
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			LogUtil.logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			log("PUT pos: "+pos);
+			LogUtil.logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 		}
 
 		MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList view = (MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
-			log("Start animation: "+pos);
+			LogUtil.logDebug("Start animation: " + pos);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
@@ -381,7 +380,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			view.imageView.startAnimation(flipAnimation);
 		}
 		else{
-			log("NULL view pos: "+positionToflip);
+			LogUtil.logWarning("NULL view pos: " + positionToflip);
 			notifyItemChanged(pos);
 		}
 	}
@@ -395,7 +394,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 
 	public void clearSelections() {
-		log("clearSelections");
+		LogUtil.logDebug("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(isItemChecked(i)){
 				toggleAllSelection(i);
@@ -466,7 +465,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
     }
     
     public void setPositionClicked(int p){
-		log("setPositionClicked: "+p);
+		LogUtil.logDebug("Position: " + p);
     	positionClicked = p;
 		notifyDataSetChanged();
     }
@@ -523,7 +522,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 	@Override
 	public boolean onLongClick(View view) {
-		log("OnLongCLick");
+		LogUtil.logDebug("OnLongCLick");
 
 		ViewHolderContactsRequestList holder = (ViewHolderContactsRequestList) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
@@ -541,11 +540,11 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 	
 	public void setContacts (ArrayList<MegaContactRequest> contacts){
-		log("SETCONTACTS!!!!");
+		LogUtil.logDebug("SETCONTACTS!!!!");
 		this.contacts = contacts;
 		if(contacts!=null)
 		{
-			log("num requests: "+contacts.size());
+			LogUtil.logDebug("Num requests: " + contacts.size());
 		}
 		positionClicked = -1;
 //		listFragment.invalidate();
@@ -584,9 +583,4 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 //
 //		return info;
 //	}
-	
-	private static void log(String log) {
-		Util.log("MegaContactRequestLollipopAdapter", log);
-	}
-
 }

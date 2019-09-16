@@ -37,6 +37,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.PhoneContactInfo;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -71,7 +72,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 		@Override
 		protected Long doInBackground(Void... args) {
-			log("doInBackGround");
+			LogUtil.logDebug("doInBackGround");
 
 			try {
 				InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
@@ -276,7 +277,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	}
 	
 	public void createDefaultAvatar(ViewHolderPhoneContactsLollipop holder, boolean isMegaContact){
-		log("createDefaultAvatar()");
+		LogUtil.logDebug("isMegaContact: " + isMegaContact);
 		
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
@@ -305,7 +306,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	    float density  = mContext.getResources().getDisplayMetrics().density;
 	    
 	    int avatarTextSize = Util.getAvatarTextSize(density);
-	    log("DENSITY: " + density + ":::: " + avatarTextSize);
+		LogUtil.logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
 	    if (isMegaContact){
 		    if (holder.contactMail != null){
 			    if (holder.contactMail.length() > 0){
@@ -334,10 +335,6 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	
 	@Override
 	public void onClick(View v) {
-		log("click!");
-	}	
-
-	private static void log(String message) {
-		Util.log("ContactsExplorerLollipopAdapter", message);
+		LogUtil.logDebug("click!");
 	}
 }

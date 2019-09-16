@@ -30,15 +30,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-
-/**
- * Created by mega on 28/11/17.
- */
 
 public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAddContactsLollipopAdapter.ViewHolderChips> implements View.OnClickListener{
 
@@ -73,7 +70,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
 
     @Override
     public MegaAddContactsLollipopAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        LogUtil.logDebug("onCreateViewHolder");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -101,7 +98,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
 
     @Override
     public void onBindViewHolder(MegaAddContactsLollipopAdapter.ViewHolderChips holder, int position) {
-        log("onBindViewHolderList");
+        LogUtil.logDebug("onBindViewHolderList");
 
         MegaContactAdapter contact = (MegaContactAdapter) getItem(position);
 
@@ -138,15 +135,15 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
 
     @Override
     public void onClick(View view) {
-        log("onClick");
+        LogUtil.logDebug("onClick");
 
         ViewHolderChips holder = (ViewHolderChips) view.getTag();
         if(holder!=null){
             int currentPosition = holder.getLayoutPosition();
-            log("onClick -> Current position: "+currentPosition);
+            LogUtil.logDebug("Current position: "+currentPosition);
 
             if(currentPosition<0){
-                log("Current position error - not valid value");
+                LogUtil.logError("Current position error - not valid value");
                 return;
             }
             switch (view.getId()) {
@@ -157,7 +154,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
             }
         }
         else{
-            log("Error. Holder is Null");
+            LogUtil.logError("Error. Holder is Null");
         }
     }
 
@@ -171,25 +168,25 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
     }
 
     public void setPositionClicked(int p) {
-        log("setPositionClicked: "+p);
+        LogUtil.logDebug("Position: " + p);
         positionClicked = p;
         notifyDataSetChanged();
     }
 
     public void setContacts (ArrayList<MegaContactAdapter> contacts){
-        log("setContacts");
+        LogUtil.logDebug("setContacts");
         this.contacts = contacts;
 
         notifyDataSetChanged();
     }
 
     public Object getItem(int position) {
-        log("getItem");
+        LogUtil.logDebug("Position: " + position);
         return contacts.get(position);
     }
 
     public Bitmap setUserAvatar(MegaContactAdapter contact){
-        log("setUserAvatar");
+        LogUtil.logDebug("setUserAvatar");
 
         File avatar = null;
         String mail;
@@ -233,7 +230,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
     }
 
     public Bitmap createDefaultAvatar(String mail, MegaContactAdapter contact){
-        log("createDefaultAvatar()");
+        LogUtil.logDebug("createDefaultAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -255,12 +252,12 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
             color = megaApi.getUserAvatarColor(contact.getMegaUser());
         }
         if(color!=null){
-            log("The color to set the avatar is "+color);
+            LogUtil.logDebug("The color to set the avatar is " + color);
             paintCircle.setColor(Color.parseColor(color));
             paintCircle.setAntiAlias(true);
         }
         else{
-            log("Default color to the avatar");
+            LogUtil.logDebug("Default color to the avatar");
             paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             paintCircle.setAntiAlias(true);
         }
@@ -284,7 +281,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
         }
         String firstLetter = fullName.charAt(0) + "";
 
-        log("Draw letter: "+firstLetter);
+        LogUtil.logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -293,9 +290,5 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
         c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
 
         return defaultAvatar;
-    }
-
-    private static void log(String log) {
-        Util.log("MegaAddContactsLollipopAdapter", log);
     }
 }
