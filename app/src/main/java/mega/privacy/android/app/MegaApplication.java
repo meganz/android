@@ -421,9 +421,22 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 	};
 
+	public void handleUncaughtException(Thread thread, Throwable e) {
+		LogUtil.logFatal("UNCAUGHT EXCEPTION", e);
+		e.printStackTrace();
+	}
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		// Setup handler for uncaught exceptions.
+		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable e) {
+				handleUncaughtException(thread, e);
+			}
+		});
 
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);

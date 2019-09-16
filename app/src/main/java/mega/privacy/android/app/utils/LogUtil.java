@@ -1,5 +1,7 @@
 package mega.privacy.android.app.utils;
 
+import android.util.Log;
+
 import nz.mega.sdk.MegaApiAndroid;
 
 public class LogUtil {
@@ -11,6 +13,16 @@ public class LogUtil {
      */
     public static void logFatal(String message) {
         log(MegaApiAndroid.LOG_LEVEL_FATAL, message);
+    }
+
+    /**
+     * Send a log message with FATAL level to the logging system.
+     *
+     * @param message Message for the logging system.
+     * @param exception Exception which produced the error.
+     */
+    public static void logFatal(String message, Throwable exception) {
+        log(MegaApiAndroid.LOG_LEVEL_FATAL, message, exception, true);
     }
 
     /**
@@ -29,7 +41,7 @@ public class LogUtil {
      * @param exception Exception which produced the error.
      */
     public static void logError(String message, Throwable exception) {
-        log(MegaApiAndroid.LOG_LEVEL_ERROR, message, exception);
+        log(MegaApiAndroid.LOG_LEVEL_ERROR, message, exception, false);
     }
 
     /**
@@ -48,7 +60,7 @@ public class LogUtil {
      * @param exception Exception which produced the warning.
      */
     public static void logWarning(String message, Throwable exception) {
-        log(MegaApiAndroid.LOG_LEVEL_WARNING, message, exception);
+        log(MegaApiAndroid.LOG_LEVEL_WARNING, message, exception, false);
     }
 
     /**
@@ -88,12 +100,11 @@ public class LogUtil {
         final int STACK_TRACE_LEVELS_UP = 4;
 
         String fileName = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getFileName();
-        String className = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getClassName();
         String methodName = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getMethodName();
         int line = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getLineNumber();
 
         MegaApiAndroid.log(logLevel, "[clientApp]: " + message +
-                " (" + fileName + ":::" + className + "::" + methodName + ":" + line + ")");
+                " (" + fileName + "::" + methodName + ":" + line + ")");
     }
 
     /**
@@ -102,17 +113,24 @@ public class LogUtil {
      * @param logLevel Log level for this message.
      * @param message  Message for the logging system.
      * @param exception Exception which produced the error or warning.
+     * @param printStackTrace Flag to print the stack trace of the exception.
      */
-    private static void log(int logLevel, String message, Throwable exception) {
+    private static void log(int logLevel, String message, Throwable exception, boolean printStackTrace) {
         final int STACK_TRACE_LEVELS_UP = 4;
 
         String fileName = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getFileName();
-        String className = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getClassName();
         String methodName = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getMethodName();
         int line = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getLineNumber();
 
-        MegaApiAndroid.log(logLevel, "[clientApp]: " + message +
-                " (" + fileName + ":::" + className + "::" + methodName + ":" + line + ")" +
-                System.lineSeparator() + "[" + exception.toString() + "]");
+        if (printStackTrace) {
+            MegaApiAndroid.log(logLevel, "[clientApp]: " + message +
+                    " (" + fileName + "::" + methodName + ":" + line + ")" +
+                    System.lineSeparator() + Log.getStackTraceString(exception));
+        } else {
+            MegaApiAndroid.log(logLevel, "[clientApp]: " + message +
+                    " (" + fileName + "::" + methodName + ":" + line + ")" +
+                    System.lineSeparator() + "[" + exception.toString() + "]");
+        }
+
     }
 }
