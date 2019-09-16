@@ -104,7 +104,7 @@ public class AttachmentUploadBottomSheetDialogFragment extends BottomSheetDialog
             }
             case R.id.attachment_upload_contact_layout:{
                 LogUtil.logDebug("Option attach contact");
-                ((ChatActivityLollipop)context).attachContact();
+                ((ChatActivityLollipop)context).chooseContactsDialog();
                 dismissAllowingStateLoss();
                 break;
             }

@@ -23,10 +23,12 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
@@ -275,6 +277,15 @@ public class ChatUtil {
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
+    public static MegaChatMessage getMegaChatMessage(Context context, MegaChatApiAndroid megaChatApi, long chatId, long messageId) {
+        if (context instanceof NodeAttachmentHistoryActivity) {
+            return megaChatApi.getMessageFromNodeHistory(chatId, messageId);
+        } else {
+            return megaChatApi.getMessage(chatId, messageId);
+        }
+
+    }
+
     public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat) {
         if (chronometer == null || callChat == null) return;
         if (activateChrono) {
@@ -287,7 +298,6 @@ public class ChatUtil {
         chronometer.stop();
         chronometer.setVisibility(View.GONE);
     }
-
 
     /**
      * Locks the device window in landscape mode.

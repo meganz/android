@@ -25,8 +25,6 @@ public class WebViewActivityLollipop extends Activity {
         setContentView(R.layout.activity_fortumo_payment);
 
         activity = this;
-        progressDialog = ProgressDialog.show(activity, this.getString(R.string.embed_web_browser_loading_title), this.getString(R.string.embed_web_browser_loading_message), true);
-        progressDialog.setCancelable(false);
 
         myWebView = findViewById(R.id.webview);
 
@@ -57,6 +55,8 @@ public class WebViewActivityLollipop extends Activity {
             String url = intent.getDataString();
             LogUtil.logDebug("URL: " + url);
             myWebView.loadUrl(url);
+            progressDialog = ProgressDialog.show(activity, this.getString(R.string.embed_web_browser_loading_title), this.getString(R.string.embed_web_browser_loading_message), true);
+            progressDialog.setCancelable(false);
         }
     }
 }

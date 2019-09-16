@@ -87,7 +87,7 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BottomSheetDial
             }
             case R.id.send_attachment_chat_contact_layout: {
                 LogUtil.logDebug("Contact option click");
-                ((ChatActivityLollipop) context).sendContact();
+                ((ChatActivityLollipop) context).chooseContactsDialog();
                 break;
             }
             case R.id.send_attachment_chat_location_layout: {

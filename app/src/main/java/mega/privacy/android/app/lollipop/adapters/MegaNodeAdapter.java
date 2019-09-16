@@ -370,6 +370,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      */
     public int getFolderCount(ArrayList<MegaNode> nodes) {
         int folderCount = 0;
+        if (nodes == null) return folderCount;
         for (MegaNode node : nodes) {
             if (node == null) {
                 continue;

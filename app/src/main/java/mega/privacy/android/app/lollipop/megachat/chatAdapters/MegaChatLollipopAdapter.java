@@ -3414,34 +3414,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             long userHandle = message.getUserHandle();
             LogUtil.logDebug("Contact message!!: " + userHandle);
-            if (((ChatActivityLollipop) context).isGroup()) {
 
-                holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
-                if (holder.fullNameTitle == null) {
-                    holder.fullNameTitle = "";
-                }
-
-                if (holder.fullNameTitle.trim().length() <= 0) {
-                    LogUtil.logDebug("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    holder.fullNameTitle = "Unknown name";
-                    if (!(holder.nameRequestedAction)) {
-                        LogUtil.logDebug("Call for nonContactName: " + message.getUserHandle());
-                        holder.nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle, chatRoom.isPreview());
-                        megaChatApi.getUserFirstname(userHandle, chatRoom.getAuthorizationToken(), listener);
-                        megaChatApi.getUserLastname(userHandle, chatRoom.getAuthorizationToken(), listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        LogUtil.logWarning("Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-                holder.nameContactText.setVisibility(View.VISIBLE);
-                holder.nameContactText.setText(holder.fullNameTitle);
-
-            }else{
-                holder.fullNameTitle = chatRoom.getTitle();
-                holder.nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(position, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -5925,32 +5899,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             long userHandle = message.getUserHandle();
             LogUtil.logDebug("Contact message: " + userHandle);
 
-            if (((ChatActivityLollipop) context).isGroup()) {
-                holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                if (holder.fullNameTitle == null) {
-                    holder.fullNameTitle = "";
-                }
-                if (holder.fullNameTitle.trim().length() <= 0) {
-                    LogUtil.logWarning("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    holder.fullNameTitle = "Unknown name";
-                    if (!(holder.nameRequestedAction)) {
-                        LogUtil.logDebug("Call for nonContactName: " + message.getUserHandle());
-                        holder.nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle, chatRoom.isPreview());
-                        megaChatApi.getUserFirstname(userHandle, chatRoom.getAuthorizationToken(), listener);
-                        megaChatApi.getUserLastname(userHandle, chatRoom.getAuthorizationToken(), listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        LogUtil.logDebug("Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-                holder.nameContactText.setVisibility(View.VISIBLE);
-                holder.nameContactText.setText(holder.fullNameTitle);
-            } else {
-                holder.fullNameTitle = chatRoom.getTitle();
-                holder.nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(positionInAdapter, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);

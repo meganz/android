@@ -2006,8 +2006,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             myAudioRecorder.reset();
             myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            myAudioRecorder.setOutputFile(outputFileVoiceNotes);
             myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            myAudioRecorder.setAudioEncodingBitRate(50000);
+            myAudioRecorder.setAudioSamplingRate(44100);
+            myAudioRecorder.setAudioChannels(1);
+            myAudioRecorder.setOutputFile(outputFileVoiceNotes);
             myAudioRecorder.prepare();
 
         } catch (IOException e) {
@@ -2047,6 +2050,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         myAudioRecorder.reset();
         myAudioRecorder.release();
         myAudioRecorder = null;
+        textChat.requestFocus();
     }
 
     /*
@@ -2062,6 +2066,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             ChatController.deleteOwnVoiceClip(this, outputFileName);
             outputFileVoiceNotes = null;
             setRecordingNow(false);
+            textChat.requestFocus();
 
         } catch (RuntimeException stopException) {
             LogUtil.logError("Error canceling a recording", stopException);
@@ -2084,6 +2089,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             setRecordingNow(false);
             uploadPictureOrVoiceClip(outputFileVoiceNotes);
             outputFileVoiceNotes = null;
+            textChat.requestFocus();
         } catch (RuntimeException ex) {
             controlErrorRecording();
         }
@@ -2600,11 +2606,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     }
                 }
-                MegaChatMessage contactMessage = megaChatApi.attachContacts(idChat, handleList);
-                if(contactMessage!=null){
-                    AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(contactMessage);
-                    sendMessageToUI(androidMsgSent);
-                }
+                retryContactAttachment(handleList);
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
@@ -2746,26 +2748,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 LogUtil.logDebug("Send location [longLatitude]: " + latitude + " [longLongitude]: " + longitude);
                 sendLocationMessage(longitude, latitude, encodedSnapshot);
             }
-        }
-        else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+        } else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             LogUtil.logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-            if (hashes != null) {
-                ArrayList<MegaNode> megaNodes = new ArrayList<>();
-                for (int i=0; i<hashes.length; i++) {
-                    MegaNode node = megaApi.getNodeByHandle(hashes[i]);
-                    if (node != null) {
-                        megaNodes.add(node);
-                    }
-                    else {
-                        LogUtil.logWarning("Node NULL, not added");
-                    }
-                }
-                if (megaNodes.size() > 0) {
-                    chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-                }
-            }
+            chatC.prepareForDownload(intent, parentPath);
         }
         else{
             LogUtil.logError("Error onActivityResult");
@@ -3285,10 +3271,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void sendContact(){
-        attachContact();
-    }
-
     public void sendFromCloud(){
         attachFromCloud();
     }
@@ -3359,11 +3341,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             LogUtil.logWarning("Online but not megaApi");
             Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
         }
-    }
-
-    public void attachContact(){
-        LogUtil.logDebug("attachContact");
-        chooseContactsDialog();
     }
 
     public void attachPhotoVideo(){
@@ -7919,9 +7896,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         callInProgressText.setText(text);
         ChatUtil.activateChrono(chrono, callInProgressChrono, call);
 
-        if (callInProgressLayout.getVisibility() == View.VISIBLE) return;
-        callInProgressLayout.setVisibility(View.VISIBLE);
-        callInProgressLayout.setOnClickListener(this);
+        if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
+            callInProgressLayout.setVisibility(View.VISIBLE);
+            callInProgressLayout.setOnClickListener(this);
+        }
     }
 
     private void hideCallInProgressLayout(MegaChatCall call) {
@@ -7930,11 +7908,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         ChatUtil.activateChrono(false, subtitleChronoCall, call);
 
         LogUtil.logDebug("hideCallInProgressLayout");
-        if (callInProgressLayout.getVisibility() == View.GONE) return;
-        callInProgressLayout.setVisibility(View.GONE);
-        callInProgressLayout.setOnClickListener(null);
-        setSubtitleVisibility();
-
+        if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.GONE) {
+            callInProgressLayout.setVisibility(View.GONE);
+            callInProgressLayout.setOnClickListener(null);
+            setSubtitleVisibility();
+        }
     }
 
     @Override

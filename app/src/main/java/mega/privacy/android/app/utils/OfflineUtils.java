@@ -580,7 +580,10 @@ public class OfflineUtils {
         LogUtil.logDebug("moveOfflineFiles");
 
         String nodePath = File.separator;
-        MegaApiAndroid megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+        MegaApiAndroid megaApi;
+
+        megaApi = MegaApplication.getInstance().getMegaApi();
+
         if (megaApi == null || megaApi.getRootNode() == null) return;
 
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);

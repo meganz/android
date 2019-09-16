@@ -6,27 +6,25 @@ import android.os.Bundle;
 import android.webkit.WebView;
 
 import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
 
+public class WebViewActivity extends Activity {
 
-public class WebViewActivity extends Activity{
+    WebView myWebView;
 
-	WebView myWebView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        LogUtil.logDebug("onCreate");
+        super.onCreate(savedInstanceState);
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		LogUtil.logDebug("onCreate");
-		super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_fortumo_payment);
+        myWebView = findViewById(R.id.webview);
 
-	   	setContentView(R.layout.activity_fortumo_payment);
-		myWebView = (WebView) findViewById(R.id.webview);
-
-		Intent intent = getIntent();
-		if (intent != null) {
-			String url = intent.getDataString();
-			LogUtil.logDebug("URL: " + url);
-			myWebView.getSettings().setJavaScriptEnabled(true);
-			myWebView.loadUrl(url);
-		}
-	}
+        Intent intent = getIntent();
+        if (intent != null) {
+            String url = intent.getDataString();
+            LogUtil.logDebug("URL: " + url);
+            myWebView.getSettings().setJavaScriptEnabled(true);
+            myWebView.loadUrl(url);
+        }
+    }
 }

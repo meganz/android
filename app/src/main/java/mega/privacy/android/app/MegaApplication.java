@@ -104,7 +104,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	final String TAG = "MegaApplication";
 
 	final private static int INITIAL_SOUND_LEVEL = 10;
-	static final public String USER_AGENT = "MEGAAndroid/3.7.0_251";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.0_254";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -160,9 +160,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	/*A/V Calls*/
 	private AudioManager audioManager;
 	private MediaPlayer thePlayer;
-	private Ringtone ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+	private Ringtone ringtone = null;
 	private Vibrator vibrator = null;
 	private Timer ringerTimer = null;
+
+	private static MegaApplication singleApplicationInstance;
 
 	@Override
 	public void networkAvailable() {
@@ -426,6 +428,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		e.printStackTrace();
 	}
 
+	public static MegaApplication getInstance() {
+		return singleApplicationInstance;
+	}
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -437,6 +443,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				handleUncaughtException(thread, e);
 			}
 		});
+
+		singleApplicationInstance = this;
 
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);

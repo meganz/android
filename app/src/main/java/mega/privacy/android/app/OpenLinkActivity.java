@@ -386,7 +386,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			return;
 		}
 
-		if (matchRegexs(url, Constants.REVERT_CHANGE_PASSWORD_LINK_REGEXS)) {
+		if (matchRegexs(url, Constants.REVERT_CHANGE_PASSWORD_LINK_REGEXS)
+				|| matchRegexs(url, Constants.MEGA_BLOG_LINK_REGEXS)) {
 			LogUtil.logDebug("Open revert password change link: " + url);
 			Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
 			openIntent.setData(Uri.parse(url));
