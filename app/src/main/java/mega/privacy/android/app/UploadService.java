@@ -798,9 +798,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 						if (node != null) {
 							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-							retriever.setDataSource(transfer.getPath());
+							String location = null;
+							try {
+								retriever.setDataSource(transfer.getPath());
+								location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+							} catch (Exception ex) {
+								log("Exception is thrown, ex: " + ex.toString());
+							}
 
-							String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
 							if(location!=null){
 								log("Location: "+location);
 

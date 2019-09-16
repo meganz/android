@@ -197,11 +197,11 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.ProgressDialogUtil;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -244,6 +244,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
 
@@ -767,6 +768,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				actionType = intent.getIntExtra("actionType", -1);
 
 				if(actionType == GO_OFFLINE){
+				    //stop cu process
+                    stopRunningCameraUploadService(ManagerActivityLollipop.this);
 					showOfflineMode();
 				}
 				else if(actionType == GO_ONLINE){
@@ -3558,6 +3561,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
                                     dbH.setCamSyncEnabled(false);
+									if(sttFLol != null  && sttFLol.isResumed()){
+										sttFLol.disableCameraUpload();
+									}
+									if(cuFL != null && cuFL.isResumed()){
+										cuFL.resetSwitchButtonLabel();
+									}
                                 }
                             });
                     builder.setNegativeButton(getString(R.string.general_cancel), null);
@@ -7822,6 +7831,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setStatusMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
+					searchMenuItem.setVisible(false);
 				}
 				return true;
 			}
@@ -9548,14 +9558,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					return;
 				}
 
-				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-				if (fbFLol != null){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItemLollipop(drawerItem);
-				}
-				else{
-					super.onBackPressed();
-				}
+				drawerItem = DrawerItem.CLOUD_DRIVE;
+				selectDrawerItemLollipop(drawerItem);
+
 				return;
 			}
 		}
@@ -9746,10 +9751,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
 						parentHandleBrowser = rootHandle;
 						refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-						if (fbFLol != null) {
-							fbFLol.scrollToFirstPosition();
-						}
 					}
 				}
 				else {
@@ -9759,8 +9760,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case R.id.bottom_navigation_item_offline: {
-				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-				setBottomNavigationMenuItemChecked(OFFLINE_BNV);
+				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					if (!pathNavigationOffline.equals("/")){
+						pathNavigationOffline = "/";
+						refreshFragment(FragmentTag.OFFLINE.getTag());
+					}
+				} else {
+					drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+					setBottomNavigationMenuItemChecked(OFFLINE_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_camera_uploads: {
@@ -9769,15 +9777,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case R.id.bottom_navigation_item_shared_items: {
-				drawerItem = DrawerItem.SHARED_ITEMS;
-				setBottomNavigationMenuItemChecked(SHARED_BNV);
-
+				if (drawerItem == DrawerItem.SHARED_ITEMS) {
+					if (getTabItemShares() == 0 && parentHandleIncoming != -1) {
+						parentHandleIncoming = -1;
+						refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+					} else if (getTabItemShares() == 1 && parentHandleOutgoing != -1){
+						parentHandleOutgoing = -1;
+						refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+					}
+					if(sharesPageAdapter!=null){
+						sharesPageAdapter.notifyDataSetChanged();
+					}
+				} else {
+					drawerItem = DrawerItem.SHARED_ITEMS;
+					setBottomNavigationMenuItemChecked(SHARED_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_chat: {
 				drawerItem = DrawerItem.CHAT;
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-
 				break;
 			}
 		}
@@ -14192,20 +14211,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-		int countChat = chatHandles.length;
-
-		for(int i=0;i<chatHandles.length;i++){
-			for(int j=0;j<userHandles.length;j++){
-				MegaHandleList handleList = MegaHandleList.createInstance();
-				handleList.addMegaHandle(userHandles[j]);
-				megaChatApi.attachContacts(chatHandles[i], handleList);
-			}
+		MegaHandleList handleList = MegaHandleList.createInstance();
+		for (long userHandle : userHandles) {
+			handleList.addMegaHandle(userHandle);
 		}
 
-		if(countChat==1){
+		for (long chatHandle : chatHandles) {
+			megaChatApi.attachContacts(chatHandle, handleList);
+		}
+
+		if (chatHandles.length == 1) {
 			showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatHandles[0]);
-		}
-		else{
+		} else{
 			String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, userHandles.length);
 			showSnackbar(MESSAGE_SNACKBAR_TYPE, message, -1);
 		}
@@ -15087,11 +15104,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-						startForegroundService(intent);
-					} else {
-						startService(intent);
-					}
+					startService(intent);
 				}
 			}
 		}
@@ -17150,7 +17163,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Pressed button positive to cancel transfer");
 						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-                        JobUtil.stopRunningCameraUploadService(ManagerActivityLollipop.this);
+                        cancelAllUploads(ManagerActivityLollipop.this);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -18184,35 +18197,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		if(call!=null){
-			if(call.getChatid() != -1){
-				if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
-					int callStatus = call.getStatus();
-					log("onChatCallUpdate:CHANGE_TYPE_STATUS: callStatus =  "+callStatus);
+		if (call == null || call.getChatid() == -1) return;
+		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
+			int callStatus = call.getStatus();
+			log("onChatCallUpdatecallStatus =  " + callStatus);
 
-					switch (callStatus) {
-						case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-						case MegaChatCall.CALL_STATUS_RING_IN:
-						case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-						case MegaChatCall.CALL_STATUS_DESTROYED:
-						case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
-							setCallBadge();
-							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-							if ((rChatFL != null) && (rChatFL.isVisible())){
-								rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
-							}
-
-							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-							if ((fbFLol != null) && (fbFLol.isVisible())){
-								fbFLol.showCallLayout();
-							}
-							break;
-						}
-
-						default:
-							break;
+			switch (callStatus) {
+				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+				case MegaChatCall.CALL_STATUS_RING_IN:
+				case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+				case MegaChatCall.CALL_STATUS_DESTROYED:
+				case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+					setCallBadge();
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+					if ((rChatFL != null) && (rChatFL.isVisible())) {
+						rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
 					}
+
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+					if ((fbFLol != null) && (fbFLol.isVisible())) {
+						fbFLol.showCallLayout();
+					}
+					break;
 				}
+				default:
+					break;
 			}
 		}
 	}

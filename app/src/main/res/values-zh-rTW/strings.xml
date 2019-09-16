@@ -280,9 +280,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">大小</string>
-    <string name="file_properties_info_modified" context="when was the file modified">最後修改</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">最後修改</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">上傳時間</string>
-    <string name="file_properties_info_created" context="when the file was created">創建於</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -632,7 +631,7 @@
     <string name="menu_take_picture" context="menu item">拍照</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">只在Wi-Fi 下</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi 或數據方案</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或數據傳輸方案</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">跳過</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">停止</string>
@@ -642,8 +641,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">正在上傳媒體資料夾中的檔案</string>
-	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
-	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">正在確認要上傳的檔案</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">初始化相機上傳</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -651,7 +650,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">儲存空間</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN 鎖定</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">影片壓縮非常耗電，如果要壓縮的影片大於%s，MEGA會提醒您為裝置充電。</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">影片壓縮很耗電力；如果要壓縮的影片大小超過%s，MEGA將會要求您主動為設備充電。</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">進階</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">清除快取</string>
@@ -688,7 +687,7 @@
     <string name="settings_empty_folder" context="settings option">選擇資料夾</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi 或數據方案</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或數據傳輸方案</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">只在Wi-Fi 下</item>
     </string-array>
 
@@ -701,7 +700,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">只在充電狀態下</string>
-    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">要求我主動為我的裝置充電</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">以設備中檔案的名稱保存</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">本地相機資料夾</string>
@@ -1080,10 +1079,10 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">將移除%d位聯絡人共享資料夾之權限。</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">已從共享資料夾中成功移除%d個聯絡人</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">未能成功刪除&#160;和%d個聯絡人</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">未能成功刪除%d個聯絡人</string>
 
-	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
-	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">成功更新%d個聯絡人的權限</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">無法更新%d個聯絡人權限</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">從手機載入聯絡人資料中&#8230;</string>
 
@@ -1799,7 +1798,7 @@
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">聊天媒體品質</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">影片品質</string>
-    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">相機上傳需存取您裝置裡的相片與其他媒體內容，請到設定頁面並且允許其權限。</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">原始品質</item>
         <item context="the options of medium quality multimedia file to  upload.">中等品質</item>
@@ -2142,7 +2141,7 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">最短期間為7天。</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">最短期間為7天，最長期間為30天。</string>
-	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">最小尺寸為%1$s，最大尺寸為%2$s。</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">刪除較舊的檔案，早於</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d天</string>
@@ -2273,11 +2272,11 @@
 
 	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">沒有足夠的儲存空間</string>
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">沒有足夠的儲存空間執行影片壓縮。</string>
-	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
-	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">因要壓縮的影片總大小超過%s，請將您的裝置接上電源來繼續</string>
-	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
-	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
-	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">影片壓縮的檔案太大</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">要壓縮影片的大小總和超過%s，請將您的裝置接上電源來繼續</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">此設定將在下次執行相機上傳時生效</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s已壓縮</string>
+	<string name="title_compress_video" context="notification title when compressing video">壓縮影片%1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">選擇的資料夾無效</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
@@ -2470,8 +2469,6 @@
     <string name="hint_action_search" context="Hint of the Search view">搜尋&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">應答</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">忽略</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">開始通話&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">開始視訊&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s已將此通話靜音</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">靜音</string>
 
@@ -2522,4 +2519,9 @@
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">通話進行中無法錄製語音留言。</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">嘗試上傳語音訊息時發生一個錯誤。</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">來電</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">讀取中</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">請等待&#8230;&#8230;</string>
 </resources>

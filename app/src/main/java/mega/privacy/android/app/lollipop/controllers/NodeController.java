@@ -441,30 +441,25 @@ public class NodeController {
         }
     }
 
-    void showSnackbar(int type, String s) {
-        if(context instanceof ManagerActivityLollipop){
+    private void showSnackbar(int type, String s) {
+        if (context instanceof ManagerActivityLollipop) {
             ((ManagerActivityLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if(context instanceof FullScreenImageViewerLollipop){
+        } else if (context instanceof FullScreenImageViewerLollipop) {
             ((FullScreenImageViewerLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if(context instanceof FileInfoActivityLollipop){
+        } else if (context instanceof FileInfoActivityLollipop) {
             ((FileInfoActivityLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if(context instanceof ContactFileListActivityLollipop){
+        } else if (context instanceof ContactFileListActivityLollipop) {
             ((ContactFileListActivityLollipop) context).showSnackbar(type, s);
-        }
-        else if(context instanceof PdfViewerActivityLollipop){
+        } else if (context instanceof PdfViewerActivityLollipop) {
             ((PdfViewerActivityLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if(context instanceof AudioVideoPlayerLollipop){
+        } else if (context instanceof AudioVideoPlayerLollipop) {
             ((AudioVideoPlayerLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if(context instanceof ContactInfoActivityLollipop){
+        } else if (context instanceof ContactInfoActivityLollipop) {
             ((ContactInfoActivityLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if (context instanceof GetLinkActivityLollipop) {
+        } else if (context instanceof GetLinkActivityLollipop) {
             ((GetLinkActivityLollipop) context).showSnackbar(s);
+        } else {
+            Util.showSnackBar(context, type, s, -1);
         }
     }
 
