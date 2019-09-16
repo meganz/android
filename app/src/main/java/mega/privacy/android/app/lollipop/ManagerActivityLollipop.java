@@ -5667,6 +5667,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 				if (cuFL == null) {
 					cuFL = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_CAMERA);
+				} else {
+					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 				}
 
 				replaceFragment(cuFL, FragmentTag.CAMERA_UPLOADS.getTag());
