@@ -981,7 +981,7 @@ public class ThumbnailUtilsLollipop {
 
 
 	/*
-	* This async task is to patch thumb nail picture to video or image files
+	* This async task is to patch thumbnail picture to video or image files
 	* in device folder when select device file to upload
 	*/
 	static class AttachThumbnailToFileStorageExplorerTask extends AsyncTask<FileDocument, Void, Boolean> {
