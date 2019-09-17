@@ -70,6 +70,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 /**
  * Created by mega on 28/05/18.
@@ -116,6 +117,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private TextView pinError;
     private TextView suggestionRK;
     private LinearLayout saveRKButton;
+    private TextView fileNameRK;
 
     private String seed = null;
     private ArrayList<String> arraySeed;
@@ -597,6 +599,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         saveRKButton = (LinearLayout) findViewById(R.id.container_rk_2fa);
         saveRKButton.setOnClickListener(this);
 
+        fileNameRK = findViewById(R.id.fileNameRK);
+        fileNameRK.setText(getRecoveryKeyFileName());
 
         if (scanOrCopyIsShown || newAccount){
             showScanOrCopyLayout();
@@ -1246,7 +1250,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             if (parentPath != null){
                 log("parentPath no NULL");
 
-                parentPath = parentPath + File.separator + getString(R.string.general_rk);
+                parentPath = parentPath + File.separator + getRecoveryKeyFileName();
 
                 Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
                 newIntent.putExtra("parentPath", parentPath);

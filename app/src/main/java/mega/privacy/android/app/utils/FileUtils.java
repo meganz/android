@@ -25,8 +25,10 @@ import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -40,6 +42,12 @@ public class FileUtils {
     public static final String LOG_DIR = MAIN_DIR + File.separator + "MEGA Logs";
 
     public static final String OLD_MK_FILE = MAIN_DIR + File.separator + "MEGAMasterKey.txt";
+
+    public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
+
+    public static String getRecoveryKeyFileName() {
+        return MegaApplication.getInstance().getApplicationContext().getString(R.string.general_rk) + ".txt";
+    }
 
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
 

@@ -2349,13 +2349,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return;
         }
 
-		///Check the MK file
+		///Check the MK or RK file
 		int versionApp = Util.getVersion(this);
 		log("-------------------Version app: "+versionApp);
 		final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
+		final File fRKOld = buildExternalStorageFile(OLD_RK_FILE);
 		if (isFileAvailable(fMKOld)) {
 			log("Old MK file need to be renamed!");
-			aC.renameMK();
+			aC.renameRK(fMKOld);
+		} else if (isFileAvailable(fRKOld)) {
+			log("Old RK file need to be renamed!");
+			aC.renameRK(fRKOld);
 		}
 
 		rootNode = megaApi.getRootNode();
@@ -14113,7 +14117,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String path = parentPath + File.separator + getString(R.string.general_rk);
+				String path = parentPath + File.separator + getRecoveryKeyFileName();
 
 				log("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
