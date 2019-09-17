@@ -60,8 +60,9 @@ import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("MissingPermission")
 public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, View.OnClickListener, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener, LocationListener {
@@ -121,7 +122,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         try {
             return geocoder.getFromLocation(latitude, longitude, 1);
         } catch (IOException e) {
-            LogUtil.logError("Exception trying to get an address from a latitude and a longitude", e);
+            logError("Exception trying to get an address from a latitude and a longitude", e);
             e.printStackTrace();
             return null;
         }
@@ -202,7 +203,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         geocoder = new Geocoder(this, Locale.getDefault());
 
-        fullscreenIconMarker = drawableBitmap(Util.mutateIconSecondary(this, R.drawable.ic_send_location, R.color.dark_primary_color_secondary));
+        fullscreenIconMarker = drawableBitmap(mutateIconSecondary(this, R.drawable.ic_send_location, R.color.dark_primary_color_secondary));
     }
 
     /**
@@ -216,11 +217,11 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 sendCurrentLocationLayout.setVisibility(View.GONE);
                 sendCurrentLocationLandscapeLayout.setVisibility(View.VISIBLE);
-                params.bottomMargin = Util.px2dp(45, outMetrics);
+                params.bottomMargin = px2dp(45, outMetrics);
             } else {
                 sendCurrentLocationLayout.setVisibility(View.VISIBLE);
                 sendCurrentLocationLandscapeLayout.setVisibility(View.GONE);
-                params.bottomMargin = Util.px2dp(72, outMetrics);
+                params.bottomMargin = px2dp(72, outMetrics);
             }
             mapLayout.setLayoutParams(params);
             return;
@@ -301,7 +302,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        LogUtil.logDebug("onMapReady");
+        logDebug("onMapReady");
         mMap = googleMap;
 
         enableLocationUpdates();
@@ -399,7 +400,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
      * @param animateCamera determines if has to have an animation or not while the camera of the map is moving
      */
     private void setMyLocation(final boolean animateCamera) {
-        LogUtil.logDebug("setMyLocation");
+        logDebug("setMyLocation");
         if (mMap == null) {
             return;
         }
@@ -407,14 +408,14 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         fusedLocationProviderClient.getLastLocation().addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                LogUtil.logError("getLastLocation() onFailure: " + e.getMessage());
+                logError("getLastLocation() onFailure: " + e.getMessage());
                 showSnackbar(findViewById(R.id.parent_layout_maps), getString(R.string.general_error));
             }
         }).addOnSuccessListener(this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
-                    LogUtil.logDebug("getLastLocation() onSuccess");
+                    logDebug("getLastLocation() onSuccess");
                     addresses = getAddresses(getApplicationContext(), location.getLatitude(), location.getLongitude());
                     if (addresses != null) {
                         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -431,7 +432,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                                 textToShow = textToShow.replace("[/A]", "</font>");
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                LogUtil.logError("Exception changing the format of a string", e);
+                                logError("Exception changing the format of a string", e);
                             }
                             Spanned result = null;
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -527,14 +528,14 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                         int quality = 100;
                         bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
                         byte[] byteArray = stream.toByteArray();
-                        LogUtil.logDebug("The bitmaps has " + byteArray.length + " initial size");
+                        logDebug("The bitmaps has " + byteArray.length + " initial size");
                         while (byteArray.length > MAX_SIZE) {
                             stream = new ByteArrayOutputStream();
                             quality -= 10;
                             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
                             byteArray = stream.toByteArray();
                         }
-                        LogUtil.logDebug("The bitmaps has " + byteArray.length + " final size with quality: " + quality);
+                        logDebug("The bitmaps has " + byteArray.length + " final size with quality: " + quality);
 
                         Intent intent = new Intent();
                         intent.putExtra(SNAPSHOT, byteArray);
@@ -573,13 +574,13 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     @Override
     public boolean onMyLocationButtonClick() {
-        LogUtil.logDebug("onMyLocationButtonClick");
+        logDebug("onMyLocationButtonClick");
         return false;
     }
 
     @Override
     public void onMyLocationClick(Location location) {
-        LogUtil.logDebug("onMyLocationClick");
+        logDebug("onMyLocationClick");
     }
 
     @Override
@@ -700,7 +701,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        LogUtil.logDebug("onInfoWindowClick");
+        logDebug("onInfoWindowClick");
         if (isFullScreenEnabled && marker.equals(fullScreenMarker)) {
             setActivityResult(fullScreenAddress);
         }
@@ -724,7 +725,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             fullScreenMarker.setVisible(false);
             fullscreenMarkerIcon.setVisibility(View.VISIBLE);
             fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
-            fullscreenMarkerIcon.animate().translationY(-Util.px2dp(12, outMetrics)).setDuration(duration).start();
+            fullscreenMarkerIcon.animate().translationY(-px2dp(12, outMetrics)).setDuration(duration).start();
         }
     }
 
@@ -735,17 +736,17 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     @Override
     public void onLocationChanged(Location location) {
-        LogUtil.logDebug("LocationListener onLocationChanged");
+        logDebug("LocationListener onLocationChanged");
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        LogUtil.logDebug("LocationListener onStatusChanged");
+        logDebug("LocationListener onStatusChanged");
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        LogUtil.logDebug("LocationListener onProviderEnabled");
+        logDebug("LocationListener onProviderEnabled");
 
         if (!provider.equals(LocationManager.GPS_PROVIDER) || mMap == null) return;
 
@@ -765,7 +766,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     @Override
     public void onProviderDisabled(String provider) {
-        LogUtil.logDebug("LocationListener onProviderDisabled");
+        logDebug("LocationListener onProviderDisabled");
 
         if (!provider.equals(LocationManager.GPS_PROVIDER) || mMap == null) return;
 

@@ -25,8 +25,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 // The following four imports are needed saveBitmapToJPEG which
 // is for debug only
@@ -55,7 +54,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
 
     public MegaSurfaceRendererGroup(TextureView view, long peerId, long clientId) {
-        LogUtil.logDebug("MegaSurfaceRendererGroup()");
+        logDebug("MegaSurfaceRendererGroup()");
 
         this.myTexture = view;
         myTexture.setSurfaceTextureListener(this);
@@ -70,7 +69,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
     // surfaceChanged and surfaceCreated share this function
     private void changeDestRect(int dstWidth, int dstHeight) {
-        LogUtil.logDebug("dstWidth = " + dstWidth + ", dstHeight = " + dstHeight);
+        logDebug("dstWidth = " + dstWidth + ", dstHeight = " + dstHeight);
         surfaceWidth = dstWidth;
         surfaceHeight = dstHeight;
         dstRect.top = 0;
@@ -82,7 +81,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     }
 
     private void adjustAspectRatio() {
-        LogUtil.logDebug("adjustAspectRatio()");
+        logDebug("adjustAspectRatio()");
         if (bitmap != null && dstRect.height() != 0) {
             dstRect.top = 0;
             dstRect.left = 0;
@@ -92,7 +91,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     }
 
     public Bitmap CreateBitmap(int width, int height) {
-        LogUtil.logDebug("width = " + width + ", height = " + height);
+        logDebug("width = " + width + ", height = " + height);
         Logging.d(TAG, "CreateByteBitmap " + width + ":" + height);
         if (bitmap == null) {
             try {
@@ -107,7 +106,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             srcRect.bottom = height;
             srcRect.left = 0;
             srcRect.right = width;
-            LogUtil.logDebug("width == height. sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
+            logDebug("width == height. sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
 
         } else if (height > width) {
             bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
@@ -115,7 +114,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             srcRect.bottom = width;
             srcRect.left = 0;
             srcRect.right = width;
-            LogUtil.logDebug("height > width. sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
+            logDebug("height > width. sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
 
         } else {
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -123,7 +122,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             srcRect.right = height;
             srcRect.top = 0;
             srcRect.bottom = height;
-            LogUtil.logDebug("height < width. sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
+            logDebug("height < width. sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
         }
         adjustAspectRatio();
         return bitmap;
@@ -170,7 +169,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int in_width, int in_height) {
-        LogUtil.logDebug("onSurfaceTextureAvailable()");
+        logDebug("onSurfaceTextureAvailable()");
         Bitmap textureViewBitmap = myTexture.getBitmap();
         Canvas canvas = new Canvas(textureViewBitmap);
         if (canvas == null) return;
@@ -181,13 +180,13 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int in_width, int in_height) {
-        LogUtil.logDebug("in_width = " + in_width + ", in_height = " + in_height);
+        logDebug("in_width = " + in_width + ", in_height = " + in_height);
         changeDestRect(in_width, in_height);
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-        LogUtil.logDebug("surfaceWidth = 0 && surfaceHeight = 0");
+        logDebug("surfaceWidth = 0 && surfaceHeight = 0");
         bitmap = null;
         byteBuffer = null;
         surfaceWidth = 0;

@@ -16,8 +16,9 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class TurnOnNotificationsFragment extends Fragment implements View.OnClickListener{
 
@@ -32,7 +33,7 @@ public class TurnOnNotificationsFragment extends Fragment implements View.OnClic
     private LinearLayout containerTurnOnNotifications;
 
     public static TurnOnNotificationsFragment newInstance() {
-        LogUtil.logDebug("newInstance");
+        logDebug("newInstance");
         TurnOnNotificationsFragment fragment = new TurnOnNotificationsFragment();
         return fragment;
     }
@@ -40,7 +41,7 @@ public class TurnOnNotificationsFragment extends Fragment implements View.OnClic
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -56,7 +57,7 @@ public class TurnOnNotificationsFragment extends Fragment implements View.OnClic
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        LogUtil.logDebug("onCreateView");
+        logDebug("onCreateView");
 
         View v = inflater.inflate(R.layout.fragment_turn_on_notifications, container, false);
         containerTurnOnNotifications = (LinearLayout) v.findViewById(R.id.turnOnNotifications_fragment_container);

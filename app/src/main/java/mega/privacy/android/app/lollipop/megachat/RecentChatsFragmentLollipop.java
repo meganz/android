@@ -55,9 +55,6 @@ import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -65,7 +62,10 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
-import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
+import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class RecentChatsFragmentLollipop extends RotatableFragment implements View.OnClickListener {
 
@@ -113,7 +113,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private ActionMode actionMode;
 
     public static RecentChatsFragmentLollipop newInstance() {
-        LogUtil.logDebug("newInstance");
+        logDebug("newInstance");
         RecentChatsFragmentLollipop fragment = new RecentChatsFragmentLollipop();
         return fragment;
     }
@@ -124,7 +124,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void activateActionMode() {
-        LogUtil.logDebug("activateActionMode");
+        logDebug("activateActionMode");
         if (!adapterList.isMultipleSelect()) {
             adapterList.setMultipleSelect(true);
             actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
@@ -139,7 +139,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -147,12 +147,12 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
-        if (Util.isChatEnabled()) {
+        if (isChatEnabled()) {
             if (megaChatApi == null) {
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
         } else {
-            LogUtil.logWarning("Chat not enabled!");
+            logWarning("Chat not enabled!");
         }
     }
 
@@ -176,7 +176,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        LogUtil.logDebug("onCreateView");
+        logDebug("onCreateView");
 
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -187,7 +187,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
         fastScroller = (FastScroller) v.findViewById(R.id.fastscroll_chat);
-        listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+        listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
         listView.setClipToPadding(false);
         listView.addItemDecoration(new ChatDividerItemDecoration(context, outMetrics));
         mLayoutManager = new LinearLayoutManager(context);
@@ -205,15 +205,15 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_chat_recent_invite);
-        emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
+        emptyTextViewInvite.setWidth(scaleWidthPx(236, outMetrics));
         emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
 
         LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams) emptyTextViewInvite.getLayoutParams();
-        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(50, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
+        emptyTextViewParams1.setMargins(0, scaleHeightPx(50, outMetrics), 0, scaleHeightPx(24, outMetrics));
         emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
 
         LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams) emptyTextView.getLayoutParams();
-        emptyTextViewParams2.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics));
+        emptyTextViewParams2.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
         emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_recent);
@@ -236,20 +236,20 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
 
-        if (Util.isChatEnabled()) {
-            LogUtil.logDebug("Chat ENABLED");
+        if (isChatEnabled()) {
+            logDebug("Chat ENABLED");
 
             if (context instanceof ManagerActivityLollipop) {
                 setStatus();
                 if (!emptyArchivedChats()) {
-                    listView.setPadding(0, Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(16, outMetrics));
+                    listView.setPadding(0, scaleHeightPx(8, outMetrics), 0, scaleHeightPx(16, outMetrics));
                 } else {
-                    listView.setPadding(0, Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(78, outMetrics));
+                    listView.setPadding(0, scaleHeightPx(8, outMetrics), 0, scaleHeightPx(78, outMetrics));
                 }
             } else {
                 //Archived chats section
                 aB.setSubtitle(null);
-                listView.setPadding(0, Util.scaleHeightPx(8, outMetrics), 0, 0);
+                listView.setPadding(0, scaleHeightPx(8, outMetrics), 0, 0);
             }
 
             this.setChats();
@@ -258,8 +258,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 megaChatApi.signalPresenceActivity();
             }
         } else {
-            LogUtil.logDebug("Chat DISABLED");
-            if (Util.isOnline(context)) {
+            logDebug("Chat DISABLED");
+            if (isOnline(context)) {
                 showDisableChatScreen();
             } else {
                 showNoConnectionScreen();
@@ -270,21 +270,21 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void setChats() {
-        LogUtil.logDebug("setChats");
+        logDebug("setChats");
 
         if (listView == null) {
-            LogUtil.logWarning("listView is null - do not update");
+            logWarning("listView is null - do not update");
             return;
         }
 
         if (isAdded()) {
-            if (Util.isChatEnabled()) {
+            if (isChatEnabled()) {
 
                 int initState = megaChatApi.getInitState();
-                LogUtil.logDebug("Init state is: " + initState);
+                logDebug("Init state is: " + initState);
 
                 if ((initState == MegaChatApi.INIT_ONLINE_SESSION)) {
-                    LogUtil.logDebug("Connected state is: " + megaChatApi.getConnectionState());
+                    logDebug("Connected state is: " + megaChatApi.getConnectionState());
 
                     if (megaChatApi.getConnectionState() == MegaChatApi.CONNECTED) {
                         if (chats != null) {
@@ -300,13 +300,13 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
 
                         if ((chats == null || chats.isEmpty()) && emptyArchivedChats()) {
-                            if (Util.isOnline(context)) {
+                            if (isOnline(context)) {
                                 showEmptyChatScreen();
                             } else {
                                 showNoConnectionScreen();
                             }
                         } else {
-                            LogUtil.logDebug("Chats size: " + chats.size());
+                            logDebug("Chats size: " + chats.size());
 
                             //Order by last interaction
                             Collections.sort(chats, new Comparator<MegaChatListItem>() {
@@ -321,7 +321,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                             });
 
                             if (adapterList == null) {
-                                LogUtil.logWarning("AdapterList is NULL");
+                                logWarning("AdapterList is NULL");
                                 adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
                             } else {
                                 adapterList.setChats(chats);
@@ -337,11 +337,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                             emptyLayout.setVisibility(View.GONE);
                         }
                     } else {
-                        LogUtil.logDebug("Show chat screen connecting...");
+                        logDebug("Show chat screen connecting...");
                         showConnectingChatScreen();
                     }
                 } else if (initState == MegaChatApi.INIT_OFFLINE_SESSION) {
-                    LogUtil.logDebug("Init with OFFLINE session");
+                    logDebug("Init with OFFLINE session");
                     if (chats != null) {
                         chats.clear();
                     } else {
@@ -357,7 +357,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if (chats == null || chats.isEmpty()) {
                         showNoConnectionScreen();
                     } else {
-                        LogUtil.logDebug("Chats no: " + chats.size());
+                        logDebug("Chats no: " + chats.size());
 
                         //Order by last interaction
                         Collections.sort(chats, new Comparator<MegaChatListItem>() {
@@ -372,7 +372,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         });
 
                         if (listView == null) {
-                            LogUtil.logWarning("INIT_OFFLINE_SESSION: listView is null");
+                            logWarning("INIT_OFFLINE_SESSION: listView is null");
                         } else if (listView != null) {
                             listView.setVisibility(View.VISIBLE);
                         }
@@ -381,7 +381,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
 
                         if (adapterList == null) {
-                            LogUtil.logWarning("AdapterList is NULL");
+                            logWarning("AdapterList is NULL");
                             adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
                             if (listView != null) {
                                 listView.setAdapter(adapterList);
@@ -395,11 +395,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         adapterList.setPositionClicked(-1);
                     }
                 } else {
-                    LogUtil.logDebug("Show chat screen connecting...");
+                    logDebug("Show chat screen connecting...");
                     showConnectingChatScreen();
                 }
             } else {
-                if (Util.isOnline(context)) {
+                if (isOnline(context)) {
                     showDisableChatScreen();
                 } else {
                     showNoConnectionScreen();
@@ -410,14 +410,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
 
     public void showCallLayout() {
-        if (Util.isChatEnabled() && context instanceof ManagerActivityLollipop && megaChatApi != null && ChatUtil.participatingInACall(megaChatApi)) {
-            LogUtil.logDebug("showCallLayout");
+        if (isChatEnabled() && context instanceof ManagerActivityLollipop && megaChatApi != null && participatingInACall(megaChatApi)) {
+            logDebug("showCallLayout");
 
             if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
                 callInProgressLayout.setVisibility(View.VISIBLE);
             }
             if (callInProgressChrono != null && callInProgressChrono.getVisibility() != View.VISIBLE) {
-                long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
+                long chatId = getChatCallInProgress(megaChatApi);
                 if ((megaChatApi != null) && chatId != -1) {
                     MegaChatCall call = megaChatApi.getChatCall(chatId);
                     if (call != null) {
@@ -441,7 +441,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void showEmptyChatScreen() {
-        LogUtil.logDebug("showEmptyChatScreen");
+        logDebug("showEmptyChatScreen");
 
         listView.setVisibility(View.GONE);
 
@@ -498,7 +498,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void showDisableChatScreen() {
-        LogUtil.logDebug("showDisableChatScreen");
+        logDebug("showDisableChatScreen");
 
         listView.setVisibility(View.GONE);
         if (context instanceof ManagerActivityLollipop) {
@@ -539,7 +539,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void showConnectingChatScreen() {
-        LogUtil.logDebug("showConnectingChatScreen");
+        logDebug("showConnectingChatScreen");
 
         listView.setVisibility(View.GONE);
         if (context instanceof ManagerActivityLollipop) {
@@ -587,7 +587,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void showNoConnectionScreen() {
-        LogUtil.logDebug("showNoConnectionScreen");
+        logDebug("showNoConnectionScreen");
 
         listView.setVisibility(View.GONE);
         if (context instanceof ManagerActivityLollipop) {
@@ -599,7 +599,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         inviteButton.setVisibility(View.GONE);
 
         emptyTextView.setText(R.string.recent_chat_empty_no_connection_text);
-        if (Util.isChatEnabled()) {
+        if (isChatEnabled()) {
             emptyTextView.setVisibility(View.GONE);
         } else {
             emptyTextView.setVisibility(View.VISIBLE);
@@ -610,36 +610,36 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Override
     public void onClick(View v) {
-        LogUtil.logDebug("onClick");
+        logDebug("onClick");
 
         switch (v.getId()) {
             case R.id.invite_button: {
-                if (Util.isChatEnabled()) {
-                    if (Util.isOnline(context)) {
+                if (isChatEnabled()) {
+                    if (isOnline(context)) {
                         ((ManagerActivityLollipop) context).addContactFromPhone();
                         if (megaChatApi.isSignalActivityRequired()) {
                             megaChatApi.signalPresenceActivity();
                         }
                     } else {
-                        ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+                        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                     }
                 } else {
-                    if (Util.isOnline(context)) {
+                    if (isOnline(context)) {
                         if (megaApi != null) {
                             if (megaApi.isLoggedIn() == 0) {
-                                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
+                                ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
                             } else {
                                 ChatController chatController = new ChatController(context);
-                                LogUtil.logDebug("Enable Chat");
+                                logDebug("Enable Chat");
                                 chatController.enableChat();
                                 getActivity().invalidateOptionsMenu();
                                 ((ManagerActivityLollipop) context).enableChat();
                             }
                         } else {
-                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
+                            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
                         }
                     } else {
-                        ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+                        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                         showNoConnectionScreen();
                     }
                 }
@@ -648,7 +648,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
             case R.id.empty_image_view_chat: {
                 numberOfClicks++;
-                LogUtil.logDebug("Number of clicks: " + numberOfClicks);
+                logDebug("Number of clicks: " + numberOfClicks);
                 if (numberOfClicks >= 5) {
                     numberOfClicks = 0;
                     showStateInfo();
@@ -657,9 +657,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 break;
             }
             case R.id.call_in_progress_layout: {
-                LogUtil.logDebug("call_in_progress_layout");
+                logDebug("call_in_progress_layout");
                 if (checkPermissionsCall()) {
-                    ChatUtil.returnCall(context, megaChatApi);
+                    returnCall(context, megaChatApi);
                 }
                 break;
             }
@@ -670,11 +670,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         StringBuilder builder = new StringBuilder();
 
-        if (Util.isChatEnabled()) {
+        if (isChatEnabled()) {
             if (megaChatApi != null) {
                 builder.append("INIT STATE: " + megaChatApi.getInitState());
                 builder.append("\nCONNECT STATE: " + megaChatApi.getConnectionState());
-                if (Util.isOnline(context)) {
+                if (isOnline(context)) {
                     builder.append("\nNetwork OK");
                 } else {
                     builder.append("\nNo network connection");
@@ -687,7 +687,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (megaChatApi != null) {
                 builder.append("\nINIT STATE: " + megaChatApi.getInitState());
                 builder.append("\nCONNECT STATE: " + megaChatApi.getConnectionState());
-                if (Util.isOnline(context)) {
+                if (isOnline(context)) {
                     builder.append("\nNetwork OK");
                 } else {
                     builder.append("\nNo network connection");
@@ -710,7 +710,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
      * Clear all selected items
      */
     public void clearSelections() {
-        LogUtil.logDebug("clearSelections");
+        logDebug("clearSelections");
         if (adapterList.isMultipleSelect()) {
             adapterList.clearSelections();
         }
@@ -729,7 +729,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             actionMode.invalidate();
         } catch (NullPointerException e) {
             e.printStackTrace();
-            LogUtil.logError("Invalidate error", e);
+            logError("Invalidate error", e);
         }
     }
 
@@ -737,7 +737,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
      * Disable selection
      */
     public void hideMultipleSelect() {
-        LogUtil.logDebug("hideMultipleSelect");
+        logDebug("hideMultipleSelect");
         adapterList.setMultipleSelect(false);
 
         if (actionMode != null) {
@@ -761,7 +761,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void itemClick(int position) {
-        LogUtil.logDebug("Position: " + position);
+        logDebug("Position: " + position);
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
@@ -772,9 +772,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 updateActionModeTitle();
             }
         } else {
-            LogUtil.logDebug("Open chat: Position: " + position + ", Chat ID: " + chats.get(position).getChatId());
+            logDebug("Open chat: Position: " + position + ", Chat ID: " + chats.get(position).getChatId());
             Intent intent = new Intent(context, ChatActivityLollipop.class);
-            intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
             intent.putExtra("CHAT_ID", adapterList.getChatAt(position).getChatId());
             this.startActivity(intent);
             if (context instanceof ManagerActivityLollipop) {
@@ -809,42 +809,42 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     public void listItemUpdate(MegaChatListItem item) {
         if (item == null) {
-            LogUtil.logWarning("Item is null");
+            logWarning("Item is null");
             return;
         }
 
-        LogUtil.logDebug("Chat ID: " + item.getChatId());
+        logDebug("Chat ID: " + item.getChatId());
 
         if (!isAdded()) {
-            LogUtil.logDebug("return!");
+            logDebug("return!");
             return;
         }
 
         if (listView == null) {
-            LogUtil.logWarning("listView is null - do not update");
+            logWarning("listView is null - do not update");
             return;
         }
 
         if (context instanceof ManagerActivityLollipop) {
             if (!(((ManagerActivityLollipop) context).getDrawerItem() == ManagerActivityLollipop.DrawerItem.CHAT)) {
-                LogUtil.logWarning("Not CHAT shown!");
+                logWarning("Not CHAT shown!");
                 return;
             }
         }
 
         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)) {
-            LogUtil.logDebug("Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
+            logDebug("Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
 
-            LogUtil.logDebug("Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
+            logDebug("Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
 
-            LogUtil.logDebug("Change participants");
+            logDebug("Change participants");
             MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
             updateCacheForNonContacts(chatToCheck);
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
 
-            LogUtil.logDebug(" Change unread count");
+            logDebug(" Change unread count");
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
@@ -863,10 +863,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     }
                 }
                 if (indexToReplace != -1) {
-                    LogUtil.logDebug("Index to replace: " + indexToReplace);
+                    logDebug("Index to replace: " + indexToReplace);
                     chats.set(indexToReplace, item);
                     if (item.getUnreadCount() == 0) {
-                        LogUtil.logDebug("No unread count");
+                        logDebug("No unread count");
                         onUnreadCountChange(indexToReplace, false);
                         onLastMessageChange(indexToReplace);
                     } else {
@@ -876,7 +876,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS)) {
-            LogUtil.logDebug("Change last ts: " + item.getChanges());
+            logDebug("Change last ts: " + item.getChanges());
 
             long chatHandleToUpdate = item.getChatId();
             int indexToReplace = -1;
@@ -896,7 +896,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
 
             if (indexToReplace != -1) {
-                LogUtil.logDebug("Index to replace: " + indexToReplace);
+                logDebug("Index to replace: " + indexToReplace);
                 chats.set(indexToReplace, item);
                 if (indexToReplace == 0) {
                     onLastTsChange(indexToReplace, false);
@@ -907,7 +907,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         } else if ((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))) {
 
-            LogUtil.logDebug("Change title ");
+            logDebug("Change title ");
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
@@ -926,7 +926,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     }
                 }
                 if (indexToReplace != -1) {
-                    LogUtil.logDebug("Index to replace: " + indexToReplace);
+                    logDebug("Index to replace: " + indexToReplace);
                     chats.set(indexToReplace, item);
                     onTitleChange(indexToReplace);
                 }
@@ -934,7 +934,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)) {
 
-            LogUtil.logDebug("Change last message: ");
+            logDebug("Change last message: ");
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
@@ -953,7 +953,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     }
                 }
                 if (indexToReplace != -1) {
-                    LogUtil.logDebug("Index to replace: " + indexToReplace);
+                    logDebug("Index to replace: " + indexToReplace);
                     chats.set(indexToReplace, item);
                     onLastMessageChange(indexToReplace);
                 }
@@ -961,8 +961,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
 
-            LogUtil.logDebug("Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
-            LogUtil.logDebug("Own privilege: " + item.getOwnPrivilege());
+            logDebug("Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
+            logDebug("Own privilege: " + item.getOwnPrivilege());
             if (adapterList.getItemCount() != 0) {
                 long chatHandleToRemove = item.getChatId();
                 int indexToRemove = -1;
@@ -979,14 +979,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     }
                 }
                 if (indexToRemove != -1) {
-                    LogUtil.logDebug("Index to replace: " + indexToRemove);
+                    logDebug("Index to replace: " + indexToRemove);
                     chats.remove(indexToRemove);
 
                     adapterList.removeChat(chats, indexToRemove);
                     adapterList.setPositionClicked(-1);
 
                     if (adapterList.getItemCount() == 0 && emptyArchivedChats()) {
-                        LogUtil.logDebug("adapterList.getItemCount() == 0");
+                        logDebug("adapterList.getItemCount() == 0");
                         listView.setVisibility(View.GONE);
                         emptyLayout.setVisibility(View.VISIBLE);
                     } else {
@@ -997,10 +997,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_ARCHIVE)) {
-            LogUtil.logDebug("Change: MegaChatListItem.CHANGE_TYPE_ARCHIVE");
+            logDebug("Change: MegaChatListItem.CHANGE_TYPE_ARCHIVE");
             if (context instanceof ManagerActivityLollipop) {
                 if (item.isArchived()) {
-                    LogUtil.logDebug("New archived element: remove from list");
+                    logDebug("New archived element: remove from list");
                     if (adapterList.getItemCount() != 0) {
 
                         long chatHandleToRemove = item.getChatId();
@@ -1018,14 +1018,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                             }
                         }
                         if (indexToRemove != -1) {
-                            LogUtil.logDebug("Index to replace: " + indexToRemove);
+                            logDebug("Index to replace: " + indexToRemove);
                             chats.remove(indexToRemove);
 
                             adapterList.removeChat(chats, indexToRemove);
                             adapterList.setPositionClicked(-1);
 
                             if (adapterList.getItemCount() == 0 && emptyArchivedChats()) {
-                                LogUtil.logDebug("adapterList.getItemCount() == 0");
+                                logDebug("adapterList.getItemCount() == 0");
                                 listView.setVisibility(View.GONE);
                                 emptyLayout.setVisibility(View.VISIBLE);
                             } else {
@@ -1039,7 +1039,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
                     }
                 } else {
-                    LogUtil.logDebug("New unarchived element: refresh chat list");
+                    logDebug("New unarchived element: refresh chat list");
                     setChats();
                     if (chats.size() == 1) {
                         ((ManagerActivityLollipop) context).invalidateOptionsMenu();
@@ -1051,18 +1051,18 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 }
 
                 if (!emptyArchivedChats()) {
-                    listView.setPadding(0, Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(16, outMetrics));
+                    listView.setPadding(0, scaleHeightPx(8, outMetrics), 0, scaleHeightPx(16, outMetrics));
                 } else {
-                    listView.setPadding(0, Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(78, outMetrics));
+                    listView.setPadding(0, scaleHeightPx(8, outMetrics), 0, scaleHeightPx(78, outMetrics));
                 }
 
                 checkScroll();
             } else if (context instanceof ArchivedChatsActivity) {
                 if (item.isArchived()) {
-                    LogUtil.logDebug("New archived element: refresh chat list");
+                    logDebug("New archived element: refresh chat list");
                     setChats();
                 } else {
-                    LogUtil.logDebug("New unarchived element: remove from Archive list");
+                    logDebug("New unarchived element: remove from Archive list");
                     if (adapterList.getItemCount() != 0) {
 
                         long chatHandleToRemove = item.getChatId();
@@ -1080,14 +1080,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                             }
                         }
                         if (indexToRemove != -1) {
-                            LogUtil.logDebug("Index to replace: " + indexToRemove);
+                            logDebug("Index to replace: " + indexToRemove);
                             chats.remove(indexToRemove);
 
                             adapterList.removeChat(chats, indexToRemove);
                             adapterList.setPositionClicked(-1);
 
                             if (adapterList.getItemCount() == 0) {
-                                LogUtil.logDebug("adapterList.getItemCount() == 0");
+                                logDebug("adapterList.getItemCount() == 0");
                                 showEmptyChatScreen();
                                 ((ArchivedChatsActivity) context).invalidateOptionsMenu();
                             } else {
@@ -1101,7 +1101,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CALL) || item.hasChanged(MegaChatListItem.CHANGE_TYPE_CHAT_MODE)) {
-            LogUtil.logDebug("Change: MegaChatListItem.CHANGE_TYPE_CALL or CHANGE_TYPE_CHAT_MODE");
+            logDebug("Change: MegaChatListItem.CHANGE_TYPE_CALL or CHANGE_TYPE_CHAT_MODE");
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
@@ -1120,21 +1120,21 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     }
                 }
                 if (indexToReplace != -1) {
-                    LogUtil.logDebug("Index to replace: " + indexToReplace);
+                    logDebug("Index to replace: " + indexToReplace);
                     chats.set(indexToReplace, item);
                     adapterList.notifyItemChanged(indexToReplace);
                 }
             }
         } else {
-            LogUtil.logDebug("Other change: " + item.getChanges());
+            logDebug("Other change: " + item.getChanges());
 
             if (item != null) {
-                LogUtil.logDebug("New chat");
+                logDebug("New chat");
                 setChats();
                 MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
                 updateCacheForNonContacts(chatToCheck);
             } else {
-                LogUtil.logError("The chat is NULL");
+                logError("The chat is NULL");
             }
         }
     }
@@ -1150,17 +1150,17 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void setStatus() {
-        LogUtil.logDebug("setStatus");
-        if (Util.isChatEnabled()) {
+        logDebug("setStatus");
+        if (isChatEnabled()) {
             chatStatus = megaChatApi.getOnlineStatus();
-            LogUtil.logDebug("Chat status --> getOnlineStatus with megaChatApi: " + chatStatus);
+            logDebug("Chat status --> getOnlineStatus with megaChatApi: " + chatStatus);
 
             onlineStatusUpdate(chatStatus);
         }
     }
 
     public void onlineStatusUpdate(int status) {
-        LogUtil.logDebug("Status: " + status);
+        logDebug("Status: " + status);
 
         chatStatus = status;
 
@@ -1184,7 +1184,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         break;
                     }
                     case MegaChatApi.STATUS_INVALID: {
-                        if (!Util.isOnline(context)) {
+                        if (!isOnline(context)) {
                             aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         } else {
                             if (megaChatApi == null) {
@@ -1201,7 +1201,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     }
                     default: {
 
-                        if (!Util.isOnline(context) || megaApi == null || megaApi.getRootNode() == null) {
+                        if (!isOnline(context) || megaApi == null || megaApi.getRootNode() == null) {
                             aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         } else {
                             if (megaChatApi == null) {
@@ -1223,23 +1223,23 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     }
                 }
             } else {
-                LogUtil.logWarning("aB is NULL");
+                logWarning("aB is NULL");
             }
         } else {
-            LogUtil.logWarning("RecentChats not added");
+            logWarning("RecentChats not added");
         }
     }
 
     public void contactStatusUpdate(long userHandle, int status) {
-        LogUtil.logDebug("User Handle: " + userHandle + ", Status: " + status);
+        logDebug("User Handle: " + userHandle + ", Status: " + status);
 
         long chatHandleToUpdate = -1;
         MegaChatRoom chatToUpdate = megaChatApi.getChatRoomByUser(userHandle);
         if (chatToUpdate != null) {
             chatHandleToUpdate = chatToUpdate.getChatId();
-            LogUtil.logDebug("Update chat: " + chatHandleToUpdate);
+            logDebug("Update chat: " + chatHandleToUpdate);
             if (chatHandleToUpdate != -1) {
-                LogUtil.logDebug("The user has a one to one chat: " + chatHandleToUpdate);
+                logDebug("The user has a one to one chat: " + chatHandleToUpdate);
 
                 int indexToReplace = -1;
                 if (chats != null) {
@@ -1256,30 +1256,30 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
                     }
                     if (indexToReplace != -1) {
-                        LogUtil.logDebug("Index to replace: " + indexToReplace);
+                        logDebug("Index to replace: " + indexToReplace);
                         onStatusChange(indexToReplace, userHandle, status);
                     }
                 } else {
-                    LogUtil.logWarning("No chat list loaded");
+                    logWarning("No chat list loaded");
                 }
             }
         }
     }
 
     public void onStatusChange(int position, long userHandle, int status) {
-        LogUtil.logDebug("Position: " + position + ", User Handle: " + userHandle + " with new presence: " + status);
+        logDebug("Position: " + position + ", User Handle: " + userHandle + " with new presence: " + status);
 
         adapterList.updateContactStatus(position, userHandle, status);
     }
 
     public void onTitleChange(int position) {
-        LogUtil.logDebug("Position: " + position);
+        logDebug("Position: " + position);
         adapterList.setTitle(position, null);
         interactionUpdate(position);
     }
 
     public void onUnreadCountChange(int position, boolean updateOrder) {
-        LogUtil.logDebug("Position: " + position + ", Update order: " + updateOrder);
+        logDebug("Position: " + position + ", Update order: " + updateOrder);
         adapterList.setPendingMessages(position, null);
 
         if (updateOrder) {
@@ -1288,7 +1288,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void onLastTsChange(int position, boolean updateOrder) {
-        LogUtil.logDebug("Position: " + position + ", Update order: " + updateOrder);
+        logDebug("Position: " + position + ", Update order: " + updateOrder);
 
         adapterList.setTs(position, null);
 
@@ -1298,7 +1298,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void onLastMessageChange(int position) {
-        LogUtil.logDebug("Position: " + position);
+        logDebug("Position: " + position);
 
         adapterList.setLastMessage(position, null);
 
@@ -1308,7 +1308,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void showMuteIcon(MegaChatListItem item) {
-        LogUtil.logDebug("Chat ID: " + item.getChatId());
+        logDebug("Chat ID: " + item.getChatId());
 
         long chatHandleToUpdate = item.getChatId();
         int indexToReplace = -1;
@@ -1325,7 +1325,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
         }
         if (indexToReplace != -1) {
-            LogUtil.logDebug("Index to replace: " + indexToReplace);
+            logDebug("Index to replace: " + indexToReplace);
             if (adapterList != null) {
                 adapterList.showMuteIcon(indexToReplace);
             }
@@ -1333,7 +1333,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void refreshNode(MegaChatListItem item) {
-        LogUtil.logDebug("Chat ID: " + item.getChatId());
+        logDebug("Chat ID: " + item.getChatId());
         ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         //elements of adapter
@@ -1353,7 +1353,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 }
             }
             if (indexToUpdate != -1) {
-                LogUtil.logDebug("Index to replace: " + indexToUpdate);
+                logDebug("Index to replace: " + indexToUpdate);
                 if (adapterList != null) {
                     adapterList.notifyItemChanged(indexToUpdate);
                 }
@@ -1362,12 +1362,12 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void interactionUpdate(int position) {
-        LogUtil.logDebug("Position: " + position);
+        logDebug("Position: " + position);
         MegaChatListItem chat = chats.remove(position);
         chats.add(0, chat);
         adapterList.notifyItemMoved(position, 0);
         if (lastFirstVisiblePosition == position) {
-            LogUtil.logDebug("Interaction - change lastFirstVisiblePosition");
+            logDebug("Interaction - change lastFirstVisiblePosition");
             lastFirstVisiblePosition = 0;
         }
 
@@ -1402,15 +1402,15 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 String fullName = getParticipantFullName(chatToCheck, i);
                 if (fullName != null) {
                     if (fullName.trim().length() <= 0) {
-                        LogUtil.logDebug("Ask for name!");
+                        logDebug("Ask for name!");
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context);
                         megaChatApi.getUserFirstname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
                         megaChatApi.getUserLastname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
                     } else {
-                        LogUtil.logDebug("Exists name!");
+                        logDebug("Exists name!");
                     }
                 } else {
-                    LogUtil.logDebug("Ask for name!");
+                    logDebug("Ask for name!");
                     ChatNonContactNameListener listener = new ChatNonContactNameListener(context);
                     megaChatApi.getUserFirstname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
                     megaChatApi.getUserLastname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
@@ -1421,7 +1421,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        LogUtil.logDebug("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         if (listView.getLayoutManager() != null) {
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
@@ -1430,7 +1430,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Override
     public void onPause() {
-        LogUtil.logDebug("onPause");
+        logDebug("onPause");
         lastFirstVisiblePosition = ((LinearLayoutManager) listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         MegaApplication.setRecentChatVisible(false);
         super.onPause();
@@ -1438,7 +1438,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Override
     public void onResume() {
-        LogUtil.logDebug("onResume: lastFirstVisiblePosition " + lastFirstVisiblePosition);
+        logDebug("onResume: lastFirstVisiblePosition " + lastFirstVisiblePosition);
         if (lastFirstVisiblePosition > 0) {
             (listView.getLayoutManager()).scrollToPosition(lastFirstVisiblePosition);
         } else {
@@ -1471,7 +1471,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        LogUtil.logDebug("onActivityCreated");
+        logDebug("onActivityCreated");
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
@@ -1484,7 +1484,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (chats == null) {
             fastScroller.setVisibility(View.GONE);
         } else {
-            if (chats.size() < Constants.MIN_ITEMS_SCROLLBAR_CHAT) {
+            if (chats.size() < MIN_ITEMS_SCROLLBAR_CHAT) {
                 fastScroller.setVisibility(View.GONE);
             } else {
                 fastScroller.setVisibility(View.VISIBLE);
@@ -1516,11 +1516,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         adapterList.setChats(chats);
 
         if (adapterList.getItemCount() == 0 && emptyArchivedChats()) {
-            LogUtil.logDebug("adapterList.getItemCount() == 0");
+            logDebug("adapterList.getItemCount() == 0");
             listView.setVisibility(View.GONE);
             emptyLayout.setVisibility(View.VISIBLE);
         } else {
-            LogUtil.logDebug("adapterList.getItemCount() NOT = 0");
+            logDebug("adapterList.getItemCount() NOT = 0");
             listView.setVisibility(View.VISIBLE);
             emptyLayout.setVisibility(View.GONE);
 
@@ -1528,18 +1528,18 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public boolean checkPermissionsCall() {
-        LogUtil.logDebug("checkPermissionsCall() ");
+        logDebug("checkPermissionsCall() ");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
             boolean hasCameraPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
             if (!hasCameraPermission) {
-                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
+                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
                 return false;
             }
 
             boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
             if (!hasRecordAudioPermission) {
-                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
                 return false;
             }
 
@@ -1550,23 +1550,23 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        LogUtil.logDebug("onRequestPermissionsResult");
+        logDebug("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case Constants.REQUEST_CAMERA: {
+            case REQUEST_CAMERA: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
-                        LogUtil.logDebug("REQUEST_CAMERA -> returnTheCall");
-                        ChatUtil.returnCall(context, megaChatApi);
+                        logDebug("REQUEST_CAMERA -> returnTheCall");
+                        returnCall(context, megaChatApi);
                     }
                 }
                 break;
             }
-            case Constants.RECORD_AUDIO: {
+            case RECORD_AUDIO: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
-                        LogUtil.logDebug("RECORD_AUDIO -> returnTheCall");
-                        ChatUtil.returnCall(context, megaChatApi);
+                        logDebug("RECORD_AUDIO -> returnTheCall");
+                        returnCall(context, megaChatApi);
                     }
                 }
                 break;
@@ -1648,7 +1648,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (context instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) context).hideFabButton();
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-                ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+                ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
                 checkScroll();
             } else if (context instanceof ArchivedChatsActivity) {
                 ((ArchivedChatsActivity) context).changeStatusBarColor(1);
@@ -1663,7 +1663,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (context instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) context).showFabButton();
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-                ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+                ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
                 checkScroll();
             } else if (context instanceof ArchivedChatsActivity) {
                 ((ArchivedChatsActivity) context).changeStatusBarColor(0);
@@ -1707,7 +1707,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         if (chat != null) {
                             if (chat.isGroup() && (chat.getOwnPrivilege() == MegaChatRoom.PRIV_RO || chat.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD
                                     || chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR)) {
-                                LogUtil.logDebug("Chat Group permissions: " + chat.getOwnPrivilege());
+                                logDebug("Chat Group permissions: " + chat.getOwnPrivilege());
                                 showLeaveChat = true;
                             } else {
                                 showLeaveChat = false;
@@ -1722,7 +1722,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                             String chatHandle = String.valueOf(chat.getChatId());
                             if (dbH.areNotificationsEnabled(chatHandle)) {
-                                LogUtil.logDebug("Chat UNMUTED");
+                                logDebug("Chat UNMUTED");
                                 showUnmute = true;
                                 break;
                             }
@@ -1735,7 +1735,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                             String chatHandle = String.valueOf(chat.getChatId());
                             if (!(dbH.areNotificationsEnabled(chatHandle))) {
-                                LogUtil.logDebug("Chat MUTED");
+                                logDebug("Chat MUTED");
                                 showMute = true;
                                 break;
                             }
@@ -1818,7 +1818,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             adapterList.setChats(filteredChats);
 
             if (adapterList.getItemCount() == 0) {
-                LogUtil.logDebug("adapterList.getItemCount() == 0");
+                logDebug("adapterList.getItemCount() == 0");
                 listView.setVisibility(View.GONE);
                 emptyLayout.setVisibility(View.VISIBLE);
                 inviteButton.setVisibility(View.GONE);
@@ -1841,7 +1841,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 emptyTextViewInvite.setText(result);
                 emptyTextViewInvite.setVisibility(View.VISIBLE);
             } else {
-                LogUtil.logDebug("adapterList.getItemCount() NOT = 0");
+                logDebug("adapterList.getItemCount() NOT = 0");
                 listView.setVisibility(View.VISIBLE);
                 emptyLayout.setVisibility(View.GONE);
             }

@@ -27,10 +27,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.PhoneContactInfo;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContactsLollipopAdapter.ViewHolderChips> implements View.OnClickListener{
 
@@ -64,7 +65,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
 
     @Override
     public AddContactsLollipopAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-        LogUtil.logDebug("onCreateViewHolder");
+        logDebug("onCreateViewHolder");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -77,7 +78,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
         holder.itemLayout.setOnClickListener(this);
 
         holder.textViewName = (TextView) v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
+        holder.textViewName.setMaxWidth(px2dp(60, outMetrics));
 
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
@@ -91,7 +92,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
 
     @Override
     public void onBindViewHolder(AddContactsLollipopAdapter.ViewHolderChips holder, int position) {
-        LogUtil.logDebug("onBindViewHolderList");
+        logDebug("onBindViewHolderList");
 
         PhoneContactInfo contact = (PhoneContactInfo) getItem(position);
         String[] s;
@@ -124,15 +125,15 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
 
     @Override
     public void onClick(View view) {
-        LogUtil.logDebug("onClick");
+        logDebug("onClick");
 
         AddContactsLollipopAdapter.ViewHolderChips holder = (AddContactsLollipopAdapter.ViewHolderChips) view.getTag();
         if(holder!=null){
             int currentPosition = holder.getLayoutPosition();
-            LogUtil.logDebug("onClick -> Current position: " + currentPosition);
+            logDebug("onClick -> Current position: " + currentPosition);
 
             if(currentPosition<0){
-                LogUtil.logError("Current position error - not valid value");
+                logError("Current position error - not valid value");
                 return;
             }
             switch (view.getId()) {
@@ -143,7 +144,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
             }
         }
         else{
-            LogUtil.logError("Error. Holder is Null");
+            logError("Error. Holder is Null");
         }
     }
 
@@ -158,27 +159,27 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
     }
 
     public void setPositionClicked(int p) {
-        LogUtil.logDebug("Position clicked: " + p);
+        logDebug("Position clicked: " + p);
         positionClicked = p;
         notifyDataSetChanged();
     }
 
     public void setContacts (ArrayList<PhoneContactInfo> contacts){
-        LogUtil.logDebug("setContacts");
+        logDebug("setContacts");
         this.contacts = contacts;
 
         notifyDataSetChanged();
     }
 
     public Object getItem(int position) {
-        LogUtil.logDebug("Position: " + position);
+        logDebug("Position: " + position);
         return contacts.get(position);
     }
 
     public Bitmap createDefaultAvatar(String fullName){
-        LogUtil.logDebug("createDefaultAvatar()");
+        logDebug("createDefaultAvatar()");
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint paintText = new Paint();
         Paint paintCircle = new Paint();
@@ -206,7 +207,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
         String firstLetter = fullName.charAt(0) + "";
-        LogUtil.logDebug("Draw letter: " + firstLetter);
+        logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);

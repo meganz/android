@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class AndroidMegaRichLinkMessage {
 
@@ -89,7 +90,7 @@ public class AndroidMegaRichLinkMessage {
         Matcher m = Patterns.WEB_URL.matcher(text);
         while (m.find()) {
             String url = m.group();
-            LogUtil.logDebug("URL extracted: " + url);
+            logDebug("URL extracted: " + url);
             if (isFileLink(url)) {
                 return links.toArray(new String[links.size()]);
             }
@@ -108,7 +109,7 @@ public class AndroidMegaRichLinkMessage {
             urlIn = URLDecoder.decode(urlIn, "UTF-8");
         }
         catch (Exception e) {
-            LogUtil.logError("Error decoding URL: " + urlIn, e);
+            logError("Error decoding URL: " + urlIn, e);
         }
 
         urlIn.replace(' ', '+');
@@ -130,7 +131,7 @@ public class AndroidMegaRichLinkMessage {
         Matcher m = Patterns.WEB_URL.matcher(urlIn);
         while (m.find()) {
             String url = m.group();
-            LogUtil.logDebug("URL extracted: " + url);
+            logDebug("URL extracted: " + url);
             if (isFileLink(url)) {
                 return url;
             }
@@ -147,7 +148,7 @@ public class AndroidMegaRichLinkMessage {
 
     public static boolean isFolderLink(String url) {
         if (url != null && (url.matches("^https://mega\\.co\\.nz/#F!.+$") || url.matches("^https://mega\\.nz/#F!.+$"))) {
-            LogUtil.logDebug("Folder link found");
+            logDebug("Folder link found");
             return true;
         }
         return false;
@@ -155,7 +156,7 @@ public class AndroidMegaRichLinkMessage {
 
     public static boolean isFileLink(String url) {
         if (url != null && (url.matches("^https://mega\\.co\\.nz/#!.+$") || url.matches("^https://mega\\.nz/#!.+$"))) {
-            LogUtil.logDebug("IS file link found");
+            logDebug("IS file link found");
             return true;
         }
         return false;
@@ -163,7 +164,7 @@ public class AndroidMegaRichLinkMessage {
 
     public static boolean isChatLink(String url) {
         if (url != null && (url.matches("^https://mega\\.co\\.nz/chat/.+$") || url.matches("^https://mega\\.nz/chat/.+$"))) {
-            LogUtil.logDebug("IS chat link found");
+            logDebug("IS chat link found");
             return true;
         }
         return false;
@@ -171,7 +172,7 @@ public class AndroidMegaRichLinkMessage {
 
     public static boolean isContactLink(String url) {
         if (url != null && (url.matches("^https://mega\\.co\\.nz/C!.+$") || url.matches("^https://mega\\.nz/C!.+$"))) {
-            LogUtil.logDebug("IS contact link found");
+            logDebug("IS contact link found");
             return true;
         }
         return false;

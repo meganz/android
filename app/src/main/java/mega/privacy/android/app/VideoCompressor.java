@@ -7,9 +7,9 @@ import java.io.File;
 import java.util.List;
 
 import mega.privacy.android.app.jobservices.SyncRecord;
-import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class VideoCompressor extends VideoDownsampling{
 
@@ -29,7 +29,7 @@ public class VideoCompressor extends VideoDownsampling{
 
     public void stop() {
         setRunning(false);
-        LogUtil.logDebug("Video compressor stopped");
+        logDebug("Video compressor stopped");
     }
 
     public VideoCompressor(Context context, VideoCompressionCallback callback) {
@@ -40,7 +40,7 @@ public class VideoCompressor extends VideoDownsampling{
     public void setPendingList(List<SyncRecord> pendingList) {
         this.pendingList = pendingList;
         totalCount = pendingList.size();
-        LogUtil.logDebug("Total compression videos count is " + totalCount);
+        logDebug("Total compression videos count is " + totalCount);
         calculateTotalSize();
     }
 
@@ -48,7 +48,7 @@ public class VideoCompressor extends VideoDownsampling{
         for (int i = 0; i < totalCount; i++) {
             totalInputSize += new File(pendingList.get(i).getLocalPath()).length();
         }
-        LogUtil.logDebug("Total compression size is " + totalInputSize);
+        logDebug("Total compression size is " + totalInputSize);
     }
 
     public long getTotalInputSize() {
@@ -75,7 +75,7 @@ public class VideoCompressor extends VideoDownsampling{
         for (int i = 0; i < totalCount && isRunning(); i++) {
             currentFileIndex = i + 1;
             SyncRecord record = pendingList.get(i);
-            LogUtil.logDebug("Video compressor start: " + record.toString());
+            logDebug("Video compressor start: " + record.toString());
             String path = record.getLocalPath();
             File src = new File(path);
             long size = src.length();
@@ -92,7 +92,7 @@ public class VideoCompressor extends VideoDownsampling{
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-                LogUtil.logError("Exception", ex);
+                logError("Exception", ex);
                 updater.onCompressFailed(record);
                 currentFileIndex++;
                 totalRead += size;

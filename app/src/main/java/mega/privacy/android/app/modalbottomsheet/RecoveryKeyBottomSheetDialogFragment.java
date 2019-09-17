@@ -18,8 +18,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -41,12 +42,12 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
     }
 
     @Override
     public void onClick(View v) {
-        LogUtil.logDebug("onClick");
+        logDebug("onClick");
 
         switch(v.getId()){
             case R.id.recovery_key_copytoclipboard_layout:{
@@ -58,13 +59,13 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.recovery_key_saveTo_fileSystem_layout:{
-                LogUtil.logDebug("Option save to File System");
+                logDebug("Option save to File System");
                 AccountController aC = new AccountController(getContext());
                 aC.saveRkToFileSystem(false);
                 break;
             }
             case R.id.recovery_key_print_layout:{
-                LogUtil.logDebug("Option print RK");
+                logDebug("Option print RK");
                 printRK();
                 break;
             }

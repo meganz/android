@@ -1,7 +1,6 @@
 package mega.privacy.android.app;
-import nz.mega.sdk.MegaApiAndroid;
 
-import mega.privacy.android.app.utils.LogUtil;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaPreferences{
 	
@@ -237,7 +236,7 @@ public class MegaPreferences{
 	}
 
 	public String getMegaHandleSecondaryFolder() {
-		LogUtil.logDebug("getMegaHandleSecondaryFolder " + megaHandleSecondaryFolder);
+		logDebug("getMegaHandleSecondaryFolder " + megaHandleSecondaryFolder);
 		return megaHandleSecondaryFolder;
 	}
 

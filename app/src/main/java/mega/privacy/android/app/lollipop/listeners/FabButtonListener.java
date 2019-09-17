@@ -7,10 +7,10 @@ import android.view.View;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class FabButtonListener implements FloatingActionButton.OnClickListener{
 
@@ -18,26 +18,26 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
     ManagerActivityLollipop.DrawerItem drawerItem;
 
     public FabButtonListener(Context context){
-        LogUtil.logDebug("FabButtonListener created");
+        logDebug("FabButtonListener created");
         this.context = context;
     }
 
     @Override
     public void onClick(View v) {
-        LogUtil.logDebug("FabButtonListener");
+        logDebug("FabButtonListener");
         switch(v.getId()) {
             case R.id.floating_button: {
-                LogUtil.logDebug("Floating Button click!");
+                logDebug("Floating Button click!");
                 if(context instanceof ManagerActivityLollipop){
                     drawerItem = ((ManagerActivityLollipop)context).getDrawerItem();
                     switch (drawerItem){
                         case CLOUD_DRIVE:
                         case SEARCH:
                         case SHARED_ITEMS:{
-                            LogUtil.logDebug("Cloud Drive SECTION");
-                            if(!Util.isOnline(context)){
+                            logDebug("Cloud Drive SECTION");
+                            if(!isOnline(context)){
                                 if(context instanceof ManagerActivityLollipop){
-                                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                                 }
                                 return;
                             }
@@ -45,10 +45,10 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                             break;
                         }
                         case CONTACTS:{
-                            LogUtil.logDebug("Add contacts");
-                            if(!Util.isOnline(context)){
+                            logDebug("Add contacts");
+                            if(!isOnline(context)){
                                 if(context instanceof ManagerActivityLollipop){
-                                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                                 }
                                 return;
                             }
@@ -56,7 +56,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                             break;
                         }
                         case CHAT:{
-                            LogUtil.logDebug("Create new chat");
+                            logDebug("Create new chat");
                             ((ManagerActivityLollipop)context).chooseAddContactDialog(true);
                             break;
                         }
@@ -65,9 +65,9 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                 break;
             }
             case R.id.floating_button_contact_file_list:{
-                if(!Util.isOnline(context)){
+                if(!isOnline(context)){
                     if(context instanceof ContactFileListActivityLollipop){
-                        ((ContactFileListActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
+                        ((ContactFileListActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
                     }
                     return;
                 }
@@ -77,20 +77,20 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                 break;
             }
             case R.id.main_fab_chat: {
-                LogUtil.logDebug("Main FAB chat click!");
+                logDebug("Main FAB chat click!");
                 ((ManagerActivityLollipop)context).animateFABCollection();
                 break;
             }
             case R.id.first_fab_chat: {
-                LogUtil.logDebug("Create new chat");
+                logDebug("Create new chat");
                 break;
             }
             case R.id.second_fab_chat: {
-                LogUtil.logDebug("Second FAB chat click");
+                logDebug("Second FAB chat click");
                 break;
             }
             case R.id.third_fab_chat: {
-                LogUtil.logDebug("Third FAB chat click");
+                logDebug("Third FAB chat click");
                 break;
             }
         }

@@ -18,8 +18,9 @@ import android.widget.ScrollView;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class TourFragmentLollipop extends Fragment implements View.OnClickListener{
 
@@ -36,11 +37,11 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            LogUtil.logError("Context is null");
+            logError("Context is null");
             return;
         }
     }
@@ -85,7 +86,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LogUtil.logDebug("onCreateView");
+        logDebug("onCreateView");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
@@ -164,26 +165,26 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
         switch(v.getId()){
             case R.id.button_register_tour:
-                LogUtil.logDebug("onRegisterClick");
-                ((LoginActivityLollipop)context).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT);
+                logDebug("onRegisterClick");
+                ((LoginActivityLollipop)context).showFragment(CREATE_ACCOUNT_FRAGMENT);
                 break;
             case R.id.button_login_tour:
-                LogUtil.logDebug("onLoginClick");
-                ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
+                logDebug("onLoginClick");
+                ((LoginActivityLollipop)context).showFragment(LOGIN_FRAGMENT);
                 break;
         }
     }
 
     @Override
     public void onAttach(Context context) {
-        LogUtil.logDebug("onAttach");
+        logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
     }
 
     @Override
     public void onAttach(Activity context) {
-        LogUtil.logDebug("onAttach Activity");
+        logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
     }

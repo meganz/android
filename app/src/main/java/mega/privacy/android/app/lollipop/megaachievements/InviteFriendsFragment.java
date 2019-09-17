@@ -40,12 +40,13 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.flowlayoutmanager.Alignment;
 import mega.privacy.android.app.components.flowlayoutmanager.FlowLayoutManager;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	
@@ -82,7 +83,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-		LogUtil.logDebug("onCreate");
+		logDebug("onCreate");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -99,7 +100,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		LogUtil.logDebug("onCreateView");
+		logDebug("onCreateView");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -113,7 +114,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		int width = outMetrics.widthPixels;
 
 		boolean enabledAchievements = megaApi.isAchievementsEnabled();
-		LogUtil.logDebug("The achievements are: " + enabledAchievements);
+		logDebug("The achievements are: " + enabledAchievements);
 
 		View v = inflater.inflate(R.layout.fragment_invite_friends, container, false);
 		recyclerView = (RecyclerView) v.findViewById(R.id.invite_friends_recycler_view);
@@ -140,7 +141,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		long referralsStorageValue = ((AchievementsActivity)context).megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
 		long referralsTransferValue = ((AchievementsActivity)context).megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
 
-		titleCard.setText(getString(R.string.figures_achievements_text_referrals, Util.getSizeString(referralsStorageValue), Util.getSizeString(referralsTransferValue)));
+		titleCard.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue), getSizeString(referralsTransferValue)));
 
 		toggleButtonMail = (ImageView) v.findViewById(R.id.toggle_button_invite_mail);
 		toggleButtonMail.setOnClickListener(this);
@@ -152,11 +153,11 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					LogUtil.logDebug("first");
+					logDebug("first");
 					String s =  v.getText().toString();
 					inputString = v.getText().toString();
 					if (s.isEmpty() || s.equals("null") || s.equals("")) {
-						Util.hideKeyboard((AchievementsActivity) context, 0);
+						hideKeyboard((AchievementsActivity) context, 0);
 					}
 					else {
 						boolean isValid = isValidEmail(s);
@@ -173,9 +174,9 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 				}
 
 				if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_SEND)) {
-					LogUtil.logDebug("second");
+					logDebug("second");
 					if (mails.isEmpty()) {
-						Util.hideKeyboard((AchievementsActivity) context, 0);
+						hideKeyboard((AchievementsActivity) context, 0);
 					}
 					else {
 						((AchievementsActivity)context).inviteFriends(mails);
@@ -223,7 +224,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 							}
 						}
 						else{
-							LogUtil.logDebug("Last character is: " + last);
+							logDebug("Last character is: " + last);
 						}
 					}
 					else {
@@ -293,7 +294,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	}
 
 	private void setError(){
-		LogUtil.logDebug("setError");
+		logDebug("setError");
 		emailErrorLayout.setVisibility(View.VISIBLE);
 		PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 		Drawable background = editTextBackground.mutate().getConstantState().newDrawable();
@@ -303,7 +304,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 	private void quitError(){
 		if(emailErrorLayout.getVisibility() != View.GONE){
-			LogUtil.logDebug("quitError");
+			logDebug("quitError");
 			emailErrorLayout.setVisibility(View.GONE);
 			editTextMail.setBackground(editTextBackground);
 		}
@@ -313,12 +314,12 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		if (target == null) {
 			return false;
 		} else {
-			return Constants.EMAIL_ADDRESS.matcher(target).matches();
+			return EMAIL_ADDRESS.matcher(target).matches();
 		}
 	}
 
 	public void deleteMail(String mailToDelete){
-		LogUtil.logDebug("Mail to delete: " + mailToDelete);
+		logDebug("Mail to delete: " + mailToDelete);
 		int positionToRemove=-1;
 		for(int i=0;i<mails.size();i++){
 			if(mailToDelete.equals(mails.get(i))){
@@ -331,7 +332,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 			adapter.setNames(mails);
 			adapter.notifyDataSetChanged();
 		}
-		LogUtil.logDebug("positionToRemove: " + positionToRemove);
+		logDebug("positionToRemove: " + positionToRemove);
 		if(mails.isEmpty()){
 			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
 			inviteButton.setOnClickListener(null);
@@ -343,7 +344,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	}
 
 	public void deleteMail(int positionToDelete){
-		LogUtil.logDebug("positionToDelete: " + positionToDelete);
+		logDebug("positionToDelete: " + positionToDelete);
 
 		if(positionToDelete!=-1){
 			mails.remove(positionToDelete);
@@ -363,7 +364,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	}
 
 	public void addMail(String mail){
-		LogUtil.logDebug("mail: " + mail);
+		logDebug("mail: " + mail);
 		if (mails.contains(mail)){
 			((AchievementsActivity) context).showSnackbar(context.getString(R.string.contact_not_added));
 		}
@@ -387,7 +388,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 	@Override
 	public void onAttach(Activity activity) {
-		LogUtil.logDebug("onAttach");
+		logDebug("onAttach");
 		super.onAttach(activity);
 		context = activity;
 		aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -395,7 +396,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 	@Override
 	public void onAttach(Context context) {
-		LogUtil.logDebug("onAttach context");
+		logDebug("onAttach context");
 		super.onAttach(context);
 		this.context = context;
 		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
@@ -403,11 +404,11 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 	@Override
 	public void onClick(View v) {
-		LogUtil.logDebug("onClick");
+		logDebug("onClick");
 		switch (v.getId()) {
 
 			case R.id.invite_button:{
-				LogUtil.logDebug("Invite friends");
+				logDebug("Invite friends");
 				((AchievementsActivity)context).inviteFriends(mails);
 				editTextMail.getText().clear();
 				mails.clear();
@@ -417,19 +418,19 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 			}
 			case R.id.toggle_button_invite_mail: {
 				Intent intent = new Intent(context, AddContactActivityLollipop.class);
-				intent.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
+				intent.putExtra("contactType", CONTACT_TYPE_DEVICE);
 				intent.putExtra("fromAchievements", true);
 				intent.putStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS, mails);
-				((AchievementsActivity)context).startActivityForResult(intent, Constants.REQUEST_CODE_GET_CONTACTS);
+				((AchievementsActivity)context).startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
 				break;
 			}
 		}
 	}
 
 	public int onBackPressed(){
-		LogUtil.logDebug("onBackPressed");
+		logDebug("onBackPressed");
 
-		((AchievementsActivity) context).showFragment(Constants.ACHIEVEMENTS_FRAGMENT, -1);
+		((AchievementsActivity) context).showFragment(ACHIEVEMENTS_FRAGMENT, -1);
 		return 0;
 	}
 }

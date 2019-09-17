@@ -94,6 +94,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class Util {
@@ -244,9 +245,9 @@ public class Util {
         	if (secStore.compareTo("") == 0){
         		return null;
         	}
-			LogUtil.logDebug("secStore: " + secStore);
+			logDebug("secStore: " + secStore);
 	        File path = new File(secStore);
-			LogUtil.logDebug("getFreeSize: " + path.getUsableSpace());
+			logDebug("getFreeSize: " + path.getUsableSpace());
 	        if(path.getUsableSpace()>0)
 	        {
 	        	return path.getAbsolutePath();
@@ -680,7 +681,7 @@ public class Util {
 				  }
 			  }
 		  } catch (Exception ex) {
-			  LogUtil.logError("Error getting local IP address", ex);
+			  logError("Error getting local IP address", ex);
 		  }
 		  return null;
    }
@@ -1093,7 +1094,7 @@ public class Util {
 	}
 	
 	public static boolean checkBitSet(BitSet paymentBitSet, int position){
-		LogUtil.logDebug("checkBitSet");
+		logDebug("checkBitSet");
 		if (paymentBitSet != null){
 			if (paymentBitSet.get(position)){
 				return true;
@@ -1115,7 +1116,7 @@ public class Util {
 				try{
 					long currentTime = System.currentTimeMillis()/1000;
 					long lastPublicHandleTimeStamp = Long.parseLong(attributes.getLastPublicHandleTimeStamp());
-					LogUtil.logDebug("currentTime: " + currentTime + " _ " + lastPublicHandleTimeStamp);
+					logDebug("currentTime: " + currentTime + " _ " + lastPublicHandleTimeStamp);
 					if ((currentTime - lastPublicHandleTimeStamp) < 86400){
 						if (Long.parseLong(attributes.getLastPublicHandle()) != -1){
 							lastPublicHandle = Long.parseLong(attributes.getLastPublicHandle());
@@ -1173,7 +1174,7 @@ public class Util {
 	 * Validate email
 	 */
 	public static String getEmailError(String value, Context context) {
-		LogUtil.logDebug("getEmailError");
+		logDebug("getEmailError");
 		if (value.length() == 0) {
 			return context.getString(R.string.error_enter_email);
 		}
@@ -1209,7 +1210,7 @@ public class Util {
 	}
 
 	public static void showAlert(Context context, String message, String title) {
-		LogUtil.logDebug("showAlert");
+		logDebug("showAlert");
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		if(title!=null){
 			builder.setTitle(title);
@@ -1220,7 +1221,7 @@ public class Util {
 	}
 
 	public static long calculateTimestampMinDifference(String timeStamp) {
-		LogUtil.logDebug("calculateTimestampDifference");
+		logDebug("calculateTimestampDifference");
 
 		Long actualTimestamp = System.currentTimeMillis()/1000;
 
@@ -1244,7 +1245,7 @@ public class Util {
 
 	public static long calculateTimestamp(String time)
 	{
-		LogUtil.logDebug("calculateTimestamp: " + time);
+		logDebug("calculateTimestamp: " + time);
 		long unixtime;
 		DateFormat dfm = new SimpleDateFormat("yyyyMMddHHmm");
 		dfm.setTimeZone( TimeZone.getDefault());//Specify your timezone
@@ -1256,21 +1257,21 @@ public class Util {
 		}
 		catch (ParseException e)
 		{
-			LogUtil.logError("ParseException!!!", e);
+			logError("ParseException!!!", e);
 		}
 		return 0;
 	}
 
 	public static Calendar calculateDateFromTimestamp (long timestamp){
-		LogUtil.logDebug("calculateTimestamp: " + timestamp);
+		logDebug("calculateTimestamp: " + timestamp);
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(timestamp*1000);
-		LogUtil.logDebug("Calendar: " + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.MONTH));
+		logDebug("Calendar: " + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.MONTH));
 		return cal;
 	}
 
 	public static boolean isChatEnabled (){
-		LogUtil.logDebug("isChatEnabled");
+		logDebug("isChatEnabled");
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(context);
 		}
@@ -1280,18 +1281,18 @@ public class Util {
 		if(chatSettings!=null){
 			if(chatSettings.getEnabled()!=null){
 				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-				LogUtil.logDebug("A - chatEnabled: " + chatEnabled);
+				logDebug("A - chatEnabled: " + chatEnabled);
 				return chatEnabled;
 			}
 			else{
 				chatEnabled=true;
-				LogUtil.logDebug("B - chatEnabled: " + chatEnabled);
+				logDebug("B - chatEnabled: " + chatEnabled);
 				return chatEnabled;
 			}
 		}
 		else{
 			chatEnabled=true;
-			LogUtil.logDebug("C - chatEnabled: " + chatEnabled);
+			logDebug("C - chatEnabled: " + chatEnabled);
 			return chatEnabled;
 		}
 	}
@@ -1363,7 +1364,7 @@ public class Util {
 	//restrict the scale factor to below 1.1 to allow user to have some level of freedom and also prevent ui issues
 	public static void setAppFontSize(Activity activity) {
 		float scale = activity.getResources().getConfiguration().fontScale;
-		LogUtil.logDebug("System font size scale is " + scale);
+		logDebug("System font size scale is " + scale);
 
 		float newScale;
 
@@ -1373,7 +1374,7 @@ public class Util {
 			newScale = (float) 1.1;
 		}
 
-		LogUtil.logDebug("New font size new scale is " + newScale);
+		logDebug("New font size new scale is " + newScale);
 		Configuration configuration = activity.getResources().getConfiguration();
 		configuration.fontScale = newScale;
 
@@ -1417,7 +1418,7 @@ public class Util {
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
 			if(context instanceof ManagerActivityLollipop){
-				LogUtil.logDebug("Show dialog to cancel transfers before logging OUT");
+				logDebug("Show dialog to cancel transfers before logging OUT");
 				builder.setMessage(R.string.logout_warning_abort_transfers);
 				builder.setPositiveButton(R.string.action_logout, new DialogInterface.OnClickListener() {
 					@Override
@@ -1427,7 +1428,7 @@ public class Util {
 				});
 			}
 			else{
-				LogUtil.logDebug("Show dialog to cancel transfers before logging IN");
+				logDebug("Show dialog to cancel transfers before logging IN");
 				builder.setMessage(R.string.login_warning_abort_transfers);
 				builder.setPositiveButton(R.string.login_text, new DialogInterface.OnClickListener() {
 					@Override
@@ -1450,7 +1451,7 @@ public class Util {
 	}
 
 	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
-		LogUtil.logDebug("changeStatusBarColor");
+		logDebug("changeStatusBarColor");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -1485,7 +1486,7 @@ public class Util {
 	}
 
 	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
-		LogUtil.logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
+		logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
@@ -1503,12 +1504,12 @@ public class Util {
 		paintText.setStyle(Paint.Style.FILL);
 
 		if(color!=null){
-			LogUtil.logDebug("The color to set the avatar is " + color);
+			logDebug("The color to set the avatar is " + color);
 			paintCircle.setColor(Color.parseColor(color));
 			paintCircle.setAntiAlias(true);
 		}
 		else{
-			LogUtil.logDebug("Default color to the avatar");
+			logDebug("Default color to the avatar");
 			paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 			paintCircle.setAntiAlias(true);
 		}
@@ -1522,7 +1523,7 @@ public class Util {
 
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-		LogUtil.logDebug("Draw letter: " + firstLetter);
+		logDebug("Draw letter: " + firstLetter);
 		Rect bounds = new Rect();
 
 		paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -1567,7 +1568,7 @@ public class Util {
         } else if (context instanceof BaseActivity) {
             View rootView = getRootViewFromContext(context);
             if (rootView == null) {
-				LogUtil.logWarning("Unable to show snack bar, view does not exist");
+				logWarning("Unable to show snack bar, view does not exist");
             } else {
                 ((BaseActivity)context).showSnackbar(snackbarType,rootView,message,idChat);
             }
@@ -1586,7 +1587,7 @@ public class Util {
                 rootView = ((ViewGroup)((BaseActivity)context).findViewById(android.R.id.content)).getChildAt(0);//get first view
             }
         } catch (Exception e) {
-			LogUtil.logError("ERROR", e);
+			logError("ERROR", e);
         }
         return rootView;
     }
@@ -1636,7 +1637,7 @@ public class Util {
 		try {
 			builder.append(Math.round(Float.parseFloat(degreesSplit[2].replace(",", "."))));
 		} catch (Exception e) {
-			LogUtil.logWarning("Error rounding seconds in coordinates", e);
+			logWarning("Error rounding seconds in coordinates", e);
 			builder.append(degreesSplit[2]);
 		}
 
@@ -1706,7 +1707,7 @@ public class Util {
     }
 
     public static void showKeyboardDelayed(final View view) {
-		LogUtil.logDebug("showKeyboardDelayed");
+		logDebug("showKeyboardDelayed");
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override

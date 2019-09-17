@@ -8,10 +8,6 @@ import java.io.File;
 
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
@@ -22,6 +18,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 
 public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
@@ -57,7 +57,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        LogUtil.logDebug("onRequestFinish()");
+        logDebug("onRequestFinish()");
         if (e.getErrorCode() == MegaError.API_OK){
 
             if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
@@ -76,12 +76,12 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
                 //Get preview of file
                 if (document.isFile()) {
                     Bitmap thumb = null;
-                    thumb = ThumbnailUtils.getThumbnailFromCache(document);
+                    thumb = getThumbnailFromCache(document);
                     if (thumb == null) {
-                        thumb = ThumbnailUtils.getThumbnailFromFolder(document, context);
+                        thumb = getThumbnailFromFolder(document, context);
                         if (thumb == null) {
                             if (document.hasThumbnail()) {
-                                File previewFile = new File(ThumbnailUtils.getThumbFolder(context), document.getBase64Handle() + ".jpg");
+                                File previewFile = new File(getThumbFolder(context), document.getBase64Handle() + ".jpg");
                                 megaApi.getThumbnail(document, previewFile.getAbsolutePath(), this);
                             }
                         }
@@ -106,7 +106,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
                         String url = richLinkMessage.getUrl();
                         String [] s = url.split("!");
-                        LogUtil.logDebug("URL parts: "  + s.length);
+                        logDebug("URL parts: "  + s.length);
                         for (int i=0;i<s.length;i++){
                             switch (i){
                                 case 1:{
@@ -121,7 +121,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
                                 }
                                 case 3:{
                                     folderSubHandle = s[3];
-                                    LogUtil.logDebug("URL_subhandle: " + folderSubHandle);
+                                    logDebug("URL_subhandle: " + folderSubHandle);
                                     break;
                                 }
                             }
@@ -129,14 +129,14 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
                         if(folderSubHandle==null){
                             richLinkMessage.setNode(rootNode);
-                            String content = MegaApiUtils.getInfoFolder(rootNode, context, megaApiFolder);
+                            String content = getInfoFolder(rootNode, context, megaApiFolder);
                             richLinkMessage.setFolderContent(content);
                         }
                         else{
                             MegaNode pN = megaApiFolder.getNodeByHandle(MegaApiAndroid.base64ToHandle(folderSubHandle));
                             richLinkMessage.setNode(pN);
                             if(pN.isFolder()){
-                                String content = MegaApiUtils.getInfoFolder(pN, context, megaApiFolder);
+                                String content = getInfoFolder(pN, context, megaApiFolder);
                                 richLinkMessage.setFolderContent(content);
                             }
                         }
@@ -149,7 +149,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
             }
         }
         else{
-            LogUtil.logError("ERROR - Info of the public node not recovered");
+            logError("ERROR - Info of the public node not recovered");
 
             if (request.getType() == MegaRequest.TYPE_LOGIN) {
                 if(e.getErrorCode() == MegaError.API_EINCOMPLETE){

@@ -19,9 +19,9 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiBackspaceClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickListener;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class EmojiKeyboard extends LinearLayout {
 
@@ -118,7 +118,7 @@ public class EmojiKeyboard extends LinearLayout {
 
         DisplayMetrics outMetrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
-        keyboardHeight = outMetrics.heightPixels / 2 - ChatUtil.getActionBarHeight(activity, getResources());
+        keyboardHeight = (outMetrics.heightPixels / 2) - getActionBarHeight(activity, getResources());
         requestLayout();
     }
 
@@ -130,7 +130,7 @@ public class EmojiKeyboard extends LinearLayout {
     //KEYBOARDS:
     public void showLetterKeyboard() {
         if (isLetterKeyboardShown || !(editInterface instanceof View)) return;
-        LogUtil.logDebug("showLetterKeyboard()");
+        logDebug("showLetterKeyboard()");
         hideEmojiKeyboard();
         View view = (View) editInterface;
         view.setFocusableInTouchMode(true);
@@ -145,7 +145,7 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void showEmojiKeyboard() {
         if (isEmojiKeyboardShown) return;
-        LogUtil.logDebug("showEmojiKeyboard");
+        logDebug("showEmojiKeyboard");
         hideLetterKeyboard();
         setVisibility(VISIBLE);
         isEmojiKeyboardShown = true;
@@ -161,7 +161,7 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void hideBothKeyboard(Activity activity) {
         if (activity == null) return;
-        LogUtil.logDebug("hideBothKeyboard()");
+        logDebug("hideBothKeyboard()");
         hideEmojiKeyboard();
         hideLetterKeyboard();
         emojiIcon.setImageResource(R.drawable.ic_emojicon);
@@ -169,7 +169,7 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void hideLetterKeyboard() {
         if (!isLetterKeyboardShown || !(editInterface instanceof View)) return;
-        LogUtil.logDebug("hideLetterKeyboard() ");
+        logDebug("hideLetterKeyboard() ");
         View view = (View) editInterface;
         view.clearFocus();
         InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -181,7 +181,7 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void hideEmojiKeyboard() {
         if (!isEmojiKeyboardShown) return;
-        LogUtil.logDebug("hideEmojiKeyboard() ");
+        logDebug("hideEmojiKeyboard() ");
         recentEmoji.persist();
         variantEmoji.persist();
         setVisibility(GONE);

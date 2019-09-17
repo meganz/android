@@ -18,10 +18,9 @@ import java.util.regex.Pattern;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.emoji.EmojiCategory;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.components.twemoji.Utils.checkNotNull;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 /* EmojiManager where an EmojiProvider can be installed for further usage.*/
 public final class EmojiManager {
@@ -44,22 +43,22 @@ public final class EmojiManager {
 
       final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text);
       if(findAllEmojis.size() == 0){
-        LogUtil.logDebug("The text has not MEGA emojis");
+        logDebug("The text has not MEGA emojis");
         if(EmojiCompat.get()!=null){
           if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-            LogUtil.logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
+            logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
             EmojiCompat.get().process(text);
 
           } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_LOADING) {
-            LogUtil.logDebug("EmojiCompat - LOAD_STATE_LOADING");
+            logDebug("EmojiCompat - LOAD_STATE_LOADING");
           }else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_FAILED) {
-            LogUtil.logWarning("EmojiCompat - LOAD_STATE_FAILED");
+            logWarning("EmojiCompat - LOAD_STATE_FAILED");
           }else{
-            LogUtil.logDebug("EmojiCompat - LOAD_OTHER_CASE");
+            logDebug("EmojiCompat - LOAD_OTHER_CASE");
           }
         }
       }else{
-        LogUtil.logDebug("The text has MEGA emojis");
+        logDebug("The text has MEGA emojis");
 
         if(emojiManager.isOnlyEmojis(text.toString())){
           for (int i = 0; i < findAllEmojis.size(); i++) {
@@ -74,15 +73,15 @@ public final class EmojiManager {
               //First emoji found
               if(EmojiCompat.get()!=null){
                 if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-                  LogUtil.logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
+                  logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
                   EmojiCompat.get().process(text,0, currentLocation.start);
 
                 } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_LOADING) {
-                  LogUtil.logDebug("EmojiCompat - LOAD_STATE_LOADING");
+                  logDebug("EmojiCompat - LOAD_STATE_LOADING");
                 }else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_FAILED) {
-                  LogUtil.logWarning("EmojiCompat - LOAD_STATE_FAILED");
+                  logWarning("EmojiCompat - LOAD_STATE_FAILED");
                 }else{
-                  LogUtil.logDebug("EmojiCompat - LOAD_OTHER_CASE");
+                  logDebug("EmojiCompat - LOAD_OTHER_CASE");
                 }
               }
 
@@ -90,15 +89,15 @@ public final class EmojiManager {
                 //First emoji found and it's the last one too
                 if(EmojiCompat.get()!=null) {
                   if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-                    LogUtil.logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
+                    logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
                     EmojiCompat.get().process(text, currentLocation.end, text.length());
 
                   } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_LOADING) {
-                    LogUtil.logDebug("EmojiCompat - LOAD_STATE_LOADING");
+                    logDebug("EmojiCompat - LOAD_STATE_LOADING");
                   } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_FAILED) {
-                    LogUtil.logWarning("EmojiCompat - LOAD_STATE_FAILED");
+                    logWarning("EmojiCompat - LOAD_STATE_FAILED");
                   } else {
-                    LogUtil.logDebug("EmojiCompat - LOAD_OTHER_CASE");
+                    logDebug("EmojiCompat - LOAD_OTHER_CASE");
                   }
                 }
               }
@@ -108,16 +107,16 @@ public final class EmojiManager {
               EmojiRange previewLocation = findAllEmojis.get(i-1);
               if(EmojiCompat.get()!=null) {
                 if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-                  LogUtil.logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
+                  logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
                   EmojiCompat.get().process(text, previewLocation.end, currentLocation.start);
                   EmojiCompat.get().process(text, currentLocation.end, text.length());
 
                 } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_LOADING) {
-                  LogUtil.logDebug("EmojiCompat - LOAD_STATE_LOADING");
+                  logDebug("EmojiCompat - LOAD_STATE_LOADING");
                 } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_FAILED) {
-                  LogUtil.logWarning("EmojiCompat - LOAD_STATE_FAILED");
+                  logWarning("EmojiCompat - LOAD_STATE_FAILED");
                 } else {
-                  LogUtil.logDebug("EmojiCompat - LOAD_OTHER_CASE");
+                  logDebug("EmojiCompat - LOAD_OTHER_CASE");
                 }
               }
             }else{
@@ -125,15 +124,15 @@ public final class EmojiManager {
               EmojiRange previewLocation = findAllEmojis.get(i-1);
               if(EmojiCompat.get()!=null) {
                 if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-                  LogUtil.logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
+                  logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
                   EmojiCompat.get().process(text, previewLocation.end, currentLocation.start);
 
                 } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_LOADING) {
-                  LogUtil.logDebug("EmojiCompat - LOAD_STATE_LOADING");
+                  logDebug("EmojiCompat - LOAD_STATE_LOADING");
                 } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_FAILED) {
-                  LogUtil.logWarning("EmojiCompat - LOAD_STATE_FAILED");
+                  logWarning("EmojiCompat - LOAD_STATE_FAILED");
                 } else {
-                  LogUtil.logDebug("EmojiCompat - LOAD_OTHER_CASE");
+                  logDebug("EmojiCompat - LOAD_OTHER_CASE");
                 }
               }
 
@@ -249,7 +248,7 @@ public final class EmojiManager {
     return num;
   }
   @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text) {
-    LogUtil.logDebug("findAllEmojis");
+    logDebug("findAllEmojis");
     final List<EmojiRange> result = new ArrayList<>();
     try {
       verifyInstalled();
@@ -263,7 +262,7 @@ public final class EmojiManager {
         }
       }
     }catch (Exception e){
-      LogUtil.logError("EXCEPTION", e);
+      logError("EXCEPTION", e);
       return result;
     }
     return result;

@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class QRCodePageAdapter extends FragmentPagerAdapter {
 
@@ -21,7 +21,7 @@ public class QRCodePageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        LogUtil.logDebug("getItem: " + position);
+        logDebug("getItem: " + position);
 
         switch (position){
             case 0: {

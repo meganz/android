@@ -32,12 +32,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatFileStorageAdapter;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
@@ -84,7 +84,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         downloadLocationDefaultPath = getDownloadLocation(context);
 
         super.onCreate(savedInstanceState);
-        LogUtil.logDebug("After onCreate called super");
+        logDebug("After onCreate called super");
     }
 
     @Override
@@ -94,7 +94,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             return null;
         }
 
-        LogUtil.logDebug("Fragment ADDED");
+        logDebug("Fragment ADDED");
 
         if (aB == null){
             aB = ((AppCompatActivity)context).getSupportActionBar();
@@ -106,12 +106,12 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-        scaleW = Util.getScaleW(outMetrics, density);
-        scaleH = Util.getScaleH(outMetrics, density);
+        scaleW = getScaleW(outMetrics, density);
+        scaleH = getScaleH(outMetrics, density);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int heightFrag = displayMetrics.heightPixels / 2 - ChatUtil.getActionBarHeight(((Activity)context), getResources());
+        int heightFrag = displayMetrics.heightPixels / 2 - getActionBarHeight(((Activity)context), getResources());
 
         View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
         rlfragment = (RelativeLayout) v.findViewById(R.id.relative_layout_frag);
@@ -199,7 +199,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void updateIconSend(boolean isVisible) {
-        LogUtil.logDebug("isVisible: " + isVisible);
+        logDebug("isVisible: " + isVisible);
         if (isVisible) {
             sendIcon.setVisibility(View.VISIBLE);
         } else {
@@ -208,7 +208,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void itemClick(int position) {
-        LogUtil.logDebug("Position: " + position);
+        logDebug("Position: " + position);
         if (adapter.isMultipleSelect()){
             adapter.toggleSelection(position);
         }
@@ -251,7 +251,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void hideMultipleSelect() {
-        LogUtil.logDebug("hideMultipleSelect");
+        logDebug("hideMultipleSelect");
         adapter.setMultipleSelect(false);
 
     }
@@ -328,7 +328,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                         return photoUris;
                     }
                 } catch (Exception ex) {
-                    LogUtil.logError("Exception is thrown", ex);
+                    logError("Exception is thrown", ex);
                 } finally {
                     if (cursor != null) {
                         cursor.close();

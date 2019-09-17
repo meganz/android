@@ -27,10 +27,10 @@ import java.nio.channels.FileChannel;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class FileUtils {
 
@@ -48,7 +48,7 @@ public class FileUtils {
 
         if (f == null) return;
 
-        LogUtil.logDebug("deleteFolderAndSubfolders: " + f.getAbsolutePath());
+        logDebug("deleteFolderAndSubfolders: " + f.getAbsolutePath());
         if (f.isDirectory() && f.listFiles() != null) {
             for (File c : f.listFiles()) {
                 deleteFolderAndSubfolders(context, c);
@@ -71,7 +71,7 @@ public class FileUtils {
                 mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 context.sendBroadcast(mediaScanIntent);
             } catch (Exception e) {
-                LogUtil.logError("Exception while deleting media scanner file", e);
+                logError("Exception while deleting media scanner file", e);
             }
 
         }
@@ -108,7 +108,7 @@ public class FileUtils {
         }
         catch (IOException e)
         {
-            LogUtil.logError("File write failed", e);
+            logError("File write failed", e);
             return null;
         }
     }
@@ -133,7 +133,7 @@ public class FileUtils {
             }
             return size;
         }
-        LogUtil.logDebug("Dir size: " + size);
+        logDebug("Dir size: " + size);
         return size;
     }
 
@@ -265,7 +265,7 @@ public class FileUtils {
     }
 
     public static void copyFile(File source, File dest) throws IOException{
-        LogUtil.logDebug("copyFile");
+        logDebug("copyFile");
 
         if (!source.getAbsolutePath().equals(dest.getAbsolutePath())){
             FileChannel inputChannel = null;
@@ -283,13 +283,13 @@ public class FileUtils {
     }
 
     public static boolean isVideoFile(String path) {
-        LogUtil.logDebug("isVideoFile: " + path);
+        logDebug("isVideoFile: " + path);
         try{
             String mimeType = URLConnection.guessContentTypeFromName(path);
             return mimeType != null && mimeType.indexOf("video") == 0;
         }
         catch(Exception e){
-            LogUtil.logError("Exception", e);
+            logError("Exception", e);
             return false;
         }
     }
@@ -427,14 +427,14 @@ public class FileUtils {
     }
 
     public static void purgeDirectory(File dir) {
-        LogUtil.logDebug("Removing cache files");
+        logDebug("Removing cache files");
         if(!dir.exists()){
             return;
         }
 
         try{
             for (File file: dir.listFiles()) {
-                LogUtil.logDebug("Removing " + file.getAbsolutePath());
+                logDebug("Removing " + file.getAbsolutePath());
                 if (file.isDirectory()) {
                     purgeDirectory(file);
                 }
@@ -456,7 +456,7 @@ public class FileUtils {
                 result = true;
             }
         } catch (IOException e) {
-            LogUtil.logError("Error appending string data to file", e);
+            logError("Error appending string data to file", e);
             e.printStackTrace();
         }
         return result;

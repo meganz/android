@@ -17,9 +17,10 @@ import android.widget.Button;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CopyrightFragmentLollipop extends Fragment implements View.OnClickListener {
 
@@ -38,11 +39,11 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            LogUtil.logWarning("context is null");
+            logWarning("context is null");
             return;
         }
 
@@ -51,7 +52,7 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LogUtil.logDebug("onCreateView");
+        logDebug("onCreateView");
 
         if(megaApi==null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -84,7 +85,7 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
             }
             case R.id.agree_button:{
                 dbH.setShowCopyright(false);
-                ((GetLinkActivityLollipop)context).showFragment(Constants.GET_LINK_FRAGMENT);
+                ((GetLinkActivityLollipop)context).showFragment(GET_LINK_FRAGMENT);
                 break;
             }
         }
@@ -93,7 +94,7 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
 
     @Override
     public void onAttach(Context context) {
-        LogUtil.logDebug("onAttach");
+        logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
 
@@ -104,7 +105,7 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
 
     @Override
     public void onAttach(Activity context) {
-        LogUtil.logDebug("onAttach Activity");
+        logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
 

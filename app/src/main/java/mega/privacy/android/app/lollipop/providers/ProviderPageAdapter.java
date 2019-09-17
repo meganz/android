@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ProviderPageAdapter extends FragmentPagerAdapter {
     final int PAGE_COUNT = 2;
@@ -20,7 +20,7 @@ public class ProviderPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        LogUtil.logDebug("position: " + position);
+        logDebug("position: " + position);
         switch (position){
             case 0: {
                 return CloudDriveProviderFragmentLollipop.newInstance();

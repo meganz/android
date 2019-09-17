@@ -16,12 +16,12 @@ import java.io.File;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.MegaApiUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
 
 public class UtilsModalBottomSheet {
 
@@ -44,7 +44,7 @@ public class UtilsModalBottomSheet {
         else {
             for (int i = 0; i < numOptions; i++) {
                 if (items_layout.getChildAt(i).getVisibility() == View.VISIBLE && peekHeight < heightScreen) {
-                    LogUtil.logDebug("Child i: " + i + " is visible; peekHeight: " + peekHeight + " heightScreen: " + heightScreen + " heightChild: " + heightChild);
+                    logDebug("Child i: " + i + " is visible; peekHeight: " + peekHeight + " heightScreen: " + heightScreen + " heightChild: " + heightChild);
                     peekHeight += heightChild;
                     if (peekHeight >= heightScreen) {
                         if (items_layout.getChildAt(i + 2) != null) {
@@ -82,12 +82,12 @@ public class UtilsModalBottomSheet {
     }
 
     public static void openWith (MegaApiAndroid megaApi, Context context, MegaNode node) {
-        LogUtil.logDebug("openWith");
+        logDebug("openWith");
 
         boolean isError = false;
 
         String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-        LogUtil.logDebug("FILENAME: " + node.getName());
+        logDebug("FILENAME: " + node.getName());
 
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
         mediaIntent.putExtra("HANDLE", node.getHandle());
@@ -120,11 +120,11 @@ public class UtilsModalBottomSheet {
             activityManager.getMemoryInfo(mi);
 
             if(mi.totalMem> Constants.BUFFER_COMP){
-                LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
                 megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
             }
             else{
-                LogUtil.logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
                 megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
             }
 
@@ -142,7 +142,7 @@ public class UtilsModalBottomSheet {
             Toast.makeText(context, context.getResources().getString(R.string.error_open_file_with), Toast.LENGTH_LONG).show();
         }
         else{
-            if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+            if (isIntentAvailable(context, mediaIntent)){
                 context.startActivity(mediaIntent);
             }
             else{

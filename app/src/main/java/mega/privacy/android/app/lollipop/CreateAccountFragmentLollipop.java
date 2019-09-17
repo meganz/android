@@ -38,14 +38,15 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class CreateAccountFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface {
 
@@ -105,11 +106,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            LogUtil.logWarning("context is null");
+            logWarning("context is null");
             return;
         }
     }
@@ -117,7 +118,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LogUtil.logDebug("onCreateView");
+        logDebug("onCreateView");
 
         View v = inflater.inflate(R.layout.fragment_create_account, container, false);
 
@@ -213,7 +214,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                LogUtil.logDebug("Text changed: " + s.toString() + "_ " + start + "__" + before + "__" + count);
+                logDebug("Text changed: " + s.toString() + "_ " + start + "__" + before + "__" + count);
                 if (s != null){
                     if (s.length() > 0) {
                         String temp = s.toString();
@@ -509,7 +510,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onClick(View v) {
-        LogUtil.logDebug("onClick");
+        logDebug("onClick");
 
         switch (v.getId()) {
             case R.id.create_account_chkTOS:
@@ -523,11 +524,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             case R.id.button_login_create:
                 hidePasswordIfVisible();
-                ((LoginActivityLollipop) context).showFragment(Constants.LOGIN_FRAGMENT);
+                ((LoginActivityLollipop) context).showFragment(LOGIN_FRAGMENT);
                 break;
 
             case R.id.tos:
-                LogUtil.logDebug("Show ToS");
+                logDebug("Show ToS");
 //				Intent browserIntent = new Intent(Intent.ACTION_VIEW);
 //				browserIntent.setComponent(new ComponentName("com.android.browser", "com.android.browser.BrowserActivity"));
 //				browserIntent.setDataAndType(Uri.parse("http://www.google.es"), "text/html");
@@ -585,7 +586,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 	 * Registration form submit
 	 */
     private void submitForm() {
-        LogUtil.logDebug("submit form!");
+        logDebug("submit form!");
 
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
@@ -599,7 +600,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(userEmail.getWindowToken(), 0);
 
-        if(!Util.isOnline(context))
+        if(!isOnline(context))
         {
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
@@ -611,7 +612,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         creatingAccountTextView.setVisibility(View.GONE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
 
-        if(!Util.isOnline(context)){
+        if(!isOnline(context)){
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
@@ -666,7 +667,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         if (value.length() == 0) {
             return getString(R.string.error_enter_email);
         }
-        if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
+        if (!EMAIL_ADDRESS.matcher(value).matches()) {
             return getString(R.string.error_invalid_email);
         }
         return null;
@@ -710,7 +711,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     }
 
     private void onKeysGenerated(final String privateKey, final String publicKey) {
-        if(!Util.isOnline(context)){
+        if(!isOnline(context)){
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
@@ -726,17 +727,17 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        LogUtil.logDebug("onRequestStart" + request.getRequestString());
+        logDebug("onRequestStart" + request.getRequestString());
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request,
                                 MegaError e) {
-        LogUtil.logDebug("onRequestFinish");
+        logDebug("onRequestFinish");
 
         if (isAdded()) {
             if (e.getErrorCode() != MegaError.API_OK) {
-                LogUtil.logWarning("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
+                logWarning("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
 
                 if (e.getErrorCode() == MegaError.API_EEXIST) {
                     try {
@@ -754,7 +755,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     try {
                         String message = e.getErrorString();
                         ((LoginActivityLollipop) context).showSnackbar(message);
-                        ((LoginActivityLollipop) context).showFragment(Constants.LOGIN_FRAGMENT);
+                        ((LoginActivityLollipop) context).showFragment(LOGIN_FRAGMENT);
                         createAccountLayout.setVisibility(View.VISIBLE);
                         creatingAccountLayout.setVisibility(View.GONE);
                         scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
@@ -781,14 +782,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     dbH.saveEphemeral(ephemeral);
                 }
 
-                ((LoginActivityLollipop)context).showFragment(Constants.CONFIRM_EMAIL_FRAGMENT);
+                ((LoginActivityLollipop)context).showFragment(CONFIRM_EMAIL_FRAGMENT);
             }
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        LogUtil.logWarning("onRequestTemporaryError");
+        logWarning("onRequestTemporaryError");
     }
 
 
@@ -800,7 +801,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onAttach(Context context) {
-        LogUtil.logDebug("onAttach");
+        logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
 
@@ -811,7 +812,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onAttach(Activity context) {
-        LogUtil.logDebug("onAttach Activity");
+        logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
 
@@ -841,7 +842,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     userEmail.setBackground(background);
                 }
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userEmail.getLayoutParams();
-                textParamsEditText.bottomMargin = Util.scaleWidthPx(3, outMetrics);
+                textParamsEditText.bottomMargin = scaleWidthPx(3, outMetrics);
                 userEmail.setLayoutParams(textParamsEditText);
             }
             break;
@@ -858,7 +859,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     userPasswordConfirm.setBackground(background);
                 }
                 RelativeLayout.LayoutParams textParamsEditText = (RelativeLayout.LayoutParams) userPasswordConfirm.getLayoutParams();
-                textParamsEditText.bottomMargin = Util.scaleWidthPx(3, outMetrics);
+                textParamsEditText.bottomMargin = scaleWidthPx(3, outMetrics);
                 userPasswordConfirm.setLayoutParams(textParamsEditText);
             }
             break;
@@ -875,7 +876,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     userName.setBackground(background);
                 }
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userName.getLayoutParams();
-                textParamsEditText.bottomMargin = Util.scaleWidthPx(3, outMetrics);
+                textParamsEditText.bottomMargin = scaleWidthPx(3, outMetrics);
                 userName.setLayoutParams(textParamsEditText);
             }
             break;
@@ -891,7 +892,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     userLastName.setBackground(background);
                 }
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userLastName.getLayoutParams();
-                textParamsEditText.bottomMargin = Util.scaleWidthPx(3, outMetrics);
+                textParamsEditText.bottomMargin = scaleWidthPx(3, outMetrics);
                 userLastName.setLayoutParams(textParamsEditText);
             }
             break;
@@ -908,7 +909,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     userPassword.setBackground(background);
                 }
                 RelativeLayout.LayoutParams textParamsEditText = (RelativeLayout.LayoutParams) userPassword.getLayoutParams();
-                textParamsEditText.bottomMargin = Util.scaleWidthPx(3, outMetrics);
+                textParamsEditText.bottomMargin = scaleWidthPx(3, outMetrics);
                 userPassword.setLayoutParams(textParamsEditText);
             }
             break;
@@ -929,7 +930,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                         userEmail.setBackground(email_background);
                     }
                     LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)userEmail.getLayoutParams();
-                    textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
+                    textParamsEditText.bottomMargin = scaleWidthPx(10, outMetrics);
                     userEmail.setLayoutParams(textParamsEditText);
                 }
             }
@@ -943,7 +944,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                         userPasswordConfirm.setBackground(password_confirm_background);
                     }
                     RelativeLayout.LayoutParams textParamsEditText = (RelativeLayout.LayoutParams) userPasswordConfirm.getLayoutParams();
-                    textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
+                    textParamsEditText.bottomMargin = scaleWidthPx(10, outMetrics);
                     userPasswordConfirm.setLayoutParams(textParamsEditText);
                 }
             }
@@ -957,7 +958,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                         userName.setBackground(name_background);
                     }
                     LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)userName.getLayoutParams();
-                    textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
+                    textParamsEditText.bottomMargin = scaleWidthPx(10, outMetrics);
                     userName.setLayoutParams(textParamsEditText);
                 }
             }
@@ -971,7 +972,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                         userLastName.setBackground(lastname_background);
                     }
                     LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)userLastName.getLayoutParams();
-                    textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
+                    textParamsEditText.bottomMargin = scaleWidthPx(10, outMetrics);
                     userLastName.setLayoutParams(textParamsEditText);
                 }
             }
@@ -985,7 +986,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                         userPassword.setBackground(password_background);
                     }
                     RelativeLayout.LayoutParams textParamsEditText = (RelativeLayout.LayoutParams) userPassword.getLayoutParams();
-                    textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
+                    textParamsEditText.bottomMargin = scaleWidthPx(10, outMetrics);
                     userPassword.setLayoutParams(textParamsEditText);
                 }
             }

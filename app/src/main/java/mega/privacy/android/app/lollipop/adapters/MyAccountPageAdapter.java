@@ -8,7 +8,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollipop;
-import mega.privacy.android.app.utils.LogUtil;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MyAccountPageAdapter extends FragmentPagerAdapter {
 
@@ -22,7 +23,7 @@ public class MyAccountPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        LogUtil.logDebug("Position: " + position);
+        logDebug("Position: " + position);
         switch (position){
             case 0: {
                 return MyAccountFragmentLollipop.newInstance();

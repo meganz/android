@@ -17,10 +17,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+
+import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ManageChatLinkBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -84,7 +84,7 @@ public class ManageChatLinkBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onClick(View v) {
-        LogUtil.logDebug("onClick");
+        logDebug("onClick");
 
         switch(v.getId()){
 
@@ -94,7 +94,7 @@ public class ManageChatLinkBottomSheetDialogFragment extends BottomSheetDialogFr
             }
 
             case R.id.manage_chat_link_delete_layout: {
-                ChatUtil.showConfirmationRemoveChatLink(context);
+                showConfirmationRemoveChatLink(context);
                 break;
             }
         }

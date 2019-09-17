@@ -37,10 +37,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.PlayListAdapter;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class PlaylistFragment extends Fragment{
 
@@ -81,14 +82,14 @@ public class PlaylistFragment extends Fragment{
     ImageButton nextButton;
 
     public static PlaylistFragment newInstance() {
-        LogUtil.logDebug("newInstance");
+        logDebug("newInstance");
         PlaylistFragment fragment = new PlaylistFragment();
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if (megaApi == null) {
@@ -107,7 +108,7 @@ public class PlaylistFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LogUtil.logDebug("onCreateView");
+        logDebug("onCreateView");
 
         outMetrics = new DisplayMetrics();
         ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
@@ -167,14 +168,14 @@ public class PlaylistFragment extends Fragment{
         ((AudioVideoPlayerLollipop) context).setPlaylistProgressBar((ProgressBar) v.findViewById(R.id.playlist_progress_bar));
 
         adapterType = ((AudioVideoPlayerLollipop) context).getAdapterType();
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER){
 //            OFFLINE CODE
             parenPath = ((AudioVideoPlayerLollipop) context).getPathNavigation();
             offNodes = ((AudioVideoPlayerLollipop) context).getMediaOffList();
             contentText.setText(""+offNodes.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, offNodes.size()));
             adapter = new PlayListAdapter(context, this, offNodes, parenPath, recyclerView, adapterType);
         }
-        else if (adapterType == Constants.ZIP_ADAPTER) {
+        else if (adapterType == ZIP_ADAPTER) {
             zipFiles = ((AudioVideoPlayerLollipop) context).getZipMediaFiles();
             contentText.setText(""+zipFiles.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, zipFiles.size()));
             adapter = new PlayListAdapter(context, this, zipFiles, recyclerView, adapterType);
@@ -277,7 +278,7 @@ public class PlaylistFragment extends Fragment{
     }
 
     public void itemClick(int position) {
-        LogUtil.logDebug("Position: " + position);
+        logDebug("Position: " + position);
         if (player != null && !((AudioVideoPlayerLollipop) context).isCreatingPlaylist()) {
             player.seekTo(position, 0);
         }
@@ -287,7 +288,7 @@ public class PlaylistFragment extends Fragment{
         if(adapter == null){
             fastScroller.setVisibility(View.GONE);
         }else{
-            if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
+            if(adapter.getItemCount() < MIN_ITEMS_SCROLLBAR){
                 fastScroller.setVisibility(View.GONE);
             }else{
                 fastScroller.setVisibility(View.VISIBLE);
@@ -297,7 +298,7 @@ public class PlaylistFragment extends Fragment{
     }
 
     public void setNodesSearch(String query){
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER){
             ArrayList<MegaOffline> offNodesSearch = new ArrayList<>();
             MegaOffline offNode;
             for (int i=0; i<offNodes.size(); i++){
@@ -315,7 +316,7 @@ public class PlaylistFragment extends Fragment{
                 contentText.setText(""+offNodesSearch.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, offNodesSearch.size()));
             }
         }
-        else if (adapterType == Constants.ZIP_ADAPTER) {
+        else if (adapterType == ZIP_ADAPTER) {
             ArrayList<File> zipFilesSearch = new ArrayList<>();
             File zipFile;
             for (int i=0; i<zipFiles.size(); i++) {
@@ -355,26 +356,26 @@ public class PlaylistFragment extends Fragment{
 
     @Override
     public void onPause() {
-        LogUtil.logDebug("onPause");
+        logDebug("onPause");
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        LogUtil.logDebug("onResume");
+        logDebug("onResume");
         super.onResume();
         ((AudioVideoPlayerLollipop) context).setPlaylistProgressBar((ProgressBar) v.findViewById(R.id.playlist_progress_bar));
     }
 
     @Override
     public void onDestroy() {
-        LogUtil.logDebug("onDestroy");
+        logDebug("onDestroy");
         super.onDestroy();
     }
 
     @Override
     public void onAttach(Activity activity) {
-        LogUtil.logDebug("onAttach");
+        logDebug("onAttach");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -382,7 +383,7 @@ public class PlaylistFragment extends Fragment{
 
     @Override
     public void onAttach(Context context) {
-        LogUtil.logDebug("onAttach");
+        logDebug("onAttach");
 
         super.onAttach(context);
         this.context = context;

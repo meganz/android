@@ -15,8 +15,8 @@ import android.widget.TextView;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SendAttachmentChatBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -71,27 +71,27 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BottomSheetDial
 
     @Override
     public void onClick(View v) {
-        LogUtil.logDebug("onClick");
+        logDebug("onClick");
 
         switch (v.getId()) {
 
             case R.id.send_attachment_chat_from_cloud_layout: {
-                LogUtil.logDebug("Cloud option click");
+                logDebug("Cloud option click");
                 ((ChatActivityLollipop) context).sendFromCloud();
                 break;
             }
             case R.id.send_attachment_chat_from_filesystem_layout: {
-                LogUtil.logDebug("Filesystem option click");
+                logDebug("Filesystem option click");
                 ((ChatActivityLollipop) context).sendFromFileSystem();
                 break;
             }
             case R.id.send_attachment_chat_contact_layout: {
-                LogUtil.logDebug("Contact option click");
+                logDebug("Contact option click");
                 ((ChatActivityLollipop) context).chooseContactsDialog();
                 break;
             }
             case R.id.send_attachment_chat_location_layout: {
-                LogUtil.logDebug("Location option click");
+                logDebug("Location option click");
                 ((ChatActivityLollipop) context).sendLocation();
                 break;
             }

@@ -16,13 +16,13 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ContactFileBaseFragment extends Fragment{
     
@@ -48,7 +48,7 @@ public class ContactFileBaseFragment extends Fragment{
     
     @Override
     public void onCreate (Bundle savedInstanceState){
-        LogUtil.logDebug("ContactFileBaseFragment onCreate");
+        logDebug("ContactFileBaseFragment onCreate");
         super.onCreate(savedInstanceState);
         
         if (megaApi == null){

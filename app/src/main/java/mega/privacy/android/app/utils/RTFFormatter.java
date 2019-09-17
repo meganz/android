@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
 
 import mega.privacy.android.app.components.CustomTypefaceSpan;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class RTFFormatter {
 
@@ -45,7 +46,7 @@ public class RTFFormatter {
 
     public SimpleSpanBuilder setRTFFormat(){
 
-        LogUtil.logDebug("setRTFFormat");
+        logDebug("setRTFFormat");
         formatted = false;
 
         if(!messageContent.isEmpty()) {
@@ -61,7 +62,7 @@ public class RTFFormatter {
             Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
 
             if (mMultiQuote != null && mMultiQuote.find()) {
-                LogUtil.logDebug("Multiquote found!");
+                logDebug("Multiquote found!");
 
                 int startBold = -1;
                 int startMultiquote = -1;
@@ -111,7 +112,7 @@ public class RTFFormatter {
 
             if (mQuote != null && mQuote.find()) {
 
-                LogUtil.logDebug("Quote find!");
+                logDebug("Quote find!");
 
                 int startBold = -1;
                 int startQuote = -1;
@@ -167,7 +168,7 @@ public class RTFFormatter {
 
             if(mItalic!=null) {
                 if(mItalic.find()){
-                    LogUtil.logDebug("Find Italic!");
+                    logDebug("Find Italic!");
                     Matcher mBold = pBold.matcher(messageContent);
 
                     int startBold = -1;
@@ -203,7 +204,7 @@ public class RTFFormatter {
                 Matcher mBold = pBold.matcher(messageContent);
 
                 if(mBold!=null && mBold.find()){
-                    LogUtil.logDebug("Bold Found");
+                    logDebug("Bold Found");
                     applyBoldFormat();
                     formatted = true;
                     return ssb;
@@ -229,7 +230,7 @@ public class RTFFormatter {
     }
 
     public void queryIfMultiQuoteFormat(){
-        LogUtil.logDebug("queryIfMultiQuoteFormat");
+        logDebug("queryIfMultiQuoteFormat");
 
         if (messageContent.length() > 6){
 
@@ -243,11 +244,11 @@ public class RTFFormatter {
             String substring;
 
             if (message.contains("```")){
-                LogUtil.logDebug("Check if there is emoji at the beginning of the string");
+                logDebug("Check if there is emoji at the beginning of the string");
                 start = messageContent.indexOf("```");
                 String emoji = messageContent.substring(0, start);
                 if(EmojiManager.isEmoji(emoji)){
-                    LogUtil.logDebug("The first element is emoji");
+                    logDebug("The first element is emoji");
                     substring = messageContent.substring(0, start);
                     if(ssb==null){
                         ssb = new SimpleSpanBuilder();
@@ -355,7 +356,7 @@ public class RTFFormatter {
     }
 
     public void applyMultiQuoteFormat(){
-        LogUtil.logDebug("applyMultiQuoteFormat");
+        logDebug("applyMultiQuoteFormat");
 
         String a = messageContent.substring(0,3);
         int start;
@@ -377,11 +378,11 @@ public class RTFFormatter {
             start = messageContent.indexOf("```");
 
             if(start==-1){
-                LogUtil.logDebug("Check if there is emoji at the beginning of the string");
+                logDebug("Check if there is emoji at the beginning of the string");
                 start = messageContent.indexOf("```");
                 String emoji = messageContent.substring(0, start);
                 if(EmojiManager.isEmoji(emoji)) {
-                    LogUtil.logDebug("The first element is emoji");
+                    logDebug("The first element is emoji");
                     substring = messageContent.substring(0, start);
                     ssb.append(substring);
 
@@ -420,7 +421,7 @@ public class RTFFormatter {
             end = messageContent.lastIndexOf("```.");
             if (end==-1) {
                 end = messageContent.lastIndexOf("```");
-                LogUtil.logDebug("FINISH End position: " + end);
+                logDebug("FINISH End position: " + end);
 
                 StringBuilder sb = new StringBuilder(messageContent);
                 sb.delete(end, end+3);
@@ -449,14 +450,14 @@ public class RTFFormatter {
 
                 String emoji = messageContent;
                 if(EmojiManager.isEmoji(emoji)){
-                    LogUtil.logDebug("The last element is emoji");
+                    logDebug("The last element is emoji");
                     ssb.append(emoji);
 
                     messageContent = "";
                 }
             }
             else {
-                LogUtil.logDebug("End position: " + end);
+                logDebug("End position: " + end);
                 StringBuilder sb = new StringBuilder(messageContent);
                 sb.delete(end, end+3);
                 messageContent = sb.toString();
@@ -480,7 +481,7 @@ public class RTFFormatter {
 
                 String emoji = messageContent;
                 if(EmojiManager.isEmoji(emoji)){
-                    LogUtil.logDebug("The last element is emoji");
+                    logDebug("The last element is emoji");
                     ssb.append(emoji);
 
                     messageContent = "";
@@ -488,7 +489,7 @@ public class RTFFormatter {
             }
         }
         else{
-            LogUtil.logDebug("End position: " + end);
+            logDebug("End position: " + end);
             StringBuilder sb = new StringBuilder(messageContent);
             sb.delete(end, end+3);
             messageContent = sb.toString();
@@ -512,7 +513,7 @@ public class RTFFormatter {
 
             String emoji = messageContent;
             if(EmojiManager.isEmoji(emoji)){
-                LogUtil.logDebug("The last element is emoji");
+                logDebug("The last element is emoji");
                 ssb.append(emoji);
 
                 messageContent = "";
@@ -524,7 +525,7 @@ public class RTFFormatter {
             setRTFFormat();
         }
         if(!messageContent.isEmpty()){
-            LogUtil.logDebug("Append more...");
+            logDebug("Append more...");
 //            StringBuilder sbBMultiQuote = new StringBuilder(messageContent);
 //            sbBMultiQuote.insert(0, '\n');
 //            messageContent = sbBMultiQuote.toString();
@@ -534,7 +535,7 @@ public class RTFFormatter {
     }
 
     public void applyQuoteFormat(){
-        LogUtil.logDebug("applyQuoteFormat");
+        logDebug("applyQuoteFormat");
 
         char a = messageContent.charAt(0);
         int start;
@@ -557,11 +558,11 @@ public class RTFFormatter {
                 if (start == -1) {
                     start = messageContent.indexOf("\n`");
                     if (start == -1){
-                        LogUtil.logDebug("Check if there is emoji at the beginning of the string");
+                        logDebug("Check if there is emoji at the beginning of the string");
                         start = messageContent.indexOf("`");
                         String emoji = messageContent.substring(0, start);
                         if(EmojiManager.isEmoji(emoji)){
-                            LogUtil.logDebug("The first element is emoji");
+                            logDebug("The first element is emoji");
                             substring = messageContent.substring(0, start);
                             ssb.append(substring);
 
@@ -594,7 +595,7 @@ public class RTFFormatter {
                         if(startPrevious<start){
                             String emoji = messageContent.substring(0, startPrevious);
                             if(EmojiManager.isEmoji(emoji)){
-                                LogUtil.logDebug("The first element is emoji");
+                                logDebug("The first element is emoji");
                                 substring = messageContent.substring(0, startPrevious);
                                 ssb.append(substring);
 
@@ -619,7 +620,7 @@ public class RTFFormatter {
                     if(startPrevious<start){
                         String emoji = messageContent.substring(0, startPrevious);
                         if(EmojiManager.isEmoji(emoji)){
-                            LogUtil.logDebug("The first element is emoji");
+                            logDebug("The first element is emoji");
                             substring = messageContent.substring(0, startPrevious);
                             ssb.append(substring);
 
@@ -644,7 +645,7 @@ public class RTFFormatter {
                 if(startPrevious<start){
                     String emoji = messageContent.substring(0, startPrevious);
                     if(EmojiManager.isEmoji(emoji)){
-                        LogUtil.logDebug("The first element is emoji");
+                        logDebug("The first element is emoji");
                         substring = messageContent.substring(0, startPrevious);
                         ssb.append(substring);
 
@@ -672,7 +673,7 @@ public class RTFFormatter {
                 end = messageContent.indexOf("`");
                 if (end == -1){
                     end = messageContent.lastIndexOf("`");
-                    LogUtil.logDebug("FINISH End position: " + end);
+                    logDebug("FINISH End position: " + end);
 
                     StringBuilder sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
@@ -688,7 +689,7 @@ public class RTFFormatter {
                     messageContent = sb.toString();
                 }
                 else {
-                    LogUtil.logDebug("End position: " + end);
+                    logDebug("End position: " + end);
                     StringBuilder sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
@@ -703,7 +704,7 @@ public class RTFFormatter {
 
                     String emoji = messageContent;
                     if(EmojiManager.isEmoji(emoji)){
-                        LogUtil.logDebug("The last element is emoji");
+                        logDebug("The last element is emoji");
                         ssb.append(emoji);
 
                         messageContent = "";
@@ -723,7 +724,7 @@ public class RTFFormatter {
                         sb.deleteCharAt(start);
                         messageContent = sb.toString();
 
-                        LogUtil.logDebug("(B) Start position: " + start);
+                        logDebug("(B) Start position: " + start);
                         substring = messageContent.substring(0, start);
                         ssb.append(substring);
 
@@ -739,7 +740,7 @@ public class RTFFormatter {
                             sb.deleteCharAt(end);
                             messageContent = sb.toString();
 
-                            LogUtil.logDebug("(B)FINISH End position: " + end);
+                            logDebug("(B)FINISH End position: " + end);
                             substring = messageContent.substring(0, end);
                             ssb.append(substring, new CustomTypefaceSpan("", font));
 
@@ -750,7 +751,7 @@ public class RTFFormatter {
                             break;
                         }
                         else{
-                            LogUtil.logDebug("End position: " + end);
+                            logDebug("End position: " + end);
                             sb = new StringBuilder(messageContent);
                             sb.deleteCharAt(end);
                             messageContent = sb.toString();
@@ -768,7 +769,7 @@ public class RTFFormatter {
                 }
             }
             else {
-                LogUtil.logDebug("End position: " + end);
+                logDebug("End position: " + end);
                 StringBuilder sb = new StringBuilder(messageContent);
                 sb.deleteCharAt(end);
                 messageContent = sb.toString();
@@ -795,7 +796,7 @@ public class RTFFormatter {
                     sb.deleteCharAt(start);
                     messageContent = sb.toString();
 
-                    LogUtil.logDebug("(B) Start position: " + start);
+                    logDebug("(B) Start position: " + start);
                     substring = messageContent.substring(0, start);
                     ssb.append(substring);
 
@@ -811,7 +812,7 @@ public class RTFFormatter {
                         sb.deleteCharAt(end);
                         messageContent = sb.toString();
 
-                        LogUtil.logDebug("(B)FINISH End position: " + end);
+                        logDebug("(B)FINISH End position: " + end);
                         substring = messageContent.substring(0, end);
                         ssb.append(substring, new CustomTypefaceSpan("", font));
 
@@ -822,7 +823,7 @@ public class RTFFormatter {
                         break;
                     }
                     else{
-                        LogUtil.logDebug("End position: " + end);
+                        logDebug("End position: " + end);
                         sb = new StringBuilder(messageContent);
                         sb.deleteCharAt(end);
                         messageContent = sb.toString();
@@ -840,7 +841,7 @@ public class RTFFormatter {
             }
         }
         else{
-            LogUtil.logDebug("End position: " + end);
+            logDebug("End position: " + end);
             StringBuilder sb = new StringBuilder(messageContent);
             sb.deleteCharAt(end);
             messageContent = sb.toString();
@@ -867,7 +868,7 @@ public class RTFFormatter {
                 sb.deleteCharAt(start);
                 messageContent = sb.toString();
 
-                LogUtil.logDebug("(B) Start position: "+start);
+                logDebug("(B) Start position: "+start);
                 substring = messageContent.substring(0, start);
                 ssb.append(substring);
 
@@ -883,7 +884,7 @@ public class RTFFormatter {
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
 
-                    LogUtil.logDebug("(B)FINISH End position: " + end);
+                    logDebug("(B)FINISH End position: " + end);
                     substring = messageContent.substring(0, end);
                     ssb.append(substring, new CustomTypefaceSpan("", font));
 
@@ -894,7 +895,7 @@ public class RTFFormatter {
                     break;
                 }
                 else{
-                    LogUtil.logDebug("End position: " + end);
+                    logDebug("End position: " + end);
                     sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
@@ -916,14 +917,14 @@ public class RTFFormatter {
             setRTFFormat();
         }
         if(!messageContent.isEmpty()){
-            LogUtil.logDebug("more to append...");
+            logDebug("more to append...");
             ssb.append(messageContent);
             messageContent ="";
         }
     }
 
     public void applyItalicFormat(){
-        LogUtil.logDebug("applyItalicFormat");
+        logDebug("applyItalicFormat");
         char a = messageContent.charAt(0);
         int start;
         int end;
@@ -962,7 +963,7 @@ public class RTFFormatter {
                     Matcher mQuote = pQuote.matcher(substring);
 
                     if (mQuote != null && mQuote.find()) {
-                        LogUtil.logDebug("Quote");
+                        logDebug("Quote");
                         applyTwoFormatsAndQuoteFormat(substring);
                     }
                     else{
@@ -988,11 +989,11 @@ public class RTFFormatter {
                 if (start == -1) {
                     start = messageContent.indexOf("\n_");
                     if (start == -1){
-                        LogUtil.logDebug("Check if there is emoji at the beginning of the string");
+                        logDebug("Check if there is emoji at the beginning of the string");
                         start = messageContent.indexOf("_");
                         String emoji = messageContent.substring(0, start);
                         if(EmojiManager.isEmoji(emoji)){
-                            LogUtil.logDebug("The first element is emoji");
+                            logDebug("The first element is emoji");
                             substring = messageContent.substring(0, start);
                             ssb.append(substring);
 
@@ -1027,7 +1028,7 @@ public class RTFFormatter {
                         {
                             String emoji = messageContent.substring(0, startPrevious);
                             if(EmojiManager.isEmoji(emoji)){
-                                LogUtil.logDebug("The first element is emoji");
+                                logDebug("The first element is emoji");
                                 substring = messageContent.substring(0, startPrevious);
                                 ssb.append(substring);
 
@@ -1052,7 +1053,7 @@ public class RTFFormatter {
                     if(startPrevious<start){
                         String emoji = messageContent.substring(0, startPrevious);
                         if(EmojiManager.isEmoji(emoji)){
-                            LogUtil.logDebug("The first element is emoji");
+                            logDebug("The first element is emoji");
                             substring = messageContent.substring(0, startPrevious);
                             ssb.append(substring);
 
@@ -1078,7 +1079,7 @@ public class RTFFormatter {
                 {
                     String emoji = messageContent.substring(0, startPrevious);
                     if(EmojiManager.isEmoji(emoji)){
-                        LogUtil.logDebug("The first element is emoji");
+                        logDebug("The first element is emoji");
                         substring = messageContent.substring(0, startPrevious);
                         ssb.append(substring);
 
@@ -1129,7 +1130,7 @@ public class RTFFormatter {
                     end = messageContent.indexOf("_\n");
                     if (end == -1){
                         end = messageContent.lastIndexOf("_");
-                        LogUtil.logDebug("FINISH End position: " + end);
+                        logDebug("FINISH End position: " + end);
 
                         StringBuilder sb = new StringBuilder(messageContent);
                         sb.deleteCharAt(end);
@@ -1147,14 +1148,14 @@ public class RTFFormatter {
                             Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
                             if (mMultiQuote != null && mMultiQuote.find()) {
-                                LogUtil.logDebug("Multiquote");
+                                logDebug("Multiquote");
                                 applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
                             }
                             else{
                                 Matcher mQuote = pQuote.matcher(substring);
 
                                 if (mQuote != null && mQuote.find()) {
-                                    LogUtil.logDebug("Quote");
+                                    logDebug("Quote");
                                     applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
                                 }
                                 else{
@@ -1170,14 +1171,14 @@ public class RTFFormatter {
 
                         String emoji = messageContent;
                         if(EmojiManager.isEmoji(emoji)){
-                            LogUtil.logDebug("The last element is emoji");
+                            logDebug("The last element is emoji");
                             ssb.append(emoji);
 
                             messageContent = "";
                         }
                     }
                     else {
-                        LogUtil.logDebug("End position: " + end);
+                        logDebug("End position: " + end);
                         StringBuilder sb = new StringBuilder(messageContent);
                         sb.deleteCharAt(end);
                         messageContent = sb.toString();
@@ -1194,14 +1195,14 @@ public class RTFFormatter {
                             Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
                             if (mMultiQuote != null && mMultiQuote.find()) {
-                                LogUtil.logDebug("Multiquote");
+                                logDebug("Multiquote");
                                 applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
                             }
                             else{
                                 Matcher mQuote = pQuote.matcher(substring);
 
                                 if (mQuote != null && mQuote.find()) {
-                                    LogUtil.logDebug("Quote");
+                                    logDebug("Quote");
                                     applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
                                 }
                                 else{
@@ -1223,7 +1224,7 @@ public class RTFFormatter {
                             sb.deleteCharAt(start);
                             messageContent = sb.toString();
 
-                            LogUtil.logDebug("(B) Start position: " + start);
+                            logDebug("(B) Start position: " + start);
                             substring = messageContent.substring(0, start);
                             ssb.append(substring);
 
@@ -1239,7 +1240,7 @@ public class RTFFormatter {
                                 sb.deleteCharAt(end);
                                 messageContent = sb.toString();
 
-                                LogUtil.logDebug("(B)FINISH End position: " + end);
+                                logDebug("(B)FINISH End position: " + end);
                                 substring = messageContent.substring(0, end);
                                 ssb.append(substring, new StyleSpan(Typeface.ITALIC));
 
@@ -1249,7 +1250,7 @@ public class RTFFormatter {
 
                                 break;
                             } else {
-                                LogUtil.logDebug("End position: " + end);
+                                logDebug("End position: " + end);
                                 sb = new StringBuilder(messageContent);
                                 sb.deleteCharAt(end);
                                 messageContent = sb.toString();
@@ -1267,7 +1268,7 @@ public class RTFFormatter {
                     }
                 }
                 else {
-                    LogUtil.logDebug("End position: "+end);
+                    logDebug("End position: "+end);
                     StringBuilder sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
@@ -1284,14 +1285,14 @@ public class RTFFormatter {
                         Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
                         if (mMultiQuote != null && mMultiQuote.find()) {
-                            LogUtil.logDebug("Multiquote");
+                            logDebug("Multiquote");
                             applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
                         }
                         else{
                             Matcher mQuote = pQuote.matcher(substring);
 
                             if (mQuote != null && mQuote.find()) {
-                                LogUtil.logDebug("Quote");
+                                logDebug("Quote");
                                 applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
                             }
                             else{
@@ -1313,7 +1314,7 @@ public class RTFFormatter {
                         sb.deleteCharAt(start);
                         messageContent = sb.toString();
 
-                        LogUtil.logDebug("(B) Start position: " + start);
+                        logDebug("(B) Start position: " + start);
                         substring = messageContent.substring(0, start);
                         ssb.append(substring);
 
@@ -1329,7 +1330,7 @@ public class RTFFormatter {
                             sb.deleteCharAt(end);
                             messageContent = sb.toString();
 
-                            LogUtil.logDebug("(B)FINISH End position: " + end);
+                            logDebug("(B)FINISH End position: " + end);
                             substring = messageContent.substring(0, end);
                             ssb.append(substring, new StyleSpan(Typeface.ITALIC));
 
@@ -1339,7 +1340,7 @@ public class RTFFormatter {
 
                             break;
                         } else {
-                            LogUtil.logDebug("End position: " + end);
+                            logDebug("End position: " + end);
                             sb = new StringBuilder(messageContent);
                             sb.deleteCharAt(end);
                             messageContent = sb.toString();
@@ -1357,7 +1358,7 @@ public class RTFFormatter {
                 }
             }
             else{
-                LogUtil.logDebug("End position: " + end);
+                logDebug("End position: " + end);
                 StringBuilder sb = new StringBuilder(messageContent);
                 sb.deleteCharAt(end);
                 messageContent = sb.toString();
@@ -1374,14 +1375,14 @@ public class RTFFormatter {
                     Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
                     if (mMultiQuote != null && mMultiQuote.find()) {
-                        LogUtil.logDebug("Multiquote");
+                        logDebug("Multiquote");
                         applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
                     }
                     else{
                         Matcher mQuote = pQuote.matcher(substring);
 
                         if (mQuote != null && mQuote.find()) {
-                            LogUtil.logDebug("Quote");
+                            logDebug("Quote");
                             applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
                         }
                         else{
@@ -1403,7 +1404,7 @@ public class RTFFormatter {
                     sb.deleteCharAt(start);
                     messageContent = sb.toString();
 
-                    LogUtil.logDebug("(B) Start position: " + start);
+                    logDebug("(B) Start position: " + start);
                     substring = messageContent.substring(0, start);
                     ssb.append(substring);
 
@@ -1419,7 +1420,7 @@ public class RTFFormatter {
                         sb.deleteCharAt(end);
                         messageContent = sb.toString();
 
-                        LogUtil.logDebug("(B)FINISH End position: " + end);
+                        logDebug("(B)FINISH End position: " + end);
                         substring = messageContent.substring(0, end);
                         ssb.append(substring, new StyleSpan(Typeface.ITALIC));
 
@@ -1430,7 +1431,7 @@ public class RTFFormatter {
                         break;
                     }
                     else{
-                        LogUtil.logDebug("End position: " + end);
+                        logDebug("End position: " + end);
                         sb = new StringBuilder(messageContent);
                         sb.deleteCharAt(end);
                         messageContent = sb.toString();
@@ -1453,7 +1454,7 @@ public class RTFFormatter {
             setRTFFormat();
         }
         if(!messageContent.isEmpty()){
-            LogUtil.logDebug("more to append...");
+            logDebug("more to append...");
             ssb.append(messageContent);
             messageContent ="";
         }
@@ -1461,7 +1462,7 @@ public class RTFFormatter {
     }
 
     public SimpleSpanBuilder applyItalicBoldFormat(String subMessageContent){
-        LogUtil.logDebug("applyItalicBoldFormat: " + subMessageContent);
+        logDebug("applyItalicBoldFormat: " + subMessageContent);
 
         char b = subMessageContent.charAt(0);
         int startB;
@@ -1493,7 +1494,7 @@ public class RTFFormatter {
         endB = subMessageContent.indexOf("* ");
         if(endB==-1){
             endB = subMessageContent.lastIndexOf("*");
-            LogUtil.logDebug("FINISH endB position: " + endB);
+            logDebug("FINISH endB position: " + endB);
 
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.deleteCharAt(endB);
@@ -1505,14 +1506,14 @@ public class RTFFormatter {
             Matcher mMultiQuote = pMultiQuote.matcher(substringB);
 
             if (mMultiQuote != null && mMultiQuote.find()) {
-                LogUtil.logDebug("Multiquote");
+                logDebug("Multiquote");
                 applyTwoFormatsAndMultiQuoteFormat(substringB);
             }
             else{
                 Matcher mQuote = pQuote.matcher(substringB);
 
                 if (mQuote != null && mQuote.find()) {
-                    LogUtil.logDebug("Quote");
+                    logDebug("Quote");
                     applyTwoFormatsAndQuoteFormat(substringB);
                 }
                 else{
@@ -1525,21 +1526,21 @@ public class RTFFormatter {
             subMessageContent = sbB.toString();
         }
         else{
-            LogUtil.logDebug("endB position: "+endB);
+            logDebug("endB position: "+endB);
 
             substringB = subMessageContent.substring(0, endB);
 
             Matcher mMultiQuote = pMultiQuote.matcher(substringB);
 
             if (mMultiQuote != null && mMultiQuote.find()) {
-                LogUtil.logDebug("Multiquote");
+                logDebug("Multiquote");
                 applyTwoFormatsAndMultiQuoteFormat(substringB);
             }
             else{
                 Matcher mQuote = pQuote.matcher(substringB);
 
                 if (mQuote != null && mQuote.find()) {
-                    LogUtil.logDebug("Quote");
+                    logDebug("Quote");
                     applyTwoFormatsAndQuoteFormat(substringB);
                 }
                 else{
@@ -1561,7 +1562,7 @@ public class RTFFormatter {
                 sbB.deleteCharAt(startB);
                 subMessageContent = sbB.toString();
 
-                LogUtil.logDebug("(B) startB position: " + startB);
+                logDebug("(B) startB position: " + startB);
                 substringB = subMessageContent.substring(0, startB);
                 ssb.append(substringB, new StyleSpan(Typeface.ITALIC));
 
@@ -1572,26 +1573,26 @@ public class RTFFormatter {
                 endB = subMessageContent.indexOf("* ");
                 if(endB==-1){
                     endB = subMessageContent.lastIndexOf("*");
-                    LogUtil.logDebug("(B)FINISH endB position: " + endB);
+                    logDebug("(B)FINISH endB position: " + endB);
 
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
 
-                    LogUtil.logDebug("(B)FINISH End position: " + endB);
+                    logDebug("(B)FINISH End position: " + endB);
                     substringB = subMessageContent.substring(0, endB);
 
                     mMultiQuote = pMultiQuote.matcher(substringB);
 
                     if (mMultiQuote != null && mMultiQuote.find()) {
-                        LogUtil.logDebug("Multiquote");
+                        logDebug("Multiquote");
                         applyTwoFormatsAndMultiQuoteFormat(substringB);
                     }
                     else{
                         Matcher mQuote = pQuote.matcher(substringB);
 
                         if (mQuote != null && mQuote.find()) {
-                            LogUtil.logDebug("Quote");
+                            logDebug("Quote");
                             applyTwoFormatsAndQuoteFormat(substringB);
                         }
                         else{
@@ -1605,7 +1606,7 @@ public class RTFFormatter {
                     break;
                 }
                 else{
-                    LogUtil.logDebug("endB position: " + endB);
+                    logDebug("endB position: " + endB);
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
@@ -1615,14 +1616,14 @@ public class RTFFormatter {
                     mMultiQuote = pMultiQuote.matcher(substringB);
 
                     if (mMultiQuote != null && mMultiQuote.find()) {
-                        LogUtil.logDebug("Multiquote");
+                        logDebug("Multiquote");
                         applyTwoFormatsAndMultiQuoteFormat(substringB);
                     }
                     else{
                         Matcher mQuote = pQuote.matcher(substringB);
 
                         if (mQuote != null && mQuote.find()) {
-                            LogUtil.logDebug("Quote");
+                            logDebug("Quote");
                             applyTwoFormatsAndQuoteFormat(substringB);
                         }
                         else{
@@ -1640,7 +1641,7 @@ public class RTFFormatter {
         }
 
         if(!subMessageContent.isEmpty()){
-            LogUtil.logDebug("(ITALICBOLD: Append more...");
+            logDebug("(ITALICBOLD: Append more...");
             ssb.append(subMessageContent, new StyleSpan(Typeface.ITALIC));
         }
 
@@ -1649,7 +1650,7 @@ public class RTFFormatter {
     }
 
     public SimpleSpanBuilder applyTwoFormatsAndQuoteFormat(String subMessageContent){
-        LogUtil.logDebug("applyTwoFormatAndQuoteFormat: " + subMessageContent);
+        logDebug("applyTwoFormatAndQuoteFormat: " + subMessageContent);
 
         char b = subMessageContent.charAt(0);
         int startB;
@@ -1682,7 +1683,7 @@ public class RTFFormatter {
         endB = subMessageContent.indexOf("` ");
         if(endB==-1){
             endB = subMessageContent.lastIndexOf("`");
-            LogUtil.logDebug("FINISH endB position: " + endB);
+            logDebug("FINISH endB position: " + endB);
 
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.deleteCharAt(endB);
@@ -1697,7 +1698,7 @@ public class RTFFormatter {
             subMessageContent = sbB.toString();
         }
         else{
-            LogUtil.logDebug("endB position: " + endB);
+            logDebug("endB position: " + endB);
 
             substringB = subMessageContent.substring(0, endB);
             ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
@@ -1716,7 +1717,7 @@ public class RTFFormatter {
                 sbB.deleteCharAt(startB);
                 subMessageContent = sbB.toString();
 
-                LogUtil.logDebug("(B) startB position: " + startB);
+                logDebug("(B) startB position: " + startB);
                 substringB = subMessageContent.substring(0, startB);
                 ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
@@ -1727,13 +1728,13 @@ public class RTFFormatter {
                 endB = subMessageContent.indexOf("* ");
                 if(endB==-1){
                     endB = subMessageContent.lastIndexOf("`");
-                    LogUtil.logDebug("(B)FINISH endB position: " + endB);
+                    logDebug("(B)FINISH endB position: " + endB);
 
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
 
-                    LogUtil.logDebug("(B)FINISH End position: " + endB);
+                    logDebug("(B)FINISH End position: " + endB);
                     substringB = subMessageContent.substring(0, endB);
                     ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
@@ -1743,7 +1744,7 @@ public class RTFFormatter {
                     break;
                 }
                 else{
-                    LogUtil.logDebug("endB position: " + endB);
+                    logDebug("endB position: " + endB);
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
@@ -1761,7 +1762,7 @@ public class RTFFormatter {
         }
 
         if(!subMessageContent.isEmpty()){
-            LogUtil.logDebug("(ONEFORMATANDQuote: Append more...");
+            logDebug("(ONEFORMATANDQuote: Append more...");
             ssb.append(subMessageContent, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
         }
 
@@ -1770,7 +1771,7 @@ public class RTFFormatter {
     }
 
     public SimpleSpanBuilder applyOneFormatAndQuoteFormat(String subMessageContent, int format){
-        LogUtil.logDebug("applyOneFormatAndQuoteFormat: " + subMessageContent);
+        logDebug("applyOneFormatAndQuoteFormat: " + subMessageContent);
 
         char b = subMessageContent.charAt(0);
         int startB;
@@ -1803,7 +1804,7 @@ public class RTFFormatter {
         endB = subMessageContent.indexOf("` ");
         if(endB==-1){
             endB = subMessageContent.lastIndexOf("`");
-            LogUtil.logDebug("FINISH endB position: " + endB);
+            logDebug("FINISH endB position: " + endB);
 
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.deleteCharAt(endB);
@@ -1818,7 +1819,7 @@ public class RTFFormatter {
             subMessageContent = sbB.toString();
         }
         else{
-            LogUtil.logDebug("endB position: " + endB);
+            logDebug("endB position: " + endB);
 
             substringB = subMessageContent.substring(0, endB);
             ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
@@ -1837,7 +1838,7 @@ public class RTFFormatter {
                 sbB.deleteCharAt(startB);
                 subMessageContent = sbB.toString();
 
-                LogUtil.logDebug("(B) startB position: " + startB);
+                logDebug("(B) startB position: " + startB);
                 substringB = subMessageContent.substring(0, startB);
                 ssb.append(substringB, new StyleSpan(format));
 
@@ -1848,13 +1849,13 @@ public class RTFFormatter {
                 endB = subMessageContent.indexOf("* ");
                 if(endB==-1){
                     endB = subMessageContent.lastIndexOf("`");
-                    LogUtil.logDebug("(B)FINISH endB position: " + endB);
+                    logDebug("(B)FINISH endB position: " + endB);
 
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
 
-                    LogUtil.logDebug("(B)FINISH End position: " + endB);
+                    logDebug("(B)FINISH End position: " + endB);
                     substringB = subMessageContent.substring(0, endB);
                     ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
 
@@ -1864,7 +1865,7 @@ public class RTFFormatter {
                     break;
                 }
                 else{
-                    LogUtil.logDebug("endB position: " + endB);
+                    logDebug("endB position: " + endB);
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
@@ -1882,7 +1883,7 @@ public class RTFFormatter {
         }
 
         if(!subMessageContent.isEmpty()){
-            LogUtil.logDebug("(ONEFORMATANDQuote: Append more...");
+            logDebug("(ONEFORMATANDQuote: Append more...");
             ssb.append(subMessageContent, new StyleSpan(format));
         }
 
@@ -1891,7 +1892,7 @@ public class RTFFormatter {
     }
 
     public SimpleSpanBuilder applyTwoFormatsAndMultiQuoteFormat(String subMessageContent){
-        LogUtil.logDebug("applyTwoFormatsAndMultiQuoteFormat: " + subMessageContent);
+        logDebug("applyTwoFormatsAndMultiQuoteFormat: " + subMessageContent);
 //        char b = subMessageContent.charAt(0);
         String b = subMessageContent.substring(0,3);
         int startB;
@@ -1925,7 +1926,7 @@ public class RTFFormatter {
         endB = subMessageContent.indexOf("``` ");
         if(endB==-1){
             endB = subMessageContent.lastIndexOf("```");
-            LogUtil.logDebug("FINISH endB position: " + endB);
+            logDebug("FINISH endB position: " + endB);
 
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.delete(endB, endB+3);
@@ -1941,7 +1942,7 @@ public class RTFFormatter {
             subMessageContent = sbB.toString();
         }
         else{
-            LogUtil.logDebug("endB position: " + endB);
+            logDebug("endB position: " + endB);
 
             substringB = subMessageContent.substring(0, endB);
 
@@ -1953,7 +1954,7 @@ public class RTFFormatter {
         }
 
         if(!subMessageContent.isEmpty()){
-            LogUtil.logDebug("(ITALICMULTIQUOTE: Append more...");
+            logDebug("(ITALICMULTIQUOTE: Append more...");
             StringBuilder sbBMultiQuote = new StringBuilder('\n'+subMessageContent);
 //            sbBMultiQuote.insert(0, '\n');
             subMessageContent = sbBMultiQuote.toString();
@@ -1965,7 +1966,7 @@ public class RTFFormatter {
     }
 
     public SimpleSpanBuilder applyOneFormatAndMultiQuoteFormat(String subMessageContent, int format){
-        LogUtil.logDebug("applyOneFormatAndMultiQuoteFormat: " + subMessageContent);
+        logDebug("applyOneFormatAndMultiQuoteFormat: " + subMessageContent);
 //        char b = subMessageContent.charAt(0);
         String b = subMessageContent.substring(0,3);
         int startB;
@@ -1998,7 +1999,7 @@ public class RTFFormatter {
         endB = subMessageContent.indexOf("``` ");
         if(endB==-1){
             endB = subMessageContent.lastIndexOf("```");
-            LogUtil.logDebug("FINISH endB position: " + endB);
+            logDebug("FINISH endB position: " + endB);
 
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.delete(endB, endB+3);
@@ -2014,7 +2015,7 @@ public class RTFFormatter {
             subMessageContent = sbB.toString();
         }
         else{
-            LogUtil.logDebug("endB position: " + endB);
+            logDebug("endB position: " + endB);
 
             substringB = subMessageContent.substring(0, endB);
 //            ssb.append(substringB, new StyleSpan(typeFace.getStyle()), new StyleSpan(Typeface.ITALIC));
@@ -2027,7 +2028,7 @@ public class RTFFormatter {
         }
 
         if(!subMessageContent.isEmpty()){
-            LogUtil.logDebug("(ITALICMULTIQUOTE: Append more...");
+            logDebug("(ITALICMULTIQUOTE: Append more...");
             StringBuilder sbBMultiQuote = new StringBuilder(subMessageContent);
             sbBMultiQuote.insert(0, '\n');
             subMessageContent = sbBMultiQuote.toString();
@@ -2039,7 +2040,7 @@ public class RTFFormatter {
     }
 
     public void applyBoldFormat(){
-        LogUtil.logDebug("applyBoldFormat");
+        logDebug("applyBoldFormat");
         char a = messageContent.charAt(0);
         int start;
         int end;
@@ -2071,14 +2072,14 @@ public class RTFFormatter {
                 Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
                 if (mMultiQuote != null && mMultiQuote.find()) {
-                    LogUtil.logDebug("Multiquote");
+                    logDebug("Multiquote");
                     applyTwoFormatsAndMultiQuoteFormat(substring);
                 }
                 else{
                     Matcher mQuote = pQuote.matcher(substring);
 
                     if (mQuote != null && mQuote.find()) {
-                        LogUtil.logDebug("Quote");
+                        logDebug("Quote");
                         applyTwoFormatsAndQuoteFormat(substring);
                     }
                     else{
@@ -2103,11 +2104,11 @@ public class RTFFormatter {
                 if (start == -1) {
                     start = messageContent.indexOf("\n*");
                     if (start == -1){
-                        LogUtil.logDebug("Check if there is emoji at the beginning of the string");
+                        logDebug("Check if there is emoji at the beginning of the string");
                         start = messageContent.indexOf("*");
                         String emoji = messageContent.substring(0, start);
                         if(EmojiManager.isEmoji(emoji)){
-                            LogUtil.logDebug("The first element is emoji");
+                            logDebug("The first element is emoji");
                             substring = messageContent.substring(0, start);
                             ssb.append(substring);
 
@@ -2141,7 +2142,7 @@ public class RTFFormatter {
                         {
                             String emoji = messageContent.substring(0, startPrevious);
                             if(EmojiManager.isEmoji(emoji)){
-                                LogUtil.logDebug("The first element is emoji");
+                                logDebug("The first element is emoji");
                                 substring = messageContent.substring(0, startPrevious);
                                 ssb.append(substring);
 
@@ -2167,7 +2168,7 @@ public class RTFFormatter {
                     {
                         String emoji = messageContent.substring(0, startPrevious);
                         if(EmojiManager.isEmoji(emoji)){
-                            LogUtil.logDebug("The first element is emoji");
+                            logDebug("The first element is emoji");
                             substring = messageContent.substring(0, startPrevious);
                             ssb.append(substring);
 
@@ -2193,7 +2194,7 @@ public class RTFFormatter {
                 {
                     String emoji = messageContent.substring(0, startPrevious);
                     if(EmojiManager.isEmoji(emoji)){
-                        LogUtil.logDebug("The first element is emoji");
+                        logDebug("The first element is emoji");
                         substring = messageContent.substring(0, startPrevious);
                         ssb.append(substring);
 
@@ -2221,7 +2222,7 @@ public class RTFFormatter {
                 end = messageContent.indexOf("*\n");
                 if (end == -1){
                     end = messageContent.lastIndexOf("*");
-                    LogUtil.logDebug("FINISH End position: " + end);
+                    logDebug("FINISH End position: " + end);
 
                     StringBuilder sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
@@ -2238,14 +2239,14 @@ public class RTFFormatter {
                         Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
                         if (mMultiQuote != null && mMultiQuote.find()) {
-                            LogUtil.logDebug("Multiquote");
+                            logDebug("Multiquote");
                             applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
                         }
                         else{
                             Matcher mQuote = pQuote.matcher(substring);
 
                             if (mQuote != null && mQuote.find()) {
-                                LogUtil.logDebug("Quote");
+                                logDebug("Quote");
                                 applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
                             }
                             else{
@@ -2260,14 +2261,14 @@ public class RTFFormatter {
 
                     String emoji = messageContent;
                     if(EmojiManager.isEmoji(emoji)){
-                        LogUtil.logDebug("The last element is emoji");
+                        logDebug("The last element is emoji");
                         ssb.append(emoji);
 
                         messageContent = "";
                     }
                 }
                 else {
-                    LogUtil.logDebug("End position: " + end);
+                    logDebug("End position: " + end);
                     StringBuilder sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
@@ -2285,14 +2286,14 @@ public class RTFFormatter {
                         Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
                         if (mMultiQuote != null && mMultiQuote.find()) {
-                            LogUtil.logDebug("Multiquote");
+                            logDebug("Multiquote");
                             applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
                         }
                         else{
                             Matcher mQuote = pQuote.matcher(substring);
 
                             if (mQuote != null && mQuote.find()) {
-                                LogUtil.logDebug("Quote");
+                                logDebug("Quote");
                                 applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
                             }
                             else{
@@ -2314,7 +2315,7 @@ public class RTFFormatter {
                         sb.deleteCharAt(start);
                         messageContent = sb.toString();
 
-                        LogUtil.logDebug("(B) Start position: " + start);
+                        logDebug("(B) Start position: " + start);
                         substring = messageContent.substring(0, start);
                         ssb.append(substring);
 
@@ -2330,7 +2331,7 @@ public class RTFFormatter {
                             sb.deleteCharAt(end);
                             messageContent = sb.toString();
 
-                            LogUtil.logDebug("(B)FINISH End position: " + end);
+                            logDebug("(B)FINISH End position: " + end);
                             substring = messageContent.substring(0, end);
                             ssb.append(substring, new StyleSpan(Typeface.BOLD));
 
@@ -2341,7 +2342,7 @@ public class RTFFormatter {
                             break;
                         }
                         else{
-                            LogUtil.logDebug("End position: " + end);
+                            logDebug("End position: " + end);
                             sb = new StringBuilder(messageContent);
                             sb.deleteCharAt(end);
                             messageContent = sb.toString();
@@ -2359,7 +2360,7 @@ public class RTFFormatter {
                 }
             }
             else {
-                LogUtil.logDebug("End position: " + end);
+                logDebug("End position: " + end);
                 StringBuilder sb = new StringBuilder(messageContent);
                 sb.deleteCharAt(end);
                 messageContent = sb.toString();
@@ -2377,14 +2378,14 @@ public class RTFFormatter {
                     Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
                     if (mMultiQuote != null && mMultiQuote.find()) {
-                        LogUtil.logDebug("Multiquote");
+                        logDebug("Multiquote");
                         applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
                     }
                     else{
                         Matcher mQuote = pQuote.matcher(substring);
 
                         if (mQuote != null && mQuote.find()) {
-                            LogUtil.logDebug("Quote");
+                            logDebug("Quote");
                             applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
                         }
                         else{
@@ -2406,7 +2407,7 @@ public class RTFFormatter {
                     sb.deleteCharAt(start);
                     messageContent = sb.toString();
 
-                    LogUtil.logDebug("(B) Start position: " + start);
+                    logDebug("(B) Start position: " + start);
                     substring = messageContent.substring(0, start);
                     ssb.append(substring);
 
@@ -2422,7 +2423,7 @@ public class RTFFormatter {
                         sb.deleteCharAt(end);
                         messageContent = sb.toString();
 
-                        LogUtil.logDebug("(B)FINISH End position: " + end);
+                        logDebug("(B)FINISH End position: " + end);
                         substring = messageContent.substring(0, end);
                         ssb.append(substring, new StyleSpan(Typeface.BOLD));
 
@@ -2433,7 +2434,7 @@ public class RTFFormatter {
                         break;
                     }
                     else{
-                        LogUtil.logDebug("End position: " + end);
+                        logDebug("End position: " + end);
                         sb = new StringBuilder(messageContent);
                         sb.deleteCharAt(end);
                         messageContent = sb.toString();
@@ -2451,7 +2452,7 @@ public class RTFFormatter {
             }
         }
         else{
-            LogUtil.logDebug("End position: " + end);
+            logDebug("End position: " + end);
             StringBuilder sb = new StringBuilder(messageContent);
             sb.deleteCharAt(end);
             messageContent = sb.toString();
@@ -2469,14 +2470,14 @@ public class RTFFormatter {
                 Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
                 if (mMultiQuote != null && mMultiQuote.find()) {
-                    LogUtil.logDebug("Multiquote");
+                    logDebug("Multiquote");
                     applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
                 }
                 else{
                     Matcher mQuote = pQuote.matcher(substring);
 
                     if (mQuote != null && mQuote.find()) {
-                        LogUtil.logDebug("Quote");
+                        logDebug("Quote");
                         applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
                     }
                     else{
@@ -2498,7 +2499,7 @@ public class RTFFormatter {
                 sb.deleteCharAt(start);
                 messageContent = sb.toString();
 
-                LogUtil.logDebug("(B) Start position: " + start);
+                logDebug("(B) Start position: " + start);
                 substring = messageContent.substring(0, start);
                 ssb.append(substring);
 
@@ -2514,7 +2515,7 @@ public class RTFFormatter {
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
 
-                    LogUtil.logDebug("(B)FINISH End position: " + end);
+                    logDebug("(B)FINISH End position: " + end);
                     substring = messageContent.substring(0, end);
                     ssb.append(substring, new StyleSpan(Typeface.BOLD));
 
@@ -2525,7 +2526,7 @@ public class RTFFormatter {
                     break;
                 }
                 else{
-                    LogUtil.logDebug("End position: " + end);
+                    logDebug("End position: " + end);
                     sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
@@ -2547,14 +2548,14 @@ public class RTFFormatter {
             setRTFFormat();
         }
         if(!messageContent.isEmpty()){
-            LogUtil.logDebug("more to append...");
+            logDebug("more to append...");
             ssb.append(messageContent);
             messageContent ="";
         }
     }
 
     public SimpleSpanBuilder applyBoldItalicFormat(String subMessageContent){
-        LogUtil.logDebug("applyBoldItalicFormat");
+        logDebug("applyBoldItalicFormat");
 
         char b = subMessageContent.charAt(0);
         int startB;
@@ -2587,7 +2588,7 @@ public class RTFFormatter {
         endB = subMessageContent.indexOf("_ ");
         if(endB==-1){
             endB = subMessageContent.lastIndexOf("_");
-            LogUtil.logDebug("FINISH endB position: " + endB);
+            logDebug("FINISH endB position: " + endB);
 
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.deleteCharAt(endB);
@@ -2598,14 +2599,14 @@ public class RTFFormatter {
             Matcher mMultiQuote = pMultiQuote.matcher(substringB);
 
             if (mMultiQuote != null && mMultiQuote.find()) {
-                LogUtil.logDebug("Multiquote");
+                logDebug("Multiquote");
                 applyTwoFormatsAndMultiQuoteFormat(substringB);
             }
             else{
                 Matcher mQuote = pQuote.matcher(substringB);
 
                 if (mQuote != null && mQuote.find()) {
-                    LogUtil.logDebug("Quote");
+                    logDebug("Quote");
                     applyTwoFormatsAndQuoteFormat(substringB);
                 }
                 else{
@@ -2618,21 +2619,21 @@ public class RTFFormatter {
             subMessageContent = sbB.toString();
         }
         else{
-            LogUtil.logDebug("endB position: " + endB);
+            logDebug("endB position: " + endB);
 
             substringB = subMessageContent.substring(0, endB);
 
             Matcher mMultiQuote = pMultiQuote.matcher(substringB);
 
             if (mMultiQuote != null && mMultiQuote.find()) {
-                LogUtil.logDebug("Multiquote");
+                logDebug("Multiquote");
                 applyTwoFormatsAndMultiQuoteFormat(substringB);
             }
             else{
                 Matcher mQuote = pQuote.matcher(substringB);
 
                 if (mQuote != null && mQuote.find()) {
-                    LogUtil.logDebug("Quote");
+                    logDebug("Quote");
                     applyTwoFormatsAndQuoteFormat(substringB);
                 }
                 else{
@@ -2654,7 +2655,7 @@ public class RTFFormatter {
                 sbB.deleteCharAt(startB);
                 subMessageContent = sbB.toString();
 
-                LogUtil.logDebug("(B) startB position: " + startB);
+                logDebug("(B) startB position: " + startB);
                 substringB = subMessageContent.substring(0, startB);
                 ssb.append(substringB, new StyleSpan(Typeface.BOLD));
 
@@ -2665,26 +2666,26 @@ public class RTFFormatter {
                 endB = subMessageContent.indexOf("_ ");
                 if(endB==-1){
                     endB = subMessageContent.lastIndexOf("_");
-                    LogUtil.logDebug("(B)FINISH endB position: " + endB);
+                    logDebug("(B)FINISH endB position: " + endB);
 
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
 
-                    LogUtil.logDebug("(B)FINISH End position: " + endB);
+                    logDebug("(B)FINISH End position: " + endB);
                     substringB = subMessageContent.substring(0, endB);
 
                     mMultiQuote = pMultiQuote.matcher(substringB);
 
                     if (mMultiQuote != null && mMultiQuote.find()) {
-                        LogUtil.logDebug("Multiquote");
+                        logDebug("Multiquote");
                         applyTwoFormatsAndMultiQuoteFormat(substringB);
                     }
                     else{
                         Matcher mQuote = pQuote.matcher(substringB);
 
                         if (mQuote != null && mQuote.find()) {
-                            LogUtil.logDebug("Quote");
+                            logDebug("Quote");
                             applyTwoFormatsAndQuoteFormat(substringB);
                         }
                         else{
@@ -2698,7 +2699,7 @@ public class RTFFormatter {
                     break;
                 }
                 else{
-                    LogUtil.logDebug("endB position: " + endB);
+                    logDebug("endB position: " + endB);
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
@@ -2708,14 +2709,14 @@ public class RTFFormatter {
                     mMultiQuote = pMultiQuote.matcher(substringB);
 
                     if (mMultiQuote != null && mMultiQuote.find()) {
-                        LogUtil.logDebug("Multiquote");
+                        logDebug("Multiquote");
                         applyTwoFormatsAndMultiQuoteFormat(substringB);
                     }
                     else{
                         Matcher mQuote = pQuote.matcher(substringB);
 
                         if (mQuote != null && mQuote.find()) {
-                            LogUtil.logDebug("Quote");
+                            logDebug("Quote");
                             applyTwoFormatsAndQuoteFormat(substringB);
                         }
                         else{
@@ -2733,7 +2734,7 @@ public class RTFFormatter {
         }
 
         if(!subMessageContent.isEmpty()){
-            LogUtil.logDebug("(ITALICBOLD: Append more...");
+            logDebug("(ITALICBOLD: Append more...");
             ssb.append(subMessageContent, new StyleSpan(Typeface.BOLD));
         }
 

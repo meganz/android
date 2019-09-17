@@ -21,6 +21,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 /*
@@ -118,14 +119,14 @@ public class ThumbnailUtils {
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 
-			LogUtil.logDebug("Downloading thumbnail finished");
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
 //			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				LogUtil.logDebug("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 				
 				if (holder != null){
@@ -141,7 +142,7 @@ public class ThumbnailUtils {
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.imgDisplay.startAnimation(fadeInAnimation);
 									adapter.notifyDataSetChanged();
-									LogUtil.logDebug("Thumbnail update");
+									logDebug("Thumbnail update");
 								}
 							}
 						}
@@ -149,7 +150,7 @@ public class ThumbnailUtils {
 				}
 			}
 			else{
-				LogUtil.logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -173,7 +174,7 @@ public class ThumbnailUtils {
         if(!isFileAvailable(thumbDir)) {
             thumbDir = getCacheFolder(context, THUMBNAIL_FOLDER);
         }
-		LogUtil.logDebug("getThumbFolder(): thumbDir= " + thumbDir);
+		logDebug("getThumbFolder(): thumbDir= " + thumbDir);
 		return thumbDir;
 	}
 	

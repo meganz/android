@@ -28,8 +28,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaCompletedTransfersAdapter;
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class CompletedTransfersFragmentLollipop extends Fragment {
@@ -69,11 +70,11 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		super.onCreate(savedInstanceState);
-		LogUtil.logDebug("onCreate");
+		logDebug("onCreate");
 	}
 
 	public static CompletedTransfersFragmentLollipop newInstance() {
-		LogUtil.logDebug("newInstance");
+		logDebug("newInstance");
 		CompletedTransfersFragmentLollipop fragment = new CompletedTransfersFragmentLollipop();
 		return fragment;
 	}
@@ -156,7 +157,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	}
 
 	public void setCompletedTransfers(){
-		LogUtil.logDebug("setCompletedTransfers");
+		logDebug("setCompletedTransfers");
 		tL.clear();
 		tL.addAll(dbH.getCompletedTransfers());
 
@@ -180,7 +181,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	}
 
 	public void updateCompletedTransfers(){
-		LogUtil.logDebug("updateCompletedTransfers");
+		logDebug("updateCompletedTransfers");
 
 		setCompletedTransfers();
 		adapter.notifyDataSetChanged();
@@ -209,7 +210,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	}
 
     public void transferFinish(AndroidCompletedTransfer transfer){
-		LogUtil.logDebug("transferFinish");
+		logDebug("transferFinish");
 		if(tL!=null){
 			tL.add(0,transfer);
 		}

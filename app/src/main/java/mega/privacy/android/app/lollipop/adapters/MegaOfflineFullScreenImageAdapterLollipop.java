@@ -38,12 +38,13 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
-import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.OfflineUtils;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener{
 	
@@ -68,7 +69,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		
 		@Override
 		protected Bitmap doInBackground(String... params) {
-			LogUtil.logDebug("doInBackground OfflinePreviewAsyncTask: " + holder.currentPath);
+			logDebug("doInBackground OfflinePreviewAsyncTask: " + holder.currentPath);
 			currentPath = params[0];
 			File currentFile = new File(currentPath);
 			
@@ -91,9 +92,9 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		    
 		    preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
 			if (preview != null){
-				preview = Util.rotateBitmap(preview, orientation);
+				preview = rotateBitmap(preview, orientation);
 				long handle = holder.currentHandle;
-				PreviewUtils.setPreviewCache(handle, preview);
+				setPreviewCache(handle, preview);
 				return preview;
 			}
 			
@@ -102,7 +103,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		
 		@Override
 		protected void onPostExecute(Bitmap preview){
-			LogUtil.logDebug("onPostExecute OfflinePreviewAsyncTask: " + holder.currentPath);
+			logDebug("onPostExecute OfflinePreviewAsyncTask: " + holder.currentPath);
 			if (preview != null){
 				if (holder.currentPath.equals(currentPath)){
 					holder.imgDisplay.setImageBitmap(preview);
@@ -164,16 +165,16 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
-		LogUtil.logDebug("INSTANTIATE POSITION " + position);
+		logDebug("INSTANTIATE POSITION " + position);
         
         File currentFile;
         if (zipImage){
         	currentFile = new File (paths.get(position));
 			if(currentFile!=null){
-				LogUtil.logDebug("Got zip Image!");
+				logDebug("Got zip Image!");
 			}
 			else{
-				LogUtil.logWarning("zip Image is NULL");
+				logWarning("zip Image is NULL");
 			}
         }
         else{
@@ -203,7 +204,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		}
 
 		if (isGIF){
-			LogUtil.logDebug("isGIF");
+			logDebug("isGIF");
 			holder.isGIF = true;
 			holder.imgDisplay.setVisibility(View.GONE);
 			holder.gifImgDisplay.setVisibility(View.VISIBLE);
@@ -221,8 +222,8 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 				try {
 					holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
 
-					thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
-					preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
+					thumb = getThumbnailFromCache(holder.currentHandle);
+					preview = getPreviewFromCache(holder.currentHandle);
 				} catch (Exception e) {
 				}
 			}
@@ -287,21 +288,21 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
 			if (zipImage){
 				holder.currentPath = paths.get(position);
-				LogUtil.logDebug("ZIP holder.currentPath: " + holder.currentPath);
+				logDebug("ZIP holder.currentPath: " + holder.currentPath);
 			}
 			else{
 				holder.currentPath = mOffList.get(position).getPath();
-				LogUtil.logDebug("holder.currentPath: " + holder.currentPath);
+				logDebug("holder.currentPath: " + holder.currentPath);
 				try{
 					holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
 
-					Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
+					Bitmap thumb = getThumbnailFromCache(holder.currentHandle);
 					if (thumb != null){
 						holder.imgDisplay.setImageBitmap(thumb);
 
 					}
 
-					Bitmap preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
+					Bitmap preview = getPreviewFromCache(holder.currentHandle);
 					if (preview != null){
 						holder.imgDisplay.setImageBitmap(preview);
 					}
@@ -320,13 +321,13 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		visibleImgs.put(position, holder);
 		
         if (zipImage){
-			LogUtil.logDebug("isZipImage");
+			logDebug("isZipImage");
 			try{
 				new OfflinePreviewAsyncTask(holder).execute(currentFile.getAbsolutePath());
 			}
 			catch(Exception e){
 				//Too many AsyncTasks
-				LogUtil.logError("OfflinePreviewAsyncTask EXCEPTION", e);
+				logError("OfflinePreviewAsyncTask EXCEPTION", e);
 			}
 		}
 		
@@ -340,7 +341,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		visibleImgs.remove(position);
         ((ViewPager) container).removeView((RelativeLayout) object);
         System.gc();
-		LogUtil.logDebug ("DESTROY POSITION " + position + " SIZE SPARSE: " + visibleImgs.size());
+		logDebug ("DESTROY POSITION " + position + " SIZE SPARSE: " + visibleImgs.size());
  
     }
 
@@ -355,7 +356,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
 	@Override
 	public void onClick(View v) {
-		LogUtil.logDebug("onClick");
+		logDebug("onClick");
 
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_gif:
@@ -366,8 +367,8 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 			    display.getMetrics(outMetrics);
 			    float density  = activity.getResources().getDisplayMetrics().density;
 				
-			    float scaleW = Util.getScaleW(outMetrics, density);
-			    float scaleH = Util.getScaleH(outMetrics, density);
+			    float scaleW = getScaleW(outMetrics, density);
+			    float scaleH = getScaleH(outMetrics, density);
 
                 ((FullScreenImageViewerLollipop) context).touchImage();
 

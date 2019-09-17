@@ -72,10 +72,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.JobUtil;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -96,7 +92,11 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 @SuppressLint("NewApi") 
@@ -246,7 +246,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		LogUtil.logDebug("onCreate first");
+		logDebug("onCreate first");
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		super.onCreate(savedInstanceState);
@@ -258,8 +258,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		display.getMetrics(outMetrics);
 		density  = getResources().getDisplayMetrics().density;
 
-		scaleW = Util.getScaleW(outMetrics, density);
-		scaleH = Util.getScaleH(outMetrics, density);
+		scaleW = getScaleW(outMetrics, density);
+		scaleH = getScaleH(outMetrics, density);
 
 		if (scaleH < scaleW){
 			scaleText = scaleH;
@@ -317,7 +317,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		}
 		else{
 
-			LogUtil.logDebug("dbH.getCredentials() NOT null");
+			logDebug("dbH.getCredentials() NOT null");
 
 			if (megaApi.getRootNode() == null){
 
@@ -328,7 +328,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
 				}
 
-				LogUtil.logDebug("megaApi.getRootNode() == null");
+				logDebug("megaApi.getRootNode() == null");
 
 				lastEmail = credentials.getEmail();
 				String gSession = credentials.getSession();
@@ -353,8 +353,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 					}
 
-					if(Util.isChatEnabled()){
-						LogUtil.logDebug("Chat is ENABLED");
+					if(isChatEnabled()){
+						logDebug("Chat is ENABLED");
 
 						if (megaChatApi == null){
 							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
@@ -364,30 +364,30 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 						if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
 							ret = megaChatApi.init(gSession);
-							LogUtil.logDebug("Result of init ---> " + ret);
+							logDebug("Result of init ---> " + ret);
 							chatSettings = dbH.getChatSettings();
 							if (ret == MegaChatApi.INIT_NO_CACHE)
 							{
-								LogUtil.logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
+								logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
 
 							}
 							else if (ret == MegaChatApi.INIT_ERROR)
 							{
-								LogUtil.logWarning("Condition ret == MegaChatApi.INIT_ERROR");
+								logWarning("Condition ret == MegaChatApi.INIT_ERROR");
 								if(chatSettings==null) {
-									LogUtil.logWarning("1 - ERROR----> Switch OFF chat");
+									logWarning("1 - ERROR----> Switch OFF chat");
 									chatSettings = new ChatSettings();
 									chatSettings.setEnabled(false+"");
 									dbH.setChatSettings(chatSettings);
 								}
 								else{
-									LogUtil.logWarning("2 - ERROR----> Switch OFF chat");
+									logWarning("2 - ERROR----> Switch OFF chat");
 									dbH.setEnabledChat(false + "");
 								}
 								megaChatApi.logout(this);
 							}
 							else{
-								LogUtil.logDebug("Chat correctly initialized");
+								logDebug("Chat correctly initialized");
 							}
 						}
 					}
@@ -400,7 +400,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 				setContentView(R.layout.activity_file_provider);
 
-				LogUtil.logDebug("megaApi.getRootNode() NOT null");
+				logDebug("megaApi.getRootNode() NOT null");
 
 				//Set toolbar
 				tB = (Toolbar) findViewById(R.id.toolbar_provider);
@@ -422,7 +422,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				cancelButton.setText(getString(R.string.general_cancel));
 				//Left and Right margin
 				LinearLayout.LayoutParams cancelButtonParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
-				cancelButtonParams.setMargins(Util.scaleWidthPx(10, metrics), 0, 0, 0);
+				cancelButtonParams.setMargins(scaleWidthPx(10, metrics), 0, 0, 0);
 				cancelButton.setLayoutParams(cancelButtonParams);
 
 				attachButton = (Button) findViewById(R.id.attach_button);
@@ -440,10 +440,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 				if (mTabsAdapterProvider == null){
 
-					LogUtil.logDebug("mTabsAdapterProvider == null");
-					LogUtil.logDebug("tabShown: " + tabShown);
-					LogUtil.logDebug("parentHandle INCOMING: " + incParentHandle);
-					LogUtil.logDebug("parentHandle CLOUD: " + gParentHandle);
+					logDebug("mTabsAdapterProvider == null");
+					logDebug("tabShown: " + tabShown);
+					logDebug("parentHandle INCOMING: " + incParentHandle);
+					logDebug("parentHandle CLOUD: " + gParentHandle);
 					viewPagerProvider.setCurrentItem(tabShown);
 					if(tabShown==-1){
 						tabShown=CLOUD_TAB;
@@ -455,10 +455,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				}
 				else{
 
-					LogUtil.logDebug("mTabsAdapterProvider NOT null");
-					LogUtil.logDebug("tabShown: " + tabShown);
-					LogUtil.logDebug("parentHandle INCOMING: " + incParentHandle);
-					LogUtil.logDebug("parentHandle CLOUD: " + gParentHandle);
+					logDebug("mTabsAdapterProvider NOT null");
+					logDebug("tabShown: " + tabShown);
+					logDebug("parentHandle INCOMING: " + incParentHandle);
+					logDebug("parentHandle CLOUD: " + gParentHandle);
 					viewPagerProvider.setCurrentItem(tabShown);
 					if(tabShown==-1){
 						tabShown=CLOUD_TAB;
@@ -470,7 +470,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
 					public void onPageSelected(int position) {
-						LogUtil.logDebug("onTabChanged TabId :" + position);
+						logDebug("onTabChanged TabId :" + position);
 						if(position == 0){
 							tabShown=CLOUD_TAB;
 							String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
@@ -521,7 +521,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		LogUtil.logDebug("onOptionsItemSelectedLollipop");
+		logDebug("onOptionsItemSelectedLollipop");
 	
 		int id = item.getItemId();
 		switch(id){
@@ -602,7 +602,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	    newToMega = (TextView) findViewById(R.id.text_newToMega);
 		//Margins (left, top, right, bottom)
 //		LinearLayout.LayoutParams textnewToMega = (LinearLayout.LayoutParams)newToMega.getLayoutParams();
-//		textnewToMega.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics));
+//		textnewToMega.setMargins(scaleHeightPx(30, outMetrics), scaleHeightPx(20, outMetrics), 0, scaleHeightPx(30, outMetrics));
 //		newToMega.setLayoutParams(textnewToMega);
 //		newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 		
@@ -872,7 +872,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			public void afterTextChanged(Editable s) {
 				if (sixthPin.length()!=0){
 					sixthPin.setCursorVisible(true);
-					Util.hideKeyboard(fileProviderActivity, 0);
+					hideKeyboard(fileProviderActivity, 0);
 
 					if (pinLongClick) {
 						pasteClipboard();
@@ -893,79 +893,79 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb1.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb1.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb1.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb1.width = scaleWidthPx(25, outMetrics);
 		}
 		firstPin.setLayoutParams(paramsb1);
 		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
-		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
 		firstPin.setLayoutParams(textParams);
 
 		secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb2.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb2.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb2.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb2.width = scaleWidthPx(25, outMetrics);
 		}
 		secondPin.setLayoutParams(paramsb2);
 		textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
-		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
 		secondPin.setLayoutParams(textParams);
 		secondPin.setEt(firstPin);
 
 		thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb3.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb3.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb3.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb3.width = scaleWidthPx(25, outMetrics);
 		}
 		thirdPin.setLayoutParams(paramsb3);
 		textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
-		textParams.setMargins(0, 0, Util.scaleWidthPx(25, outMetrics), 0);
+		textParams.setMargins(0, 0, scaleWidthPx(25, outMetrics), 0);
 		thirdPin.setLayoutParams(textParams);
 		thirdPin.setEt(secondPin);
 
 		fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb4.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb4.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb4.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb4.width = scaleWidthPx(25, outMetrics);
 		}
 		fourthPin.setLayoutParams(paramsb4);
 		textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
-		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
 		fourthPin.setLayoutParams(textParams);
 		fourthPin.setEt(thirdPin);
 
 		fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb5.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb5.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb5.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb5.width = scaleWidthPx(25, outMetrics);
 		}
 		fifthPin.setLayoutParams(paramsb5);
 		textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
-		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
 		fifthPin.setLayoutParams(textParams);
 		fifthPin.setEt(fourthPin);
 
 		sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb6.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb6.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb6.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb6.width = scaleWidthPx(25, outMetrics);
 		}
 		sixthPin.setLayoutParams(paramsb6);
 		textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
@@ -975,9 +975,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	}
 
 	void permitVerify(){
-		LogUtil.logDebug("permitVerify");
+		logDebug("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			Util.hideKeyboard(this, 0);
+			hideKeyboard(this, 0);
 			if (sb.length()>0) {
 				sb.delete(0, sb.length());
 			}
@@ -988,10 +988,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			sb.append(fifthPin.getText());
 			sb.append(sixthPin.getText());
 			pin = sb.toString();
-			LogUtil.logDebug("PIN: " + pin);
+			logDebug("PIN: " + pin);
 			if (!isErrorShown && pin != null){
 				verify2faProgressBar.setVisibility(View.VISIBLE);
-				LogUtil.logDebug("lastEmail: " + lastEmail + " lastPasswd: " + lastPassword);
+				logDebug("lastEmail: " + lastEmail + " lastPasswd: " + lastPassword);
 				megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
 			}
 		}
@@ -1040,13 +1040,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	}
 
 	void pasteClipboard() {
-		LogUtil.logDebug("pasteClipboard");
+		logDebug("pasteClipboard");
 		pinLongClick = false;
 		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 		ClipData clipData = clipboard.getPrimaryClip();
 		if (clipData != null) {
 			String code = clipData.getItemAt(0).getText().toString();
-			LogUtil.logDebug("Code: " + code);
+			logDebug("Code: " + code);
 			if (code != null && code.length() == 6) {
 				boolean areDigits = true;
 				for (int i=0; i<6; i++) {
@@ -1104,7 +1104,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
-		LogUtil.logDebug("onCreateOptionsMenuLollipop");
+		logDebug("onCreateOptionsMenuLollipop");
 		
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
@@ -1154,14 +1154,14 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	public void downloadAndAttach(long size, long [] hashes){
 
-		LogUtil.logDebug("downloadAndAttach");
+		logDebug("downloadAndAttach");
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
+						REQUEST_WRITE_STORAGE);
 			}
 		}
 
@@ -1183,14 +1183,14 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize(), pathToDownload);
 				if(localPath != null){
 					try {
-						LogUtil.logDebug("COPY_FILE");
+						logDebug("COPY_FILE");
 						File fileToShare = new File(pathToDownload, tempNode.getName());
 						copyFile(new File(localPath), fileToShare);
 
 						if(fileToShare.exists()){
 							Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", fileToShare);
 							grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-							LogUtil.logDebug("CONTENT URI: " + contentUri);
+							logDebug("CONTENT URI: " + contentUri);
 							if(totalTransfers == 0) {
 								Intent result = new Intent();
 								result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -1252,7 +1252,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				String path = dlFiles.get(document);
 
 				if(availableFreeSpace < document.getSize()){
-					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+					showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
 					continue;
 				}
 
@@ -1288,7 +1288,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	
 	@Override
 	public void onBackPressed() {
-		LogUtil.logDebug("tabShown: " + tabShown);
+		logDebug("tabShown: " + tabShown);
 
 		if(tabShown==CLOUD_TAB){
 			String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
@@ -1404,7 +1404,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (value.length() == 0) {
 			return getString(R.string.error_enter_email);
 		}
-		if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
+		if (!EMAIL_ADDRESS.matcher(value).matches()) {
 			return getString(R.string.error_invalid_email);
 		}
 		return null;
@@ -1446,7 +1446,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 		
-		if(!Util.isOnline(this))
+		if(!isOnline(this))
 		{
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
@@ -1464,7 +1464,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				serversBusyText.setVisibility(View.GONE);
 			}
 			
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),false, this);
+			showErrorAlertDialog(getString(R.string.error_server_connection_problem),false, this);
 			return;
 		}
 		
@@ -1483,7 +1483,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		lastEmail = et_user.getText().toString().toLowerCase(Locale.ENGLISH).trim();
 		lastPassword = et_password.getText().toString();
 
-		LogUtil.logDebug("Generating keys");
+		logDebug("Generating keys");
 
 		onKeysGenerated(lastEmail, lastPassword);
 	}
@@ -1505,10 +1505,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			MegaApplication.setLoggingIn(false);
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				LogUtil.logDebug("Connected to chat!");
+				logDebug("Connected to chat!");
 			}
 			else{
-				LogUtil.logError("ERROR WHEN CONNECTING " + e.getErrorString());
+				logError("ERROR WHEN CONNECTING " + e.getErrorString());
 			}
 		}
 	}
@@ -1519,7 +1519,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	}
 
 	private void onKeysGenerated(String email, String password) {
-		LogUtil.logDebug("Key generation finished");
+		logDebug("Key generation finished");
 
 		this.lastEmail = email;
 		this.lastPassword = password;
@@ -1529,7 +1529,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	
 	private void onKeysGeneratedLogin(final String email, final String password) {
 
-		if(!Util.isOnline(this)){
+		if(!isOnline(this)){
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
 			if(scrollView!=null){
@@ -1546,7 +1546,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				serversBusyText.setVisibility(View.GONE);
 			}
 
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
 		}
 
@@ -1558,23 +1558,23 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			if (serversBusyText != null) {
 				serversBusyText.setVisibility(View.GONE);
 			}
-			LogUtil.logDebug("fastLogin with publicKey and privateKey");
-			if (Util.isChatEnabled()) {
-				LogUtil.logDebug("Chat is ENABLED");
+			logDebug("fastLogin with publicKey and privateKey");
+			if (isChatEnabled()) {
+				logDebug("Chat is ENABLED");
 				if (megaChatApi == null) {
 					megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 				}
 				int ret = megaChatApi.init(null);
-				LogUtil.logDebug("Result of init ---> " + ret);
+				logDebug("Result of init ---> " + ret);
 				if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
-					LogUtil.logDebug("Start fastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
+					logDebug("Start fastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
 					megaApi.login(lastEmail, lastPassword, this);
 				} else {
-					LogUtil.logError("ERROR INIT CHAT: " + ret);
+					logError("ERROR INIT CHAT: " + ret);
 					megaChatApi.logout(this);
 				}
 			} else {
-				LogUtil.logWarning("Chat is NOT ENABLED");
+				logWarning("Chat is NOT ENABLED");
 				megaApi.login(lastEmail, lastPassword, this);
 			}
 		}
@@ -1636,7 +1636,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		LogUtil.logDebug("onRequestStart");
+		logDebug("onRequestStart");
 	}
 
 	String gSession = null;
@@ -1645,9 +1645,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		LogUtil.logDebug("onRequestFinish: " + request.getFile());
+		logDebug("onRequestFinish: " + request.getFile());
 
-		LogUtil.logDebug("Timer cancel");
+		logDebug("Timer cancel");
 		try{
 			if(timer!=null){
 				timer.cancel();
@@ -1657,11 +1657,11 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			}
 		}
 		catch(Exception ex){
-			LogUtil.logError("TIMER EXCEPTION", ex);
+			logError("TIMER EXCEPTION", ex);
 		}
 
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
-			LogUtil.logDebug("REQUEST LOGIN");
+			logDebug("REQUEST LOGIN");
 
 			try {
 				statusDialog.dismiss();	
@@ -1727,14 +1727,14 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 						serversBusyText.setVisibility(View.GONE);
 					}
 
-					Util.showErrorAlertDialog(errorMessage, false, this);
+					showErrorAlertDialog(errorMessage, false, this);
 				}
 				
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				if (dbH.getPreferences() != null){
 					dbH.clearPreferences();
 					dbH.setFirstTime(false);
-                    JobUtil.stopRunningCameraUploadService(this);
+                    stopRunningCameraUploadService(this);
 				}
 			}
 			else{
@@ -1769,7 +1769,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 //				dbH.clearCredentials();
 //				dbH.saveCredentials(credentials);
 
-				LogUtil.logDebug("Logged in");
+				logDebug("Logged in");
 				
 				megaApi.fetchNodes(this);
 			}
@@ -1820,19 +1820,19 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				
 				setContentView(R.layout.activity_file_provider);
 				tabShown = CLOUD_TAB;
-				LogUtil.logDebug("megaApi.getRootNode() NOT null");
+				logDebug("megaApi.getRootNode() NOT null");
 
 				chatSettings = dbH.getChatSettings();
 				if(chatSettings!=null) {
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
-						LogUtil.logDebug("Chat enabled-->connect");
+						logDebug("Chat enabled-->connect");
 						if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
-							LogUtil.logDebug("Connection goes!!!");
+							logDebug("Connection goes!!!");
 							megaChatApi.connect(this);
 						}
 						else{
-							LogUtil.logDebug("Not launch connect: " + megaChatApi.getInitState());
+							logDebug("Not launch connect: " + megaChatApi.getInitState());
 						}
 
 						MegaApplication.setLoggingIn(false);
@@ -1846,13 +1846,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 						}
 					}
 					else{
-						LogUtil.logWarning("Chat NOT enabled - readyToManager");
+						logWarning("Chat NOT enabled - readyToManager");
 						MegaApplication.setLoggingIn(false);
 						afterFetchNodes();
 					}
 				}
 				else{
-					LogUtil.logWarning("chatSettings NULL - readyToManager");
+					logWarning("chatSettings NULL - readyToManager");
 					MegaApplication.setLoggingIn(false);
 					afterFetchNodes();
 				}
@@ -1868,7 +1868,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	}
 
 	public void afterFetchNodes(){
-		LogUtil.logDebug("afterFetchNodes");
+		logDebug("afterFetchNodes");
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar_provider);
 
@@ -1910,7 +1910,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
 			public void onPageSelected(int position) {
-				LogUtil.logDebug("onTabChanged TabId: " + position);
+				logDebug("onTabChanged TabId: " + position);
 				if(position == 0){
 					tabShown=CLOUD_TAB;
 					String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
@@ -1950,33 +1950,33 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		LogUtil.logWarning("onRequestTemporaryError: " + request.getRequestString());
+		logWarning("onRequestTemporaryError: " + request.getRequestString());
 
-		LogUtil.logDebug("Start timer");
+		logDebug("Start timer");
 		try {
 			timer = new CountDownTimer(10000, 2000) {
 
 				public void onTick(long millisUntilFinished) {
-					LogUtil.logDebug("TemporaryError one more");
+					logDebug("TemporaryError one more");
 				}
 
 				public void onFinish() {
-					LogUtil.logDebug("The timer finished, message shown");
+					logDebug("The timer finished, message shown");
 					if (serversBusyText != null) {
 						serversBusyText.setVisibility(View.VISIBLE);
 					}
 				}
 			}.start();
 		} catch (Exception exception) {
-			LogUtil.logError("EXCEPTION when starting count", exception);
+			logError("EXCEPTION when starting count", exception);
 		}
 	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		LogUtil.logDebug("onRequestUpdate");
+		logDebug("onRequestUpdate");
 
-		LogUtil.logDebug("Cancel timer");
+		logDebug("Cancel timer");
 		try {
 			if (timer != null) {
 				timer.cancel();
@@ -1985,23 +1985,23 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				}
 			}
 		} catch (Exception e) {
-			LogUtil.logError("TIMER EXCEPTION", e);
+			logError("TIMER EXCEPTION", e);
 		}
 	}
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		LogUtil.logDebug("onUsersUpdate");
+		logDebug("onUsersUpdate");
 	}
 
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-		LogUtil.logDebug("onUserAlertsUpdate");
+		logDebug("onUserAlertsUpdate");
 	}
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-		LogUtil.logDebug("onNodesUpdate");
+		logDebug("onNodesUpdate");
 		if (cDriveProviderLol != null){
 			if (megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()) != null){
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()));
@@ -2038,7 +2038,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
-		LogUtil.logDebug("onTransferFinish: " + transfer.getPath());
+		logDebug("onTransferFinish: " + transfer.getPath());
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
@@ -2051,7 +2051,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 		
 			if(totalTransfers == 0) {
-				LogUtil.logDebug("CONTENT URI: " + contentUri);
+				logDebug("CONTENT URI: " + contentUri);
 				//Send it
 				Intent result = new Intent();
 				result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

@@ -23,8 +23,8 @@ import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatFileStorageFragment;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFileStorageAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener {
 
@@ -77,7 +77,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
             ((ChatFileStorageFragment) fragment).addPosition(pos);
 
         }
-        LogUtil.logDebug("Adapter type is GRID");
+        logDebug("Adapter type is GRID");
         if (selectedItems.size() <= 0) {
             ((ChatFileStorageFragment) fragment).hideMultipleSelect();
         }
@@ -221,12 +221,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public void onClick(View v) {
-        LogUtil.logDebug("onClick()");
+        logDebug("onClick()");
         ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
         int currentPosition = holder.getAdapterPosition();
-        LogUtil.logDebug("Current position: " + currentPosition);
+        logDebug("Current position: " + currentPosition);
         if (currentPosition < 0) {
-            LogUtil.logWarning("Current position error - not valid value");
+            logWarning("Current position error - not valid value");
             return;
         }
         if (!isMultipleSelect()) {

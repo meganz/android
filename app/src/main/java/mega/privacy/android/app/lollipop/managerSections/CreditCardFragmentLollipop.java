@@ -33,13 +33,14 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class CreditCardFragmentLollipop extends Fragment implements MegaRequestListenerInterface, OnClickListener, OnItemSelectedListener{
 	
@@ -164,7 +165,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		}
 
 		super.onCreate(savedInstanceState);
-		LogUtil.logDebug("onCreate");
+		logDebug("onCreate");
 	}
 	
 	
@@ -186,16 +187,16 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
+		float scaleW = getScaleW(outMetrics, density);
+		float scaleH = getScaleH(outMetrics, density);
 
 		View v = null;
 		v = inflater.inflate(R.layout.activity_credit_card_payment, container, false);
 
 		packageIcon = (ImageView) v.findViewById(R.id.pro_image_cc);
 
-		packageIcon.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-		packageIcon.getLayoutParams().height = Util.px2dp((100*scaleW), outMetrics);
+		packageIcon.getLayoutParams().width = px2dp((100*scaleW), outMetrics);
+		packageIcon.getLayoutParams().height = px2dp((100*scaleW), outMetrics);
 
 		packageName = (TextView) v.findViewById(R.id.pro_title_cc);
 		pricingFrom = (TextView) v.findViewById(R.id.pricing_from_cc);
@@ -236,7 +237,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		postalCodeEdit = (EditText) v.findViewById(R.id.postal_code_cc);
 		
 		countrySpinner = (Spinner) v.findViewById(R.id.country_cc);
-		List<String> countryList = Util.getCountryList(context);
+		List<String> countryList = getCountryList(context);
 		// Populate the spinner using a customized ArrayAdapter that hides the first (dummy) entry
 		ArrayAdapter<String> countryAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, countryList){
 			@Override
@@ -275,7 +276,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		creditCardNumberEdit = (EditText) v.findViewById(R.id.credit_card_number_cc);
 		
 		monthSpinner = (Spinner) v.findViewById(R.id.month_cc);
-		List<String> monthList = Util.getMonthListInt(context);
+		List<String> monthList = getMonthListInt(context);
 		// Populate the spinner using a customized ArrayAdapter that hides the first (dummy) entry
 		ArrayAdapter<String> monthAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, monthList){
 			@Override
@@ -306,7 +307,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		monthSpinner.setAdapter(monthAdapter);
 		
 		yearSpinner = (Spinner) v.findViewById(R.id.year_cc);
-		List<String> yearList = Util.getYearListInt(context);
+		List<String> yearList = getYearListInt(context);
 		// Populate the spinner using a customized ArrayAdapter that hides the first (dummy) entry
 		ArrayAdapter<String> yearAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, yearList){
 			@Override
@@ -537,7 +538,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	}	
 	
 	public void payYear() {
-		LogUtil.logDebug("yearly");
+		logDebug("yearly");
 		
 		paymentMonth = 0;
 		
@@ -701,7 +702,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 ////				
 ////				paymentDialog = builder.create();
 ////				paymentDialog.show();
-////				Util.brandAlertDialog(paymentDialog);
+////				brandAlertDialog(paymentDialog);
 ////
 //////				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
 ////				break;
@@ -737,19 +738,19 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 
-		LogUtil.logDebug("REQUEST: " + request.getName() + "__" + request.getRequestString());
+		logDebug("REQUEST: " + request.getName() + "__" + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_STORE){
 			if (e.getErrorCode() == MegaError.API_OK){
-				LogUtil.logDebug("API_OK!!");
-				LogUtil.logDebug("PRODUCTHANDLE: " + productHandleLong);
+				logDebug("API_OK!!");
+				logDebug("PRODUCTHANDLE: " + productHandleLong);
 				megaApi.upgradeAccount(productHandleLong, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD, this);
 			}
 			else if (e.getErrorCode() == MegaError.API_EEXIST){
-				LogUtil.logWarning("API_EEXIST");
+				logWarning("API_EEXIST");
 				megaApi.upgradeAccount(productHandleLong, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD, this);
 			}
 			else{
-				LogUtil.logError("ERROR: " + e.getErrorCode() + "__" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "__" + e.getErrorString());
 				Toast.makeText(context, getString(R.string.credit_card_information_error) + " ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
 				((ManagerActivityLollipop)context).dismissStatusDialog();
 				((ManagerActivityLollipop)context).updateInfoNumberOfSubscriptions();
@@ -759,14 +760,14 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		else if (request.getType() == MegaRequest.TYPE_UPGRADE_ACCOUNT){
 			((ManagerActivityLollipop)context).dismissStatusDialog();
 			if (e.getErrorCode() == MegaError.API_OK){
-				LogUtil.logDebug("OK payment!!!");
+				logDebug("OK payment!!!");
 				Toast.makeText(context, getString(R.string.account_successfully_upgraded), Toast.LENGTH_LONG).show();
 				((ManagerActivityLollipop)context).dismissStatusDialog();
 				((ManagerActivityLollipop)context).updateInfoNumberOfSubscriptions();
 				((ManagerActivityLollipop)context).showMyAccount();
 			}
 			else{
-				LogUtil.logError("ERROR: " + e.getErrorCode() + "__" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "__" + e.getErrorString());
 				Toast.makeText(context, getString(R.string.account_error_upgraded) + " ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
 				((ManagerActivityLollipop)context).dismissStatusDialog();
 				((ManagerActivityLollipop)context).updateInfoNumberOfSubscriptions();
@@ -845,7 +846,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 				cvvString = cvvEdit.getText().toString();
 //				countryString = "ES";
 //				Toast.makeText(context, address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryCode + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString, Toast.LENGTH_LONG).show();
-				LogUtil.logDebug(address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryCode + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString);
+				logDebug(address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryCode + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString);
 
 				ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
@@ -869,7 +870,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 				((ManagerActivityLollipop)context).showStatusDialog(getString(R.string.upgrading_account_message));
 //				Toast.makeText(context, getString(R.string.upgrading_account_message), Toast.LENGTH_LONG).show();
 //					((ManagerActivity)context).showMyAccount();
-				LogUtil.logDebug("PRODUCT HANDLE CC: " + productHandleLong);
+				logDebug("PRODUCT HANDLE CC: " + productHandleLong);
 //				Toast.makeText(context, "PRODUCT HANDLE CC: " + productHandleLong, Toast.LENGTH_LONG).show();
 				break;
 			}
@@ -907,7 +908,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 				else{
 					String countryString = parent.getItemAtPosition(position).toString();
 //					Toast.makeText(context, "CountryString: " + countryString, Toast.LENGTH_LONG).show();
-					countryCode = Util.getCountryCode(countryString);
+					countryCode = getCountryCode(countryString);
 //					Toast.makeText(context, "CountryCode: " + countryString, Toast.LENGTH_LONG).show();
 				}
 				break;

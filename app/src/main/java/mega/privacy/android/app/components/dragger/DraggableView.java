@@ -14,8 +14,8 @@ import android.widget.FrameLayout;
 
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class DraggableView extends FrameLayout{
 
@@ -239,7 +239,7 @@ public class DraggableView extends FrameLayout{
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        LogUtil.logDebug("onInterceptTouchEvent");
+        logDebug("onInterceptTouchEvent");
         final int action = MotionEventCompat.getActionMasked(event);
 
         if (getContext() instanceof FullScreenImageViewerLollipop){
@@ -281,14 +281,14 @@ public class DraggableView extends FrameLayout{
     }
 
     public void update() {
-        LogUtil.logDebug("update()");
+        logDebug("update()");
         float percentX = getPercentX();
         float percentY = getPercentY();
         update(percentX, percentY);
     }
 
     public void update(float percentX, float percentY) {
-        LogUtil.logDebug("update");
+        logDebug("update");
         if (rotationEnabled) {
             ViewCompat.setRotation(this, percentX * rotationValue);
         }
@@ -345,7 +345,7 @@ public class DraggableView extends FrameLayout{
     }
 
     public boolean animateExit(Direction direction) {
-        LogUtil.logDebug("animateExit");
+        logDebug("animateExit");
         boolean animateExit = false;
         if (viewAnimator != null) {
             if (direction == Direction.NONE) {
@@ -377,7 +377,7 @@ public class DraggableView extends FrameLayout{
     }
 
     boolean handleTouch(MotionEvent event) {
-        LogUtil.logDebug("handleTouch");
+        logDebug("handleTouch");
         if (draggable && !animating) {
             boolean handledByDetector = this.detector.onTouchEvent(event);
             if (!handledByDetector) {
@@ -429,7 +429,7 @@ public class DraggableView extends FrameLayout{
     }
 
     void actionUp() {
-        LogUtil.logDebug("actionUp");
+        logDebug("actionUp");
         float percentX = getPercentX();
         float percentY = getPercentY();
 
@@ -446,7 +446,7 @@ public class DraggableView extends FrameLayout{
     }
 
     float getParentWidth() {
-        LogUtil.logDebug("getParentWidth");
+        logDebug("getParentWidth");
         if (parentWidth == 0) {
             parentWidth = ((View) getParent()).getWidth();
         }
@@ -454,7 +454,7 @@ public class DraggableView extends FrameLayout{
     }
 
     float getParentHeight() {
-        LogUtil.logDebug("getParentHeight");
+        logDebug("getParentHeight");
         if (parentHeight == 0) {
             parentHeight = ((View) getParent()).getHeight();
         }
@@ -465,7 +465,7 @@ public class DraggableView extends FrameLayout{
         detector = new GestureDetectorCompat(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onFling(@Nullable MotionEvent event1, @Nullable MotionEvent event2, float velocityX, float velocityY) {
-                LogUtil.logDebug("onFling");
+                logDebug("onFling");
                 boolean animated = false;
                 if (listenVelocity && !animating && viewAnimator != null && event1 != null && event2 != null) {
                     if (vertical) {

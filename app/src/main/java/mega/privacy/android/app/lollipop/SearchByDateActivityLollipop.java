@@ -28,9 +28,6 @@ import java.util.Date;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -40,7 +37,9 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class SearchByDateActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
@@ -83,7 +82,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
     ActionBar aB;
     Toolbar tB;
 
-    public int visibleFragment= Constants.COPYRIGHT_FRAGMENT;
+    public int visibleFragment= COPYRIGHT_FRAGMENT;
 
     static SearchByDateActivityLollipop searchByDateActivity;
 
@@ -99,7 +98,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
     @SuppressLint("NewApi")
     @Override protected void onCreate(Bundle savedInstanceState) {
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         searchByDateActivity = this;
@@ -109,8 +108,8 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-        scaleW = Util.getScaleW(outMetrics, density);
-        scaleH = Util.getScaleH(outMetrics, density);
+        scaleW = getScaleW(outMetrics, density);
+        scaleH = getScaleH(outMetrics, density);
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         if (megaApi == null){
@@ -118,24 +117,24 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         }
 
         if(megaApi==null||megaApi.getRootNode()==null){
-            LogUtil.logDebug("Refresh session - sdk");
+            logDebug("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
             return;
         }
 
-        if(Util.isChatEnabled()){
+        if(isChatEnabled()){
             if (megaChatApi == null){
                 megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
             }
 
             if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                LogUtil.logDebug("Refresh session - karere");
+                logDebug("Refresh session - karere");
                 Intent intent = new Intent(this, LoginActivityLollipop.class);
-                intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
@@ -156,7 +155,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
         tB = (Toolbar) findViewById(R.id.toolbar_search);
         if(tB==null){
-            LogUtil.logError("Tb is Null");
+            logError("Tb is Null");
             return;
         }
 
@@ -237,7 +236,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
     @Override
     public void onResume() {
-        LogUtil.logDebug("onResume");
+        logDebug("onResume");
         super.onResume();
     }
 

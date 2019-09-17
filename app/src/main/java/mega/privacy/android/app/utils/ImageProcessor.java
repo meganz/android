@@ -13,16 +13,17 @@ import android.provider.MediaStore;
 
 import java.io.File;
 
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUtilsAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ImageProcessor {
 
     private static int PREVIEW_SIZE = 1000;
 
     public static void createImageThumbnail(MegaApiJava api,String localPath,File dst) {
-        LogUtil.logDebug("Create image thumbnail for: " + localPath);
+        logDebug("Create image thumbnail for: " + localPath);
         boolean result = MegaUtilsAndroid.createThumbnail(new File(localPath),dst);
         if (!result) {
             processThumbnail(null, api, localPath, dst);
@@ -30,7 +31,7 @@ public class ImageProcessor {
     }
 
     public static void createVideoThumbnail(MegaApiJava api,String localPath,File dst) {
-        LogUtil.logDebug("Create video thumbnail for: " + localPath);
+        logDebug("Create video thumbnail for: " + localPath);
         boolean result = MegaUtilsAndroid.createThumbnail(new File(localPath),dst);
         if (!result) {
             processThumbnail(null, api, localPath, dst);
@@ -39,10 +40,10 @@ public class ImageProcessor {
 
     private static void processThumbnail(Bitmap thumbnail,MegaApiJava api,String localPath,File dst) {
         if (thumbnail == null) {
-            LogUtil.logDebug("create thumbnail use api");
+            logDebug("create thumbnail use api");
             api.createThumbnail(localPath,dst.getAbsolutePath());
         } else {
-            LogUtil.logDebug("get from db is not null");
+            logDebug("get from db is not null");
             nz.mega.sdk.AndroidGfxProcessor.saveBitmap(thumbnail,dst);
         }
     }

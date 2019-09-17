@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class RecordButton extends AppCompatImageView implements View.OnTouchListener, View.OnClickListener {
     private RecordView recordView;
@@ -82,27 +82,27 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
-                LogUtil.logDebug("onTouch() - ACTION_DOWN");
+                logDebug("onTouch() - ACTION_DOWN");
                 recordView.onActionDown((RelativeLayout) v.getParent(), event);
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
-                LogUtil.logDebug("onTouch() - ACTION_MOVE");
+                logDebug("onTouch() - ACTION_MOVE");
                 recordView.onActionMove((RelativeLayout) v.getParent(), event);
                 break;
             }
             case MotionEvent.ACTION_UP: {
-                LogUtil.logDebug("onTouch() - ACTION_UP");
+                logDebug("onTouch() - ACTION_UP");
                 recordView.onActionUp((RelativeLayout) v.getParent());
                 break;
             }
             case MotionEvent.ACTION_CANCEL: {
-                LogUtil.logDebug("onTouch() - ACTION_CANCEL");
+                logDebug("onTouch() - ACTION_CANCEL");
                 recordView.onActionCancel((RelativeLayout) v.getParent());
                 break;
             }
             default: {
-                LogUtil.logDebug("onTouch() - default");
+                logDebug("onTouch() - default");
                 break;
             }
         }
@@ -110,7 +110,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     }
 
     public void setOnRecordClickListener(OnRecordClickListener onRecordClickListener) {
-        LogUtil.logDebug("setOnRecordClickListener");
+        logDebug("setOnRecordClickListener");
         this.onRecordClickListener = onRecordClickListener;
     }
 

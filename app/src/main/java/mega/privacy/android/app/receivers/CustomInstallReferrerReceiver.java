@@ -5,8 +5,6 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
-//import com.google.android.gms.analytics.CampaignTrackingReceiver;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 /*
 *  A simple Broadcast Receiver to receive an INSTALL_REFERRER
@@ -27,7 +24,7 @@ public class CustomInstallReferrerReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-        LogUtil.logDebug("onReceive()");
+        logDebug("onReceive()");
 		try {
             final Bundle extras = intent.getExtras();
             if (extras != null) {
@@ -79,7 +76,7 @@ public class CustomInstallReferrerReceiver extends BroadcastReceiver {
             String value = referralParams.get(key);
             if(value != null)
             {
-                LogUtil.logDebug("KEY: "  + key + "; VALUE: " + value);
+                logDebug("KEY: "  + key + "; VALUE: " + value);
             	Log.d("MEGAInstallReferrerReceiver", key + " = " + value);
             }
         }

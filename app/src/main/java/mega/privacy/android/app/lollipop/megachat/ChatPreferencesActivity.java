@@ -18,8 +18,9 @@ import android.widget.FrameLayout;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ChatPreferencesActivity extends PinActivityLollipop {
 
@@ -30,7 +31,7 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
 
@@ -47,14 +48,14 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
 
         tB = (Toolbar) findViewById(R.id.toolbar_chat_settings);
         if(tB==null){
-            LogUtil.logError("Tb is Null");
+            logError("Tb is Null");
             return;
         }
 
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        LogUtil.logDebug("aB.setHomeAsUpIndicator");
+        logDebug("aB.setHomeAsUpIndicator");
         aB.setTitle(getString(R.string.section_chat));
         aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
@@ -67,22 +68,22 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
     }
 
     public void changeSound(String soundString){
-        LogUtil.logDebug("Sound string: " + soundString);
+        logDebug("Sound string: " + soundString);
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.notification_sound_title));
 
         if (soundString == null){
-            LogUtil.logWarning("NULL sound");
+            logWarning("NULL sound");
             Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
         }
         else if(soundString.equals("-1")){
-            LogUtil.logWarning("Notification sound -1");
+            logWarning("Notification sound -1");
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
         }
         else if(soundString.isEmpty()){
-            LogUtil.logWarning("Empty sound");
+            logWarning("Empty sound");
             Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
         }
@@ -91,17 +92,17 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
         }
 
 
-        this.startActivityForResult(intent, Constants.SELECT_NOTIFICATION_SOUND);
+        this.startActivityForResult(intent, SELECT_NOTIFICATION_SOUND);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
-        LogUtil.logDebug("Result code: " + resultCode);
+        logDebug("Result code: " + resultCode);
 
-        if (resultCode == RESULT_OK && requestCode == Constants.SELECT_NOTIFICATION_SOUND)
+        if (resultCode == RESULT_OK && requestCode == SELECT_NOTIFICATION_SOUND)
         {
-            LogUtil.logDebug("Selected notification sound OK");
+            logDebug("Selected notification sound OK");
 
             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
 
@@ -116,7 +117,7 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        LogUtil.logDebug("onOptionsItemSelectedLollipop");
+        logDebug("onOptionsItemSelectedLollipop");
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {

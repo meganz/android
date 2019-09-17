@@ -16,9 +16,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -27,6 +24,9 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CreateChatToPerformActionListener implements MegaChatRequestListenerInterface {
 
@@ -101,16 +101,16 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        LogUtil.logDebug("Error code: "+e.getErrorCode());
+        logDebug("Error code: "+e.getErrorCode());
 
         if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
             if(action==SEND_FILE){
-                LogUtil.logDebug("Action: SEND_FILE");
+                logDebug("Action: SEND_FILE");
                 counter--;
-                LogUtil.logDebug("Counter after decrease: " + counter);
+                logDebug("Counter after decrease: " + counter);
                 if (e.getErrorCode() != MegaError.API_OK){
                     error++;
-                    LogUtil.logError("ERROR creating chat");
+                    logError("ERROR creating chat");
                 }
                 else{
                     if(chats==null){
@@ -123,29 +123,29 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 }
 
                 if(counter==0){
-                    LogUtil.logDebug("Counter is 0 - all requests processed");
+                    logDebug("Counter is 0 - all requests processed");
                     if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
                         //All send files fail
                         message = context.getResources().getString(R.string.number_no_sent, error);
                         if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                         }
                         else if(context instanceof ContactInfoActivityLollipop){
-                            ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                            ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                         }
 
                         message = context.getResources().getQuantityString(R.plurals.num_files_not_send, handles.length, totalCounter);
                         if (context instanceof FullScreenImageViewerLollipop) {
-                            ((FullScreenImageViewerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                            ((FullScreenImageViewerLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                         }
                         else if (context instanceof AudioVideoPlayerLollipop) {
-                            ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                            ((AudioVideoPlayerLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                         }
                         else if (context instanceof PdfViewerActivityLollipop) {
-                            ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                            ((PdfViewerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                         }
                         else if (context instanceof FileInfoActivityLollipop) {
-                            ((FileInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                            ((FileInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                         }
                     }
                     else {
@@ -170,42 +170,42 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     }
                 }
             } else if (action == START_AUDIO_CALL) {
-                LogUtil.logDebug("Action: START_AUDIO_CALL");
+                logDebug("Action: START_AUDIO_CALL");
                 if (context instanceof ContactInfoActivityLollipop) {
                     if (e.getErrorCode() != MegaError.API_OK) {
-                        ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
+                        ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
                     } else {
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
                         if (chat != null) {
                             ((MegaApplication) ((Activity) context).getApplication()).setSpeakerStatus(chat.getChatId(), false);
                             megaChatApi.startChatCall(chat.getChatId(), false, (ContactInfoActivityLollipop) context);
                         } else {
-                            LogUtil.logWarning("Chatroom not recovered");
+                            logWarning("Chatroom not recovered");
                         }
                     }
                 }
             } else if (action == START_VIDEO_CALL) {
-                LogUtil.logDebug("Action: START_VIDEO_CALL");
+                logDebug("Action: START_VIDEO_CALL");
                 if (context instanceof ContactInfoActivityLollipop) {
                     if (e.getErrorCode() != MegaError.API_OK) {
-                        ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
+                        ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
                     } else {
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
                         if (chat != null) {
                             ((MegaApplication) ((Activity) context).getApplication()).setSpeakerStatus(chat.getChatId(), true);
                             megaChatApi.startChatCall(chat.getChatId(), true, (ContactInfoActivityLollipop) context);
                         } else {
-                            LogUtil.logWarning("Chatroom not recovered");
+                            logWarning("Chatroom not recovered");
                         }
                     }
                 }
             }
             else if (action == SEND_FILES) {
                 counter--;
-                LogUtil.logDebug("Counter after decrease: " + counter);
+                logDebug("Counter after decrease: " + counter);
                 if (e.getErrorCode() != MegaError.API_OK){
                     error++;
-                    LogUtil.logError("ERROR creating chat");
+                    logError("ERROR creating chat");
                 }
                 else{
                     if(chats==null){
@@ -218,12 +218,12 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 }
 
                 if(counter==0){
-                    LogUtil.logDebug("Counter is 0 - all requests processed");
+                    logDebug("Counter is 0 - all requests processed");
                     if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
                         //All send files fail; Show error
                         message = context.getResources().getQuantityString(R.plurals.num_files_not_send, handles.length, totalCounter);
                         if(context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                         }
                     }
                     else {
@@ -236,10 +236,10 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
             }
             else if (action == SEND_CONTACTS) {
                 counter--;
-                LogUtil.logDebug("Counter after decrease: " + counter);
+                logDebug("Counter after decrease: " + counter);
                 if (e.getErrorCode() != MegaError.API_OK){
                     error++;
-                    LogUtil.logError("ERROR creating chat");
+                    logError("ERROR creating chat");
                 }
                 else{
                     if(chats==null){
@@ -252,12 +252,12 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 }
 
                 if(counter==0){
-                    LogUtil.logDebug("Counter is 0 - all requests processed");
+                    logDebug("Counter is 0 - all requests processed");
                     if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
                         //All send contacts fail; Show error
                         message = context.getResources().getQuantityString(R.plurals.num_contacts_not_send, handles.length, totalCounter);
                         if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                         }
                     }
                     else {
@@ -270,10 +270,10 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
             }
             else if (action == SEND_MESSAGES) {
                 counter--;
-                LogUtil.logDebug("Counter after decrease: " + counter);
+                logDebug("Counter after decrease: " + counter);
                 if (e.getErrorCode() != MegaError.API_OK){
                     error++;
-                    LogUtil.logError("ERROR creating chat");
+                    logError("ERROR creating chat");
                 }
                 else{
                     if(chats==null){
@@ -286,15 +286,15 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 }
 
                 if(counter==0){
-                    LogUtil.logDebug("Counter is 0 - all requests processed");
+                    logDebug("Counter is 0 - all requests processed");
                     if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
                         //All send messages fail; Show error
                         message = context.getResources().getQuantityString(R.plurals.num_messages_not_send, handles.length, totalCounter);
                         if (context instanceof ChatActivityLollipop) {
-                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                            ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                         }
                         else if (context instanceof NodeAttachmentHistoryActivity) {
-                            ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, message);
+                            ((NodeAttachmentHistoryActivity) context).showSnackbar(SNACKBAR_TYPE, message);
                         }
                     }
                     else {
@@ -310,10 +310,10 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
             }
             else if (action == SEND_FILE_EXPLORER_CONTENT) {
                 counter--;
-                LogUtil.logDebug("Counter after decrease: " + counter);
+                logDebug("Counter after decrease: " + counter);
                 if (e.getErrorCode() != MegaError.API_OK){
                     error++;
-                    LogUtil.logError("ERROR creating chat");
+                    logError("ERROR creating chat");
                 }
                 else{
                     if(chats==null){
@@ -326,7 +326,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 }
 
                 if(counter==0){
-                    LogUtil.logDebug("Counter is 0 - all requests processed");
+                    logDebug("Counter is 0 - all requests processed");
                     if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
                         //All send messages fail; Show error
                         message = context.getResources().getString(R.string.content_not_send, totalCounter);

@@ -17,11 +17,11 @@ import java.nio.ByteBuffer;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class LocalCameraCallFragment extends Fragment implements MegaChatVideoListenerInterface {
@@ -37,7 +37,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     private ImageView microIcon;
 
     public static LocalCameraCallFragment newInstance(long chatId) {
-        LogUtil.logDebug("chatId: " + chatId);
+        logDebug("chatId: " + chatId);
         LocalCameraCallFragment f = new LocalCameraCallFragment();
         Bundle args = new Bundle();
         args.putLong("Chat ID", chatId);
@@ -52,9 +52,9 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         }
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
-        LogUtil.logDebug("Chat ID: " + chatId);
+        logDebug("Chat ID: " + chatId);
         super.onCreate(savedInstanceState);
-        LogUtil.logDebug("After onCreate called super");
+        logDebug("After onCreate called super");
     }
 
     @Override
@@ -65,7 +65,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         }
 
         View v = inflater.inflate(R.layout.fragment_local_camera_call, container, false);
-        LogUtil.logDebug("onCreateView()");
+        logDebug("onCreateView()");
         localSurfaceView = v.findViewById(R.id.surface_local_video);
         localSurfaceView.setZOrderMediaOverlay(true);
         SurfaceHolder localSurfaceHolder = localSurfaceView.getHolder();
@@ -121,14 +121,14 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
     @Override
     public void onDestroy() {
-        LogUtil.logDebug("onDestroy");
+        logDebug("onDestroy");
         removeSurfaceView();
         super.onDestroy();
     }
 
     @Override
     public void onResume() {
-        LogUtil.logDebug("onResume()");
+        logDebug("onResume()");
         this.width = 0;
         this.height = 0;
         localSurfaceView.setVisibility(View.VISIBLE);
@@ -137,7 +137,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     }
 
     public void showMicro(boolean isShouldShown) {
-        LogUtil.logDebug("showMicro");
+        logDebug("showMicro");
         if (microIcon == null) return;
         if (isShouldShown) {
             microIcon.setVisibility(View.VISIBLE);
@@ -147,13 +147,13 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     }
 
     public void removeSurfaceView() {
-        LogUtil.logDebug("removeSurfaceView()");
+        logDebug("removeSurfaceView()");
         if (microIcon != null) {
             microIcon.setVisibility(View.GONE);
         }
         if (localSurfaceView != null) {
             if (localSurfaceView.getParent() != null && localSurfaceView.getParent().getParent() != null) {
-                LogUtil.logDebug("removeView Chat ID: " + chatId);
+                logDebug("removeView Chat ID: " + chatId);
                 ((ViewGroup) localSurfaceView.getParent()).removeView(localSurfaceView);
             }
             localSurfaceView.setVisibility(View.GONE);

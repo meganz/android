@@ -6,11 +6,12 @@ import android.os.Handler;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.PinUtil;
-import mega.privacy.android.app.utils.JobUtil;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+
+import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class PinActivityLollipop extends BaseActivity {
@@ -28,7 +29,7 @@ public class PinActivityLollipop extends BaseActivity {
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
 
-		if(Util.isChatEnabled()){
+		if(isChatEnabled()){
 			if (megaChatApi == null){
 				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
 			}
@@ -37,12 +38,12 @@ public class PinActivityLollipop extends BaseActivity {
 
 	@Override
 	protected void onPause() {
-		LogUtil.logDebug("onPause");
+		logDebug("onPause");
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
 
-		if(Util.isChatEnabled()){
+		if(isChatEnabled()){
 			if (megaChatApi == null){
 				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
 			}
@@ -55,17 +56,17 @@ public class PinActivityLollipop extends BaseActivity {
 	
 	@Override
 	protected void onResume() {
-		LogUtil.logDebug("onResume");
+		logDebug("onResume");
 
 		super.onResume();
-        Util.setAppFontSize(this);
+        setAppFontSize(this);
 		MegaApplication.activityResumed();
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
 
-		if(Util.isChatEnabled()){
+		if(isChatEnabled()){
 			if (megaChatApi == null){
 				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
 			}
@@ -84,7 +85,7 @@ public class PinActivityLollipop extends BaseActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    JobUtil.startCameraUploadService(PinActivityLollipop.this);
+                    startCameraUploadService(PinActivityLollipop.this);
                 }
             }, 3000);
         }

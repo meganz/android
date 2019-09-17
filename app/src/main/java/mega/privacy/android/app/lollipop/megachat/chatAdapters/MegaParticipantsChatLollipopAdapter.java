@@ -34,9 +34,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.ChatParticipantAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -45,7 +42,10 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<MegaParticipantsChatLollipopAdapter.ViewHolderParticipants> implements OnClickListener {
@@ -127,7 +127,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 	@Override
 	public ViewHolderParticipants onCreateViewHolder(ViewGroup parent, int viewType) {
-		LogUtil.logDebug("onCreateViewHolder");
+		logDebug("onCreateViewHolder");
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -152,13 +152,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			holderList.statusImage = (ImageView) v.findViewById(R.id.group_participants_state_circle);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				LogUtil.logDebug("Landscape configuration");
-				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
-				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+				logDebug("Landscape configuration");
+				holderList.textViewContactName.setMaxWidth(scaleWidthPx(260, outMetrics));
+				holderList.textViewContent.setMaxWidth(scaleWidthPx(260, outMetrics));
 			}
 			else{
-				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
-				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
+				holderList.textViewContactName.setMaxWidth(scaleWidthPx(180, outMetrics));
+				holderList.textViewContent.setMaxWidth(scaleWidthPx(180, outMetrics));
 			}
 
 			holderList.itemLayout.setOnClickListener(this);
@@ -167,7 +167,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			return holderList;
 		}
 		else{
-			LogUtil.logDebug("Last element - type add participant");
+			logDebug("Last element - type add participant");
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_add_participant_chat_list, parent, false);
 //			v = LayoutInflater.from(context).inflate(R.layout.item_add_participant_chat_list, null);
 			holderAddParticipant = new ViewHolderAddParticipant(v);
@@ -184,7 +184,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	@Override
 	public void onBindViewHolder(ViewHolderParticipants holder, int position) {
 		final int itemType = getItemViewType(position);
-		LogUtil.logDebug("position: " + position + ", itemType: "+itemType);
+		logDebug("position: " + position + ", itemType: "+itemType);
 
 		if(itemType==ITEM_VIEW_TYPE_NORMAL) {
 			((ViewHolderParticipantsList)holder).currentPosition = position;
@@ -195,7 +195,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			((ViewHolderParticipantsList)holder).contactMail = participant.getEmail();
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(participant.getHandle());
 			((ViewHolderParticipantsList)holder).userHandle = userHandleEncoded;
-			LogUtil.logDebug("participant: " + participant.getEmail() + ", handle: " + participant.getHandle());
+			logDebug("participant: " + participant.getEmail() + ", handle: " + participant.getHandle());
 			((ViewHolderParticipantsList)holder).fullName = participant.getFullName();
 
 			int userStatus;
@@ -208,40 +208,40 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 
 			if(userStatus == MegaChatApi.STATUS_ONLINE){
-				LogUtil.logDebug("This user is connected");
+				logDebug("This user is connected");
 				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
 				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
 				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.online_status));
 				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
 			}
 			else if(userStatus == MegaChatApi.STATUS_AWAY){
-				LogUtil.logDebug("This user is away");
+				logDebug("This user is away");
 				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
 				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
 				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.away_status));
 				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
 			}
 			else if(userStatus == MegaChatApi.STATUS_BUSY){
-				LogUtil.logDebug("This user is busy");
+				logDebug("This user is busy");
 				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
 				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
 				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.busy_status));
 				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
 			}
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
-				LogUtil.logDebug("This user is offline");
+				logDebug("This user is offline");
 				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
 				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
 				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.offline_status));
 				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
 			}
 			else if(userStatus == MegaChatApi.STATUS_INVALID){
-				LogUtil.logWarning("INVALID status: " + userStatus);
+				logWarning("INVALID status: " + userStatus);
 				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.GONE);
 				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.GONE);
 			}
 			else{
-				LogUtil.logDebug("This user status is: " + userStatus);
+				logDebug("This user status is: " + userStatus);
 				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.GONE);
 				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.GONE);
 			}
@@ -266,7 +266,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 			String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
 			if((((ViewHolderParticipantsList)holder).userHandle).equals(myUserHandleEncoded)){
-				LogUtil.logDebug("It's me!!!");
+				logDebug("It's me!!!");
 				File avatar = buildAvatarFile(context,((ViewHolderParticipantsList)holder).contactMail + ".jpg");
 				Bitmap bitmap = null;
 				if(avatar!=null){
@@ -283,21 +283,21 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 						}
 					}
 					else{
-						LogUtil.logWarning("My avatar Not exists");
+						logWarning("My avatar Not exists");
 					}
 				}
 				else{
-					LogUtil.logWarning("My avatar NULL");
+					logWarning("My avatar NULL");
 				}
 
 				((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
 				((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(this);
 			}
 			else{
-				LogUtil.logDebug("NOOOT me!!!");
+				logDebug("NOOOT me!!!");
 				ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(context, ((ViewHolderParticipantsList)holder), this);
 				if (((ViewHolderParticipantsList)holder).contactMail != null) {
-					LogUtil.logDebug("The participant is contact!!");
+					logDebug("The participant is contact!!");
 
 					MegaUser contact = megaApi.getContact(((ViewHolderParticipantsList)holder).contactMail);
 					if(contact!=null){
@@ -325,12 +325,12 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 						((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
 					}
 					else{
-						LogUtil.logDebug("Participant is NOT contact");
+						logDebug("Participant is NOT contact");
                         megaApi.getUserAvatar(((ViewHolderParticipantsList)holder).contactMail,buildAvatarFile(context,((ViewHolderParticipantsList)holder).contactMail + ".jpg").getAbsolutePath(),listener);
 					}
 
 				} else {
-					LogUtil.logDebug("NOT email- Participant is NOT contact");
+					logDebug("NOT email- Participant is NOT contact");
 					if(position!=0){
 						((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
 						((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(null);
@@ -359,25 +359,25 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			((ViewHolderParticipantsList)holder).threeDotsLayout.setTag(holder);
 		}
 		else{
-			LogUtil.logDebug("Bind item add participant");
+			logDebug("Bind item add participant");
 			((ViewHolderAddParticipant)holder).itemLayout.setOnClickListener(this);
 		}
 	}
 	
 	public void createDefaultAvatar(ViewHolderParticipantsList holder){
-		LogUtil.logDebug("createDefaultAvatar()");
+		logDebug("createDefaultAvatar()");
 		
-		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
 		String color = megaApi.getUserAvatarColor(holder.userHandle);
 		if(color!=null){
-			LogUtil.logDebug("The color to set the avatar is " + color);
+			logDebug("The color to set the avatar is " + color);
 			p.setColor(Color.parseColor(color));
 		}
 		else{
-			LogUtil.logDebug("Default color to the avatar");
+			logDebug("Default color to the avatar");
 			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 		}
 
@@ -438,7 +438,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 	@Override
     public int getItemCount() {
-		LogUtil.logDebug("getItemCount");
+		logDebug("getItemCount");
 
 		if (isPreview) {
 			return participants.size();
@@ -448,9 +448,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			int permission = participants.get(size-1).getPrivilege();
 
 			if (permission == MegaChatRoom.PRIV_MODERATOR) {
-				LogUtil.logDebug("Moderator type");
+				logDebug("Moderator type");
 				int participantNumber = participants.size()+1;
-				LogUtil.logDebug("Return value: " + participantNumber);
+				logDebug("Return value: " + participantNumber);
 				return participantNumber;
 			} else {
 				return participants.size();
@@ -460,7 +460,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 	@Override
 	public int getItemViewType(int position) {
-		LogUtil.logDebug("position: " + position);
+		logDebug("position: " + position);
 
 		if (isPreview) {
 			return  ITEM_VIEW_TYPE_NORMAL;
@@ -471,11 +471,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			int permission = participants.get(size-1).getPrivilege();
 
 			if (permission == MegaChatRoom.PRIV_MODERATOR) {
-				LogUtil.logDebug("Moderator type");
+				logDebug("Moderator type");
 				if (position>0) {
 					return ITEM_VIEW_TYPE_NORMAL;
 				} else {
-					LogUtil.logDebug("Type ADD_PARTICIPANT");
+					logDebug("Type ADD_PARTICIPANT");
 					return ITEM_VIEW_TYPE_ADD_PARTICIPANT;
 				}
 			} else {
@@ -485,17 +485,17 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 
 	public Object getItem(int position) {
-		LogUtil.logDebug("position: " + position);
+		logDebug("position: " + position);
 		if (isPreview) {
 			return participants.get(position);
 		}
 		else {
 			int size = participants.size();
-			LogUtil.logDebug("Participants size: " + size);
+			logDebug("Participants size: " + size);
 			int permission = participants.get(size-1).getPrivilege();
 
 			if (permission == MegaChatRoom.PRIV_MODERATOR) {
-				LogUtil.logDebug("Moderator type");
+				logDebug("Moderator type");
 				return participants.get(position-1);
 			}
 			else {
@@ -514,7 +514,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 
 	public void setPositionClicked(int p) {
-		LogUtil.logDebug("position: " + p);
+		logDebug("position: " + p);
 		positionClicked = p;
 		notifyDataSetChanged();
 	}
@@ -535,13 +535,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 	
 	public void toggleSelection(int pos) {
-		LogUtil.logDebug("position: " + pos);
+		logDebug("position: " + pos);
 		if (selectedItems.get(pos, false)) {
-			LogUtil.logDebug("Delete pos: " + pos);
+			logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			LogUtil.logDebug("PUT pos: " + pos);
+			logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
@@ -611,7 +611,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	@Override
 	public void onClick(View v) {
 
-		if(!Util.isOnline(context)){
+		if(!isOnline(context)){
 			if(context instanceof GroupChatInfoActivityLollipop){
 				((GroupChatInfoActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
 			}
@@ -621,21 +621,21 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		switch (v.getId()){
 			case R.id.participant_list_three_dots_layout:
 			case R.id.participant_list_item_layout:{
-				LogUtil.logDebug("contact_list_three_dots");
+				logDebug("contact_list_three_dots");
 				ViewHolderParticipantsList holder = (ViewHolderParticipantsList) v.getTag();
 				int currentPosition = holder.currentPosition;
 				MegaChatParticipant p = (MegaChatParticipant) getItem(currentPosition);
 				if(p==null){
-					LogUtil.logWarning("Participant is null");
+					logWarning("Participant is null");
 				}
 				else{
-					LogUtil.logDebug("Selected: " + p.getFullName());
+					logDebug("Selected: " + p.getFullName());
 				}
 				((GroupChatInfoActivityLollipop) context).showParticipantsPanel(p);
 				break;
 			}
 			case R.id.add_participant_list_item_layout:{
-				LogUtil.logDebug("add_participant_item_layout");
+				logDebug("add_participant_item_layout");
 				((GroupChatInfoActivityLollipop) context).chooseAddParticipantDialog();
 				break;
 			}
@@ -643,21 +643,21 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 	
 	public void setParticipants (ArrayList<MegaChatParticipant> participants){
-		LogUtil.logDebug("participants: " + participants.size());
+		logDebug("participants: " + participants.size());
 		this.participants = participants;
 		positionClicked = -1;
 		notifyDataSetChanged();
 	}
 
 	public void updateParticipant(int position, ArrayList<MegaChatParticipant> participants){
-		LogUtil.logDebug("updateParticipant");
+		logDebug("updateParticipant");
 		this.participants = participants;
 		positionClicked = -1;
 		notifyItemChanged(position);
 	}
 
 	public void removeParticipant(int position, ArrayList<MegaChatParticipant> participants){
-		LogUtil.logDebug("updateParticipant");
+		logDebug("updateParticipant");
 		this.participants = participants;
 		positionClicked = -1;
 		notifyItemRemoved(position);
@@ -697,7 +697,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 
 	public void updateContactStatus(int position){
-		LogUtil.logDebug("position: " + position);
+		logDebug("position: " + position);
 
 		if(listFragment.findViewHolderForAdapterPosition(position) instanceof MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList){
 			notifyItemChanged(position);

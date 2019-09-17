@@ -36,11 +36,12 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaContactRequestLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class SentRequestsFragmentLollipop extends Fragment {
 	
@@ -73,7 +74,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	ArrayList<MegaContactRequest> contacts;
 //
 	public void activateActionMode(){
-		LogUtil.logDebug("activateActionMode");
+		logDebug("activateActionMode");
 		if (!adapterList.isMultipleSelect()){
 			adapterList.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -117,7 +118,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.sent_request_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
-			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
@@ -127,7 +128,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			clearSelections();
 			adapterList.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
-            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
@@ -153,7 +154,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 
 			}
 			else{
-				LogUtil.logDebug("selected is = 0");
+				logDebug("selected is = 0");
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 
@@ -199,7 +200,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
-			LogUtil.logError("Invalidate error", e);
+			logError("Invalidate error", e);
 			e.printStackTrace();
 		}
 	}
@@ -208,7 +209,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		LogUtil.logDebug("hideMultipleSelect");
+		logDebug("hideMultipleSelect");
 		adapterList.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
@@ -232,7 +233,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	/////END Multiselect/////
 
 	public static SentRequestsFragmentLollipop newInstance() {
-		LogUtil.logDebug("newInstance");
+		logDebug("newInstance");
 		SentRequestsFragmentLollipop fragment = new SentRequestsFragmentLollipop();
 		return fragment;
 	}
@@ -240,7 +241,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		LogUtil.logDebug("onCreate");
+		logDebug("onCreate");
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -248,11 +249,11 @@ public class SentRequestsFragmentLollipop extends Fragment {
     }
 
 	public void updateView(){
-		LogUtil.logDebug("updateView");
+		logDebug("updateView");
 
 		contacts = megaApi.getOutgoingContactRequests();
 		if(contacts!=null) {
-			LogUtil.logDebug("Sent requests: " + contacts.size());
+			logDebug("Sent requests: " + contacts.size());
 			//Order by last interaction
 			Collections.sort(contacts, new Comparator<MegaContactRequest>() {
 
@@ -266,7 +267,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			});
 
 			if (adapterList == null) {
-				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.OUTGOING_REQUEST_ADAPTER);
+				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, OUTGOING_REQUEST_ADAPTER);
 				listView.setAdapter(adapterList);
 			} else {
 				adapterList.setContacts(contacts);
@@ -275,7 +276,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			adapterList.setPositionClicked(-1);
 
 			if (adapterList.getItemCount() == 0) {
-				LogUtil.logDebug("adapterList.getItemCount() == 0");
+				logDebug("adapterList.getItemCount() == 0");
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 					emptyImageView.setImageResource(R.drawable.sent_request_empty_landscape);
 				}else{
@@ -301,7 +302,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			} else {
-				LogUtil.logDebug("adapterList.getItemCount() NOT = 0");
+				logDebug("adapterList.getItemCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
@@ -322,7 +323,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		LogUtil.logDebug("onCreateView");
+		logDebug("onCreateView");
 
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -347,7 +348,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
     	if (isList){
 	        View v = inflater.inflate(R.layout.contacts_sent_requests_tab, container, false);			
 	        listView = (RecyclerView) v.findViewById(R.id.incoming_contacts_list_view);
-			listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 	        listView.setClipToPadding(false);;
 			
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
@@ -367,7 +368,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.empty_text_contacts_requests_first);
 
 			if (adapterList == null){
-				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.OUTGOING_REQUEST_ADAPTER);
+				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, OUTGOING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
@@ -377,7 +378,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			listView.setAdapter(adapterList);
 						
 			if (adapterList.getItemCount() == 0){
-				LogUtil.logDebug("adapterList.getItemCount() == 0");
+				logDebug("adapterList.getItemCount() == 0");
 
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
@@ -405,7 +406,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				emptyTextViewFirst.setText(result);
 
 			}else{
-				LogUtil.logDebug("adapterList.getItemCount() NOT = 0");
+				logDebug("adapterList.getItemCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
@@ -448,7 +449,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
     }
 
 	public void itemClick(int position) {
-		LogUtil.logDebug("Position: " + position);
+		logDebug("Position: " + position);
 		if (adapterList.isMultipleSelect()){
 			adapterList.toggleSelection(position);
 
@@ -458,7 +459,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			}
 		}
 		else{
-			LogUtil.logDebug("not multiple select - show menu");
+			logDebug("not multiple select - show menu");
 			MegaContactRequest c = contacts.get(position);
 			((ManagerActivityLollipop) context).showSentRequestOptionsPanel(c);
 		}

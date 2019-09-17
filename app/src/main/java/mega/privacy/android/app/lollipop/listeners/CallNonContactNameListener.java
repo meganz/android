@@ -10,8 +10,6 @@ import java.io.File;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -23,6 +21,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CallNonContactNameListener implements MegaChatRequestListenerInterface, MegaRequestListenerInterface {
 
@@ -37,7 +36,7 @@ public class CallNonContactNameListener implements MegaChatRequestListenerInterf
     RecyclerView.Adapter adapter;
 
     public CallNonContactNameListener(Context context, long peerId, boolean isAvatar, String name) {
-        LogUtil.logDebug("CallNonContactNameListener");
+        logDebug("CallNonContactNameListener");
 
         this.context = context;
         this.peerId = peerId;
@@ -50,7 +49,7 @@ public class CallNonContactNameListener implements MegaChatRequestListenerInterf
     }
 
     public CallNonContactNameListener(Context context, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter, long peerId, String fullName, int position) {
-        LogUtil.logDebug("CallNonContactNameListener");
+        logDebug("CallNonContactNameListener");
 
         this.context = context;
         this.peerId = peerId;
@@ -79,7 +78,7 @@ public class CallNonContactNameListener implements MegaChatRequestListenerInterf
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         if(request.getType()==MegaChatRequest.TYPE_GET_EMAIL){
             if (e.getErrorCode() == MegaError.API_OK){
-                LogUtil.logDebug("TYPE_GET_EMAIL OK");
+                logDebug("TYPE_GET_EMAIL OK");
 
                 mail = request.getText();
                 if(mail!=null){
@@ -88,19 +87,19 @@ public class CallNonContactNameListener implements MegaChatRequestListenerInterf
                     }
                 }
                 if((holder!=null)&&(holder instanceof GroupCallAdapter.ViewHolderGroupCall)){
-                    LogUtil.logDebug("GroupCallAdapter:setProfile");
+                    logDebug("GroupCallAdapter:setProfile");
                     ((GroupCallAdapter) adapter).setProfile(peerId, name, mail, (GroupCallAdapter.ViewHolderGroupCall)holder, position);
                 }else{
                     if(isAvatar){
-                        LogUtil.logDebug("PeerSelected:setProfilePeerSelected");
+                        logDebug("PeerSelected:setProfilePeerSelected");
                         ((ChatCallActivity)context).setProfilePeerSelected(peerId, name, mail);
                     }else{
-                        LogUtil.logDebug("GetName:updateNonContactName");
+                        logDebug("GetName:updateNonContactName");
                         ((ChatCallActivity)context).updateNonContactName(peerId, mail);
                     }
                 }
             }else{
-                LogUtil.logError("ERROR: TYPE_GET_EMAIL: " + request.getRequestString());
+                logError("ERROR: TYPE_GET_EMAIL: " + request.getRequestString());
             }
         }
     }
@@ -112,16 +111,16 @@ public class CallNonContactNameListener implements MegaChatRequestListenerInterf
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        LogUtil.logDebug("onRequestStart()");
+        logDebug("onRequestStart()");
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        LogUtil.logDebug("Error code: " + e.getErrorCode());
+        logDebug("Error code: " + e.getErrorCode());
         if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
 
             if (e.getErrorCode() != MegaError.API_OK) {
-                LogUtil.logDebug("TYPE_GET_ATTR_USER: OK");
+                logDebug("TYPE_GET_ATTR_USER: OK");
                 if((holder!=null) && (holder instanceof GroupCallAdapter.ViewHolderGroupCall)){
                     File avatar = buildAvatarFile(context, request.getEmail() + ".jpg");
                     Bitmap bitmap = null;
@@ -134,7 +133,7 @@ public class CallNonContactNameListener implements MegaChatRequestListenerInterf
                             if (bitmap == null) {
                                 avatar.delete();
                             }else{
-                                LogUtil.logDebug("GroupCallAdapter:setImageView ");
+                                logDebug("GroupCallAdapter:setImageView ");
                                 ((GroupCallAdapter.ViewHolderGroupCall) holder).setImageView(bitmap);
                             }
                         }

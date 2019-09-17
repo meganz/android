@@ -38,9 +38,6 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -50,7 +47,10 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -96,7 +96,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
@@ -106,10 +106,10 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         }
 
         if(savedInstanceState!=null) {
-            LogUtil.logDebug("Bundle is NOT NULL");
+            logDebug("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong("chatId", -1);
             messageId = savedInstanceState.getLong("messageId", -1);
-            LogUtil.logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
+            logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
             email = savedInstanceState.getString("email");
             MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
             if(messageMega!=null){
@@ -117,7 +117,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             }
         }
         else{
-            LogUtil.logWarning("Bundle NULL");
+            logWarning("Bundle NULL");
 
             if(context instanceof ChatActivityLollipop){
                 chatId = ((ChatActivityLollipop) context).idChat;
@@ -129,7 +129,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 email = ((ContactAttachmentActivityLollipop) context).selectedEmail;
             }
 
-            LogUtil.logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
+            logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
             MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
             if(messageMega!=null){
                 message = new AndroidMegaChatMessage(messageMega);
@@ -146,7 +146,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     public void setupDialog(final Dialog dialog, int style) {
 
         super.setupDialog(dialog, style);
-        LogUtil.logDebug("setupDialog");
+        logDebug("setupDialog");
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -163,8 +163,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
         stateIcon.setVisibility(View.VISIBLE);
 
-        stateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
-        stateIcon.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
+        stateIcon.setMaxWidth(scaleWidthPx(6,outMetrics));
+        stateIcon.setMaxHeight(scaleHeightPx(6,outMetrics));
 
         titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.contact_attachment_chat_mail_text);
         contactImageView = (RoundedImageView) contentView.findViewById(R.id.contact_attachment_thumbnail);
@@ -186,19 +186,19 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         optionRemove.setVisibility(View.GONE);
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            LogUtil.logDebug("Landscape configuration");
-            titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(270, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(270, outMetrics));
+            logDebug("Landscape configuration");
+            titleNameContactChatPanel.setMaxWidth(scaleWidthPx(270, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(scaleWidthPx(270, outMetrics));
         }
         else{
-            titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+            titleNameContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
         }
 
         if (message != null) {
             long userCount  = message.getMessage().getUsersCount();
             if(userCount==1){
-                LogUtil.logDebug("One contact attached");
+                logDebug("One contact attached");
 
                 optionView.setVisibility(View.GONE);
                 optionInfo.setVisibility(View.VISIBLE);
@@ -206,31 +206,31 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 long userHandle = message.getMessage().getUserHandle(0);
                 int state = megaChatApi.getUserOnlineStatus(userHandle);
                 if(state == MegaChatApi.STATUS_ONLINE){
-                    LogUtil.logDebug("This user is connected");
+                    logDebug("This user is connected");
                     stateIcon.setVisibility(View.VISIBLE);
                     stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
                 }
                 else if(state == MegaChatApi.STATUS_AWAY){
-                    LogUtil.logDebug("This user is away");
+                    logDebug("This user is away");
                     stateIcon.setVisibility(View.VISIBLE);
                     stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
                 }
                 else if(state == MegaChatApi.STATUS_BUSY){
-                    LogUtil.logDebug("This user is busy");
+                    logDebug("This user is busy");
                     stateIcon.setVisibility(View.VISIBLE);
                     stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
                 }
                 else if(state == MegaChatApi.STATUS_OFFLINE){
-                    LogUtil.logDebug("This user is offline");
+                    logDebug("This user is offline");
                     stateIcon.setVisibility(View.VISIBLE);
                     stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
                 }
                 else if(state == MegaChatApi.STATUS_INVALID){
-                    LogUtil.logWarning("INVALID status: " + state);
+                    logWarning("INVALID status: " + state);
                     stateIcon.setVisibility(View.GONE);
                 }
                 else{
-                    LogUtil.logDebug("This user status is: " + state);
+                    logDebug("This user status is: " + state);
                     stateIcon.setVisibility(View.GONE);
                 }
 
@@ -267,14 +267,14 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                             optionInvite.setVisibility(View.GONE);
                         }
                         else{
-                            LogUtil.logDebug("Non contact");
+                            logDebug("Non contact");
                             optionInfo.setVisibility(View.GONE);
                             optionStartConversation.setVisibility(View.GONE);
                             optionInvite.setVisibility(View.VISIBLE);
                         }
                     }
                     else{
-                        LogUtil.logDebug("Non contact");
+                        logDebug("Non contact");
                         optionInfo.setVisibility(View.GONE);
                         optionStartConversation.setVisibility(View.GONE);
                         optionInvite.setVisibility(View.VISIBLE);
@@ -284,10 +284,10 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 }
             }
             else {
-                LogUtil.logDebug("More than one contact attached");
+                logDebug("More than one contact attached");
 
                 if(email==null){
-                    LogUtil.logDebug("Panel shown from ChatActivity");
+                    logDebug("Panel shown from ChatActivity");
                     optionView.setVisibility(View.VISIBLE);
                     optionInfo.setVisibility(View.GONE);
 
@@ -307,21 +307,21 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
                         if(contact!=null) {
                             if (contact.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
-                                LogUtil.logDebug("Non contact");
+                                logDebug("Non contact");
                                 optionStartConversation.setVisibility(View.GONE);
                                 optionInvite.setVisibility(View.VISIBLE);
                                 break;
                             }
                         }
                         else{
-                            LogUtil.logDebug("Non contact");
+                            logDebug("Non contact");
                             optionStartConversation.setVisibility(View.GONE);
                             optionInvite.setVisibility(View.VISIBLE);
                             break;
                         }
                     }
 
-                    LogUtil.logDebug("Names of attached contacts: " + name);
+                    logDebug("Names of attached contacts: " + name);
                     titleMailContactChatPanel.setText(name);
 
                     String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int)userCount, userCount);
@@ -330,15 +330,15 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     addAvatarParticipantPanel(-1, null, userCount+"");
                 }
                 else{
-                    LogUtil.logDebug("Panel shown from ContactAttachmentActivity - always one contact selected");
+                    logDebug("Panel shown from ContactAttachmentActivity - always one contact selected");
                     optionView.setVisibility(View.GONE);
 
                     stateIcon.setVisibility(View.VISIBLE);
 
                     position = getPositionByMail(email);
-                    LogUtil.logDebug("Position selected: " + position);
+                    logDebug("Position selected: " + position);
                     if(position==-1){
-                        LogUtil.logWarning("Error - position -1");
+                        logWarning("Error - position -1");
                         return;
                     }
 
@@ -348,16 +348,16 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     String email = message.getMessage().getUserEmail(position);
                     titleMailContactChatPanel.setText(email);
 
-                    LogUtil.logDebug("Contact Email: " + email);
+                    logDebug("Contact Email: " + email);
 
                     long userHandle = message.getMessage().getUserHandle(position);
-                    LogUtil.logDebug("Contact Handle: " + userHandle);
+                    logDebug("Contact Handle: " + userHandle);
                     String name = "";
                     name = chatC.getFullName(userHandle, chatId);
-                    LogUtil.logDebug("Name before: " + name);
+                    logDebug("Name before: " + name);
                     name = message.getMessage().getUserName(position);
                     if (name!=null){
-                        LogUtil.logDebug("Name here: " + name);
+                        logDebug("Name here: " + name);
                         if(name.trim().isEmpty()) {
                             name = chatC.getFullName(userHandle, chatId);
                             if(name.trim().isEmpty()) {
@@ -366,13 +366,13 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                         }
                     }
                     else{
-                        LogUtil.logWarning("Contact Name: is NULL... find more...");
+                        logWarning("Contact Name: is NULL... find more...");
                         name = chatC.getFullName(userHandle, chatId);
                         if(name.trim().isEmpty()) {
                             name = email;
                         }
                     }
-                    LogUtil.logDebug("Contact Name: " + name);
+                    logDebug("Contact Name: " + name);
 
                     titleNameContactChatPanel.setText(name);
 
@@ -399,14 +399,14 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                             optionInvite.setVisibility(View.GONE);
                         }
                         else{
-                            LogUtil.logDebug("Non contact");
+                            logDebug("Non contact");
                             optionInfo.setVisibility(View.GONE);
                             optionStartConversation.setVisibility(View.GONE);
                             optionInvite.setVisibility(View.VISIBLE);
                         }
                     }
                     else{
-                        LogUtil.logDebug("Non contact");
+                        logDebug("Non contact");
                         optionInfo.setVisibility(View.GONE);
                         optionStartConversation.setVisibility(View.GONE);
                         optionInvite.setVisibility(View.VISIBLE);
@@ -441,7 +441,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     }
 
     public void addAvatarParticipantPanel(long handle, String email, String name){
-        LogUtil.logDebug("handle: " + handle);
+        logDebug("handle: " + handle);
         if (handle != -1) {
             //Ask for avatar
             File avatar = buildAvatarFile(getActivity(),email + ".jpg");
@@ -463,20 +463,20 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 }
             }
 
-            LogUtil.logDebug("Set default avatar");
+            logDebug("Set default avatar");
             ////DEfault AVATAR
-            Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+            Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
             Canvas c = new Canvas(defaultAvatar);
             Paint p = new Paint();
             p.setAntiAlias(true);
             String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
             String color = megaApi.getUserAvatarColor(userHandleEncoded);
             if(color!=null){
-                LogUtil.logDebug("The color to set the avatar is " + color);
+                logDebug("The color to set the avatar is " + color);
                 p.setColor(Color.parseColor(color));
             }
             else{
-                LogUtil.logDebug("Default color to the avatar");
+                logDebug("Default color to the avatar");
                 p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
 
@@ -511,9 +511,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             }
         }
         else{
-            LogUtil.logWarning("Set default avatar HANDLE is Null");
+            logWarning("Set default avatar HANDLE is Null");
             ////DEfault AVATAR
-            Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+            Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
             Canvas c = new Canvas(defaultAvatar);
             Paint p = new Paint();
             p.setAntiAlias(true);
@@ -549,20 +549,20 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
     @Override
     public void onClick(View v) {
-        LogUtil.logDebug("onClick");
+        logDebug("onClick");
 
         if(message==null){
-            LogUtil.logWarning("Error. The message is NULL");
+            logWarning("Error. The message is NULL");
             return;
         }
 
         switch(v.getId()){
 
             case R.id.option_info_layout:{
-                LogUtil.logDebug("Info option");
+                logDebug("Info option");
 
-                if (!Util.isOnline(context)){
-                    ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                if (!isOnline(context)){
+                    ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     return;
                 }
 
@@ -575,7 +575,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                         i.putExtra("name", message.getMessage().getUserEmail(position));
                     }
                     else{
-                        LogUtil.logWarning("Error - position -1");
+                        logWarning("Error - position -1");
                     }
                 }
 
@@ -584,7 +584,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 break;
             }
             case R.id.option_view_layout:{
-                LogUtil.logDebug("View option");
+                logDebug("View option");
                 Intent i = new Intent(context, ContactAttachmentActivityLollipop.class);
                 i.putExtra("chatId", chatId);
                 i.putExtra("messageId", messageId);
@@ -593,10 +593,10 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 break;
             }
             case R.id.option_invite_layout:{
-                LogUtil.logDebug("Invite option");
+                logDebug("Invite option");
 
-                if (!Util.isOnline(context)){
-                    ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                if (!isOnline(context)){
+                    ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 }
                 else{
                     ContactController cC = new ContactController(context);
@@ -608,7 +608,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                             cC.inviteContact(message.getMessage().getUserEmail(0));
                         }
                         else{
-                            LogUtil.logDebug("Num users to invite: " + numUsers);
+                            logDebug("Num users to invite: " + numUsers);
                             contactEmails = new ArrayList<>();
 
                             for(int i=0;i<numUsers;i++){
@@ -628,7 +628,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 break;
             }
             case R.id.option_start_conversation_layout:{
-                LogUtil.logDebug("Start conversation option");
+                logDebug("Start conversation option");
 
                 long numUsers = message.getMessage().getUsersCount();
                 if(context instanceof ChatActivityLollipop){
@@ -637,7 +637,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                         dismissAllowingStateLoss();
                     }
                     else{
-                        LogUtil.logDebug("Num users to invite: " + numUsers);
+                        logDebug("Num users to invite: " + numUsers);
                         ArrayList<Long> contactHandles = new ArrayList<>();
 
                         for(int i=0;i<numUsers;i++){
@@ -648,8 +648,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     }
                 }
                 else{
-                    LogUtil.logDebug("Instance of ContactAttachmentActivityLollipop");
-                    LogUtil.logDebug("position: " + position);
+                    logDebug("Instance of ContactAttachmentActivityLollipop");
+                    logDebug("position: " + position);
                     long userHandle = message.getMessage().getUserHandle(position);
                     ((ContactAttachmentActivityLollipop) context).startConversation(userHandle);
                     dismissAllowingStateLoss();
@@ -677,7 +677,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
     @Override
     public void onAttach(Activity activity) {
-        LogUtil.logDebug("onAttach");
+        logDebug("onAttach");
         super.onAttach(activity);
         this.context = activity;
     }
@@ -691,7 +691,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        LogUtil.logDebug("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
         outState.putLong("chatId", chatId);

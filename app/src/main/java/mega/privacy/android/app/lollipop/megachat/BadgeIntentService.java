@@ -9,7 +9,8 @@ import android.support.annotation.Nullable;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.LogUtil;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class BadgeIntentService extends IntentService {
 
@@ -18,22 +19,22 @@ public class BadgeIntentService extends IntentService {
 
     public BadgeIntentService() {
         super("BadgeIntentService");
-        LogUtil.logDebug("Constructor");
+        logDebug("Constructor");
     }
 
     @Override
     public void onStart(@Nullable Intent intent, int startId) {
-        LogUtil.logDebug("onStart");
+        logDebug("onStart");
         super.onStart(intent, startId);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        LogUtil.logDebug("onHandleIntent");
+        logDebug("onHandleIntent");
         if (intent != null) {
             int badgeCount = intent.getIntExtra("badgeCount", 0);
-            LogUtil.logDebug("Badge count: " + badgeCount + " abs: " + Math.abs(badgeCount));
+            logDebug("Badge count: " + badgeCount + " abs: " + Math.abs(badgeCount));
             notificationManager.cancel(notificationId);
             notificationId++;
 

@@ -34,15 +34,15 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
-import static mega.privacy.android.app.utils.Util.brandAlertDialog;
-import static mega.privacy.android.app.utils.Util.getCustomAlertBuilder;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatUtil {
 
     /*Method to know if i'm participating in any A/V call*/
     public static boolean participatingInACall(MegaChatApiAndroid megaChatApi) {
-        LogUtil.logDebug("participatingInACall");
+        logDebug("participatingInACall");
         if (megaChatApi == null) return false;
         MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
         MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
@@ -52,41 +52,41 @@ public class ChatUtil {
         MegaHandleList listCalls = megaChatApi.getChatCalls();
 
         if ((listCalls.size() - listCallsDestroy.size()) == 0) {
-            LogUtil.logDebug("No calls in progress");
+            logDebug("No calls in progress");
             return false;
         }
 
-        LogUtil.logDebug("There is some call in progress");
+        logDebug("There is some call in progress");
 
         if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsRingIn.size())) {
-            LogUtil.logDebug("I'm not participating in any of the calls there");
+            logDebug("I'm not participating in any of the calls there");
             return false;
         }
         if (listCallsRequestSent.size() > 0) {
-            LogUtil.logDebug("I'm doing a outgoing call");
+            logDebug("I'm doing a outgoing call");
             return true;
         }
-        LogUtil.logDebug("I'm in a call in progress");
+        logDebug("I'm in a call in progress");
         return true;
 
     }
 
     /*Method to know the chat id which A / V call I am participating in*/
     public static long getChatCallInProgress(MegaChatApiAndroid megaChatApi) {
-        LogUtil.logDebug("getChatCallInProgress()");
+        logDebug("getChatCallInProgress()");
         long chatId = -1;
         if (megaChatApi != null) {
             MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
             if ((listCallsRequestSent != null) && (listCallsRequestSent.size() > 0)) {
-                LogUtil.logDebug("Request Sent");
+                logDebug("Request Sent");
                 //Return to request sent
                 chatId = listCallsRequestSent.get(0);
             } else {
-                LogUtil.logDebug("NOT Request Sent");
+                logDebug("NOT Request Sent");
                 MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
                 if ((listCallsInProgress != null) && (listCallsInProgress.size() > 0)) {
                     //Return to in progress
-                    LogUtil.logDebug("In progress");
+                    logDebug("In progress");
                     chatId = listCallsInProgress.get(0);
                 }
             }
@@ -96,7 +96,7 @@ public class ChatUtil {
 
     /*Method to return to the call which I am participating*/
     public static void returnCall(Context context, MegaChatApiAndroid megaChatApi) {
-        LogUtil.logDebug("returnCall()");
+        logDebug("returnCall()");
         if ((megaChatApi == null) || (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)) == null))
             return;
         long chatId = getChatCallInProgress(megaChatApi);
@@ -250,7 +250,7 @@ public class ChatUtil {
     }
 
     public static void showConfirmationRemoveChatLink(final Context context) {
-        LogUtil.logDebug("showConfirmationRemoveChatLink");
+        logDebug("showConfirmationRemoveChatLink");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override

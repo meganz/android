@@ -13,8 +13,8 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 /*
 	 * Background task to process files for uploading
@@ -23,19 +23,19 @@ public class FilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
     Context context;
 
     public FilePrepareTask(Context context){
-        LogUtil.logDebug("FilePrepareTask::FilePrepareTask");
+        logDebug("FilePrepareTask::FilePrepareTask");
         this.context = context;
     }
 
     @Override
     protected List<ShareInfo> doInBackground(Intent... params) {
-        LogUtil.logDebug("FilePrepareTask::doInBackGround");
+        logDebug("FilePrepareTask::doInBackGround");
         return ShareInfo.processIntent(params[0], context);
     }
 
     @Override
     protected void onPostExecute(List<ShareInfo> info) {
-        LogUtil.logDebug("FilePrepareTask::onPostExecute");
+        logDebug("FilePrepareTask::onPostExecute");
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop)context).onIntentProcessed(info);
         }

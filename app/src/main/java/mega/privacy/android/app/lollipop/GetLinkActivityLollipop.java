@@ -34,9 +34,6 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -46,6 +43,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class GetLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface {
@@ -66,7 +67,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	ActionBar aB;
 	Toolbar tB;
 
-	public int visibleFragment= Constants.COPYRIGHT_FRAGMENT;
+	public int visibleFragment= COPYRIGHT_FRAGMENT;
 
 	static GetLinkActivityLollipop getLinkActivity;
 
@@ -85,7 +86,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		LogUtil.logDebug("onCreate");
+		logDebug("onCreate");
 		super.onCreate(savedInstanceState);
 
 		getLinkActivity = this;
@@ -95,8 +96,8 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		display.getMetrics(outMetrics);
 		density  = getResources().getDisplayMetrics().density;
 
-		scaleW = Util.getScaleW(outMetrics, density);
-		scaleH = Util.getScaleH(outMetrics, density);
+		scaleW = getScaleW(outMetrics, density);
+		scaleH = getScaleH(outMetrics, density);
 
 	    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (megaApi == null){
@@ -104,24 +105,24 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		if(megaApi==null||megaApi.getRootNode()==null){
-			LogUtil.logDebug("Refresh session - sdk");
+			logDebug("Refresh session - sdk");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
 			return;
 		}
 
-		if(Util.isChatEnabled()){
+		if(isChatEnabled()){
 			if (megaChatApi == null){
 				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 			}
 
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				LogUtil.logDebug("Refresh session - karere");
+				logDebug("Refresh session - karere");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
@@ -159,7 +160,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		fragmentContainer = (CoordinatorLayout) findViewById(R.id.get_link_coordinator_layout);
 		tB = (Toolbar) findViewById(R.id.toolbar_get_link);
 		if(tB==null){
-			LogUtil.logWarning("Tb is Null");
+			logWarning("Tb is Null");
 		}
 
 		tB.setVisibility(View.GONE);
@@ -171,34 +172,34 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(selectedNode.isExported()){
 
-			visibleFragment = Constants.GET_LINK_FRAGMENT;
+			visibleFragment = GET_LINK_FRAGMENT;
 		}
 		else{
 
 			ArrayList<MegaNode> nodeLinks = megaApi.getPublicLinks();
 			if(nodeLinks==null){
 				boolean showCopyright = Boolean.parseBoolean(dbH.getShowCopyright());
-				LogUtil.logDebug("No public links: showCopyright = " + showCopyright);
+				logDebug("No public links: showCopyright = " + showCopyright);
 				if(showCopyright){
-					visibleFragment = Constants.COPYRIGHT_FRAGMENT;
+					visibleFragment = COPYRIGHT_FRAGMENT;
 				}
 				else{
-					visibleFragment = Constants.GET_LINK_FRAGMENT;
+					visibleFragment = GET_LINK_FRAGMENT;
 				}
 			}
 			else{
 				if(nodeLinks.size()==0){
 					boolean showCopyright = Boolean.parseBoolean(dbH.getShowCopyright());
-					LogUtil.logDebug("No public links: showCopyright = " + showCopyright);
+					logDebug("No public links: showCopyright = " + showCopyright);
 					if(showCopyright){
-						visibleFragment = Constants.COPYRIGHT_FRAGMENT;
+						visibleFragment = COPYRIGHT_FRAGMENT;
 					}
 					else{
-						visibleFragment = Constants.GET_LINK_FRAGMENT;
+						visibleFragment = GET_LINK_FRAGMENT;
 					}
 				}
 				else{
-					visibleFragment = Constants.GET_LINK_FRAGMENT;
+					visibleFragment = GET_LINK_FRAGMENT;
 				}
 			}
 		}
@@ -219,7 +220,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
     }
 
 	public void sendLink(String link){
-		LogUtil.logDebug("Link: " + link);
+		logDebug("Link: " + link);
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.setType("text/plain");
 		intent.putExtra(Intent.EXTRA_TEXT, link);
@@ -227,7 +228,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void copyLink(String link){
-		LogUtil.logDebug("Link: " + link);
+		logDebug("Link: " + link);
 		if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
 			android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 			clipboard.setText(link);
@@ -245,7 +246,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 
 	public void showSetPasswordDialog(final String password, final String link){
-		LogUtil.logDebug("showSetPasswordDialog");
+		logDebug("showSetPasswordDialog");
 
 		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.overquota_alert_title));
@@ -382,9 +383,9 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				}
 
 				if(proceedInput1&&proceedInput2){
-					LogUtil.logDebug("Check are equal");
+					logDebug("Check are equal");
 					if(value1.equals(value2)){
-						LogUtil.logDebug("Proceed to set pass");
+						logDebug("Proceed to set pass");
 						getLinkFragment.processingPass();
 						megaApi.encryptLinkWithPassword(link, value2, getLinkActivity);
 						passwordDialog.dismiss();
@@ -397,19 +398,19 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 				else if(!proceedInput1&&proceedInput2){
-					LogUtil.logWarning("Error on pass1");
+					logWarning("Error on pass1");
 					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					errorLayout1.setVisibility(View.VISIBLE);
 					input1.requestFocus();
 				}
 				else if(!proceedInput2&&proceedInput1){
-					LogUtil.logWarning("Error on pass2");
+					logWarning("Error on pass2");
 					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					errorLayout2.setVisibility(View.VISIBLE);
 					input2.requestFocus();
 				}
 				else{
-					LogUtil.logWarning("Error on both");
+					logWarning("Error on both");
 					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					errorLayout1.setVisibility(View.VISIBLE);
 					input1.requestFocus();
@@ -422,7 +423,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	private void showKeyboardDelayed(final View view) {
-		LogUtil.logDebug("showKeyboardDelayed");
+		logDebug("showKeyboardDelayed");
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -433,11 +434,11 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showFragment(int visibleFragment){
-		LogUtil.logDebug("visibleFragment: " + visibleFragment);
+		logDebug("visibleFragment: " + visibleFragment);
 		this.visibleFragment = visibleFragment;
 		switch (visibleFragment){
-			case Constants.GET_LINK_FRAGMENT:{
-				LogUtil.logDebug("Show GET_LINK_FRAGMENT");
+			case GET_LINK_FRAGMENT:{
+				logDebug("Show GET_LINK_FRAGMENT");
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					Window window = this.getWindow();
@@ -468,8 +469,8 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 				break;
 			}
-			case Constants.COPYRIGHT_FRAGMENT:{
-				LogUtil.logDebug("Show COPYRIGHT_FRAGMENT");
+			case COPYRIGHT_FRAGMENT:{
+				logDebug("Show COPYRIGHT_FRAGMENT");
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					Window window = this.getWindow();
@@ -496,7 +497,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onResume() {
-		LogUtil.logDebug("onResume");
+		logDebug("onResume");
 		super.onResume();
 	}
 
@@ -512,10 +513,10 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		LogUtil.logDebug("onRequestFinish");
+		logDebug("onRequestFinish");
 
 		if (e.getErrorCode() == MegaError.API_OK) {
-			LogUtil.logDebug("link: " + request.getLink());
+			logDebug("link: " + request.getLink());
 			
 			//for megaApi.encryptLinkWithPassword() case, request.getNodeHandle() returns -1 and cause selectedNode set to null
 			long handle = request.getNodeHandle();
@@ -531,7 +532,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		} else {
-			LogUtil.logWarning("Error: " + e.getErrorString());
+			logWarning("Error: " + e.getErrorString());
 			showSnackbar(getString(R.string.context_no_link));
 		}
 	}

@@ -18,9 +18,10 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFriendsAdapter.ViewHolderChips> implements View.OnClickListener {
@@ -65,7 +66,7 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 	@Override
 	public MegaInviteFriendsAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-		LogUtil.logDebug("onCreateViewHolder");
+		logDebug("onCreateViewHolder");
 
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -78,11 +79,11 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 		holderList.textViewName = (TextView) v.findViewById(R.id.name_chip);
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			LogUtil.logDebug("Landscape");
-			holderList.textViewName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+			logDebug("Landscape");
+			holderList.textViewName.setMaxWidth(scaleWidthPx(260, outMetrics));
 		}else{
-			LogUtil.logDebug("Portrait");
-			holderList.textViewName.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
+			logDebug("Portrait");
+			holderList.textViewName.setMaxWidth(scaleWidthPx(230, outMetrics));
 		}
 
 		holderList.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
@@ -98,7 +99,7 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 	@Override
 	public void onBindViewHolder(ViewHolderChips holder, int position) {
-		LogUtil.logDebug("onBindViewHolderList");
+		logDebug("onBindViewHolderList");
 
 		String name = (String) getItem(position);
 		holder.textViewName.setText(name);
@@ -106,15 +107,15 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 	@Override
 	public void onClick(View v) {
-		LogUtil.logDebug("onClick");
+		logDebug("onClick");
 
 		MegaInviteFriendsAdapter.ViewHolderChips holder = (MegaInviteFriendsAdapter.ViewHolderChips) v.getTag();
 		if(holder!=null){
 			int currentPosition = holder.getLayoutPosition();
-			LogUtil.logDebug("Current position: " + currentPosition);
+			logDebug("Current position: " + currentPosition);
 
 			if(currentPosition<0){
-				LogUtil.logWarning("Current position error - not valid value");
+				logWarning("Current position error - not valid value");
 				return;
 			}
 			switch (v.getId()) {
@@ -125,7 +126,7 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 			}
 		}
 		else{
-			LogUtil.logWarning("Error. Holder is Null");
+			logWarning("Error. Holder is Null");
 		}
 	}
 
@@ -169,7 +170,7 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 	}
 
 	public void setPositionClicked(int p) {
-		LogUtil.logDebug("setPositionClicked: " + p);
+		logDebug("setPositionClicked: " + p);
 		positionClicked = p;
 		notifyDataSetChanged();
 	}
@@ -186,14 +187,14 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 //	}
 //
 	public void setNames (ArrayList<String> names){
-		LogUtil.logDebug("setNames");
+		logDebug("setNames");
 		this.names = names;
 
 		notifyDataSetChanged();
 	}
 
 	public Object getItem(int position) {
-		LogUtil.logDebug("getItem");
+		logDebug("getItem");
 		return names.get(position);
 	}
 

@@ -16,8 +16,9 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.jobservices.CameraUploadStarterService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 @TargetApi(21)
 public class JobUtil {
@@ -36,12 +37,12 @@ public class JobUtil {
             List<JobInfo> jobs = js.getAllPendingJobs();
             for (JobInfo info : jobs) {
                 if (info.getId() == id) {
-                    LogUtil.logDebug("Job already scheduled");
+                    logDebug("Job already scheduled");
                     return true;
                 }
             }
         }
-        LogUtil.logDebug("No scheduled job found");
+        logDebug("No scheduled job found");
         return false;
     }
 
@@ -51,7 +52,7 @@ public class JobUtil {
     }
 
     public static synchronized int scheduleCameraUploadJob(Context context) {
-        LogUtil.logDebug("scheduleCameraUploadJob");
+        logDebug("scheduleCameraUploadJob");
         if (isJobScheduled(context,PHOTOS_UPLOAD_JOB_ID)) {
             return START_JOB_FAILED;
         }
@@ -62,22 +63,22 @@ public class JobUtil {
             jobInfoBuilder.setPersisted(true);
 
             int result = jobScheduler.schedule(jobInfoBuilder.build());
-            LogUtil.logDebug("Job scheduled successfully");
+            logDebug("Job scheduled successfully");
             return result;
         }
-        LogUtil.logError("Schedule job failed");
+        logError("Schedule job failed");
         return START_JOB_FAILED;
     }
 
     public static synchronized void startCameraUploadService(Context context) {
         boolean isOverQuota = isOverquota(context);
         boolean hasReadPermission = Util.hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
-        LogUtil.logDebug("isOverQuota:" + isOverQuota + ", hasStoragePermission:" + hasReadPermission);
+        logDebug("isOverQuota:" + isOverQuota + ", hasStoragePermission:" + hasReadPermission);
         if (!CameraUploadsService.isServiceRunning && !isOverQuota && hasReadPermission) {
             Intent newIntent = new Intent(context,CameraUploadsService.class);
             postIntent(context, newIntent);
         } else {
-            LogUtil.logDebug("Service not started because service is running");
+            logDebug("Service not started because service is running");
         }
     }
 
@@ -87,14 +88,14 @@ public class JobUtil {
     }
 
     public static synchronized void stopRunningCameraUploadService(Context context) {
-        LogUtil.logDebug("stopRunningCameraUploadService");
+        logDebug("stopRunningCameraUploadService");
         Intent stopIntent = new Intent(context,CameraUploadsService.class);
         stopIntent.setAction(CameraUploadsService.ACTION_STOP);
         postIntent(context, stopIntent);
     }
 
     public static synchronized void cancelAllUploads(Context context) {
-        LogUtil.logDebug("stopRunningCameraUploadService");
+        logDebug("stopRunningCameraUploadService");
         Intent stopIntent = new Intent(context,CameraUploadsService.class);
         stopIntent.setAction(CameraUploadsService.ACTION_CANCEL_ALL);
         postIntent(context, stopIntent);
@@ -102,10 +103,10 @@ public class JobUtil {
 
     private static void postIntent(Context context, Intent intent){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            LogUtil.logDebug("Starting on Oreo or above");
+            logDebug("Starting on Oreo or above");
             context.startForegroundService(intent);
         } else {
-            LogUtil.logDebug("Starting below Oreo");
+            logDebug("Starting below Oreo");
             context.startService(intent);
         }
     }
@@ -117,7 +118,7 @@ public class JobUtil {
             
             @Override
             public void run() {
-                LogUtil.logDebug("Rescheduling CU");
+                logDebug("Rescheduling CU");
                 scheduleCameraUploadJob(context);
             }
         },CU_RESCHEDULE_INTERVAL);

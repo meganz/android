@@ -23,15 +23,14 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.TimeUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.utils.FileUtils.isFile;
-import static mega.privacy.android.app.utils.Util.toCDATA;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificationsAdapter.ViewHolderNotifications> implements OnClickListener{
@@ -95,7 +94,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 	@Override
 	public ViewHolderNotifications onCreateViewHolder(ViewGroup parent, int viewType) {
-		LogUtil.logDebug("onCreateViewHolder");
+		logDebug("onCreateViewHolder");
 
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_notification_list, parent, false);
 
@@ -125,15 +124,15 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 	@Override
 	public void onBindViewHolder(ViewHolderNotifications holder, int position) {
-		LogUtil.logDebug("Position: " + position);
+		logDebug("Position: " + position);
 
 		MegaUserAlert alert = (MegaUserAlert) getItem(position);
 
 		int alertType = alert.getType();
 
 		String section = alert.getHeading();
-		LogUtil.logDebug("****" + alert.getHeading()+ " " +alert.getTypeString() + " " + alert.getTitle() + " "+alert.getString(0));
-		LogUtil.logDebug("****" + alert.getTypeString() + ": " + alert.getNodeHandle() + " " + alert.getPath());
+		logDebug("****" + alert.getHeading()+ " " +alert.getTypeString() + " " + alert.getTitle() + " "+alert.getString(0));
+		logDebug("****" + alert.getTypeString() + ": " + alert.getNodeHandle() + " " + alert.getPath());
 
 		final LinearLayout.LayoutParams params;
 
@@ -176,21 +175,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -235,21 +234,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -294,21 +293,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -353,21 +352,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -414,21 +413,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -472,21 +471,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -531,21 +530,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -590,21 +589,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -648,21 +647,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -706,21 +705,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -764,21 +763,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -822,21 +821,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				//Description set to max, adjust title
 				holder.titleText.setMaxLines(1);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					holder.descriptionText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -881,18 +880,18 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setMaxLines(3);
 				if(alert.getSeen()==false){
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 				}
 				else{
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -960,18 +959,18 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setMaxLines(3);
 				if(alert.getSeen()==false){
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 				}
 				else{
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -1033,18 +1032,18 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setMaxLines(3);
 				if(alert.getSeen()==false){
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 				}
 				else{
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -1096,18 +1095,18 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setMaxLines(3);
 				if(alert.getSeen()==false){
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 				}
 				else{
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -1140,18 +1139,18 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setMaxLines(3);
 				if(alert.getSeen()==false){
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 				}
 				else{
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -1182,18 +1181,18 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setMaxLines(3);
 				if(alert.getSeen()==false){
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 				}
 				else{
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -1223,18 +1222,18 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setMaxLines(3);
 				if(alert.getSeen()==false){
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 				}
 				else{
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -1289,18 +1288,18 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setMaxLines(3);
 				if(alert.getSeen()==false){
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 				}
 				else{
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -1359,18 +1358,18 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setMaxLines(3);
 				if(alert.getSeen()==false){
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 				}
 				else{
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+						holder.titleText.setMaxWidth(scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
 					}
 				}
 
@@ -1395,7 +1394,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 		holder.sectionText.setText(section);
 
-		String date = TimeUtils.formatDateAndTime(context,alert.getTimestamp(0), TimeUtils.DATE_LONG_FORMAT);
+		String date = formatDateAndTime(context,alert.getTimestamp(0), DATE_LONG_FORMAT);
 		holder.dateText.setText(date);
 
 		if(alert.getSeen()==false){
@@ -1406,7 +1405,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				MegaUserAlert nextAlert = (MegaUserAlert) getItem(position+1);
 				if(nextAlert.getSeen()==false){
 					LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)holder.separator.getLayoutParams();
-					textParams.setMargins(Util.scaleWidthPx(16, outMetrics), 0, Util.scaleWidthPx(16, outMetrics), 0);
+					textParams.setMargins(scaleWidthPx(16, outMetrics), 0, scaleWidthPx(16, outMetrics), 0);
 					holder.separator.setLayoutParams(textParams);
 				}
 				else{
@@ -1416,7 +1415,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 			}
 			else{
-				LogUtil.logDebug("Last element of the notifications");
+				logDebug("Last element of the notifications");
 				LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)holder.separator.getLayoutParams();
 				textParams.setMargins(0, 0, 0, 0);
 				holder.separator.setLayoutParams(textParams);
@@ -1427,7 +1426,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_background_new_messages));
 
 			LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)holder.separator.getLayoutParams();
-			textParams.setMargins(Util.scaleWidthPx(16, outMetrics), 0, Util.scaleWidthPx(16, outMetrics), 0);
+			textParams.setMargins(scaleWidthPx(16, outMetrics), 0, scaleWidthPx(16, outMetrics), 0);
 			holder.separator.setLayoutParams(textParams);
 		}
 
@@ -1442,7 +1441,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
     }
 
 	public Object getItem(int position) {
-		LogUtil.logDebug("Position: " + position);
+		logDebug("Position: " + position);
 		return notifications.get(position);
 	}
 
@@ -1456,7 +1455,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 	}
 
 	public void setPositionClicked(int p) {
-		LogUtil.logDebug("Position: " + p);
+		logDebug("Position: " + p);
 		positionClicked = p;
 		notifyDataSetChanged();
 	}
@@ -1464,7 +1463,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 	@Override
 	public void onClick(View v) {
-		LogUtil.logDebug("onClick");
+		logDebug("onClick");
 
 		ViewHolderNotifications holder = (ViewHolderNotifications) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
@@ -1473,7 +1472,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 			switch (v.getId()){
 				case R.id.notification_list_item_layout:{
-					LogUtil.logDebug("notification_list_item_layout");
+					logDebug("notification_list_item_layout");
 					if (fragment != null){
 						fragment.itemClick(currentPosition);
 					}
@@ -1481,12 +1480,12 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 			}
 		} catch (IndexOutOfBoundsException e) {
-			LogUtil.logError("EXCEPTION" ,e);
+			logError("EXCEPTION" ,e);
 		}
 	}
 	
 	public void setNotifications (ArrayList<MegaUserAlert> notifications){
-		LogUtil.logDebug("setNotifications");
+		logDebug("setNotifications");
 		this.notifications = notifications;
 		positionClicked = -1;
 		notifyDataSetChanged();

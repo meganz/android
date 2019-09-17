@@ -66,16 +66,16 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineFragmentLollipop extends RotatableFragment{
 
@@ -145,7 +145,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void activateActionMode(){
-		LogUtil.logDebug("activateActionMode");
+		logDebug("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -153,7 +153,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void updateScrollPosition(int position) {
-		LogUtil.logDebug("Position: " + position);
+		logDebug("Position: " + position);
 		if (adapter != null) {
 			if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
@@ -223,7 +223,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
     }
 
 	public ImageView getImageDrag(int position) {
-		LogUtil.logDebug("Position: " + position);
+		logDebug("Position: " + position);
 		if (adapter != null) {
 			if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
@@ -252,7 +252,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			LogUtil.logDebug("ActionBarCallBack::onActionItemClicked");
+			logDebug("ActionBarCallBack::onActionItemClicked");
 			List<MegaOffline> documents = adapter.getSelectedOfflineNodes();
 			
 			switch(item.getItemId()){
@@ -372,32 +372,32 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			LogUtil.logDebug("ActionBarCallBack::onCreateActionMode");
+			logDebug("ActionBarCallBack::onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.offline_browser_action, menu);
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
 		
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			LogUtil.logDebug("ActionBarCallBack::onDestroyActionMode");
+			logDebug("ActionBarCallBack::onDestroyActionMode");
 			hideMultipleSelect();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			LogUtil.logDebug("ActionBarCallBack::onPrepareActionMode");
+			logDebug("ActionBarCallBack::onPrepareActionMode");
 //			ContextCompat.getDrawable(context, R.drawable.ic_arrow_back_white)
 			List<MegaOffline> selected = adapter.getSelectedOfflineNodes();
 			
-			if (Util.isOnline(context)){
+			if (isOnline(context)){
 				if (selected.size() != 0) {
 					menu.findItem(R.id.cab_menu_download).setVisible(false);
 					menu.findItem(R.id.cab_menu_share).setVisible(false);
@@ -453,7 +453,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void selectAll(){
-		LogUtil.logDebug("selectAll");
+		logDebug("selectAll");
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
@@ -470,7 +470,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 	
 	public boolean showSelectMenuItem(){
-		LogUtil.logDebug("showSelectMenuItem");
+		logDebug("showSelectMenuItem");
 		if (adapter != null){
 			return adapter.isMultipleSelect();
 		}
@@ -481,9 +481,9 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		LogUtil.logDebug("onCreate");
+		logDebug("onCreate");
 		
-		if (Util.isOnline(context)){
+		if (isOnline(context)){
 			if (megaApi == null){
 				megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 			}
@@ -513,7 +513,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		LogUtil.logDebug("onCreateView");
+		logDebug("onCreateView");
 		if (aB == null){
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
@@ -537,7 +537,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 		//Check pathNAvigation
 		if (((ManagerActivityLollipop)context).isList){
-			LogUtil.logDebug("onCreateList");
+			logDebug("onCreateList");
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
             recyclerView.removeItemDecoration(headerItemDecoration);
@@ -546,7 +546,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			//Add bottom padding for recyclerView like in other fragments.
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -615,7 +615,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			return v;
 		}
 		else{
-			LogUtil.logDebug("onCreateGRID");
+			logDebug("onCreateGRID");
 			View v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
 			
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
@@ -693,16 +693,16 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void findNodes(){
-		LogUtil.logDebug("findNodes");
+		logDebug("findNodes");
 
 		if((getActivity() == null) || (!isAdded())){
-			LogUtil.logWarning("Fragment NOT Attached!");
+			logWarning("Fragment NOT Attached!");
 			return;
 		}
 
 		mOffList=dbH.findByPath(pathNavigation);
 
-		LogUtil.logDebug("Number of elements: " + mOffList.size());
+		logDebug("Number of elements: " + mOffList.size());
 
 		for(int i=0; i<mOffList.size();i++){
 
@@ -768,7 +768,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void sortByNameDescending(){
-		LogUtil.logDebug("sortByNameDescending");
+		logDebug("sortByNameDescending");
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
@@ -829,7 +829,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
     
     
     public void sortByNameAscending() {
-		LogUtil.logDebug("sortByNameAscending");
+		logDebug("sortByNameAscending");
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
@@ -899,7 +899,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public boolean isFolder(String path){
-		LogUtil.logDebug("isFolder");
+		logDebug("isFolder");
 
 		MegaNode n = megaApi.getNodeByPath(path);
 		if(n == null)
@@ -916,7 +916,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 	
 	private String getInfoFolder(ArrayList<MegaOffline> mOffInfo) {
-		LogUtil.logDebug("getInfoFolder");
+		logDebug("getInfoFolder");
 //		log("primer elemento: "+mOffInfo.get(0).getName());
 		
 		String info = "";
@@ -940,13 +940,13 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					}
 				}
 				else{
-					LogUtil.logWarning("File do not exist");
+					logWarning("File do not exist");
 				}		
 			}
 		}
 		
 		//Check if the file MarterKey is exported
-		LogUtil.logDebug("Export in: " + getExternalStoragePath(RK_FILE));
+		logDebug("Export in: " + getExternalStoragePath(RK_FILE));
 		File file= buildExternalStorageFile(RK_FILE);
 		if(isFileAvailable(file)){
 			numFiles++;
@@ -972,13 +972,13 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 							R.plurals.general_num_files, numFiles);
 		}
 
-		LogUtil.logDebug(info);
+		logDebug(info);
 		return info;
 	}
 
 	@Override
     public void onAttach(Activity activity) {
-		LogUtil.logDebug("onAttach");
+		logDebug("onAttach");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -988,13 +988,13 @@ public class OfflineFragmentLollipop extends RotatableFragment{
     }
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
-		LogUtil.logDebug("Position: " + position);
+		logDebug("Position: " + position);
 		//Otherwise out of bounds exception happens.
 		if(position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
 			position -= placeholderCount;
 		}
 		if (adapter.isMultipleSelect()){
-			LogUtil.logDebug("Multiselect");
+			logDebug("Multiselect");
 			MegaOffline item = mOffList.get(position);
 			if(!(item.getHandle().equals("0"))){
 				adapter.toggleSelection(position);
@@ -1010,7 +1010,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			File currentFile=null;
 			
 			if(currentNode.getHandle().equals("0")){
-				LogUtil.logDebug("Click on Master Key");
+				logDebug("Click on Master Key");
 				openFile(buildExternalStorageFile(RK_FILE));
 //				viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
 //				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
@@ -1026,12 +1026,12 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				else{
 					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
-						LogUtil.logWarning("Completely -1 then find just visible position");
+						logWarning("Completely -1 then find just visible position");
 						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
-				LogUtil.logDebug("Push to stack " + lastFirstVisiblePosition + " position");
+				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";
@@ -1122,7 +1122,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					
 					//Open it!
 					if(MimeTypeList.typeForName(currentFile.getName()).isZip()){
-						LogUtil.logDebug("MimeTypeList ZIP");
+						logDebug("MimeTypeList ZIP");
 						Intent intentZip = new Intent();
 						intentZip.setClass(context, ZipBrowserActivityLollipop.class);
 						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
@@ -1134,7 +1134,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
                         intent.putExtra("placeholder", placeholderCount);
 						intent.putExtra("position", position);
-						intent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						intent.putExtra("adapterType", OFFLINE_ADAPTER);
 						intent.putExtra("parentNodeHandle", -1L);
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
 						intent.putExtra("pathNavigation", pathNavigation);
@@ -1146,7 +1146,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						imageDrag = imageView;
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
-						LogUtil.logDebug("Video file");
+						logDebug("Video file");
 
 						Intent mediaIntent;
 						boolean internalIntent;
@@ -1167,7 +1167,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						mediaIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						mediaIntent.putExtra("FILENAME", currentNode.getName());
 						mediaIntent.putExtra("path", currentFile.getAbsolutePath());
-						mediaIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						mediaIntent.putExtra("adapterType", OFFLINE_ADAPTER);
                         mediaIntent.putExtra("placeholder", placeholderCount);
 						mediaIntent.putExtra("position", position);
 						mediaIntent.putExtra("parentNodeHandle", -1L);
@@ -1190,11 +1190,11 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 							startActivity(mediaIntent);
 						}
 						else {
-							if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+							if (isIntentAvailable(context, mediaIntent)){
 								startActivity(mediaIntent);
 							}
 							else {
-								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
+								((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -1204,8 +1204,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 									intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 								}
 								intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-								if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
-									LogUtil.logDebug("Call to startActivity(intentShare)");
+								if (isIntentAvailable(context, intentShare)) {
+									logDebug("Call to startActivity(intentShare)");
 									context.startActivity(intentShare);
 								}
 							}
@@ -1214,15 +1214,15 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						imageDrag = imageView;
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
-						LogUtil.logDebug("PDF file");
+						logDebug("PDF file");
 
-						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
+						//String localPath = getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 
 						pdfIntent.putExtra("inside", true);
 						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
-						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						pdfIntent.putExtra("adapterType", OFFLINE_ADAPTER);
 						pdfIntent.putExtra("path", currentFile.getAbsolutePath());
 						pdfIntent.putExtra("pathNavigation", pathNavigation);
 						pdfIntent.putExtra("screenPosition", screenPosition);
@@ -1238,7 +1238,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						imageDrag = imageView;
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isURL()) {
-						LogUtil.logDebug("Is URL file");
+						logDebug("Is URL file");
 						InputStream instream = null;
 						try {
 							// open the file for reading
@@ -1256,12 +1256,12 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 									String url = line2.replace("URL=", "");
 
-									LogUtil.logDebug("Is URL - launch browser intent");
+									logDebug("Is URL - launch browser intent");
 									Intent i = new Intent(Intent.ACTION_VIEW);
 									i.setData(Uri.parse(url));
 									startActivity(i);
 								} else {
-									LogUtil.logWarning("Not expected format: Exception on processing url file");
+									logWarning("Not expected format: Exception on processing url file");
 									openFile(currentFile);
 								}
 							}
@@ -1274,7 +1274,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 							try {
 								instream.close();
 							} catch (IOException e) {
-								LogUtil.logError("EXCEPTION closing InputStream", e);
+								logError("EXCEPTION closing InputStream", e);
 							}
 						}
 					}
@@ -1295,7 +1295,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
     public void openFile (File currentFile){
-		LogUtil.logDebug("openFile");
+		logDebug("openFile");
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 
     	String type = "";
@@ -1313,7 +1313,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			viewIntent.setDataAndType(Uri.fromFile(currentFile), type);
 		}
 		viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		if (MegaApiUtils.isIntentAvailable(context, viewIntent)){
+		if (isIntentAvailable(context, viewIntent)){
 			context.startActivity(viewIntent);
 		}
 		else{
@@ -1325,7 +1325,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 			}
 			intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-			if (MegaApiUtils.isIntentAvailable(context, intentShare)){
+			if (isIntentAvailable(context, intentShare)){
 				context.startActivity(intentShare);
 			}
 		}
@@ -1350,7 +1350,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	@Override
 	protected void updateActionModeTitle() {
-		LogUtil.logDebug("updateActionModeTitle");
+		logDebug("updateActionModeTitle");
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
@@ -1375,7 +1375,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					}
 				}
 				else{
-					LogUtil.logWarning("File do not exist");
+					logWarning("File do not exist");
 				}		
 			}
 		}
@@ -1414,7 +1414,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			LogUtil.logError("Invalidate error", e);
+			logError("Invalidate error", e);
 		}
 		// actionMode.
 	}
@@ -1432,7 +1432,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 	
 	public int onBackPressed(){
-		LogUtil.logDebug("onBackPressed");
+		logDebug("onBackPressed");
 
 		if (adapter == null){
 			return 0;
@@ -1475,9 +1475,9 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
-					LogUtil.logDebug("Pop of the stack " + lastVisiblePosition + " position");
+					logDebug("Pop of the stack " + lastVisiblePosition + " position");
 				}
-				LogUtil.logDebug("Scroll to " + lastVisiblePosition + " position");
+				logDebug("Scroll to " + lastVisiblePosition + " position");
 
 				if(lastVisiblePosition>=0){
 
@@ -1494,7 +1494,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				return 2;
 			}
 			else{
-				LogUtil.logDebug("Navigation path is ROOT");
+				logDebug("Navigation path is ROOT");
 				return 0;
 			}
 		}
@@ -1508,7 +1508,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 	
 	public void setNodes(ArrayList<MegaOffline> _mOff){
-		LogUtil.logDebug("setNodes");
+		logDebug("setNodes");
 		this.mOffList = _mOff;
 
 		if (adapter != null){
@@ -1547,21 +1547,21 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 	
 	public void setPositionClicked(int positionClicked){
-		LogUtil.logDebug("Position: " + positionClicked);
+		logDebug("Position: " + positionClicked);
 		if (adapter != null){
 			adapter.setPositionClicked(positionClicked);
 		}
 	}
 	
 	public void notifyDataSetChanged(){
-		LogUtil.logDebug("notifyDataSetChanged");
+		logDebug("notifyDataSetChanged");
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
 		}
 	}
 
 	public void refresh(){
-		LogUtil.logDebug("refresh");
+		logDebug("refresh");
 
 		mOffList=dbH.findByPath(pathNavigation);
 
@@ -1633,7 +1633,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 	
 	public void refreshPaths(){
-		LogUtil.logDebug("refreshPaths()");
+		logDebug("refreshPaths()");
 		mOffList=dbH.findByPath("/");	
 		
 		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1665,7 +1665,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 	
 	public void refreshPaths(MegaOffline mOff){
-		LogUtil.logDebug("Offline node handle: " + mOff.getHandle());
+		logDebug("Offline node handle: " + mOff.getHandle());
 		int index=0;
 //		MegaOffline retFindPath = null;
 		
@@ -1703,7 +1703,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 	
 	public int getItemCount(){
-		LogUtil.logDebug("getItemCount");
+		logDebug("getItemCount");
 		if(adapter != null){
 			return adapter.getItemCount();
 		}
@@ -1711,7 +1711,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public int getItemCountWithoutRK(){
-		LogUtil.logDebug("getItemCountWithoutRK");
+		logDebug("getItemCountWithoutRK");
 		if(adapter != null){
 			return adapter.getItemCountWithoutRK();
 		}
@@ -1734,13 +1734,13 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			nodeToShow = dbH.findbyPathAndName(pathToShow, nameToShow);
 			if(nodeToShow!=null){
 				//Show the node
-				LogUtil.logDebug("Node Handle: "+ nodeToShow.getHandle());
+				logDebug("Node Handle: "+ nodeToShow.getHandle());
 				pathNavigation=pathToShow+nodeToShow.getName()+"/";
 				return;
 			}
 			else{
 				if(pathNavigation.equals("/")){
-					LogUtil.logDebug("Return Path /");
+					logDebug("Return Path /");
 					return;
 				}
 				else{
@@ -1754,7 +1754,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void setPathNavigation(String _pathNavigation){
-		LogUtil.logDebug("setPathNavigation()");
+		logDebug("setPathNavigation()");
 		this.pathNavigation = _pathNavigation;
 		addSectionTitle(mOffList);
 		if (adapter != null){
@@ -1764,7 +1764,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void setOrder(int orderGetChildren){
-		LogUtil.logDebug("setOrder");
+		logDebug("setOrder");
 		this.orderGetChildren = orderGetChildren;
 	}
 	
@@ -1774,7 +1774,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 //	}
 	
 	public String getPathNavigation() {
-		LogUtil.logDebug("getPathNavigation");
+		logDebug("getPathNavigation");
 		return pathNavigation;
 	}
 }

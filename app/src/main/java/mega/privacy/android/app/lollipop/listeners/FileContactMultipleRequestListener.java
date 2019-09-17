@@ -3,13 +3,13 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class FileContactMultipleRequestListener implements MegaRequestListenerInterface {
     
@@ -36,7 +36,7 @@ public class FileContactMultipleRequestListener implements MegaRequestListenerIn
         if (counter > max_items) {
             max_items = counter;
         }
-        LogUtil.logDebug("Counter: " + counter);
+        logDebug("Counter: " + counter);
     }
     
     @Override
@@ -51,16 +51,16 @@ public class FileContactMultipleRequestListener implements MegaRequestListenerIn
             error++;
         }
         int requestType = request.getType();
-        LogUtil.logDebug("Counter: " + counter + ", Error: " + error );
+        logDebug("Counter: " + counter + ", Error: " + error );
         if (counter == 0 && requestType == MegaRequest.TYPE_SHARE) {
-            if (actionType == Constants.MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER) {
-                LogUtil.logDebug("Share request finished");
+            if (actionType == MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER) {
+                logDebug("Share request finished");
                 if (error > 0) {
                     message = context.getString(R.string.number_correctly_removed_from_shared,max_items - error) + context.getString(R.string.number_incorrectly_removed_from_shared,error);
                 } else {
                     message = context.getString(R.string.number_correctly_removed_from_shared,max_items);
                 }
-            } else if (actionType == Constants.MULTIPLE_CHANGE_PERMISSION) {
+            } else if (actionType == MULTIPLE_CHANGE_PERMISSION) {
                 if (error > 0) {
                     message = context.getString(R.string.number_permission_correctly_changed_from_shared,max_items - error) + context.getString(R.string.number_permission_incorrectly_changed_from_shared,error);
                 } else {
@@ -77,6 +77,6 @@ public class FileContactMultipleRequestListener implements MegaRequestListenerIn
     
     @Override
     public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
-        LogUtil.logWarning("Counter: " + counter);
+        logWarning("Counter: " + counter);
     }
 }

@@ -8,14 +8,15 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ChatImportToForwardListener implements MegaRequestListenerInterface {
 
@@ -48,7 +49,7 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
-        LogUtil.logWarning("Counter: " + counter);
+        logWarning("Counter: " + counter);
 //			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
 //			if(node!=null){
 //				log("onRequestTemporaryError: "+node.getName());
@@ -78,17 +79,17 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
             switch (requestType) {
 
                 case MegaRequest.TYPE_COPY:{
-                    if(actionListener==Constants.MULTIPLE_FORWARD_MESSAGES){
+                    if(actionListener==MULTIPLE_FORWARD_MESSAGES){
                         //Many files shared with one contacts
                         if(error>0){
                             message = context.getResources().getQuantityString(R.plurals.error_forwarding_messages, error);
                             if(context instanceof ChatActivityLollipop){
                                 ((ChatActivityLollipop) context).removeProgressDialog();
-                                ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                                ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                             }
                             else if(context instanceof NodeAttachmentHistoryActivity){
                                 ((NodeAttachmentHistoryActivity) context).removeProgressDialog();
-                                ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, message);
+                                ((NodeAttachmentHistoryActivity) context).showSnackbar(SNACKBAR_TYPE, message);
                             }
                         }
                         else{

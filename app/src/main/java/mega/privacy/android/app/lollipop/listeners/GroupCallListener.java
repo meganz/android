@@ -7,10 +7,10 @@ import android.view.TextureView;
 import java.nio.ByteBuffer;
 
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class GroupCallListener implements MegaChatVideoListenerInterface {
 
@@ -23,7 +23,7 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
     MegaSurfaceRendererGroup localRenderer = null;
 
     public GroupCallListener(Context context, TextureView myTexture, long peerid, long clientid, boolean isLocal) {
-        LogUtil.logDebug("GroupCallListener");
+        logDebug("GroupCallListener");
         this.context = context;
         this.width = 0;
         this.height = 0;

@@ -29,13 +29,14 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
+
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdapter.ViewHolderChips> implements View.OnClickListener{
 
@@ -71,7 +72,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
     @Override
     public ShareContactsAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-        LogUtil.logDebug("onCreateViewHolder");
+        logDebug("onCreateViewHolder");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -84,7 +85,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         holder.itemLayout.setOnClickListener(this);
 
         holder.textViewName = (TextView) v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
+        holder.textViewName.setMaxWidth(px2dp(60, outMetrics));
 
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
 
@@ -99,7 +100,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
     @Override
     public void onBindViewHolder(ShareContactsAdapter.ViewHolderChips holder, int position) {
-        LogUtil.logDebug("Position: " + position);
+        logDebug("Position: " + position);
 
         ShareContactInfo contact = (ShareContactInfo) getItem(position);
         String[] s;
@@ -165,15 +166,15 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
     @Override
     public void onClick(View view) {
-        LogUtil.logDebug("onClick");
+        logDebug("onClick");
 
         ShareContactsAdapter.ViewHolderChips holder = (ShareContactsAdapter.ViewHolderChips) view.getTag();
         if(holder!=null){
             int currentPosition = holder.getLayoutPosition();
-            LogUtil.logDebug("Current position: " + currentPosition);
+            logDebug("Current position: " + currentPosition);
 
             if(currentPosition<0){
-                LogUtil.logError("Current position error - not valid value");
+                logError("Current position error - not valid value");
                 return;
             }
             switch (view.getId()) {
@@ -184,7 +185,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
             }
         }
         else{
-            LogUtil.logError("Error. Holder is Null");
+            logError("Error. Holder is Null");
         }
     }
 
@@ -199,25 +200,25 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
     }
 
     public void setPositionClicked(int p) {
-        LogUtil.logDebug("Position: " + p);
+        logDebug("Position: " + p);
         positionClicked = p;
         notifyDataSetChanged();
     }
 
     public void setContacts (ArrayList<ShareContactInfo> contacts){
-        LogUtil.logDebug("setContacts");
+        logDebug("setContacts");
         this.contacts = contacts;
 
         notifyDataSetChanged();
     }
 
     public Object getItem(int position) {
-        LogUtil.logDebug("Position: " + position);
+        logDebug("Position: " + position);
         return contacts.get(position);
     }
 
     public Bitmap setUserAvatar(ShareContactInfo contact){
-        LogUtil.logDebug("setUserAvatar");
+        logDebug("setUserAvatar");
 
         File avatar = null;
         String mail = null;
@@ -240,7 +241,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
                     return createDefaultAvatar(mail, contact);
                 }
                 else{
-                    return Util.getCircleBitmap(bitmap);
+                    return getCircleBitmap(bitmap);
                 }
             }
             else{
@@ -253,9 +254,9 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
     }
 
     public Bitmap createDefaultAvatar(String mail, ShareContactInfo contact){
-        LogUtil.logDebug("createDefaultAvatar()");
+        logDebug("createDefaultAvatar()");
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint paintText = new Paint();
         Paint paintCircle = new Paint();
@@ -275,11 +276,11 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
             color = megaApi.getUserAvatarColor(contact.getMegaContactAdapter().getMegaUser());
         }
         if(color!=null){
-            LogUtil.logDebug("The color to set the avatar is " + color);
+            logDebug("The color to set the avatar is " + color);
             paintCircle.setColor(Color.parseColor(color));
         }
         else{
-            LogUtil.logDebug("Default color to the avatar");
+            logDebug("Default color to the avatar");
             paintCircle.setColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
         }
         paintCircle.setAntiAlias(true);
@@ -311,7 +312,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         }
         String firstLetter = fullName.charAt(0) + "";
 
-        LogUtil.logDebug("Draw letter: " + firstLetter);
+        logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);

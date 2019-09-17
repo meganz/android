@@ -34,12 +34,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.providers.FileProviderActivity;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class IncomingSharesProviderFragmentLollipop extends Fragment{
@@ -71,7 +72,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	Handler handler;
 
 	public void activateActionMode(){
-		LogUtil.logDebug("activateActionMode");
+		logDebug("activateActionMode");
 		if(!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -82,16 +83,16 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			LogUtil.logDebug("onCreateActionMode");
+			logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
-			Util.changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
+			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
 			return true;
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			LogUtil.logDebug("onPrepareActionMode");
+			logDebug("onPrepareActionMode");
 			List<MegaNode> selected = adapter.getSelectedNodes();
 
 			boolean showDownload = false;
@@ -152,12 +153,12 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			LogUtil.logDebug("onActionItemClicked");
+			logDebug("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
 
 			switch (item.getItemId()) {
 				case R.id.action_mode_close_button: {
-					LogUtil.logDebug("Close button");
+					logDebug("Close button");
 				}
 				case R.id.cab_menu_select_all: {
 					selectAll();
@@ -174,16 +175,16 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			LogUtil.logDebug("onDestroyActionMode");
+			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			Util.changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
+			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
 		}
 	}
 
 
 	public static IncomingSharesProviderFragmentLollipop newInstance() {
-		LogUtil.logDebug("newInstance");
+		logDebug("newInstance");
 		IncomingSharesProviderFragmentLollipop fragment = new IncomingSharesProviderFragmentLollipop();
 		return fragment;
 	}
@@ -191,7 +192,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		LogUtil.logDebug("onCreate");
+		logDebug("onCreate");
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -210,7 +211,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		LogUtil.logDebug("onCreateView");
+		logDebug("onCreateView");
 	
 		View v = inflater.inflate(R.layout.fragment_clouddriveprovider, container, false);	
 		
@@ -236,12 +237,12 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		if (context instanceof FileProviderActivity){
 			parentHandle = ((FileProviderActivity)context).getIncParentHandle();
 			deepBrowserTree = ((FileProviderActivity)context).getIncomingDeepBrowserTree();
-			LogUtil.logDebug("The parent handle is: " + parentHandle);
-			LogUtil.logDebug("The browser tree deep is: " + deepBrowserTree);
+			logDebug("The parent handle is: " + parentHandle);
+			logDebug("The browser tree deep is: " + deepBrowserTree);
 		}
 		
 		if (adapter == null){
-			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView, Constants.INCOMING_SHARES_PROVIDER_ADAPTER);
+			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView, INCOMING_SHARES_PROVIDER_ADAPTER);
 		}
 		listView.setAdapter(adapter);
 
@@ -256,11 +257,11 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			if(parentNode!=null){
 				nodes = megaApi.getChildren(parentNode);
 				setNodes(nodes);
-				LogUtil.logDebug("INCOMING is in: " + parentNode.getName());
+				logDebug("INCOMING is in: " + parentNode.getName());
 				changeActionBarTitle(parentNode.getName());
 			}
 			else{
-				LogUtil.logWarning("ERROR parentNode is NULL");
+				logWarning("ERROR parentNode is NULL");
 				findNodes();
 				setNodes(nodes);
 				parentHandle = -1;
@@ -268,7 +269,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
 				if (context instanceof FileProviderActivity){
 					((FileProviderActivity)context).setParentHandle(parentHandle);
-					LogUtil.logDebug("PArentHandle change to: " + parentHandle);
+					logDebug("PArentHandle change to: " + parentHandle);
 				}
 			}
 		}
@@ -279,12 +280,12 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	}
 	
 	public void findNodes(){
-		LogUtil.logDebug("findNodes");
+		logDebug("findNodes");
 
 		deepBrowserTree=0;
 		if (context instanceof FileProviderActivity){
 			((FileProviderActivity)context).setIncomingDeepBrowserTree(deepBrowserTree);
-			LogUtil.logDebug("The browser tree change to: " + deepBrowserTree);
+			logDebug("The browser tree change to: " + deepBrowserTree);
 		}
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		nodes.clear();
@@ -323,9 +324,9 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
     }
 
     public void itemClick(int position) {
-		LogUtil.logDebug("deepBrowserTree: " + deepBrowserTree);
+		logDebug("deepBrowserTree: " + deepBrowserTree);
 		if (adapter.isMultipleSelect()) {
-			LogUtil.logDebug("Multiselect ON");
+			logDebug("Multiselect ON");
 			adapter.toggleSelection(position);
 
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
@@ -346,7 +347,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				deepBrowserTree = deepBrowserTree + 1;
 				if (context instanceof FileProviderActivity) {
 					((FileProviderActivity) context).setIncomingDeepBrowserTree(deepBrowserTree);
-					LogUtil.logDebug("The browser tree change to: " + deepBrowserTree);
+					logDebug("The browser tree change to: " + deepBrowserTree);
 				}
 
 				MegaNode n = nodes.get(position);
@@ -355,7 +356,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 
-				LogUtil.logDebug("Push to stack " + lastFirstVisiblePosition + " position");
+				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
 				String path = n.getName();
@@ -368,7 +369,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				parentHandle = nodes.get(position).getHandle();
 				if (context instanceof FileProviderActivity) {
 					((FileProviderActivity) context).setIncParentHandle(parentHandle);
-					LogUtil.logDebug("The parent handle change to: " + parentHandle);
+					logDebug("The parent handle change to: " + parentHandle);
 				}
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position));
@@ -386,18 +387,18 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 
 	public int onBackPressed(){
-		LogUtil.logDebug("deepBrowserTree: "+deepBrowserTree);
+		logDebug("deepBrowserTree: "+deepBrowserTree);
 		deepBrowserTree = deepBrowserTree-1;
 		if (context instanceof FileProviderActivity){
 			((FileProviderActivity)context).setIncomingDeepBrowserTree(deepBrowserTree);
-			LogUtil.logDebug("The browser tree change to: " + deepBrowserTree);
+			logDebug("The browser tree change to: " + deepBrowserTree);
 		}
 
 		if(deepBrowserTree==0){
 			parentHandle=-1;
 			if (context instanceof FileProviderActivity){
 				((FileProviderActivity)context).setIncParentHandle(parentHandle);
-				LogUtil.logDebug("The parent handle change to: " + parentHandle);
+				logDebug("The parent handle change to: " + parentHandle);
 			}
 			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
 			findNodes();
@@ -406,9 +407,9 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
-				LogUtil.logDebug("Pop of the stack " + lastVisiblePosition + " position");
+				logDebug("Pop of the stack " + lastVisiblePosition + " position");
 			}
-			LogUtil.logDebug("Scroll to " + lastVisiblePosition + " position");
+			logDebug("Scroll to " + lastVisiblePosition + " position");
 
 			if(lastVisiblePosition>=0){
 				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
@@ -422,7 +423,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			//((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);			
 			if (context instanceof FileProviderActivity){
 				((FileProviderActivity)context).setIncParentHandle(parentHandle);
-				LogUtil.logDebug("The parent handle change to: " + parentHandle);
+				logDebug("The parent handle change to: " + parentHandle);
 			}
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 
@@ -436,7 +437,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				parentHandle = parentNode.getHandle();
 				if (context instanceof FileProviderActivity){
 					((FileProviderActivity)context).setIncParentHandle(parentHandle);
-					LogUtil.logDebug("The parent handle change to: " + parentHandle);
+					logDebug("The parent handle change to: " + parentHandle);
 				}
 				nodes = megaApi.getChildren(parentNode);
 
@@ -444,9 +445,9 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
-					LogUtil.logDebug("Pop of the stack " + lastVisiblePosition + " position");
+					logDebug("Pop of the stack " + lastVisiblePosition + " position");
 				}
-				LogUtil.logDebug("Scroll to " + lastVisiblePosition + " position");
+				logDebug("Scroll to " + lastVisiblePosition + " position");
 
 				if(lastVisiblePosition>=0){
 						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
@@ -463,7 +464,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			deepBrowserTree=0;
 			if (context instanceof FileProviderActivity){
 				((FileProviderActivity)context).setIncomingDeepBrowserTree(deepBrowserTree);
-				LogUtil.logDebug("The browser tree change to: " + deepBrowserTree);
+				logDebug("The browser tree change to: " + deepBrowserTree);
 			}
 			return 0;
 		}
@@ -474,11 +475,11 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	}
 	
 	public void setParentHandle(long parentHandle){
-		LogUtil.logDebug("setParentHandle");
+		logDebug("setParentHandle");
 		this.parentHandle = parentHandle;
 		if (context instanceof FileProviderActivity){
 			((FileProviderActivity)context).setIncParentHandle(parentHandle);
-			LogUtil.logDebug("The parent handle change to: " + parentHandle);
+			logDebug("The parent handle change to: " + parentHandle);
 		}
 		if (adapter != null){
 			adapter.setParentHandle(parentHandle);
@@ -486,7 +487,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
-		LogUtil.logDebug("setNodes");
+		logDebug("setNodes");
 		this.nodes = nodes;
 		if (adapter != null){
 			adapter.setNodes(nodes);
@@ -562,7 +563,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	}
 
 	public void hideMultipleSelect(){
-		LogUtil.logDebug("hideMultipleSelect");
+		logDebug("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 
 		if (actionMode != null) {
@@ -571,7 +572,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	}
 
 	public void selectAll(){
-		LogUtil.logDebug("selectAll");
+		logDebug("selectAll");
 		if(adapter != null){
 			adapter.selectAll();
 		}
@@ -586,9 +587,9 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	}
 
 	private void updateActionModeTitle() {
-		LogUtil.logDebug("updateActionModeTitle");
+		logDebug("updateActionModeTitle");
 		if (actionMode == null || getActivity() == null) {
-			LogUtil.logDebug("RETURN: actionMode == null || getActivity() == null");
+			logDebug("RETURN: actionMode == null || getActivity() == null");
 			return;
 		}
 
@@ -622,7 +623,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			LogUtil.logError("Invalidate error", e);
+			logError("Invalidate error", e);
 		}
 
 	}

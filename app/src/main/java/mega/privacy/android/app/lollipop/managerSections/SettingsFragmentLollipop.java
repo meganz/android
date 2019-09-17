@@ -10,7 +10,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -67,23 +66,20 @@ import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.DBUtil;
-import mega.privacy.android.app.utils.JobUtil;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("NewApi")
@@ -325,7 +321,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-		LogUtil.logDebug("onCreate");
+		logDebug("onCreate");
 
         if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -458,18 +454,18 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		storageCategory.removePreference(storageAdvancedDevices);
 		File[] fs = context.getExternalFilesDirs(null);
 		if (fs.length == 1){
-			LogUtil.logDebug("fs.length == 1");
+			logDebug("fs.length == 1");
 			storageCategory.removePreference(downloadLocationPreference);
 		}
 		else{
 			if (fs.length > 1){
-				LogUtil.logDebug("fs.length > 1");
+				logDebug("fs.length > 1");
 				if (fs[1] == null){
-					LogUtil.logDebug("storageCategory.removePreference");
+					logDebug("storageCategory.removePreference");
 					storageCategory.removePreference(downloadLocationPreference);
 				}
 				else{
-					LogUtil.logDebug("storageCategory.removePreference");
+					logDebug("storageCategory.removePreference");
 					storageCategory.removePreference(downloadLocation);
 				}
 			}
@@ -495,7 +491,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		daysRbSchedulerPreference = (Preference) findPreference(KEY_DAYS_RB_SCHEDULER);
 
 		if(megaApi.serverSideRubbishBinAutopurgeEnabled()){
-			LogUtil.logDebug("RubbishBinAutopurgeEnabled --> request userAttribute info");
+			logDebug("RubbishBinAutopurgeEnabled --> request userAttribute info");
 			megaApi.getRubbishBinAutopurgePeriod((ManagerActivityLollipop)context);
 			fileManagementCategory.addPreference(enableRbSchedulerSwitch);
 			fileManagementCategory.addPreference(daysRbSchedulerPreference);
@@ -537,7 +533,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		codeLink.setOnPreferenceClickListener(this);
 
 		if (prefs == null){
-			LogUtil.logWarning("pref is NULL");
+			logWarning("pref is NULL");
 			dbH.setStorageAskAlways(false);
 
 			File defaultDownloadLocation = buildDefaultDownloadDir(context);
@@ -719,7 +715,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 								localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
 							}
 							else{
-								LogUtil.logDebug("pickedDirNAme NULL");
+								logDebug("pickedDirNAme NULL");
 							}
 						}
 					}
@@ -732,7 +728,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 				else{
 					secondaryUpload = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
-					LogUtil.logDebug("Secondary is: " + secondaryUpload);
+					logDebug("Secondary is: " + secondaryUpload);
 
 					if(secondaryUpload){
 						secondaryUpload=true;
@@ -855,8 +851,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			statusConfig = megaChatApi.getPresenceConfig();
 			if(statusConfig!=null){
 
-				LogUtil.logDebug("SETTINGS chatStatus pending: " + statusConfig.isPending());
-				LogUtil.logDebug("Status: " + statusConfig.getOnlineStatus());
+				logDebug("SETTINGS chatStatus pending: " + statusConfig.isPending());
+				logDebug("Status: " + statusConfig.getOnlineStatus());
 
 				statusChatListPreference.setValue(statusConfig.getOnlineStatus()+"");
 				if(statusConfig.getOnlineStatus()==MegaChatApi.STATUS_INVALID){
@@ -876,7 +872,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				waitPresenceConfig();
 			}
 
-			boolean sendOriginalAttachment = DBUtil.isSendOriginalAttachments(context);
+			boolean sendOriginalAttachment = isSendOriginalAttachments(context);
 			if(sendOriginalAttachment){
 				chatAttachmentsChatListPreference.setValue(1+"");
 			}
@@ -962,7 +958,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				String secHandle = prefs.getMegaHandleSecondaryFolder();
 				if(secHandle!=null){
 					if (secHandle.compareTo("") != 0){
-						LogUtil.logDebug("handleSecondaryMediaFolder NOT empty");
+						logDebug("handleSecondaryMediaFolder NOT empty");
 						handleSecondaryMediaFolder = Long.valueOf(secHandle);
 						if(handleSecondaryMediaFolder!=null && handleSecondaryMediaFolder!=-1){
 							megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
@@ -978,13 +974,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 						}
 					}
 					else{
-						LogUtil.logWarning("handleSecondaryMediaFolder empty string");
+						logWarning("handleSecondaryMediaFolder empty string");
 						megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 					}
 
 				}
 				else{
-					LogUtil.logWarning("handleSecondaryMediaFolder Null");
+					logWarning("handleSecondaryMediaFolder Null");
 					dbH.setSecondaryFolderHandle(-1);
 					handleSecondaryMediaFolder = (long) -1;
 					megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
@@ -993,7 +989,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				//check if the local secondary folder exists
 				localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
 				if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
-					LogUtil.logWarning("Secondary ON: invalid localSecondaryFolderPath");
+					logWarning("Secondary ON: invalid localSecondaryFolderPath");
 					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 				}
@@ -1001,7 +997,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				{
 					File checkSecondaryFile = new File(localSecondaryFolderPath);
 					if(!checkSecondaryFile.exists()){
-						LogUtil.logWarning("Secondary ON: the local folder does not exist");
+						logWarning("Secondary ON: the local folder does not exist");
 						dbH.setSecondaryFolderPath("-1");
 						//If the secondary folder does not exist
 						Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
@@ -1093,7 +1089,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 
 		useHttpsOnlyValue = Boolean.parseBoolean(dbH.getUseHttpsOnly());
-		LogUtil.logDebug("Value of useHttpsOnly: " + useHttpsOnlyValue);
+		logDebug("Value of useHttpsOnly: " + useHttpsOnlyValue);
 
 		useHttpsOnly.setChecked(useHttpsOnlyValue);
 
@@ -1132,16 +1128,16 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void setVersionsInfo(){
-		LogUtil.logDebug("setVersionsInfo");
+		logDebug("setVersionsInfo");
 
 		MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 
 		if(myAccountInfo!=null){
 			int numVersions = myAccountInfo.getNumVersions();
-			LogUtil.logDebug("Num versions: " + numVersions);
+			logDebug("Num versions: " + numVersions);
 			String previousVersions = myAccountInfo.getFormattedPreviousVersionsSize();
 			String text = getString(R.string.settings_file_management_file_versions_subtitle, numVersions, previousVersions);
-			LogUtil.logDebug("Previous versions: " + previousVersions);
+			logDebug("Previous versions: " + previousVersions);
 			fileVersionsFileManagement.setSummary(text);
 			if(numVersions>0){
 				fileManagementCategory.addPreference(clearVersionsFileManagement);
@@ -1153,7 +1149,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void resetVersionsInfo(){
-		LogUtil.logDebug("resetVersionsInfo");
+		logDebug("resetVersionsInfo");
 
 		String text = getString(R.string.settings_file_management_file_versions_subtitle, 0, "0 B");
 		fileVersionsFileManagement.setSummary(text);
@@ -1161,14 +1157,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void setRubbishInfo(){
-		LogUtil.logDebug("setRubbishInfo");
+		logDebug("setRubbishInfo");
 		rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo().getFormattedUsedRubbish()));
 	}
 
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		LogUtil.logDebug("onViewCreated");
+		logDebug("onViewCreated");
 		listView = view.findViewById(android.R.id.list);
 		if (((ManagerActivityLollipop) context).openSettingsStorage) {
 			goToCategoryStorage();
@@ -1198,12 +1194,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void goToCategoryStorage() {
-		LogUtil.logDebug("goToCategoryStorage");
+		logDebug("goToCategoryStorage");
 		scrollToPreference(storageCategory);
 	}
 
 	public void goToCategoryQR() {
-		LogUtil.logDebug("goToCategoryQR");
+		logDebug("goToCategoryQR");
 		scrollToPreference(qrCodeCategory);
 	}
 
@@ -1215,7 +1211,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			lv.setPadding(0, 0, 0, 0);
 		}
 
-		if(Util.isOnline(context)){
+		if(isOnline(context)){
 			if(megaApi==null || megaApi.getRootNode()==null){
 				setOnlineOptions(false);
 			}
@@ -1224,7 +1220,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else{
-			LogUtil.logDebug("Offline");
+			logDebug("Offline");
 			setOnlineOptions(false);
 		}
 
@@ -1283,7 +1279,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
-		LogUtil.logDebug("onPreferenceChange");
+		logDebug("onPreferenceChange");
 		prefs = dbH.getPreferences();
 		if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_HOW_TO) == 0){
 			switch (Integer.parseInt((String)newValue)){
@@ -1335,7 +1331,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             rescheduleCameraUpload(context);
 		}else if(preference.getKey().compareTo(KEY_CAMERA_UPLOAD_VIDEO_QUALITY) == 0){
 
-			LogUtil.logDebug( "Video quality selected");
+			logDebug( "Video quality selected");
             switch(Integer.parseInt((String)newValue)){
                 case VIDEO_QUALITY_ORIGINAL:{
                     dbH.setCameraUploadVideoQuality(ORIGINAL);
@@ -1377,12 +1373,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			pinLockCode.setSummary(ast);
 
 			pinLockCode.setSummary(ast);
-			LogUtil.logDebug("Object: " + newValue);
+			logDebug("Object: " + newValue);
 		}
 		else if (preference.getKey().compareTo("settings_chat_list_status") == 0){
-			LogUtil.logDebug("Change status (CHAT)");
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("Change status (CHAT)");
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			statusChatListPreference.setSummary(statusChatListPreference.getEntry());
@@ -1390,9 +1386,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			megaChatApi.setOnlineStatus(newStatus, (ManagerActivityLollipop) context);
 		}
 		else if (preference.getKey().compareTo("settings_chat_send_originals") == 0){
-			LogUtil.logDebug("Change send originals (CHAT)");
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("Change send originals (CHAT)");
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1425,12 +1421,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
-		LogUtil.logDebug("onPreferenceClick");
+		logDebug("onPreferenceClick");
 
 		prefs = dbH.getPreferences();
-		LogUtil.logDebug("KEY = " + preference.getKey());
+		logDebug("KEY = " + preference.getKey());
 		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0){
-			LogUtil.logDebug("KEY_ABOUT_SDK_VERSION pressed");
+			logDebug("KEY_ABOUT_SDK_VERSION pressed");
 			numberOfClicksSDK++;
 			if (numberOfClicksSDK == 5){
 				MegaAttributes attrs = dbH.getAttributes();
@@ -1441,10 +1437,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 						}
 						else{
 							dbH.setFileLoggerSDK(false);
-							Util.setFileLoggerSDK(false);
+							setFileLoggerSDK(false);
 							numberOfClicksSDK = 0;
 							MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-                            ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
+                            ((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
 						}
 					}
 					catch(Exception e){
@@ -1461,7 +1457,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 
 		if (preference.getKey().compareTo(KEY_ABOUT_KARERE_VERSION) == 0){
-			LogUtil.logDebug("KEY_ABOUT_KARERE_VERSION pressed");
+			logDebug("KEY_ABOUT_KARERE_VERSION pressed");
 			numberOfClicksKarere++;
 			if (numberOfClicksKarere == 5){
 				MegaAttributes attrs = dbH.getAttributes();
@@ -1472,10 +1468,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 						}
 						else{
 							dbH.setFileLoggerKarere(false);
-							Util.setFileLoggerKarere(false);
+							setFileLoggerKarere(false);
 							numberOfClicksKarere = 0;
 							MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
-							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
+							((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
 						}
 					}
 					catch(Exception e){
@@ -1492,19 +1488,19 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 
 		if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) == 0){
-			LogUtil.logDebug("KEY_ABOUT_APP_VERSION pressed");
+			logDebug("KEY_ABOUT_APP_VERSION pressed");
 			numberOfClicksAppVersion++;
 			if (numberOfClicksAppVersion == 5){
 
 				if (MegaApplication.isShowInfoChatMessages() == false) {
 					MegaApplication.setShowInfoChatMessages(true);
 					numberOfClicksAppVersion = 0;
-					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, "Action to show info of chat messages is enabled", -1);
+					((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is enabled", -1);
 				}
 				else{
 					MegaApplication.setShowInfoChatMessages(false);
 					numberOfClicksAppVersion = 0;
-					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, "Action to show info of chat messages is disabled", -1);
+					((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is disabled", -1);
 				}
 			}
 		}
@@ -1513,14 +1509,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
-			LogUtil.logDebug("KEY_STORAGE_DOWNLOAD_LOCATION pressed");
+			logDebug("KEY_STORAGE_DOWNLOAD_LOCATION pressed");
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 			startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE) == 0){
-			LogUtil.logDebug("KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE pressed");
+			logDebug("KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE pressed");
 			Dialog downloadLocationDialog;
 			String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
 	        AlertDialog.Builder b=new AlertDialog.Builder(context);
@@ -1530,10 +1526,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					LogUtil.logDebug("onClick");
+					logDebug("onClick");
 					switch(which){
 						case 0:{
-							LogUtil.logDebug("Intent to FileStorageActivityLollipop");
+							logDebug("Intent to FileStorageActivityLollipop");
 							Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 							intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 							intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
@@ -1541,12 +1537,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 							break;
 						}
 						case 1:{
-							LogUtil.logDebug("Get External Files");
+							logDebug("Get External Files");
 							File[] fs = context.getExternalFilesDirs(null);
 							if (fs.length > 1){
-								LogUtil.logDebug("More than one");
+								logDebug("More than one");
 								if (fs[1] != null){
-									LogUtil.logDebug("External not NULL");
+									logDebug("External not NULL");
 									String path = fs[1].getAbsolutePath();
 									dbH.setStorageDownloadLocation(path);
 									if (downloadLocation != null){
@@ -1557,7 +1553,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 									}
 								}
 								else{
-									LogUtil.logWarning("External NULL -- intent to FileStorageActivityLollipop");
+									logWarning("External NULL -- intent to FileStorageActivityLollipop");
 									Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 									intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
@@ -1573,22 +1569,22 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					LogUtil.logDebug("Cancel dialog");
+					logDebug("Cancel dialog");
 					dialog.cancel();
 				}
 			});
 			downloadLocationDialog = b.create();
 			downloadLocationDialog.show();
-			LogUtil.logDebug("downloadLocationDialog shown");
+			logDebug("downloadLocationDialog shown");
 		}
 		else if (preference.getKey().compareTo(KEY_CACHE) == 0){
-			LogUtil.logDebug("Clear Cache!");
+			logDebug("Clear Cache!");
 
 			ClearCacheTask clearCacheTask = new ClearCacheTask(context);
 			clearCacheTask.execute();
 		}
 		else if (preference.getKey().compareTo(KEY_OFFLINE) == 0){
-			LogUtil.logDebug("Clear Offline!");
+			logDebug("Clear Offline!");
 
 			ClearOfflineTask clearOfflineTask = new ClearOfflineTask(context);
 			clearOfflineTask.execute();
@@ -1603,10 +1599,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             showResetCompressionQueueSizeDialog();
         }
 		else if (preference.getKey().compareTo(KEY_SECONDARY_MEDIA_FOLDER_ON) == 0){
-			LogUtil.logDebug("Changing the secondary uploads");
+			logDebug("Changing the secondary uploads");
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1665,32 +1661,32 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			rescheduleCameraUpload(context);
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_ADVANCED_DEVICES) == 0){
-			LogUtil.logDebug("Changing the advances devices preference");
+			logDebug("Changing the advances devices preference");
 			advancedDevices = !advancedDevices;
 			if(advancedDevices){
-				if(Util.getExternalCardPath()==null){
+				if(getExternalCardPath()==null){
 					Toast.makeText(context, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_SHORT).show();
 					storageAdvancedDevices.setChecked(false);
 					advancedDevices = !advancedDevices;
 				}
 			}
 			else{
-				LogUtil.logDebug("No advanced devices");
+				logDebug("No advanced devices");
 			}
 
 			dbH.setStorageAdvancedDevices(advancedDevices);
 		}
 		else if (preference.getKey().compareTo(KEY_LOCAL_SECONDARY_MEDIA_FOLDER) == 0){
-			LogUtil.logDebug("Changing the local folder for secondary uploads");
+			logDebug("Changing the local folder for secondary uploads");
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 			startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_MEGA_SECONDARY_MEDIA_FOLDER) == 0){
-			LogUtil.logDebug("Changing the MEGA folder for secondary uploads");
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("Changing the MEGA folder for secondary uploads");
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
@@ -1698,10 +1694,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			startActivityForResult(intent, REQUEST_MEGA_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_ON) == 0){
-			LogUtil.logDebug("Changing camera upload");
+			logDebug("Changing camera upload");
 			if(cameraUpload){
-				if (!Util.isOnline(context)){
-					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+				if (!isOnline(context)){
+					((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 					return false;
 				}
 			}
@@ -1711,11 +1707,11 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			refreshCameraUploadsSettings();
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_ENABLE) == 0){
-			LogUtil.logDebug("KEY_PIN_LOCK_ENABLE");
+			logDebug("KEY_PIN_LOCK_ENABLE");
 			pinLock = !pinLock;
 			if (pinLock){
 				//Intent to set the PIN
-				LogUtil.logDebug("Call to showPanelSetPinLock");
+				logDebug("Call to showPanelSetPinLock");
 				((ManagerActivityLollipop)getActivity()).showPanelSetPinLock();
 			}
 			else{
@@ -1726,17 +1722,17 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_CHAT_ENABLE) == 0){
-			LogUtil.logDebug("KEY_CHAT_ENABLE");
+			logDebug("KEY_CHAT_ENABLE");
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				chatEnableSwitch.setChecked(chatEnabled);
 				return false;
 			}
 
 			chatEnabled = !chatEnabled;
 			if (chatEnabled){
-				LogUtil.logDebug("CONNECT CHAT!!!");
+				logDebug("CONNECT CHAT!!!");
 				dbH.setEnabledChat(true+"");
 				((ManagerActivityLollipop)context).enableChat();
 				preferenceScreen.addPreference(chatNotificationsCategory);
@@ -1747,27 +1743,27 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				chatEnabledCategory.addPreference(statusChatListPreference);
 			}
 			else{
-				LogUtil.logDebug("DISCONNECT CHAT!!!");
+				logDebug("DISCONNECT CHAT!!!");
 				dbH.setEnabledChat(false+"");
 				((ManagerActivityLollipop)context).disableChat();
 				hidePreferencesChat();
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_AUTOAWAY_ENABLE) == 0){
-			LogUtil.logDebug("KEY_AUTOAWAY_ENABLE");
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("KEY_AUTOAWAY_ENABLE");
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			statusConfig = megaChatApi.getPresenceConfig();
 			if(statusConfig!=null){
 				if(statusConfig.isAutoawayEnabled()){
-					LogUtil.logDebug("Change AUTOAWAY chat to false");
+					logDebug("Change AUTOAWAY chat to false");
 					megaChatApi.setPresenceAutoaway(false, 0);
 					autoawayChatCategory.removePreference(chatAutoAwayPreference);
 				}
 				else{
-					LogUtil.logDebug("Change AUTOAWAY chat to true");
+					logDebug("Change AUTOAWAY chat to true");
 					megaChatApi.setPresenceAutoaway(true, 300);
 					autoawayChatCategory.addPreference(chatAutoAwayPreference);
 					chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, 5));
@@ -1776,25 +1772,25 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		else if (preference.getKey().compareTo(KEY_RICH_LINKS_ENABLE) == 0){
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
 			if(richLinksSwitch.isChecked()){
-				LogUtil.logDebug("Enable rich links");
+				logDebug("Enable rich links");
 				megaApi.enableRichPreviews(true, (ManagerActivityLollipop)context);
 			}
 			else{
-				LogUtil.logDebug("Disable rich links");
+				logDebug("Disable rich links");
 				megaApi.enableRichPreviews(false, (ManagerActivityLollipop)context);
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_ENABLE_VERSIONS) == 0){
-			LogUtil.logDebug("Change KEY_ENABLE_VERSIONS");
+			logDebug("Change KEY_ENABLE_VERSIONS");
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1806,15 +1802,15 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_ENABLE_RB_SCHEDULER) == 0){
-			LogUtil.logDebug("Change KEY_ENABLE_RB_SCHEDULER");
+			logDebug("Change KEY_ENABLE_RB_SCHEDULER");
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
 			if(!enableRbSchedulerSwitch.isChecked()){
-				LogUtil.logDebug("Disable RB schedule");
+				logDebug("Disable RB schedule");
 				//Check the account type
 				MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 				if(myAccountInfo!=null ){
@@ -1830,54 +1826,54 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 			}
 			else{
-				LogUtil.logDebug("ENABLE RB schedule");
+				logDebug("ENABLE RB schedule");
 				((ManagerActivityLollipop)context).showRbSchedulerValueDialog(true);
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_DAYS_RB_SCHEDULER) == 0){
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
 			((ManagerActivityLollipop)context).showRbSchedulerValueDialog(false);
 		}
 		else if (preference.getKey().compareTo(KEY_ENABLE_LAST_GREEN_CHAT) == 0){
-			LogUtil.logDebug("Change KEY_ENABLE_LAST_GREEN_CHAT");
+			logDebug("Change KEY_ENABLE_LAST_GREEN_CHAT");
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
 			if(!enableLastGreenChatSwitch.isChecked()){
-				LogUtil.logDebug("Disable last green");
+				logDebug("Disable last green");
 				((ManagerActivityLollipop)context).enableLastGreen(false);
 			}
 			else{
-				LogUtil.logDebug("Enable last green");
+				logDebug("Enable last green");
 				((ManagerActivityLollipop)context).enableLastGreen(true);
 			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			((ManagerActivityLollipop)context).showAutoAwayValueDialog();
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_PERSISTENCE) == 0){
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
 			if(statusConfig.isPersist()){
-				LogUtil.logDebug("Change persistence chat to false");
+				logDebug("Change persistence chat to false");
 				megaChatApi.setPresencePersist(false);
 			}
 			else{
-				LogUtil.logDebug("Change persistence chat to true");
+				logDebug("Change persistence chat to true");
 				megaChatApi.setPresencePersist(true);
 			}
 		}
@@ -1888,15 +1884,15 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN
-			LogUtil.logDebug("KEY_PIN_LOCK_CODE");
+			logDebug("KEY_PIN_LOCK_CODE");
 			resetPinLock();
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_ASK_ME_ALWAYS) == 0){
-			LogUtil.logDebug("KEY_STORAGE_ASK_ME_ALWAYS");
+			logDebug("KEY_STORAGE_ASK_ME_ALWAYS");
 			askMe = storageAskMeAlways.isChecked();
 			dbH.setStorageAskAlways(askMe);
 			if (storageAskMeAlways.isChecked()){
-				LogUtil.logDebug("storageAskMeAlways is checked!");
+				logDebug("storageAskMeAlways is checked!");
 				if (downloadLocation != null){
 					downloadLocation.setEnabled(false);
 					downloadLocation.setSummary("");
@@ -1908,7 +1904,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				storageAdvancedDevices.setEnabled(true);
 			}
 			else{
-				LogUtil.logDebug("storageAskMeAlways NOT checked!");
+				logDebug("storageAskMeAlways NOT checked!");
 				if (downloadLocation != null){
 					downloadLocation.setEnabled(true);
 					downloadLocation.setSummary(downloadLocationPath);
@@ -1921,13 +1917,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else if (preference.getKey().compareTo("settings_use_https_only") == 0){
-			LogUtil.logDebug("settings_use_https_only");
+			logDebug("settings_use_https_only");
 			useHttpsOnlyValue = useHttpsOnly.isChecked();
 			dbH.setUseHttpsOnly(useHttpsOnlyValue);
 			megaApi.useHttpsOnly(useHttpsOnlyValue);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CHARGING) == 0){
-			LogUtil.logDebug("KEY_CAMERA_UPLOAD_CHARGING");
+			logDebug("KEY_CAMERA_UPLOAD_CHARGING");
 			charging = cameraUploadCharging.isChecked();
 			if(charging){
                 enableVideoCompressionSizeSettingsAndRestartUpload();
@@ -1937,13 +1933,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			dbH.setConversionOnCharging(charging);
 		}
 		else if(preference.getKey().compareTo(KEY_KEEP_FILE_NAMES) == 0){
-			LogUtil.logDebug("KEY_KEEP_FILE_NAMES");
+			logDebug("KEY_KEEP_FILE_NAMES");
 			fileNames = keepFileNames.isChecked();
 			dbH.setKeepFileNames(fileNames);
             Toast.makeText(context, getString(R.string.message_keep_device_name), Toast.LENGTH_SHORT).show();
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER) == 0){
-			LogUtil.logDebug("Changing the LOCAL folder for camera uploads");
+			logDebug("Changing the LOCAL folder for camera uploads");
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
@@ -1951,7 +1947,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD) == 0){
-			LogUtil.logDebug("KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD");
+			logDebug("KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD");
 			Dialog localCameraDialog;
 			String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
 	        AlertDialog.Builder b=new AlertDialog.Builder(context);
@@ -2001,9 +1997,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			localCameraDialog.show();
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_MEGA_FOLDER) == 0){
-			LogUtil.logDebug("Changing the MEGA folder for camera uploads");
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("Changing the MEGA folder for camera uploads");
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
@@ -2034,7 +2030,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			startActivity(viewIntent);
 		}
 		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
-			LogUtil.logDebug("Cancel account preference");
+			logDebug("Cancel account preference");
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
 		else if (preference.getKey().compareTo(KEY_QR_CODE_AUTO_ACCEPT) == 0){
@@ -2043,29 +2039,29 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			megaApi.getContactLinksOption((ManagerActivityLollipop) context);
 		}
 		else if (preference.getKey().compareTo(KEY_RECOVERY_KEY) == 0){
-			LogUtil.logDebug("Export Recovery Key");
+			logDebug("Export Recovery Key");
 			((ManagerActivityLollipop)context).showMKLayout();
 		}
 		else if (preference.getKey().compareTo(KEY_CHANGE_PASSWORD) == 0){
-			LogUtil.logDebug("Change password");
+			logDebug("Change password");
 			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
 			startActivity(intent);
 		}
 		else if (preference.getKey().compareTo(KEY_2FA) == 0){
 			if (((ManagerActivityLollipop) context).is2FAEnabled()){
-				LogUtil.logDebug("2FA is Checked");
+				logDebug("2FA is Checked");
 				twoFASwitch.setChecked(true);
-				((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.DISABLE_2FA);
+				((ManagerActivityLollipop) context).showVerifyPin2FA(DISABLE_2FA);
 			}
 			else {
-				LogUtil.logDebug("2FA is NOT Checked");
+				logDebug("2FA is NOT Checked");
 				twoFASwitch.setChecked(false);
 				Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
 				startActivity(intent);
 			}
 		}else if(preference.getKey().compareTo(KEY_AUTO_PLAY_SWITCH) == 0 ){
             boolean isChecked = autoPlaySwitch.isChecked();
-			LogUtil.logDebug("Is auto play checked " + isChecked);
+			logDebug("Is auto play checked " + isChecked);
             dbH.setAutoPlayEnabled(String.valueOf(isChecked));
 
         }
@@ -2076,19 +2072,19 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	 * Refresh the Camera Uploads service settings depending on the service status.
 	 */
     private void refreshCameraUploadsSettings() {
-		LogUtil.logDebug("refreshCameraUploadsSettings");
+		logDebug("refreshCameraUploadsSettings");
         boolean cuEnabled = false;
         if (prefs != null) {
             cuEnabled = Boolean.parseBoolean(prefs.getCamSyncEnabled());
         }
         if (!cuEnabled) {
-			LogUtil.logDebug("Camera Uploads ON");
+			logDebug("Camera Uploads ON");
             String[] PERMISSIONS = {
                     android.Manifest.permission.READ_EXTERNAL_STORAGE
             };
 
-            if (!Util.hasPermissions(context,PERMISSIONS)) {
-                ActivityCompat.requestPermissions((ManagerActivityLollipop)context,PERMISSIONS,Constants.REQUEST_CAMERA_UPLOAD);
+            if (!hasPermissions(context,PERMISSIONS)) {
+                ActivityCompat.requestPermissions((ManagerActivityLollipop)context,PERMISSIONS,REQUEST_CAMERA_UPLOAD);
             } else {
                 enableCameraUpload();
             }
@@ -2099,13 +2095,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		LogUtil.logDebug("onActivityResult");
+		logDebug("onActivityResult");
 
 		prefs = dbH.getPreferences();
-		LogUtil.logDebug("REQUEST CODE: " + requestCode + "___RESULT CODE: " + resultCode);
+		logDebug("REQUEST CODE: " + requestCode + "___RESULT CODE: " + resultCode);
 		if (requestCode == REQUEST_CODE_TREE_LOCAL_CAMERA && resultCode == Activity.RESULT_OK){
 			if (intent == null){
-				LogUtil.logWarning("intent NULL");
+				logWarning("intent NULL");
 				return;
 			}
 
@@ -2131,24 +2127,24 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
 			}
 			else{
-				LogUtil.logWarning("pickedDirNAme NULL");
+				logWarning("pickedDirNAme NULL");
 			}
 
 			resetCUTimeStampsAndCache();
 			rescheduleCameraUpload(context);
 		}
-		else if(requestCode == Constants.SET_PIN){
+		else if(requestCode == SET_PIN){
 			if(resultCode == Activity.RESULT_OK) {
-				LogUtil.logDebug("Set PIN Ok");
+				logDebug("Set PIN Ok");
 
 				afterSetPinLock();
 			}
 			else{
-				LogUtil.logWarning("Set PIN ERROR");
+				logWarning("Set PIN ERROR");
 			}
 		}
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_CANCELED && intent != null){
-			LogUtil.logDebug("REQUEST_DOWNLOAD_FOLDER - canceled");
+			logDebug("REQUEST_DOWNLOAD_FOLDER - canceled");
 		}
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK && intent != null) {
 			String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
@@ -2214,10 +2210,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				dbH.setSecSyncTimeStamp(0);
 				dbH.setSecVideoSyncTimeStamp(0);
 				rescheduleCameraUpload(context);
-				LogUtil.logDebug("Mega folder to secondary uploads change!!");
+				logDebug("Mega folder to secondary uploads change!!");
 			}
 			else{
-				LogUtil.logError("Error choosing the secondary uploads");
+				logError("Error choosing the secondary uploads");
 			}
 
 		}
@@ -2239,10 +2235,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				megaCameraFolder.setSummary(camSyncMegaPath);
                 resetCUTimeStampsAndCache();
 				rescheduleCameraUpload(context);
-				LogUtil.logDebug("Mega folder to sync the Camera CHANGED!!");
+				logDebug("Mega folder to sync the Camera CHANGED!!");
 			}
 			else{
-				LogUtil.logError("Error choosing the Mega folder to sync the Camera");
+				logError("Error choosing the Mega folder to sync the Camera");
 			}
 		}
 	}
@@ -2266,9 +2262,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	@Override
 	public void onResume() {
-		LogUtil.logDebug("onResume");
+		logDebug("onResume");
 
-		IntentFilter filter = new IntentFilter(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
 		filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
 		LocalBroadcastManager.getInstance(context).registerReceiver(receiver, filter);
@@ -2294,7 +2290,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		taskGetSizeCache();
 		taskGetSizeOffline();
 
-		if(!Util.isOnline(context)){
+		if(!isOnline(context)){
 			chatEnabledCategory.setEnabled(false);
 			cameraUploadCategory.setEnabled(false);
 		}
@@ -2308,23 +2304,23 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	private void refreshAccountInfo(){
-		LogUtil.logDebug("refreshAccountInfo");
+		logDebug("refreshAccountInfo");
 
 		//Check if the call is recently
-		LogUtil.logDebug("Check the last call to getAccountDetails");
-		if(DBUtil.callToAccountDetails(context)){
-			LogUtil.logDebug("megaApi.getAccountDetails SEND");
+		logDebug("Check the last call to getAccountDetails");
+		if(callToAccountDetails(context)){
+			logDebug("megaApi.getAccountDetails SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
 		}
 	}
 
 	public void update2FAPreference(boolean enabled) {
-		LogUtil.logDebug("update2FAPreference - Enabled: " + enabled);
+		logDebug("update2FAPreference - Enabled: " + enabled);
 		twoFASwitch.setChecked(enabled);
 	}
 
 	public void update2FAVisibility(){
-		LogUtil.logDebug("update2FAVisbility");
+		logDebug("update2FAVisbility");
 		if (megaApi == null){
 			if (context != null){
 				if (((Activity)context).getApplication() != null){
@@ -2335,18 +2331,18 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		if (megaApi != null) {
 			if (megaApi.multiFactorAuthAvailable()) {
-				LogUtil.logDebug("update2FAVisbility true");
+				logDebug("update2FAVisbility true");
 				preferenceScreen.addPreference(twoFACategory);
 				megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
 			} else {
-				LogUtil.logDebug("update2FAVisbility false");
+				logDebug("update2FAVisbility false");
 				preferenceScreen.removePreference(twoFACategory);
 			}
 		}
 	}
 
 	public void afterSetPinLock(){
-		LogUtil.logDebug("afterSetPinLock");
+		logDebug("afterSetPinLock");
 
 		prefs=dbH.getPreferences();
 		pinLockCodeTxt = prefs.getPinLockCode();
@@ -2371,45 +2367,45 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void taskGetSizeCache (){
-		LogUtil.logDebug("taskGetSizeCache");
+		logDebug("taskGetSizeCache");
 		GetCacheSizeTask getCacheSizeTask = new GetCacheSizeTask(context);
 		getCacheSizeTask.execute();
 	}
 
 	public void taskGetSizeOffline (){
-		LogUtil.logDebug("taskGetSizeOffline");
+		logDebug("taskGetSizeOffline");
 		GetOfflineSizeTask getOfflineSizeTask = new GetOfflineSizeTask(context);
 		getOfflineSizeTask.execute();
 	}
 
 	public void intentToPinLock(){
-		LogUtil.logDebug("intentToPinLock");
+		logDebug("intentToPinLock");
 		Intent intent = new Intent(context, PinLockActivityLollipop.class);
 		intent.setAction(PinLockActivityLollipop.ACTION_SET_PIN_LOCK);
-		startActivityForResult(intent, Constants.SET_PIN);
+		startActivityForResult(intent, SET_PIN);
 	}
 
 	public void resetPinLock(){
-		LogUtil.logDebug("resetPinLock");
+		logDebug("resetPinLock");
 		Intent intent = new Intent(context, PinLockActivityLollipop.class);
 		intent.setAction(PinLockActivityLollipop.ACTION_RESET_PIN_LOCK);
 		startActivity(intent);
 	}
 
 	public void updatePresenceConfigChat(boolean cancelled, MegaChatPresenceConfig config){
-		LogUtil.logDebug("updatePresenceConfigChat: " + cancelled);
+		logDebug("updatePresenceConfigChat: " + cancelled);
 
 		if(!cancelled){
 			statusConfig = config;
 		}
 
-		if(Util.isChatEnabled()){
+		if(isChatEnabled()){
 			showPresenceChatConfig();
 		}
 	}
 
 	public void updateEnabledRichLinks(){
-		LogUtil.logDebug("updateEnabledRichLinks");
+		logDebug("updateEnabledRichLinks");
 
 		if(MegaApplication.isEnabledRichLinks()!=richLinksSwitch.isChecked()){
 			richLinksSwitch.setOnPreferenceClickListener(null);
@@ -2419,7 +2415,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void updateEnabledFileVersions(){
-		LogUtil.logDebug("updateEnabledFileVersions: " + MegaApplication.isDisableFileVersions());
+		logDebug("updateEnabledFileVersions: " + MegaApplication.isDisableFileVersions());
 
 		enableVersionsSwitch.setOnPreferenceClickListener(null);
 		if(MegaApplication.isDisableFileVersions() == 1){
@@ -2441,7 +2437,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void updateRBScheduler(long daysCount){
-		LogUtil.logDebug("updateRBScheduler: " + daysCount);
+		logDebug("updateRBScheduler: " + daysCount);
 
 		if(daysCount<1){
 			enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
@@ -2481,7 +2477,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void waitPresenceConfig(){
-		LogUtil.logDebug("waitPresenceConfig: ");
+		logDebug("waitPresenceConfig: ");
 
 		preferenceScreen.removePreference(autoawayChatCategory);
 		preferenceScreen.removePreference(persistenceChatCategory);
@@ -2494,7 +2490,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void showPresenceChatConfig(){
-		LogUtil.logDebug("showPresenceChatConfig: " + statusConfig.getOnlineStatus());
+		logDebug("showPresenceChatConfig: " + statusConfig.getOnlineStatus());
 
 		statusChatListPreference.setValue(statusConfig.getOnlineStatus()+"");
 		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
@@ -2547,7 +2543,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		//Show configuration last green
 		if(statusConfig.isLastGreenVisible()){
-			LogUtil.logDebug("Last visible ON");
+			logDebug("Last visible ON");
 			enableLastGreenChatSwitch.setEnabled(true);
 			if(!enableLastGreenChatSwitch.isChecked()){
 				enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
@@ -2556,7 +2552,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
 		}
 		else{
-			LogUtil.logDebug("Last visible OFF");
+			logDebug("Last visible OFF");
 			enableLastGreenChatSwitch.setEnabled(true);
 			if(enableLastGreenChatSwitch.isChecked()){
 				enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
@@ -2568,7 +2564,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 
 	public void cancelSetPinLock(){
-		LogUtil.logDebug("cancelSetPinkLock");
+		logDebug("cancelSetPinkLock");
 		pinLock = false;
 		pinLockEnableSwitch.setChecked(pinLock);
 
@@ -2577,7 +2573,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void hidePreferencesChat(){
-		LogUtil.logDebug("hidePreferencesChat");
+		logDebug("hidePreferencesChat");
 
 		getPreferenceScreen().removePreference(chatNotificationsCategory);
 		getPreferenceScreen().removePreference(autoawayChatCategory);
@@ -2673,7 +2669,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			if (!isExternalSDCard) {
 				File checkFile = new File(camSyncLocalPath);
 				if (!checkFile.exists()) {
-					LogUtil.logWarning("Local path not exist, use default camera folder path");
+					logWarning("Local path not exist, use default camera folder path");
 					camSyncLocalPath = cameraFolderLocation;
 				}
 			} else {
@@ -2683,11 +2679,11 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				if (pickedDirName != null) {
 					camSyncLocalPath = pickedDirName;
 				} else {
-					LogUtil.logError("pickedDirName is NULL");
+					logError("pickedDirName is NULL");
 				}
 			}
 		} else {
-			LogUtil.logError("Local path is NULL");
+			logError("Local path is NULL");
 			dbH.setCameraFolderExternalSDCard(false);
 			isExternalSDCard = false;
 			camSyncLocalPath = cameraFolderLocation;
@@ -2737,7 +2733,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			String secHandle = prefs.getMegaHandleSecondaryFolder();
 			if (secHandle != null) {
 				if (!TextUtils.isEmpty(secHandle)) {
-					LogUtil.logDebug("handleSecondaryMediaFolder NOT empty");
+					logDebug("handleSecondaryMediaFolder NOT empty");
 					handleSecondaryMediaFolder = Long.valueOf(secHandle);
 					if (handleSecondaryMediaFolder != -1) {
 						megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
@@ -2750,11 +2746,11 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 						megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 					}
 				} else {
-					LogUtil.logWarning("handleSecondaryMediaFolder empty string");
+					logWarning("handleSecondaryMediaFolder empty string");
 					megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 				}
 			} else {
-				LogUtil.logWarning("handleSecondaryMediaFolder Null");
+				logWarning("handleSecondaryMediaFolder Null");
 				dbH.setSecondaryFolderHandle(-1);
 				handleSecondaryMediaFolder = (long) -1;
 				megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
@@ -2763,13 +2759,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			//check if the local secondary folder exists
 			localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
 			if (localSecondaryFolderPath == null || localSecondaryFolderPath.equals("-1")) {
-				LogUtil.logWarning("Secondary ON: invalid localSecondaryFolderPath");
+				logWarning("Secondary ON: invalid localSecondaryFolderPath");
 				localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 				Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 			} else {
 				File checkSecondaryFile = new File(localSecondaryFolderPath);
 				if (!checkSecondaryFile.exists()) {
-					LogUtil.logDebug("Secondary ON: the local folder does not exist");
+					logDebug("Secondary ON: the local folder does not exist");
 					dbH.setSecondaryFolderPath("-1");
 					//If the secondary folder does not exist
 					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
@@ -2798,7 +2794,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			if (camSyncHandle == -1) {
 				camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
 			} else {
-				LogUtil.logDebug("camSyncHandle is " + camSyncHandle);
+				logDebug("camSyncHandle is " + camSyncHandle);
 			}
 		}
 		megaCameraFolder.setSummary(camSyncMegaPath);
@@ -2832,8 +2828,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 			@Override
 			public void run() {
-				LogUtil.logDebug("Enable Camera Uploads, Now I start the service");
-				JobUtil.startCameraUploadService(context);
+				logDebug("Enable Camera Uploads, Now I start the service");
+				startCameraUploadService(context);
 			}
 		}, 1000);
 
@@ -2846,7 +2842,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
     public void disableCameraUpload(){
-		LogUtil.logDebug("Camera Uploads OFF");
+		logDebug("Camera Uploads OFF");
         cameraUpload = false;
         resetCUTimeStampsAndCache();
         handler.postDelayed(new Runnable() {
@@ -2879,7 +2875,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
     }
 
     public void showResetCompressionQueueSizeDialog(){
-		LogUtil.logDebug("showResetCompressionQueueSizeDialog");
+		logDebug("showResetCompressionQueueSizeDialog");
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
@@ -2888,7 +2884,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Util.px2dp(margin, outMetrics), Util.px2dp(margin, outMetrics), Util.px2dp(margin, outMetrics), 0);
+        params.setMargins(px2dp(margin, outMetrics), px2dp(margin, outMetrics), px2dp(margin, outMetrics), 0);
 
         queueSizeInput = new EditText(context);
         queueSizeInput.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -2922,7 +2918,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         });
 
         params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Util.px2dp(margin+5, outMetrics), Util.px2dp(0, outMetrics), Util.px2dp(margin, outMetrics), 0);
+        params.setMargins(px2dp(margin+5, outMetrics), px2dp(0, outMetrics), px2dp(margin, outMetrics), 0);
         final TextView text = new TextView(context);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
         String MB = getString(R.string.label_file_size_mega_byte);

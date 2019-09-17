@@ -12,11 +12,11 @@ import android.view.Display;
 import java.io.File;
 
 import mega.privacy.android.app.PreviewCache;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class PreviewUtils {
@@ -118,10 +118,10 @@ public class PreviewUtils {
             //half of the screen size.
             inSampleSize = calculateInSampleSize(bOpts,size.x / 2,size.y / 2);
         }
-		LogUtil.logDebug("inSampleSize: " + inSampleSize);
+		logDebug("inSampleSize: " + inSampleSize);
         bOpts.inJustDecodeBounds = false;
         bOpts.inSampleSize = inSampleSize;
-		LogUtil.logDebug("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
+		logDebug("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
         return BitmapFactory.decodeFile(bmpFile.getAbsolutePath(),bOpts);
     }
 
@@ -158,7 +158,7 @@ public class PreviewUtils {
         long usedMemInMB = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
         long maxHeapSizeInMB = runtime.maxMemory() / 1048576L;
         long availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB;
-        LogUtil.logDebug("maxHeapSizeInMB " + maxHeapSizeInMB + " availHeapSizeInMB is " + availHeapSizeInMB + " usedMemInMB is" + usedMemInMB);
+        logDebug("maxHeapSizeInMB " + maxHeapSizeInMB + " availHeapSizeInMB is " + availHeapSizeInMB + " usedMemInMB is" + usedMemInMB);
         return runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory()) > THRESHOLD;
     }
 

@@ -9,14 +9,14 @@ import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 //Listener for  multi attach
 public class MultipleAttachChatListener implements MegaChatRequestListenerInterface {
@@ -39,7 +39,7 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
 
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-        LogUtil.logDebug("onRequestStart");
+        logDebug("onRequestStart");
     }
 
     @Override
@@ -52,11 +52,11 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
         counter--;
         if (e.getErrorCode() != MegaError.API_OK){
             error++;
-            LogUtil.logError("Attach node error: " + e.getErrorString() + "__" + e.getErrorCode());
+            logError("Attach node error: " + e.getErrorString() + "__" + e.getErrorCode());
         }
 
-        LogUtil.logDebug("Counter: " + counter);
-        LogUtil.logDebug("Error: " + error);
+        logDebug("Counter: " + counter);
+        logDebug("Error: " + error);
 
         if(counter==0){
             int success = max_items - error;
@@ -65,78 +65,78 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
                 if(success>0){
                     if(chatId==-1){
                         if(sendMultipleFiles){
-                            ((ManagerActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 10), -1);
+                            ((ManagerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 10), -1);
                         }
                         else{
-                            ((ManagerActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
+                            ((ManagerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
                         }
                     }
                     else{
-                        ((ManagerActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId);
+                        ((ManagerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
                     }
                 }
                 else{
-                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
+                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
             }
             else if(context instanceof ContactInfoActivityLollipop){
                 if(success>0){
-                   ((ContactInfoActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId);
+                   ((ContactInfoActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
                 }
                 else{
-                    ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
+                    ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
             }
             else if (context instanceof FullScreenImageViewerLollipop) {
                 if(success>0){
                     if(chatId==-1){
-                        ((FullScreenImageViewerLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
+                        ((FullScreenImageViewerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
                     }
                     else{
-                        ((FullScreenImageViewerLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId);
+                        ((FullScreenImageViewerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
                     }
                 }
                 else{
-                    ((FullScreenImageViewerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
+                    ((FullScreenImageViewerLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
             }
             else if (context instanceof AudioVideoPlayerLollipop) {
                 if(success>0){
                     if(chatId==-1){
-                        ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
+                        ((AudioVideoPlayerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
                     }
                     else{
-                        ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId);
+                        ((AudioVideoPlayerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
                     }
                 }
                 else{
-                    ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
+                    ((AudioVideoPlayerLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
             }
             else if (context instanceof PdfViewerActivityLollipop) {
                 if(success>0){
                     if(chatId==-1){
-                        ((PdfViewerActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
+                        ((PdfViewerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
                     }
                     else{
-                        ((PdfViewerActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId);
+                        ((PdfViewerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
                     }
                 }
                 else{
-                    ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
+                    ((PdfViewerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
             }
             else if (context instanceof FileInfoActivityLollipop) {
                 if(success>0){
                     if(chatId==-1){
-                        ((FileInfoActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
+                        ((FileInfoActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
                     }
                     else{
-                        ((FileInfoActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId);
+                        ((FileInfoActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
                     }
                 }
                 else{
-                    ((FileInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
+                    ((FileInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
             }
         }
@@ -144,6 +144,6 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
 
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        LogUtil.logWarning("Counter: " + counter);
+        logWarning("Counter: " + counter);
     }
 };

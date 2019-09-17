@@ -4,9 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class NetworkTypeChangeReceiver extends BroadcastReceiver {
 
@@ -17,10 +16,10 @@ public class NetworkTypeChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context,Intent intent) {
-        LogUtil.logDebug("Network changes: " + intent.getAction());
+        logDebug("Network changes: " + intent.getAction());
         if("android.net.conn.CONNECTIVITY_CHANGE".equalsIgnoreCase(intent.getAction())) {
-            int type = Util.isOnWifi(context) ? WIFI : MOBILE;
-            LogUtil.logDebug("Network type: " + type);
+            int type = isOnWifi(context) ? WIFI : MOBILE;
+            logDebug("Network type: " + type);
             if (callback != null) {
                 callback.onTypeChanges(type);
             }

@@ -25,12 +25,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
-import mega.privacy.android.app.utils.LogUtil;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaCompletedTransfersAdapter.ViewHolderTransfer> implements OnClickListener {
@@ -88,7 +89,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
     @Override
 	public ViewHolderTransfer onCreateViewHolder(ViewGroup parent, int viewType) {
-		LogUtil.logDebug("onCreateViewHolder");
+		logDebug("onCreateViewHolder");
     	
     	ViewHolderTransfer holder;
     	
@@ -97,8 +98,8 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 	    display.getMetrics(outMetrics);
 	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
 		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
+	    float scaleW = getScaleW(outMetrics, density);
+	    float scaleH = getScaleH(outMetrics, density);
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -112,7 +113,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		holder.textViewFileName.setSingleLine(true);
 		holder.textViewFileName.setEllipsize(TruncateAt.MIDDLE);
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = Util.px2dp((150*scaleW), outMetrics);
+		holder.textViewFileName.getLayoutParams().width = px2dp((150*scaleW), outMetrics);
 		holder.imageViewCompleted = (ImageView) v.findViewById(R.id.transfers_list_completed_image);
 		holder.textViewCompleted = (TextView) v.findViewById(R.id.transfers_list_completed_text);
 		holder.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_bar);
@@ -126,7 +127,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 	@Override
 	public void onBindViewHolder(ViewHolderTransfer holder, int position) {
-		LogUtil.logDebug("Position: " + position);
+		logDebug("Position: " + position);
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
@@ -156,7 +157,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
         if (MimeTypeList.typeForName(transfer.getFileName()).isImage()||MimeTypeList.typeForName(transfer.getFileName()).isVideo()){
 
             long handle = Long.parseLong(transfer.getNodeHandle());
-            Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(handle);
+            Bitmap thumb = getThumbnailFromCache(handle);
             if (thumb != null){
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -172,7 +173,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
             }
             else{
                 MegaNode node = megaApi.getNodeByHandle(handle);
-                thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                thumb = getThumbnailFromFolder(node, context);
                 if (thumb != null){
 					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -198,7 +199,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		}
 
 		int state = transfer.getState();
-		LogUtil.logDebug("State of the transfer: " + state);
+		logDebug("State of the transfer: " + state);
 		switch (state){
 			case MegaTransfer.STATE_COMPLETED:{
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.title_tab_completed_transfers));
@@ -207,7 +208,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 				break;
 			}
 			default:{
-				LogUtil.logError("Default status -- error, this should be completed state always");
+				logError("Default status -- error, this should be completed state always");
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				break;
@@ -249,7 +250,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 	@Override
 	public void onClick(View v) {
-		LogUtil.logDebug("onClick");
+		logDebug("onClick");
 		
 //		ViewHolderTransfer holder = (ViewHolderTransfer) v.getTag();
 //		int currentPosition = holder.currentPosition;

@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import mega.privacy.android.app.utils.JobUtil;
+import static mega.privacy.android.app.utils.JobUtil.*;
 
 
 public class CameraEventReceiver extends BroadcastReceiver {
     
     @Override
     public void onReceive(final Context context,Intent intent) {
-        JobUtil.startCameraUploadService(context);
+        startCameraUploadService(context);
     }
 }

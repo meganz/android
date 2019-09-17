@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class MegaMonthPicLollipop {
@@ -35,14 +36,14 @@ public class MegaMonthPicLollipop {
 	}
 
 	public long getPosition(long node){
-		LogUtil.logDebug("Node is " + node);
-		LogUtil.logDebug("getPostion return null " + (nodesSite.get(new Long(node)) == null));
+		logDebug("Node is " + node);
+		logDebug("getPostion return null " + (nodesSite.get(new Long(node)) == null));
 		return nodesSite.get(new Long(node));
 	}
 
 	public long getPosition(Long node){
-		LogUtil.logDebug("Node is " + node);
-		LogUtil.logDebug("getPostion return null " + (nodesSite.get(node) == null));
+		logDebug("Node is " + node);
+		logDebug("getPostion return null " + (nodesSite.get(node) == null));
 		return nodesSite.get(node);
 	}
 

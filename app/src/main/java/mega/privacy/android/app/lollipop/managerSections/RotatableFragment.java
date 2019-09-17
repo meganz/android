@@ -7,7 +7,8 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
-import mega.privacy.android.app.utils.LogUtil;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public abstract class RotatableFragment extends Fragment {
 
@@ -27,25 +28,25 @@ public abstract class RotatableFragment extends Fragment {
     private int lastPlaceHolderCount;
 
     private void reDoTheSelectionAfterRotation() {
-        LogUtil.logDebug("Reselect items");
+        logDebug("Reselect items");
         RotatableAdapter adapter = getAdapter();
         if (adapter != null) {
             int folderCount = adapter.getFolderCount();
-            LogUtil.logDebug("Folders: " + folderCount);
+            logDebug("Folders: " + folderCount);
             int currentPlaceHolderCount = adapter.getPlaceholderCount();
-            LogUtil.logDebug("Place holder: " + currentPlaceHolderCount);
+            logDebug("Place holder: " + currentPlaceHolderCount);
             if (selectedItems != null && selectedItems.size() > 0) {
                 activateActionMode();
                 for (int selectedItem : selectedItems) {
                     if (((ManagerActivityLollipop) getActivity()).isList) {
-                        LogUtil.logDebug("selectedItem:" + selectedItem);
+                        logDebug("selectedItem:" + selectedItem);
                         multipleItemClick(selectedItem);
                     } else {
                         if (selectedItem < folderCount) {
-                            LogUtil.logDebug("List folder, selectedItem: " + selectedItem);
+                            logDebug("List folder, selectedItem: " + selectedItem);
                             multipleItemClick(selectedItem);
                         } else {
-                            LogUtil.logDebug("File selection, selectedItem: " + selectedItem + "lastPlaceHolderCount:" + lastPlaceHolderCount + ". currentPlaceHolderCount: " + currentPlaceHolderCount);
+                            logDebug("File selection, selectedItem: " + selectedItem + "lastPlaceHolderCount:" + lastPlaceHolderCount + ". currentPlaceHolderCount: " + currentPlaceHolderCount);
                             multipleItemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount));
                         }
                     }

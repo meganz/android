@@ -19,12 +19,12 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -46,21 +46,21 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
     }
 
     @Override
     public void onClick(View v) {
-        LogUtil.logDebug("onClick");
+        logDebug("onClick");
         switch(v.getId()){
 
             case R.id.qr_code_saveTo_cloud_layout:{
-                LogUtil.logDebug("Option save to Cloud Drive");
+                logDebug("Option save to Cloud Drive");
                 saveToCloudDrive();
                 break;
             }
             case R.id.qr_code_saveTo_fileSystem_layout:{
-                LogUtil.logDebug("Option save to File System");
+                logDebug("Option save to File System");
                 saveToFileSystem();
                 break;
             }

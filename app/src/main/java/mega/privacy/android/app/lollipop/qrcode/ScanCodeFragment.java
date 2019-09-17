@@ -39,7 +39,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -48,6 +47,7 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 //import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
@@ -107,14 +107,14 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     private MegaUser userQuery;
 
     public static ScanCodeFragment newInstance() {
-        LogUtil.logDebug("newInstance");
+        logDebug("newInstance");
         ScanCodeFragment fragment = new ScanCodeFragment();
         return fragment;
     }
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        LogUtil.logDebug("onCreate");
+        logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
 
@@ -149,7 +149,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LogUtil.logDebug("onCreateView");
+        logDebug("onCreateView");
 
 //        scannerView = new ZXingScannerView(getActivity());
 
@@ -237,7 +237,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     @Override
     public void onStart(){
-        LogUtil.logDebug("onStart");
+        logDebug("onStart");
         super.onStart();
 //        scannerView.setAutoFocus(true);
 //        scannerView.startCamera();
@@ -245,7 +245,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     @Override
     public void onResume() {
-        LogUtil.logDebug("onResume");
+        logDebug("onResume");
         super.onResume();
 //        scannerView.setAutoFocus(true);
 //        scannerView.startCamera();
@@ -255,7 +255,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     @Override
     public void onPause() {
-        LogUtil.logDebug("onPause");
+        logDebug("onPause");
         super.onPause();
 //        scannerView.stopCamera();
         codeScanner.releaseResources();
@@ -330,7 +330,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         else{
             invalidCode.setVisibility(View.GONE);
             handle = MegaApiAndroid.base64ToHandle(s[1].trim());
-            LogUtil.logDebug("Contact link: " + contactLink + " s[1]: " + s[1] + " handle: " + handle);
+            logDebug("Contact link: " + contactLink + " s[1]: " + s[1] + " handle: " + handle);
             if (megaApi == null){
                 megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
             }
@@ -353,7 +353,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    LogUtil.logDebug("onDismiss");
+                    logDebug("onDismiss");
 //                scannerView.setAutoFocus(true);
 //                scannerView.startCamera();
 //                onResume();
@@ -368,7 +368,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     @Override
     public void onAttach(Activity activity) {
-        LogUtil.logDebug("onAttach");
+        logDebug("onAttach");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -376,7 +376,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     @Override
     public void onAttach(Context context) {
-        LogUtil.logDebug("onAttach context");
+        logDebug("onAttach context");
         super.onAttach(context);
         this.context = context;
         aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
@@ -427,33 +427,33 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     }
 
     public void sendInvitation () {
-        LogUtil.logDebug("sendInvitation");
+        logDebug("sendInvitation");
         megaApi.inviteContact(myEmail, null, MegaContactRequest.INVITE_ACTION_ADD, handleContactLink, (QRCodeActivity) context);
     }
 
     public void setAvatar(){
-        LogUtil.logDebug("updateAvatar");
+        logDebug("updateAvatar");
 
         if (!isContact){
-            LogUtil.logDebug("Is not Contact");
+            logDebug("Is not Contact");
             setDefaultAvatar();
         }
         else {
 
-            LogUtil.logDebug("Is Contact");
+            logDebug("Is Contact");
             File avatar = null;
             if(context!=null){
-                LogUtil.logDebug("Context is not null");
+                logDebug("Context is not null");
                 avatar = buildAvatarFile(context,myEmail + ".jpg");
             }
             else{
-                LogUtil.logWarning("Context is null!!!");
+                logWarning("Context is null!!!");
                 if(getActivity()!=null){
-                    LogUtil.logDebug("getActivity is not null");
+                    logDebug("getActivity is not null");
                     avatar = buildAvatarFile(getActivity(),myEmail + ".jpg");
                 }
                 else{
-                    LogUtil.logWarning("getActivity is ALSO null");
+                    logWarning("getActivity is ALSO null");
                     return;
                 }
             }
@@ -468,40 +468,40 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     }
 
     public void setProfileAvatar(File avatar){
-        LogUtil.logDebug("setProfileAvatar");
+        logDebug("setProfileAvatar");
 
         Bitmap imBitmap = null;
         if (avatar.exists()){
-            LogUtil.logDebug("Avatar path: " + avatar.getAbsolutePath());
+            logDebug("Avatar path: " + avatar.getAbsolutePath());
             if (avatar.length() > 0){
-                LogUtil.logDebug("My avatar exists!");
+                logDebug("My avatar exists!");
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
                 bOpts.inInputShareable = true;
                 imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                 if (imBitmap == null) {
                     avatar.delete();
-                    LogUtil.logDebug("Call to getUserAvatar");
+                    logDebug("Call to getUserAvatar");
                     setDefaultAvatar();
                 }
                 else{
-                    LogUtil.logDebug("Show my avatar");
+                    logDebug("Show my avatar");
                     avatarImage.setImageBitmap(imBitmap);
                     initialLetter.setVisibility(View.GONE);
                     contentAvatar = true;
                 }
             }
         }else{
-            LogUtil.logDebug("My avatar NOT exists!");
-            LogUtil.logDebug("Call to getUserAvatar");
-            LogUtil.logDebug("DO NOT Retry!");
+            logDebug("My avatar NOT exists!");
+            logDebug("Call to getUserAvatar");
+            logDebug("DO NOT Retry!");
             megaApi.getUserAvatar(myEmail, avatar.getPath(), (QRCodeActivity) context);
 //            setDefaultAvatar();
         }
     }
 
     public void setDefaultAvatar(){
-        LogUtil.logDebug("setDefaultAvatar");
+        logDebug("setDefaultAvatar");
         Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
@@ -510,11 +510,11 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         if (isContact && userQuery != null){
             String color = megaApi.getUserAvatarColor(userQuery);
             if(color!=null){
-                LogUtil.logDebug("The color to set the avatar is " + color);
+                logDebug("The color to set the avatar is " + color);
                 p.setColor(Color.parseColor(color));
             }
             else{
-                LogUtil.logDebug("Default color to the avatar");
+                logDebug("Default color to the avatar");
                 p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         }
@@ -533,7 +533,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
         float density = ((Activity) context).getResources().getDisplayMetrics().density;
         int avatarTextSize = getAvatarTextSize(density);
-        LogUtil.logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
+        logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
 
         String fullName = "";
         if(contactNameContent != null){
@@ -646,7 +646,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    LogUtil.logDebug("onDismiss");
+                    logDebug("onDismiss");
                     inviteShown = false;
                     codeScanner.startPreview();
                 }
@@ -664,7 +664,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
         for (int i=0; i<contacts.size(); i++){
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-                LogUtil.logDebug("Contact mail[i]=" + i + ":" + contacts.get(i).getEmail() + " contact mail request: " + myEmail);
+                logDebug("Contact mail[i]=" + i + ":" + contacts.get(i).getEmail() + " contact mail request: " + myEmail);
                 if (contacts.get(i).getEmail().equals(myEmail)){
                     isContact = true;
                     return contacts.get(i);
@@ -677,7 +677,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     public void initDialogInvite(MegaRequest request, MegaError e){
         if (e.getErrorCode() == MegaError.API_OK) {
-            LogUtil.logDebug("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
+            logDebug("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
             handleContactLink = request.getNodeHandle();
             contactNameContent = request.getName() + " " + request.getText();
             myEmail = request.getEmail();
