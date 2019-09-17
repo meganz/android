@@ -8815,14 +8815,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		break;
 		        	}
 		        	case SAVED_FOR_OFFLINE: {
-
-		        		sortByDateTV.setVisibility(View.GONE);
-		        		newestCheck.setVisibility(View.GONE);
-		        		oldestCheck.setVisibility(View.GONE);
-		        		sortBySizeTV.setVisibility(View.GONE);
-		        		largestCheck.setVisibility(View.GONE);
-		        		smallestCheck.setVisibility(View.GONE);
-
 		        		ascendingCheck.setOnClickListener(new OnClickListener() {
 
 							@Override
