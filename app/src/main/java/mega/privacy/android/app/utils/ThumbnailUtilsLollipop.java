@@ -1003,7 +1003,7 @@ public class ThumbnailUtilsLollipop {
 
 		@Override
 		protected Boolean doInBackground(FileDocument... params) {
-			log("Attach Thumb nails to file storage explorer Start");
+			log("Attach Thumbnails to file storage explorer Start");
 			File thumbDir = getThumbFolder(context);
 			this.originalFile = params[0].getFile();
 			thumbFile = new File(thumbDir, megaApi.getFingerprint(this.originalFile.getAbsolutePath()) + ".jpg" );
