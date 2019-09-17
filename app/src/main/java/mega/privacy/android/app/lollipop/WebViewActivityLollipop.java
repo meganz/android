@@ -10,7 +10,7 @@ import android.webkit.WebViewClient;
 import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.Constants.MEGA_BLOG_LINK_REGEXS;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 
 

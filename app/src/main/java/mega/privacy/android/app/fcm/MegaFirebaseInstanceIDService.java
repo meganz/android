@@ -23,7 +23,7 @@ import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class MegaFirebaseInstanceIDService extends FirebaseInstanceIdService {

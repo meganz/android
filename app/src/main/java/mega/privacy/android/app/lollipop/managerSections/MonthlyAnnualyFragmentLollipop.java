@@ -29,9 +29,10 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
-import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickListener{
 
@@ -88,7 +89,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-		LogUtil.logDebug("onCreate");
+		logDebug("onCreate");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -255,19 +256,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 	public void refreshAccountInfo(){
 
-		LogUtil.logDebug("Check the last call to callToPricing");
+		logDebug("Check the last call to callToPricing");
 		if(DBUtil.callToPricing(context)){
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}
 
-		LogUtil.logDebug("Check the last call to callToPaymentMethods");
+		logDebug("Check the last call to callToPaymentMethods");
 		if(DBUtil.callToPaymentMethods(context)){
 			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
 		}
 	}
 
 	public void setPricing(){
-		LogUtil.logDebug("setPricing");
+		logDebug("setPricing");
 
 		DecimalFormat df = new DecimalFormat("#.##");
 
@@ -282,12 +283,12 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
 		if (accounts == null){
-			LogUtil.logWarning("accounts == null");
+			logWarning("accounts == null");
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 			return;
 		}
 
-		LogUtil.logDebug("parameterType: " + parameterType);
+		logDebug("parameterType: " + parameterType);
 
 		switch(parameterType){
 			case 1:{
@@ -370,12 +371,12 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 						if (myAccountInfo.getProIMonthly() != null) {
-							LogUtil.logDebug("ProIMonthly already subscribed: " + myAccountInfo.getProIMonthly().getOriginalJson());
+							logDebug("ProIMonthly already subscribed: " + myAccountInfo.getProIMonthly().getOriginalJson());
 							priceMonthlyLayout.setVisibility(View.GONE);
 						}
 
 						if (myAccountInfo.getProIYearly() != null) {
-							LogUtil.logDebug("ProIAnnualy already subscribed: " + myAccountInfo.getProIYearly().getOriginalJson());
+							logDebug("ProIAnnualy already subscribed: " + myAccountInfo.getProIYearly().getOriginalJson());
 							priceAnnualyLayout.setVisibility(View.GONE);
 							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
 								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
@@ -472,12 +473,12 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 						if (myAccountInfo.getProIIMonthly() != null) {
-							LogUtil.logDebug("ProIIMonthly already subscribed: " + myAccountInfo.getProIIMonthly().getOriginalJson());
+							logDebug("ProIIMonthly already subscribed: " + myAccountInfo.getProIIMonthly().getOriginalJson());
 							priceMonthlyLayout.setVisibility(View.GONE);
 						}
 
 						if (myAccountInfo.getProIIYearly() != null) {
-							LogUtil.logDebug("ProIIAnnualy already subscribed: " + myAccountInfo.getProIIYearly().getOriginalJson());
+							logDebug("ProIIAnnualy already subscribed: " + myAccountInfo.getProIIYearly().getOriginalJson());
 							priceAnnualyLayout.setVisibility(View.GONE);
 
 							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
@@ -576,12 +577,12 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 						if (myAccountInfo.getProIIIMonthly() != null) {
-							LogUtil.logDebug("ProIIIMonthly already subscribed: " + myAccountInfo.getProIIIMonthly().getOriginalJson());
+							logDebug("ProIIIMonthly already subscribed: " + myAccountInfo.getProIIIMonthly().getOriginalJson());
 							priceMonthlyLayout.setVisibility(View.GONE);
 						}
 
 						if (myAccountInfo.getProIIIYearly() != null) {
-							LogUtil.logDebug("ProIIIAnnualy already subscribed: " + myAccountInfo.getProIIIYearly().getOriginalJson());
+							logDebug("ProIIIAnnualy already subscribed: " + myAccountInfo.getProIIIYearly().getOriginalJson());
 							priceAnnualyLayout.setVisibility(View.GONE);
 							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
 								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
@@ -598,7 +599,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case 4:{
-				LogUtil.logDebug("case 4 -> accounts.size() " + accounts.size());
+				logDebug("case 4 -> accounts.size() " + accounts.size());
 
 				for (int i=0;i<accounts.size();i++){
 
@@ -696,15 +697,15 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						LogUtil.logDebug("PAYMENT_METHOD_GOOGLE_WALLET");
+						logDebug("PAYMENT_METHOD_GOOGLE_WALLET");
 
 						if (myAccountInfo.getProLiteMonthly() != null) {
-							LogUtil.logDebug("ProLiteMonthly already subscribed: " + myAccountInfo.getProLiteMonthly().getOriginalJson());
+							logDebug("ProLiteMonthly already subscribed: " + myAccountInfo.getProLiteMonthly().getOriginalJson());
 							priceMonthlyLayout.setVisibility(View.GONE);
 						}
 
 						if (myAccountInfo.getProLiteYearly() != null) {
-							LogUtil.logDebug("ProLiteAnnualy already subscribed: " + myAccountInfo.getProLiteYearly().getOriginalJson());
+							logDebug("ProLiteAnnualy already subscribed: " + myAccountInfo.getProLiteYearly().getOriginalJson());
 							priceAnnualyLayout.setVisibility(View.GONE);
 							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
 								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
@@ -768,9 +769,9 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 	public void onClick(View v) {
 		switch (v.getId()){
 			case R.id.monthly_annualy_subscribe_layout: {
-				LogUtil.logDebug("Button Subscribe pressed");
+				logDebug("Button Subscribe pressed");
 				if (selectedSubscription == Constants.PAYMENT_CC_MONTH) {
-					LogUtil.logDebug("procced with PAYMENT_CC_MONTH");
+					logDebug("procced with PAYMENT_CC_MONTH");
 					//MONTHLY SUBSCRIPTION
 					switch (parameterType) {
 						case 1: {
@@ -854,7 +855,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 					}
 				} else {
 					//YEARLY SUBSCRIPTION
-					LogUtil.logDebug("procced with PAYMENT_CC_YEAR");
+					logDebug("procced with PAYMENT_CC_YEAR");
 					switch (parameterType) {
 						case 1: {
 							switch (paymentMethod) {
@@ -939,7 +940,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 			}
 			case R.id.monthly_annualy_annualy_layout:
 			{
-				LogUtil.logDebug("PAYMENT_CC_YEAR selected");
+				logDebug("PAYMENT_CC_YEAR selected");
 				selectedSubscription = Constants.PAYMENT_CC_YEAR;
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
 					priceAnnualyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
@@ -951,7 +952,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.monthly_annualy_monthly_layout:{
-				LogUtil.logDebug("PAYMENT_CC_MONTH selected");
+				logDebug("PAYMENT_CC_MONTH selected");
 				selectedSubscription = Constants.PAYMENT_CC_MONTH;
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
 					priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);

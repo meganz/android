@@ -8,7 +8,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.utils.LogUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
@@ -63,14 +62,14 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        LogUtil.logDebug("Error code: " + e.getErrorCode());
+        logDebug("Error code: " + e.getErrorCode());
         counter--;
         if (e.getErrorCode() != MegaError.API_OK){
             error++;
         }
         int requestType = request.getType();
-        LogUtil.logDebug("Counter: " + counter);
-        LogUtil.logDebug("Error: " + error);
+        logDebug("Counter: " + counter);
+        logDebug("Error: " + error);
 //			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
 //			if(node!=null){
 //				log("onRequestTemporaryError: "+node.getName());

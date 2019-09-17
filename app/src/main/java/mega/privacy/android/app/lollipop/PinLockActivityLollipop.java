@@ -48,6 +48,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 @SuppressLint("NewApi")
 public class PinLockActivityLollipop extends BaseActivity implements OnClickListener, MegaRequestListenerInterface {
@@ -117,10 +118,10 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		prefs = dbH.getPreferences();
 		att = dbH.getAttributes();
 		attemps = att.getAttemps();
-		LogUtil.logDebug("Attemps number: " + attemps);
+		logDebug("Attemps number: " + attemps);
 
 		if (savedInstanceState != null) {
-			LogUtil.logDebug("Bundle is NOT NULL");
+			logDebug("Bundle is NOT NULL");
 			mode = savedInstanceState.getInt("mode");
 			chosenTypePin = savedInstanceState.getString("chosenTypePin");
 			secondRound = savedInstanceState.getBoolean("isSecondRound");
@@ -129,7 +130,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 			}
 		}
 		else {
-			LogUtil.logDebug("Bundle is NULL");
+			logDebug("Bundle is NULL");
 
 			if (prefs != null) {
 				chosenTypePin = prefs.getPinLockType();
@@ -224,15 +225,15 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 			logoutButton.setVisibility(View.INVISIBLE);
 		}
 
-		LogUtil.logDebug("ATTEMPS value: " + attemps);
+		logDebug("ATTEMPS value: " + attemps);
 		if (attemps==MAX_ATTEMPS-1){
 			//Last intent available!!
-			LogUtil.logDebug("Last intent: " + attemps);
+			logDebug("Last intent: " + attemps);
 		}
 		else if(attemps==MAX_ATTEMPS){
 			if(attemps==10){
 				//Log out!!
-				LogUtil.logWarning("INTENTS==10 - LOGOUT");
+				logWarning("INTENTS==10 - LOGOUT");
 				redLayout.setVisibility(View.VISIBLE);
 				textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
@@ -246,7 +247,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 					}
 
 					public void onFinish() {
-						LogUtil.logWarning("Logout!!!");
+						logWarning("Logout!!!");
 						attemps=0;
 						att.setAttemps(attemps);
 //						dbH.setAttributes(att);
@@ -259,19 +260,19 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		}
 		else if(attemps>=5){
 			//Show alert
-			LogUtil.logDebug("Attemps less than 5: " + attemps);
+			logDebug("Attemps less than 5: " + attemps);
 			warningLayout.setVisibility(View.VISIBLE);
 		}
 		else{
 			//Hide alert
-			LogUtil.logDebug("Number of attemps: " + attemps);
+			logDebug("Number of attemps: " + attemps);
 			warningLayout.setVisibility(View.INVISIBLE);
 		}
 
 		if (prefs != null){
 			if (chosenTypePin != null){
 				if(chosenTypePin.equals(Constants.PIN_4)){
-					LogUtil.logDebug("4 PIN");
+					logDebug("4 PIN");
 					add4DigitsPin();
 				}
 				else if(chosenTypePin.equals(Constants.PIN_6)){
@@ -282,32 +283,32 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				}
 			}
 			else{
-				LogUtil.logWarning("Pin lock type is NULL");
+				logWarning("Pin lock type is NULL");
 
 				String code = prefs.getPinLockCode();
 				if(code!=null){
 					boolean atleastOneAlpha = code.matches(".*[a-zA-Z]+.*");
 					if (atleastOneAlpha) {
-						LogUtil.logDebug("Alphanumeric");
+						logDebug("Alphanumeric");
 						prefs.setPinLockType(Constants.PIN_ALPHANUMERIC);
 						dbH.setPinLockType(Constants.PIN_ALPHANUMERIC);
 						addAlphanumericPin();
 					}
 					else{
 						if(code.length()==4){
-							LogUtil.logDebug("FOUR PIN detected");
+							logDebug("FOUR PIN detected");
 							prefs.setPinLockType(Constants.PIN_4);
 							dbH.setPinLockType(Constants.PIN_4);
 							add4DigitsPin();
 						}
 						else if(code.length()==6){
-							LogUtil.logDebug("SIX PIN detected");
+							logDebug("SIX PIN detected");
 							prefs.setPinLockType(Constants.PIN_6);
 							dbH.setPinLockType(Constants.PIN_6);
 							add6DigitsPin();
 						}
 						else{
-							LogUtil.logDebug("DEFAULT FOUR PIN");
+							logDebug("DEFAULT FOUR PIN");
 							prefs.setPinLockType(Constants.PIN_4);
 							dbH.setPinLockType(Constants.PIN_4);
 							add4DigitsPin();
@@ -319,7 +320,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	}
 
 	private void addAlphanumericPin(){
-		LogUtil.logDebug("addAlphanumericPin");
+		logDebug("addAlphanumericPin");
 
 		fourPinLayout.setVisibility(View.GONE);
 		sixPinLayout.setVisibility(View.GONE);
@@ -369,7 +370,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	}
 
 	private void add6DigitsPin(){
-		LogUtil.logDebug("add6DigitsPin");
+		logDebug("add6DigitsPin");
 
 		fourPinLayout.setVisibility(View.GONE);
 		alphanumericLayout.setVisibility(View.GONE);
@@ -466,7 +467,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
-				LogUtil.logDebug("6passFirstLetter: afterTextChanged");
+				logDebug("6passFirstLetter: afterTextChanged");
             	if(passFirstLetter.length()!=0){
                 	passSecondLetter.requestFocus();
                     passSecondLetter.setCursorVisible(true);
@@ -485,7 +486,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
-				LogUtil.logDebug("6passSecondLetter: afterTextChanged");
+				logDebug("6passSecondLetter: afterTextChanged");
             	 if(passSecondLetter.length()!=0){
                      passThirdLetter.requestFocus();
                      passThirdLetter.setCursorVisible(true);
@@ -502,7 +503,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
-				LogUtil.logDebug("6passThirdLetter: afterTextChanged");
+				logDebug("6passThirdLetter: afterTextChanged");
             	if(passThirdLetter.length()!=0){
                 	passFourthLetter.requestFocus();
                 	passFourthLetter.setCursorVisible(true);
@@ -518,7 +519,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
-				LogUtil.logDebug("6passFourthLetter: afterTextChanged");
+				logDebug("6passFourthLetter: afterTextChanged");
             	if(passFourthLetter.length()!=0){
                 	passFifthLetter.requestFocus();
                 	passFifthLetter.setCursorVisible(true);
@@ -534,7 +535,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
-				LogUtil.logDebug("6passFifthLetter: afterTextChanged");
+				logDebug("6passFifthLetter: afterTextChanged");
             	if(passFifthLetter.length()!=0){
                 	passSixthLetter.requestFocus();
                 	passSixthLetter.setCursorVisible(true);
@@ -546,7 +547,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 		passSixthLetter.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {
-				LogUtil.logDebug("6passSixthLetter: afterTextChanged");
+				logDebug("6passSixthLetter: afterTextChanged");
             	if(passSixthLetter.length()!=0){
             		passFirstLetter.setCursorVisible(false);
             		passFirstLetter.requestFocus();
@@ -587,7 +588,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
     	                    default:
     	                    {
     	                    	//Re-enter pass
-								LogUtil.logDebug("Default CASE");
+								logDebug("Default CASE");
     	                        passFirstLetter.setText("");
     	                        passSecondLetter.setText("");
     	                        passThirdLetter.setText("");
@@ -606,7 +607,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                     }
                     else if(secondRound)
                     {
-						LogUtil.logDebug("SECOND TIME 4thletter");
+						logDebug("SECOND TIME 4thletter");
                     	if(passFirstLetter.length()==1 & passSecondLetter.length()==1 & passThirdLetter.length()==1 & passFourthLetter.length()==1){
                     		sbSecond.append(passFirstLetter.getText());
                     		sbSecond.append(passSecondLetter.getText());
@@ -617,11 +618,11 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                     	}
 //                    	submitForm(sbSecond.toString());
                         if(sbFirst.toString().equals(sbSecond.toString())){
-							LogUtil.logDebug("PIN match - submit form");
+							logDebug("PIN match - submit form");
                         	submitForm(sbSecond.toString());
                         }
                         else{
-							LogUtil.logWarning("PIN NOT match - show snackBar");
+							logWarning("PIN NOT match - show snackBar");
                         	secondRound = false;
 							showSnackbar(getString(R.string.pin_lock_not_match));
 
@@ -659,7 +660,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	}
 
 	private void add4DigitsPin(){
-		LogUtil.logDebug("add4DigitsPin");
+		logDebug("add4DigitsPin");
 		//Margins
 		RelativeLayout.LayoutParams pinParams = (RelativeLayout.LayoutParams)fourPinLayout.getLayoutParams();
 		pinParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(20, outMetrics));
@@ -732,7 +733,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
-				LogUtil.logDebug("4passFirstLetter: afterTextChanged");
+				logDebug("4passFirstLetter: afterTextChanged");
             	if(passFirstLetter.length()!=0){
                 	passSecondLetter.requestFocus();
                     passSecondLetter.setCursorVisible(true);
@@ -750,7 +751,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
-				LogUtil.logDebug("4passSecondLetter: afterTextChanged");
+				logDebug("4passSecondLetter: afterTextChanged");
             	 if(passSecondLetter.length()!=0){
                      passThirdLetter.requestFocus();
                      passThirdLetter.setCursorVisible(true);
@@ -767,7 +768,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
-				LogUtil.logDebug("4passThirdLetter: afterTextChanged");
+				logDebug("4passThirdLetter: afterTextChanged");
             	if(passThirdLetter.length()!=0){
                 	passFourthLetter.requestFocus();
                 	passFourthLetter.setCursorVisible(true);
@@ -779,7 +780,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 		passFourthLetter.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {
-				LogUtil.logDebug("4passFourthLetter: afterTextChanged");
+				logDebug("4passFourthLetter: afterTextChanged");
             	if(passFourthLetter.length()!=0){
             		passFirstLetter.setCursorVisible(false);
             		passFirstLetter.requestFocus();
@@ -816,7 +817,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
     	                    default:
     	                    {
     	                    	//Re-enter pass
-								LogUtil.logDebug("Default CASE");
+								logDebug("Default CASE");
     	                        passFirstLetter.setText("");
     	                        passSecondLetter.setText("");
     	                        passThirdLetter.setText("");
@@ -833,7 +834,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                     }
                     else if(secondRound)
                     {
-						LogUtil.logDebug("SECOND TIME 4thletter");
+						logDebug("SECOND TIME 4thletter");
                     	if(passFirstLetter.length()==1 & passSecondLetter.length()==1 & passThirdLetter.length()==1 & passFourthLetter.length()==1){
                     		sbSecond.append(passFirstLetter.getText());
                     		sbSecond.append(passSecondLetter.getText());
@@ -843,11 +844,11 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 //                    	submitForm(sbSecond.toString());
                         if(sbFirst.toString().equals(sbSecond.toString())){
-							LogUtil.logDebug("PIN match - submit form");
+							logDebug("PIN match - submit form");
                         	submitForm(sbSecond.toString());
                         }
                         else{
-							LogUtil.logWarning("PIN NOT match - show snackBar");
+							logWarning("PIN NOT match - show snackBar");
                         	secondRound = false;
 							showSnackbar(getString(R.string.pin_lock_not_match));
 
@@ -879,7 +880,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	}
 
 	private void setPin(String pin){
-		LogUtil.logDebug("setPin");
+		logDebug("setPin");
 
 		if ( pin != null){
 			dbH.setPinLockCode(pin);
@@ -890,7 +891,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		PinUtil.update();
 		Intent intent = new Intent();
 		setResult(RESULT_OK, intent);
-		LogUtil.logDebug("finish!");
+		logDebug("finish!");
 		finish();
 	}
 
@@ -912,14 +913,14 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 					finish();
 				}
 				else{
-					LogUtil.logDebug("PIN INCORRECT RESET_UNLOCK - show snackBar");
+					logDebug("PIN INCORRECT RESET_UNLOCK - show snackBar");
 					attemps=attemps+1;
 					att.setAttemps(attemps);
 //						dbH.setAttributes(att);
 					dbH.setAttrAttemps(attemps);
 					if(attemps==10){
 						//Log out!!
-						LogUtil.logDebug("INTENTS==10 - LOGOUT");
+						logDebug("INTENTS==10 - LOGOUT");
 				    	redLayout.setVisibility(View.VISIBLE);
 				    	textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
@@ -944,7 +945,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						     }
 
 						     public void onFinish() {
-								 LogUtil.logWarning("Logout!!!");
+								 logWarning("Logout!!!");
 								 attemps=0;
 								 att.setAttemps(attemps);
 //						dbH.setAttributes(att);
@@ -999,7 +1000,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				break;
 			}
 			case RESET_UNLOCK:{
-				LogUtil.logDebug("case RESET_UNLOCK");
+				logDebug("case RESET_UNLOCK");
 				String codePref = prefs.getPinLockCode();
 
 				if (code.compareTo(codePref) == 0){
@@ -1015,14 +1016,14 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 				}
 				else{
-					LogUtil.logWarning("PIN INCORRECT RESET_UNLOCK - show snackBar");
+					logWarning("PIN INCORRECT RESET_UNLOCK - show snackBar");
 					attemps=attemps+1;
 					att.setAttemps(attemps);
 //						dbH.setAttributes(att);
 					dbH.setAttrAttemps(attemps);
 					if(attemps==10){
 						//Log out!!
-						LogUtil.logDebug("INTENTS==9 - LOGOUT");
+						logDebug("INTENTS==9 - LOGOUT");
 						passFirstLetter.setCursorVisible(false);
 
 						if(passSixthLetter!=null){
@@ -1045,7 +1046,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						     }
 
 						     public void onFinish() {
-								 LogUtil.logWarning("Logout!!!");
+								 logWarning("Logout!!!");
 								 attemps=0;
 								 att.setAttemps(attemps);
 //						dbH.setAttributes(att);
@@ -1096,7 +1097,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				break;
 			}
 			case RESET_SET:{
-				LogUtil.logDebug("case RESET_SET");
+				logDebug("case RESET_SET");
 				setPin(code);
 				break;
 			}
@@ -1122,14 +1123,14 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 					finish();
 				}
 				else{
-					LogUtil.logWarning("PIN INCORRECT RESET_UNLOCK - show snackBar");
+					logWarning("PIN INCORRECT RESET_UNLOCK - show snackBar");
 					attemps=attemps+1;
 					att.setAttemps(attemps);
 //						dbH.setAttributes(att);
 					dbH.setAttrAttemps(attemps);
 					if(attemps==10){
 						//Log out!!
-						LogUtil.logDebug("INTENTS==10 - LOGOUT");
+						logDebug("INTENTS==10 - LOGOUT");
 				    	redLayout.setVisibility(View.VISIBLE);
 				    	textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
@@ -1145,7 +1146,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						     }
 
 						     public void onFinish() {
-								 LogUtil.logWarning("Logout!!!");
+								 logWarning("Logout!!!");
 								 attemps=0;
 								 att.setAttemps(attemps);
 //						dbH.setAttributes(att);
@@ -1191,7 +1192,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				break;
 			}
 			case RESET_UNLOCK:{
-				LogUtil.logDebug("case RESET_UNLOCK");
+				logDebug("case RESET_UNLOCK");
 				String codePref = prefs.getPinLockCode();
 
 				if (code.compareTo(codePref) == 0){
@@ -1207,14 +1208,14 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 				}
 				else{
-					LogUtil.logWarning("PIN INCORRECT RESET_UNLOCK - show snackBar");
+					logWarning("PIN INCORRECT RESET_UNLOCK - show snackBar");
 					attemps=attemps+1;
 					att.setAttemps(attemps);
 //						dbH.setAttributes(att);
 					dbH.setAttrAttemps(attemps);
 					if(attemps==10){
 						//Log out!!
-						LogUtil.logDebug("INTENTS==9 - LOGOUT");
+						logDebug("INTENTS==9 - LOGOUT");
 
 						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
 						//						startActivity(intent);
@@ -1233,7 +1234,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						     }
 
 						     public void onFinish() {
-								 LogUtil.logWarning("Logout!!!");
+								 logWarning("Logout!!!");
 								 attemps=0;
 								 att.setAttemps(attemps);
 //						dbH.setAttributes(att);
@@ -1274,7 +1275,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				break;
 			}
 			case RESET_SET:{
-				LogUtil.logDebug("case RESET_SET");
+				logDebug("case RESET_SET");
 				setPin(code);
 				break;
 			}
@@ -1283,7 +1284,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	}
 
 	private void choosePinLockType(){
-		LogUtil.logDebug("setPinLock");
+		logDebug("setPinLock");
 
 		AlertDialog setPinDialog;
 		LayoutInflater inflater = getLayoutInflater();
@@ -1364,12 +1365,12 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	}
 
 	public void modeSetResetOn(String type)	{
-		LogUtil.logDebug("modeSetResetOn");
+		logDebug("modeSetResetOn");
 		chosenTypePin = type;
 		mode=RESET_SET;
 
 		if(type.equals(Constants.PIN_4)){
-			LogUtil.logDebug("4 PIN");
+			logDebug("4 PIN");
 			if(sixPinLayout!=null){
 				sixPinLayout.setVisibility(View.GONE);
 			}
@@ -1385,7 +1386,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	        passFirstLetter.setCursorVisible(true);
 		}
 		else if(type.equals(Constants.PIN_6)){
-			LogUtil.logDebug("6 PIN");
+			logDebug("6 PIN");
 			add6DigitsPin();
 
 			//Re-enter pass
@@ -1405,7 +1406,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	        passFirstLetter.setCursorVisible(true);
 		}
 		else{
-			LogUtil.logDebug("AN PIN");
+			logDebug("AN PIN");
 			addAlphanumericPin();
 
 			if(passwordText!=null){
@@ -1421,9 +1422,9 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 	@Override
 	public void onBackPressed() {
-		LogUtil.logDebug("onBackPressed");
+		logDebug("onBackPressed");
 		if(attemps<10){
-			LogUtil.logDebug("attemps<10");
+			logDebug("attemps<10");
 			switch(mode){
 				case UNLOCK:{
 					moveTaskToBack(true);
@@ -1437,7 +1438,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 			}
 		}
 		else{
-			LogUtil.logWarning("attemps MORE 10");
+			logWarning("attemps MORE 10");
 			moveTaskToBack(false);
 		}
 	}
@@ -1462,7 +1463,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 	@Override
 	public void onClick(View v) {
-		LogUtil.logDebug("onClick");
+		logDebug("onClick");
 		switch(v.getId()){
 			case R.id.button_logout:{
 				attemps=0;
@@ -1481,7 +1482,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	}
 
 	public void checkPasswordText() {
-		LogUtil.logDebug("checkPasswordText");
+		logDebug("checkPasswordText");
 
     	if(passwordText.length()!=0){
     		passwordText.setCursorVisible(false);
@@ -1510,7 +1511,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                     default:
                     {
                     	//Re-enter pass
-						LogUtil.logDebug("Alphanumeric Default CASE");
+						logDebug("Alphanumeric Default CASE");
                     	passwordText.setText("");
 
                         passwordText.requestFocus();
@@ -1524,16 +1525,16 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
             }
             else if(secondRound)
             {
-				LogUtil.logDebug("SECOND TIME alphanumeric");
+				logDebug("SECOND TIME alphanumeric");
             	sbSecond.append(passwordText.getText());
 
                 submitForm(sbSecond.toString());
                 if(sbFirst.toString().equals(sbSecond.toString())){
-					LogUtil.logDebug("Alphanumeric PIN match - submit form");
+					logDebug("Alphanumeric PIN match - submit form");
                 	submitFormAlphanumeric(sbSecond.toString());
                 }
                 else{
-					LogUtil.logWarning("Alphanumeric PIN NOT match - show snackBar");
+					logWarning("Alphanumeric PIN NOT match - show snackBar");
                 	secondRound = false;
                 	showSnackbar(getString(R.string.pin_lock_not_match));
 
@@ -1567,14 +1568,14 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 	@Override
 	protected void onPause() {
-		LogUtil.logDebug("onPause");
+		logDebug("onPause");
 		MegaApplication.activityPaused();
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
-		LogUtil.logDebug("onResume");
+		logDebug("onResume");
 		Util.setAppFontSize(this);
 		super.onResume();
 
@@ -1583,7 +1584,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 	@Override
 	protected void onDestroy() {
-		LogUtil.logDebug("onDestroy");
+		logDebug("onDestroy");
 
 		MegaApplication.setShowPinScreen(isFinishing() ? true : false);
 
@@ -1592,7 +1593,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		LogUtil.logDebug("onSaveInstanceState");
+		logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 
 		outState.putInt("mode", mode);
@@ -1615,13 +1616,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		LogUtil.logDebug("onRequestFinish");
+		logDebug("onRequestFinish");
 		if(request.getType() == MegaRequest.TYPE_LOGOUT){
 			if(Util.isChatEnabled()){
-				LogUtil.logDebug("END logout sdk request - wait chat logout");
+				logDebug("END logout sdk request - wait chat logout");
 			}
 			else{
-				LogUtil.logDebug("END logout sdk request - chat disabled");
+				logDebug("END logout sdk request - chat disabled");
 
 				AccountController aC = new AccountController(this);
 				aC.logoutConfirmed(this);
