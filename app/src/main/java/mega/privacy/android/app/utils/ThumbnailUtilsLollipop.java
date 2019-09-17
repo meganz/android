@@ -1436,7 +1436,7 @@ public class ThumbnailUtilsLollipop {
             }
         }
 
-		// There is no cache before, we have to start an async task to have the thumb nail bitmap
+		// There is no cache before, we have to start an async task to have the thumbnail bitmap
 		new AttachThumbnailToFileStorageExplorerTask(context, megaApi, adapter, position).execute(document);
 
 	}
