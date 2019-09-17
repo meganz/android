@@ -40,7 +40,7 @@ import java.util.HashMap;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
-import mega.privacy.android.app.lollipop.FileDocument;
+import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter.ViewHolderFileStorage;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;

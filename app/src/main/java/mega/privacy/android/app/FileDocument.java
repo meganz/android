@@ -1,8 +1,6 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app;
 
 import java.io.File;
-
-import mega.privacy.android.app.MimeTypeList;
 
 /*
  * File system document representation
@@ -29,10 +27,6 @@ public class FileDocument {
 
     public long getSize() {
         return file.length();
-    }
-
-    public long getTimestampInMillis() {
-        return file.lastModified();
     }
 
     public String getName() {
