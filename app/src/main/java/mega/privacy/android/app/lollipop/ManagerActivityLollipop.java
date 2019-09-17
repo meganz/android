@@ -8460,18 +8460,66 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         		else if(drawerItem==DrawerItem.SAVED_FOR_OFFLINE){
         			log("orderOthers: "+orderOthers);
         			switch(orderOthers){
-		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-		        			log("ASCE");
-		        			ascendingCheck.setChecked(true);
-		        			descendingCheck.setChecked(false);
-		        			break;
-		        		}
+						case MegaApiJava.ORDER_DEFAULT_ASC: {
+							log("ASCE");
+							ascendingCheck.setChecked(true);
+							descendingCheck.setChecked(false);
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(false);
+							largestCheck.setChecked(false);
+							smallestCheck.setChecked(false);
+							break;
+						}
 		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
 		        			log("DESC");
 		        			ascendingCheck.setChecked(false);
 		        			descendingCheck.setChecked(true);
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(false);
+							largestCheck.setChecked(false);
+							smallestCheck.setChecked(false);
 		        			break;
 		        		}
+						case MegaApiJava.ORDER_CREATION_ASC:{
+							log("CREATION ASC");
+							ascendingCheck.setChecked(false);
+							descendingCheck.setChecked(false);
+							newestCheck.setChecked(true);
+							oldestCheck.setChecked(false);
+							largestCheck.setChecked(false);
+							smallestCheck.setChecked(false);
+							break;
+						}
+						case MegaApiJava.ORDER_CREATION_DESC:{
+							log("CREATION DESC");
+							ascendingCheck.setChecked(false);
+							descendingCheck.setChecked(false);
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(true);
+							largestCheck.setChecked(false);
+							smallestCheck.setChecked(false);
+							break;
+						}
+						case MegaApiJava.ORDER_SIZE_ASC:{
+							log("SIZE ASC");
+							ascendingCheck.setChecked(false);
+							descendingCheck.setChecked(false);
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(false);
+							largestCheck.setChecked(true);
+							smallestCheck.setChecked(false);
+							break;
+						}
+						case MegaApiJava.ORDER_SIZE_DESC:{
+							log("SIZE DESC");
+							ascendingCheck.setChecked(false);
+							descendingCheck.setChecked(false);
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(false);
+							largestCheck.setChecked(false);
+							smallestCheck.setChecked(true);
+							break;
+						}
         			}
         		}
         		else if(drawerItem==DrawerItem.SHARED_ITEMS){
@@ -8668,24 +8716,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			smallestCheck.setChecked(false);
 		        			break;
 		        		}
-//		        		case MegaApiJava.ORDER_CREATION_DESC:{
-//		        			ascendingCheck.setChecked(false);
-//		        			descendingCheck.setChecked(false);
-//		        			newestCheck.setChecked(true);
-//		        			oldestCheck.setChecked(false);
-//		        			largestCheck.setChecked(false);
-//		        			smallestCheck.setChecked(false);
-//		        			break;
-//		        		}
-//		        		case MegaApiJava.ORDER_CREATION_ASC:{
-//		        			ascendingCheck.setChecked(false);
-//		        			descendingCheck.setChecked(false);
-//		        			newestCheck.setChecked(false);
-//		        			oldestCheck.setChecked(true);
-//		        			largestCheck.setChecked(false);
-//		        			smallestCheck.setChecked(false);
-//		        			break;
-//		        		}
+
 						case MegaApiJava.ORDER_MODIFICATION_ASC:{
 							ascendingCheck.setChecked(false);
 							descendingCheck.setChecked(false);
@@ -8814,40 +8845,119 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		        		break;
 		        	}
-		        	case SAVED_FOR_OFFLINE: {
-		        		ascendingCheck.setOnClickListener(new OnClickListener() {
+					case SAVED_FOR_OFFLINE: {
+						ascendingCheck.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
 								ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_ASC) {
+								descendingCheck.setChecked(false);
+								newestCheck.setChecked(false);
+								oldestCheck.setChecked(false);
+								largestCheck.setChecked(false);
+								smallestCheck.setChecked(false);
+								if (orderOthers != MegaApiJava.ORDER_DEFAULT_ASC) {
 									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_ASC);
 								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
+								if (dialog != null) {
+									dialog.dismiss();
+								}
 							}
 						});
 
-		        		descendingCheck.setOnClickListener(new OnClickListener() {
+						descendingCheck.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_DESC) {
+								descendingCheck.setChecked(true);
+								newestCheck.setChecked(false);
+								oldestCheck.setChecked(false);
+								largestCheck.setChecked(false);
+								smallestCheck.setChecked(false);
+								if (orderOthers != MegaApiJava.ORDER_DEFAULT_DESC) {
 									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_DESC);
 								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
+								if (dialog != null) {
+									dialog.dismiss();
+								}
 							}
 						});
 
-		        		break;
+						newestCheck.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);
+								newestCheck.setChecked(true);
+								oldestCheck.setChecked(false);
+								largestCheck.setChecked(false);
+								smallestCheck.setChecked(false);
+								if (orderOthers != MegaApiJava.ORDER_CREATION_ASC) {
+									selectSortByOffline(MegaApiJava.ORDER_CREATION_ASC);
+								}
+								if (dialog != null) {
+									dialog.dismiss();
+								}
+							}
+						});
 
-		        	}
+						oldestCheck.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);
+								newestCheck.setChecked(false);
+								oldestCheck.setChecked(true);
+								largestCheck.setChecked(false);
+								smallestCheck.setChecked(false);
+								if (orderOthers != MegaApiJava.ORDER_CREATION_DESC) {
+									selectSortByOffline(MegaApiJava.ORDER_CREATION_DESC);
+								}
+								if (dialog != null) {
+									dialog.dismiss();
+								}
+							}
+						});
+
+						largestCheck.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);
+								newestCheck.setChecked(false);
+								oldestCheck.setChecked(false);
+								largestCheck.setChecked(true);
+								smallestCheck.setChecked(false);
+								if (orderOthers != MegaApiJava.ORDER_SIZE_ASC) {
+									selectSortByOffline(MegaApiJava.ORDER_SIZE_ASC);
+								}
+								if (dialog != null) {
+									dialog.dismiss();
+								}
+							}
+						});
+
+						smallestCheck.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);
+								newestCheck.setChecked(false);
+								oldestCheck.setChecked(false);
+								largestCheck.setChecked(false);
+								smallestCheck.setChecked(true);
+								if (orderOthers != MegaApiJava.ORDER_SIZE_DESC) {
+									selectSortByOffline(MegaApiJava.ORDER_SIZE_DESC);
+								}
+								if (dialog != null) {
+									dialog.dismiss();
+								}
+							}
+						});
+
+						break;
+					}
 		        	case SHARED_ITEMS: {
 
 						if(firstNavigationLevel){
