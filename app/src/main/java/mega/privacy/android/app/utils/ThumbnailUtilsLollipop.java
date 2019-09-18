@@ -63,12 +63,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUtilsAndroid;
-
-import static mega.privacy.android.app.utils.ThumbnailUtils.createThumbnail;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static nz.mega.sdk.MegaUtilsAndroid.createThumbnail;
 
 
 /*
@@ -1007,7 +1005,7 @@ public class ThumbnailUtilsLollipop {
 			File thumbDir = getThumbFolder(context);
 			this.originalFile = params[0].getFile();
 			thumbFile = new File(thumbDir, megaApi.getFingerprint(this.originalFile.getAbsolutePath()) + ".jpg" );
-			boolean thumbCreated = createThumbnail(this.originalFile, context, thumbFile);
+			boolean thumbCreated = createThumbnail(this.originalFile, thumbFile);
 			return thumbCreated;
 		}
 
@@ -1045,7 +1043,7 @@ public class ThumbnailUtilsLollipop {
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1084,7 +1082,7 @@ public class ThumbnailUtilsLollipop {
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1151,7 +1149,7 @@ public class ThumbnailUtilsLollipop {
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1204,7 +1202,7 @@ public class ThumbnailUtilsLollipop {
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1263,7 +1261,7 @@ public class ThumbnailUtilsLollipop {
 
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
