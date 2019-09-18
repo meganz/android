@@ -26,7 +26,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 
-public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnClickListener {
+public class SetPasswordDialog extends AlertDialog implements View.OnClickListener {
 
     private AlertDialog mDialog;
     private EditText userPassword, userPasswordConfirm;
@@ -35,12 +35,28 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
     private Drawable passwordConfirmBackground, passwordBackground;
     private ImageView toggleButtonPassword, toggleButtonConfirmPassword, firstShape, secondShape, thirdShape, fourthShape, fifthShape;
     private LinearLayout containerPasswordElements;
-    private TextView passwordType, passwordAdvice, passwordConfirmErrorText, passwordErrorText;
+    private TextView passwordType, passwordAdvice, passwordConfirmErrorText, passwordErrorText, passwordTitle, confirmPasswordTitle;
     private boolean isPasswordValid, isPasswordVisible;
+    private SetPasswordCallback mCallback;
+    private Context mContext;
+    private Builder builder;
+    private int accentColor;
+    private Drawable showPassword, hidePassword;
 
-    protected SetPasswordDialog(@NonNull Context mContext, @NonNull SetPasswordCallback callback, MegaApiAndroid api) {
-        super(mContext, callback);
+    interface SetPasswordCallback {
+        void onConfirmed(String password);
+        void onCanceled();
+    }
+
+    protected SetPasswordDialog(@NonNull Context context, @NonNull SetPasswordCallback callback, MegaApiAndroid api) {
+        super(context);
+        mContext = context;
+        builder = new Builder(context);
+        mCallback = callback;
         megaApi = api;
+        accentColor = ContextCompat.getColor(mContext, R.color.accentColor);
+        showPassword = ContextCompat.getDrawable(mContext, R.drawable.ic_b_see);
+        hidePassword = ContextCompat.getDrawable(mContext, R.drawable.ic_b_shared_read);
         setupView();
         mDialog = builder.create();
         mDialog.setCanceledOnTouchOutside(false);
@@ -65,10 +81,12 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
         builder.setTitle(mContext.getString(R.string.set_password_protection_dialog));
         isPasswordVisible = false;
         isPasswordValid = false;
-        Button confirmButton = v.findViewById(R.id.button_confirm_password);
+        final Button confirmButton = v.findViewById(R.id.button_confirm_password);
         confirmButton.setOnClickListener(this);
         Button cancelButton = v.findViewById(R.id.button_cancel);
         cancelButton.setOnClickListener(this);
+        passwordTitle = v.findViewById(R.id.lbl_password);
+        confirmPasswordTitle = v.findViewById(R.id.lbl_confirm_password);
         passwordErrorText = v.findViewById(R.id.create_account_password_error_text);
         passwordConfirmErrorText = v.findViewById(R.id.create_account_password_confirm_error_text);
         containerPasswordElements = v.findViewById(R.id.container_passwd_elements);
@@ -94,16 +112,19 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
                 if (s.length() > 0) {
                     String temp = s.toString();
                     containerPasswordElements.setVisibility(View.VISIBLE);
+                    passwordTitle.setVisibility(View.VISIBLE);
                     checkPasswordStrength(temp.trim());
                 } else {
                     isPasswordValid = false;
                     containerPasswordElements.setVisibility(View.GONE);
+                    passwordTitle.setVisibility(View.INVISIBLE);
                 }
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
                 quitError(userPassword);
+                passwordTitle.setTextColor(accentColor);
             }
         });
 
@@ -113,7 +134,7 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
                 if (hasFocus) {
                     Util.showKeyboardDelayed(v);
                     toggleButtonPassword.setVisibility(View.VISIBLE);
-                    toggleButtonPassword.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_b_shared_read));
+                    toggleButtonPassword.setImageDrawable(hidePassword);
                 } else {
                     toggleButtonPassword.setVisibility(View.GONE);
                     isPasswordVisible = false;
@@ -132,12 +153,17 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                if (charSequence.length() > 0) {
+                    confirmPasswordTitle.setVisibility(View.VISIBLE);
+                } else {
+                    confirmPasswordTitle.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
                 quitError(userPasswordConfirm);
+                confirmPasswordTitle.setTextColor(accentColor);
             }
         });
 
@@ -146,7 +172,7 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     toggleButtonConfirmPassword.setVisibility(View.VISIBLE);
-                    toggleButtonConfirmPassword.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_b_shared_read));
+                    toggleButtonConfirmPassword.setImageDrawable(hidePassword);
                 } else {
                     toggleButtonConfirmPassword.setVisibility(View.GONE);
                     isPasswordVisible = false;
@@ -175,52 +201,59 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
     private void checkPasswordStrength(String s) {
 
         int passwordStrength = megaApi.getPasswordStrength(s);
+        Drawable veryWeak = ContextCompat.getDrawable(mContext, R.drawable.passwd_very_weak);
+        Drawable weak = ContextCompat.getDrawable(mContext, R.drawable.passwd_weak);
+        Drawable medium = ContextCompat.getDrawable(mContext, R.drawable.passwd_medium);
+        Drawable good = ContextCompat.getDrawable(mContext, R.drawable.passwd_good);
+        Drawable strong = ContextCompat.getDrawable(mContext, R.drawable.passwd_strong);
+        Drawable shape = ContextCompat.getDrawable(mContext, R.drawable.shape_password);
+        
         if (passwordStrength == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK) {
-            firstShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_very_weak));
-            secondShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_password));
-            thirdShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_password));
-            fourthShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_password));
-            fifthShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_password));
+            firstShape.setBackground(veryWeak);
+            secondShape.setBackground(shape);
+            thirdShape.setBackground(shape);
+            fourthShape.setBackground(shape);
+            fifthShape.setBackground(shape);
             passwordType.setText(mContext.getString(R.string.pass_very_weak));
             passwordType.setTextColor(ContextCompat.getColor(mContext, R.color.login_warning));
             passwordAdvice.setText(mContext.getString(R.string.passwd_weak));
             isPasswordValid = false;
         } else if (passwordStrength == MegaApiJava.PASSWORD_STRENGTH_WEAK) {
-            firstShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_weak));
-            secondShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_weak));
-            thirdShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_password));
-            fourthShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_password));
-            fifthShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_password));
+            firstShape.setBackground(weak);
+            secondShape.setBackground(weak);
+            thirdShape.setBackground(shape);
+            fourthShape.setBackground(shape);
+            fifthShape.setBackground(shape);
             passwordType.setText(mContext.getString(R.string.pass_weak));
             passwordType.setTextColor(ContextCompat.getColor(mContext, R.color.pass_weak));
             passwordAdvice.setText(mContext.getString(R.string.passwd_weak));
             isPasswordValid = true;
         } else if (passwordStrength == MegaApiJava.PASSWORD_STRENGTH_MEDIUM) {
-            firstShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_medium));
-            secondShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_medium));
-            thirdShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_medium));
-            fourthShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_password));
-            fifthShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_password));
+            firstShape.setBackground(medium);
+            secondShape.setBackground(medium);
+            thirdShape.setBackground(medium);
+            fourthShape.setBackground(shape);
+            fifthShape.setBackground(shape);
             passwordType.setText(mContext.getString(R.string.pass_medium));
             passwordType.setTextColor(ContextCompat.getColor(mContext, R.color.green_unlocked_rewards));
             passwordAdvice.setText(mContext.getString(R.string.passwd_medium));
             isPasswordValid = true;
         } else if (passwordStrength == MegaApiJava.PASSWORD_STRENGTH_GOOD) {
-            firstShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_good));
-            secondShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_good));
-            thirdShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_good));
-            fourthShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_good));
-            fifthShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_password));
+            firstShape.setBackground(good);
+            secondShape.setBackground(good);
+            thirdShape.setBackground(good);
+            fourthShape.setBackground(good);
+            fifthShape.setBackground(shape);
             passwordType.setText(mContext.getString(R.string.pass_good));
             passwordType.setTextColor(ContextCompat.getColor(mContext, R.color.pass_good));
             passwordAdvice.setText(mContext.getString(R.string.passwd_good));
             isPasswordValid = true;
         } else {
-            firstShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_strong));
-            secondShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_strong));
-            thirdShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_strong));
-            fourthShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_strong));
-            fifthShape.setBackground(ContextCompat.getDrawable(mContext, R.drawable.passwd_strong));
+            firstShape.setBackground(strong);
+            secondShape.setBackground(strong);
+            thirdShape.setBackground(strong);
+            fourthShape.setBackground(strong);
+            fifthShape.setBackground(strong);
             passwordType.setText(mContext.getString(R.string.pass_strong));
             passwordType.setTextColor(ContextCompat.getColor(mContext, R.color.blue_unlocked_rewards));
             passwordAdvice.setText(mContext.getString(R.string.passwd_strong));
@@ -292,7 +325,8 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
         if (error == null || error.equals("")) {
             return;
         }
-        PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(mContext, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+        int errorColor = ContextCompat.getColor(mContext, R.color.login_warning);
+        PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(errorColor, PorterDuff.Mode.SRC_ATOP);
         Drawable background;
         switch (editText.getId()) {
             case R.id.create_account_password_text_confirm:
@@ -301,6 +335,7 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
                 background = passwordConfirmBackground.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
                 userPasswordConfirm.setBackground(background);
+                confirmPasswordTitle.setTextColor(errorColor);
                 break;
             case R.id.create_account_password_text:
                 passwordErrorLayout.setVisibility(View.VISIBLE);
@@ -308,6 +343,7 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
                 background = passwordBackground.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
                 userPassword.setBackground(background);
+                passwordTitle.setTextColor(errorColor);
                 break;
         }
     }
@@ -337,20 +373,20 @@ public class SetPasswordDialog extends TwoButtonsAlertDialog implements View.OnC
         switch (v.getId()) {
             case R.id.toggle_button_passwd:
                 if (isPasswordVisible) {
-                    toggleButtonPassword.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_b_shared_read));
+                    toggleButtonPassword.setImageDrawable(hidePassword);
                     isPasswordVisible = false;
                 } else {
-                    toggleButtonPassword.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_b_see));
+                    toggleButtonPassword.setImageDrawable(showPassword);
                     isPasswordVisible = true;
                 }
                 showHidePassword(false);
                 break;
             case R.id.toggle_button_confirm_passwd:
                 if (isPasswordVisible) {
-                    toggleButtonConfirmPassword.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_b_shared_read));
+                    toggleButtonConfirmPassword.setImageDrawable(hidePassword);
                     isPasswordVisible = false;
                 } else {
-                    toggleButtonConfirmPassword.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_b_see));
+                    toggleButtonConfirmPassword.setImageDrawable(showPassword);
                     isPasswordVisible = true;
                 }
                 showHidePassword(true);
