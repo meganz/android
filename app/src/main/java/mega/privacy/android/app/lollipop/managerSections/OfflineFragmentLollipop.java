@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -768,9 +769,9 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 
 	private void sortByName(Boolean isDescending) {
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
+		ArrayList<String> foldersOrder = new ArrayList<>();
+		ArrayList<String> filesOrder = new ArrayList<>();
+		ArrayList<MegaOffline> tempOffline = new ArrayList<>();
 
 		//Remove MK before sorting
 		if (mOffList.size() > 0) {
@@ -833,6 +834,37 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		sortByName(false);
 	}
 
+	private void sortByModificationDate(Boolean isDescending) {
+		ArrayList<MegaOffline> foldersOrder = new ArrayList<>();
+		ArrayList<MegaOffline> filesOrder = new ArrayList<>();
+		ArrayList<MegaOffline> tempOffline = new ArrayList<>();
+
+		//Remove MK before sorting
+		if (mOffList.size() > 0) {
+			MegaOffline lastItem = mOffList.get(mOffList.size() - 1);
+			if (lastItem.getHandle().equals("0")) {
+				mOffList.remove(mOffList.size() - 1);
+			}
+		} else {
+			return;
+		}
+
+		for (MegaOffline node : mOffList) {
+			if (node.getType().equals("1")) {
+				foldersOrder.add(node);
+			} else {
+				filesOrder.add(node);
+			}
+		}
+
+		Comparator<MegaOffline> megaOfflineComparator = new Comparator<MegaOffline>() {
+			@Override
+			public int compare(MegaOffline o1, MegaOffline o2) {
+				return 0;
+			}
+		};
+
+	}
 	public boolean isFolder(String path){
 		log("isFolder");
 
