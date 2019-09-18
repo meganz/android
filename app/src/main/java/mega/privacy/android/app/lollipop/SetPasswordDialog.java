@@ -11,9 +11,11 @@ import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -178,6 +180,16 @@ public class SetPasswordDialog extends AlertDialog implements View.OnClickListen
                     isPasswordVisible = false;
                     showHidePassword(true);
                 }
+            }
+        });
+
+        userPasswordConfirm.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    setButtonClicked();
+                }
+                return false;
             }
         });
 
@@ -392,12 +404,7 @@ public class SetPasswordDialog extends AlertDialog implements View.OnClickListen
                 showHidePassword(true);
                 break;
             case R.id.button_confirm_password:
-                if (validateForm()) {
-                    dismiss();
-                    if (mCallback != null) {
-                        mCallback.onConfirmed(userPassword.getText().toString());
-                    }
-                }
+                setButtonClicked();
                 break;
             case R.id.button_cancel:
                 dismiss();
@@ -405,6 +412,15 @@ public class SetPasswordDialog extends AlertDialog implements View.OnClickListen
                     mCallback.onCanceled();
                 }
                 break;
+        }
+    }
+
+    private void setButtonClicked(){
+        if (validateForm()) {
+            dismiss();
+            if (mCallback != null) {
+                mCallback.onConfirmed(userPassword.getText().toString());
+            }
         }
     }
 
