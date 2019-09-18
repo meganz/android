@@ -766,135 +766,71 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 	}
 
+
+	private void sortByName(Boolean isDescending) {
+		ArrayList<String> foldersOrder = new ArrayList<String>();
+		ArrayList<String> filesOrder = new ArrayList<String>();
+		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
+
+		//Remove MK before sorting
+		if (mOffList.size() > 0) {
+			MegaOffline lastItem = mOffList.get(mOffList.size() - 1);
+			if (lastItem.getHandle().equals("0")) {
+				mOffList.remove(mOffList.size() - 1);
+			}
+		} else {
+			return;
+		}
+
+		for (MegaOffline node : mOffList) {
+			if (node.getType().equals("1")) {
+				foldersOrder.add(node.getName());
+			} else {
+				filesOrder.add(node.getName());
+			}
+		}
+
+		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+
+		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+
+		if (isDescending) {
+			Collections.reverse(foldersOrder);
+			Collections.reverse(filesOrder);
+		}
+
+		for (String name : foldersOrder) {
+			for (MegaOffline megaOffline : mOffList) {
+				if (name.equals(megaOffline.getName())) {
+					tempOffline.add(megaOffline);
+				}
+			}
+		}
+
+		for (String name : filesOrder) {
+			for (MegaOffline megaOffline : mOffList) {
+				if (name.equals(megaOffline.getName())) {
+					tempOffline.add(megaOffline);
+				}
+			}
+		}
+
+		mOffList.clear();
+		mOffList.addAll(tempOffline);
+		if (adapter != null) {
+			adapter.setNodes(mOffList);
+		}
+	}
+
 	public void sortByNameDescending(){
 		log("sortByNameDescending");
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
-		
-		//Remove MK before sorting
-		if(mOffList.size()>0){
-			MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-			if(lastItem.getHandle().equals("0")){
-				mOffList.remove(mOffList.size()-1);
-			}
-		}		
-		else{
-			return;
-		}
-		
-		for(int k = 0; k < mOffList.size() ; k++) {
-			MegaOffline node = mOffList.get(k);
-			if(node.getType().equals("1")){
-				foldersOrder.add(node.getName());
-			}
-			else{
-				filesOrder.add(node.getName());
-			}
-		}		
-	
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(foldersOrder);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(filesOrder);
-
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = foldersOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));
-				}				
-			}
-		}
-		
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = filesOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));					
-				}				
-			}
-		}
-		
-		mOffList.clear();
-		mOffList.addAll(tempOffline);
-		if (adapter!= null) {
-			adapter.setNodes(mOffList);
-		}
-//		contentText.setText(getInfoFolder(mOffList));
+		sortByName(true);
 	}
-    
-    
+
+
     public void sortByNameAscending() {
 		log("sortByNameAscending");
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
-		
-		//Remove MK before sorting
-		if(mOffList.size()>0){
-			MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-			if(lastItem.getHandle().equals("0")){
-				mOffList.remove(mOffList.size()-1);
-			}
-		}		
-		else{
-			return;
-		}
-				
-		for(int k = 0; k < mOffList.size() ; k++) {
-			MegaOffline node = mOffList.get(k);
-			if(node == null) {
-			    continue;
-            }
-			if(node.getType().equals("1")){
-				foldersOrder.add(node.getName());
-			}
-			else{
-				filesOrder.add(node.getName());
-			}
-		}		
-	
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = foldersOrder.get(k);
-                MegaOffline offline = mOffList.get(j);
-                if(offline == null) {
-                    continue;
-                }
-                String nameOffline = offline.getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(offline);
-				}				
-			}			
-		}
-		
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = filesOrder.get(k);
-                MegaOffline offline = mOffList.get(j);
-                if(offline == null) {
-                    continue;
-                }
-                String nameOffline = offline.getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(offline);
-				}				
-			}
-			
-		}
-		
-		mOffList.clear();
-		mOffList.addAll(tempOffline);
-		if (adapter!= null) {
-			adapter.setNodes(mOffList);
-		}
-//		contentText.setText(getInfoFolder(mOffList));
+		sortByName(false);
 	}
 
 	public boolean isFolder(String path){
