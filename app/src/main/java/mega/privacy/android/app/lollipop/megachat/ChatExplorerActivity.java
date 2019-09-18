@@ -258,7 +258,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     public void isPendingToOpenSearchView () {
-        if (pendingToOpenSearchView) {
+        if (pendingToOpenSearchView && searchMenuItem != null && searchView != null) {
             String query = querySearch;
             searchMenuItem.expandActionView();
             searchView.setQuery(query, false);
@@ -416,7 +416,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             intent.putExtra("SELECTED_CHATS", chatHandles);
         }
 
-        if (users != null && !chats.isEmpty()) {
+        if (users != null && !users.isEmpty()) {
             long[] userHandles = new long[users.size()];
             for (int i=0; i<users.size(); i++) {
                 userHandles[i] = users.get(i).getHandle();

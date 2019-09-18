@@ -12621,7 +12621,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			log("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			log("Send to "+chatHandles.length+" chats");
 
 			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
 
