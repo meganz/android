@@ -1438,6 +1438,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
         if (this.multipleSelect) {
             selectedItems = new SparseBooleanArray();
+        } else if (selectedItems != null) {
+            selectedItems.clear();
         }
     }
 

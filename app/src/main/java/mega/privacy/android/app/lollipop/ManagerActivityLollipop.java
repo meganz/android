@@ -9215,31 +9215,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		hideFabButton();
 	}
 
-	public void refreshAfterMovingToRubbish(){
+	public void refreshAfterMovingToRubbish() {
 		log("refreshAfterMovingToRubbish");
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-			//Refresh Cloud Fragment
 			refreshCloudDrive();
-
-			//Refresh Rubbish Fragment
-			refreshRubbishBin();
-		}
-		else if (drawerItem == DrawerItem.INBOX){
+		} else if (drawerItem == DrawerItem.INBOX) {
 			onNodesInboxUpdate();
-			refreshRubbishBin();
-		}
-		else if (drawerItem == DrawerItem.SHARED_ITEMS){
+		} else if (drawerItem == DrawerItem.SHARED_ITEMS) {
 			onNodesSharedUpdate();
-
-			//Refresh Rubbish Fragment
-			refreshRubbishBin();
-
-		}else if(drawerItem == DrawerItem.SEARCH){
+		} else if (drawerItem == DrawerItem.SEARCH) {
 			refreshSearch();
-			//Refresh Rubbish Fragment
-			refreshRubbishBin();
 		}
+
+		refreshRubbishBin();
 		setToolbarTitle();
 	}
 
@@ -9254,6 +9243,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
 			}
 
+			rubbishBinFLol.hideMultipleSelect();
 			rubbishBinFLol.setNodes(nodes);
 			rubbishBinFLol.getRecyclerView().invalidate();
 		}

@@ -365,10 +365,28 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionMove.setVisibility(View.GONE);
                             counterRemove--;
                             optionRubbishBin.setVisibility(View.GONE);
+                            counterShares--;
+                            optionLink.setVisibility(View.GONE);
+                            nodeIconLayout.setVisibility(View.GONE);
+                            optionLinkText.setText(R.string.context_get_link_menu);
+                            counterShares--;
+                            optionRemoveLink.setVisibility(View.GONE);
                             break;
                         }
                         case MegaShare.ACCESS_FULL:
                         case MegaShare.ACCESS_OWNER: {
+                            optionLink.setVisibility(View.VISIBLE);
+                            if (node.isExported()) {
+                                nodeIconLayout.setVisibility(View.VISIBLE);
+                                nodeIcon.setImageResource(R.drawable.link_ic);
+                                optionLinkText.setText(R.string.edit_link_option);
+                                optionRemoveLink.setVisibility(View.VISIBLE);
+                            } else {
+                                nodeIconLayout.setVisibility(View.GONE);
+                                optionLinkText.setText(R.string.context_get_link_menu);
+                                counterShares--;
+                                optionRemoveLink.setVisibility(View.GONE);
+                            }
                             break;
                         }
                     }
