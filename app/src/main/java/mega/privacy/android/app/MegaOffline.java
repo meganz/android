@@ -5,12 +5,8 @@ import android.content.Context;
 import java.io.File;
 
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflineSize;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflinesSizeInRaw;
 
 public class MegaOffline {
 	
@@ -137,7 +133,12 @@ public class MegaOffline {
 	}
 
 	public long getSize(Context context) {
-		return getOfflinesSizeInRaw(context);
+		File offlineNode = getOfflineFile(context, this);
+		if (offlineNode.exists()) {
+			return offlineNode.length();
+		} else {
+			return 0;
+		}
 	}
 
 	private static void log(String log) {

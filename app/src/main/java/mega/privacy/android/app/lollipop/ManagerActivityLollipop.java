@@ -250,6 +250,8 @@ import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC;
 import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
 import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -12934,21 +12936,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 		if (oFLol != null){
 			oFLol.setOrder(orderOthers);
-			switch(orderOthers) {
-				case ORDER_DEFAULT_ASC : {
+			switch (orderOthers) {
+				case ORDER_DEFAULT_ASC: {
 					oFLol.sortByNameAscending();
 					break;
 				}
-				case ORDER_DEFAULT_DESC : {
+				case ORDER_DEFAULT_DESC: {
 					oFLol.sortByNameDescending();
 					break;
 				}
-				case ORDER_MODIFICATION_ASC : {
+				case ORDER_MODIFICATION_ASC: {
+					oFLol.sortByModificationDate(true);
+					break;
+				}
+				case ORDER_MODIFICATION_DESC: {
 					oFLol.sortByModificationDate(false);
 					break;
 				}
-				case ORDER_MODIFICATION_DESC : {
-					oFLol.sortByModificationDate(true);
+				case ORDER_SIZE_ASC: {
+					oFLol.sortBySize(true);
+					break;
+				}
+				case ORDER_SIZE_DESC: {
+					oFLol.sortBySize(false);
+					break;
+				}
+				default: {
 					break;
 				}
 			}

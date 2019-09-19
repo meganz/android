@@ -309,17 +309,6 @@ public class OfflineUtils {
         return new File(path + File.separator + MegaApiUtils.createStringTree(node, context));
     }
 
-    public static long getOfflinesSizeInRaw(Context context) {
-        log("getOfflineSizeInRaw");
-        File offline = getOfflineFolder(context, OFFLINE_DIR);
-        long size;
-        if (isFileAvailable(offline)) {
-            return getDirSize(offline);
-        }
-
-        return 0;
-    }
-
     public static String getOfflineSize(Context context) {
         log("getOfflineSize");
         File offline = getOfflineFolder(context, OFFLINE_DIR);
