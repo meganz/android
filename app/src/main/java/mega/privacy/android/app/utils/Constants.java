@@ -383,8 +383,11 @@ public class Constants {
     public static final int EMOJI_SIZE_MEDIUM = 25;
     public static final int EMOJI_AVATAR_SIZE = 30;
     public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
+    public static final int EMOJI_AVATAR_CALL_SMALL = 40;
+    public static final int EMOJI_AVATAR_CALL_HIGH = 60;
 
-	public static final String[] FILE_LINK_REGEXS = {
+
+    public static final String[] FILE_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#!.+$",
 			"^https://mega\\.nz/#!.+$"
 	};
