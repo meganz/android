@@ -3982,7 +3982,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		error_layout_firtName.setVisibility(View.GONE);
 
-		final EditText inputLastName = new EditText(this);
+		final EmojiEditText inputLastName = new EmojiEditText(this);
 		inputLastName.getBackground().mutate().clearColorFilter();
 		inputLastName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputLastName, params);
