@@ -13,6 +13,8 @@ import android.support.v4.content.ContextCompat;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +43,15 @@ public class OfflineUtils {
 
     private static final String DB_FILE = "0";
     private static final String DB_FOLDER = "1";
+
+    public enum Sort_Condition {
+        Sort_By_Name_Asc,
+        Sort_By_Name_Desc,
+        Sort_By_Size_Asc,
+        Sort_By_Size_Desc,
+        Sort_by_Modification_Date_Asc,
+        Sort_by_Modification_Date_Desc
+    }
 
     public static void saveOffline (File destination, MegaNode node, Context context, Activity activity, MegaApiAndroid megaApi){
         log("saveOffline");
@@ -642,6 +653,104 @@ public class OfflineUtils {
     private static File findOldOfflineFile(MegaOffline offlineNode) {
         String path = getOldTempFolder(MAIN_DIR).getAbsolutePath() + File.separator;
         return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
+    }
+
+
+    public static void sort(Sort_Condition condition, ArrayList<MegaOffline> mOffList, final Context context) {
+        ArrayList<MegaOffline> foldersOrder = new ArrayList<>();
+        ArrayList<MegaOffline> filesOrder = new ArrayList<>();
+        ArrayList<MegaOffline> tempOffline = new ArrayList<>();
+
+        //Remove MK before sorting
+        if (mOffList.size() > 0) {
+            MegaOffline lastItem = mOffList.get(mOffList.size() - 1);
+            if (lastItem.getHandle().equals("0")) {
+                mOffList.remove(mOffList.size() - 1);
+            }
+        } else {
+            return;
+        }
+
+        for (MegaOffline node : mOffList) {
+            if (node.getType().equals("1")) {
+                foldersOrder.add(node);
+            } else {
+                filesOrder.add(node);
+            }
+        }
+
+        Comparator<MegaOffline> modificationDateComparator = new Comparator<MegaOffline>() {
+            @Override
+            public int compare(MegaOffline o1, MegaOffline o2) {
+                return Long.compare(o1.getModificationDate(context), o2.getModificationDate(context));
+            }
+        };
+
+        Comparator<MegaOffline> sizeComparator = new Comparator<MegaOffline>() {
+            @Override
+            public int compare(MegaOffline o1, MegaOffline o2) {
+                return Long.compare(o1.getSize(context), o2.getSize(context));
+            }
+        };
+
+        Comparator<MegaOffline> nameComparator = new Comparator<MegaOffline>() {
+            @Override
+            public int compare(MegaOffline o1, MegaOffline o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        };
+
+        Comparator comparator = nameComparator;
+        switch (condition) {
+            case Sort_By_Name_Asc:
+            case Sort_By_Name_Desc: {
+                comparator = nameComparator;
+                break;
+            }
+            case Sort_by_Modification_Date_Asc:
+            case Sort_by_Modification_Date_Desc: {
+                comparator = modificationDateComparator;
+                break;
+            }
+            case Sort_By_Size_Asc:
+            case Sort_By_Size_Desc: {
+                comparator = sizeComparator;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+        Collections.sort(foldersOrder, comparator);
+
+        Collections.sort(filesOrder, comparator);
+
+        Boolean isAscending = false;
+        switch (condition) {
+            case Sort_By_Name_Asc:
+            case Sort_by_Modification_Date_Asc:
+            case Sort_By_Size_Asc: {
+                isAscending = true;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+
+        if (isAscending) {
+            Collections.reverse(foldersOrder);
+            Collections.reverse(filesOrder);
+        }
+
+        tempOffline.addAll(foldersOrder);
+
+        tempOffline.addAll(filesOrder);
+
+        mOffList.clear();
+        mOffList.addAll(tempOffline);
     }
 
     public static void log(String message) {
