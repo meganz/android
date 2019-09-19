@@ -8484,7 +8484,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							smallestCheck.setChecked(false);
 		        			break;
 		        		}
-						case MegaApiJava.ORDER_CREATION_ASC:{
+						case MegaApiJava.ORDER_MODIFICATION_ASC:{
 							log("CREATION ASC");
 							ascendingCheck.setChecked(false);
 							descendingCheck.setChecked(false);
@@ -8494,7 +8494,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							smallestCheck.setChecked(false);
 							break;
 						}
-						case MegaApiJava.ORDER_CREATION_DESC:{
+						case MegaApiJava.ORDER_MODIFICATION_DESC:{
 							log("CREATION DESC");
 							ascendingCheck.setChecked(false);
 							descendingCheck.setChecked(false);
@@ -8898,7 +8898,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
 								if (orderOthers != MegaApiJava.ORDER_CREATION_ASC) {
-									selectSortByOffline(MegaApiJava.ORDER_CREATION_ASC);
+									selectSortByOffline(ORDER_MODIFICATION_ASC);
 								}
 								if (dialog != null) {
 									dialog.dismiss();
@@ -8916,7 +8916,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
 								if (orderOthers != MegaApiJava.ORDER_CREATION_DESC) {
-									selectSortByOffline(MegaApiJava.ORDER_CREATION_DESC);
+									selectSortByOffline(MegaApiJava.ORDER_MODIFICATION_DESC);
 								}
 								if (dialog != null) {
 									dialog.dismiss();

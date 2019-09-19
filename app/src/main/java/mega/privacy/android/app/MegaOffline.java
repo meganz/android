@@ -1,8 +1,16 @@
 package mega.privacy.android.app;
 
+import android.content.Context;
+
+import java.io.File;
+
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineSize;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflinesSizeInRaw;
 
 public class MegaOffline {
 	
@@ -119,22 +127,17 @@ public class MegaOffline {
 		this.origin = origin;
 	}
 
-	public long getModificationDate(MegaApiAndroid megaApi) {
-		MegaNode node = megaApi.getNodeByHandle(Long.parseLong(this.getHandle()));
-		if (node != null) {
-			return node.getModificationTime();
+	public long getModificationDate(Context context) {
+		File offlineNode = getOfflineFile(context, this);
+		if (offlineNode.exists()) {
+			return offlineNode.lastModified();
 		} else {
 			return 0;
 		}
 	}
 
-	public long getSize(MegaApiAndroid megaApi) {
-		MegaNode node = megaApi.getNodeByHandle(Long.parseLong(this.getHandle()));
-		if (node != null) {
-			return node.getSize();
-		} else {
-			return 0;
-		}
+	public long getSize(Context context) {
+		return getOfflinesSizeInRaw(context);
 	}
 
 	private static void log(String log) {

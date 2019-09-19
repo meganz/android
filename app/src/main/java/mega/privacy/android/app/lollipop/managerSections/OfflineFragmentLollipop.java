@@ -102,7 +102,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	ArrayList<MegaOffline> mOffList= null;
 	String pathNavigation = null;
 	TextView contentText;
-//	boolean isList = true;
 	int orderGetChildren;
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
@@ -394,7 +393,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			log("ActionBarCallBack::onPrepareActionMode");
-//			ContextCompat.getDrawable(context, R.drawable.ic_arrow_back_white)
 			List<MegaOffline> selected = adapter.getSelectedOfflineNodes();
 			
 			if (Util.isOnline(context)){
@@ -491,8 +489,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		else{
 			megaApi=null;
 		}			
-		
-//		dbH = new DatabaseHandler(context);
+
 		lastPositionStack = new Stack<>();
 
 		dbH = DatabaseHandler.getDbHandler(context);
@@ -526,7 +523,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-//		    isList = ((ManagerActivityLollipop)context).isList();
 			orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
 		}
 
@@ -542,7 +538,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
             recyclerView.removeItemDecoration(headerItemDecoration);
             headerItemDecoration = null;
-//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			//Add bottom padding for recyclerView like in other fragments.
@@ -604,12 +599,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-//					contentText.setText(getInfoFolder(mOffList));
 				}
 			}
 			else{
 			    adapter.setRecylerView(recyclerView);
-//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
 			return v;
@@ -680,12 +673,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-//					contentText.setText(getInfoFolder(mOffList));
 				}
 			}
 			else{
                 adapter.setRecylerView(recyclerView);
-//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
 			return v;
@@ -762,7 +753,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-//				contentText.setText(getInfoFolder(mOffList));
 			}
 		}
 	}
@@ -860,8 +850,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		Comparator<MegaOffline> megaOfflineComparator = new Comparator<MegaOffline>() {
 			@Override
 			public int compare(MegaOffline o1, MegaOffline o2) {
-				long o1ModificationDate = o1.getModificationDate(megaApi);
-				long o2ModificationDate = o2.getModificationDate(megaApi);
+				long o1ModificationDate = o1.getModificationDate(getContext());
+				long o2ModificationDate = o2.getModificationDate(getContext());
 				if (o1ModificationDate < o2ModificationDate) {
 					return -1;
 				} else if (o1ModificationDate > o2ModificationDate) {
@@ -912,7 +902,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	
 	private String getInfoFolder(ArrayList<MegaOffline> mOffInfo) {
 		log("getInfoFolder");
-//		log("primer elemento: "+mOffInfo.get(0).getName());
 		
 		String info = "";
 		int numFolders=0;
@@ -1007,8 +996,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			if(currentNode.getHandle().equals("0")){
 				log("click on Master Key");
 				openFile(buildExternalStorageFile(RK_FILE));
-//				viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
-//				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
 				return;
 			}
 			currentFile = getOfflineFile(context, currentNode);
@@ -1066,7 +1053,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						}			
 					}
 				}
-//				contentText.setText(getInfoFolder(mOffList));
 				adapter.setNodes(mOffList);
 				
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1213,8 +1199,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
 
-						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
-
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 
 						pdfIntent.putExtra("inside", true);
@@ -1334,14 +1318,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	private void clearSelections() {
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
-		}else{
-//			if(adapter.getItemCount() == 1 ){
-//				boolean result = adapter.isRecoveryKey(adapter.getItemOff(0));
-//				if(result){
-//
-//					adapter.clearSelections();
-//				}
-//			}
 		}
 	}
 
@@ -1457,11 +1433,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					((ManagerActivityLollipop)context).setToolbarTitle();
 				}
 
-//				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();
 				mOffList = dbH.findByPath(pathNavigation);
-				
-//				contentText.setText(getInfoFolder(mOffList));
-				
+
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 					sortByNameDescending();
 				}
@@ -1487,8 +1460,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 					}
 				}
-
-				//adapterList.setNodes(mOffList);
 				
 				return 2;
 			}
@@ -1576,7 +1547,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			if (adapter == null) {
 				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			} else {
-//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 				adapter.setNodes(mOffList);
 				adapter.notifyDataSetChanged();
 				recyclerView.invalidate();
@@ -1586,7 +1556,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			if (adapter == null) {
 				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			} else {
-//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 				adapter.setNodes(mOffList);
                 adapter.notifyDataSetChanged();
                 recyclerView.invalidate();
@@ -1624,7 +1593,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-//			contentText.setText(getInfoFolder(mOffList));
 		}
 		addSectionTitle(mOffList);
 		setPositionClicked(-1);
@@ -1646,7 +1614,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			if (adapter == null) {
 				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			} else {
-//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 				adapter.setNodes(mOffList);
 			}
 		} else {
@@ -1654,19 +1621,16 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			if (adapter == null) {
 				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			} else {
-//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 				adapter.setNodes(mOffList);
 			}
 		}
 		addSectionTitle(mOffList);
-//		setNodes(mOffList);
 		recyclerView.invalidate();
 	}
 	
 	public void refreshPaths(MegaOffline mOff){
 		log("refreshPaths(MegaOffline mOff): "+mOff.getName());
 		int index=0;
-//		MegaOffline retFindPath = null;
 		
 		//Find in the tree, the last existing node
 		String pNav= mOff.getPath();
@@ -1698,7 +1662,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 		((ManagerActivityLollipop)context).setToolbarTitle();
 		log("At the end of refreshPaths the path is: "+pathNavigation);
-//		contentText.setText(getInfoFolder(mOffList));
 		setNodes(mOffList);
 	}
 	
@@ -1764,7 +1727,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		this.pathNavigation = _pathNavigation;
 		addSectionTitle(mOffList);
 		if (adapter != null){
-//			contentText.setText(getInfoFolder(mOffList));
 			adapter.setNodes(dbH.findByPath(_pathNavigation));
 		}
 	}
@@ -1777,11 +1739,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	private static void log(String log) {
 		Util.log("OfflineFragmentLollipop", log);
 	}
-	
-//	private void dlog(Object o) {
-//		String s = (o == null) ? "NULL" : o.toString();
-//		Log.e("@#$","---> " + s);
-//	}
 	
 	public String getPathNavigation() {
 		log("getPathNavigation");
