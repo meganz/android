@@ -246,6 +246,10 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -473,9 +477,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
 
-	public int orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
-	public int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
-	public int orderOthers = MegaApiJava.ORDER_DEFAULT_ASC;
+	public int orderCloud = ORDER_DEFAULT_ASC;
+	public int orderContacts = ORDER_DEFAULT_ASC;
+	public int orderOthers = ORDER_DEFAULT_ASC;
 	public int orderCamera = MegaApiJava.ORDER_MODIFICATION_DESC;
 //	private int orderOffline = MegaApiJava.ORDER_DEFAULT_ASC;
 //	private int orderOutgoing = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -2021,7 +2025,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("The orderCloud preference is: "+orderCloud);
 			}
 			else{
-				orderCloud = megaApi.ORDER_DEFAULT_ASC;
+				orderCloud = ORDER_DEFAULT_ASC;
 				log("Preference orderCloud is NULL -> ORDER_DEFAULT_ASC");
 			}
 			if(prefs.getPreferredSortContacts()!=null){
@@ -2029,7 +2033,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("The orderContacts preference is: "+orderContacts);
 			}
 			else{
-				orderContacts = megaApi.ORDER_DEFAULT_ASC;
+				orderContacts = ORDER_DEFAULT_ASC;
 				log("Preference orderContacts is NULL -> ORDER_DEFAULT_ASC");
 			}
 			if(prefs.getPreferredSortOthers()!=null){
@@ -2037,15 +2041,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("The orderOthers preference is: "+orderOthers);
 			}
 			else{
-				orderOthers = megaApi.ORDER_DEFAULT_ASC;
+				orderOthers = ORDER_DEFAULT_ASC;
 				log("Preference orderOthers is NULL -> ORDER_DEFAULT_ASC");
 			}
 		}
 		else {
 			log("Prefs is NULL -> ORDER_DEFAULT_ASC");
-			orderCloud = megaApi.ORDER_DEFAULT_ASC;
-			orderContacts = megaApi.ORDER_DEFAULT_ASC;
-			orderOthers = megaApi.ORDER_DEFAULT_ASC;
+			orderCloud = ORDER_DEFAULT_ASC;
+			orderContacts = ORDER_DEFAULT_ASC;
+			orderOthers = ORDER_DEFAULT_ASC;
 		}
 		getOverflowMenu();
 
@@ -8427,7 +8431,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         		sortByDialog.show();
         		if(drawerItem==DrawerItem.CONTACTS){
         			switch(orderContacts){
-		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
+		        		case ORDER_DEFAULT_ASC:{
 		        			ascendingCheck.setChecked(true);
 		        			descendingCheck.setChecked(false);
 							newestCheck.setChecked(false);
@@ -8460,7 +8464,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         		else if(drawerItem==DrawerItem.SAVED_FOR_OFFLINE){
         			log("orderOthers: "+orderOthers);
         			switch(orderOthers){
-						case MegaApiJava.ORDER_DEFAULT_ASC: {
+						case ORDER_DEFAULT_ASC: {
 							log("ASCE");
 							ascendingCheck.setChecked(true);
 							descendingCheck.setChecked(false);
@@ -8528,7 +8532,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if(index==1){
 							if (parentHandleOutgoing == -1){
 								switch(orderOthers){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
+									case ORDER_DEFAULT_ASC:{
 										log("ASCE");
 										ascendingCheck.setChecked(true);
 										descendingCheck.setChecked(false);
@@ -8544,7 +8548,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							}
 							else{
 								switch(orderCloud){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
+									case ORDER_DEFAULT_ASC:{
 										ascendingCheck.setChecked(true);
 										descendingCheck.setChecked(false);
 										newestCheck.setChecked(false);
@@ -8604,7 +8608,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						else{
 							if (parentHandleIncoming == -1){
 								switch(orderOthers){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
+									case ORDER_DEFAULT_ASC:{
 										log("ASCE");
 										ascendingCheck.setChecked(true);
 										descendingCheck.setChecked(false);
@@ -8620,7 +8624,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							}
 							else{
 								switch(orderCloud){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
+									case ORDER_DEFAULT_ASC:{
 										ascendingCheck.setChecked(true);
 										descendingCheck.setChecked(false);
 										newestCheck.setChecked(false);
@@ -8698,7 +8702,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         		else{
 					log("orderCloud: "+orderCloud);
 	        		switch(orderCloud){
-		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
+		        		case ORDER_DEFAULT_ASC:{
 		        			ascendingCheck.setChecked(true);
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
@@ -8776,9 +8780,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								newestCheck.setChecked(false);
 								oldestCheck.setChecked(false);
 								log("order contacts value _ "+orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_ASC){
+								if(orderContacts!= ORDER_DEFAULT_ASC){
 									log("call to selectSortByContacts ASC _ "+orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_DEFAULT_ASC);
+									selectSortByContacts(ORDER_DEFAULT_ASC);
 								}
 			        			if (dialog != null){
 			        				dialog.dismiss();
@@ -8856,8 +8860,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								oldestCheck.setChecked(false);
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
-								if (orderOthers != MegaApiJava.ORDER_DEFAULT_ASC) {
-									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_ASC);
+								if (orderOthers != ORDER_DEFAULT_ASC) {
+									selectSortByOffline(ORDER_DEFAULT_ASC);
 								}
 								if (dialog != null) {
 									dialog.dismiss();
@@ -8983,8 +8987,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								public void onClick(View v) {
 									ascendingCheck.setChecked(true);
 									descendingCheck.setChecked(false);
-									if(orderOthers!=MegaApiJava.ORDER_DEFAULT_ASC){
-										refreshOthersOrder(MegaApiJava.ORDER_DEFAULT_ASC);
+									if(orderOthers!= ORDER_DEFAULT_ASC){
+										refreshOthersOrder(ORDER_DEFAULT_ASC);
 									}
 
 									if (dialog != null){
@@ -9024,7 +9028,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									largestCheck.setChecked(false);
 									smallestCheck.setChecked(false);
 
-									refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_ASC);
+									refreshCloudOrder(ORDER_DEFAULT_ASC);
 
 									if (dialog != null){
 										dialog.dismiss();
@@ -9190,7 +9194,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        			largestCheck.setChecked(false);
 			        			smallestCheck.setChecked(false);
 
-								refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_ASC);
+								refreshCloudOrder(ORDER_DEFAULT_ASC);
 
 			        			if (dialog != null){
 			        				dialog.dismiss();
@@ -12930,12 +12934,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 		if (oFLol != null){
 			oFLol.setOrder(orderOthers);
-			if (orderOthers == MegaApiJava.ORDER_DEFAULT_ASC){
-				oFLol.sortByNameAscending();
+			switch(orderOthers) {
+				case ORDER_DEFAULT_ASC : {
+					oFLol.sortByNameAscending();
+					break;
+				}
+				case ORDER_DEFAULT_DESC : {
+					oFLol.sortByNameDescending();
+					break;
+				}
+				case ORDER_MODIFICATION_ASC : {
+					oFLol.sortByModificationDate(false);
+					break;
+				}
+				case ORDER_MODIFICATION_DESC : {
+					oFLol.sortByModificationDate(true);
+					break;
+				}
 			}
-			else{
-				oFLol.sortByNameDescending();
-			}
+
 		}
 	}
 

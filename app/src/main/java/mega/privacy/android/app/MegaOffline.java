@@ -1,6 +1,8 @@
 package mega.privacy.android.app;
 
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 
 public class MegaOffline {
 	
@@ -115,6 +117,24 @@ public class MegaOffline {
 
 	public void setOrigin(int origin) {
 		this.origin = origin;
+	}
+
+	public long getModificationDate(MegaApiAndroid megaApi) {
+		MegaNode node = megaApi.getNodeByHandle(Long.parseLong(this.getHandle()));
+		if (node != null) {
+			return node.getModificationTime();
+		} else {
+			return 0;
+		}
+	}
+
+	public long getSize(MegaApiAndroid megaApi) {
+		MegaNode node = megaApi.getNodeByHandle(Long.parseLong(this.getHandle()));
+		if (node != null) {
+			return node.getSize();
+		} else {
+			return 0;
+		}
 	}
 
 	private static void log(String log) {

@@ -834,7 +834,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		sortByName(false);
 	}
 
-	private void sortByModificationDate(Boolean isDescending) {
+	public void sortByModificationDate(Boolean isDescending) {
 		ArrayList<MegaOffline> foldersOrder = new ArrayList<>();
 		ArrayList<MegaOffline> filesOrder = new ArrayList<>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<>();
@@ -860,11 +860,39 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		Comparator<MegaOffline> megaOfflineComparator = new Comparator<MegaOffline>() {
 			@Override
 			public int compare(MegaOffline o1, MegaOffline o2) {
-				return 0;
+				long o1ModificationDate = o1.getModificationDate(megaApi);
+				long o2ModificationDate = o2.getModificationDate(megaApi);
+				if (o1ModificationDate < o2ModificationDate) {
+					return -1;
+				} else if (o1ModificationDate > o2ModificationDate) {
+					return 1;
+				} else {
+					return 0;
+				}
 			}
 		};
 
+		Collections.sort(foldersOrder, megaOfflineComparator);
+
+		Collections.sort(filesOrder, megaOfflineComparator);
+
+		if (isDescending) {
+			Collections.reverse(foldersOrder);
+			Collections.reverse(filesOrder);
+		}
+
+		tempOffline.addAll(foldersOrder);
+
+		tempOffline.addAll(filesOrder);
+
+		mOffList.clear();
+		mOffList.addAll(tempOffline);
+		if (adapter != null) {
+			adapter.setNodes(mOffList);
+		}
+
 	}
+
 	public boolean isFolder(String path){
 		log("isFolder");
 
