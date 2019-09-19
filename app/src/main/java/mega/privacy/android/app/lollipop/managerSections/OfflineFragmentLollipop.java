@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,7 +36,6 @@ import android.widget.TextView;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -51,7 +49,6 @@ import java.util.Stack;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
@@ -81,39 +78,32 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public static ImageView imageDrag;
 	public static final String REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list";
-	
-	MegaPreferences prefs;
-	
-	Context context;
-	ActionBar aB;
-	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
 
-	Stack<Integer> lastPositionStack;
+	private Context context;
+	private ActionBar aB;
+	private RecyclerView recyclerView;
+	private LinearLayoutManager mLayoutManager;
+	private CustomizedGridLayoutManager gridLayoutManager;
+
+	private Stack<Integer> lastPositionStack;
 	public NewHeaderItemDecoration headerItemDecoration;
-	ImageView emptyImageView;
-	LinearLayout emptyTextView;
-	TextView emptyTextViewFirst;
+	private ImageView emptyImageView;
+	private LinearLayout emptyTextView;
+	private TextView emptyTextViewFirst;
 
 	MegaOfflineLollipopAdapter adapter;
-	OfflineFragmentLollipop offlineFragment = this;
 	DatabaseHandler dbH = null;
-	ArrayList<MegaOffline> mOffList= null;
+	ArrayList<MegaOffline> mOffList = null;
 	String pathNavigation = null;
 	TextView contentText;
 	int orderGetChildren;
-	public static String DB_FILE = "0";
-	public static String DB_FOLDER = "1";
-	MegaApiAndroid megaApi;
-	RelativeLayout contentTextLayout;
-	
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
+	private static String DB_FILE = "0";
+	private static String DB_FOLDER = "1";
+	private MegaApiAndroid megaApi;
+	private RelativeLayout contentTextLayout;
 
 	private ActionMode actionMode;
-	
+
 	private int placeholderCount;
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -122,8 +112,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			refresh();
 		}
 	};
-
-	private int lastPlaceHolderCount;
 
 	@Override
 	public void onResume(){
@@ -303,7 +291,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				}
 				case R.id.cab_menu_share:{
 					//Check that all the selected options are folders
-					ArrayList<Long> handleList = new ArrayList<Long>();
+					ArrayList<Long> handleList = new ArrayList<>();
 					for (int i=0;i<documents.size();i++){
 						String path = documents.get(i).getPath() + documents.get(i).getName();
 						MegaNode n = megaApi.getNodeByPath(path);
@@ -320,7 +308,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_move:{					
-					ArrayList<Long> handleList = new ArrayList<Long>();
+					ArrayList<Long> handleList = new ArrayList<>();
 					for (int i=0;i<documents.size();i++){
 						String path = documents.get(i).getPath() + documents.get(i).getName();
 						MegaNode n = megaApi.getNodeByPath(path);			
@@ -494,7 +482,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		
-		mOffList = new ArrayList<MegaOffline>();
+		mOffList = new ArrayList<>();
 	}
 
 	public void checkScroll () {
@@ -526,16 +514,15 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
 		}
 
-		display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
+		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics();
 	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
 
 		//Check pathNAvigation
 		if (((ManagerActivityLollipop)context).isList){
 			log("onCreateList");
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
-			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
+			recyclerView = v.findViewById(R.id.offline_view_browser);
             recyclerView.removeItemDecoration(headerItemDecoration);
             headerItemDecoration = null;
 			mLayoutManager = new LinearLayoutManager(context);
@@ -552,11 +539,11 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				}
 			});
 
-			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
-			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text);
-			emptyTextViewFirst = (TextView) v.findViewById(R.id.offline_empty_text_first);
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.offline_content_text);			
+			emptyImageView = v.findViewById(R.id.offline_empty_image);
+			emptyTextView = v.findViewById(R.id.offline_empty_text);
+			emptyTextViewFirst = v.findViewById(R.id.offline_empty_text_first);
+			contentTextLayout = v.findViewById(R.id.offline_content_text_layout);
+			contentText = v.findViewById(R.id.offline_content_text);
 
 			findNodes();
 			addSectionTitle(mOffList);
@@ -626,12 +613,12 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				}
 			});
 			
-			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image_grid);
-			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text_grid);
-			emptyTextViewFirst = (TextView) v.findViewById(R.id.offline_empty_text_grid_first);
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_grid_text_layout);
+			emptyImageView = v.findViewById(R.id.offline_empty_image_grid);
+			emptyTextView = v.findViewById(R.id.offline_empty_text_grid);
+			emptyTextViewFirst = v.findViewById(R.id.offline_empty_text_grid_first);
+			contentTextLayout = v.findViewById(R.id.offline_content_grid_text_layout);
 
-			contentText = (TextView) v.findViewById(R.id.offline_content_text_grid);			
+			contentText = v.findViewById(R.id.offline_content_text_grid);
 
 			findNodes();
 			addSectionTitle(mOffList);
@@ -660,7 +647,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
-					Spanned result = null;
+					Spanned result;
 					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 					} else {
@@ -739,8 +726,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
-				catch (Exception e){}
-				Spanned result = null;
+				catch (Exception e){
+					e.printStackTrace();
+				}
+				Spanned result;
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 				} else {
@@ -932,73 +921,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		{
 			return false;
 		}
-		
-		if(n.isFile()){
-			return false;
-		}
-		else{
-			return true;
-		}		
-	}
-	
-	private String getInfoFolder(ArrayList<MegaOffline> mOffInfo) {
-		log("getInfoFolder");
-		
-		String info = "";
-		int numFolders=0;
-		int numFiles=0;
-		
-		if(mOffInfo.size()>0){
-			String pathI = getOfflineAbsolutePath(context, mOffInfo.get(0));
-			
-			for(int i=0; i<mOffInfo.size();i++){
-				MegaOffline mOff = (MegaOffline) mOffInfo.get(i);
-				String path = pathI + mOff.getPath() + mOff.getName();			
-
-				File destination = new File(path);
-				if (destination.exists()){
-					if(destination.isFile()){
-						numFiles++;					
-					}
-					else{
-						numFolders++;					
-					}
-				}
-				else{
-					log("File do not exist");
-				}		
-			}
-		}
-		
-		//Check if the file MarterKey is exported
-		log("Export in: "+getExternalStoragePath(RK_FILE));
-		File file= buildExternalStorageFile(RK_FILE);
-		if(isFileAvailable(file)){
-			numFiles++;
-		}
-		
-		if (numFolders > 0) {
-			info = numFolders
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info
-						+ ", "
-						+ numFiles
-						+ " "
-						+ context.getResources().getQuantityString(
-								R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			info = numFiles
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_files, numFiles);
-		}
-
-		log(info);
-		return info;
+		return n.isFolder();
 	}
 
 	@Override
@@ -1032,7 +955,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 		else{
 			MegaOffline currentNode = mOffList.get(position);
-			File currentFile=null;
+			File currentFile;
 			
 			if(currentNode.getHandle().equals("0")){
 				log("click on Master Key");
@@ -1042,7 +965,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			currentFile = getOfflineFile(context, currentNode);
 			if(isFileAvailable(currentFile) && currentFile.isDirectory()){
 
-				int lastFirstVisiblePosition = 0;
+				int lastFirstVisiblePosition;
 				if(((ManagerActivityLollipop)context).isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
@@ -1121,8 +1044,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
-					catch (Exception e){}
-					Spanned result = null;
+					catch (Exception e){
+						e.printStackTrace();
+					}
+					Spanned result;
 					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 					} else {
@@ -1295,7 +1220,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 							// close the file.
 							try {
 								instream.close();
-							} catch (IOException e) {
+							} catch (Exception e) {
 								log("EXCEPTION closing InputStream");
 							}
 						}
@@ -1320,7 +1245,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		log("openFile");
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 
-    	String type = "";
+    	String type;
 		if (MimeTypeList.typeForName(currentFile.getName()).isURL()){
 			type = "text/plain";
 		}
@@ -1352,15 +1277,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 		}
     }
-	
-	/*
-	 * Clear all selected items
-	 */
-	private void clearSelections() {
-		if(adapter.isMultipleSelect()){
-			adapter.clearSelections();
-		}
-	}
 
 	@Override
 	protected void updateActionModeTitle() {
@@ -1376,7 +1292,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			String pathI = getOfflineAbsolutePath(context, documents.get(0));
 			
 			for(int i=0; i<documents.size();i++){
-				MegaOffline mOff = (MegaOffline) documents.get(i);
+				MegaOffline mOff = documents.get(i);
 				String path = pathI + mOff.getPath() + mOff.getName();			
 
 				File destination = new File(path);
@@ -1393,23 +1309,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				}		
 			}
 		}
-		
-		Resources res = getActivity().getResources();
-		/*String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
-		String title;
-		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
-		} else if (files == 0) {
-			title = foldersStr;
-		} else if (folders == 0) {
-			title = filesStr;
-		} else {
-			title = foldersStr + ", " + filesStr;
-		}*/
 
 		String title;
 		int sum=files+folders;
@@ -1540,8 +1439,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
-				catch (Exception e){}
-				Spanned result = null;
+				catch (Exception e){
+					e.printStackTrace();
+				}
+				Spanned result;
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 				} else {
@@ -1619,8 +1520,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
 				textToShow = textToShow.replace("[/B]", "</font>");
 			}
-			catch (Exception e){}
-			Spanned result = null;
+			catch (Exception e){
+				e.printStackTrace();
+			}
+			Spanned result;
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 			} else {
@@ -1671,14 +1574,13 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	
 	public void refreshPaths(MegaOffline mOff){
 		log("refreshPaths(MegaOffline mOff): "+mOff.getName());
-		int index=0;
 		
 		//Find in the tree, the last existing node
 		String pNav= mOff.getPath();
 		
-		if(mOff.getType()==DB_FILE){
+		if(mOff.getType().equals(DB_FILE)){
 			
-			index=pNav.lastIndexOf("/");				
+			int index=pNav.lastIndexOf("/");
 			pNav=pNav.substring(0,index+1);
 			
 		}
@@ -1688,7 +1590,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			
 		if(pNav.length()==0){
 			mOffList=dbH.findByPath("/");
-			pNav="/";
 		}
 		else{
 			findPath(pNav);			
@@ -1725,7 +1626,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	private void findPath (String pNav){
 		log("findPath():" + pNav);
 
-		MegaOffline nodeToShow = null;
+		MegaOffline nodeToShow;
 		
 		if(!pNav.equals("/")){
 			
@@ -1737,7 +1638,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			int index=pNav.lastIndexOf("/");	
 			String pathToShow = pNav.substring(0, index+1);
 			log("Path: "+ pathToShow);
-			String nameToShow = pNav.substring(index+1, pNav.length());
+			String nameToShow = pNav.substring(index+1);
 			log("Name: "+ nameToShow);
 			
 			nodeToShow = dbH.findbyPathAndName(pathToShow, nameToShow);
@@ -1746,12 +1647,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				log("findPath:Node: "+ nodeToShow.getName());
 				pathNavigation=pathToShow+nodeToShow.getName()+"/";
 				log("findPath:pathNavigation: "+pathNavigation);
-				return;
 			}
 			else{
 				if(pathNavigation.equals("/")){
 					log("Return Path /");
-					return;
 				}
 				else{
 					findPath(pathToShow);
