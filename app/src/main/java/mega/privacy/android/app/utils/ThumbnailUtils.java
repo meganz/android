@@ -7,10 +7,14 @@ import android.graphics.BitmapFactory;
 import java.io.File;
 
 import mega.privacy.android.app.ThumbnailCache;
+import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 /*
@@ -28,7 +32,7 @@ public class ThumbnailUtils {
         if(!isFileAvailable(thumbDir)) {
             thumbDir = getCacheFolder(context, THUMBNAIL_FOLDER);
         }
-		log("getThumbFolder(): thumbDir= " + thumbDir);
+		logDebug("getThumbFolder(): thumbDir= " + thumbDir);
 		return thumbDir;
 	}
 	
@@ -83,8 +87,4 @@ public class ThumbnailUtils {
 		Bitmap bmp = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
 		return bmp;
 	}
-
-	private static void log(String log) {
-		Util.log("ThumbnailUtils", log);
-	}	
 }

@@ -13,7 +13,8 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 /*
 	 * Background task to process files for uploading
@@ -22,19 +23,19 @@ public class FilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
     Context context;
 
     public FilePrepareTask(Context context){
-        log("FilePrepareTask::FilePrepareTask");
+        logDebug("FilePrepareTask::FilePrepareTask");
         this.context = context;
     }
 
     @Override
     protected List<ShareInfo> doInBackground(Intent... params) {
-        log("FilePrepareTask::doInBackGround");
+        logDebug("FilePrepareTask::doInBackGround");
         return ShareInfo.processIntent(params[0], context);
     }
 
     @Override
     protected void onPostExecute(List<ShareInfo> info) {
-        log("FilePrepareTask::onPostExecute");
+        logDebug("FilePrepareTask::onPostExecute");
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop)context).onIntentProcessed(info);
         }
@@ -50,9 +51,5 @@ public class FilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
         else if(context instanceof PdfViewerActivityLollipop){
             ((PdfViewerActivityLollipop)context).onIntentProcessed(info);
         }
-    }
-
-    public static void log(String message) {
-        Util.log("FilePrepareTask", message);
     }
 }

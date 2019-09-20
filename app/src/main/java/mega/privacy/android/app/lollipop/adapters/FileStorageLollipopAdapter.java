@@ -29,8 +29,11 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapter.OnItemClickListener;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
+
 
 /*
  * Adapter for FilestorageActivity list
@@ -86,9 +89,9 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-	    float scaleW = Util.getScaleW(outMetrics, density);
-
+	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;		
+	    float scaleW = getScaleW(outMetrics, density);
+		
 	    View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
 	    ViewHolderFileStorage holder = new ViewHolderFileStorage(v);
 
@@ -97,7 +100,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
 		holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = Util.px2dp((260*scaleW), outMetrics);
+		holder.textViewFileName.getLayoutParams().width = px2dp((260*scaleW), outMetrics);
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
 
 		v.setTag(holder);
@@ -112,18 +115,18 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		holder.textViewFileName.setText(document.getName());
 
 		if(document.isFolder()){
-			String items = Util.getNumberItemChildren(document.getFile());
+			String items = getNumberItemChildren(document.getFile());
 			holder.textViewFileSize.setText(items);
 		}
 		else{
 			long documentSize = document.getSize();
-			holder.textViewFileSize.setText(Util.getSizeString(documentSize));
+			holder.textViewFileSize.setText(getSizeString(documentSize));
 		}
 
 		if(mode == Mode.PICK_FILE)
 		{
 			if(document.getFile().canRead() == false){
-				Util.setViewAlpha(holder.imageView, .4f);
+				setViewAlpha(holder.imageView, .4f);
 				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
 
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -140,7 +143,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 				}
 			}
 			else{
-				Util.setViewAlpha(holder.imageView, 1);
+				setViewAlpha(holder.imageView, 1);
 				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
 
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -192,18 +195,18 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 				holder.itemLayout.setEnabled(false);
 			}
 			else{
-				log("position: "+position+" is ENABLED");
+				logDebug("Position: " + position + " is ENABLED");
 				holder.itemLayout.setEnabled(true);
 			}
 			if (document.isFolder()){
 				holder.imageView.setImageResource(R.drawable.ic_folder_list);
-				Util.setViewAlpha(holder.imageView, 1);
+				setViewAlpha(holder.imageView, 1);
 				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
 			}
 			else{
 				//Document is FILE
-				holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
-				Util.setViewAlpha(holder.imageView, .4f);
+				holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());	
+				setViewAlpha(holder.imageView, .4f);
 				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
 			}
 
@@ -212,7 +215,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 
 	// Set new files on folder change
 	public void setFiles(List<FileDocument> newFiles) {
-		log("setFiles");
+		logDebug("setFiles");
 		if(newFiles!=null){
 			if(newFiles.size()>0){
 				listFragment.setVisibility(View.VISIBLE);
@@ -256,18 +259,18 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	}
 
 	public boolean isEnabled(int position) {
-		log("isEnabled: position: "+position);
+		logDebug("Position: " + position);
 		if (currentFiles.size() == 0) {
-			log("1-return");
+			logWarning("return");
 			return false;
 		}
 		FileDocument document = currentFiles.get(position);
 		if (mode == Mode.PICK_FOLDER && !document.isFolder()) {
-			log("2-return");
+			logWarning("return");
 			return false;
 		}
 		if (document.getFile().canRead() == false) {
-			log("3-return");
+			logWarning("return");
 			return false;
 		}
 
@@ -275,20 +278,20 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	}
 
 	public void toggleSelection(int pos) {
-		log("toggleSelection");
+		logDebug("Position: " + pos);
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			log("PUT pos: "+pos);
+			logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
 
 		FileStorageLollipopAdapter.ViewHolderFileStorage view = (FileStorageLollipopAdapter.ViewHolderFileStorage) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
-			log("Start animation: "+pos);
+			logDebug("Start animation: " + pos);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
@@ -311,21 +314,21 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	}
 
 	public void toggleAllSelection(int pos) {
-		log("toggleSelection: "+pos);
+		logDebug("Position: " + pos);
 		final int positionToflip = pos;
 
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			log("PUT pos: "+pos);
+			logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 		}
 
 		FileStorageLollipopAdapter.ViewHolderFileStorage view = (FileStorageLollipopAdapter.ViewHolderFileStorage) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
-			log("Start animation: "+pos);
+			logDebug("Start animation: " + pos);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
@@ -350,7 +353,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			view.imageView.startAnimation(flipAnimation);
 		}
 		else{
-			log("NULL view pos: "+positionToflip);
+			logWarning("NULL view pos: " + positionToflip);
 			notifyItemChanged(pos);
 		}
 	}
@@ -364,7 +367,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	}
 
 	public void clearSelections() {
-		log("clearSelections");
+		logDebug("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(isItemChecked(i)){
 				toggleAllSelection(i);
@@ -437,12 +440,12 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 
 	@Override
 	public void onClick(View v) {
-		log("click!");
+		logDebug("click!");
 		ViewHolderFileStorage holder = (ViewHolderFileStorage) v.getTag();
 
 		int currentPosition = holder.getAdapterPosition();
 		final FileDocument doc = (FileDocument) getItem(currentPosition);
-		log(" in position: "+currentPosition+" document: "+doc.getName());
+		logDebug("In position: " + currentPosition + " document: " + doc.getName());
 
 		switch (v.getId()) {
 			case R.id.file_explorer_item_layout:{
@@ -450,9 +453,5 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 				break;
 			}
 		}
-	}
-
-	private static void log(String message) {
-		Util.log("FileStorageLollipopAdapter", message);
 	}
 }
