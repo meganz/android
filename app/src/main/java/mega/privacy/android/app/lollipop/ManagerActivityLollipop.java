@@ -12946,19 +12946,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					break;
 				}
 				case ORDER_MODIFICATION_ASC: {
-					oFLol.sortByModificationDate(true);
+					oFLol.sortByModificationDateAscending();
 					break;
 				}
 				case ORDER_MODIFICATION_DESC: {
-					oFLol.sortByModificationDate(false);
+					oFLol.sortByModificationDateDescending();
 					break;
 				}
 				case ORDER_SIZE_ASC: {
-					oFLol.sortBySize(true);
+					oFLol.sortBySizeAscending();
 					break;
 				}
 				case ORDER_SIZE_DESC: {
-					oFLol.sortBySize(false);
+					oFLol.sortBySizeDescending();
 					break;
 				}
 				default: {

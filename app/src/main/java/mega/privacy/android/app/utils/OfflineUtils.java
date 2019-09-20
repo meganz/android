@@ -49,8 +49,8 @@ public class OfflineUtils {
         Sort_By_Name_Desc,
         Sort_By_Size_Asc,
         Sort_By_Size_Desc,
-        Sort_by_Modification_Date_Asc,
-        Sort_by_Modification_Date_Desc
+        Sort_By_Modification_Date_Asc,
+        Sort_By_Modification_Date_Desc
     }
 
     public static void saveOffline (File destination, MegaNode node, Context context, Activity activity, MegaApiAndroid megaApi){
@@ -707,8 +707,8 @@ public class OfflineUtils {
                 comparator = nameComparator;
                 break;
             }
-            case Sort_by_Modification_Date_Asc:
-            case Sort_by_Modification_Date_Desc: {
+            case Sort_By_Modification_Date_Asc:
+            case Sort_By_Modification_Date_Desc: {
                 comparator = modificationDateComparator;
                 break;
             }
@@ -728,9 +728,9 @@ public class OfflineUtils {
 
         Boolean isAscending = false;
         switch (condition) {
-            case Sort_By_Name_Asc:
-            case Sort_by_Modification_Date_Asc:
-            case Sort_By_Size_Asc: {
+            case Sort_By_Name_Desc:
+            case Sort_By_Modification_Date_Desc:
+            case Sort_By_Size_Desc: {
                 isAscending = true;
                 break;
             }

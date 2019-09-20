@@ -73,6 +73,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.Sort_Condition.*;
 
 public class OfflineFragmentLollipop extends RotatableFragment{
 
@@ -746,168 +747,50 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 	}
 
-
-	private void sortByName(Boolean isDescending) {
-		ArrayList<String> foldersOrder = new ArrayList<>();
-		ArrayList<String> filesOrder = new ArrayList<>();
-		ArrayList<MegaOffline> tempOffline = new ArrayList<>();
-
-		//Remove MK before sorting
-		if (mOffList.size() > 0) {
-			MegaOffline lastItem = mOffList.get(mOffList.size() - 1);
-			if (lastItem.getHandle().equals("0")) {
-				mOffList.remove(mOffList.size() - 1);
-			}
-		} else {
-			return;
-		}
-
-		for (MegaOffline node : mOffList) {
-			if (node.getType().equals("1")) {
-				foldersOrder.add(node.getName());
-			} else {
-				filesOrder.add(node.getName());
-			}
-		}
-
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-
-		if (isDescending) {
-			Collections.reverse(foldersOrder);
-			Collections.reverse(filesOrder);
-		}
-
-		for (String name : foldersOrder) {
-			for (MegaOffline megaOffline : mOffList) {
-				if (name.equals(megaOffline.getName())) {
-					tempOffline.add(megaOffline);
-				}
-			}
-		}
-
-		for (String name : filesOrder) {
-			for (MegaOffline megaOffline : mOffList) {
-				if (name.equals(megaOffline.getName())) {
-					tempOffline.add(megaOffline);
-				}
-			}
-		}
-
-		mOffList.clear();
-		mOffList.addAll(tempOffline);
-		if (adapter != null) {
-			adapter.setNodes(mOffList);
-		}
-	}
-
-	public void sortByNameDescending(){
-		log("sortByNameDescending");
-		sortByName(true);
-	}
-
-
-    public void sortByNameAscending() {
+	public void sortByNameAscending() {
 		log("sortByNameAscending");
-		sortByName(false);
-	}
-
-	public void sortByModificationDate(Boolean isAscending) {
-		ArrayList<MegaOffline> foldersOrder = new ArrayList<>();
-		ArrayList<MegaOffline> filesOrder = new ArrayList<>();
-		ArrayList<MegaOffline> tempOffline = new ArrayList<>();
-
-		//Remove MK before sorting
-		if (mOffList.size() > 0) {
-			MegaOffline lastItem = mOffList.get(mOffList.size() - 1);
-			if (lastItem.getHandle().equals("0")) {
-				mOffList.remove(mOffList.size() - 1);
-			}
-		} else {
-			return;
-		}
-
-		for (MegaOffline node : mOffList) {
-			if (node.getType().equals("1")) {
-				foldersOrder.add(node);
-			} else {
-				filesOrder.add(node);
-			}
-		}
-
-		Comparator<MegaOffline> megaOfflineComparator = new Comparator<MegaOffline>() {
-			@Override
-			public int compare(MegaOffline o1, MegaOffline o2) {
-				return Long.compare(o1.getModificationDate(getContext()), o2.getModificationDate(getContext()));
-			}
-		};
-
-		Collections.sort(foldersOrder, megaOfflineComparator);
-
-		Collections.sort(filesOrder, megaOfflineComparator);
-
-		if (isAscending) {
-			Collections.reverse(foldersOrder);
-			Collections.reverse(filesOrder);
-		}
-
-		tempOffline.addAll(foldersOrder);
-
-		tempOffline.addAll(filesOrder);
-
-		mOffList.clear();
-		mOffList.addAll(tempOffline);
+		sort(Sort_By_Name_Asc, mOffList, getContext());
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
 		}
 	}
 
-	public void sortBySize(Boolean isAscending) {
-		ArrayList<MegaOffline> foldersOrder = new ArrayList<>();
-		ArrayList<MegaOffline> filesOrder = new ArrayList<>();
-		ArrayList<MegaOffline> tempOffline = new ArrayList<>();
-
-		//Remove MK before sorting
-		if (mOffList.size() > 0) {
-			MegaOffline lastItem = mOffList.get(mOffList.size() - 1);
-			if (lastItem.getHandle().equals("0")) {
-				mOffList.remove(mOffList.size() - 1);
-			}
-		} else {
-			return;
+	public void sortByNameDescending() {
+		log("sortByNameDescending");
+		sort(Sort_By_Name_Desc, mOffList, getContext());
+		if (adapter != null) {
+			adapter.setNodes(mOffList);
 		}
+	}
 
-		for (MegaOffline node : mOffList) {
-			if (node.getType().equals("1")) {
-				foldersOrder.add(node);
-			} else {
-				filesOrder.add(node);
-			}
+	public void sortByModificationDateAscending() {
+		log("sortByModificationDateAscending");
+		sort(Sort_By_Modification_Date_Asc, mOffList, getContext());
+		if (adapter != null) {
+			adapter.setNodes(mOffList);
 		}
+	}
 
-		Comparator<MegaOffline> megaOfflineComparator = new Comparator<MegaOffline>() {
-			@Override
-			public int compare(MegaOffline o1, MegaOffline o2) {
-				return Long.compare(o1.getSize(getContext()), o2.getSize(getContext()));
-			}
-		};
-
-		Collections.sort(foldersOrder, megaOfflineComparator);
-
-		Collections.sort(filesOrder, megaOfflineComparator);
-
-		if (isAscending) {
-			Collections.reverse(foldersOrder);
-			Collections.reverse(filesOrder);
+	public void sortByModificationDateDescending() {
+		log("sortByModificationDateDescending");
+		sort(Sort_By_Modification_Date_Desc, mOffList, getContext());
+		adapter.setNodes(mOffList);
+		if (adapter != null) {
+			adapter.setNodes(mOffList);
 		}
+	}
 
-		tempOffline.addAll(foldersOrder);
+	public void sortBySizeAscending() {
+		log("sortBySizeAscending");
+		sort(Sort_By_Size_Asc, mOffList, getContext());
+		if (adapter != null) {
+			adapter.setNodes(mOffList);
+		}
+	}
 
-		tempOffline.addAll(filesOrder);
-
-		mOffList.clear();
-		mOffList.addAll(tempOffline);
+	public void sortBySizeDescending() {
+		log("sortBySizeDescending");
+		sort(Sort_By_Size_Desc, mOffList, getContext());
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
 		}
