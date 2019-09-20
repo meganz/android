@@ -81,10 +81,6 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         setText(getText());
     }
 
-    public static void log(String message) {
-        Util.log("EmojiTextView", message);
-    }
-
     @Override
     public void setText(CharSequence rawText, BufferType type) {
         CharSequence text = rawText == null ? "" : rawText;
@@ -136,7 +132,6 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             setText(getText());
         }
     }
-
     @Override
     public final void setEmojiSizeRes(@DimenRes final int res) {
         setEmojiSizeRes(res, true);
@@ -146,4 +141,5 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     public final void setEmojiSizeRes(@DimenRes final int res, final boolean shouldInvalidate) {
         setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
     }
+
 }
