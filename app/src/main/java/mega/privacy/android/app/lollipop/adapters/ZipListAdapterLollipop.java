@@ -20,7 +20,9 @@ import java.util.zip.ZipEntry;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapterLollipop.ViewHolderBrowserList> implements View.OnClickListener {
@@ -80,8 +82,8 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
+		float scaleW = getScaleW(outMetrics, density);
+		float scaleH = getScaleH(outMetrics, density);
 
 		View convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list, parent, false);
 		ViewHolderBrowserList holder = new ViewHolderBrowserList(convertView);
@@ -91,7 +93,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 		holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
 		holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
+		holder.textViewFileName.getLayoutParams().width = px2dp((225 * scaleW), outMetrics);
 		holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
 		holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
 		holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
@@ -136,7 +138,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
                 int index = nameFile.lastIndexOf("/");
 				nameFile = nameFile.substring(index+1, nameFile.length());
 
-				holder.textViewFileSize.setText(Util.getSizeString(zipNode.getSize()));
+				holder.textViewFileSize.setText(getSizeString(zipNode.getSize()));
 				holder.textViewFileName.setText(nameFile);
 
 				holder.imageView.setImageResource(MimeTypeList.typeForName(zipNode.getName()).getIconResourceId());
@@ -163,7 +165,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		logDebug("onClick");
 
 		ViewHolderBrowserList holder = (ViewHolderBrowserList) v.getTag();
 		if (holder.isUnknownFile) {
@@ -183,14 +185,9 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 			((ZipBrowserActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
 		}
 	}
-
-	private static void log(String log) {
-		Util.log("ZipListAdapter", log);
-	}
 	
 	public void setFolder(String folder){
-		log("setFolder: "+folder);
+		logDebug("folder: " + folder);
 		this.currentFolder=folder;
 	}
-
 }
