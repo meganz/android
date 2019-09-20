@@ -280,7 +280,7 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Grootte</string>
-    <string name="file_properties_info_last_modified" context="When the file was last modified">Last Modified</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Laatst aangepast</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Toegevoegd</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
