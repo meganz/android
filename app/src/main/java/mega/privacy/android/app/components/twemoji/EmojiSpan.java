@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.text.style.ReplacementSpan;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.utils.Util;
 
 final class EmojiSpan extends ReplacementSpan {
   private final float size;
@@ -51,8 +50,5 @@ final class EmojiSpan extends ReplacementSpan {
     canvas.translate(x, transitionY);
     drawable.draw(canvas);
     canvas.restore();
-  }
-  public static void log(String message) {
-    Util.log("EmojiSpan", message);
   }
 }
