@@ -682,21 +682,27 @@ public class OfflineUtils {
         Comparator<MegaOffline> modificationDateComparator = new Comparator<MegaOffline>() {
             @Override
             public int compare(MegaOffline o1, MegaOffline o2) {
-                return Long.compare(o1.getModificationDate(context), o2.getModificationDate(context));
+                return Long.compare(o2.getModificationDate(context), o1.getModificationDate(context));
             }
         };
 
         Comparator<MegaOffline> sizeComparator = new Comparator<MegaOffline>() {
             @Override
             public int compare(MegaOffline o1, MegaOffline o2) {
-                return Long.compare(o1.getSize(context), o2.getSize(context));
+                return Long.compare(o2.getSize(context), o1.getSize(context));
             }
         };
 
         Comparator<MegaOffline> nameComparator = new Comparator<MegaOffline>() {
             @Override
             public int compare(MegaOffline o1, MegaOffline o2) {
-                return o1.getName().compareTo(o2.getName());
+                String name1 = o1.getName();
+                String name2 = o2.getName();
+                if (name1.length() > name2.length()) {
+                    return 1;
+                } else if (name1.length() < name2.length()) {
+                    return -1;
+                } else return name1.compareTo(name2);
             }
         };
 
@@ -726,12 +732,12 @@ public class OfflineUtils {
 
         Collections.sort(filesOrder, comparator);
 
-        Boolean isAscending = false;
+        Boolean isDescending = false;
         switch (condition) {
             case Sort_By_Name_Desc:
             case Sort_By_Modification_Date_Desc:
             case Sort_By_Size_Desc: {
-                isAscending = true;
+                isDescending = true;
                 break;
             }
             default: {
@@ -740,7 +746,7 @@ public class OfflineUtils {
         }
 
 
-        if (isAscending) {
+        if (isDescending) {
             Collections.reverse(foldersOrder);
             Collections.reverse(filesOrder);
         }
