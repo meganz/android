@@ -33,6 +33,12 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.getNodePath;
 import static mega.privacy.android.app.utils.Util.getSizeString;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC;
 
 public class OfflineUtils {
 
@@ -43,15 +49,6 @@ public class OfflineUtils {
 
     private static final String DB_FILE = "0";
     private static final String DB_FOLDER = "1";
-
-    public enum Sort_Condition {
-        Sort_By_Name_Asc,
-        Sort_By_Name_Desc,
-        Sort_By_Size_Asc,
-        Sort_By_Size_Desc,
-        Sort_By_Modification_Date_Asc,
-        Sort_By_Modification_Date_Desc
-    }
 
     public static void saveOffline (File destination, MegaNode node, Context context, Activity activity, MegaApiAndroid megaApi){
         log("saveOffline");
@@ -656,7 +653,7 @@ public class OfflineUtils {
     }
 
 
-    public static void sort(Sort_Condition condition, ArrayList<MegaOffline> mOffList, final Context context) {
+    public static void sort(int order, ArrayList<MegaOffline> mOffList, final Context context) {
         ArrayList<MegaOffline> foldersOrder = new ArrayList<>();
         ArrayList<MegaOffline> filesOrder = new ArrayList<>();
         ArrayList<MegaOffline> tempOffline = new ArrayList<>();
@@ -707,19 +704,19 @@ public class OfflineUtils {
         };
 
         Comparator comparator = nameComparator;
-        switch (condition) {
-            case Sort_By_Name_Asc:
-            case Sort_By_Name_Desc: {
+        switch (order) {
+            case ORDER_DEFAULT_ASC:
+            case ORDER_DEFAULT_DESC: {
                 comparator = nameComparator;
                 break;
             }
-            case Sort_By_Modification_Date_Asc:
-            case Sort_By_Modification_Date_Desc: {
+            case ORDER_MODIFICATION_ASC:
+            case ORDER_MODIFICATION_DESC: {
                 comparator = modificationDateComparator;
                 break;
             }
-            case Sort_By_Size_Asc:
-            case Sort_By_Size_Desc: {
+            case ORDER_SIZE_ASC:
+            case ORDER_SIZE_DESC: {
                 comparator = sizeComparator;
                 break;
             }
@@ -733,10 +730,10 @@ public class OfflineUtils {
         Collections.sort(filesOrder, comparator);
 
         Boolean isDescending = false;
-        switch (condition) {
-            case Sort_By_Name_Desc:
-            case Sort_By_Modification_Date_Desc:
-            case Sort_By_Size_Desc: {
+        switch (order) {
+            case ORDER_DEFAULT_DESC:
+            case ORDER_MODIFICATION_DESC:
+            case ORDER_SIZE_DESC: {
                 isDescending = true;
                 break;
             }

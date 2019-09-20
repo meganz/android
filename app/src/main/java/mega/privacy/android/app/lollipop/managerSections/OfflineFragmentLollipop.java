@@ -39,8 +39,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +71,12 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.OfflineUtils.Sort_Condition.*;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC;
 
 public class OfflineFragmentLollipop extends RotatableFragment{
 
@@ -694,12 +697,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			addSectionTitle(mOffList);
 		}
 
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
+		refreshOrder();
 
 		if(adapter!=null){
 			adapter.setNodes(mOffList);
@@ -749,7 +747,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public void sortByNameAscending() {
 		log("sortByNameAscending");
-		sort(Sort_By_Name_Asc, mOffList, getContext());
+		sort(ORDER_DEFAULT_ASC, mOffList, getContext());
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
 		}
@@ -757,7 +755,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public void sortByNameDescending() {
 		log("sortByNameDescending");
-		sort(Sort_By_Name_Desc, mOffList, getContext());
+		sort(ORDER_DEFAULT_DESC, mOffList, getContext());
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
 		}
@@ -765,7 +763,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public void sortByModificationDateAscending() {
 		log("sortByModificationDateAscending");
-		sort(Sort_By_Modification_Date_Asc, mOffList, getContext());
+		sort(ORDER_MODIFICATION_ASC, mOffList, getContext());
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
 		}
@@ -773,7 +771,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public void sortByModificationDateDescending() {
 		log("sortByModificationDateDescending");
-		sort(Sort_By_Modification_Date_Desc, mOffList, getContext());
+		sort(ORDER_MODIFICATION_DESC, mOffList, getContext());
 		adapter.setNodes(mOffList);
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
@@ -782,7 +780,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public void sortBySizeAscending() {
 		log("sortBySizeAscending");
-		sort(Sort_By_Size_Asc, mOffList, getContext());
+		sort(ORDER_SIZE_ASC, mOffList, getContext());
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
 		}
@@ -790,7 +788,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public void sortBySizeDescending() {
 		log("sortBySizeDescending");
-		sort(Sort_By_Size_Desc, mOffList, getContext());
+		sort(ORDER_SIZE_DESC, mOffList, getContext());
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
 		}
@@ -902,12 +900,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				}
 				adapter.setNodes(mOffList);
 				
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					sortByNameDescending();
-				}
-				else{
-					sortByNameAscending();
-				}
+				refreshOrder();
 				
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
@@ -1258,12 +1251,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 				mOffList = dbH.findByPath(pathNavigation);
 
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					sortByNameDescending();
-				}
-				else{
-					sortByNameAscending();
-				}
+				refreshOrder();
 
 				setNodes(mOffList);
 
@@ -1360,13 +1348,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 		mOffList=dbH.findByPath(pathNavigation);
 
+		refreshOrder();
 
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
 		if (((ManagerActivityLollipop)context).isList) {
 			addSectionTitle(mOffList);
 			if (adapter == null) {
@@ -1430,12 +1413,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		log("refreshPaths()");
 		mOffList=dbH.findByPath("/");	
 		
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
+		refreshOrder();
+
 		if (((ManagerActivityLollipop)context).isList) {
 			addSectionTitle(mOffList);
 			if (adapter == null) {
@@ -1478,12 +1457,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			findPath(pNav);			
 		}
 				
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
+		refreshOrder();
 
 		((ManagerActivityLollipop)context).setToolbarTitle();
 		log("At the end of refreshPaths the path is: "+pathNavigation);
@@ -1557,6 +1531,38 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	public void setOrder(int orderGetChildren){
 		log("setOrder");
 		this.orderGetChildren = orderGetChildren;
+	}
+
+	private void refreshOrder() {
+		switch (orderGetChildren) {
+			case ORDER_DEFAULT_ASC: {
+				sortByNameAscending();
+				break;
+			}
+			case ORDER_DEFAULT_DESC: {
+				sortByNameDescending();
+				break;
+			}
+			case ORDER_MODIFICATION_ASC: {
+				sortByModificationDateAscending();
+				break;
+			}
+			case ORDER_MODIFICATION_DESC: {
+				sortByModificationDateDescending();
+				break;
+			}
+			case ORDER_SIZE_ASC: {
+				sortBySizeAscending();
+				break;
+			}
+			case ORDER_SIZE_DESC: {
+				sortBySizeDescending();
+				break;
+			}
+			default: {
+				break;
+			}
+		}
 	}
 	
 	private static void log(String log) {
