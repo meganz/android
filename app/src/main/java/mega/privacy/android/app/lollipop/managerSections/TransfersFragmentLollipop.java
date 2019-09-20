@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -27,9 +26,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaTransfer;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class TransfersFragmentLollipop extends Fragment {
@@ -68,11 +68,11 @@ public class TransfersFragmentLollipop extends Fragment {
 		tL = new ArrayList<MegaTransfer>();
 
 		super.onCreate(savedInstanceState);
-		log("onCreate");		
+		logDebug("onCreate");
 	}
 
 	public static TransfersFragmentLollipop newInstance() {
-		log("newInstance");
+		logDebug("newInstance");
 		TransfersFragmentLollipop fragment = new TransfersFragmentLollipop();
 		return fragment;
 	}
@@ -156,7 +156,7 @@ public class TransfersFragmentLollipop extends Fragment {
 	}
 
 	public void setTransfers(){
-		log("setTransfers");
+		logDebug("setTransfers");
 
 		for(int i=0; i<((ManagerActivityLollipop)context).transfersInProgress.size();i++){
 			MegaTransfer transfer = megaApi.getTransferByTag(((ManagerActivityLollipop)context).transfersInProgress.get(i));
@@ -180,7 +180,7 @@ public class TransfersFragmentLollipop extends Fragment {
 	}
 
 	public void refreshAllTransfers(){
-		log("refreshAllTransfers");
+		logDebug("refreshAllTransfers");
 		tL.clear();
 
 		for(int i=0; i<((ManagerActivityLollipop)context).transfersInProgress.size();i++){
@@ -211,7 +211,7 @@ public class TransfersFragmentLollipop extends Fragment {
     }
 
 	public void transferUpdate(MegaTransfer transfer){
-        log("transferUpdate");
+		logDebug("Node handle: " + transfer.getNodeHandle());
         try{
 			ListIterator li = tL.listIterator();
 			int index = 0;
@@ -225,17 +225,17 @@ public class TransfersFragmentLollipop extends Fragment {
 				}
 			}
 			tL.set(index, transfer);
-			log("Update the transfer with index : "+index +", left: "+tL.size());
+			logDebug("Update the transfer with index: " + index + ", left: " + tL.size());
 
 			adapter.updateProgress(index, transfer);
 		}
         catch(IndexOutOfBoundsException e){
-			log("EXCEPTION:transferUpdate: "+e.getMessage());
+			logError("EXCEPTION", e);
 		}
     }
 
 	public void changeStatusButton(int tag){
-		log("transferUpdate");
+		logDebug("tag: " + tag);
 
 		ListIterator li = tL.listIterator();
 		int index = 0;
@@ -248,13 +248,13 @@ public class TransfersFragmentLollipop extends Fragment {
 		}
 		MegaTransfer transfer = megaApi.getTransferByTag(tag);
 		tL.set(index, transfer);
-		log("The transfer with index : "+index +"has been paused/resumed, left: "+tL.size());
+		logDebug("The transfer with index : " + index + "has been paused/resumed, left: " + tL.size());
 
 		adapter.notifyItemChanged(index);
 	}
 
     public void transferFinish(int transferTag){
-		log("transferFinish: transferTag is " + transferTag);
+		logDebug("transferTag is " + transferTag);
 		int position = -1;
         for (int i=0; i<tL.size(); i++) {
             MegaTransfer transfer = tL.get(i);
@@ -282,7 +282,7 @@ public class TransfersFragmentLollipop extends Fragment {
 	}
 
 	public void transferStart(MegaTransfer transfer){
-		log("transferStart");
+		logDebug("Node handle: " + transfer.getNodeHandle());
 		if(!transfer.isStreamingTransfer()){
 			tL.add(transfer);
 		}
@@ -300,9 +300,4 @@ public class TransfersFragmentLollipop extends Fragment {
 			listView.setVisibility(View.VISIBLE);
 		}
 	}
-
-	private static void log(String log) {
-		Util.log("TransfersFragmentLollipop", log);
-	}
-
 }

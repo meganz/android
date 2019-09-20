@@ -16,12 +16,16 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class PreviewUtils {
 	
 	public static File previewDir;
 	public static PreviewCache previewCache = new PreviewCache();
+
+	//10mb
+	private static final long THRESHOLD = 10 * 1024 * 1024;
 
 	/*
 	 * Get preview folder
@@ -114,11 +118,48 @@ public class PreviewUtils {
             //half of the screen size.
             inSampleSize = calculateInSampleSize(bOpts,size.x / 2,size.y / 2);
         }
-        log("inSampleSize: " + inSampleSize);
+		logDebug("inSampleSize: " + inSampleSize);
         bOpts.inJustDecodeBounds = false;
         bOpts.inSampleSize = inSampleSize;
-        log("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
+		logDebug("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
         return BitmapFactory.decodeFile(bmpFile.getAbsolutePath(),bOpts);
+    }
+
+    public static Bitmap getPreviewFromFolderFullImage(MegaNode node, Context context){
+        Bitmap bmp = previewCache.get(node.getHandle());
+        if(bmp == null) {
+            File previewDir = getPreviewFolder(context);
+            File preview = new File(previewDir, node.getBase64Handle()+".jpg");
+            if (preview.exists()){
+                if (preview.length() > 0){
+                    bmp = getBitmapForCacheFullImage(preview, context);
+                    if (bmp == null) {
+                        preview.delete();
+                    }
+                    else{
+                        previewCache.put(node.getHandle(), bmp);
+                    }
+                }
+            }
+        }
+        return bmp;
+    }
+
+    public static Bitmap getBitmapForCacheFullImage(File bmpFile, Context context) {
+	    if(!testAllocation()) {
+            return null;
+        } else {
+	        return getBitmapForCache(bmpFile, context);
+        }
+    }
+
+    public static boolean testAllocation() {
+	    Runtime runtime = Runtime.getRuntime();
+        long usedMemInMB = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
+        long maxHeapSizeInMB = runtime.maxMemory() / 1048576L;
+        long availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB;
+        logDebug("maxHeapSizeInMB " + maxHeapSizeInMB + " availHeapSizeInMB is " + availHeapSizeInMB + " usedMemInMB is" + usedMemInMB);
+        return runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory()) > THRESHOLD;
     }
 
 	/*code from developer.android, https://developer.android.com/topic/performance/graphics/load-bitmap.html*/
@@ -161,8 +202,4 @@ public class PreviewUtils {
 
 		return resizeBitmap;
 	}
-	
-	private static void log(String log) {
-		Util.log("PreviewUtils", log);
-	}	
 }

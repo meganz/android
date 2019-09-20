@@ -28,7 +28,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -44,8 +43,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -53,7 +50,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.Util.changeStatusBarColor;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 @SuppressLint("NewApi")
@@ -139,8 +138,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 		
-	    scaleW = Util.getScaleW(outMetrics, density);
-	    scaleH = Util.getScaleH(outMetrics, density);
+	    scaleW = getScaleW(outMetrics, density);
+	    scaleH = getScaleH(outMetrics, density);
 
 		title = (TextView) findViewById(R.id.title_change_pass);
 
@@ -174,7 +173,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				log("onTextChanged: " + s.toString() + "_ " + start + "__" + before + "__" + count);
+				logDebug("Text changed: " + s.toString() + "_ " + start + "__" + before + "__" + count);
 				if (s != null){
 					if (s.length() > 0) {
 						String temp = s.toString();
@@ -262,7 +261,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
                     .replace("[A]", "<u>")
                     .replace("[/A]", "</u>");
         } catch (Exception e) {
-            log(e.getMessage());
+            logError("Exception formatting string", e);
         }
 
         Spanned resultTOP;
@@ -298,31 +297,31 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		Intent intentReceived = getIntent();
 		if (intentReceived != null) {
-			log("There is an intent!");
+			logDebug("There is an intent!");
 			if(intentReceived.getAction()!=null){
-				if (getIntent().getAction().equals(Constants.ACTION_RESET_PASS_FROM_LINK)) {
-					log("ACTION_RESET_PASS_FROM_LINK");
+				if (getIntent().getAction().equals(ACTION_RESET_PASS_FROM_LINK)) {
+					logDebug("ACTION_RESET_PASS_FROM_LINK");
 					changePassword=false;
 					linkToReset = getIntent().getDataString();
 					if (linkToReset == null) {
-						log("link is NULL - close activity");
+						logWarning("link is NULL - close activity");
 						finish();
 					}
 					mk = getIntent().getStringExtra("MK");
 					if(mk==null){
-						log("MK is NULL - close activity");
-						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
+						logWarning("MK is NULL - close activity");
+						showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					}
 
 					title.setText(getString(R.string.title_enter_new_password));
 				}
-				if (getIntent().getAction().equals(Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT)) {
+				if (getIntent().getAction().equals(ACTION_RESET_PASS_FROM_PARK_ACCOUNT)) {
 					changePassword=false;
-					log("ACTION_RESET_PASS_FROM_PARK_ACCOUNT");
+					logDebug("ACTION_RESET_PASS_FROM_PARK_ACCOUNT");
 					linkToReset = getIntent().getDataString();
 					if (linkToReset == null) {
-						log("link is NULL - close activity");
-						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
+						logWarning("link is NULL - close activity");
+						showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					}
 					mk = null;
 
@@ -334,7 +333,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	@Override
 	public void onBackPressed() {
-		log("onBackPressed");
+		logDebug("onBackPressed");
 		if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
 			Intent intent = new Intent(this, TestPasswordActivity.class);
 			intent.putExtra("logout", getIntent().getBooleanExtra("logout", false));
@@ -634,7 +633,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			public void afterTextChanged(Editable s) {
 				if (sixthPin.length()!=0){
 					sixthPin.setCursorVisible(true);
-					Util.hideKeyboard(changePasswordActivity, 0);
+					hideKeyboard(changePasswordActivity, 0);
 
 					if (pinLongClick) {
 						pasteClipboard();
@@ -654,79 +653,79 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb1.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb1.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb1.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb1.width = scaleWidthPx(25, outMetrics);
 		}
 		firstPin.setLayoutParams(paramsb1);
 		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
-		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
 		firstPin.setLayoutParams(textParams);
 
 		secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb2.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb2.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb2.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb2.width = scaleWidthPx(25, outMetrics);
 		}
 		secondPin.setLayoutParams(paramsb2);
 		textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
-		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
 		secondPin.setLayoutParams(textParams);
 		secondPin.setEt(firstPin);
 
 		thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb3.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb3.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb3.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb3.width = scaleWidthPx(25, outMetrics);
 		}
 		thirdPin.setLayoutParams(paramsb3);
 		textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
-		textParams.setMargins(0, 0, Util.scaleWidthPx(25, outMetrics), 0);
+		textParams.setMargins(0, 0, scaleWidthPx(25, outMetrics), 0);
 		thirdPin.setLayoutParams(textParams);
 		thirdPin.setEt(secondPin);
 
 		fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb4.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb4.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb4.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb4.width = scaleWidthPx(25, outMetrics);
 		}
 		fourthPin.setLayoutParams(paramsb4);
 		textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
-		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
 		fourthPin.setLayoutParams(textParams);
 		fourthPin.setEt(thirdPin);
 
 		fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb5.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb5.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb5.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb5.width = scaleWidthPx(25, outMetrics);
 		}
 		fifthPin.setLayoutParams(paramsb5);
 		textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
-		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
 		fifthPin.setLayoutParams(textParams);
 		fifthPin.setEt(fourthPin);
 
 		sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb6.width = Util.scaleWidthPx(42, outMetrics);
+			paramsb6.width = scaleWidthPx(42, outMetrics);
 		}
 		else {
-			paramsb6.width = Util.scaleWidthPx(25, outMetrics);
+			paramsb6.width = scaleWidthPx(25, outMetrics);
 		}
 		sixthPin.setLayoutParams(paramsb6);
 		textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
@@ -770,9 +769,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	void permitVerify(){
-		log("permitVerify");
+		logDebug("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			Util.hideKeyboard(changePasswordActivity, 0);
+			hideKeyboard(changePasswordActivity, 0);
 			if (sb.length()>0) {
 				sb.delete(0, sb.length());
 			}
@@ -783,7 +782,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			sb.append(fifthPin.getText());
 			sb.append(sixthPin.getText());
 			pin = sb.toString();
-			log("PIN: "+pin);
 			if (!isErrorShown && pin != null) {
 				verify2faProgressBar.setVisibility(View.VISIBLE);
 				changePassword(newPassword1.getText().toString());
@@ -792,13 +790,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	void pasteClipboard() {
-		log("pasteClipboard");
+		logDebug("pasteClipboard");
 		pinLongClick = false;
 		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 		ClipData clipData = clipboard.getPrimaryClip();
 		if (clipData != null) {
 			String code = clipData.getItemAt(0).getText().toString();
-			log("code: "+code);
 			if (code != null && code.length() == 6) {
 				boolean areDigits = true;
 				for (int i=0; i<6; i++) {
@@ -851,24 +848,24 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		logDebug("onClick");
 		switch(v.getId()){
 			case R.id.action_change_password: {
 				hidePasswordIfVisible();
 				if (changePassword) {
-					log("ok proceed to change");
+					logDebug("Ok proceed to change");
 					onChangePasswordClick();
 				} else {
-					log("reset pass on click");
+					logDebug("Reset pass on click");
 					if (linkToReset == null) {
-						log("link is NULL");
-						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
+						logWarning("link is NULL");
+						showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					} else {
 						if (mk == null) {
-							log("proceed to park account");
+							logDebug("Proceed to park account");
 							onResetPasswordClick(false);
 						} else {
-							log("ok proceed to reset");
+							logDebug("Ok proceed to reset");
 							onResetPasswordClick(true);
 						}
 					}
@@ -917,17 +914,17 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				break;
 			}
             case R.id.top:
-                log("Show top");
+                logDebug("Show top");
                 hidePasswordIfVisible();
                 try {
                     Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(Constants.URL_E2EE));
+                    openTermsIntent.setData(Uri.parse(URL_E2EE));
                     startActivity(openTermsIntent);
                 }
                 catch (Exception e){
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setData(Uri.parse(Constants.URL_E2EE));
+                    viewIntent.setData(Uri.parse(URL_E2EE));
                     startActivity(viewIntent);
                 }
 
@@ -1064,9 +1061,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	public void onResetPasswordClick(boolean hasMk){
-		log("onResetPasswordClick");
+		logDebug("hasMk: " + hasMk);
 
-		if(!Util.isOnline(this))
+		if(!isOnline(this))
 		{
 			showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
@@ -1085,7 +1082,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		progress.show();
 
 		if(hasMk){
-			log("reset with mk");
+			logDebug("reset with mk");
 			megaApi.confirmResetPassword(linkToReset, newPass1, mk, this);
 		}
 		else{
@@ -1094,8 +1091,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 	
 	public void onChangePasswordClick(){
-		log("onChangePasswordClick");
-		if(!Util.isOnline(this))
+		logDebug("onChangePasswordClick");
+		if(!isOnline(this))
 		{
 			showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
@@ -1185,7 +1182,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 	
 	private void changePassword (String newPassword){
-		log("changePassword");
+		logDebug("changePassword");
 
 		if (is2FAEnabled){
 			megaApi.multiFactorAuthChangePassword(null, newPassword, pin, this);
@@ -1199,17 +1196,17 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getName());
+		logDebug("onRequestStart: " + request.getName());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
+		logDebug("onRequestFinish");
 		
 		if (request.getType() == MegaRequest.TYPE_CHANGE_PW){
-			log("TYPE_CHANGE_PW");
+			logDebug("TYPE_CHANGE_PW");
 			if (e.getErrorCode() != MegaError.API_OK){
-				log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
+				logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
 
 				if (!is2FAEnabled) {
 					try {
@@ -1227,7 +1224,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					//Intent to MyAccount
 					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
 					if (e.getErrorCode() != MegaError.API_OK) {
-						log("Error, request: " + e.getErrorString());
+						logWarning("Error, request: " + e.getErrorString());
 						if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED) {
 							if (is2FAEnabled) {
 								verifyShowError();
@@ -1238,8 +1235,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 						}
 					}
 					else {
-						resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
-						log("General Error");
+						resetPassIntent.setAction(ACTION_PASS_CHANGED);
+						logWarning("General Error");
 						resetPassIntent.putExtra("RESULT", -1);
 						startActivity(resetPassIntent);
 						finish();
@@ -1247,7 +1244,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 			}
 			else{
-				log("pass changed OK");
+				logDebug("Pass changed OK");
 				try{ 
 					progress.dismiss();
 				} catch(Exception ex) {};
@@ -1259,7 +1256,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				else {
 					//Intent to MyAccount
 					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.setAction(ACTION_PASS_CHANGED);
 					resetPassIntent.putExtra("RESULT", 0);
 					startActivity(resetPassIntent);
 					finish();
@@ -1267,11 +1264,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK){
-			log("TYPE_CONFIRM_RECOVERY_LINK");
+			logDebug("TYPE_CONFIRM_RECOVERY_LINK");
 			if(megaApi.getRootNode()==null) {
-				log("Not logged in");
+				logDebug("Not logged in");
 				if (e.getErrorCode() != MegaError.API_OK){
-					log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
+					logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
 
 					try{
 						progress.dismiss();
@@ -1279,8 +1276,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 					//Intent to Login
 					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-					resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+					resetPassIntent.setAction(ACTION_PASS_CHANGED);
 
 					if(e.getErrorCode()==MegaError.API_EARGS){
 						resetPassIntent.putExtra("RESULT", MegaError.API_EARGS);
@@ -1296,7 +1293,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					finish();
 				}
 				else{
-					log("pass changed");
+					logDebug("Pass changed");
 					try{
 						progress.dismiss();
 					} catch(Exception ex) {};
@@ -1304,18 +1301,18 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 					//Intent to Login
 					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-					resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+					resetPassIntent.setAction(ACTION_PASS_CHANGED);
 					resetPassIntent.putExtra("RESULT", 0);
 					startActivity(resetPassIntent);
 					finish();
 				}
 			}
 			else {
-				log("Logged IN");
+				logDebug("Logged IN");
 
 				if (e.getErrorCode() != MegaError.API_OK){
-					log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
+					logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
 
 					try{
 						progress.dismiss();
@@ -1323,13 +1320,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 					//Intent to Login
 					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.setAction(ACTION_PASS_CHANGED);
 					resetPassIntent.putExtra("RESULT", -1);
 					startActivity(resetPassIntent);
 					finish();
 				}
 				else{
-					log("pass changed");
+					logDebug("Pass changed");
 					try{
 						progress.dismiss();
 					} catch(Exception ex) {};
@@ -1337,7 +1334,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 					//Intent to Login
 					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.setAction(ACTION_PASS_CHANGED);
 					resetPassIntent.putExtra("RESULT", 0);
 					startActivity(resetPassIntent);
 					finish();
@@ -1360,7 +1357,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	private void setError(final EditText editText, String error){
-		log("setError");
+		logDebug("setError");
 		if(error == null || error.equals("")){
 			return;
 		}
@@ -1402,11 +1399,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError: " + request.getName());
-	}
-	
-	public static void log(String message) {
-		Util.log("ChangePasswordActivityLollipop", message);
+		logWarning("onRequestTemporaryError: " + request.getName());
 	}
 
 	@Override

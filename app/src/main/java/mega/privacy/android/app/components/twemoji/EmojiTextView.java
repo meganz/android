@@ -145,8 +145,4 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
   @Override public final void setEmojiSizeRes(@DimenRes final int res, final boolean shouldInvalidate) {
     setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
   }
-
-  public static void log(String message) {
-    Util.log("EmojiTextView", message);
-  }
 }

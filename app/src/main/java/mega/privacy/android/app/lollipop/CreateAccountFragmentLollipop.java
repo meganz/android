@@ -37,13 +37,15 @@ import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class CreateAccountFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, OnKeyboardVisibilityListener {
 
@@ -95,11 +97,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            log("context is null");
+            logWarning("context is null");
             return;
         }
 
@@ -109,7 +111,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        logDebug("onCreateView");
 
         View v = inflater.inflate(R.layout.fragment_create_account, container, false);
 
@@ -210,7 +212,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                log("onTextChanged: " + s.toString() + "_ " + start + "__" + before + "__" + count);
+                logDebug("Text changed: " + s.toString() + "_ " + start + "__" + before + "__" + count);
                 if (s != null){
                     if (s.length() > 0) {
                         String temp = s.toString();
@@ -309,7 +311,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     .replace("[A]", "<u>")
                     .replace("[/A]", "</u>");
         } catch (Exception e) {
-            log(e.getMessage());
+            logError("Exception formatting string", e);
         }
 
         Spanned resultTOP;
@@ -487,7 +489,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        logDebug("onClick");
 
         switch (v.getId()) {
             case R.id.create_account_chkTOS:
@@ -501,11 +503,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             case R.id.button_login_create:
                 hidePasswordIfVisible();
-                ((LoginActivityLollipop) context).showFragment(Constants.LOGIN_FRAGMENT);
+                ((LoginActivityLollipop) context).showFragment(LOGIN_FRAGMENT);
                 break;
 
             case R.id.tos:
-                log("Show tos");
+                logDebug("Show ToS");
 //				Intent browserIntent = new Intent(Intent.ACTION_VIEW);
 //				browserIntent.setComponent(new ComponentName("com.android.browser", "com.android.browser.BrowserActivity"));
 //				browserIntent.setDataAndType(Uri.parse("http://www.google.es"), "text/html");
@@ -527,17 +529,17 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 break;
             case R.id.top:
-                log("Show terms of password");
+                logDebug("Show terms of password");
                 hidePasswordIfVisible();
                 try {
                     Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(Constants.URL_E2EE));
+                    openTermsIntent.setData(Uri.parse(URL_E2EE));
                     startActivity(openTermsIntent);
                 }
                 catch (Exception e){
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setData(Uri.parse(Constants.URL_E2EE));
+                    viewIntent.setData(Uri.parse(URL_E2EE));
                     startActivity(viewIntent);
                 }
 
@@ -574,7 +576,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 	 * Registration form submit
 	 */
     private void submitForm() {
-        log("submit form!");
+        logDebug("submit form!");
 
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         dbH.clearCredentials();
@@ -586,7 +588,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(userEmail.getWindowToken(), 0);
 
-        if(!Util.isOnline(context)){
+        if(!isOnline(context)){
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
@@ -645,7 +647,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         if (value.length() == 0) {
             return getString(R.string.error_enter_email);
         }
-        if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
+        if (!EMAIL_ADDRESS.matcher(value).matches()) {
             return getString(R.string.error_invalid_email);
         }
         return null;
@@ -691,7 +693,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     }
 
     private void onKeysGenerated(final String privateKey, final String publicKey) {
-        if(!Util.isOnline(context)){
+        if(!isOnline(context)){
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
@@ -700,25 +702,23 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         creatingAccountLayout.setVisibility(View.VISIBLE);
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
-        log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
-        log("[CREDENTIALS]userPassword: _" + userPassword.getText().toString() +"_");
         megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
 //		megaApi.fastCreateAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), privateKey, userName.getText().toString().trim(), this);
     }
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart" + request.getRequestString());
+        logDebug("onRequestStart" + request.getRequestString());
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request,
                                 MegaError e) {
-        log("onRequestFinish");
+        logDebug("onRequestFinish");
 
         if (isAdded()) {
             if (e.getErrorCode() != MegaError.API_OK) {
-                log("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
+                logWarning("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
 
                 if (e.getErrorCode() == MegaError.API_EEXIST) {
                     try {
@@ -735,7 +735,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     try {
                         String message = e.getErrorString();
                         ((LoginActivityLollipop) context).showSnackbar(message);
-                        ((LoginActivityLollipop) context).showFragment(Constants.LOGIN_FRAGMENT);
+                        ((LoginActivityLollipop) context).showFragment(LOGIN_FRAGMENT);
                         createAccountLayout.setVisibility(View.VISIBLE);
                         creatingAccountLayout.setVisibility(View.GONE);
                         creatingAccountTextView.setVisibility(View.GONE);
@@ -756,20 +756,19 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 if (dbH != null){
                     dbH.clearEphemeral();
 
-                    log("EphemeralCredentials: (" + request.getEmail() + "," + request.getPassword() + "," + request.getSessionKey() + "," + request.getName() + "," + request.getText() + ")");
                     EphemeralCredentials ephemeral = new EphemeralCredentials(request.getEmail(), request.getPassword(), request.getSessionKey(), request.getName(), request.getText());
 
                     dbH.saveEphemeral(ephemeral);
                 }
 
-                ((LoginActivityLollipop)context).showFragment(Constants.CONFIRM_EMAIL_FRAGMENT);
+                ((LoginActivityLollipop)context).showFragment(CONFIRM_EMAIL_FRAGMENT);
             }
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        log ("onRequestTemporaryError");
+        logWarning("onRequestTemporaryError");
     }
 
 
@@ -781,7 +780,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach");
+        logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
 
@@ -792,7 +791,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onAttach(Activity context) {
-        log("onAttach Activity");
+        logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
 
@@ -808,6 +807,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         switch (editText.getId()){
             case R.id.create_account_email_text:{
+
                 userEmailLayout.setError(error);
                 userEmailLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
                 userEmailError.setVisibility(View.VISIBLE);
@@ -883,9 +883,5 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         } else {
             createAccountAndAcceptLayout.setVisibility(View.GONE);
         }
-    }
-
-    public static void log(String log) {
-        Util.log("CreateAccountFragmentLollipop", log);
     }
 }
