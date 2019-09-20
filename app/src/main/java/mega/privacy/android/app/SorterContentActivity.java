@@ -12,9 +12,11 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
+
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class SorterContentActivity extends BaseActivity {
 
@@ -67,7 +69,7 @@ public class SorterContentActivity extends BaseActivity {
         textViewTitle.setText(context.getString(R.string.action_sort_by));
         textViewTitle.setTextSize(20);
         textViewTitle.setTextColor(0xde000000);
-        textViewTitle.setPadding(Util.scaleWidthPx(23, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
+        textViewTitle.setPadding(scaleWidthPx(23, outMetrics), scaleHeightPx(20, outMetrics), 0, 0);
         builder.setCustomTitle(textViewTitle);
 
         sortByDialog = builder.create();
@@ -160,7 +162,7 @@ public class SorterContentActivity extends BaseActivity {
         }
         else if (context instanceof FileExplorerActivityLollipop) {
 
-            MegaPreferences prefs = Util.getPreferences(context);
+            MegaPreferences prefs = DatabaseHandler.getDbHandler(context).getPreferences();
             drawerItem = ((FileExplorerActivityLollipop) context).getCurrentItem();
 
             if (drawerItem == null) {
@@ -364,7 +366,7 @@ public class SorterContentActivity extends BaseActivity {
     }
 
     void updateManagerOrder (boolean cloudOrder, int order) {
-        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER);
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ORDER);
         intent.putExtra("cloudOrder", cloudOrder);
         intent.putExtra("order", order);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -372,7 +374,7 @@ public class SorterContentActivity extends BaseActivity {
 
     private void setFileExplorerOrder (ManagerActivityLollipop.DrawerItem drawerItem, Context context, int order) {
         ((FileExplorerActivityLollipop) context).refreshOrderNodes(order);
-        MegaPreferences prefs = Util.getPreferences(context);
+        MegaPreferences prefs = DatabaseHandler.getDbHandler(context).getPreferences();
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS && ((FileExplorerActivityLollipop) context).getParentHandleIncoming() == -1) {
             if (prefs != null) {

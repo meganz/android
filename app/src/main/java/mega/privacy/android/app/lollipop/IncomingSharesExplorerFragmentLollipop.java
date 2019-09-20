@@ -443,7 +443,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 	}
 
-	public void findNodes(){
+	private void findNodes(){
 		logDebug("findNodes");
 		((FileExplorerActivityLollipop)context).setDeepBrowserTree(0);
 

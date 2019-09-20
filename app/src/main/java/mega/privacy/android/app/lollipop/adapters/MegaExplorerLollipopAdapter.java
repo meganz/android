@@ -67,7 +67,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	ArrayList<String> names;
 	ArrayList<MegaNode> nodes;
 
-	DatabaseHandler dbH = null;
+    DatabaseHandler dbH = null;
 	private ArrayList<Long> disabledNodes;
 
 	Object fragment;
@@ -757,7 +757,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		this.selectFile = selectFile;
 	}
 
-	public boolean isCameraUploads(MegaNode n){
+	private boolean isCameraUploads(MegaNode n){
 		String cameraSyncHandle = null;
 
 		//Check if the item is the Camera Uploads folder
