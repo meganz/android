@@ -42,8 +42,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.VersionBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -57,6 +55,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class VersionsFileActivity extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
 
@@ -114,14 +116,14 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 					sizeNumber = sizeNumber + node.getSize();
 				}
 			}
-			String size = Util.getSizeString(sizeNumber);
-			log("doInBackground-AsyncTask GetVersionsSizeTask: "+size);
+			String size = getSizeString(sizeNumber);
+			logDebug("doInBackground-AsyncTask GetVersionsSizeTask: " + size);
 			return size;
 		}
 
 		@Override
 		protected void onPostExecute(String size) {
-			log("GetVersionsSizeTask::onPostExecute");
+			logDebug("GetVersionsSizeTask::onPostExecute");
 			updateSize(size);
 		}
 	}
@@ -129,7 +131,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
-			log("onLongPress -- RecyclerViewOnGestureListener");
+			logDebug("onLongPress -- RecyclerViewOnGestureListener");
 
 			View view = listView.findChildViewUnder(e.getX(), e.getY());
 			int position = listView.getChildLayoutPosition(view);
@@ -137,7 +139,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			if (!adapter.isMultipleSelect()){
 
 				if(position<0){
-					log("Position not valid: "+position);
+					logDebug("Position not valid: " + position);
 				}
 				else{
 					adapter.setMultipleSelect(true);
@@ -156,7 +158,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			log("onActionItemClicked");
+			logDebug("onActionItemClicked");
 			final List<MegaNode> nodes = adapter.getSelectedNodes();
 						
 			switch(item.getItemId()){
@@ -201,30 +203,30 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			log("onCreateActionMode");
+			logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.versions_files_action, menu);
 			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 			menu.findItem(R.id.action_download_versions).setVisible(false);
 			menu.findItem(R.id.action_delete_versions).setVisible(false);
-			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
+			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
 		
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
+			logDebug("onDestroyActionMode");
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
-			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 3);
+			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 3);
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			log("onPrepareActionMode");
+			logDebug("onPrepareActionMode");
 			List<MegaNode> selected = adapter.getSelectedNodes();
 
-			menu.findItem(R.id.action_revert_version).setIcon(Util.mutateIconSecondary(versionsFileActivity, R.drawable.ic_restore_black_24dp, R.color.white));
+			menu.findItem(R.id.action_revert_version).setIcon(mutateIconSecondary(versionsFileActivity, R.drawable.ic_restore_black_24dp, R.color.white));
 
 			if (selected.size() != 0) {
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
@@ -264,7 +266,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
+		logDebug("onCreate");
 		super.onCreate(savedInstanceState);
 		
 		if (megaApi == null){
@@ -272,23 +274,23 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		}
 
 		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
+			logDebug("Refresh session - sdk");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
 			return;
 		}
-		if(Util.isChatEnabled()){
+		if(isChatEnabled()){
 			if (megaChatApi == null){
 				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 			}
 
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				log("Refresh session - karere");
+				logDebug("Refresh session - karere");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
@@ -322,7 +324,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 
 		listView = (RecyclerView) findViewById(R.id.recycler_view_versions_file);
-		listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+		listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 		listView.setClipToPadding(false);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new LinearLayoutManager(this);
@@ -345,7 +347,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		long nodeHandle = -1;
 
 		if (savedInstanceState != null){
-			nodeHandle = savedInstanceState.getLong(Constants.EXTRA_NODE_HANDLE, -1);
+			nodeHandle = savedInstanceState.getLong(EXTRA_NODE_HANDLE, -1);
 		}
 
 	    Bundle extras = getIntent().getExtras();
@@ -388,7 +390,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				listView.setAdapter(adapter);
 			}
 			else{
-				log("ERROR: node is NULL");
+				logError("ERROR: node is NULL");
 			}
 		}
 	}
@@ -407,7 +409,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	public void changeActionBarElevation(boolean whitElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			if (whitElevation) {
-				aB.setElevation(Util.px2dp(4, outMetrics));
+				aB.setElevation(px2dp(4, outMetrics));
 			}
 			else {
 				aB.setElevation(0);
@@ -416,7 +418,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 	
 	public void showOptionsPanel(MegaNode sNode, int sPosition){
-		log("showOptionsPanel");
+		logDebug("showOptionsPanel");
 		if(node!=null){
 			this.selectedNode = sNode;
 			this.selectedPosition = sPosition;
@@ -484,7 +486,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 
 	void showDeleteVersionHistoryDialog () {
-		log("showDeleteVersionHistoryDialog");
+		logDebug("showDeleteVersionHistoryDialog");
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -521,7 +523,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 	
 	public void selectAll(){
-		log("selectAll");
+		logDebug("selectAll");
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
@@ -547,21 +549,21 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		if (request.getType() == MegaRequest.TYPE_SHARE) {
-			log("onRequestStart - Share");
+			logDebug("onRequestStart - Share");
 		}
 	}	
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		log("onRequestFinish: " + request.getType());
-		log("onRequestFinish: " + request.getRequestString());
+		logDebug("onRequestFinish: " + request.getType());
+		logDebug("onRequestFinish: " + request.getRequestString());
 		if(adapter!=null && adapter.isMultipleSelect()){
 			adapter.clearSelections();
 			hideMultipleSelect();
 		}
 
 		if (request.getType() == MegaRequest.TYPE_REMOVE) {
-			log(" MegaRequest.TYPE_REMOVE");
+			logDebug("MegaRequest.TYPE_REMOVE");
 			totalRemoveSelected --;
 			if (e.getErrorCode() == MegaError.API_OK) {
 				completedRemove++;
@@ -585,7 +587,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_RESTORE){
-			log(" MegaRequest.TYPE_RESTORE");
+			logDebug("MegaRequest.TYPE_RESTORE");
 			if (e.getErrorCode() == MegaError.API_OK) {
 				showSnackbar(getString(R.string.version_restored));
 			}
@@ -599,15 +601,11 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError");
-	}
-	
-	public static void log(String log) {
-		Util.log("VersionsFileActivity", log);
+		logWarning("onRequestTemporaryError");
 	}
 
 	public void itemClick(int position) {
-		log("itemClick");
+		logDebug("Position: " + position);
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
@@ -619,7 +617,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 	
 	private void updateActionModeTitle() {
-		log("updateActionModeTitle");
+		logDebug("updateActionModeTitle");
 		if (actionMode == null) {
 			return;
 		}
@@ -633,7 +631,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			log("oninvalidate error");
+			logError("Invalidate error", e);
 		}		
 	}
 	
@@ -652,7 +650,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
 				Intent i = new Intent(this, ManagerActivityLollipop.class);
-				i.setAction(Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER);
+				i.setAction(ACTION_REFRESH_PARENTHANDLE_BROWSER);
 				i.putExtra("parentHandle", node.getHandle());
 				startActivity(i);
 				finish();
@@ -669,13 +667,13 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		log("onUserupdate");
+		logDebug("onUserupdate");
 
 	}
 
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-		log("onUserAlertsUpdate");
+		logDebug("onUserAlertsUpdate");
 	}
 
 	@Override
@@ -685,7 +683,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
-		log("onNodesUpdate");
+		logDebug("onNodesUpdate");
 
 		boolean thisNode = false;
 		boolean anyChild = false;
@@ -714,7 +712,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		}
 
 		if ((!thisNode)&&(!anyChild)){
-			log("exit onNodesUpdate - Not related to this node");
+			logWarning("Exit - Not related to this node");
 			return;
 		}
 
@@ -725,7 +723,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				MegaNode newParent = megaApi.getParentNode(n);
 				if(oldParent.getHandle()==newParent.getHandle()){
 					if(newParent.isFile()){
-						log("New version added");
+						logDebug("New version added");
 						node = newParent;
 					}
 					else{
@@ -735,7 +733,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				else{
 					node = n;
 				}
-				log("Node name: "+node.getName());
+				logDebug("Node name: " + node.getName());
 				if(megaApi.hasVersions(node)){
 					nodeVersions = megaApi.getVersions(node);
 				}
@@ -794,7 +792,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			finish();
 		}
 		else{
-			log("After update - nodeVersions size: "+nodeVersions.size());
+			logDebug("After update - nodeVersions size: " + nodeVersions.size());
 
 			if(adapter!=null){
 				adapter.setNodes(nodeVersions);
@@ -900,20 +898,21 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 
 	public void revertVersion(){
-		log("revertVersion");
+		logDebug("revertVersion");
 		megaApi.restoreVersion(selectedNode, this);
 	}
 
 	public void removeVersion(){
-		log("removeVersion");
+		logDebug("removeVersion");
 		megaApi.removeVersion(selectedNode, this);
 	}
 
 	public void removeVersions(List<MegaNode> removeNodes){
-		log("removeVersion");
+		logDebug("removeVersion");
 		totalRemoveSelected = removeNodes.size();
 		errorRemove = 0;
 		completedRemove = 0;
+
 		for(int i=0; i<removeNodes.size();i++){
 			megaApi.removeVersion(removeNodes.get(i), this);
 		}
@@ -928,7 +927,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 
 	public void updateSize(String size){
-		log("updateSize");
+		logDebug("Size: " + size);
 		this.versionsSize = size;
 		adapter.notifyItemChanged(1);
 	}
@@ -942,7 +941,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 
 	public void showConfirmationRemoveVersion(){
-		log("showConfirmationRemoveContact");
+		logDebug("showConfirmationRemoveContact");
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -966,7 +965,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 
 	public void showConfirmationRemoveVersions(final List<MegaNode> removeNodes){
-		log("showConfirmationRemoveContactRequests");
+		logDebug("showConfirmationRemoveContactRequests");
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -1002,9 +1001,9 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		log("onSaveInstanceState");
+		logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
-		outState.putLong(Constants.EXTRA_NODE_HANDLE, node.getHandle());
+		outState.putLong(EXTRA_NODE_HANDLE, node.getHandle());
 	}
 }
 

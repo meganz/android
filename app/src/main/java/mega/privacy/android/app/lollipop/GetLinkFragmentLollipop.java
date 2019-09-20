@@ -33,13 +33,15 @@ import java.util.TimeZone;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class GetLinkFragmentLollipop extends Fragment implements View.OnClickListener, DatePickerDialog.OnDateSetListener, android.widget.CompoundButton.OnCheckedChangeListener {
 
@@ -98,11 +100,11 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            log("context is null");
+            logWarning("context is null");
             return;
         }
 
@@ -111,7 +113,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        logDebug("onCreateView");
 
         if(megaApi==null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -178,8 +180,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         separatorPass.setVisibility(View.GONE);
 
         if(((GetLinkActivityLollipop)context).selectedNode.isExported()){
-            log("node is already exported: "+((GetLinkActivityLollipop)context).selectedNode.getName());
-            log("node link: "+((GetLinkActivityLollipop)context).selectedNode.getPublicLink());
+            logDebug("Node is already exported: " + ((GetLinkActivityLollipop)context).selectedNode.getHandle());
+            logDebug("Node link: " + ((GetLinkActivityLollipop)context).selectedNode.getPublicLink());
             link = ((GetLinkActivityLollipop)context).selectedNode.getPublicLink();
 
             linkWithoutKeyCheck.setChecked(false);
@@ -197,7 +199,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         }
 
 		if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE){
-			log("The user is PRO - enable expiration date");
+            logDebug("The user is PRO - enable expiration date");
 
             transparentKeyLayoutExpiry.setVisibility(View.GONE);
 
@@ -209,7 +211,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 			else{
 				switchButtonExpiry.setChecked(true);
 				java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
-				Calendar cal = Util.calculateDateFromTimestamp(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime());
+				Calendar cal = calculateDateFromTimestamp(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime());
 				TimeZone tz = cal.getTimeZone();
 				df.setTimeZone(tz);
 				Date date = cal.getTime();
@@ -238,7 +240,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
             switchButtonProtection.setOnClickListener(this);
 		}
 		else{
-			log("The is user is not PRO");
+            logDebug("The user is not PRO");
             transparentKeyLayoutExpiry.setVisibility(View.VISIBLE);
 
             switchButtonExpiry.setEnabled(false);
@@ -256,14 +258,14 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
     }
 
     public void showDatePicker(long expirationTimestamp){
-        log("showDatePicker: "+expirationTimestamp);
+        logDebug("expirationTimestamp: " + expirationTimestamp);
         int year;
         int month;
         int day;
 
         if(expirationTimestamp!=-1){
             java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
-            Calendar c = Util.calculateDateFromTimestamp(expirationTimestamp);
+            Calendar c = calculateDateFromTimestamp(expirationTimestamp);
             year = c.get(Calendar.YEAR);
             month = c.get(Calendar.MONTH);
             day = c.get(Calendar.DAY_OF_MONTH);
@@ -295,19 +297,19 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        logDebug("onClick");
         switch (v.getId()){
             case R.id.expiry_date_button:{
                 showDatePicker(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime());
                 break;
             }
             case R.id.disagree_button:{
-                log("DISAgree button");
+                logDebug("DISAgree button");
                 ((GetLinkActivityLollipop)context).finish();
                 break;
             }
             case R.id.agree_button:{
-                log("Agree button");
+                logDebug("Agree button");
                 break;
             }
             case R.id.advanced_options_layout:{
@@ -401,7 +403,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach");
+        logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
 
@@ -412,17 +414,13 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
     @Override
     public void onAttach(Activity context) {
-        log("onAttach Activity");
+        logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
-    }
-
-    public static void log(String message) {
-        Util.log("GetLinkFragmentLollipop", message);
     }
 
     @Override
@@ -434,9 +432,9 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         SimpleDateFormat dfTimestamp = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
         String dateString = dfTimestamp.format(date);
         dateString = dateString + "2359";
-        log("the date string is: "+dateString);
-        int timestamp = (int) Util.calculateTimestamp(dateString);
-        log("the TIMESTAMP is: "+timestamp);
+        logDebug("The date string is: " + dateString);
+        int timestamp = (int) calculateTimestamp(dateString);
+        logDebug("The TIMESTAMP is: " + timestamp);
         isExpiredDateLink=true;
         nC.exportLinkTimestamp(((GetLinkActivityLollipop)context).selectedNode, timestamp);
     }
@@ -452,14 +450,14 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
     }
 
     public void requestFinish(MegaRequest request, MegaError e){
-        log("requestFinish");
+        logDebug("requestFinish");
 
         if (request.getType() == MegaRequest.TYPE_EXPORT) {
-            log("export request finished");
+            logDebug("Export request finished");
             MegaNode node = ((GetLinkActivityLollipop)context).selectedNode;
-            log("EXPIRATION DATE: " + node.getExpirationTime());
+            logDebug("EXPIRATION DATE: " + node.getExpirationTime());
             if (isExpiredDateLink) {
-                log("change the expiration date");
+                logDebug("Change the expiration date");
                 if (node.getExpirationTime() <= 0) {
                     switchButtonExpiry.setChecked(false);
                     expiryDateButton.setVisibility(View.GONE);
@@ -467,7 +465,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 } else {
                     switchButtonExpiry.setChecked(true);
                     java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
-                    Calendar cal = Util.calculateDateFromTimestamp(node.getExpirationTime());
+                    Calendar cal = calculateDateFromTimestamp(node.getExpirationTime());
                     TimeZone tz = cal.getTimeZone();
                     df.setTimeZone(tz);
                     Date date = cal.getTime();
@@ -509,12 +507,12 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                     sendButton.setEnabled(true);
                 }
             }
-            log("link: " + request.getLink());
+            logDebug("Link: " + request.getLink());
 
             isExpiredDateLink = false;
         }
         else if(request.getType() == MegaRequest.TYPE_PASSWORD_LINK){
-            log("password link request finished");
+            logDebug("Password link request finished");
             linkText.setText(request.getText());
             copyButton.setEnabled(true);
             sendButton.setEnabled(true);
@@ -533,11 +531,11 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        log("onCheckedChanged");
+        logDebug("isChecked: " + isChecked);
 
         switch (buttonView.getId()){
             case R.id.switch_set_expiry_date:{
-                log("Set expiry date");
+                logDebug("Set expiry date");
                 if(switchButtonExpiry.isChecked()){
                     showDatePicker(-1);
                 }
@@ -548,12 +546,12 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 break;
             }
             case R.id.switch_set_password_protection:{
-                log("Set password protection");
+                logDebug("Set password protection");
                 if(switchButtonProtection.isChecked()){
                     ((GetLinkActivityLollipop)context).showSetPasswordDialog(null, link);
                 }
                 else{
-                    log("Remove pass protection");
+                    logDebug("Remove pass protection");
                     if (linkWithKeyCheck.isChecked()) {
                         linkText.setText(link);
                     } else if (linkWithoutKeyCheck.isChecked()) {
