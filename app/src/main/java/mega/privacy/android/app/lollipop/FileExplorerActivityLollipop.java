@@ -71,10 +71,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.TimeUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -98,6 +94,14 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
+
+import static android.webkit.URLUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class FileExplorerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
@@ -253,23 +257,23 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestFinish(CHAT)");
+		logDebug("onRequestFinish(CHAT)");
 
 		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
 			MegaApplication.setLoggingIn(false);
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Connected to chat!");
+				logDebug("Connected to chat!");
 			}
 			else{
-				log("ERROR WHEN CONNECTING " + e.getErrorString());
+				logWarning("ERROR WHEN CONNECTING " + e.getErrorString());
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
-			log("Create chat request finish.");
+			logDebug("Create chat request finish.");
 			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
-			log("Attach file request finish.");
+			logDebug("Attach file request finish.");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				totalAttached++;
 			}
@@ -280,7 +284,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if (totalErrors == 0 || totalAttached > 0) {
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					intent.setAction(Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE);
+					intent.setAction(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE);
 					if (chatListItems.size() == 1) {
 						intent.putExtra("CHAT_ID", chatListItems.get(0).getChatId());
 					}
@@ -311,7 +315,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		
 		@Override
 		protected List<ShareInfo> doInBackground(Intent... params) {
-			log("OwnFilePrepareTask: doInBackground");
+			logDebug("OwnFilePrepareTask: doInBackground");
 			return ShareInfo.processIntent(params[0], context);
 		}
 
@@ -354,17 +358,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		log("onCreate first");
+		logDebug("onCreate first");
 		super.onCreate(savedInstanceState);
 
 		if(savedInstanceState!=null){
-			log("Bundle is NOT NULL");
+			logDebug("Bundle is NOT NULL");
 			parentHandleCloud = savedInstanceState.getLong("parentHandleCloud", -1);
-			log("savedInstanceState -> parentHandleCloud: "+parentHandleCloud);
+			logDebug("savedInstanceState -> parentHandleCloud: " + parentHandleCloud);
 			parentHandleIncoming = savedInstanceState.getLong("parentHandleIncoming", -1);
-			log("savedInstanceState -> parentHandleIncoming: "+parentHandleIncoming);
+			logDebug("savedInstanceState -> parentHandleIncoming: " + parentHandleIncoming);
 			deepBrowserTree = savedInstanceState.getInt("deepBrowserTree", 0);
-			log("savedInstanceState -> deepBrowserTree: "+deepBrowserTree);
+			logDebug("savedInstanceState -> deepBrowserTree: " + deepBrowserTree);
 			importFileF = savedInstanceState.getBoolean("importFileF", false);
 			importFragmentSelected = savedInstanceState.getInt("importFragmentSelected", -1);
 			action = savedInstanceState.getString("action", null);
@@ -381,7 +385,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else{
-			log("Bundle is NULL");
+			logDebug("Bundle is NULL");
 			parentHandleCloud = -1;
 			parentHandleIncoming = -1;
 			deepBrowserTree = 0;
@@ -405,14 +409,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		
 		if (credentials == null){
 
-			log("User credentials NULL");
+			logWarning("User credentials NULL");
 //			megaApi.localLogout();
 //			AccountController aC = new AccountController(this);
 //			aC.logout(this, megaApi, megaChatApi, false);
 			
 			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-			loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);
+			loginIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+			loginIntent.setAction(ACTION_FILE_EXPLORER_UPLOAD);
 			/*if (intent != null){
 				if(intent.getExtras() != null)
 				{
@@ -436,7 +440,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			return;
 		}
 		else{
-			log("User has credentials");
+			logDebug("User has credentials");
 		}
 		
 		if (savedInstanceState != null){
@@ -446,7 +450,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		megaApi.addGlobalListener(this);
 
-		if (Util.isChatEnabled()) {
+		if (isChatEnabled()) {
 			if (megaChatApi == null) {
 				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
 			}
@@ -465,7 +469,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			aB.hide();
 		}
 		else{
-			log("aB is null");
+			logWarning("aB is null");
 		}
 
 		fabButton = (FloatingActionButton) findViewById(R.id.fab_file_explorer);
@@ -491,7 +495,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		if (megaApi.getRootNode() == null){
 			getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
 
-			log("hide action bar");
+			logDebug("hide action bar");
 			if (!MegaApplication.isLoggingIn()) {
 
 				MegaApplication.setLoggingIn(true);
@@ -510,40 +514,33 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				prepareNodesText.setVisibility(View.GONE);
 				gSession = credentials.getSession();
 
-				if(Util.isChatEnabled()){
-					log("onCreate: Chat is ENABLED");
+				if(isChatEnabled()){
+					logDebug("Chat is ENABLED");
 
 					int ret = megaChatApi.getInitState();
 
 					if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
 						ret = megaChatApi.init(gSession);
-						log("onCreate: result of init ---> "+ret);
+						logDebug("Result of init ---> " + ret);
 						chatSettings = dbH.getChatSettings();
-						if (ret == MegaChatApi.INIT_NO_CACHE)
-						{
-							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-
+						if (ret == MegaChatApi.INIT_NO_CACHE) {
+							logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
 						}
-						else if (ret == MegaChatApi.INIT_ERROR)
-						{
-
-							log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
-							if(chatSettings==null) {
-
-								log("1 - onCreate: ERROR----> Switch OFF chat");
+						else if (ret == MegaChatApi.INIT_ERROR) {
+							logDebug("Condition ret == MegaChatApi.INIT_ERROR");
+							if(chatSettings == null) {
+								logWarning("ERROR----> Switch OFF chat");
 								chatSettings = new ChatSettings();
 								chatSettings.setEnabled(false+"");
 								dbH.setChatSettings(chatSettings);
-							}
-							else{
-
-								log("2 - onCreate: ERROR----> Switch OFF chat");
+							} else{
+								logWarning("ERROR----> Switch OFF chat");
 								dbH.setEnabledChat(false + "");
 							}
 							megaChatApi.logout(this);
 						}
 						else{
-							log("onCreate: Chat correctly initialized");
+							logDebug("onCreate: Chat correctly initialized");
 						}
 					}
 				}
@@ -551,7 +548,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				megaApi.fastLogin(gSession, this);
 			}
 			else{
-				log("Another login is proccessing");
+				logWarning("Another login is proccessing");
 			}
 		}
 		else{
@@ -568,20 +565,20 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	private void afterLoginAndFetch(){
 		handler = new Handler();
 
-		log("SHOW action bar");
+		logDebug("SHOW action bar");
 		if(aB==null){
 			aB=getSupportActionBar();
 		}
 		aB.show();
-		log("aB.setHomeAsUpIndicator_65");
-		aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
+		logDebug("aB.setHomeAsUpIndicator");
+		aB.setHomeAsUpIndicator(mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 
 		if ((intent != null) && (intent.getAction() != null)){
-			log("intent OK: "+intent.getAction());
+			logDebug("intent OK: " + intent.getAction());
 			if (intent.getAction().equals(ACTION_SELECT_FOLDER_TO_SHARE)){
-				log("action = ACTION_SELECT_FOLDER_TO_SHARE");
+				logDebug("action = ACTION_SELECT_FOLDER_TO_SHARE");
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 
 				mode = SELECT;
@@ -609,7 +606,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			}
 			else if (intent.getAction().equals(ACTION_SELECT_FILE)){
-				log("action = ACTION_SELECT_FILE");
+				logDebug("action = ACTION_SELECT_FILE");
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 
 				mode = SELECT;
@@ -637,7 +634,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				tabShown=NO_TABS;
 			}
 			else if (intent.getAction().equals(ACTION_MULTISELECT_FILE)){
-				log("action = ACTION_MULTISELECT_FILE");
+				logDebug("action = ACTION_MULTISELECT_FILE");
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 
 				mode = SELECT;
@@ -669,7 +666,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			else{
 
 				if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)){
-					log("ACTION_PICK_MOVE_FOLDER");
+					logDebug("ACTION_PICK_MOVE_FOLDER");
 					mode = MOVE;
 					moveFromHandles = intent.getLongArrayExtra("MOVE_FROM");
 
@@ -689,7 +686,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 					}
 					else{
-						log("mTabsAdapterExplorer != null");
+						logDebug("mTabsAdapterExplorer != null");
 					}
 
 					ArrayList<Long> list = new ArrayList<Long>(moveFromHandles.length);
@@ -710,7 +707,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 				else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)){
-					log("ACTION_PICK_COPY_FOLDER");
+					logDebug("ACTION_PICK_COPY_FOLDER");
 					mode = COPY;
 					copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
 
@@ -741,7 +738,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 				else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)){
-					log("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
+					logDebug("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
 					mode = SELECT_CAMERA_FOLDER;
 
 					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
@@ -782,7 +779,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 				else if ((intent.getAction().equals(ACTION_SELECT_FOLDER))){
-					log("action = ACTION_SELECT_FOLDER");
+					logDebug("action = ACTION_SELECT_FOLDER");
 					mode = SELECT;
 					selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
@@ -803,7 +800,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 				else if ((intent.getAction().equals(ACTION_UPLOAD_TO_CLOUD))){
-					log("action = UPLOAD to Cloud Drive");
+					logDebug("action = UPLOAD to Cloud Drive");
 					mode = UPLOAD;
 					selectFile = false;
 
@@ -827,12 +824,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					tabShown=NO_TABS;
 				}
 				else{
-					log("action = UPLOAD");
+					logDebug("action = UPLOAD");
 					mode = UPLOAD;
 
 					if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
 						if ("text/plain".equals(intent.getType())) {
-							log("Handle intent of text plain");
+							logDebug("Handle intent of text plain");
 							Bundle extras = intent.getExtras();
 							if(extras!=null) {
 								if (!extras.containsKey(Intent.EXTRA_STREAM)) {
@@ -847,7 +844,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (mTabsAdapterExplorer == null){
 							tabLayoutExplorer.setVisibility(View.VISIBLE);
 							viewPagerExplorer.setVisibility(View.VISIBLE);
-                            if (Util.isChatEnabled()) {
+                            if (isChatEnabled()) {
                                 mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
                             }
                             else {
@@ -857,7 +854,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 							tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-							if (!Util.isChatEnabled() && mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2) {
+							if (!isChatEnabled() && mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2) {
                                 tabLayoutExplorer.removeTabAt(2);
                             }
 						}
@@ -884,7 +881,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
 					public void onPageSelected(int position) {
-						log("onTabChanged TabId :"+ position);
+						logDebug("Position:"+ position);
 						supportInvalidateOptionsMenu();
 						changeTitle();
 					}
@@ -893,7 +890,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		}
 		else{
-			log("intent error");
+			logWarning("intent error");
 		}
 	}
 
@@ -943,7 +940,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		if (chatExplorer == null || chatExplorer.isHidden()) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				if (whitElevation) {
-					abL.setElevation(Util.px2dp(4, outMetrics));
+					abL.setElevation(px2dp(4, outMetrics));
 				}
 				else {
 					abL.setElevation(0);
@@ -954,14 +951,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
-		log("onCreateOptionsMenuLollipop");
+		logDebug("onCreateOptionsMenuLollipop");
 		
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.file_explorer_action, menu);
 
 	    searchMenuItem = menu.findItem(R.id.cab_menu_search);
-	    searchMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
+	    searchMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
 
@@ -1008,8 +1005,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				log("onQueryTextSubmit: "+query);
-				Util.hideKeyboard(fileExplorerActivityLollipop, 0);
+				logDebug("Query: " + query);
+				hideKeyboard(fileExplorerActivityLollipop, 0);
 				return true;
 			}
 
@@ -1048,7 +1045,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-		log("onPrepareOptionsMenuLollipop");
+		logDebug("onPrepareOptionsMenuLollipop");
 
 	    //Check the tab shown
 		if (viewPagerExplorer != null && tabShown != NO_TABS){
@@ -1088,7 +1085,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					String cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 1);
 					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 					if(iSharesExplorer != null){
-						log("Level deepBrowserTree: "+deepBrowserTree);
+						logDebug("Level deepBrowserTree: " + deepBrowserTree);
 						if (deepBrowserTree==0){
 							createFolderMenuItem.setVisible(false);
 						}
@@ -1097,21 +1094,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							long parentH = iSharesExplorer.getParentHandle();
 							MegaNode n = megaApi.getNodeByHandle(parentH);
 							int accessLevel= megaApi.getAccess(n);
-							log("Node: "+n.getName());
+							logDebug("Node: " + n.getHandle() + ", Permissions: " + accessLevel);
 
 							switch(accessLevel){
 								case MegaShare.ACCESS_OWNER:
 								case MegaShare.ACCESS_READWRITE:
-								case MegaShare.ACCESS_FULL:{
-									log("The node is: "+n.getName()+" permissions: "+accessLevel);
+								case MegaShare.ACCESS_FULL:
 									createFolderMenuItem.setVisible(true);
 									break;
-								}
-								case MegaShare.ACCESS_READ:{
-									log("The node is: "+n.getName()+" permissions: ACCESS_READ "+accessLevel);
+								case MegaShare.ACCESS_READ:
 									createFolderMenuItem.setVisible(false);
 									break;
-								}
 							}
 						}
 					}
@@ -1124,7 +1117,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					String cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
 					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 					if(iSharesExplorer != null){
-						log("Level deepBrowserTree: "+deepBrowserTree);
+						logDebug("Level deepBrowserTree: " + deepBrowserTree);
 						if (deepBrowserTree==0){
 							createFolderMenuItem.setVisible(false);
 						}
@@ -1133,21 +1126,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							long parentH = iSharesExplorer.getParentHandle();
 							MegaNode n = megaApi.getNodeByHandle(parentH);
 							int accessLevel= megaApi.getAccess(n);
-							log("Node: "+n.getName());
+							logDebug("Node: " + n.getHandle() + ", Permissions: " + accessLevel);
 
 							switch(accessLevel){
 								case MegaShare.ACCESS_OWNER:
 								case MegaShare.ACCESS_READWRITE:
-								case MegaShare.ACCESS_FULL:{
-									log("The node is: "+n.getName()+" permissions: "+accessLevel);
+								case MegaShare.ACCESS_FULL:
 									createFolderMenuItem.setVisible(true);
 									break;
-								}
-								case MegaShare.ACCESS_READ:{
-									log("The node is: "+n.getName()+" permissions: ACCESS_READ "+accessLevel);
+								case MegaShare.ACCESS_READ:
 									createFolderMenuItem.setVisible(false);
 									break;
-								}
 							}
 						}
 					}
@@ -1239,7 +1228,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 
 	public void setRootTitle(){
-		log("setRootTitle");
+		logDebug("setRootTitle");
 
 		if(mode == SELECT){
 			if(selectFile){
@@ -1287,7 +1276,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	public void changeTitle (){
-		log("changeTitle");
+		logDebug("changeTitle");
 
 		if(tabShown==NO_TABS){
 			if (importFileF) {
@@ -1481,7 +1470,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	@Override
 	protected void onSaveInstanceState(Bundle bundle) {
-		log("onSaveInstanceState");
+		logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(bundle);
 		bundle.putBoolean("folderSelected", folderSelected);
 		if(cDriveExplorer!=null){
@@ -1513,7 +1502,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		bundle.putLong("parentHandleIncoming", parentHandleIncoming);
 		bundle.putInt("deepBrowserTree", deepBrowserTree);
-		log("IN BUNDLE -> deepBrowserTree: "+deepBrowserTree);
+		logDebug("IN BUNDLE -> deepBrowserTree: " + deepBrowserTree);
 
 		bundle.putBoolean("importFileF", importFileF);
 		bundle.putInt("importFragmentSelected", importFragmentSelected);
@@ -1549,7 +1538,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	@Override
 	public void onBackPressed() {
-		log("onBackPressed: "+tabShown);
+		logDebug("tabShown: " + tabShown);
 		retryConnectionsAndSignalPresence();
 
 		String cFTag;
@@ -1637,7 +1626,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	long createPendingMessageDBH (long idChat, long timestamp, String fingerprint, ShareInfo info) {
-		log("createPendingMessageDBH Id chat: "+idChat+" Fingerprint: "+fingerprint);
+		logDebug("Chat ID: "+ idChat +", Fingerprint: " + fingerprint);
 		PendingMessageSingle pMsgSingle = new PendingMessageSingle();
 		pMsgSingle.setChatId(idChat);
 		pMsgSingle.setUploadTimestamp(timestamp);
@@ -1648,17 +1637,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		pMsgSingle.setId(idMessage);
 
 		if(idMessage!=-1){
-			log("name of the file: "+info.getTitle());
-			log("size of the file: "+info.getSize());
+			logDebug("File: " + info.getTitle() + ", Size: " + info.getSize());
 		}
 		else{
-			log("Error when adding pending msg to the database");
+			logWarning("Error when adding pending msg to the database");
 		}
 		return idMessage;
 	}
 
 	void startChatUploadService () {
-		log("Launch chat upload with files "+filePreparedInfos.size());
+		logDebug("Launch chat upload with files " + filePreparedInfos.size());
 		filesChecked = 0;
 		long[] attachNodeHandles;
 		ArrayList<Long> pendMsgArray = new ArrayList<>();
@@ -1717,7 +1705,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					long timestamp = System.currentTimeMillis()/1000;
 					String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
 					if (fingerprint == null) {
-						log("Error, fingerprint == NULL is not possible to access file for some reason");
+						logWarning("Error, fingerprint == NULL is not possible to access file for some reason");
 						continue;
 					}
 					filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
@@ -1736,7 +1724,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else{
 			filePreparedInfos = null;
-			log("ERROR null files to upload");
+			logWarning("ERROR null files to upload");
 			finishActivity();
 		}
 	}
@@ -1750,7 +1738,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 
 		filePreparedInfos = null;
-		log("finish!!!");
+		logDebug("finish!!!");
 		finishActivity();
 	}
 
@@ -1783,7 +1771,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	 * Handle processed upload intent
 	 */
 	public void onIntentChatProcessed(List<ShareInfo> infos) {
-		log("onIntentChatProcessed");
+		logDebug("onIntentChatProcessed");
 
 		if (getIntent() != null && getIntent().getAction() != ACTION_PROCESSED) {
 			getIntent().setAction(ACTION_PROCESSED);
@@ -1793,10 +1781,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		    showSnackbar(getString(R.string.upload_can_not_open));
 		}
 		else {
-			myChatFilesNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+			myChatFilesNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
 			if(myChatFilesNode == null){
-				log("Create folder: "+Constants.CHAT_FOLDER);
-				megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), this);
+				logDebug("Create folder: " + CHAT_FOLDER);
+				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
 			}
 			else {
 				checkIfFilesExistsInMEGA();
@@ -1817,8 +1805,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			catch(Exception ex){}
 		}
-		
-		log("intent processed!");
+
+		logDebug("intent processed!");
 		if (folderSelected) {
 			if (infos == null) {
 				showSnackbar(getString(R.string.upload_can_not_open));
@@ -1849,14 +1837,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					startService(intent);
 				}
 				filePreparedInfos = null;
-				log("finish!!!");
+				logDebug("finish!!!");
 				finishActivity();
 			}	
 		}
 	}
 
     public void buttonClick(long[] handles){
-        log("buttonClick handles");
+		logDebug("handles: " + handles.length);
 
         Intent intent = new Intent();
         intent.putExtra("NODE_HANDLES", handles);
@@ -1881,7 +1869,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 	
 	public void buttonClick(long handle){
-		log("buttonClick");
+		logDebug("handle: " + handle);
 
 		if (tabShown == INCOMING_TAB){
 			if (deepBrowserTree==0){
@@ -1906,7 +1894,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			intent.putExtra("MOVE_TO", parentNode.getHandle());
 			intent.putExtra("MOVE_HANDLES", moveFromHandles);
 			setResult(RESULT_OK, intent);
-			log("finish!");
+			logDebug("finish!");
 			finishActivity();
 		}
 		else if (mode == COPY){
@@ -1921,16 +1909,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			intent.putExtra("COPY_TO", parentNode.getHandle());
 			intent.putExtra("COPY_HANDLES", copyFromHandles);
 			setResult(RESULT_OK, intent);
-			log("finish!");
+			logDebug("finish!");
 			finishActivity();
 		}
 		else if (mode == UPLOAD){
 
-			log("mode UPLOAD");
+			logDebug("mode UPLOAD");
 
 			if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
 				if ("text/plain".equals(intent.getType())) {
-					log("Handle intent of text plain");
+					logDebug("Handle intent of text plain");
 
 					Bundle extras = intent.getExtras();
 					if(extras!=null){
@@ -1939,7 +1927,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							StringBuilder body = new StringBuilder();
 							String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
 							if (sharedText != null) {
-								if (URLUtil.isHttpsUrl(sharedText) || URLUtil.isHttpUrl(sharedText)) {
+								if (isHttpsUrl(sharedText) || isHttpUrl(sharedText)) {
 									isURL = true;
 									String header = "[InternetShortcut]\n";
 									body.append(header);
@@ -1989,7 +1977,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			else{
 				onIntentProcessed();
 			}
-			log("After UPLOAD click - back to Cloud");
+			logDebug("After UPLOAD click - back to Cloud");
 			this.backToCloud(handle);
 		}
 		else if (mode == IMPORT){
@@ -2015,7 +2003,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 
 			setResult(RESULT_OK, intent);
-			log("finish!");
+			logDebug("finish!");
 			finishActivity();
 		}
 		else if (mode == SELECT){
@@ -2058,10 +2046,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	public void backToCloud(long handle){
-		log("backToCloud: "+handle);
+		logDebug("handle: " + handle);
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
 		if(handle!=-1){
-			startIntent.setAction(Constants.ACTION_OPEN_FOLDER);
+			startIntent.setAction(ACTION_OPEN_FOLDER);
 			startIntent.putExtra("PARENT_HANDLE", handle);
 		}
 		startActivity(startIntent);
@@ -2074,10 +2062,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
     private void createFile(String name, String data, MegaNode parentNode, boolean isURL){
 		File file;
 		if (isURL){
-			file = Util.createTemporalURLFile(name, data);
+			file = createTemporalURLFile(this, name, data);
 		}
 		else {
-			file = Util.createTemporalTextFile(name, data);
+			file = createTemporalTextFile(this, name, data);
 		}
 		if(file!=null){
 			showSnackbar(getString(R.string.upload_began));
@@ -2088,7 +2076,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
 			startService(intent);
 
-			log("After UPLOAD click - back to Cloud");
+			logDebug("After UPLOAD click - back to Cloud");
 			this.backToCloud(parentNode.getHandle());
 			finishActivity();
 		}
@@ -2098,9 +2086,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	private void createFolder(String title) {
-	
-		log("createFolder");
-		if (!Util.isOnline(this)){
+
+		logDebug("createFolder");
+		if (!isOnline(this)){
             showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
@@ -2113,7 +2101,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		if(tabShown==CLOUD_TAB){
 			if (cDriveExplorer != null){
 				parentHandle = cDriveExplorer.getParentHandle();
-				log("1)cDriveExplorer != null: " + parentHandle);
+				logDebug("cDriveExplorer != null: " + parentHandle);
 			}
 			else{
 				String gcFTag;
@@ -2126,14 +2114,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 				if (cDriveExplorer != null){
 					parentHandle = cDriveExplorer.getParentHandle();
-					log("2)cDriveExplorer != null: " + parentHandle);
+					logDebug("cDriveExplorer != null: " + parentHandle);
 				}	
 			}
 		}
 		else if (tabShown == INCOMING_TAB){
 			if (iSharesExplorer != null){
 				parentHandle = iSharesExplorer.getParentHandle();
-				log("1)iSharesExplorer != null: " + parentHandle);
+				logDebug("iSharesExplorer != null: " + parentHandle);
 			}
 			else{
 				String gcFTag;
@@ -2146,7 +2134,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 				if (iSharesExplorer != null){
 					parentHandle = iSharesExplorer.getParentHandle();
-					log("2)iSharesExplorer != null: " + parentHandle);
+					logDebug("iSharesExplorer != null: " + parentHandle);
 				}	
 			}
 		}
@@ -2169,7 +2157,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			else if (cDriveExplorer != null){
 				parentHandle = cDriveExplorer.getParentHandle();
-				log("1)cDriveExplorer != null: " + parentHandle);
+				logDebug("cDriveExplorer != null: " + parentHandle);
 			}
 			else{
 				String gcFTag;
@@ -2182,7 +2170,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 				if (cDriveExplorer != null){
 					parentHandle = cDriveExplorer.getParentHandle();
-					log("2)cDriveExplorer != null: " + parentHandle);
+					logDebug("cDriveExplorer != null: " + parentHandle);
 				}
 			}
 		}
@@ -2190,7 +2178,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 		
 		if (parentNode != null){
-			log("parentNode != null: " + parentNode.getName());
+			logDebug("parentNode != null: " + parentNode.getName());
 			boolean exists = false;
 			ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
 			for (int i=0;i<nL.size();i++){
@@ -2217,10 +2205,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else{
-			log("parentNode == null: " + parentHandle);
+			logWarning("parentNode == null: " + parentHandle);
 			parentNode = megaApi.getRootNode();
 			if (parentNode != null){
-				log("megaApi.getRootNode() != null");
+				logDebug("megaApi.getRootNode() != null");
 				boolean exists = false;
 				ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
 				for (int i=0;i<nL.size();i++){
@@ -2269,21 +2257,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}, 50);
 	}
-	
-	public static void log(String log) {
-		Util.log("FileExplorerActivityLollipop", log);
-	}
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart");
+		logDebug("onRequestStart");
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
-		log("onRequestFinish");
+		logDebug("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-			myChatFilesNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+			myChatFilesNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
 			if (myChatFilesNode != null && myChatFilesNode.getHandle() == request.getNodeHandle()) {
 				checkIfFilesExistsInMEGA();
 			}
@@ -2307,7 +2291,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (cDriveExplorer != null){
 							cDriveExplorer.navigateToFolder(request.getNodeHandle());
 							parentHandleCloud = request.getNodeHandle();
-							log("The handle of the created folder is: "+parentHandleCloud);
+							logDebug("The handle of the created folder is: " + parentHandleCloud);
 						}
 					}
 					else if (tabShown == NO_TABS){
@@ -2345,7 +2329,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 								parentHandleCloud = request.getNodeHandle();
 							}
 						}
-						log("The handle of the created folder is: "+parentHandleCloud);
+						logDebug("The handle of the created folder is: " + parentHandleCloud);
 					}
 					else{
 
@@ -2420,8 +2404,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
-				
-				log("Logged in with session");
+
+				logDebug("Logged in with session");
 
 				megaApi.fetchNodes(this);
 			}
@@ -2454,27 +2438,22 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
 
-						log("Chat enabled-->connect");
+						logDebug("Chat enabled-->connect");
 						if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
-							log("Connection goes!!!");
+							logDebug("Connection goes!!!");
 							megaChatApi.connect(this);
-						}
-						else{
-							log("Not launch connect: "+megaChatApi.getInitState());
+						} else{
+							logWarning("Not launch connect: " + megaChatApi.getInitState());
 						}
 						MegaApplication.setLoggingIn(false);
 						afterLoginAndFetch();
-					}
-					else{
-
-						log("Chat NOT enabled - readyToManager");
+					} else{
+						logWarning("Chat NOT enabled - readyToManager");
 						MegaApplication.setLoggingIn(false);
 						afterLoginAndFetch();
 					}
-				}
-				else{
-
-					log("chatSettings NULL - readyToManager");
+				} else{
+					logWarning("chatSettings NULL - readyToManager");
 					MegaApplication.setLoggingIn(false);
 					afterLoginAndFetch();
 
@@ -2488,9 +2467,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if (node != null) {
 					attachNodes.add(node);
 				}
-			}
-			else {
-				log("Error copying node into My Chat Files");
+			} else {
+				logWarning("Error copying node into My Chat Files");
 			}
 			if (filesChecked == filePreparedInfos.size()) {
 				startChatUploadService();
@@ -2519,7 +2497,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-		log("onUserAlertsUpdate");
+		logDebug("onUserAlertsUpdate");
 	}
 
 
@@ -2530,7 +2508,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-		log("onNodesUpdate");
+		logDebug("onNodesUpdate");
 		if (cDriveExplorer != null){
 			if (megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()) != null){
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
@@ -2561,7 +2539,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			megaApi.removeGlobalListener(this);
 		}
 
-		File childThumbDir = new File(ThumbnailUtils.getThumbFolder(this), ImportFilesFragment.THUMB_FOLDER);
+		File childThumbDir = new File(getThumbFolder(this), ImportFilesFragment.THUMB_FOLDER);
 		if (childThumbDir != null){
 			if (childThumbDir.exists()){
 				try {
@@ -2613,7 +2591,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
-		log("onOptionsItemSelected");
+		logDebug("onOptionsItemSelected");
 
 		int id = item.getItemId();
 		switch(id){
@@ -2638,14 +2616,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						else{
 							Intent in = new Intent(this, AddContactActivityLollipop.class);
-							in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-							startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
+							in.putExtra("contactType", CONTACT_TYPE_MEGA);
+							startActivityForResult(in, REQUEST_CREATE_CHAT);
 						}
 					}
 				}
 				else{
-					log("Online but not megaApi");
-					Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+					logWarning("Online but not megaApi");
+					showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				}
 			}
 		}
@@ -2654,13 +2632,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		log("-------------------onActivityResult " + requestCode + "____" + resultCode);
+		logDebug("Request code: " + requestCode + ", Result code: " + resultCode);
 
-		if (requestCode == Constants.REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
-			log("onActivityResult REQUEST_CREATE_CHAT OK");
+		if (requestCode == REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
+			logDebug("REQUEST_CREATE_CHAT OK");
 
 			if (intent == null) {
-				log("Return.....");
+				logWarning("Return.....");
 				return;
 			}
 
@@ -2670,12 +2648,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if(contactsData.size()==1){
 					MegaUser user = megaApi.getContact(contactsData.get(0));
 					if(user!=null){
-						log("Chat with contact: "+contactsData.size());
+						logDebug("Chat with contact: " + contactsData.size());
 						startOneToOneChat(user);
 					}
 				}
 				else{
-					log("Create GROUP chat");
+					logDebug("Create GROUP chat");
 					MegaChatPeerList peers = MegaChatPeerList.createInstance();
 					for (int i=0; i<contactsData.size(); i++){
 						MegaUser user = megaApi.getContact(contactsData.get(i));
@@ -2683,7 +2661,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 						}
 					}
-					log("create group chat with participants: "+peers.size());
+					logDebug("create group chat with participants: " + peers.size());
 
 					final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
 					final boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
@@ -2699,7 +2677,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 								megaChatApi.createPublicChat(peers, chatTitle, listener);
 							}
 							else{
-								Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
+								showAlert(this, getString(R.string.message_error_set_title_get_link), null);
 							}
 						}
 						else{
@@ -2712,10 +2690,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean publicLink){
-		log("onRequestFinishCreateChat");
+		logDebug("onRequestFinishCreateChat");
 
 		if(errorCode==MegaChatError.ERROR_OK){
-			log("Chat CREATED.");
+			logDebug("Chat CREATED.");
 			//Update chat view
 			chatExplorer = getChatExplorerFragment();
 			if(chatExplorer!=null){
@@ -2724,38 +2702,38 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			showSnackbar(getString(R.string.new_group_chat_created));
 		}
 		else{
-			log("EEEERRRRROR WHEN CREATING CHAT " + errorCode);
+			logWarning("ERROR WHEN CREATING CHAT " + errorCode);
 			showSnackbar(getString(R.string.create_chat_error));
 		}
 	}
 
 	public void startOneToOneChat(MegaUser user){
-		log("startOneToOneChat");
+		logDebug("User: " + user.getHandle());
 		MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
 		MegaChatPeerList peers = MegaChatPeerList.createInstance();
 		if(chat==null){
-			log("No chat, create it!");
+			logDebug("No chat, create it!");
 			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 			megaChatApi.createChat(false, peers, this);
 		}
 		else{
-			log("There is already a chat, open it!");
+			logDebug("There is already a chat, open it!");
 			showSnackbar(getString(R.string.chat_already_exists));
 		}
 	}
 
 	public void showNewFolderDialog(){
-		log("showNewFolderDialog");
+		logDebug("showNewFolderDialog");
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
 		final EditText input = new EditText(this);
 		layout.addView(input, params);
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
 		final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
 		layout.addView(error_layout, params1);
@@ -2778,7 +2756,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
@@ -2933,7 +2911,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		logDebug("onClick");
 
 		switch(v.getId()) {
 			case R.id.fab_file_explorer: {
@@ -2958,15 +2936,15 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						else{
 							Intent intent = new Intent(this, AddContactActivityLollipop.class);
-							intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+							intent.putExtra("contactType", CONTACT_TYPE_MEGA);
 							intent.putExtra("onlyCreateGroup", true);
-							startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT);
+							startActivityForResult(intent, REQUEST_CREATE_CHAT);
 						}
 					}
 				}
 				else{
-					log("Online but not megaApi");
-					Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+					logWarning("Online but not megaApi");
+					showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				}
 				break;
 			}
@@ -2987,7 +2965,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
 			Bundle extras = intent.getExtras();
 			if ("text/plain".equals(intent.getType()) && extras != null && !extras.containsKey(Intent.EXTRA_STREAM)) {
-				log("Handle intent of text plain");
+				logDebug("Handle intent of text plain");
 				StringBuilder body = new StringBuilder();
 				String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
 				if (sharedText2 != null) {
@@ -3021,14 +2999,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					if(chatItem!=null){
 						Intent intent = new Intent(this, ManagerActivityLollipop.class);
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+						intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
 						intent.putExtra("CHAT_ID", idChat);
 						startActivity(intent);
 					}
 				}
 				else{
 					Intent chatIntent = new Intent(this, ManagerActivityLollipop.class);
-					chatIntent.setAction(Constants.ACTION_CHAT_SUMMARY);
+					chatIntent.setAction(ACTION_CHAT_SUMMARY);
 					startActivity(chatIntent);
 				}
 			}
@@ -3056,18 +3034,18 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	public void showNewFileDialog(final MegaNode parentNode, final String data, final boolean isURL){
-		log("showNewFileDialog");
+		logDebug("showNewFileDialog");
 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
 		final EditText input = new EditText(this);
 		layout.addView(input, params);
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
 		final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
 		layout.addView(error_layout, params1);
@@ -3089,7 +3067,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
@@ -3264,12 +3242,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
     public void showRenameDialog(final File document, final String text){
-        log("showRenameDialog");
+		logDebug("showRenameDialog");
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 //	    layout.setLayoutParams(params);
 
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isDirectory());
@@ -3315,7 +3293,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         layout.addView(input, params);
 
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+        params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
         final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
         layout.addView(error_layout, params1);
@@ -3337,7 +3315,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
         params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+        params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
         textError.setLayoutParams(params_text_error);
 
         textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
@@ -3483,7 +3461,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
 		int state = megaChatApi.getUserOnlineStatus(userhandle);
 		if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
-			String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
+			String formattedDate = lastGreenDate(this, lastGreen);
 			if (userhandle != megaChatApi.getMyUserHandle()) {
 				chatExplorer = getChatExplorerFragment();
 				if (chatExplorer != null) {
@@ -3495,7 +3473,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	ChatExplorerFragment getChatExplorerFragment () {
 
-		if (!Util.isChatEnabled()) {
+		if (!isChatEnabled()) {
 			return null;
 		}
 
