@@ -5171,7 +5171,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 log("Portrait");
                                 holder.contentOwnMessageThumbPort.setImageBitmap(preview);
-                                holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                                 if (MimeTypeList.typeForName(node.getName()).isPdf()) {
                                     log("Is pfd preview");
@@ -5241,7 +5241,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             } else {
                                 log("Landscape");
                                 holder.contentOwnMessageThumbLand.setImageBitmap(preview);
-                                holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                                 if (MimeTypeList.typeForName(node.getName()).isPdf()) {
                                     log("Is pfd preview");
@@ -5495,7 +5495,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 log("Portrait");
 
                                 holder.contentContactMessageThumbPort.setImageBitmap(preview);
-                                holder.contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                holder.contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                                 if (MimeTypeList.typeForName(node.getName()).isPdf()) {
                                     log("Contact message - Is pfd preview");
@@ -5552,7 +5552,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 log("Landscape");
 
                                 holder.contentContactMessageThumbLand.setImageBitmap(preview);
-                                holder.contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                holder.contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                                 if (MimeTypeList.typeForName(node.getName()).isPdf()) {
                                     log("Contact message - Is pfd preview");
@@ -7610,7 +7610,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 log("Portrait");
 
                 holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
-                holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                 if (MimeTypeList.typeForName(node.getName()).isPdf()) {
                     log("Is pfd preview");
@@ -7660,7 +7660,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 log("Landscape");
 
                 holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
-                holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                 if (MimeTypeList.typeForName(node.getName()).isPdf()) {
                     log("Is pfd preview");
@@ -7713,7 +7713,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (bitmap.getWidth() < bitmap.getHeight()) {
             log("Portrait");
             holder.contentContactMessageThumbPort.setImageBitmap(bitmap);
-            holder.contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            holder.contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
             if (MimeTypeList.typeForName(node.getName()).isPdf()) {
                 log("Contact message - Is pfd preview");
@@ -7785,7 +7785,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("Landscape");
 
             holder.contentContactMessageThumbLand.setImageBitmap(bitmap);
-            holder.contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            holder.contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
             if (MimeTypeList.typeForName(node.getName()).isPdf()) {
                 log("Contact message - Is pfd preview");
@@ -7879,7 +7879,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 log("Portrait");
 
                                 holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
-                                holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                                 if (MimeTypeList.typeForName(name).isPdf()) {
                                     log("Is pfd preview");
@@ -7938,7 +7938,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             } else {
                                 log("Landscape");
                                 holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
-                                holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                                 if (MimeTypeList.typeForName(name).isPdf()) {
                                     log("Is pfd preview");
@@ -8001,7 +8001,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 log("Portrait");
                                 holder.contentContactMessageThumbPort.setImageBitmap(bitmap);
-                                holder.contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                holder.contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                                 if (MimeTypeList.typeForName(name).isPdf()) {
                                     log("Contact message - Is pfd preview");
@@ -8081,7 +8081,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 log("Landscape");
                                 holder.contentContactMessageThumbLand.setImageBitmap(bitmap);
-                                holder.contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                holder.contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                                 if (MimeTypeList.typeForName(name).isPdf()) {
                                     log("Contact message - Is pfd preview");
@@ -8227,7 +8227,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (bitmap.getWidth() < bitmap.getHeight()) {
                         log("Portrait show preview");
                         holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
-                        holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                         holder.previewFramePort.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
 
@@ -8246,7 +8246,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     } else {
                         log("Landscape show preview");
                         holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
-                        holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                         holder.previewFrameLand.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
 
