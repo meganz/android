@@ -7,14 +7,14 @@ import android.graphics.BitmapFactory;
 import java.io.File;
 
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ChatParticipantAvatarListener implements MegaRequestListenerInterface {
 
@@ -30,12 +30,12 @@ public class ChatParticipantAvatarListener implements MegaRequestListenerInterfa
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart()");
+        logDebug("onRequestStart()");
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish()");
+        logDebug("onRequestFinish()");
         if (e.getErrorCode() == MegaError.API_OK){
             boolean avatarExists = false;
 
@@ -79,25 +79,19 @@ public class ChatParticipantAvatarListener implements MegaRequestListenerInterfa
                     }
                 }
                 else{
-                    log("Handle do not match");
+                    logWarning("Handle do not match");
                 }
             }
         }
     }
 
     @Override
-    public void onRequestTemporaryError(MegaApiJava api,
-                                        MegaRequest request, MegaError e) {
-        log("onRequestTemporaryError");
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+        logWarning("onRequestTemporaryError");
     }
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
         // TODO Auto-generated method stub
     }
-
-    private static void log(String log) {
-        Util.log("ChatParticipantAvatarListener", log);
-    }
-
 }

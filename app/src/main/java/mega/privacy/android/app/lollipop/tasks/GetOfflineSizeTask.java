@@ -5,7 +5,9 @@ import android.os.AsyncTask;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 /*
  * Background task to calculate the size of offline folder
@@ -19,22 +21,18 @@ public class GetOfflineSizeTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        log("doInBackground-Async Task GetOfflineSizeTask");
+        logDebug("doInBackground-Async Task GetOfflineSizeTask");
 
-        String size = Util.getOfflineSize(context);
+        String size = getOfflineSize(context);
         return size;
     }
 
     @Override
     protected void onPostExecute(String size) {
-        log("GetOfflineSizeTask::onPostExecute");
+        logDebug("GetOfflineSizeTask::onPostExecute");
         SettingsFragmentLollipop sttFLol = ((ManagerActivityLollipop)context).getSettingsFragment();
         if(sttFLol!=null){
             sttFLol.setOfflineSize(size);
         }
-    }
-
-    public static void log(String message) {
-        Util.log("GetOfflineSizeTask", message);
     }
 }

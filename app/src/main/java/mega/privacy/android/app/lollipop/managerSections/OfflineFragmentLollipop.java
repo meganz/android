@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
@@ -65,15 +64,20 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
-public class OfflineFragmentLollipop extends Fragment{
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
+
+public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public static ImageView imageDrag;
 	public static final String REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list";
@@ -120,6 +124,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 	};
 
+	private int lastPlaceHolderCount;
+
 	@Override
 	public void onResume(){
 		super.onResume();
@@ -133,8 +139,13 @@ public class OfflineFragmentLollipop extends Fragment{
 		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
 	}
 
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
+	}
+
 	public void activateActionMode(){
-		log("activateActionMode");
+		logDebug("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -142,7 +153,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void updateScrollPosition(int position) {
-		log("updateScrollPosition");
+		logDebug("Position: " + position);
 		if (adapter != null) {
 			if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
@@ -212,7 +223,7 @@ public class OfflineFragmentLollipop extends Fragment{
     }
 
 	public ImageView getImageDrag(int position) {
-		log("getImageDrag");
+		logDebug("Position: " + position);
 		if (adapter != null) {
 			if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
@@ -241,7 +252,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			log("ActionBarCallBack::onActionItemClicked");
+			logDebug("ActionBarCallBack::onActionItemClicked");
 			List<MegaOffline> documents = adapter.getSelectedOfflineNodes();
 			
 			switch(item.getItemId()){
@@ -361,32 +372,32 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			log("ActionBarCallBack::onCreateActionMode");
+			logDebug("ActionBarCallBack::onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.offline_browser_action, menu);
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
 		
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("ActionBarCallBack::onDestroyActionMode");
+			logDebug("ActionBarCallBack::onDestroyActionMode");
 			hideMultipleSelect();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			log("ActionBarCallBack::onPrepareActionMode");
+			logDebug("ActionBarCallBack::onPrepareActionMode");
 //			ContextCompat.getDrawable(context, R.drawable.ic_arrow_back_white)
 			List<MegaOffline> selected = adapter.getSelectedOfflineNodes();
 			
-			if (Util.isOnline(context)){
+			if (isOnline(context)){
 				if (selected.size() != 0) {
 					menu.findItem(R.id.cab_menu_download).setVisible(false);
 					menu.findItem(R.id.cab_menu_share).setVisible(false);
@@ -442,7 +453,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void selectAll(){
-		log("selectAll");
+		logDebug("selectAll");
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
@@ -459,7 +470,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	public boolean showSelectMenuItem(){
-		log("showSelectMenuItem");
+		logDebug("showSelectMenuItem");
 		if (adapter != null){
 			return adapter.isMultipleSelect();
 		}
@@ -470,9 +481,9 @@ public class OfflineFragmentLollipop extends Fragment{
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		logDebug("onCreate");
 		
-		if (Util.isOnline(context)){
+		if (isOnline(context)){
 			if (megaApi == null){
 				megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 			}
@@ -502,7 +513,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		logDebug("onCreateView");
 		if (aB == null){
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
@@ -526,7 +537,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		//Check pathNAvigation
 		if (((ManagerActivityLollipop)context).isList){
-			log("onCreateList");
+			logDebug("onCreateList");
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
             recyclerView.removeItemDecoration(headerItemDecoration);
@@ -535,7 +546,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			//Add bottom padding for recyclerView like in other fragments.
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -604,7 +615,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			return v;
 		}
 		else{
-			log("onCreateGRID");
+			logDebug("onCreateGRID");
 			View v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
 			
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
@@ -682,72 +693,24 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void findNodes(){
-		log("findNodes");
+		logDebug("findNodes");
 
 		if((getActivity() == null) || (!isAdded())){
-			log("Fragment NOT Attached!");
+			logWarning("Fragment NOT Attached!");
 			return;
 		}
 
 		mOffList=dbH.findByPath(pathNavigation);
 
-		log("Number of elements: "+mOffList.size());
+		logDebug("Number of elements: " + mOffList.size());
 
 		for(int i=0; i<mOffList.size();i++){
 
 			MegaOffline checkOffline = mOffList.get(i);
-			File offlineDirectory = null;
-			if(checkOffline.getOrigin()==MegaOffline.INCOMING){
-
-				log("isIncomingOffline");
-
-				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-					log("offlineDirectory: "+offlineDirectory);
-				}
-				else{
-					offlineDirectory = context.getFilesDir();
-				}
-			}
-			else if(checkOffline.getOrigin()==MegaOffline.INBOX){
-
-				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
-					log("offlineDirectory: "+offlineDirectory);
-				}
-				else{
-					offlineDirectory = context.getFilesDir();
-				}
-			}
-			else{
-				log("FROM other origin");
-
-				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
-				}
-				else{
-					offlineDirectory = context.getFilesDir();
-				}
-
-				if (!offlineDirectory.exists()){
-					log("Not exists for not incoming offline");
-
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in" + checkOffline.getPath()+checkOffline.getName());
-					}
-					else{
-						offlineDirectory = context.getFilesDir();
-					}
-				}
-			}
-
-			if(offlineDirectory!=null){
-				if (!offlineDirectory.exists()){
-					log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-					//dbH.removeById(mOffList.get(i).getId());
-					mOffList.remove(i);
-					i--;
-				}
+			File offlineFile = getOfflineFile(context, checkOffline);
+			if (!isFileAvailable(offlineFile)) {
+				mOffList.remove(i);
+				i--;
 			}
 			addSectionTitle(mOffList);
 		}
@@ -805,7 +768,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void sortByNameDescending(){
-		log("sortByNameDescending");
+		logDebug("sortByNameDescending");
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
@@ -866,7 +829,7 @@ public class OfflineFragmentLollipop extends Fragment{
     
     
     public void sortByNameAscending() {
-		log("sortByNameAscending");
+		logDebug("sortByNameAscending");
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
@@ -934,33 +897,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 //		contentText.setText(getInfoFolder(mOffList));
 	}
-	
-//	public void updateView (){
-//		log("updateView");
-//		mOffList=dbH.findByPath(pathNavigation);
-//		
-//		for(int i=0; i<mOffList.size();i++){
-//			
-//			File offlineDirectory = null;
-//			if (Environment.getExternalStorageDirectory() != null){
-//				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
-//			}
-//			else{
-//				offlineDirectory = context.getFilesDir();
-//			}	
-//			
-//			if (!offlineDirectory.exists()){
-//				dbH.removeById(mOffList.get(i).getId());
-//				mOffList.remove(i);
-//				
-//			}			
-//		}
-//		this.setNodes(mOffList);
-//	}
-//	
 
 	public boolean isFolder(String path){
-		log("isFolder");
+		logDebug("isFolder");
 
 		MegaNode n = megaApi.getNodeByPath(path);
 		if(n == null)
@@ -977,25 +916,15 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	private String getInfoFolder(ArrayList<MegaOffline> mOffInfo) {
-		log("getInfoFolder");
+		logDebug("getInfoFolder");
 //		log("primer elemento: "+mOffInfo.get(0).getName());
 		
 		String info = "";
 		int numFolders=0;
 		int numFiles=0;
 		
-		String pathI=null;
-		
 		if(mOffInfo.size()>0){
-			if(mOffInfo.get(0).getOrigin()==MegaOffline.INCOMING){
-				pathI = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + mOffInfo.get(0).getHandleIncoming() + "/";
-			}
-			else if(mOffInfo.get(0).getOrigin()==MegaOffline.INBOX){
-				pathI = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
-			}
-			else{
-				pathI= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-			}	
+			String pathI = getOfflineAbsolutePath(context, mOffInfo.get(0));
 			
 			for(int i=0; i<mOffInfo.size();i++){
 				MegaOffline mOff = (MegaOffline) mOffInfo.get(i);
@@ -1011,16 +940,15 @@ public class OfflineFragmentLollipop extends Fragment{
 					}
 				}
 				else{
-					log("File do not exist");
+					logWarning("File do not exist");
 				}		
 			}
 		}
 		
 		//Check if the file MarterKey is exported
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-		log("Export in: "+path);
-		File file= new File(path);
-		if(file.exists()){
+		logDebug("Export in: " + getExternalStoragePath(RK_FILE));
+		File file= buildExternalStorageFile(RK_FILE);
+		if(isFileAvailable(file)){
 			numFiles++;
 		}
 		
@@ -1044,13 +972,13 @@ public class OfflineFragmentLollipop extends Fragment{
 							R.plurals.general_num_files, numFiles);
 		}
 
-		log(info);
+		logDebug(info);
 		return info;
 	}
 
 	@Override
     public void onAttach(Activity activity) {
-		log("onAttach");
+		logDebug("onAttach");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -1060,13 +988,13 @@ public class OfflineFragmentLollipop extends Fragment{
     }
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
-		log("itemClick");
+		logDebug("Position: " + position);
 		//Otherwise out of bounds exception happens.
 		if(position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
 			position -= placeholderCount;
 		}
 		if (adapter.isMultipleSelect()){
-			log("multiselect");
+			logDebug("Multiselect");
 			MegaOffline item = mOffList.get(position);
 			if(!(item.getHandle().equals("0"))){
 				adapter.toggleSelection(position);
@@ -1082,27 +1010,14 @@ public class OfflineFragmentLollipop extends Fragment{
 			File currentFile=null;
 			
 			if(currentNode.getHandle().equals("0")){
-				log("click on Master Key");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-				openFile(new File(path));
+				logDebug("Click on Master Key");
+				openFile(buildExternalStorageFile(RK_FILE));
 //				viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
 //				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
 				return;
 			}
-						
-			if(currentNode.getOrigin()==MegaOffline.INCOMING){
-				String handleString = currentNode.getHandleIncoming();
-				currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+currentNode.getPath() + "/" + currentNode.getName());
-			}
-			else if(currentNode.getOrigin()==MegaOffline.INBOX){
-				String handleString = currentNode.getHandleIncoming();
-				currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/"+currentNode.getPath() + "/" + currentNode.getName());
-			}
-			else{
-				currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
-			}
-			
-			if(currentFile.exists() && currentFile.isDirectory()){
+			currentFile = getOfflineFile(context, currentNode);
+			if(isFileAvailable(currentFile) && currentFile.isDirectory()){
 
 				int lastFirstVisiblePosition = 0;
 				if(((ManagerActivityLollipop)context).isList){
@@ -1111,12 +1026,12 @@ public class OfflineFragmentLollipop extends Fragment{
 				else{
 					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
-						log("Completely -1 then find just visible position");
+						logWarning("Completely -1 then find just visible position");
 						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
-				log("Push to stack "+lastFirstVisiblePosition+" position");
+				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";
@@ -1135,23 +1050,11 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 				else{
 					File offlineDirectory = null;
-					String path;
-
-					if(currentNode.getOrigin()==MegaOffline.INCOMING){
-						path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming();
-					}
-					else if(currentNode.getOrigin()==MegaOffline.INBOX){
-						path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in";
-					}
-					else{							
-						path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-						log("Path NOT INCOMING: "+path);							
-					}						
+					String path = getOfflineAbsolutePath(context, currentNode);
 											
 					for(int i=0; i<mOffList.size();i++){
 						
 						if (Environment.getExternalStorageDirectory() != null){								
-							log("mOffList path: "+path+mOffList.get(i).getPath());
 							offlineDirectory = new File(path + mOffList.get(i).getPath()+mOffList.get(i).getName());
 						}
 						else{
@@ -1160,7 +1063,6 @@ public class OfflineFragmentLollipop extends Fragment{
 
 						if (!offlineDirectory.exists()){
 							//Updating the DB because the file does not exist	
-							log("Path to remove C: "+(path + mOffList.get(i).getName()));
 							dbH.removeById(mOffList.get(i).getId());
 							mOffList.remove(i);
 							i--;
@@ -1220,7 +1122,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					
 					//Open it!
 					if(MimeTypeList.typeForName(currentFile.getName()).isZip()){
-						log("MimeTypeList ZIP");
+						logDebug("MimeTypeList ZIP");
 						Intent intentZip = new Intent();
 						intentZip.setClass(context, ZipBrowserActivityLollipop.class);
 						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
@@ -1232,7 +1134,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
                         intent.putExtra("placeholder", placeholderCount);
 						intent.putExtra("position", position);
-						intent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						intent.putExtra("adapterType", OFFLINE_ADAPTER);
 						intent.putExtra("parentNodeHandle", -1L);
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
 						intent.putExtra("pathNavigation", pathNavigation);
@@ -1244,7 +1146,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						imageDrag = imageView;
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
-						log("Video file");
+						logDebug("Video file");
 
 						Intent mediaIntent;
 						boolean internalIntent;
@@ -1265,7 +1167,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						mediaIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						mediaIntent.putExtra("FILENAME", currentNode.getName());
 						mediaIntent.putExtra("path", currentFile.getAbsolutePath());
-						mediaIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						mediaIntent.putExtra("adapterType", OFFLINE_ADAPTER);
                         mediaIntent.putExtra("placeholder", placeholderCount);
 						mediaIntent.putExtra("position", position);
 						mediaIntent.putExtra("parentNodeHandle", -1L);
@@ -1288,11 +1190,11 @@ public class OfflineFragmentLollipop extends Fragment{
 							startActivity(mediaIntent);
 						}
 						else {
-							if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+							if (isIntentAvailable(context, mediaIntent)){
 								startActivity(mediaIntent);
 							}
 							else {
-								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
+								((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -1302,8 +1204,8 @@ public class OfflineFragmentLollipop extends Fragment{
 									intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 								}
 								intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-								if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
-									log("call to startActivity(intentShare)");
+								if (isIntentAvailable(context, intentShare)) {
+									logDebug("Call to startActivity(intentShare)");
 									context.startActivity(intentShare);
 								}
 							}
@@ -1312,15 +1214,15 @@ public class OfflineFragmentLollipop extends Fragment{
 						imageDrag = imageView;
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
-						log("Pdf file");
+						logDebug("PDF file");
 
-						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
+						//String localPath = getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 
 						pdfIntent.putExtra("inside", true);
 						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
-						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						pdfIntent.putExtra("adapterType", OFFLINE_ADAPTER);
 						pdfIntent.putExtra("path", currentFile.getAbsolutePath());
 						pdfIntent.putExtra("pathNavigation", pathNavigation);
 						pdfIntent.putExtra("screenPosition", screenPosition);
@@ -1336,7 +1238,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						imageDrag = imageView;
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isURL()) {
-						log("Is URL file");
+						logDebug("Is URL file");
 						InputStream instream = null;
 						try {
 							// open the file for reading
@@ -1354,12 +1256,12 @@ public class OfflineFragmentLollipop extends Fragment{
 
 									String url = line2.replace("URL=", "");
 
-									log("Is URL - launch browser intent");
+									logDebug("Is URL - launch browser intent");
 									Intent i = new Intent(Intent.ACTION_VIEW);
 									i.setData(Uri.parse(url));
 									startActivity(i);
 								} else {
-									log("Not expected format: Exception on processing url file");
+									logWarning("Not expected format: Exception on processing url file");
 									openFile(currentFile);
 								}
 							}
@@ -1372,7 +1274,7 @@ public class OfflineFragmentLollipop extends Fragment{
 							try {
 								instream.close();
 							} catch (IOException e) {
-								log("EXCEPTION closing InputStream");
+								logError("EXCEPTION closing InputStream", e);
 							}
 						}
 					}
@@ -1383,9 +1285,17 @@ public class OfflineFragmentLollipop extends Fragment{
 			}
 		}
     }
-    
+
+	@Override
+	public void multipleItemClick(int position) {
+		if (position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
+			position -= placeholderCount;
+		}
+		adapter.toggleSelection(position);
+	}
+
     public void openFile (File currentFile){
-		log("openFile");
+		logDebug("openFile");
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 
     	String type = "";
@@ -1403,7 +1313,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			viewIntent.setDataAndType(Uri.fromFile(currentFile), type);
 		}
 		viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		if (MegaApiUtils.isIntentAvailable(context, viewIntent)){
+		if (isIntentAvailable(context, viewIntent)){
 			context.startActivity(viewIntent);
 		}
 		else{
@@ -1415,7 +1325,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 			}
 			intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-			if (MegaApiUtils.isIntentAvailable(context, intentShare)){
+			if (isIntentAvailable(context, intentShare)){
 				context.startActivity(intentShare);
 			}
 		}
@@ -1437,9 +1347,10 @@ public class OfflineFragmentLollipop extends Fragment{
 //			}
 		}
 	}
-	
-	private void updateActionModeTitle() {
-		log("updateActionModeTitle");
+
+	@Override
+	protected void updateActionModeTitle() {
+		logDebug("updateActionModeTitle");
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
@@ -1447,18 +1358,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		int folders=0;
 		int files=0;
 		
-		String pathI=null;
-		
 		if(documents.size()>0){
-			if(documents.get(0).getOrigin()==MegaOffline.INCOMING){
-				pathI = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + documents.get(0).getHandleIncoming() + "/";
-			}
-			else if(documents.get(0).getOrigin()==MegaOffline.INBOX){
-				pathI = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
-			}
-			else{
-				pathI= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-			}	
+			String pathI = getOfflineAbsolutePath(context, documents.get(0));
 			
 			for(int i=0; i<documents.size();i++){
 				MegaOffline mOff = (MegaOffline) documents.get(i);
@@ -1474,7 +1375,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					}
 				}
 				else{
-					log("File do not exist");
+					logWarning("File do not exist");
 				}		
 			}
 		}
@@ -1513,7 +1414,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			log("oninvalidate error");
+			logError("Invalidate error", e);
 		}
 		// actionMode.
 	}
@@ -1531,7 +1432,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	public int onBackPressed(){
-		log("onBackPressed");
+		logDebug("onBackPressed");
 
 		if (adapter == null){
 			return 0;
@@ -1547,10 +1448,8 @@ public class OfflineFragmentLollipop extends Fragment{
 				return 0;
 			}
 			if (!pathNavigation.equals("/")){
-				log("onBackPress: "+pathNavigation);
 				pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
-				log("substring: "+pathNavigation);
-				int index=pathNavigation.lastIndexOf("/");				
+				int index=pathNavigation.lastIndexOf("/");
 				pathNavigation=pathNavigation.substring(0,index+1);
 				
 				if (context instanceof ManagerActivityLollipop){
@@ -1576,9 +1475,9 @@ public class OfflineFragmentLollipop extends Fragment{
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack "+lastVisiblePosition+" position");
+					logDebug("Pop of the stack " + lastVisiblePosition + " position");
 				}
-				log("Scroll to "+lastVisiblePosition+" position");
+				logDebug("Scroll to " + lastVisiblePosition + " position");
 
 				if(lastVisiblePosition>=0){
 
@@ -1595,7 +1494,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				return 2;
 			}
 			else{
-				log("pathNavigation  / ");
+				logDebug("Navigation path is ROOT");
 				return 0;
 			}
 		}
@@ -1609,7 +1508,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	public void setNodes(ArrayList<MegaOffline> _mOff){
-		log("setNodes");
+		logDebug("setNodes");
 		this.mOffList = _mOff;
 
 		if (adapter != null){
@@ -1648,21 +1547,21 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	public void setPositionClicked(int positionClicked){
-		log("setPositionClicked");
+		logDebug("Position: " + positionClicked);
 		if (adapter != null){
 			adapter.setPositionClicked(positionClicked);
 		}
 	}
 	
 	public void notifyDataSetChanged(){
-		log("notifyDataSetChanged");
+		logDebug("notifyDataSetChanged");
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
 		}
 	}
 
 	public void refresh(){
-		log("refresh");
+		logDebug("refresh");
 
 		mOffList=dbH.findByPath(pathNavigation);
 
@@ -1734,7 +1633,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	public void refreshPaths(){
-		log("refreshPaths()");
+		logDebug("refreshPaths()");
 		mOffList=dbH.findByPath("/");	
 		
 		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1766,7 +1665,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	public void refreshPaths(MegaOffline mOff){
-		log("refreshPaths(MegaOffline mOff): "+mOff.getName());
+		logDebug("Offline node handle: " + mOff.getHandle());
 		int index=0;
 //		MegaOffline retFindPath = null;
 		
@@ -1799,13 +1698,12 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 
 		((ManagerActivityLollipop)context).setToolbarTitle();
-		log("At the end of refreshPaths the path is: "+pathNavigation);
 //		contentText.setText(getInfoFolder(mOffList));
 		setNodes(mOffList);
 	}
 	
 	public int getItemCount(){
-		log("getItemCount");
+		logDebug("getItemCount");
 		if(adapter != null){
 			return adapter.getItemCount();
 		}
@@ -1813,7 +1711,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public int getItemCountWithoutRK(){
-		log("getItemCountWithoutRK");
+		logDebug("getItemCountWithoutRK");
 		if(adapter != null){
 			return adapter.getItemCountWithoutRK();
 		}
@@ -1821,34 +1719,28 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	private void findPath (String pNav){
-		log("findPath():" + pNav);
-
 		MegaOffline nodeToShow = null;
 		
 		if(!pNav.equals("/")){
 			
 			if (pNav.endsWith("/")) {
 				pNav = pNav.substring(0, pNav.length() - 1);
-				log("NEW findPath:" + pNav);		
 			}
 			
 			int index=pNav.lastIndexOf("/");	
 			String pathToShow = pNav.substring(0, index+1);
-			log("Path: "+ pathToShow);
 			String nameToShow = pNav.substring(index+1, pNav.length());
-			log("Name: "+ nameToShow);
 			
 			nodeToShow = dbH.findbyPathAndName(pathToShow, nameToShow);
 			if(nodeToShow!=null){
 				//Show the node
-				log("findPath:Node: "+ nodeToShow.getName());
+				logDebug("Node Handle: "+ nodeToShow.getHandle());
 				pathNavigation=pathToShow+nodeToShow.getName()+"/";
-				log("findPath:pathNavigation: "+pathNavigation);
 				return;
 			}
 			else{
 				if(pathNavigation.equals("/")){
-					log("Return Path /");
+					logDebug("Return Path /");
 					return;
 				}
 				else{
@@ -1862,7 +1754,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void setPathNavigation(String _pathNavigation){
-		log("setPathNavigation(): "+pathNavigation);
+		logDebug("setPathNavigation()");
 		this.pathNavigation = _pathNavigation;
 		addSectionTitle(mOffList);
 		if (adapter != null){
@@ -1872,12 +1764,8 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void setOrder(int orderGetChildren){
-		log("setOrder");
+		logDebug("setOrder");
 		this.orderGetChildren = orderGetChildren;
-	}
-	
-	private static void log(String log) {
-		Util.log("OfflineFragmentLollipop", log);
 	}
 	
 //	private void dlog(Object o) {
@@ -1886,7 +1774,7 @@ public class OfflineFragmentLollipop extends Fragment{
 //	}
 	
 	public String getPathNavigation() {
-		log("getPathNavigation");
+		logDebug("getPathNavigation");
 		return pathNavigation;
 	}
 }

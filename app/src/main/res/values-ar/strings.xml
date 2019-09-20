@@ -9,7 +9,7 @@
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">من</string>
     <string name="general_yes" context="Answer for confirmation dialog.">نعم</string>
     <string name="general_no" context="Answer for confirmation dialog.">لا</string>
-    <string name="general_cancel" context="Answer for confirmation dialog.">إلغاء</string>
+    <string name="general_cancel" context="Answer for confirmation dialog.">الغاء</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">نقل الي</string>
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">النسخ الي</string>
     <!--
@@ -23,7 +23,7 @@
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     -->
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">تحميل</string>
-    <string name="general_add" context="button">أضف</string>
+    <string name="general_add" context="button">اضافة</string>
     <string name="general_move" context="button">نقل</string>
     <string name="general_remove" context="button">حذف</string>
     <string name="general_share" context="button">مشاركة</string>
@@ -164,7 +164,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s سيتم تحميلهم</string>
     <string name="alert_no_app" context="Alert text before download">ليس هناك أي تطبيق لفتح الملف %s. هل تريد متابعة التنزيل؟</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">عدم الإظهار مجدّدا</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">لا تظهر مرة أخرى</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Are you sure that you want to cancel the current login process?</string>
 
@@ -232,7 +232,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">سحابة التخزين</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">تحميل الوسائط</string>
-    <string name="section_inbox" context="title of the screen that show the inbox">صندوق الواردات</string>
+    <string name="section_inbox" context="title of the screen that show the inbox">صندوق الوارد</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">حفظ الملفات للعمل دون اتصال</string>
     <string name="section_saved_for_offline_new" context="title of the screen that shows the files saved for offline in the device">غير متاح</string>
     <!--
@@ -240,7 +240,7 @@
     -->
     <string name="section_shared_items" context="title of the screen that shows all the shared items">المجلدات المشاركة</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">سلة المحذوفات</string>
-    <string name="section_contacts" context="Title of the contact list">المتصلّين.</string>
+    <string name="section_contacts" context="Title of the contact list">جهات الاتصال</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">جهات اتصال  [A](%1$d)[/A]</string>
     <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B]لا توجد[/B] [A]طلبات مرسلة[/A][B].[/B]</string>
@@ -280,9 +280,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">الحجم</string>
-    <string name="file_properties_info_modified" context="when was the file modified">عُدِّل</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">آخر تعديل</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">أُضِيف</string>
-    <string name="file_properties_info_created" context="when the file was created">أنشئ</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -347,7 +346,7 @@
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">إزالة المشاركة</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">إزالة الرابط</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">لن يكون هذا الرابط متاحا للعامة بعد الآن</string>
-    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">إعادة تسمية</string>
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">تغيير الاسم</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">فتح الرابط</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">فتح</string>
     <string name="context_renaming" context="while renaming a file or folder">جاري اعادة التسمية</string>
@@ -365,7 +364,7 @@
     <!--
     <string name="context_sharing" context="while sharing a folder">Sharing folder</string>
     -->
-    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">انسخ</string>
+    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">نسخ</string>
     <string name="context_upload" context="Item menu option upon right click on one or multiple files.">رفع</string>
     <string name="context_copying" context="while copying a file or folder">جاري النسخ</string>
     <!--
@@ -399,7 +398,7 @@
     <string name="context_send_file" context="menu item">ارسل الملف الى المحادثة</string>
     <string name="context_send_contact" context="menu item">مشاركة جهة الاتصال الى المحادثات</string>
     <string name="context_view_shared_folders" context="open a shared folder">عرض الملفات المشاركة</string>
-    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">النشر</string>
+    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">المشاركة</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -498,9 +497,9 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">لم يتم إلغاء اشتراكك. يرجى تقديم سبب لإلغائه</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">المجلد الآن خاص</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">تم حذف المشاركة بنجاح</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">مجلد جديد</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">إضافة متصّل</string>
@@ -642,6 +641,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">رفع ملفات مجلدات الميديا</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Uploads</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -649,6 +650,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">التخزين</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">كود التعريف الشخصي</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">متقدم</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">مسح التخزين المؤقت</string>
@@ -674,9 +676,9 @@
         <item context="import from phone option">استيراد من جهاز</item>
     </string-array>
 
-    <string name="settings_camera_upload_on" context="settings option">تفعيل رفع البوم الكاميرا</string>
+    <string name="settings_camera_upload_on" context="settings option">تفعيل تحميلات الكاميرا</string>
     <string name="settings_camera_upload_turn_on" context="settings option">تشغيل تحميلات الكاميرا</string>
-    <string name="settings_camera_upload_off" context="settings option">تعطيل رفع الالبوم</string>
+    <string name="settings_camera_upload_off" context="settings option">تعطيل تحميلات الكاميرا</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">طريقة رفع الملفات</string>
 
     <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">تمكين تحميلات الوسائط الثانوية</string>
@@ -698,6 +700,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">فقط عند الشحن</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to actively charge my device</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">إبقاء أسماء الملفات كما في الجهاز</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">مجلد الكاميرا المحلي</string>
@@ -737,7 +740,7 @@
     <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">أعد إدخال رمز PIN</string>
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">سيتم حذف جميع بياناتك المحلية وسيتم تسجيل خروجك خلال %1d ثانية</string>
 
-    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">عن</string>
+    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">حول</string>
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">سياسة الخصوصية</string>
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">شروط الخدمة</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
@@ -754,7 +757,7 @@
     <string name="june">جوان</string>
     <string name="july">جويلية</string>
     <string name="august">أوت</string>
-    <string name="september">ستبمبر</string>
+    <string name="september">سبتمبر</string>
     <string name="october">أكتوبر</string>
     <string name="november">نوفمبر</string>
     <string name="december">ديسمبر</string>
@@ -999,6 +1002,8 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">رابط الملف غير متوفر</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">تم إزالة رابط الملف بسبب انتهاك بنود الخدمة</string>
 
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">This URL is corrupt or deformed. The link you are trying to access does not exist.</string>
+
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">بانتظار تأكيد البريد الإلكتروني</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">يُرجى التحقق من البريد الإلكتروني الخاص بك واضغط على الرابط لتأكيد حسابك.</string>
 
@@ -1074,7 +1079,10 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d جهات اتصال ستتم إزالتهم من مجلد المشاركة.</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d تمت إزالة جهات الاتصال بشكل صحيح من مجلد المشاركة.</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;و %d جهات اتصال لم تحذف بنجاح</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">فشل حذف %d جهة اتصال</string>
+
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Successfully updated permissions for %d contacts</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Failed to update permissions for %d contacts</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">جار تحميل جهات الاتصال من الهاتف &#8230;</string>
 
@@ -1146,7 +1154,7 @@
 
     <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">هل تود إزالة %s من هذه المحادثة؟</string>
 
-    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">إقرء فقط</string>
+    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">للقراءة فقط</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1269,7 +1277,7 @@
 
     <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]وأكثر يكتبون&#8230;[/A]</string>
     <string name="label_more" context="button label more">المزيد</string>
-    <string name="label_close" context="button label Close">إغلق</string>
+    <string name="label_close" context="button label Close">إغلاق</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">عام</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">التخزين</string>
     <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">التخزين</string>
@@ -1338,6 +1346,7 @@
         <item context="Plural" quantity="other">%1$d من %2$d ملفات</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Process is finishing&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">عرض</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">إيقاف جميع عمليات النقل</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">استئناف جميع عمليات النقل</string>
@@ -1502,7 +1511,7 @@
     <string name="file_properties_shared_folder_public_link_name">رابط</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">وصول كامل</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">إقرء فقط</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">للقراءة فقط</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">قراءة وكتابة</string>
 
     <string name="attachment_uploading_state_uploading">جاري الرفع&#8230;</string>
@@ -1788,7 +1797,8 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">المحادثة يتم رفعها</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">جودة وسائط ضمن المحادثات</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Quality</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Original quality</item>
         <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
@@ -1846,9 +1856,9 @@
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">النسخ الى الحافظة</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">تصدير مفتاح الاستعادة</string>
     <string name="proceed_to_logout" context="Option that permits user logout">متابعة تسجيل الخروج</string>
-    <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">المفتاح الرئيسي</string>
+    <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">مفتاح الإستعادة</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">الحفظ على نظام الملفات</string>
-    <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">تم النّسخ إلى الحافظة</string>
+    <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">تم النسخ الى حافظة النصوص</string>
 
     <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">اذهب للأحدث</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">رسائل جديدة</string>
@@ -1874,7 +1884,7 @@
     <string name="context_loop_video" context="menu option to loop video or audio file">التكرار</string>
 
     <string name="settings_security_options_title" context="Title of the category Security options on Settings section">خيارات الامان</string>
-    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">المفتاح الرئيسي</string>
+    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">مفتاح الإستعادة</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">تصدير مفتاح الاستعادة والحفاظ عليه في مكان آمن يساعدك على تحديد كلمة مرور جديدة دون فقدك للبيانات.</string>
 
     <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">لم ينجح الاتصال مع MEGA. يرجى التأكد من الاتصال الشبكي أو إعادة المحاولة بعد قليل.</string>
@@ -1956,7 +1966,7 @@
     <string name="label_2fa_disabled" context="Label shown when it disables the Two-Factor Authentication">تم تعطيل المصادقة المزدوجة 2FA</string>
     <string name="open_app_button" context="Text of the button which action is to show the authentication apps">فتح بواسطة</string>
     <string name="intent_not_available_2fa" context="message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn\'t any app that open it">لا يوجد أي تطبيق متوفر لتفعيل المصادقة المزدوجة 2FA على جهازك</string>
-    <string name="general_close" context="Text button">إغلق</string>
+    <string name="general_close" context="Text button">إغلاق</string>
 
     <string name="backup_rk_2fa_end" context="Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process">قم بتصدير مفتاح الاسترجاع خاصتك لإتمام العملية</string>
     <string name="no_authentication_apps_title" context="Title of dialog shown when it tries to open an authentication app and there is no installed">تطبيق المصادقة</string>
@@ -2131,9 +2141,13 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">المدة الأقصر هي 7 أيام</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">المدة الدنيا هي 7 أيام والمدة القصوى هي 30 يوم.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">أزل الملفات الأكبر من</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d يوم</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notify me when size is larger than</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to compress are larger than</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">لتعطيل الافراغ التلقائي لسلة المحذوفات أو لتحديد زمن أطول للاحتفاظ، يجب ان تشترك باشتراك PRO.</string>
 
@@ -2239,7 +2253,7 @@
     <string name="billing_period_title" context="title of billing period">فترة الفاتورة</string>
     <string name="billed_monthly_text" context="option of billing period, monthly">[A]Billed monthly[/A] %s /month</string>
     <string name="billed_yearly_text" context="option of billing period, yearly">[A]Billed yearly[/A] %s /year</string>
-    <string name="button_cancel" context="dialog option cancel in alert dialog">إلغاء</string>
+    <string name="button_cancel" context="dialog option cancel in alert dialog">الغاء</string>
     <string name="button_continue" context="dialog option continue in alert dialog">استمرار</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (subscription)</string>
@@ -2255,6 +2269,15 @@
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">إظهار آخر ظهور&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">السماح لجهات الاتصال خاصتك بمعرفة آخر وقت ظهور كنت فيه متصلاً مع MEGA.</string>
+
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video compression.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">The total size of the videos to compress exceeds %s, please put your device on charge to continue.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">This setting will take effect the next time Camera Uploads runs</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
+	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d ملف</item>
@@ -2308,7 +2331,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Allow access to your camera to scan documents, take pictures and make video calls.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
     <string name="general_enable_access" context="General enable access">Enable access</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">الملفات المشاركة</string>
@@ -2447,8 +2469,6 @@
     <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">إجابة</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">تجاهل</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Starting audio call&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Starting video call&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s muted this call</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
 
@@ -2461,8 +2481,8 @@
 
     <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
     <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
     <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
     <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
     <string name="action_open_contact_link" context="Menu item">Open contact link</string>
@@ -2485,7 +2505,7 @@
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">This voice clip is not available</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
@@ -2499,4 +2519,9 @@
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">مكالمة واردة</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">جاري التحميل</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">يُرجى الانتظار&#8230;</string>
 </resources>

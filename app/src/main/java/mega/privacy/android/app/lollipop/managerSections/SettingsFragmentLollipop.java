@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -10,9 +9,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -29,22 +26,33 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.preference.SwitchPreferenceCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
+import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -58,22 +66,29 @@ import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.DBUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaTransfer;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.DBUtil.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.MegaPreferences.*;
+import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
+import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
 
 	public static final String ACTION_REFRESH_CAMERA_UPLOADS_SETTING = "ACTION_REFRESH_CAMERA_UPLOADS_SETTING";
 	public static final String ACTION_REFRESH_CLEAR_OFFLINE_SETTING = "ACTION_REFRESH_CLEAR_OFFLINE_SETTING";
+	private static final int COMPRESSION_QUEUE_SIZE_MIN = 100;
+	private static final int COMPRESSION_QUEUE_SIZE_MAX = 1000;
 
 	Context context;
 	private MegaApiAndroid megaApi;
@@ -86,7 +101,11 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	private static int REQUEST_MEGA_CAMERA_FOLDER = 3000;
 	private static int REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER = 4000;
 	private static int REQUEST_MEGA_SECONDARY_MEDIA_FOLDER = 5000;
-	
+	private final String KEY_SET_QUEUE_DIALOG = "KEY_SET_QUEUE_DIALOG";
+    private final String KEY_SET_QUEUE_SIZE = "KEY_SET_QUEUE_SIZE";
+
+	public static final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
+
 	public static String CATEGORY_PIN_LOCK = "settings_pin_lock";
 	public static String CATEGORY_CHAT_ENABLED = "settings_chat";
 	public static String CATEGORY_CHAT_NOTIFICATIONS = "settings_notifications_chat";
@@ -124,16 +143,18 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	public static String KEY_CAMERA_UPLOAD_ON = "settings_camera_upload_on";
 	public static String KEY_CAMERA_UPLOAD_HOW_TO = "settings_camera_upload_how_to_upload";
 	public static String KEY_CAMERA_UPLOAD_CHARGING = "settings_camera_upload_charging";
+    public static String KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE = "video_compression_queue_size";
 	public static String KEY_KEEP_FILE_NAMES = "settings_keep_file_names";
 	public static String KEY_CAMERA_UPLOAD_WHAT_TO = "settings_camera_upload_what_to_upload";
+    public static String KEY_CAMERA_UPLOAD_VIDEO_QUALITY = "settings_video_upload_quality";
 	public static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER = "settings_local_camera_upload_folder";
 	public static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD = "settings_local_camera_upload_folder_sdcard";
 	public static String KEY_CAMERA_UPLOAD_MEGA_FOLDER = "settings_mega_camera_folder";
-	
+
 	public static String KEY_SECONDARY_MEDIA_FOLDER_ON = "settings_secondary_media_folder_on";
 	public static String KEY_LOCAL_SECONDARY_MEDIA_FOLDER = "settings_local_secondary_media_folder";
 	public static String KEY_MEGA_SECONDARY_MEDIA_FOLDER = "settings_mega_secondary_media_folder";
-	
+
 	public static String KEY_CACHE = "settings_advanced_features_cache";
 	public static String KEY_OFFLINE = "settings_file_management_offline";
 	public static String KEY_RUBBISH = "settings_file_management_rubbish";
@@ -144,7 +165,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	public static String KEY_DAYS_RB_SCHEDULER = "settings_days_rb_scheduler";
 
 	public static String KEY_ENABLE_LAST_GREEN_CHAT = "settings_last_green_chat_switch";
-	
+
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
 	public static String KEY_ABOUT_GDPR = "settings_about_gdpr";
@@ -163,11 +184,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	public final static int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
 	public final static int CAMERA_UPLOAD_WIFI = 1002;
-	
+
 	public final static int CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS = 1001;
 	public final static int CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS = 1002;
 	public final static int CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS = 1003;
-	
+	public final static int VIDEO_QUALITY_ORIGINAL = 0;
+    public final static int VIDEO_QUALITY_MEDIUM = 1;
+
 	public final static int STORAGE_DOWNLOAD_LOCATION_INTERNAL_SD_CARD = 1001;
 	public final static int STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD = 1002;
 
@@ -179,7 +202,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
     SwitchPreferenceCompat autoPlaySwitch;
 
 	PreferenceScreen preferenceScreen;
-
 	PreferenceCategory pinLockCategory;
 	PreferenceCategory chatEnabledCategory;
 	PreferenceCategory chatNotificationsCategory;
@@ -209,7 +231,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	Preference cameraUploadOn;
 	ListPreference cameraUploadHow;
 	ListPreference cameraUploadWhat;
-	TwoLineCheckPreference cameraUploadCharging;
+	ListPreference videoQuality;
+    SwitchPreferenceCompat cameraUploadCharging;
+	Preference cameraUploadVideoQueueSize;
 	TwoLineCheckPreference keepFileNames;
 	Preference localCameraUploadFolder;
 	Preference localCameraUploadFolderSDCard;
@@ -241,7 +265,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	ListPreference statusChatListPreference;
 	ListPreference chatAttachmentsChatListPreference;
-	
+
 	TwoLineCheckPreference storageAskMeAlways;
 	TwoLineCheckPreference storageAdvancedDevices;
 
@@ -251,7 +275,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	Preference recoveryKey;
 	Preference changePass;
-	
+
 	boolean cameraUpload = false;
 	boolean secondaryUpload = false;
 	boolean charging = false;
@@ -261,9 +285,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	boolean fileNames = false;
 	boolean advancedDevices = false;
 	boolean autoAccept = true;
-	
+
 	DatabaseHandler dbH;
-	
+
 	MegaPreferences prefs;
 	ChatSettings chatSettings;
 	String wifi = "";
@@ -273,12 +297,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	MegaNode camSyncMegaNode = null;
 	String camSyncMegaPath = "";
 	String fileUpload = "";
+	String videoQualitySummary = "";
 	String downloadLocationPath = "";
 	String ast = "";
 	String pinLockCodeTxt = "";
 
 	boolean useHttpsOnlyValue = false;
-	
+
 	//Secondary Folder
 	String localSecondaryFolderPath = "";
 	Long handleSecondaryMediaFolder = null;
@@ -291,11 +316,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	RecyclerView listView;
 
 	boolean setAutoaccept = false;
-	
+    AlertDialog compressionQueueSizeDialog;
+    private EditText queueSizeInput;
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
-		
+		logDebug("onCreate");
+
         if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -303,11 +330,11 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		if (megaChatApi == null){
 			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
 		}
-		
+
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
 		chatSettings = dbH.getChatSettings();
-		
+
 		super.onCreate(savedInstanceState);
 	}
 
@@ -346,7 +373,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		twoFASwitch = (SwitchPreferenceCompat) findPreference(KEY_2FA);
 		twoFASwitch.setOnPreferenceClickListener(this);
-		
+
 		autoPlaySwitch = (SwitchPreferenceCompat) findPreference(KEY_AUTO_PLAY_SWITCH);
         autoPlaySwitch.setOnPreferenceClickListener(this);
         boolean autoPlayEnabled = prefs.isAutoPlayEnabled();
@@ -394,8 +421,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		cameraUploadWhat = (ListPreference) findPreference(KEY_CAMERA_UPLOAD_WHAT_TO);
 		cameraUploadWhat.setOnPreferenceChangeListener(this);
 
-		cameraUploadCharging = (TwoLineCheckPreference) findPreference(KEY_CAMERA_UPLOAD_CHARGING);
-		cameraUploadCharging.setOnPreferenceClickListener(this);
+		videoQuality = (ListPreference)findPreference(KEY_CAMERA_UPLOAD_VIDEO_QUALITY);
+		videoQuality.setOnPreferenceChangeListener(this);
+
+        cameraUploadCharging = (SwitchPreferenceCompat)findPreference(KEY_CAMERA_UPLOAD_CHARGING);
+        cameraUploadCharging.setOnPreferenceClickListener(this);
+
+        cameraUploadVideoQueueSize = findPreference(KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE);
+        cameraUploadVideoQueueSize.setOnPreferenceClickListener(this);
 
 		keepFileNames = (TwoLineCheckPreference) findPreference(KEY_KEEP_FILE_NAMES);
 		keepFileNames.setOnPreferenceClickListener(this);
@@ -421,18 +454,18 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		storageCategory.removePreference(storageAdvancedDevices);
 		File[] fs = context.getExternalFilesDirs(null);
 		if (fs.length == 1){
-			log("fs.length == 1");
+			logDebug("fs.length == 1");
 			storageCategory.removePreference(downloadLocationPreference);
 		}
 		else{
 			if (fs.length > 1){
-				log("fs.length > 1");
+				logDebug("fs.length > 1");
 				if (fs[1] == null){
-					log("storageCategory.removePreference");
+					logDebug("storageCategory.removePreference");
 					storageCategory.removePreference(downloadLocationPreference);
 				}
 				else{
-					log("storageCategory.removePreference");
+					logDebug("storageCategory.removePreference");
 					storageCategory.removePreference(downloadLocation);
 				}
 			}
@@ -458,7 +491,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		daysRbSchedulerPreference = (Preference) findPreference(KEY_DAYS_RB_SCHEDULER);
 
 		if(megaApi.serverSideRubbishBinAutopurgeEnabled()){
-			log("RubbishBinAutopurgeEnabled --> request userAttribute info");
+			logDebug("RubbishBinAutopurgeEnabled --> request userAttribute info");
 			megaApi.getRubbishBinAutopurgePeriod((ManagerActivityLollipop)context);
 			fileManagementCategory.addPreference(enableRbSchedulerSwitch);
 			fileManagementCategory.addPreference(daysRbSchedulerPreference);
@@ -500,17 +533,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		codeLink.setOnPreferenceClickListener(this);
 
 		if (prefs == null){
-			log("pref is NULL");
+			logWarning("pref is NULL");
 			dbH.setStorageAskAlways(false);
 
-			File defaultDownloadLocation = null;
-			if (Environment.getExternalStorageDirectory() != null){
-				defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
-			}
-			else{
-				defaultDownloadLocation = context.getFilesDir();
-			}
-
+			File defaultDownloadLocation = buildDefaultDownloadDir(context);
 			defaultDownloadLocation.mkdirs();
 
 			dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
@@ -554,49 +580,22 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 							dbH.setCamSyncHandle(-1);
 							camSyncHandle = (long) -1;
 							//Meanwhile is not created, set just the name
-							camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
+							camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
 						}
 					}
 					else{
 						//Meanwhile is not created, set just the name
-						camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
+						camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
 					}
 				}
 				else{
 					dbH.setCamSyncHandle(-1);
 					camSyncHandle = (long) -1;
 					//Meanwhile is not created, set just the name
-					camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
+					camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
 				}
 
-				if (prefs.getCamSyncFileUpload() == null){
-					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-					fileUpload = getString(R.string.settings_camera_upload_only_photos);
-				}
-				else{
-					switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
-						case MegaPreferences.ONLY_PHOTOS:{
-							fileUpload = getString(R.string.settings_camera_upload_only_photos);
-							cameraUploadWhat.setValueIndex(0);
-							break;
-						}
-						case MegaPreferences.ONLY_VIDEOS:{
-							fileUpload = getString(R.string.settings_camera_upload_only_videos);
-							cameraUploadWhat.setValueIndex(1);
-							break;
-						}
-						case MegaPreferences.PHOTOS_AND_VIDEOS:{
-							fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
-							cameraUploadWhat.setValueIndex(2);
-							break;
-						}
-						default:{
-							fileUpload = getString(R.string.settings_camera_upload_only_photos);
-							cameraUploadWhat.setValueIndex(0);
-							break;
-						}
-					}
-				}
+				setWhatToUploadForCameraUpload();
 
 				if (Boolean.parseBoolean(prefs.getCamSyncWifi())){
 					wifi = getString(R.string.cam_sync_wifi);
@@ -607,16 +606,53 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					cameraUploadHow.setValueIndex(0);
 				}
 
-				if (prefs.getCamSyncCharging() == null){
-					log("Charging NULLL");
-					dbH.setCamSyncCharging(true);
-					charging = true;
-				}
-				else{
-					charging = Boolean.parseBoolean(prefs.getCamSyncCharging());
-					log("Charging: "+charging);
-				}
+                if(!getString(R.string.settings_camera_upload_only_photos).equals(fileUpload)){
+                    //video quality
+                    String uploadQuality = prefs.getUploadVideoQuality();
+                    int quality;
+                    if (uploadQuality == null || uploadQuality.isEmpty()) {
+                        dbH.setCameraUploadVideoQuality(MEDIUM);
+                        quality = VIDEO_QUALITY_MEDIUM;
+                    } else if (Integer.parseInt(uploadQuality) == ORIGINAL) {
+                        quality = VIDEO_QUALITY_ORIGINAL;
+                    } else {
+                        quality = VIDEO_QUALITY_MEDIUM;
+                    }
+                    videoQuality.setValueIndex(quality);
+                    videoQuality.setSummary(videoQuality.getEntry());
 
+                    //require me to charge
+                    if(quality == VIDEO_QUALITY_MEDIUM){
+                        enableChargingSettings();
+                        //convention on charging
+                        if (prefs.getConversionOnCharging() == null){
+                            dbH.setConversionOnCharging(true);
+                            charging = true;
+                        }
+                        else{
+                            charging = Boolean.parseBoolean(prefs.getConversionOnCharging());
+                        }
+                        cameraUploadCharging.setChecked(charging);
+
+                        //show charge when size over $MB
+                        if(charging){
+                            enableVideoCompressionSizeSettings();
+                        }else{
+                            disableVideoCompressionSizeSettings();
+                        }
+
+                    }else{
+                        disableChargingSettings();
+                    }
+
+                }else{
+					hideVideoQualitySettingsSection();
+                    dbH.setCameraUploadVideoQuality(ORIGINAL);
+                    dbH.setConversionOnCharging(false);
+                    dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+                }
+
+				// keep file name
 				if (prefs.getKeepFileNames() == null){
 					dbH.setKeepFileNames(false);
 					fileNames = false;
@@ -679,7 +715,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 								localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
 							}
 							else{
-								log("pickedDirNAme NULL");
+								logDebug("pickedDirNAme NULL");
 							}
 						}
 					}
@@ -692,7 +728,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 				else{
 					secondaryUpload = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
-					log("onCreate, secondary is: "+secondaryUpload);
+					logDebug("Secondary is: " + secondaryUpload);
 
 					if(secondaryUpload){
 						secondaryUpload=true;
@@ -722,14 +758,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			if (prefs.getStorageAskAlways() == null){
 				dbH.setStorageAskAlways(false);
 
-				File defaultDownloadLocation = null;
-				if (Environment.getExternalStorageDirectory() != null){
-					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
-				}
-				else{
-					defaultDownloadLocation = context.getFilesDir();
-				}
-
+				File defaultDownloadLocation = buildDefaultDownloadDir(context);
 				defaultDownloadLocation.mkdirs();
 
 				dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
@@ -747,14 +776,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			else{
 				askMe = Boolean.parseBoolean(prefs.getStorageAskAlways());
 				if (prefs.getStorageDownloadLocation() == null){
-					File defaultDownloadLocation = null;
-					if (Environment.getExternalStorageDirectory() != null){
-						defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
-					}
-					else{
-						defaultDownloadLocation = context.getFilesDir();
-					}
-
+					File defaultDownloadLocation = buildDefaultDownloadDir(context);
 					defaultDownloadLocation.mkdirs();
 
 					dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
@@ -772,14 +794,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					downloadLocationPath = prefs.getStorageDownloadLocation();
 
 					if (downloadLocationPath.compareTo("") == 0){
-						File defaultDownloadLocation = null;
-						if (Environment.getExternalStorageDirectory() != null){
-							defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
-						}
-						else{
-							defaultDownloadLocation = context.getFilesDir();
-						}
-
+						File defaultDownloadLocation = buildDefaultDownloadDir(context);
 						defaultDownloadLocation.mkdirs();
 
 						dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
@@ -836,8 +851,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			statusConfig = megaChatApi.getPresenceConfig();
 			if(statusConfig!=null){
 
-				log("SETTINGS chatStatus pending: "+statusConfig.isPending());
-				log("---------------status: "+statusConfig.getOnlineStatus());
+				logDebug("SETTINGS chatStatus pending: " + statusConfig.isPending());
+				logDebug("Status: " + statusConfig.getOnlineStatus());
 
 				statusChatListPreference.setValue(statusConfig.getOnlineStatus()+"");
 				if(statusConfig.getOnlineStatus()==MegaChatApi.STATUS_INVALID){
@@ -857,7 +872,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				waitPresenceConfig();
 			}
 
-			boolean sendOriginalAttachment = DBUtil.isSendOriginalAttachments(context);
+			boolean sendOriginalAttachment = isSendOriginalAttachments(context);
 			if(sendOriginalAttachment){
 				chatAttachmentsChatListPreference.setValue(1+"");
 			}
@@ -915,7 +930,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			keepFileNames.setChecked(fileNames);
 			cameraUploadCategory.addPreference(cameraUploadHow);
 			cameraUploadCategory.addPreference(cameraUploadWhat);
-			cameraUploadCategory.addPreference(cameraUploadCharging);
+            if(!charging){
+                disableVideoCompressionSizeSettings();
+            }
 			cameraUploadCategory.addPreference(keepFileNames);
 
 			fs = context.getExternalFilesDirs(null);
@@ -941,7 +958,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				String secHandle = prefs.getMegaHandleSecondaryFolder();
 				if(secHandle!=null){
 					if (secHandle.compareTo("") != 0){
-						log("handleSecondaryMediaFolder NOT empty");
+						logDebug("handleSecondaryMediaFolder NOT empty");
 						handleSecondaryMediaFolder = Long.valueOf(secHandle);
 						if(handleSecondaryMediaFolder!=null && handleSecondaryMediaFolder!=-1){
 							megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
@@ -949,30 +966,30 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 								megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
 							}
 							else{
-								megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+								megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 							}
 						}
 						else{
-							megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+							megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 						}
 					}
 					else{
-						log("handleSecondaryMediaFolder empty string");
-						megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+						logWarning("handleSecondaryMediaFolder empty string");
+						megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 					}
 
 				}
 				else{
-					log("handleSecondaryMediaFolder Null");
+					logWarning("handleSecondaryMediaFolder Null");
 					dbH.setSecondaryFolderHandle(-1);
 					handleSecondaryMediaFolder = (long) -1;
-					megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+					megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 				}
 
 				//check if the local secondary folder exists
 				localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
 				if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
-					log("secondary ON: invalid localSecondaryFolderPath");
+					logWarning("Secondary ON: invalid localSecondaryFolderPath");
 					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 				}
@@ -980,7 +997,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				{
 					File checkSecondaryFile = new File(localSecondaryFolderPath);
 					if(!checkSecondaryFile.exists()){
-						log("secondary ON: the local folder does not exist");
+						logWarning("Secondary ON: the local folder does not exist");
 						dbH.setSecondaryFolderPath("-1");
 						//If the secondary folder does not exist
 						Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
@@ -1004,6 +1021,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		else{
 			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
+            cameraUploadOn.setSummary("");
 			cameraUploadHow.setSummary("");
 			localCameraUploadFolder.setSummary("");
 			localCameraUploadFolderSDCard.setSummary("");
@@ -1013,7 +1031,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			cameraUploadWhat.setSummary("");
 			cameraUploadCategory.removePreference(localCameraUploadFolder);
 			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-			cameraUploadCategory.removePreference(cameraUploadCharging);
+			hideVideoQualitySettingsSection();
 			cameraUploadCategory.removePreference(keepFileNames);
 			cameraUploadCategory.removePreference(megaCameraFolder);
 			cameraUploadCategory.removePreference(cameraUploadHow);
@@ -1071,7 +1089,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 
 		useHttpsOnlyValue = Boolean.parseBoolean(dbH.getUseHttpsOnly());
-		log("Value of useHttpsOnly: "+useHttpsOnlyValue);
+		logDebug("Value of useHttpsOnly: " + useHttpsOnlyValue);
 
 		useHttpsOnly.setChecked(useHttpsOnlyValue);
 
@@ -1086,19 +1104,40 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		megaApi.getContactLinksOption((ManagerActivityLollipop) context);
 		megaApi.getFileVersionsOption((ManagerActivityLollipop)context);
+
+        String sizeInDB = prefs.getChargingOnSize();
+        String size;
+        if(sizeInDB == null){
+            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+            size = String.valueOf(DEFAULT_CONVENTION_QUEUE_SIZE);
+        }else{
+            size = String.valueOf(Integer.parseInt(sizeInDB));
+        }
+        String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, size + getResources().getString(R.string.label_file_size_mega_byte));
+        cameraUploadCharging.setSummary(chargingHelper);
+
+        if(savedInstanceState != null){
+            boolean isShowingQueueDialog = savedInstanceState.getBoolean(KEY_SET_QUEUE_DIALOG, false);
+            if(isShowingQueueDialog){
+                showResetCompressionQueueSizeDialog();
+                String input = savedInstanceState.getString(KEY_SET_QUEUE_SIZE, "");
+                queueSizeInput.setText(input);
+                queueSizeInput.setSelection(input.length());
+            }
+        }
 	}
 
 	public void setVersionsInfo(){
-		log("setVersionsInfo");
+		logDebug("setVersionsInfo");
 
 		MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 
 		if(myAccountInfo!=null){
 			int numVersions = myAccountInfo.getNumVersions();
-			log("Num versions: " + numVersions);
+			logDebug("Num versions: " + numVersions);
 			String previousVersions = myAccountInfo.getFormattedPreviousVersionsSize();
 			String text = getString(R.string.settings_file_management_file_versions_subtitle, numVersions, previousVersions);
-			log("Previous versions: " + previousVersions);
+			logDebug("Previous versions: " + previousVersions);
 			fileVersionsFileManagement.setSummary(text);
 			if(numVersions>0){
 				fileManagementCategory.addPreference(clearVersionsFileManagement);
@@ -1110,7 +1149,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void resetVersionsInfo(){
-		log("resetVersionsInfo");
+		logDebug("resetVersionsInfo");
 
 		String text = getString(R.string.settings_file_management_file_versions_subtitle, 0, "0 B");
 		fileVersionsFileManagement.setSummary(text);
@@ -1118,21 +1157,18 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void setRubbishInfo(){
-		log("setRubbishInfo");
+		logDebug("setRubbishInfo");
 		rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo().getFormattedUsedRubbish()));
 	}
 
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		log("onViewCreated");
-		listView = (RecyclerView) view.findViewById(R.id.list);
+		logDebug("onViewCreated");
+		listView = view.findViewById(android.R.id.list);
 		if (((ManagerActivityLollipop) context).openSettingsStorage) {
-//			listView = (ListView) view.findViewById(android.R.id.list);
 			goToCategoryStorage();
-		}
-		else if (((ManagerActivityLollipop) context).openSettingsQR){
-//			listView = (ListView) view.findViewById(android.R.id.list);
+		} else if (((ManagerActivityLollipop) context).openSettingsQR) {
 			goToCategoryQR();
 		}
 		if (listView != null) {
@@ -1157,50 +1193,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 	}
 
-	public void goToCategoryStorage(){
-		log("goToCategoryStorage");
+	public void goToCategoryStorage() {
+		logDebug("goToCategoryStorage");
 		scrollToPreference(storageCategory);
-
-//		for (int i=0; i<getPreferenceScreen().getRootAdapter().getCount(); i++){
-//			if (getPreferenceScreen().getRootAdapter().getItem(i).equals(storageCategory)){
-//				((ManagerActivityLollipop) context).openSettingsStorage = false;
-//				if (listView != null) {
-//					listView.clearFocus();
-//					final int finalI = i;
-//					listView.postDelayed(new Runnable() {
-//						@Override
-//						public void run() {
-//							listView.setSelection(finalI);
-//							listView.smoothScrollToPositionFromTop(finalI, 0);
-//						}
-//					}, 200);
-//				}
-//				break;
-//			}
-//		}
 	}
 
-	public void goToCategoryQR(){
-		log("goToCategoryQR");
+	public void goToCategoryQR() {
+		logDebug("goToCategoryQR");
 		scrollToPreference(qrCodeCategory);
-
-//		for (int i=0; i<getPreferenceScreen().getRootAdapter().getCount(); i++){
-//			if (getPreferenceScreen().getRootAdapter().getItem(i).equals(qrCodeCategory)){
-//				((ManagerActivityLollipop) context).openSettingsQR = false;
-//				if (listView != null) {
-//					listView.clearFocus();
-//					final int finalI = i;
-//					listView.postDelayed(new Runnable() {
-//						@Override
-//						public void run() {
-//							listView.setSelection(finalI);
-//							listView.smoothScrollToPositionFromTop(finalI, 0);
-//						}
-//					}, 200);
-//				}
-//				break;
-//			}
-//		}
 	}
 
 	@Override
@@ -1211,7 +1211,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			lv.setPadding(0, 0, 0, 0);
 		}
 
-		if(Util.isOnline(context)){
+		if(isOnline(context)){
 			if(megaApi==null || megaApi.getRootNode()==null){
 				setOnlineOptions(false);
 			}
@@ -1220,7 +1220,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else{
-			log("Offline");
+			logDebug("Offline");
 			setOnlineOptions(false);
 		}
 
@@ -1279,7 +1279,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
-		log("onPreferenceChange");
+		logDebug("onPreferenceChange");
 		prefs = dbH.getPreferences();
 		if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_HOW_TO) == 0){
 			switch (Integer.parseInt((String)newValue)){
@@ -1297,16 +1297,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 			}
 			cameraUploadHow.setSummary(wifi);
-			handler.postDelayed(new Runnable() {
-				
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-						context.startService(new Intent(context, CameraSyncService.class));
-					}
-				}
-			}, 30 * 1000);
+            rescheduleCameraUpload(context);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_WHAT_TO) == 0){
 			switch(Integer.parseInt((String)newValue)){
@@ -1314,47 +1305,62 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 					fileUpload = getString(R.string.settings_camera_upload_only_photos);
 					cameraUploadWhat.setValueIndex(0);
+					resetVideoQualitySettings();
+                    disableVideoQualitySettings();
 					break;
 				}
 				case CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS:{
 					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_VIDEOS);
 					fileUpload = getString(R.string.settings_camera_upload_only_videos);
 					cameraUploadWhat.setValueIndex(1);
+					resetVideoQualitySettings();
+					enableVideoQualitySettings();
 					break;
 				}
 				case CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS:{
 					dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
 					fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
 					cameraUploadWhat.setValueIndex(2);
+					resetVideoQualitySettings();
+                    enableVideoQualitySettings();
 					break;
 				}
 			}
 			cameraUploadWhat.setSummary(fileUpload);
-			dbH.setCamSyncTimeStamp(0);
-			dbH.setSecSyncTimeStamp(0);
+			resetCUTimeStampsAndCache();
+            rescheduleCameraUpload(context);
+		}else if(preference.getKey().compareTo(KEY_CAMERA_UPLOAD_VIDEO_QUALITY) == 0){
 
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
-			}
-			
-			handler.postDelayed(new Runnable() {
-				
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-						context.startService(new Intent(context, CameraSyncService.class));
-					}
-				}
-			}, 30 * 1000);
-		}
-		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
+			logDebug( "Video quality selected");
+            switch(Integer.parseInt((String)newValue)){
+                case VIDEO_QUALITY_ORIGINAL:{
+                    dbH.setCameraUploadVideoQuality(ORIGINAL);
+                    prefs.setUploadVideoQuality(ORIGINAL + "");
+                    videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
+                    disableChargingSettings();
+                    dbH.updateVideoState(SyncRecord.STATUS_PENDING);
+                    break;
+                }
+                case VIDEO_QUALITY_MEDIUM:{
+                    dbH.setCameraUploadVideoQuality(MEDIUM);
+                    prefs.setUploadVideoQuality(MEDIUM + "");
+                    videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
+					resetVideoQualitySettings();
+                    enableChargingSettings();
+                    dbH.updateVideoState(SyncRecord.STATUS_TO_COMPRESS);
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            videoQuality.setSummary(videoQuality.getEntry());
+            rescheduleCameraUpload(context);
+
+        } else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			pinLockCodeTxt = (String) newValue;
 			dbH.setPinLockCode(pinLockCodeTxt);
-			
+
 			ast = "";
 			if (pinLockCodeTxt.compareTo("") == 0){
 				ast = getString(R.string.settings_pin_lock_code_not_set);
@@ -1365,14 +1371,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 			}
 			pinLockCode.setSummary(ast);
-			
+
 			pinLockCode.setSummary(ast);
-			log("Object: " + newValue);
+			logDebug("Object: " + newValue);
 		}
 		else if (preference.getKey().compareTo("settings_chat_list_status") == 0){
-			log("onPreferenceChage: change status chat");
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("Change status (CHAT)");
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			statusChatListPreference.setSummary(statusChatListPreference.getEntry());
@@ -1380,9 +1386,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			megaChatApi.setOnlineStatus(newStatus, (ManagerActivityLollipop) context);
 		}
 		else if (preference.getKey().compareTo("settings_chat_send_originals") == 0){
-			log("onPreferenceChage: change send originals chat");
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("Change send originals (CHAT)");
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1396,17 +1402,16 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				chatAttachmentsChatListPreference.setValue(1+"");
 			}
 			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
-//			dbH.setSendOriginalAttachments();
 		}
 		return true;
 	}
-	
+
 	public void setCacheSize(String size){
 		if(isAdded()){
 			cacheAdvancedOptions.setSummary(getString(R.string.settings_advanced_features_size, size));
 		}
 	}
-	
+
 	public void setOfflineSize(String size){
 		if(isAdded()){
 			offlineFileManagement.setSummary(getString(R.string.settings_advanced_features_size, size));
@@ -1416,12 +1421,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
-		log("onPreferenceClick");
+		logDebug("onPreferenceClick");
 
 		prefs = dbH.getPreferences();
-		log("KEY = " + preference.getKey());
+		logDebug("KEY = " + preference.getKey());
 		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0){
-			log("KEY_ABOUT_SDK_VERSION pressed");
+			logDebug("KEY_ABOUT_SDK_VERSION pressed");
 			numberOfClicksSDK++;
 			if (numberOfClicksSDK == 5){
 				MegaAttributes attrs = dbH.getAttributes();
@@ -1432,10 +1437,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 						}
 						else{
 							dbH.setFileLoggerSDK(false);
-							Util.setFileLoggerSDK(false);
+							setFileLoggerSDK(false);
 							numberOfClicksSDK = 0;
 							MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-                            ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
+                            ((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
 						}
 					}
 					catch(Exception e){
@@ -1452,7 +1457,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 
 		if (preference.getKey().compareTo(KEY_ABOUT_KARERE_VERSION) == 0){
-			log("KEY_ABOUT_KARERE_VERSION pressed");
+			logDebug("KEY_ABOUT_KARERE_VERSION pressed");
 			numberOfClicksKarere++;
 			if (numberOfClicksKarere == 5){
 				MegaAttributes attrs = dbH.getAttributes();
@@ -1463,10 +1468,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 						}
 						else{
 							dbH.setFileLoggerKarere(false);
-							Util.setFileLoggerKarere(false);
+							setFileLoggerKarere(false);
 							numberOfClicksKarere = 0;
 							MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
-							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
+							((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
 						}
 					}
 					catch(Exception e){
@@ -1483,19 +1488,19 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 
 		if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) == 0){
-			log("KEY_ABOUT_APP_VERSION pressed");
+			logDebug("KEY_ABOUT_APP_VERSION pressed");
 			numberOfClicksAppVersion++;
 			if (numberOfClicksAppVersion == 5){
 
 				if (MegaApplication.isShowInfoChatMessages() == false) {
 					MegaApplication.setShowInfoChatMessages(true);
 					numberOfClicksAppVersion = 0;
-					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, "Action to show info of chat messages is enabled", -1);
+					((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is enabled", -1);
 				}
 				else{
 					MegaApplication.setShowInfoChatMessages(false);
 					numberOfClicksAppVersion = 0;
-					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, "Action to show info of chat messages is disabled", -1);
+					((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is disabled", -1);
 				}
 			}
 		}
@@ -1504,27 +1509,27 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
-			log("KEY_STORAGE_DOWNLOAD_LOCATION pressed");
+			logDebug("KEY_STORAGE_DOWNLOAD_LOCATION pressed");
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 			startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE) == 0){
-			log("KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE pressed");
+			logDebug("KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE pressed");
 			Dialog downloadLocationDialog;
 			String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
 	        AlertDialog.Builder b=new AlertDialog.Builder(context);
 
 			b.setTitle(getResources().getString(R.string.settings_storage_download_location));
 			b.setItems(sdCardOptions, new OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					log("onClick");
+					logDebug("onClick");
 					switch(which){
 						case 0:{
-							log("intent to FileStorageActivityLollipop");
+							logDebug("Intent to FileStorageActivityLollipop");
 							Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 							intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 							intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
@@ -1532,12 +1537,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 							break;
 						}
 						case 1:{
-							log("get External Files");
+							logDebug("Get External Files");
 							File[] fs = context.getExternalFilesDirs(null);
 							if (fs.length > 1){
-								log("more than one");
+								logDebug("More than one");
 								if (fs[1] != null){
-									log("external not NULL");
+									logDebug("External not NULL");
 									String path = fs[1].getAbsolutePath();
 									dbH.setStorageDownloadLocation(path);
 									if (downloadLocation != null){
@@ -1548,7 +1553,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 									}
 								}
 								else{
-									log("external NULL -- intent to FileStorageActivityLollipop");
+									logWarning("External NULL -- intent to FileStorageActivityLollipop");
 									Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 									intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
@@ -1561,25 +1566,25 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 			});
 			b.setNegativeButton(getResources().getString(R.string.general_cancel), new OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					log("Cancel dialog");
+					logDebug("Cancel dialog");
 					dialog.cancel();
 				}
 			});
 			downloadLocationDialog = b.create();
 			downloadLocationDialog.show();
-			log("downloadLocationDialog shown");
+			logDebug("downloadLocationDialog shown");
 		}
 		else if (preference.getKey().compareTo(KEY_CACHE) == 0){
-			log("Clear Cache!");
+			logDebug("Clear Cache!");
 
 			ClearCacheTask clearCacheTask = new ClearCacheTask(context);
 			clearCacheTask.execute();
 		}
 		else if (preference.getKey().compareTo(KEY_OFFLINE) == 0){
-			log("Clear Offline!");
+			logDebug("Clear Offline!");
 
 			ClearOfflineTask clearOfflineTask = new ClearOfflineTask(context);
 			clearOfflineTask.execute();
@@ -1590,15 +1595,20 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		else if(preference.getKey().compareTo(KEY_CLEAR_VERSIONS) == 0){
 			((ManagerActivityLollipop)context).showConfirmationClearAllVersions();
 		}
+        else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE) == 0){
+            showResetCompressionQueueSizeDialog();
+        }
 		else if (preference.getKey().compareTo(KEY_SECONDARY_MEDIA_FOLDER_ON) == 0){
-			log("Changing the secondary uploads");
+			logDebug("Changing the secondary uploads");
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
-			dbH.setSecSyncTimeStamp(0);			
+			dbH.setSecSyncTimeStamp(0);
+			dbH.setSecVideoSyncTimeStamp(0);
+			dbH.deleteAllSecondarySyncRecords(TYPE_ANY);
 			secondaryUpload = !secondaryUpload;
 			if (secondaryUpload){
 				dbH.setSecondaryUploadEnabled(true);
@@ -1606,30 +1616,29 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				//Check MEGA folder
 				if(handleSecondaryMediaFolder!=null){
 					if(handleSecondaryMediaFolder==-1){
-						megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+						megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 					}
-				}		
-				else{
-					megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
 				}
-				
-				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);			
-				
+				else{
+					megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
+				}
+
+				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
+
 				prefs = dbH.getPreferences();
 				localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
-				
-				//Check local folder				
+
+				//Check local folder
 				if(localSecondaryFolderPath!=null){
-					log("Secondary folder in database: "+localSecondaryFolderPath);
 					File checkSecondaryFile = new File(localSecondaryFolderPath);
-					if(!checkSecondaryFile.exists()){					
+					if(!checkSecondaryFile.exists()){
 						dbH.setSecondaryFolderPath("-1");
 						//If the secondary folder does not exist any more
 						Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
-						
+
 						if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
-							localSecondaryFolderPath = getString(R.string.settings_empty_folder);						
-						}					
+							localSecondaryFolderPath = getString(R.string.settings_empty_folder);
+						}
 					}
 				}
 				else{
@@ -1640,58 +1649,44 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 
 				localSecondaryFolder.setSummary(localSecondaryFolderPath);
-				
 				cameraUploadCategory.addPreference(localSecondaryFolder);
 				cameraUploadCategory.addPreference(megaSecondaryFolder);
-				
-				handler.postDelayed(new Runnable() {
-					
-					@Override
-					public void run() {
-						log("Now I start the service");
-						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-							context.startService(new Intent(context, CameraSyncService.class));
-						}
-					}
-				}, 5 * 1000);
-				
 			}
-			else{				
-
+			else{
 				dbH.setSecondaryUploadEnabled(false);
-				
 				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
 				cameraUploadCategory.removePreference(localSecondaryFolder);
 				cameraUploadCategory.removePreference(megaSecondaryFolder);
-			}			
+			}
+			rescheduleCameraUpload(context);
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_ADVANCED_DEVICES) == 0){
-			log("Changing the advances devices preference");
+			logDebug("Changing the advances devices preference");
 			advancedDevices = !advancedDevices;
 			if(advancedDevices){
-				if(Util.getExternalCardPath()==null){
+				if(getExternalCardPath()==null){
 					Toast.makeText(context, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_SHORT).show();
 					storageAdvancedDevices.setChecked(false);
 					advancedDevices = !advancedDevices;
 				}
 			}
 			else{
-				log("No advanced devices");
+				logDebug("No advanced devices");
 			}
-			
+
 			dbH.setStorageAdvancedDevices(advancedDevices);
 		}
 		else if (preference.getKey().compareTo(KEY_LOCAL_SECONDARY_MEDIA_FOLDER) == 0){
-			log("Changing the local folder for secondary uploads");
+			logDebug("Changing the local folder for secondary uploads");
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 			startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_MEGA_SECONDARY_MEDIA_FOLDER) == 0){
-			log("Changing the MEGA folder for secondary uploads");
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("Changing the MEGA folder for secondary uploads");
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
@@ -1699,25 +1694,24 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			startActivityForResult(intent, REQUEST_MEGA_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_ON) == 0){
-			log("Changing camera upload");
-			if(!cameraUpload){
-				if (!Util.isOnline(context)){
-					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("Changing camera upload");
+			if(cameraUpload){
+				if (!isOnline(context)){
+					((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 					return false;
 				}
 			}
 
-			dbH.setCamSyncTimeStamp(0);			
+			dbH.setCamSyncTimeStamp(0);
 			cameraUpload = !cameraUpload;
-			
 			refreshCameraUploadsSettings();
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_ENABLE) == 0){
-			log("KEY_PIN_LOCK_ENABLE");
+			logDebug("KEY_PIN_LOCK_ENABLE");
 			pinLock = !pinLock;
 			if (pinLock){
 				//Intent to set the PIN
-				log("call to showPAnelSetPinLock");
+				logDebug("Call to showPanelSetPinLock");
 				((ManagerActivityLollipop)getActivity()).showPanelSetPinLock();
 			}
 			else{
@@ -1728,17 +1722,17 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_CHAT_ENABLE) == 0){
-			log("KEY_CHAT_ENABLE");
+			logDebug("KEY_CHAT_ENABLE");
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				chatEnableSwitch.setChecked(chatEnabled);
 				return false;
 			}
 
 			chatEnabled = !chatEnabled;
 			if (chatEnabled){
-				log("CONNECT CHAT!!!");
+				logDebug("CONNECT CHAT!!!");
 				dbH.setEnabledChat(true+"");
 				((ManagerActivityLollipop)context).enableChat();
 				preferenceScreen.addPreference(chatNotificationsCategory);
@@ -1749,27 +1743,27 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				chatEnabledCategory.addPreference(statusChatListPreference);
 			}
 			else{
-				log("DISCONNECT CHAT!!!");
+				logDebug("DISCONNECT CHAT!!!");
 				dbH.setEnabledChat(false+"");
 				((ManagerActivityLollipop)context).disableChat();
 				hidePreferencesChat();
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_AUTOAWAY_ENABLE) == 0){
-			log("KEY_AUTOAWAY_ENABLE");
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("KEY_AUTOAWAY_ENABLE");
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			statusConfig = megaChatApi.getPresenceConfig();
 			if(statusConfig!=null){
 				if(statusConfig.isAutoawayEnabled()){
-					log("Change AUTOAWAY chat to false");
+					logDebug("Change AUTOAWAY chat to false");
 					megaChatApi.setPresenceAutoaway(false, 0);
 					autoawayChatCategory.removePreference(chatAutoAwayPreference);
 				}
 				else{
-					log("Change AUTOAWAY chat to true");
+					logDebug("Change AUTOAWAY chat to true");
 					megaChatApi.setPresenceAutoaway(true, 300);
 					autoawayChatCategory.addPreference(chatAutoAwayPreference);
 					chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, 5));
@@ -1778,25 +1772,25 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		else if (preference.getKey().compareTo(KEY_RICH_LINKS_ENABLE) == 0){
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
 			if(richLinksSwitch.isChecked()){
-				log("Enable rich links");
+				logDebug("Enable rich links");
 				megaApi.enableRichPreviews(true, (ManagerActivityLollipop)context);
 			}
 			else{
-				log("Disable rich links");
+				logDebug("Disable rich links");
 				megaApi.enableRichPreviews(false, (ManagerActivityLollipop)context);
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_ENABLE_VERSIONS) == 0){
-			log("Change KEY_ENABLE_VERSIONS");
+			logDebug("Change KEY_ENABLE_VERSIONS");
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1808,15 +1802,15 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_ENABLE_RB_SCHEDULER) == 0){
-			log("Change KEY_ENABLE_RB_SCHEDULER");
+			logDebug("Change KEY_ENABLE_RB_SCHEDULER");
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
 			if(!enableRbSchedulerSwitch.isChecked()){
-				log("Disable RB schedule");
+				logDebug("Disable RB schedule");
 				//Check the account type
 				MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 				if(myAccountInfo!=null ){
@@ -1832,54 +1826,54 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 			}
 			else{
-				log("ENABLE RB schedule");
+				logDebug("ENABLE RB schedule");
 				((ManagerActivityLollipop)context).showRbSchedulerValueDialog(true);
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_DAYS_RB_SCHEDULER) == 0){
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
 			((ManagerActivityLollipop)context).showRbSchedulerValueDialog(false);
 		}
 		else if (preference.getKey().compareTo(KEY_ENABLE_LAST_GREEN_CHAT) == 0){
-			log("Change KEY_ENABLE_LAST_GREEN_CHAT");
+			logDebug("Change KEY_ENABLE_LAST_GREEN_CHAT");
 
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
 			if(!enableLastGreenChatSwitch.isChecked()){
-				log("Disable last green");
+				logDebug("Disable last green");
 				((ManagerActivityLollipop)context).enableLastGreen(false);
 			}
 			else{
-				log("Enable last green");
+				logDebug("Enable last green");
 				((ManagerActivityLollipop)context).enableLastGreen(true);
 			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			((ManagerActivityLollipop)context).showAutoAwayValueDialog();
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_PERSISTENCE) == 0){
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
 			if(statusConfig.isPersist()){
-				log("Change persistence chat to false");
+				logDebug("Change persistence chat to false");
 				megaChatApi.setPresencePersist(false);
 			}
 			else{
-				log("Change persistence chat to true");
+				logDebug("Change persistence chat to true");
 				megaChatApi.setPresencePersist(true);
 			}
 		}
@@ -1890,15 +1884,15 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN
-			log("KEY_PIN_LOCK_CODE");
+			logDebug("KEY_PIN_LOCK_CODE");
 			resetPinLock();
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_ASK_ME_ALWAYS) == 0){
-			log("KEY_STORAGE_ASK_ME_ALWAYS");
+			logDebug("KEY_STORAGE_ASK_ME_ALWAYS");
 			askMe = storageAskMeAlways.isChecked();
 			dbH.setStorageAskAlways(askMe);
 			if (storageAskMeAlways.isChecked()){
-				log("storageAskMeAlways is checked!");
+				logDebug("storageAskMeAlways is checked!");
 				if (downloadLocation != null){
 					downloadLocation.setEnabled(false);
 					downloadLocation.setSummary("");
@@ -1910,7 +1904,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				storageAdvancedDevices.setEnabled(true);
 			}
 			else{
-				log("storageAskMeAlways NOT checked!");
+				logDebug("storageAskMeAlways NOT checked!");
 				if (downloadLocation != null){
 					downloadLocation.setEnabled(true);
 					downloadLocation.setSummary(downloadLocationPath);
@@ -1923,23 +1917,29 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else if (preference.getKey().compareTo("settings_use_https_only") == 0){
-			log("settings_use_https_only");
+			logDebug("settings_use_https_only");
 			useHttpsOnlyValue = useHttpsOnly.isChecked();
 			dbH.setUseHttpsOnly(useHttpsOnlyValue);
 			megaApi.useHttpsOnly(useHttpsOnlyValue);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CHARGING) == 0){
-			log("KEY_CAMERA_UPLOAD_CHARGING");
+			logDebug("KEY_CAMERA_UPLOAD_CHARGING");
 			charging = cameraUploadCharging.isChecked();
-			dbH.setCamSyncCharging(charging);
+			if(charging){
+                enableVideoCompressionSizeSettingsAndRestartUpload();
+            }else{
+                disableVideoCompressionSizeSettingsAndRestartUpload();
+            }
+			dbH.setConversionOnCharging(charging);
 		}
 		else if(preference.getKey().compareTo(KEY_KEEP_FILE_NAMES) == 0){
-			log("KEY_KEEP_FILE_NAMES");
+			logDebug("KEY_KEEP_FILE_NAMES");
 			fileNames = keepFileNames.isChecked();
 			dbH.setKeepFileNames(fileNames);
+            Toast.makeText(context, getString(R.string.message_keep_device_name), Toast.LENGTH_SHORT).show();
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER) == 0){
-			log("Changing the LOCAL folder for camera uploads");
+			logDebug("Changing the LOCAL folder for camera uploads");
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
@@ -1947,14 +1947,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD) == 0){
-			log("KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD");
+			logDebug("KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD");
 			Dialog localCameraDialog;
 			String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
 	        AlertDialog.Builder b=new AlertDialog.Builder(context);
 
 			b.setTitle(getResources().getString(R.string.settings_local_camera_upload_folder));
 			b.setItems(sdCardOptions, new OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					switch(which){
@@ -1968,7 +1968,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 						}
 						case 1:{
 							File[] fs = context.getExternalFilesDirs(null);
-							if (fs.length > 1){		
+							if (fs.length > 1){
 								if (fs[1] != null){
 									Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 									startActivityForResult(intent, REQUEST_CODE_TREE_LOCAL_CAMERA);
@@ -1987,7 +1987,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 			});
 			b.setNegativeButton(getResources().getString(R.string.general_cancel), new OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.cancel();
@@ -1997,9 +1997,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			localCameraDialog.show();
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_MEGA_FOLDER) == 0){
-			log("Changing the MEGA folder for camera uploads");
-			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			logDebug("Changing the MEGA folder for camera uploads");
+			if (!isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
@@ -2030,7 +2030,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			startActivity(viewIntent);
 		}
 		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
-			log("Cancel account preference");
+			logDebug("Cancel account preference");
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
 		else if (preference.getKey().compareTo(KEY_QR_CODE_AUTO_ACCEPT) == 0){
@@ -2039,280 +2039,112 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			megaApi.getContactLinksOption((ManagerActivityLollipop) context);
 		}
 		else if (preference.getKey().compareTo(KEY_RECOVERY_KEY) == 0){
-			log("Export Recovery Key");
+			logDebug("Export Recovery Key");
 			((ManagerActivityLollipop)context).showMKLayout();
 		}
 		else if (preference.getKey().compareTo(KEY_CHANGE_PASSWORD) == 0){
-			log("Change password");
+			logDebug("Change password");
 			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
 			startActivity(intent);
 		}
 		else if (preference.getKey().compareTo(KEY_2FA) == 0){
 			if (((ManagerActivityLollipop) context).is2FAEnabled()){
-				log("2FA is Checked");
+				logDebug("2FA is Checked");
 				twoFASwitch.setChecked(true);
-				((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.DISABLE_2FA);
+				((ManagerActivityLollipop) context).showVerifyPin2FA(DISABLE_2FA);
 			}
 			else {
-				log("2FA is NOT Checked");
+				logDebug("2FA is NOT Checked");
 				twoFASwitch.setChecked(false);
 				Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
 				startActivity(intent);
 			}
 		}else if(preference.getKey().compareTo(KEY_AUTO_PLAY_SWITCH) == 0 ){
-		    boolean isChecked = autoPlaySwitch.isChecked();
-		    log("is auto play checked " + isChecked);
+            boolean isChecked = autoPlaySwitch.isChecked();
+			logDebug("Is auto play checked " + isChecked);
             dbH.setAutoPlayEnabled(String.valueOf(isChecked));
-        
+
         }
-		
 		return true;
 	}
 
 	/**
 	 * Refresh the Camera Uploads service settings depending on the service status.
 	 */
-	private void refreshCameraUploadsSettings() {
-		log("refreshCameraUploadsSettings");
+    private void refreshCameraUploadsSettings() {
+		logDebug("refreshCameraUploadsSettings");
+        boolean cuEnabled = false;
+        if (prefs != null) {
+            cuEnabled = Boolean.parseBoolean(prefs.getCamSyncEnabled());
+        }
+        if (!cuEnabled) {
+			logDebug("Camera Uploads ON");
+            String[] PERMISSIONS = {
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+            };
 
-		if (cameraUpload){
-			log("Camera ON");
-			if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				log("No storage permission");
-				ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
-			}
+            if (!hasPermissions(context,PERMISSIONS)) {
+                ActivityCompat.requestPermissions((ManagerActivityLollipop)context,PERMISSIONS,REQUEST_CAMERA_UPLOAD);
+            } else {
+                enableCameraUpload();
+            }
+        } else {
+            disableCameraUpload();
+        }
+    }
 
-			if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA)){
-				log("No camera permission");
-				ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-						new String[]{Manifest.permission.CAMERA},
-						Constants.REQUEST_CAMERA);
-			}
-
-			if (camSyncLocalPath!=null){
-
-				if (!isExternalSDCard){
-					File checkFile = new File(camSyncLocalPath);
-					if(!checkFile.exists()){
-						//Local path does not exist, then Camera folder by default
-						log("local path not exist, default camera folder");
-						File cameraDownloadLocation = null;
-						if (Environment.getExternalStorageDirectory() != null){
-							cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-						}
-
-						cameraDownloadLocation.mkdirs();
-
-						dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
-
-						camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-						localCameraUploadFolder.setSummary(camSyncLocalPath);
-						localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
-					}
-				}
-				else{
-					Uri uri = Uri.parse(prefs.getUriExternalSDCard());
-
-					DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
-					String pickedDirName = pickedDir.getName();
-					if(pickedDirName!=null){
-						camSyncLocalPath = pickedDir.getName();
-						localCameraUploadFolder.setSummary(pickedDir.getName());
-						localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
-					}
-					else{
-						log("pickedDirNAme NULL");
-					}
-				}
-			}
-			else{
-				log("local parh is NULL");
-				//Local path not valid = null, then Camera folder by default
-				File cameraDownloadLocation = null;
-				if (Environment.getExternalStorageDirectory() != null){
-					cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-				}
-
-				cameraDownloadLocation.mkdirs();
-
-				dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
-				dbH.setCameraFolderExternalSDCard(false);
-				isExternalSDCard = false;
-
-				camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-			}
-
-			if(camSyncHandle!=null){
-				if(camSyncHandle==-1){
-					camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
-				}
-			}
-			else{
-				camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
-			}
-
-			megaCameraFolder.setSummary(camSyncMegaPath);
-
-			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-			fileUpload = getString(R.string.settings_camera_upload_only_photos);
-			cameraUploadWhat.setValueIndex(0);
-
-			dbH.setCamSyncWifi(true);
-			wifi = getString(R.string.cam_sync_wifi);
-			cameraUploadHow.setValueIndex(1);
-
-			dbH.setCamSyncCharging(true);
-			charging = true;
-			cameraUploadCharging.setChecked(charging);
-
-			dbH.setCamSyncEnabled(true);
-
-			handler.postDelayed(new Runnable() {
-
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-						context.startService(new Intent(context, CameraSyncService.class));
-					}
-				}
-			}, 5 * 1000);
-
-			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
-			cameraUploadHow.setSummary(wifi);
-			localCameraUploadFolder.setSummary(camSyncLocalPath);
-			localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
-
-			cameraUploadWhat.setSummary(fileUpload);
-			cameraUploadCategory.addPreference(cameraUploadHow);
-			cameraUploadCategory.addPreference(cameraUploadWhat);
-			cameraUploadCategory.addPreference(cameraUploadCharging);
-			cameraUploadCategory.addPreference(keepFileNames);
-			cameraUploadCategory.addPreference(megaCameraFolder);
-			cameraUploadCategory.addPreference(secondaryMediaFolderOn);
-			cameraUploadCategory.removePreference(localSecondaryFolder);
-			cameraUploadCategory.removePreference(megaSecondaryFolder);
-
-			File[] fs = context.getExternalFilesDirs(null);
-			if (fs.length == 1){
-				cameraUploadCategory.addPreference(localCameraUploadFolder);
-				cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-			}
-			else{
-				if (fs.length > 1){
-					if (fs[1] == null){
-						cameraUploadCategory.addPreference(localCameraUploadFolder);
-						cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-					}
-					else{
-						cameraUploadCategory.removePreference(localCameraUploadFolder);
-						cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
-					}
-				}
-			}
-		}
-		else{
-			log("Camera OFF");
-			secondaryUpload = false;
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-				Intent stopIntent = null;
-				stopIntent = new Intent(context, CameraSyncService.class);
-				stopIntent.setAction(CameraSyncService.ACTION_STOP);
-				context.startService(stopIntent);
-			}
-			else {
-				dbH.setCamSyncEnabled(false);
-				dbH.setSecondaryUploadEnabled(false);
-				if (megaApi != null) {
-					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-				}
-			}
-
-			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
-			secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
-			cameraUploadCategory.removePreference(cameraUploadHow);
-			cameraUploadCategory.removePreference(cameraUploadWhat);
-			cameraUploadCategory.removePreference(localCameraUploadFolder);
-			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-			cameraUploadCategory.removePreference(cameraUploadCharging);
-			cameraUploadCategory.removePreference(keepFileNames);
-			cameraUploadCategory.removePreference(megaCameraFolder);
-			cameraUploadCategory.removePreference(secondaryMediaFolderOn);
-			cameraUploadCategory.removePreference(localSecondaryFolder);
-			cameraUploadCategory.removePreference(megaSecondaryFolder);
-		}
-	}
-	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		log("onActivityResult");
-		
+		logDebug("onActivityResult");
+
 		prefs = dbH.getPreferences();
-		log("REQUEST CODE: " + requestCode + "___RESULT CODE: " + resultCode);
+		logDebug("REQUEST CODE: " + requestCode + "___RESULT CODE: " + resultCode);
 		if (requestCode == REQUEST_CODE_TREE_LOCAL_CAMERA && resultCode == Activity.RESULT_OK){
 			if (intent == null){
-				log("intent NULL");
+				logWarning("intent NULL");
 				return;
 			}
-			
+
 			Uri treeUri = intent.getData();
-			
+
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(context);
 			}
-			
+
 			dbH.setUriExternalSDCard(treeUri.toString());
 			dbH.setCameraFolderExternalSDCard(true);
 			isExternalSDCard = true;
-			
+
 			DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
 
 			String pickedDirName = pickedDir.getName();
 			if(pickedDirName!=null){
 				prefs.setCamSyncLocalPath(pickedDir.getName());
+				//prefs.setCamSyncHandle();
 				camSyncLocalPath = pickedDir.getName();
 				dbH.setCamSyncLocalPath(pickedDir.getName());
 				localCameraUploadFolder.setSummary(pickedDir.getName());
 				localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
 			}
 			else{
-				log("pickedDirNAme NULL");
+				logWarning("pickedDirNAme NULL");
 			}
 
-			dbH.setCamSyncTimeStamp(0);
-
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
-			}
-			
-			handler.postDelayed(new Runnable() {
-				
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-						context.startService(new Intent(context, CameraSyncService.class));
-					}
-				}
-			}, 5 * 1000);
+			resetCUTimeStampsAndCache();
+			rescheduleCameraUpload(context);
 		}
-		else if(requestCode == Constants.SET_PIN){
+		else if(requestCode == SET_PIN){
 			if(resultCode == Activity.RESULT_OK) {
-				log("Set PIN Ok");
+				logDebug("Set PIN Ok");
 
 				afterSetPinLock();
 			}
 			else{
-				log("Set PIN ERROR");
+				logWarning("Set PIN ERROR");
 			}
 		}
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_CANCELED && intent != null){
-			log("REQUEST_DOWNLOAD_FOLDER - canceled");
+			logDebug("REQUEST_DOWNLOAD_FOLDER - canceled");
 		}
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK && intent != null) {
 			String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
@@ -2323,10 +2155,15 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			if (downloadLocationPreference != null){
 				downloadLocationPreference.setSummary(path);
 			}
-		}		
+		}
 		else if (requestCode == REQUEST_CAMERA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
 			String cameraPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            if(!isNewSettingValid(cameraPath, prefs.getLocalPathSecondaryFolder(), prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())){
+                Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
+                return;
+            }
+
 			prefs.setCamSyncLocalPath(cameraPath);
 			camSyncLocalPath = cameraPath;
 			dbH.setCamSyncLocalPath(cameraPath);
@@ -2334,129 +2171,75 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			isExternalSDCard = false;
 			localCameraUploadFolder.setSummary(cameraPath);
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
-			dbH.setCamSyncTimeStamp(0);
-
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
-			}
-			
-			handler.postDelayed(new Runnable() {
-				
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-						context.startService(new Intent(context, CameraSyncService.class));
-					}
-				}
-			}, 5 * 1000);
+            resetCUTimeStampsAndCache();
+            rescheduleCameraUpload(context);
 		}
 		else if (requestCode == REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
 			String secondaryPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			
+            if(!isNewSettingValid(prefs.getCamSyncLocalPath(), secondaryPath, prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())){
+                Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
+                return;
+            }
+
 			dbH.setSecondaryFolderPath(secondaryPath);
 			localSecondaryFolder.setSummary(secondaryPath);
 			dbH.setSecSyncTimeStamp(0);
-
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
-			}
-
-			handler.postDelayed(new Runnable() {
-				
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-						context.startService(new Intent(context, CameraSyncService.class));
-					}
-				}
-			}, 5 * 1000);
-		}		
+			dbH.setSecVideoSyncTimeStamp(0);
+			prefs.setLocalPathSecondaryFolder(secondaryPath);
+			rescheduleCameraUpload(context);
+		}
 		else if (requestCode == REQUEST_MEGA_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Mega folder to sync
-			
+
 			Long handle = intent.getLongExtra("SELECT_MEGA_FOLDER",-1);
+            if(!isNewSettingValid(prefs.getCamSyncLocalPath(), prefs.getLocalPathSecondaryFolder(), prefs.getCamSyncHandle(), String.valueOf(handle))){
+                Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
+                return;
+            }
+
 			if(handle!=-1){
-				dbH.setSecondaryFolderHandle(handle);						
-				
+				dbH.setSecondaryFolderHandle(handle);
+				prefs.setMegaHandleSecondaryFolder(String.valueOf(handle));
+
 				handleSecondaryMediaFolder = handle;
 				megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
 				megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
-				
+
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 				dbH.setSecSyncTimeStamp(0);
-
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-					Intent photosVideosIntent = null;
-					photosVideosIntent = new Intent(context, CameraSyncService.class);
-					photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-					context.startService(photosVideosIntent);
-				}
-				
-				handler.postDelayed(new Runnable() {
-					
-					@Override
-					public void run() {
-						log("Now I start the service");
-						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-							context.startService(new Intent(context, CameraSyncService.class));
-						}
-					}
-				}, 5 * 1000);
-				
-				log("Mega folder to secondary uploads change!!");
+				dbH.setSecVideoSyncTimeStamp(0);
+				rescheduleCameraUpload(context);
+				logDebug("Mega folder to secondary uploads change!!");
 			}
 			else{
-				log("Error choosing the secondary uploads");
+				logError("Error choosing the secondary uploads");
 			}
-			
+
 		}
 		else if (requestCode == REQUEST_MEGA_CAMERA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Mega folder to sync
-			
+
 			Long handle = intent.getLongExtra("SELECT_MEGA_FOLDER",-1);
+            if(!isNewSettingValid(prefs.getCamSyncLocalPath(), prefs.getLocalPathSecondaryFolder(), String.valueOf(handle), prefs.getMegaHandleSecondaryFolder())){
+                Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
+                return;
+            }
+
 			if(handle!=-1){
 				dbH.setCamSyncHandle(handle);
-				
+				prefs.setCamSyncHandle(String.valueOf(handle));
 				camSyncHandle = handle;
-				camSyncMegaNode = megaApi.getNodeByHandle(camSyncHandle);	
+				camSyncMegaNode = megaApi.getNodeByHandle(camSyncHandle);
 				camSyncMegaPath = camSyncMegaNode.getName();
-				
 				megaCameraFolder.setSummary(camSyncMegaPath);
-				dbH.setCamSyncTimeStamp(0);
-
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-					Intent photosVideosIntent = null;
-					photosVideosIntent = new Intent(context, CameraSyncService.class);
-					photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-					context.startService(photosVideosIntent);
-				}
-				
-				handler.postDelayed(new Runnable() {
-					
-					@Override
-					public void run() {
-						log("Now I start the service");
-						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-							context.startService(new Intent(context, CameraSyncService.class));
-						}
-					}
-				}, 5 * 1000);
-				
-				log("Mega folder to sync the Camera CHANGED!!");
+                resetCUTimeStampsAndCache();
+				rescheduleCameraUpload(context);
+				logDebug("Mega folder to sync the Camera CHANGED!!");
 			}
 			else{
-				log("Error choosing the Mega folder to sync the Camera");
+				logError("Error choosing the Mega folder to sync the Camera");
 			}
-			
 		}
 	}
 
@@ -2476,18 +2259,18 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 	};
-	
+
 	@Override
 	public void onResume() {
-	    log("onResume");
+		logDebug("onResume");
 
-		IntentFilter filter = new IntentFilter(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
 		filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
 		LocalBroadcastManager.getInstance(context).registerReceiver(receiver, filter);
 
 	    prefs=dbH.getPreferences();
-	    
+
 	    if (prefs.getPinLockEnabled() == null){
 			dbH.setPinLockEnabled(false);
 			dbH.setPinLockCode("");
@@ -2502,12 +2285,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				pinLockCodeTxt = "";
 				dbH.setPinLockCode(pinLockCodeTxt);
 			}
-		}	    
+		}
 
 		taskGetSizeCache();
 		taskGetSizeOffline();
 
-		if(!Util.isOnline(context)){
+		if(!isOnline(context)){
 			chatEnabledCategory.setEnabled(false);
 			cameraUploadCategory.setEnabled(false);
 		}
@@ -2521,23 +2304,23 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	private void refreshAccountInfo(){
-		log("refreshAccountInfo");
+		logDebug("refreshAccountInfo");
 
 		//Check if the call is recently
-		log("Check the last call to getAccountDetails");
-		if(DBUtil.callToAccountDetails(context)){
-			log("megaApi.getAccountDetails SEND");
+		logDebug("Check the last call to getAccountDetails");
+		if(callToAccountDetails(context)){
+			logDebug("megaApi.getAccountDetails SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
 		}
 	}
 
 	public void update2FAPreference(boolean enabled) {
-		log("update2FAPreference");
+		logDebug("update2FAPreference - Enabled: " + enabled);
 		twoFASwitch.setChecked(enabled);
 	}
 
 	public void update2FAVisibility(){
-		log("update2FAVisbility");
+		logDebug("update2FAVisbility");
 		if (megaApi == null){
 			if (context != null){
 				if (((Activity)context).getApplication() != null){
@@ -2548,18 +2331,18 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		if (megaApi != null) {
 			if (megaApi.multiFactorAuthAvailable()) {
-				log("update2FAVisbility true");
+				logDebug("update2FAVisbility true");
 				preferenceScreen.addPreference(twoFACategory);
 				megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
 			} else {
-				log("update2FAVisbility false");
+				logDebug("update2FAVisbility false");
 				preferenceScreen.removePreference(twoFACategory);
 			}
 		}
 	}
 
 	public void afterSetPinLock(){
-		log("afterSetPinLock");
+		logDebug("afterSetPinLock");
 
 		prefs=dbH.getPreferences();
 		pinLockCodeTxt = prefs.getPinLockCode();
@@ -2584,45 +2367,45 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void taskGetSizeCache (){
-		log("taskGetSizeCache");
+		logDebug("taskGetSizeCache");
 		GetCacheSizeTask getCacheSizeTask = new GetCacheSizeTask(context);
 		getCacheSizeTask.execute();
 	}
 
 	public void taskGetSizeOffline (){
-		log("taskGetSizeOffline");
+		logDebug("taskGetSizeOffline");
 		GetOfflineSizeTask getOfflineSizeTask = new GetOfflineSizeTask(context);
 		getOfflineSizeTask.execute();
 	}
 
 	public void intentToPinLock(){
-		log("intentToPinLock");
+		logDebug("intentToPinLock");
 		Intent intent = new Intent(context, PinLockActivityLollipop.class);
 		intent.setAction(PinLockActivityLollipop.ACTION_SET_PIN_LOCK);
-		startActivityForResult(intent, Constants.SET_PIN);
+		startActivityForResult(intent, SET_PIN);
 	}
 
 	public void resetPinLock(){
-		log("resetPinLock");
+		logDebug("resetPinLock");
 		Intent intent = new Intent(context, PinLockActivityLollipop.class);
 		intent.setAction(PinLockActivityLollipop.ACTION_RESET_PIN_LOCK);
 		startActivity(intent);
 	}
 
 	public void updatePresenceConfigChat(boolean cancelled, MegaChatPresenceConfig config){
-		log("updatePresenceConfigChat: "+cancelled);
+		logDebug("updatePresenceConfigChat: " + cancelled);
 
 		if(!cancelled){
 			statusConfig = config;
 		}
 
-		if(Util.isChatEnabled()){
+		if(isChatEnabled()){
 			showPresenceChatConfig();
 		}
 	}
 
 	public void updateEnabledRichLinks(){
-		log("updateEnabledRichLinks");
+		logDebug("updateEnabledRichLinks");
 
 		if(MegaApplication.isEnabledRichLinks()!=richLinksSwitch.isChecked()){
 			richLinksSwitch.setOnPreferenceClickListener(null);
@@ -2632,7 +2415,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void updateEnabledFileVersions(){
-		log("updateEnabledFileVersions: "+MegaApplication.isDisableFileVersions());
+		logDebug("updateEnabledFileVersions: " + MegaApplication.isDisableFileVersions());
 
 		enableVersionsSwitch.setOnPreferenceClickListener(null);
 		if(MegaApplication.isDisableFileVersions() == 1){
@@ -2654,7 +2437,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void updateRBScheduler(long daysCount){
-		log("updateRBScheduler: "+daysCount);
+		logDebug("updateRBScheduler: " + daysCount);
 
 		if(daysCount<1){
 			enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
@@ -2694,7 +2477,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void waitPresenceConfig(){
-		log("waitPresenceConfig: ");
+		logDebug("waitPresenceConfig: ");
 
 		preferenceScreen.removePreference(autoawayChatCategory);
 		preferenceScreen.removePreference(persistenceChatCategory);
@@ -2707,7 +2490,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void showPresenceChatConfig(){
-		log("showPresenceChatConfig: "+statusConfig.getOnlineStatus());
+		logDebug("showPresenceChatConfig: " + statusConfig.getOnlineStatus());
 
 		statusChatListPreference.setValue(statusConfig.getOnlineStatus()+"");
 		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
@@ -2760,7 +2543,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		//Show configuration last green
 		if(statusConfig.isLastGreenVisible()){
-			log("Last visible ON");
+			logDebug("Last visible ON");
 			enableLastGreenChatSwitch.setEnabled(true);
 			if(!enableLastGreenChatSwitch.isChecked()){
 				enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
@@ -2769,7 +2552,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
 		}
 		else{
-			log("Last visible OFF");
+			logDebug("Last visible OFF");
 			enableLastGreenChatSwitch.setEnabled(true);
 			if(enableLastGreenChatSwitch.isChecked()){
 				enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
@@ -2781,7 +2564,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 
 	public void cancelSetPinLock(){
-		log("cancelSetPinkLock");
+		logDebug("cancelSetPinkLock");
 		pinLock = false;
 		pinLockEnableSwitch.setChecked(pinLock);
 
@@ -2790,7 +2573,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	}
 
 	public void hidePreferencesChat(){
-		log("hidePreferencesChat");
+		logDebug("hidePreferencesChat");
 
 		getPreferenceScreen().removePreference(chatNotificationsCategory);
 		getPreferenceScreen().removePreference(autoawayChatCategory);
@@ -2799,11 +2582,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		chatEnabledCategory.removePreference(richLinksSwitch);
 		chatEnabledCategory.removePreference(enableLastGreenChatSwitch);
 		chatEnabledCategory.removePreference(statusChatListPreference);
-	}
-
-
-	private static void log(String log) {
-		Util.log("SettingsFragmentLollipop", log);
 	}
 
 	public void setValueOfAutoaccept (boolean autoAccept) {
@@ -2826,4 +2604,498 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	public boolean getAutoacceptSetting () {
 		return autoAccept;
 	}
+
+	private String getLocalDCIMFolderPath(){
+		return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
+	}
+
+	private void setWhatToUploadForCameraUpload(){
+		if (prefs.getCamSyncFileUpload() == null){
+			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+			fileUpload = getString(R.string.settings_camera_upload_only_photos);
+			cameraUploadWhat.setValueIndex(0);
+		}
+		else{
+			switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
+				case MegaPreferences.ONLY_PHOTOS:{
+					fileUpload = getString(R.string.settings_camera_upload_only_photos);
+					cameraUploadWhat.setValueIndex(0);
+					disableVideoQualitySettings();
+					break;
+				}
+				case MegaPreferences.ONLY_VIDEOS:{
+					fileUpload = getString(R.string.settings_camera_upload_only_videos);
+					cameraUploadWhat.setValueIndex(1);
+					break;
+				}
+				case MegaPreferences.PHOTOS_AND_VIDEOS:{
+					fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
+					cameraUploadWhat.setValueIndex(2);
+					break;
+				}
+				default:{
+					fileUpload = getString(R.string.settings_camera_upload_only_photos);
+					cameraUploadWhat.setValueIndex(0);
+					disableVideoQualitySettings();
+					break;
+				}
+			}
+		}
+		cameraUploadWhat.setSummary(fileUpload);
+	}
+
+	private void setupConnectionTypeForCameraUpload(){
+		if (prefs.getCamSyncWifi() == null){
+			dbH.setCamSyncWifi(true);
+			cameraUploadHow.setSummary(getString(R.string.cam_sync_wifi));
+			cameraUploadHow.setValueIndex(1);
+		}else{
+			if(Boolean.parseBoolean(prefs.getCamSyncWifi())){
+				cameraUploadHow.setSummary(getString(R.string.cam_sync_wifi));
+				cameraUploadHow.setValueIndex(1);
+			}else{
+				cameraUploadHow.setSummary(getString(R.string.cam_sync_data));
+				cameraUploadHow.setValueIndex(0);
+			}
+		}
+	}
+
+	private void setupLocalPathForCameraUpload(){
+	    String cameraFolderLocation = prefs.getCamSyncLocalPath();
+        if(TextUtils.isEmpty(cameraFolderLocation)) {
+            cameraFolderLocation = getLocalDCIMFolderPath();
+        }
+		if (camSyncLocalPath != null) {
+			if (!isExternalSDCard) {
+				File checkFile = new File(camSyncLocalPath);
+				if (!checkFile.exists()) {
+					logWarning("Local path not exist, use default camera folder path");
+					camSyncLocalPath = cameraFolderLocation;
+				}
+			} else {
+				Uri uri = Uri.parse(prefs.getUriExternalSDCard());
+				DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
+				String pickedDirName = pickedDir.getName();
+				if (pickedDirName != null) {
+					camSyncLocalPath = pickedDirName;
+				} else {
+					logError("pickedDirName is NULL");
+				}
+			}
+		} else {
+			logError("Local path is NULL");
+			dbH.setCameraFolderExternalSDCard(false);
+			isExternalSDCard = false;
+			camSyncLocalPath = cameraFolderLocation;
+		}
+
+		dbH.setCamSyncLocalPath(cameraFolderLocation);
+		localCameraUploadFolder.setSummary(camSyncLocalPath);
+		localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
+		File[] fs = context.getExternalFilesDirs(null);
+		if (fs.length == 1) {
+			cameraUploadCategory.addPreference(localCameraUploadFolder);
+			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+		} else {
+			if (fs.length > 1) {
+				if (fs[1] == null) {
+					cameraUploadCategory.addPreference(localCameraUploadFolder);
+					cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+				} else {
+					cameraUploadCategory.removePreference(localCameraUploadFolder);
+					cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
+				}
+			}
+		}
+	}
+
+	private void setupVideoOptionsForCameraUpload(){
+		if (prefs.getCamSyncFileUpload() == null) {
+			disableVideoQualitySettings();
+		} else {
+			boolean isPhotoOnly = Integer.parseInt(prefs.getCamSyncFileUpload()) == MegaPreferences.ONLY_PHOTOS;
+			if (!isPhotoOnly) {
+				enableVideoQualitySettings();
+			}
+		}
+	}
+
+	private void setupSecondaryUpload(){
+		if (prefs.getSecondaryMediaFolderEnabled() == null) {
+			dbH.setSecondaryUploadEnabled(false);
+			secondaryUpload = false;
+		} else {
+			secondaryUpload = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+		}
+
+		if (secondaryUpload) {
+			//Check if the node exists in MEGA
+			String secHandle = prefs.getMegaHandleSecondaryFolder();
+			if (secHandle != null) {
+				if (!TextUtils.isEmpty(secHandle)) {
+					logDebug("handleSecondaryMediaFolder NOT empty");
+					handleSecondaryMediaFolder = Long.valueOf(secHandle);
+					if (handleSecondaryMediaFolder != -1) {
+						megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
+						if (megaNodeSecondaryMediaFolder != null) {
+							megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
+						} else {
+							megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
+						}
+					} else {
+						megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
+					}
+				} else {
+					logWarning("handleSecondaryMediaFolder empty string");
+					megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
+				}
+			} else {
+				logWarning("handleSecondaryMediaFolder Null");
+				dbH.setSecondaryFolderHandle(-1);
+				handleSecondaryMediaFolder = (long) -1;
+				megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
+			}
+
+			//check if the local secondary folder exists
+			localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
+			if (localSecondaryFolderPath == null || localSecondaryFolderPath.equals("-1")) {
+				logWarning("Secondary ON: invalid localSecondaryFolderPath");
+				localSecondaryFolderPath = getString(R.string.settings_empty_folder);
+				Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
+			} else {
+				File checkSecondaryFile = new File(localSecondaryFolderPath);
+				if (!checkSecondaryFile.exists()) {
+					logDebug("Secondary ON: the local folder does not exist");
+					dbH.setSecondaryFolderPath("-1");
+					//If the secondary folder does not exist
+					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
+					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
+
+				}
+			}
+
+			megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
+			localSecondaryFolder.setSummary(localSecondaryFolderPath);
+			secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_off));
+			cameraUploadCategory.addPreference(localSecondaryFolder);
+			cameraUploadCategory.addPreference(megaSecondaryFolder);
+
+		} else {
+			secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
+			cameraUploadCategory.removePreference(localSecondaryFolder);
+			cameraUploadCategory.removePreference(megaSecondaryFolder);
+		}
+	}
+
+	private void setupPrimaryCloudFolder() {
+		if (camSyncHandle == null) {
+			camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
+		} else {
+			if (camSyncHandle == -1) {
+				camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
+			} else {
+				logDebug("camSyncHandle is " + camSyncHandle);
+			}
+		}
+		megaCameraFolder.setSummary(camSyncMegaPath);
+	}
+
+	public void enableCameraUpload() {
+		cameraUpload = true;
+		prefs = dbH.getPreferences();
+
+		//internet connect type
+		setupConnectionTypeForCameraUpload();
+
+		//upload type
+		setWhatToUploadForCameraUpload();
+
+		//video options
+		setupVideoOptionsForCameraUpload();
+
+		//local primary folder
+		setupLocalPathForCameraUpload();
+
+		//cloud primary folder
+		setupPrimaryCloudFolder();
+
+		//secondary upload
+		setupSecondaryUpload();
+
+		//set cu enabled and start the service
+		dbH.setCamSyncEnabled(true);
+		handler.postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				logDebug("Enable Camera Uploads, Now I start the service");
+				startCameraUploadService(context);
+			}
+		}, 1000);
+
+		cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
+		cameraUploadCategory.addPreference(cameraUploadHow);
+		cameraUploadCategory.addPreference(cameraUploadWhat);
+		cameraUploadCategory.addPreference(keepFileNames);
+		cameraUploadCategory.addPreference(megaCameraFolder);
+		cameraUploadCategory.addPreference(secondaryMediaFolderOn);
+	}
+
+    public void disableCameraUpload(){
+		logDebug("Camera Uploads OFF");
+        cameraUpload = false;
+        resetCUTimeStampsAndCache();
+        handler.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                if(dbH.shouldClearCamsyncRecords()){
+                    dbH.deleteAllSyncRecords(TYPE_ANY);
+                    dbH.saveShouldClearCamsyncRecords(false);
+                }
+            }
+        },10 * 1000);
+
+        dbH.setCamSyncEnabled(false);
+        stopRunningCameraUploadService(context);
+
+        cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
+        cameraUploadOn.setSummary("");
+        secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
+        cameraUploadCategory.removePreference(cameraUploadHow);
+        cameraUploadCategory.removePreference(cameraUploadWhat);
+        cameraUploadCategory.removePreference(localCameraUploadFolder);
+        cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+		hideVideoQualitySettingsSection();
+        cameraUploadCategory.removePreference(keepFileNames);
+        cameraUploadCategory.removePreference(megaCameraFolder);
+        cameraUploadCategory.removePreference(secondaryMediaFolderOn);
+        cameraUploadCategory.removePreference(localSecondaryFolder);
+        cameraUploadCategory.removePreference(megaSecondaryFolder);
+    }
+
+    public void showResetCompressionQueueSizeDialog(){
+		logDebug("showResetCompressionQueueSizeDialog");
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+        int margin = 20;
+
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(px2dp(margin, outMetrics), px2dp(margin, outMetrics), px2dp(margin, outMetrics), 0);
+
+        queueSizeInput = new EditText(context);
+        queueSizeInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+        layout.addView(queueSizeInput, params);
+
+        queueSizeInput.setSingleLine();
+        queueSizeInput.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+        queueSizeInput.setHint(getString(R.string.label_file_size_mega_byte));
+        queueSizeInput.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        queueSizeInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    String value = v.getText().toString().trim();
+                    setCompressionQueueSize(value, queueSizeInput);
+
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        queueSizeInput.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+        queueSizeInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    showKeyboardDelayed(v);
+                }
+            }
+        });
+
+        params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(px2dp(margin+5, outMetrics), px2dp(0, outMetrics), px2dp(margin, outMetrics), 0);
+        final TextView text = new TextView(context);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
+        String MB = getString(R.string.label_file_size_mega_byte);
+        text.setText(getString(R.string.settings_compression_queue_subtitle, COMPRESSION_QUEUE_SIZE_MIN + MB, COMPRESSION_QUEUE_SIZE_MAX + MB));
+        layout.addView(text,params);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(getString(R.string.settings_video_compression_queue_size_popup_title));
+        builder.setPositiveButton(getString(R.string.cam_sync_ok),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) { }
+                });
+        builder.setNegativeButton(getString(android.R.string.cancel), null);
+        builder.setView(layout);
+        compressionQueueSizeDialog = builder.create();
+        compressionQueueSizeDialog.show();
+
+        compressionQueueSizeDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String value = queueSizeInput.getText().toString().trim();
+                setCompressionQueueSize(value, queueSizeInput);
+            }
+        });
+    }
+
+    private void setCompressionQueueSize(String value, EditText input){
+        if (value.length() == 0) {
+            compressionQueueSizeDialog.dismiss();
+            return;
+        }
+
+        try{
+            int size = Integer.parseInt(value);
+            if(isQueueSizeValid(size)){
+                compressionQueueSizeDialog.dismiss();
+                cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.label_file_size_mega_byte));
+                String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, size + getResources().getString(R.string.label_file_size_mega_byte));
+                cameraUploadCharging.setSummary(chargingHelper);
+                dbH.setChargingOnSize(size);
+                prefs.setChargingOnSize(size + "");
+                rescheduleCameraUpload(context);
+            }else{
+                resetSizeInput(input);
+            }
+        } catch (Exception e){
+            resetSizeInput(input);
+        }
+    }
+
+    private boolean isQueueSizeValid(int size){
+		return size >= COMPRESSION_QUEUE_SIZE_MIN && size <= COMPRESSION_QUEUE_SIZE_MAX;
+    }
+
+    private void resetSizeInput(EditText input){
+        input.setText("");
+        input.requestFocus();
+    }
+
+	private void hideVideoQualitySettingsSection(){
+		cameraUploadCategory.removePreference(videoQuality);
+		cameraUploadCategory.removePreference(cameraUploadCharging);
+		cameraUploadCategory.removePreference(cameraUploadVideoQueueSize);
+	}
+
+    private void disableVideoQualitySettings(){
+		prefs.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_MEDIUM));
+		dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
+        cameraUploadCategory.removePreference(videoQuality);
+        disableChargingSettings();
+    }
+
+    private void disableChargingSettings(){
+		charging = false;
+		dbH.setConversionOnCharging(charging);
+		cameraUploadCharging.setChecked(charging);
+		cameraUploadCategory.removePreference(cameraUploadCharging);
+		disableVideoCompressionSizeSettings();
+    }
+
+    private void disableVideoCompressionSizeSettings(){
+        cameraUploadCategory.removePreference(cameraUploadVideoQueueSize);
+    }
+
+    private void disableVideoCompressionSizeSettingsAndRestartUpload(){
+        disableVideoCompressionSizeSettings();
+        rescheduleCameraUpload(context);
+    }
+
+    private void resetVideoQualitySettings(){
+		dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
+		dbH.setConversionOnCharging(true);
+		dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+		String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, DEFAULT_CONVENTION_QUEUE_SIZE + getResources().getString(R.string.label_file_size_mega_byte));
+		cameraUploadCharging.setSummary(chargingHelper);
+	}
+
+	private void enableVideoQualitySettings() {
+		prefs = dbH.getPreferences();
+		cameraUploadCategory.addPreference(videoQuality);
+		String uploadQuality = prefs.getUploadVideoQuality();
+		if (TextUtils.isEmpty(uploadQuality)) {
+			prefs.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_MEDIUM));
+			dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
+			videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
+			enableChargingSettings();
+		} else if (Integer.parseInt(uploadQuality) == MEDIUM) {
+			enableChargingSettings();
+			videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
+		} else if (Integer.parseInt(uploadQuality) == ORIGINAL) {
+			videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
+		}
+		videoQuality.setSummary(videoQuality.getEntry());
+	}
+
+	private void enableChargingSettings() {
+		prefs = dbH.getPreferences();
+		if (prefs.getConversionOnCharging() == null) {
+			dbH.setConversionOnCharging(true);
+			charging = true;
+		} else {
+			charging = Boolean.parseBoolean(prefs.getConversionOnCharging());
+		}
+		cameraUploadCharging.setChecked(charging);
+		cameraUploadCategory.addPreference(cameraUploadCharging);
+
+		if(charging){
+			enableVideoCompressionSizeSettings();
+		}
+	}
+
+	private void enableVideoCompressionSizeSettings() {
+		prefs = dbH.getPreferences();
+		cameraUploadCategory.addPreference(cameraUploadVideoQueueSize);
+
+		//convention queue size
+		String sizeInDB = prefs.getChargingOnSize();
+		int size;
+		if (sizeInDB == null) {
+			dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+			size = DEFAULT_CONVENTION_QUEUE_SIZE;
+		} else {
+			size = Integer.parseInt(sizeInDB);
+		}
+		cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.label_file_size_mega_byte));
+	}
+
+    private void enableVideoCompressionSizeSettingsAndRestartUpload(){
+        enableVideoCompressionSizeSettings();
+        rescheduleCameraUpload(context);
+    }
+
+    private boolean isNewSettingValid(String primaryPath, String secondaryPath, String primaryHandle, String secondaryHandle){
+	    if(!secondaryUpload || primaryPath == null || primaryHandle == null || secondaryPath == null || secondaryHandle == null){
+	        return true;
+        }else if(primaryHandle.equals(secondaryHandle) && (primaryPath.contains(secondaryPath) || secondaryPath.contains(primaryPath))){
+	        return false;
+        }else{
+            return true;
+        }
+    }
+
+    private void resetCUTimeStampsAndCache(){
+        dbH.setCamSyncTimeStamp(0);
+        dbH.setCamVideoSyncTimeStamp(0);
+        dbH.setSecSyncTimeStamp(0);
+        dbH.setSecVideoSyncTimeStamp(0);
+        dbH.saveShouldClearCamsyncRecords(true);
+        purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(compressionQueueSizeDialog != null && compressionQueueSizeDialog.isShowing()){
+            outState.putBoolean(KEY_SET_QUEUE_DIALOG, true);
+            outState.putString(KEY_SET_QUEUE_SIZE, queueSizeInput.getText().toString());
+        }
+    }
 }

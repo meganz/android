@@ -20,8 +20,9 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.PermissionsImageAdapter;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class PermissionsFragment extends Fragment implements View.OnClickListener {
 
@@ -76,7 +77,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
         View v = inflater.inflate(R.layout.fragment_permissions, container, false);
 
-        ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
+        ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
 
         setupLayout = (LinearLayout) v.findViewById(R.id.setup_fragment_container);
         notNowButton = (Button) v.findViewById(R.id.not_now_button);
@@ -188,11 +189,15 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             }
         }
 
+        if (isAllowingAccessShown) {
+            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
+        }
+
         if (numItems == 1){
             itemsLayout.setVisibility(View.GONE);
         }
         else {
-            itemsText.setText(getString(R.string.wizard_steps_indicator, 1, numItems));
+            itemsText.setText(getString(R.string.wizard_steps_indicator, currentPermission + 1, numItems));
         }
     }
 
@@ -204,7 +209,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 break;
             }
             case R.id.setup_button: {
-                ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+                ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
                 showAllowAccessLayout();
                 break;
             }
@@ -264,19 +269,19 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
     void askForMediaPermissions () {
         if (!readGranted && !writeGranted)  {
-            log("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
+            logDebug("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                     PERMISSIONS_FRAGMENT);
         }
         else if (!writeGranted) {
-            log("WRITE_EXTERNAL_STORAGE");
+            logDebug("WRITE_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_FRAGMENT);
         }
         else if (!readGranted) {
-            log("READ_EXTERNAL_STORAGE");
+            logDebug("READ_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     PERMISSIONS_FRAGMENT);
@@ -285,7 +290,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
     void askForCameraPermission() {
         if (!cameraGranted) {
-            log("CAMERA");
+            logDebug("CAMERA");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_FRAGMENT);
         }
     }
@@ -299,7 +304,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 //        }
 //        else if (!microphoneGranted) {
         if (!microphoneGranted) {
-            log("RECORD_AUDIO");
+            logDebug("RECORD_AUDIO");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.RECORD_AUDIO},
                     PERMISSIONS_FRAGMENT);
@@ -352,9 +357,5 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-    }
-
-    private static void log(String log) {
-        Util.log("PermissionsFragment", log);
     }
 }
