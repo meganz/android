@@ -10,13 +10,15 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class MyAccountInfo {
 
@@ -80,7 +82,7 @@ public class MyAccountInfo {
     public final int hasSessionsDetails = 0x020;
 
     public MyAccountInfo(Context context){
-        log("MyAccountInfo created");
+        logDebug("MyAccountInfo created");
 
         this.context = context;
 
@@ -94,10 +96,10 @@ public class MyAccountInfo {
     }
 
     public void setAccountDetails(int numDetails){
-        log("setAccountDetails");
+        logDebug("numDetails: " + numDetails);
 
         if(accountInfo==null){
-            log("Error because account info is NUll in setAccountDetails");
+            logError("Error because account info is NUll in setAccountDetails");
             return;
         }
 
@@ -115,7 +117,7 @@ public class MyAccountInfo {
             //Check size of the different nodes
             if(megaApi.getRootNode()!=null){
                 usedCloudDrive = accountInfo.getStorageUsed(megaApi.getRootNode().getHandle());
-                formattedUsedCloud = Util.getSizeString(usedCloudDrive);
+                formattedUsedCloud = getSizeString(usedCloudDrive);
             }
 
             if(megaApi.getInboxNode()!=null){
@@ -124,13 +126,13 @@ public class MyAccountInfo {
                     formattedUsedInbox = "";
                 }
                 else {
-                    formattedUsedInbox = Util.getSizeString(usedInbox);
+                    formattedUsedInbox = getSizeString(usedInbox);
                 }
             }
 
             if(megaApi.getRubbishNode()!=null){
                 usedRubbish = accountInfo.getStorageUsed(megaApi.getRubbishNode().getHandle());
-                formattedUsedRubbish = Util.getSizeString(usedRubbish);
+                formattedUsedRubbish = getSizeString(usedRubbish);
             }
 
             ArrayList<MegaNode> nodes=megaApi.getInShares();
@@ -141,12 +143,12 @@ public class MyAccountInfo {
                 }
             }
 
-            formattedUsedIncoming = Util.getSizeString(usedIncoming);
+            formattedUsedIncoming = getSizeString(usedIncoming);
 
-            totalFormatted = Util.getSizeString(totalStorage);
+            totalFormatted = getSizeString(totalStorage);
 
             usedStorage = accountInfo.getStorageUsed();
-            usedFormatted=Util.getSizeString(usedStorage);
+            usedFormatted=getSizeString(usedStorage);
 
             usedPerc = 0;
             if (totalStorage != 0){
@@ -155,16 +157,16 @@ public class MyAccountInfo {
 
             long availableSpace = totalStorage - usedStorage;
             if (availableSpace < 0) {
-                formattedAvailableSpace = Util.getSizeString(0);
+                formattedAvailableSpace = getSizeString(0);
             }
             else{
-                formattedAvailableSpace = Util.getSizeString(availableSpace);
+                formattedAvailableSpace = getSizeString(availableSpace);
             }
         }
 
         if (transfer) {
-            totalTransferFormatted = Util.getSizeString(accountInfo.getTransferMax());
-            usedTransferFormatted = Util.getSizeString(accountInfo.getTransferOwnUsed());
+            totalTransferFormatted = getSizeString(accountInfo.getTransferMax());
+            usedTransferFormatted = getSizeString(accountInfo.getTransferOwnUsed());
         }
 
         if (pro) {
@@ -199,7 +201,7 @@ public class MyAccountInfo {
 
         accountDetailsFinished = true;
 
-        log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; INVENTORYFINISHED: " + inventoryFinished);
+        logDebug("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; INVENTORYFINISHED: " + inventoryFinished);
     }
 
     public MegaAccountDetails getAccountInfo() {
@@ -209,10 +211,10 @@ public class MyAccountInfo {
     public void setAccountInfo(MegaAccountDetails accountInfo) {
 
         this.accountInfo = accountInfo;
-        log("***Renews ts: "+accountInfo.getSubscriptionRenewTime());
-        log("***Renews on: "+Util.getDateString(accountInfo.getSubscriptionRenewTime()));
-        log("***Expires ts:"+accountInfo.getProExpiration());
-        log("***Expires on: "+Util.getDateString(accountInfo.getProExpiration()));
+        logDebug("Renews ts: " + accountInfo.getSubscriptionRenewTime());
+        logDebug("Renews on: " + getDateString(accountInfo.getSubscriptionRenewTime()));
+        logDebug("Expires ts: " + accountInfo.getProExpiration());
+        logDebug("Expires on: " + getDateString(accountInfo.getProExpiration()));
     }
 
     public int getAccountType() {
@@ -325,16 +327,12 @@ public class MyAccountInfo {
     }
 
     public void setLastSessionFormattedDate(String lastSessionFormattedDate) {
-        log("setLastSessionFormattedDate: "+lastSessionFormattedDate);
+        logDebug("lastSessionFormattedDate: " + lastSessionFormattedDate);
         this.lastSessionFormattedDate = lastSessionFormattedDate;
     }
 
-    public static void log(String message) {
-        Util.log("MyAccountInfo", message);
-    }
-
     public void setFullName(){
-        log("setFullName");
+        logDebug("setFullName");
         if (firstNameText.trim().length() <= 0){
             fullName = lastNameText;
         }
@@ -343,7 +341,7 @@ public class MyAccountInfo {
         }
 
         if (fullName.trim().length() <= 0) {
-            log("Put email as fullname");
+            logDebug("Put email as fullname");
             String email = "";
             MegaUser user = megaApi.getMyUser();
             if (user != null) {
@@ -355,7 +353,7 @@ public class MyAccountInfo {
 
         if (fullName.trim().length() <= 0){
             fullName = context.getString(R.string.name_text)+" "+context.getString(R.string.lastname_text);
-            log("Full name set by default: "+fullName);
+            logDebug("Full name set by default: " + fullName);
         }
 
         firstLetter = fullName.charAt(0) + "";
@@ -363,7 +361,7 @@ public class MyAccountInfo {
     }
 
     public void setProductAccounts(MegaPricing p){
-        log("setProductAccounts");
+        logDebug("setProductAccounts");
 
         if(productAccounts==null){
             productAccounts = new ArrayList<Product>();
@@ -373,7 +371,7 @@ public class MyAccountInfo {
         }
 
         for (int i = 0; i < p.getNumProducts(); i++) {
-            log("p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
+            logDebug("p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
 
             Product account = new Product(p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
 
@@ -456,7 +454,7 @@ public class MyAccountInfo {
     }
 
     public String getFormattedPreviousVersionsSize() {
-        return Util.getSizeString(previousVersionsSize);
+        return getSizeString(previousVersionsSize);
     }
 
     public void setFormattedAvailableSpace(String formattedAvailableSpace) {
@@ -560,7 +558,7 @@ public class MyAccountInfo {
     }
 
     public void setCreateSessionTimeStamp(long createSessionTimeStamp) {
-        log("setCreateSessionTimeStamp: " + createSessionTimeStamp);
+        logDebug("createSessionTimeStamp: " + createSessionTimeStamp);
         this.createSessionTimeStamp = createSessionTimeStamp;
     }
 

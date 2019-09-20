@@ -36,18 +36,18 @@ import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_FILE_INFO;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -112,23 +112,23 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        log("onCreate");
+        logDebug("onCreate");
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            logDebug("Bundle is NOT NULL");
             long handle = savedInstanceState.getLong("handle", -1);
             height = savedInstanceState.getInt("height", -1);
-            log("Handle of the node: "+handle);
+            logDebug("Handle of the node: " + handle);
             node = megaApi.getNodeByHandle(handle);
             if(context instanceof ManagerActivityLollipop){
                 drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
             }
         }
         else{
-            log("Bundle NULL");
+            logWarning("Bundle NULL");
             if(context instanceof ManagerActivityLollipop){
                 node = ((ManagerActivityLollipop) context).getSelectedNode();
                 drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
@@ -144,7 +144,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     public void setupDialog(final Dialog dialog, int style) {
 
         super.setupDialog(dialog, style);
-        log("setupDialog");
+        logDebug("setupDialog");
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -233,12 +233,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         nodeIconLayout.setVisibility(View.GONE);
 
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            log("onCreate: Landscape configuration");
-            nodeName.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
-            nodeInfo.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
+            logDebug("Landscape configuration");
+            nodeName.setMaxWidth(scaleWidthPx(275, outMetrics));
+            nodeInfo.setMaxWidth(scaleWidthPx(275, outMetrics));
         } else {
-            nodeName.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
-            nodeInfo.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
+            nodeName.setMaxWidth(scaleWidthPx(210, outMetrics));
+            nodeInfo.setMaxWidth(scaleWidthPx(210, outMetrics));
         }
 
         if (node == null) return;
@@ -251,11 +251,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             optionOpenWith.setVisibility(View.GONE);
         }
 
-        if (Util.isOnline(context)) {
+        if (isOnline(context)) {
             nodeName.setText(node.getName());
 
             if (node.isFolder()) {
-                nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
+                nodeInfo.setText(getInfoFolder(node, context, megaApi));
                 nodeVersionsIcon.setVisibility(View.GONE);
 
                 if (node.isInShare()) {
@@ -264,7 +264,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
                 }
                 else{
-//                        nodeThumb.setImageResource(R.drawable.ic_folder_list);
                     if(((ManagerActivityLollipop) context).isCameraUploads(node)){
                         nodeThumb.setImageResource(R.drawable.ic_folder_image_list);
                     }else{
@@ -275,7 +274,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionSendChat.setVisibility(View.GONE);
             } else {
                 long nodeSize = node.getSize();
-                nodeInfo.setText(Util.getSizeString(nodeSize));
+                nodeInfo.setText(getSizeString(nodeSize));
 
                 if(megaApi.hasVersions(node)){
                     nodeVersionsIcon.setVisibility(View.VISIBLE);
@@ -285,18 +284,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
 
                 if (node.hasThumbnail()) {
-                    log("Node has thumbnail");
+                    logDebug("Node has thumbnail");
                     RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
                     params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
                     params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
                     params1.setMargins(20, 0, 12, 0);
                     nodeThumb.setLayoutParams(params1);
 
-                    thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                    thumb = getThumbnailFromCache(node);
                     if (thumb != null) {
                         nodeThumb.setImageBitmap(thumb);
                     } else {
-                        thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                        thumb = getThumbnailFromFolder(node, context);
                         if (thumb != null) {
                             nodeThumb.setImageBitmap(thumb);
                         } else {
@@ -306,7 +305,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 } else {
                     nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                 }
-                if (Util.isChatEnabled()) {
+                if (isChatEnabled()) {
                     optionSendChat.setVisibility(View.VISIBLE);
                 }
                 else {
@@ -316,10 +315,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
         }
 
-
         switch (drawerItem) {
             case CLOUD_DRIVE: {
-                log("show Cloud bottom sheet");
+                logDebug("show Cloud bottom sheet");
                 if (((ManagerActivityLollipop) context).isOnRecents()) {
                     optionInfoText.setText(R.string.general_file_info);
                     counterShares--;
@@ -337,7 +335,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionOfflineText.setText(getString(R.string.save_for_offline));
                     }
 
-                    if (Util.isChatEnabled()) {
+                    if (isChatEnabled()) {
                         optionSendChat.setVisibility(View.VISIBLE);
                     } else {
                         counterShares--;
@@ -354,7 +352,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionRestoreFromRubbish.setVisibility(View.GONE);
 
                     int accessLevel = megaApi.getAccess(node);
-
                     switch (accessLevel) {
                         case MegaShare.ACCESS_READWRITE:
                         case MegaShare.ACCESS_READ:
@@ -415,7 +412,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionLinkText.setText(R.string.edit_link_option);
                     optionRemoveLink.setVisibility(View.VISIBLE);
                     if (node.isExpired()) {
-                        log("Node exported but expired!!");
+                        logDebug("Node exported but expired!!");
                     }
                 } else {
                     nodeIconLayout.setVisibility(View.GONE);
@@ -457,7 +454,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case RUBBISH_BIN: {
-                log("show Rubbish bottom sheet");
+                logDebug("show Rubbish bottom sheet");
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
                 } else {
@@ -527,7 +524,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionLinkText.setText(R.string.edit_link_option);
                     optionRemoveLink.setVisibility(View.VISIBLE);
                     if (node.isExpired()) {
-                        log("Node exported but expired!!");
+                        logDebug("Node exported but expired!!");
                     }
                 } else {
                     nodeIconLayout.setVisibility(View.GONE);
@@ -572,7 +569,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                 int tabSelected = ((ManagerActivityLollipop) context).getTabItemShares();
                 if (tabSelected == 0) {
-                    log("showOptionsPanelIncoming");
+                    logDebug("showOptionsPanelIncoming");
 
                     if (node.isFolder()) {
                         optionInfoText.setText(R.string.general_folder_info);
@@ -580,7 +577,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionSendChat.setVisibility(View.GONE);
                     } else {
                         optionInfoText.setText(R.string.general_file_info);
-                        if (Util.isChatEnabled()) {
+
+                        if (isChatEnabled()) {
                             optionSendChat.setVisibility(View.VISIBLE);
                         }
                         else {
@@ -592,7 +590,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     nodeIconLayout.setVisibility(View.VISIBLE);
 
                     int accessLevel = megaApi.getAccess(node);
-                    log("Node: " + node.getName() + " " + accessLevel);
                     counterOpen--;
                     optionOpenFolder.setVisibility(View.GONE);
                     optionDownload.setVisibility(View.VISIBLE);
@@ -609,7 +606,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionShare.setVisibility(View.GONE);
 
                     int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
-                    log("DeepTree value:" + dBT);
+                    logDebug("DeepTree value:" + dBT);
                     if (dBT > 0) {
                         counterShares--;
                         optionLeaveShares.setVisibility(View.GONE);
@@ -630,7 +627,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                                             nodeInfo.setText(user.getEmail());
                                         }
                                     } else {
-                                        log("The contactDB is null: ");
+                                        logDebug("The contactDB is null: ");
                                         nodeInfo.setText(user.getEmail());
                                     }
                                 } else {
@@ -642,17 +639,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         switch (accessLevel) {
                             case MegaShare.ACCESS_FULL: {
-                                log("LEVEL 0 - access FULL");
+                                logDebug("LEVEL 0 - access FULL");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
                                 break;
                             }
                             case MegaShare.ACCESS_READ: {
-                                log("LEVEL 0 - access read");
+                                logDebug("LEVEL 0 - access read");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_read);
                                 break;
                             }
                             case MegaShare.ACCESS_READWRITE: {
-                                log("LEVEL 0 - readwrite");
+                                logDebug("LEVEL 0 - readwrite");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
                             }
                         }
@@ -660,7 +657,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                     switch (accessLevel) {
                         case MegaShare.ACCESS_FULL: {
-                            log("access FULL");
+                            logDebug("access FULL");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                             counterShares--;
@@ -685,7 +682,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             break;
                         }
                         case MegaShare.ACCESS_READ: {
-                            log("access read");
+                            logDebug("access read");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                             counterShares--;
@@ -701,7 +698,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             break;
                         }
                         case MegaShare.ACCESS_READWRITE: {
-                            log("readwrite");
+                            logDebug("readwrite");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                             counterShares--;
@@ -718,7 +715,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         }
                     }
                 } else if (tabSelected == 1) {
-                    log("showOptionsPanelOutgoing");
+                    logDebug("showOptionsPanelOutgoing");
 
                     if (node.isFolder()) {
                         optionInfoText.setText(R.string.general_folder_info);
@@ -737,7 +734,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionLinkText.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
                         if (node.isExpired()) {
-                            log("Node exported but expired!!");
+                            logDebug("Node exported but expired!!");
                         }
                     } else {
                         nodeIconLayout.setVisibility(View.GONE);
@@ -801,14 +798,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                 int dBT = nC.getIncomingLevel(node);
                 if (nC.nodeComesFromIncoming(node)) {
-                    log("dBT: "+dBT);
+                    logDebug("dBT: "+dBT);
                     if (node.isFolder()) {
                         optionInfoText.setText(R.string.general_folder_info);
                         counterShares--;
                         optionSendChat.setVisibility(View.GONE);
                     } else {
                         optionInfoText.setText(R.string.general_file_info);
-                        if (Util.isChatEnabled()) {
+                        if (isChatEnabled()) {
                             optionSendChat.setVisibility(View.VISIBLE);
                         }
                         else {
@@ -820,7 +817,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     nodeIconLayout.setVisibility(View.VISIBLE);
 
                     int accessLevel = megaApi.getAccess(node);
-                    log("Node: " + node.getName() + " " + accessLevel);
+                    logDebug("Node: " + node.getName() + " " + accessLevel);
                     optionDownload.setVisibility(View.VISIBLE);
                     if (availableOffline(context, node)) {
                         optionOfflineText.setText(getString(R.string.context_delete_offline));
@@ -836,7 +833,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     counterModify--;
                     optionRestoreFromRubbish.setVisibility(View.GONE);
 
-                    log("DeepTree value:" + dBT);
+                    logDebug("DeepTree value:" + dBT);
                     if (dBT > 0) {
                         counterShares--;
                         optionLeaveShares.setVisibility(View.GONE);
@@ -857,7 +854,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                                             nodeInfo.setText(user.getEmail());
                                         }
                                     } else {
-                                        log("The contactDB is null: ");
+                                        logWarning("The contactDB is null: ");
                                         nodeInfo.setText(user.getEmail());
                                     }
                                 } else {
@@ -869,17 +866,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         switch (accessLevel) {
                             case MegaShare.ACCESS_FULL: {
-                                log("LEVEL 0 - access FULL");
+                                logDebug("LEVEL 0 - access FULL");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
                                 break;
                             }
                             case MegaShare.ACCESS_READ: {
-                                log("LEVEL 0 - access read");
+                                logDebug("LEVEL 0 - access read");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_read);
                                 break;
                             }
                             case MegaShare.ACCESS_READWRITE: {
-                                log("LEVEL 0 - readwrite");
+                                logDebug("LEVEL 0 - readwrite");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
                             }
                         }
@@ -887,7 +884,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                     switch (accessLevel) {
                         case MegaShare.ACCESS_FULL: {
-                            log("access FULL");
+                            logDebug("access FULL");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                             counterShares--;
@@ -911,7 +908,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             break;
                         }
                         case MegaShare.ACCESS_READ: {
-                            log("access read");
+                            logDebug("access read");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                             counterShares--;
@@ -927,7 +924,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             break;
                         }
                         case MegaShare.ACCESS_READWRITE: {
-                            log("readwrite");
+                            logDebug("readwrite");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                             counterShares--;
@@ -952,7 +949,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionLinkText.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
                         if (node.isExpired()) {
-                            log("Node exported but expired!!");
+                            logDebug("Node exported but expired!!");
                         }
                     } else {
                         nodeIconLayout.setVisibility(View.GONE);
@@ -1050,41 +1047,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-//                    if(slideOffset> 0 && !heightseted){
-//                        log("HeightReal is "+ heightReal);
-//                        if(context instanceof CustomHeight){
-//                            height = ((CustomHeight) context).getHeightToPanel(thisclass);
-//                        }
-//                        log("Height is "+height);
-//                        if(height != -1 && heightReal != -1){
-//                            heightseted = true;
-//                            int numSons = 0;
-//                            int num = items_layout.getChildCount();
-//                            for(int i=0; i<num; i++){
-//                                View v = items_layout.getChildAt(i);
-//                                if(v.getVisibility() == View.VISIBLE){
-//                                    numSons++;
-//                                }
-//                            }
-//                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
-//
-//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-//                                params.height = height;
-//                                bottomSheet.setLayoutParams(params);
-//                            }
-//                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
-//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-//                                params.height = height;
-//                                bottomSheet.setLayoutParams(params);
-//                            }
-//                            if(heightReal > height){
-//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-//                                params.height = height;
-//                                bottomSheet.setLayoutParams(params);
-//                            }
-//                        }
-//                    }
-
                 if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
                     ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
                     if (getActivity() != null && getActivity().findViewById(R.id.toolbar) != null) {
@@ -1095,7 +1057,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8, context.getResources().getDisplayMetrics());
                         int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
 
-                        log("bottomSheet.height: "+mainLinearLayout.getHeight()+" maxHeight: "+maxHeight);
+                        logDebug("bottomSheet.height: "+mainLinearLayout.getHeight()+" maxHeight: "+maxHeight);
                         if (mainLinearLayout.getHeight() > maxHeight) {
                             params.height = maxHeight;
                             bottomSheet.setLayoutParams(params);
@@ -1106,35 +1068,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         });
     }
 
-    //    private int getBottomSheetMaximumHeight() {
-//        // get toolbar height
-//        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-//        int toolbarHeight = toolbar.getHeight();
-//
-//        //get status bar height
-//        Rect rectangle = new Rect();
-//        Window window = getActivity().getWindow();
-//        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
-//        int windowHeight = rectangle.bottom;
-//
-//        // material design recommended bottomsheet padding from actionbar
-//        final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8, getContext().getResources().getDisplayMetrics());
-//
-//        // maximum height of the bottomsheet
-////        return windowHeight - toolbarHeight - rectangle.top - padding;
-//        return toolbarHeight + rectangle.top + padding;
-//
-//    }
-
     @Override
     public void onClick(View v) {
 
         switch(v.getId()){
 
             case R.id.option_download_layout:{
-                log("Download option");
+                logDebug("Download option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1144,7 +1086,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
             case R.id.option_offline_layout: {
                 if (node==null) {
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 if (availableOffline(context, node)) {
@@ -1157,9 +1099,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.option_properties_layout:{
-                log("Properties option");
+                logDebug("Properties option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 Intent i = new Intent(context, FileInfoActivityLollipop.class);
@@ -1167,27 +1109,27 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                 if(drawerItem== ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
                     if(((ManagerActivityLollipop) context).getTabItemShares()==0){
-                        i.putExtra("from", Constants.FROM_INCOMING_SHARES);
+                        i.putExtra("from", FROM_INCOMING_SHARES);
                         int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
                         if(dBT<=0){
-                            log("First LEVEL is true: "+dBT);
+                            logDebug("First LEVEL is true: " + dBT);
                             i.putExtra("firstLevel", true);
                         }
                         else{
-                            log("First LEVEL is false: "+dBT);
+                            logDebug("First LEVEL is false: " + dBT);
                             i.putExtra("firstLevel", false);
                         }
                     }
                 }
                 else if(drawerItem== ManagerActivityLollipop.DrawerItem.INBOX){
                     if(((ManagerActivityLollipop) context).getTabItemShares()==0){
-                        i.putExtra("from", Constants.FROM_INBOX);
+                        i.putExtra("from", FROM_INBOX);
                     }
                 }
                 else if (drawerItem == ManagerActivityLollipop.DrawerItem.SEARCH
                         || (context instanceof ManagerActivityLollipop && ((ManagerActivityLollipop) context).isOnRecents())) {
                     if (nC.nodeComesFromIncoming(node)){
-                        i.putExtra("from", Constants.FROM_INCOMING_SHARES);
+                        i.putExtra("from", FROM_INCOMING_SHARES);
                         int dBT = nC.getIncomingLevel(node);
                         if(dBT<=0){
                             i.putExtra("firstLevel", true);
@@ -1219,27 +1161,27 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.option_link_layout:{
-                log("Public link option");
+                logDebug("Public link option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ((ManagerActivityLollipop) context).showGetLinkActivity(node.getHandle());
                 break;
             }
             case R.id.option_remove_link_layout:{
-                log("REMOVE public link option");
+                logDebug("REMOVE public link option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(node);
                 break;
             }
             case R.id.option_share_layout:{
-                log("Share option");
+                logDebug("Share option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 if(node.isOutShare()||megaApi.isPendingShare(node)){
@@ -1256,9 +1198,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.option_clear_share_layout:{
-                log("Clear shares");
+                logDebug("Clear shares");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<MegaShare> shareList = megaApi.getOutShares(node);
@@ -1266,18 +1208,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.option_leave_share_layout:{
-                log("Leave share option");
+                logDebug("Leave share option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ((ManagerActivityLollipop) context).showConfirmationLeaveIncomingShare(node);
                 break;
             }
             case R.id.option_send_chat_layout:{
-                log("Send chat option");
+                logDebug("Send chat option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
@@ -1285,9 +1227,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.option_rename_layout:{
-                log("Rename option");
+                logDebug("Rename option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ((ManagerActivityLollipop) context).showRenameDialog(node, node.getName());
@@ -1295,9 +1237,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.option_move_layout:{
-                log("Move option");
+                logDebug("Move option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1307,9 +1249,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.option_copy_layout:{
-                log("Copy option");
+                logDebug("Copy option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1319,9 +1261,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.option_rubbish_bin_layout:{
-                log("Move to rubbish option");
+                logDebug("Move to rubbish option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1330,9 +1272,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.option_remove_layout:{
-                log("Remove option");
+                logDebug("Remove option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1341,9 +1283,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.option_open_folder_layout:{
-                log("Open folder option");
+                logDebug("Open folder option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 nC.openFolderFromSearch(node.getHandle());
@@ -1352,18 +1294,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
 
             case R.id.option_open_with_layout:{
-                log("Open with");
+                logDebug("Open with");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 UtilsModalBottomSheet.openWith(megaApi, context, node);
                 break;
             }
             case R.id.option_restore_layout:{
-                log("Restore option");
+                logDebug("Restore option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ((ManagerActivityLollipop) context).restoreFromRubbish(node);
@@ -1409,17 +1351,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         switch (drawerItem) {
             case INBOX: {
-                adapterType = Constants.FROM_INBOX;
+                adapterType = FROM_INBOX;
                 break;
             }
             case SHARED_ITEMS: {
                 if (((ManagerActivityLollipop) context).getTabItemShares() == 0) {
-                    adapterType = Constants.FROM_INCOMING_SHARES;
+                    adapterType = FROM_INCOMING_SHARES;
                     break;
                 }
             }
             default: {
-                adapterType = Constants.FROM_OTHERS;
+                adapterType = FROM_OTHERS;
             }
         }
 
@@ -1437,7 +1379,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     @Override
     public void onAttach(Activity activity) {
-        log("onAttach");
+        logDebug("onAttach");
         super.onAttach(activity);
         this.context = activity;
     }
@@ -1451,15 +1393,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
-        log("Handle of the node: "+handle);
+        logDebug("Handle of the node: " + handle);
         outState.putLong("handle", handle);
-    }
-
-    private static void log(String log) {
-        Util.log("NodeOptionsBottomSheetDialogFragment", log);
     }
 
     public interface CustomHeight{

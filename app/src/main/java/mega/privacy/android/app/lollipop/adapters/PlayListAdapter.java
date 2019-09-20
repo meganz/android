@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -26,18 +25,15 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.PlaylistFragment;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
-
-/**
- * Created by mega on 24/04/18.
- */
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHolderBrowser> implements View.OnClickListener, SectionTitleProvider {
 
@@ -130,26 +126,26 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     }
 
     public void setZipNodes (ArrayList<File> files) {
-        log("setZipNodes");
+        logDebug("setZipNodes");
         this.zipFiles = files;
         notifyDataSetChanged();
     }
 
     public void setOffNodes(ArrayList<MegaOffline> nodes) {
-        log("setOffNodes");
+        logDebug("setOffNodes");
         this.offNodes = nodes;
         notifyDataSetChanged();
     }
 
     public void setNodes(ArrayList<MegaNode> nodes) {
-        log("setNodes size: "+nodes.size());
+        logDebug("Size: " + nodes.size());
         this.nodes = nodes;
         notifyDataSetChanged();
     }
 
     @Override
     public PlayListAdapter.ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        logDebug("onCreateViewHolder");
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_playlist, parent, false);
         PlayListAdapter.ViewHolderBrowser holderList = new PlayListAdapter.ViewHolderBrowser(v);
@@ -168,18 +164,18 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolderBrowser holder, int position) {
-        log("onBindViewHolder");
+        logDebug("Position: " + position);
 
         MegaOffline offNode = null;
         File mediaFile = null;
         File zipFile = null;
         MegaNode node = null;
 
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER){
             offNode = (MegaOffline) getItem(position);
             mediaFile = getOfflineFile(context, offNode);
         }
-        else if (adapterType == Constants.ZIP_ADAPTER) {
+        else if (adapterType == ZIP_ADAPTER) {
             zipFile = (File) getItem(position);
         }
         else {
@@ -189,9 +185,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         Bitmap thumb = null;
         String querySearch = ((AudioVideoPlayerLollipop) context).getQuerySearch();
 
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER){
             holder.textViewFileName.setText(offNode.getName());
-            holder.textViewFileSize.setText(Util.getSizeString(mediaFile.length()));
+            holder.textViewFileSize.setText(getSizeString(mediaFile.length()));
 
             if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && querySearch.equals("")
                     || (((PlaylistFragment) fragment).isSearchOpen() || !querySearch.equals("")) && (offNode.getName().equals(offNodeChecked.getName()))){
@@ -212,9 +208,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             }
             holder.imageView.setImageResource(MimeTypeList.typeForName(offNode.getName()).getIconResourceId());
         }
-        else if (adapterType == Constants.ZIP_ADAPTER) {
+        else if (adapterType == ZIP_ADAPTER) {
             holder.textViewFileName.setText(zipFile.getName());
-            holder.textViewFileSize.setText(Util.getSizeString(zipFile.length()));
+            holder.textViewFileSize.setText(getSizeString(zipFile.length()));
 
             if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && querySearch.equals("")
                     || (((PlaylistFragment) fragment).isSearchOpen() || !querySearch.equals("")) && (zipFile.getName().equals(zipChecked.getName()))) {
@@ -237,7 +233,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         }
         else {
             holder.textViewFileName.setText(node.getName());
-            holder.textViewFileSize.setText(Util.getSizeString(node.getSize()));
+            holder.textViewFileSize.setText(getSizeString(node.getSize()));
 
             if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && querySearch.equals("")
                     || (((PlaylistFragment) fragment).isSearchOpen() || !querySearch.equals("")) && (node.getName().equals(nodeChecked.getName()))){
@@ -265,14 +261,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         params.setMargins(0, 0, 0, 0);
         holder.imageView.setLayoutParams(params);
 
-        log("Check the thumb");
+        logDebug("Check the thumb");
 
-        if (adapterType == Constants.OFFLINE_ADAPTER || adapterType == Constants.ZIP_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER || adapterType == ZIP_ADAPTER){
 
         }
         else{
             if (node.hasThumbnail()) {
-                log("Node has thumbnail");
+                logDebug("Node has thumbnail");
                 RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
                 params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
                 params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -281,14 +277,13 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
                 holder.imageView.setLayoutParams(params1);
 
-                thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                thumb = getThumbnailFromCache(node);
                 if (thumb != null) {
 
                     holder.imageView.setImageBitmap(thumb);
 
                 } else {
-                    thumb = ThumbnailUtils
-                            .getThumbnailFromFolder(node, context);
+                    thumb = getThumbnailFromFolder(node, context);
                     if (thumb != null) {
                         holder.imageView.setImageBitmap(thumb);
 
@@ -304,8 +299,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                     }
                 }
             } else {
-                log("Node NOT thumbnail");
-                thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                logDebug("Node NOT thumbnail");
+                thumb = getThumbnailFromCache(node);
                 if (thumb != null) {
                     RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
                     params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -318,7 +313,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
 
                 } else {
-                    thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                    thumb = getThumbnailFromFolder(node, context);
                     if (thumb != null) {
                         RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
                         params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -342,12 +337,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
     public Object getItem(int position) {
 
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER){
             if (offNodes != null){
                 return offNodes.get(position);
             }
         }
-        else if (adapterType == Constants.ZIP_ADAPTER) {
+        else if (adapterType == ZIP_ADAPTER) {
             if (zipFiles != null) {
                 return zipFiles.get(position);
             }
@@ -363,12 +358,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER){
             if (offNodes != null){
                 return offNodes.size();
             }
         }
-        else if (adapterType == Constants.ZIP_ADAPTER) {
+        else if (adapterType == ZIP_ADAPTER) {
             if (zipFiles != null) {
                 return zipFiles.size();
             }
@@ -417,7 +412,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         else {
             ((AudioVideoPlayerLollipop) context).getSearchMenuItem().collapseActionView();
             String name = holder.textViewFileName.getText().toString();
-            if (adapterType == Constants.OFFLINE_ADAPTER){
+            if (adapterType == OFFLINE_ADAPTER){
                 if (name.equals(offNodeChecked.getName())){
                     playPauseItem();
                 }
@@ -430,7 +425,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                     }
                 }
             }
-            else if (adapterType == Constants.ZIP_ADAPTER) {
+            else if (adapterType == ZIP_ADAPTER) {
                 if (name.equals(zipChecked.getName())) {
                     playPauseItem();
                 }
@@ -480,12 +475,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     public void setItemChecked (int position){
         if (position >=0) {
             this.itemChecked = position;
-            if (adapterType == Constants.OFFLINE_ADAPTER) {
+            if (adapterType == OFFLINE_ADAPTER) {
                 if (offNodes != null && position < offNodes.size()) {
                     offNodeChecked = offNodes.get(position);
                 }
             }
-            else if (adapterType == Constants.ZIP_ADAPTER) {
+            else if (adapterType == ZIP_ADAPTER) {
                 if (zipFiles != null && position < zipFiles.size()) {
                     zipChecked = zipFiles.get(position);
                 }
@@ -500,9 +495,5 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
     public int getItemChecked (){
         return itemChecked;
-    }
-
-    private static void log(String log) {
-        Util.log("PlayListAdapter", log);
     }
 }

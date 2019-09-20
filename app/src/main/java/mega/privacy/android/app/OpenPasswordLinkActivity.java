@@ -30,14 +30,16 @@ import android.widget.TextView;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class OpenPasswordLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener {
 	
@@ -67,7 +69,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate()");
+		logDebug("onCreate");
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		
@@ -81,13 +83,13 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 //		if(megaApi==null||megaApi.getRootNode()==null){
 //			log("Refresh session - sdk");
 //			Intent intent = new Intent(this, LoginActivityLollipop.class);
-//			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+//			intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 //			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //			startActivity(intent);
 //			finish();
 //			return;
 //		}
-//		if(Util.isChatEnabled()){
+//		if(isChatEnabled()){
 //			if (megaChatApi == null){
 //				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 //			}
@@ -95,7 +97,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 //			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
 //				log("Refresh session - karere");
 //				Intent intent = new Intent(this, LoginActivityLollipop.class);
-//				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+//				intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 //				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //				startActivity(intent);
 //				finish();
@@ -126,12 +128,12 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	}
 
 	public void askForPasswordDialog(){
-		log("askForPasswordDialog");
+		logDebug("askForPasswordDialog");
 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
 		final EditText input = new EditText(this);
 		layout.addView(input, params);
@@ -194,7 +196,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	}
 
 	private void showKeyboardDelayed(final View view) {
-		log("showKeyboardDelayed");
+		logDebug("showKeyboardDelayed");
 		handler = new Handler();
 		handler.postDelayed(new Runnable() {
 			@Override
@@ -221,24 +223,20 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 		megaApi.decryptPasswordProtectedLink(url, value, openPasswordLinkActivity);
 	}
 
-	public static void log(String message) {
-		Util.log("OpenPasswordLinkActivity", message);
-	}
-
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getRequestString());
+		logDebug("onRequestStart: " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		log("onRequestUpdate: " + request.getRequestString());
+		logDebug("onRequestUpdate: " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestFinish: " + request.getRequestString());
+		logDebug("onRequestFinish: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_PASSWORD_LINK){
 			try { 
 				statusDialog.dismiss();	
@@ -251,29 +249,29 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 
 				// Folder Download link
 				if (decryptedLink != null && (url.matches("^https://mega.co.nz/#F!.+$") || decryptedLink.matches("^https://mega.nz/#F!.+$"))) {
-					log("folder link url");
+					logDebug("Folder link url");
 
 					Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
 					openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
+					openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
 					openFolderIntent.setData(Uri.parse(decryptedLink));
 					startActivity(openFolderIntent);
 					finish();
 				}
 
 				else if (decryptedLink != null && (decryptedLink.matches("^https://mega.co.nz/#!.+$") || decryptedLink.matches("^https://mega.nz/#!.+$"))) {
-					log("open link url");
+					logDebug("Open link url");
 
 					Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
 					openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					openFileIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
+					openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
 					openFileIntent.setData(Uri.parse(decryptedLink));
 					startActivity(openFileIntent);
 					finish();
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode());
+				logError("ERROR: " + e.getErrorCode());
 				askForPasswordDialog();
 			}
 		}
@@ -283,7 +281,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError: " + request.getRequestString());
+		logWarning("onRequestTemporaryError: " + request.getRequestString());
 	}
 
 	@Override

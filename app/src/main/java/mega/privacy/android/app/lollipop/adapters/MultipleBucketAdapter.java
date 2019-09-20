@@ -21,14 +21,15 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.FileUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.TimeUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAdapter.ViewHolderMultipleBucket> implements View.OnClickListener, SectionTitleProvider {
 
@@ -77,8 +78,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                 this.thumbnailMedia.setImageBitmap(image);
             } else {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.thumbnailList.getLayoutParams();
-                params.width = params.height = Util.px2dp(36, outMetrics);
-                int margin = Util.px2dp(18, outMetrics);
+                params.width = params.height = px2dp(36, outMetrics);
+                int margin = px2dp(18, outMetrics);
                 params.setMargins(margin, margin, margin, 0);
 
                 this.thumbnailList.setLayoutParams(params);
@@ -89,7 +90,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
     @Override
     public ViewHolderMultipleBucket onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        logDebug("onCreateViewHolder");
         outMetrics = context.getResources().getDisplayMetrics();
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_multiple_bucket, parent, false);
         ViewHolderMultipleBucket holder = new ViewHolderMultipleBucket(v);
@@ -115,7 +116,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
     @Override
     public void onBindViewHolder(ViewHolderMultipleBucket holder, int position) {
-        log("onBindViewHolder");
+        logDebug("onBindViewHolder");
         MegaNode node = getItemAtPosition(position);
         if (node == null) return;
 
@@ -124,21 +125,21 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         if (isMedia) {
             holder.mediaView.setVisibility(View.VISIBLE);
             holder.listView.setVisibility(View.GONE);
-            if (FileUtils.isAudioOrVideo(node)) {
+            if (isAudioOrVideo(node)) {
                 holder.videoLayout.setVisibility(View.VISIBLE);
-                holder.videoDuration.setText(TimeUtils.getVideoDuration(node.getDuration()));
+                holder.videoDuration.setText(getVideoDuration(node.getDuration()));
             } else {
                 holder.videoLayout.setVisibility(View.GONE);
             }
 
             int size;
-            if (Util.isScreenInPortrait(context)) {
+            if (isScreenInPortrait(context)) {
                 size = outMetrics.widthPixels / 4;
             } else {
                 size = outMetrics.widthPixels / 6;
             }
-            size -= Util.px2dp(2, outMetrics);
-            log("outMetrics.widthPixels: " + outMetrics.widthPixels + " final size: " + size);
+            size -= px2dp(2, outMetrics);
+            logDebug("outMetrics.widthPixels: " + outMetrics.widthPixels + " final size: " + size);
             holder.thumbnailMedia.getLayoutParams().width = size;
             holder.thumbnailMedia.getLayoutParams().height = size;
             holder.thumbnailMedia.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
@@ -146,28 +147,28 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             holder.mediaView.setVisibility(View.GONE);
             holder.listView.setVisibility(View.VISIBLE);
             holder.nameText.setText(node.getName());
-            holder.infoText.setText(Util.getSizeString(node.getSize()) + " · " + TimeUtils.formatTime(node.getCreationTime()));
+            holder.infoText.setText(getSizeString(node.getSize()) + " · " + formatTime(node.getCreationTime()));
 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnailList.getLayoutParams();
-            params.width = params.height = Util.px2dp(48, outMetrics);
-            int margin = Util.px2dp(12, outMetrics);
+            params.width = params.height = px2dp(48, outMetrics);
+            int margin = px2dp(12, outMetrics);
             params.setMargins(margin, margin, margin, 0);
             holder.thumbnailList.setLayoutParams(params);
             holder.thumbnailList.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
         }
 
-        Bitmap thumbnail = ThumbnailUtils.getThumbnailFromCache(node);
+        Bitmap thumbnail = getThumbnailFromCache(node);
         if (thumbnail == null) {
-            thumbnail = ThumbnailUtils.getThumbnailFromFolder(node, context);
+            thumbnail = getThumbnailFromFolder(node, context);
             if (thumbnail == null) {
                 try {
                     if (node.hasThumbnail()) {
-                        thumbnail = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
+                        thumbnail = getThumbnailFromMegaList(node, context, holder, megaApi, this);
                     } else {
-                        ThumbnailUtilsLollipop.createThumbnailList(context, node, holder, megaApi, this);
+                        createThumbnailList(context, node, holder, megaApi, this);
                     }
                 } catch (Exception e) {
-                    log("Error getting or creating node thumbnail");
+                    logError("Error getting or creating node thumbnail", e);
                     e.printStackTrace();
                 }
             }
@@ -197,7 +198,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        logDebug("onClick");
         MultipleBucketAdapter.ViewHolderMultipleBucket holder = (MultipleBucketAdapter.ViewHolderMultipleBucket) v.getTag();
         if (holder == null) return;
 
@@ -205,9 +206,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         if (node == null) return;
         switch (v.getId()) {
             case R.id.three_dots: {
-                log("three_dots click");
-                if (!Util.isOnline(context)) {
-                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                if (!isOnline(context)) {
+                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     break;
                 }
                 ((ManagerActivityLollipop) context).showNodeOptionsPanel(node);
@@ -230,9 +230,4 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
         return "";
     }
-
-    private static void log(String log) {
-        Util.log("MultipleBucketAdapter", log);
-    }
-
 }

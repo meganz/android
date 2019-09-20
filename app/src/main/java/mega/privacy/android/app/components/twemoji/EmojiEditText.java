@@ -12,7 +12,6 @@ import android.view.KeyEvent;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.utils.Util;
 
 
 //Reference implementation for an EditText with emoji support
@@ -118,9 +117,5 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
     }
     @Override public final void setEmojiSizeRes(@DimenRes final int res, final boolean shouldInvalidate) {
         setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
-    }
-
-    public static void log(String message) {
-        Util.log("EmojiEditText", message);
     }
 }

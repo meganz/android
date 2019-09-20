@@ -25,6 +25,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+
 public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapter.ViewHolderMediaBucket> implements View.OnClickListener {
 
     private MegaApiAndroid megaApi;
@@ -104,7 +106,7 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
                         ThumbnailUtilsLollipop.createThumbnailList(context, node, holder, megaApi, this);
                     }
                 } catch (Exception e) {
-                    log("Error getting or creating node thumbnail");
+                    logError("Error getting or creating node thumbnail", e);
                     e.printStackTrace();
                 }
             }
@@ -147,9 +149,5 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         ((RecentsFragment) fragment).setBucketSelected(bucket);
         ((RecentsFragment) fragment).openFile(node, true);
 
-    }
-
-    private static void log(String log) {
-        Util.log("MediaRecentsAdapter", log);
     }
 }

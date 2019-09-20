@@ -29,9 +29,11 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ImportFilesFragment extends Fragment implements View.OnClickListener {
 
@@ -60,7 +62,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
     HashMap<String, String> nameFiles = new HashMap<>();
 
     public static ImportFilesFragment newInstance() {
-        log("newInstance");
+        logDebug("newInstance");
         ImportFilesFragment fragment = new ImportFilesFragment();
         return fragment;
     }
@@ -136,7 +138,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
         chatButton = (RelativeLayout) v.findViewById(R.id.chat_layout);
         chatButton.setOnClickListener(this);
 
-        if (Util.isChatEnabled()) {
+        if (isChatEnabled()) {
             chatButton.setVisibility(View.VISIBLE);
         }
         else {
@@ -169,7 +171,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
                 adapter.SetOnItemClickListener(new ImportFilesAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        log("item click listener trigger!!");
+                        logDebug("Item click listener trigger!!");
                         itemClick(view, position);
                     }
                 });
@@ -190,7 +192,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
     }
 
     public void itemClick(View view, int position) {
-        log("itemClick");
+        logDebug("Position: " + position);
 
         if (view.getId() == R.id.edit_icon_layout) {
             if (adapter != null) {
@@ -272,9 +274,5 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
             }
             return null;
         }
-    }
-
-    private static void log(String log) {
-        Util.log("ImportFileFragment", log);
     }
 }

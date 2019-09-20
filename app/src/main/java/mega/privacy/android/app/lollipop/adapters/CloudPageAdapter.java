@@ -9,7 +9,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CloudPageAdapter extends FragmentStatePagerAdapter {
 
@@ -25,7 +26,7 @@ public class CloudPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        log("getItem: " + position);
+        logDebug("getItem: " + position);
         switch (position) {
             case CLOUD_TAB: {
                 FileBrowserFragmentLollipop fbF = (FileBrowserFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag((ManagerActivityLollipop.FragmentTag.CLOUD_DRIVE.getTag()));
@@ -69,9 +70,5 @@ public class CloudPageAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return PAGE_COUNT;
-    }
-
-    private static void log(String log) {
-        Util.log("CloudPageAdapter", log);
     }
 }
