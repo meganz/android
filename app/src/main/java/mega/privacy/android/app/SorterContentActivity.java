@@ -133,7 +133,6 @@ public class SorterContentActivity extends BaseActivity {
                         smallestCheck.setVisibility(View.GONE);
                     }
                     else{
-                        log("No first level navigation on Incoming Shares");
                         sortByNameTV.setText(context.getString(R.string.sortby_name));
                     }
 
@@ -195,7 +194,6 @@ public class SorterContentActivity extends BaseActivity {
                         smallestCheck.setVisibility(View.GONE);
                     }
                     else{
-                        log("No first level navigation on Incoming Shares");
                         sortByNameTV.setText(context.getString(R.string.sortby_name));
                     }
 
@@ -388,9 +386,5 @@ public class SorterContentActivity extends BaseActivity {
             }
             dbH.setPreferredSortCloud(String.valueOf(order));
         }
-    }
-
-    public static void log(String message) {
-        Util.log("SorterContentActivity", message);
     }
 }

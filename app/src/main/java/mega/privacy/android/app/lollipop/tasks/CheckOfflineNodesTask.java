@@ -9,9 +9,9 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 /*
@@ -28,7 +28,7 @@ public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        log("doInBackground-Async Task CheckOfflineNodesTask");
+        logDebug("doInBackground-Async Task CheckOfflineNodesTask");
 
         ArrayList<MegaOffline> offlineNodes = dbH.getOfflineFiles();
 
@@ -41,9 +41,9 @@ public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
                 File fileToCheck = getOfflineFile(context, mOff);
                 if (!isFileAvailable(fileToCheck)) {
                     int removed = dbH.deleteOfflineFile(mOff);
-                    log("File removed: "+removed);
+                    logDebug("File removed: " + removed);
                 } else {
-                    log("The file exists!");
+                    logDebug("The file exists!");
                 }
             }
             //Check no empty folders
@@ -54,13 +54,13 @@ public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
                 if(mOff.isFolder()){
                     ArrayList<MegaOffline> children = dbH.findByParentId(mOff.getId());
                     if(children.size()<1){
-                        log("Delete the empty folder: "+mOff.getName());
+                        logDebug("Delete the empty folder: " + mOff.getName());
                         dbH.deleteOfflineFile(mOff);
                         File folderToDelete = getOfflineFile(context, mOff);
                         try {
                             deleteFolderAndSubfolders(context, folderToDelete);
                         } catch (IOException e) {
-                            log("IOException mOff");
+                            logError("IOException mOff", e);
                             e.printStackTrace();
                         }
                     }
@@ -72,7 +72,7 @@ public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
             //Delete the DB if NOT empty
             if(offlineNodes.size()>0){
                 //Delete the content
-                log("Clear Offline TABLE");
+                logDebug("Clear Offline TABLE");
                 dbH.clearOffline();
             }
         }
@@ -88,7 +88,4 @@ public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
 //					rbFLol.setContentText();
 //			}
 //        }
-    public static void log(String message) {
-    Util.log("CheckOfflineNodesTask", message);
-}
 }

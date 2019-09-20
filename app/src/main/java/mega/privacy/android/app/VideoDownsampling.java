@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -17,8 +18,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class VideoDownsampling {
 
@@ -38,9 +40,6 @@ public class VideoDownsampling {
 
     private int mWidth = 1280;
     private int mHeight = 720;
-
-    private static final int MEDIUM_WIDTH = 1280;
-    private static final int MEDIUM_HEIGHT = 720;
 
     static Context context;
 
@@ -78,7 +77,7 @@ public class VideoDownsampling {
     }
 
     public void changeResolution(File f, String inputFile, long idMessage) throws Throwable {
-        log("changeResolution");
+        logDebug("changeResolution");
 
         queue.add(new VideoUpload(f.getAbsolutePath(), inputFile, f.length(), idMessage));
 
@@ -116,7 +115,7 @@ public class VideoDownsampling {
         }
 
         public static void changeResolutionInSeparatedThread(VideoDownsampling changer) throws Throwable {
-            log("changeResolutionInSeparatedThread");
+            logDebug("changeResolutionInSeparatedThread");
             ChangerWrapper wrapper = new ChangerWrapper(changer);
             Thread th = new Thread(wrapper, ChangerWrapper.class.getSimpleName());
             th.start();
@@ -127,7 +126,7 @@ public class VideoDownsampling {
     }
 
     protected void prepareAndChangeResolution(VideoUpload video) throws Exception {
-        log("prepareAndChangeResolution");
+        logDebug("prepareAndChangeResolution");
         Exception exception = null;
         String mInputFile = video.original;
 
@@ -262,7 +261,7 @@ public class VideoDownsampling {
             }
         }
         if (exception != null){
-            log("VideoDownsampling Exception: "+exception.toString());
+            logError("Exception", exception);
             throw exception;
         }
         else{
@@ -275,14 +274,20 @@ public class VideoDownsampling {
     private void resetWidthAndHeight(String mInputFile) {
         MediaMetadataRetriever m = new MediaMetadataRetriever();
         m.setDataSource(mInputFile);
-
-        int rotation = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
-        if (rotation == 90 || rotation == 270) {
-            mWidth = MEDIUM_HEIGHT;
-            mHeight = MEDIUM_WIDTH;
+        Bitmap thumbnail = m.getFrameAtTime();
+        int inputWidth = thumbnail.getWidth(), inputHeight = thumbnail.getHeight();
+        if (inputWidth > inputHeight) {
+            if (mWidth < mHeight) {
+                int w = mWidth;
+                mWidth = mHeight;
+                mHeight = w;
+            }
         } else {
-            mWidth = MEDIUM_WIDTH;
-            mHeight = MEDIUM_HEIGHT;
+            if (mWidth > mHeight) {
+                int w = mWidth;
+                mWidth = mHeight;
+                mHeight = w;
+            }
         }
     }
 
@@ -346,7 +351,7 @@ public class VideoDownsampling {
                                   MediaCodec audioDecoder, MediaCodec audioEncoder,
                                   MediaMuxer muxer,
                                   InputSurface inputSurface, OutputSurface outputSurface, VideoUpload video) {
-        log("changeResolution");
+        logDebug("changeResolution");
         String mOutputFile = video.outFile;
 
         ByteBuffer[] videoDecoderInputBuffers = null;
@@ -613,9 +618,5 @@ public class VideoDownsampling {
             }
         }
         return null;
-    }
-
-    private static void log(String log) {
-        Util.log("VideoDownsampling", log);
     }
 }

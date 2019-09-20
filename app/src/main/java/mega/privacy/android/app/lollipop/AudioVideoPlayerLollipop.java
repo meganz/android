@@ -123,8 +123,6 @@ import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.utils.CacheFolderManager;
-import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -142,7 +140,6 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -155,6 +152,11 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 
@@ -334,16 +336,26 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
     };
 
+    private BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                finish();
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log("onCreate");
+        logDebug("onCreate");
 
         setContentView(R.layout.activity_audiovideoplayer);
 
         audioVideoPlayerLollipop = this;
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         downloadLocationDefaultPath = getDownloadLocation(this);
 
@@ -353,18 +365,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         Intent intent = getIntent();
         if (intent == null){
-            log("intent null");
+            logWarning("intent null");
             finish();
             return;
         }
 
         if (savedInstanceState != null) {
-            log("savedInstanceState NOT null");
+            logDebug("savedInstanceState NOT null");
             currentTime = savedInstanceState.getLong("currentTime");
             fileName = savedInstanceState.getString("fileName");
             handle = savedInstanceState.getLong("handle");
             uri = Uri.parse(savedInstanceState.getString("uri"));
-            log("savedInstanceState uri: "+uri);
+            logDebug("savedInstanceState uri: " + uri);
 
             renamed = savedInstanceState.getBoolean("renamed");
             loop = savedInstanceState.getBoolean("loop");
@@ -379,7 +391,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             placeholderCount = savedInstanceState.getInt("placeholder", 0);
         }
         else {
-            log("savedInstanceState null");
+            logDebug("savedInstanceState null");
 
             isDeleteDialogShow = false;
             onPlaylist = false;
@@ -394,7 +406,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         if (!renamed) {
             uri = intent.getData();
             if (uri == null) {
-                log("uri null");
+                logWarning("uri null");
                 finish();
                 return;
             }
@@ -403,23 +415,23 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         fromShared = intent.getBooleanExtra("fromShared", false);
         path = intent.getStringExtra("path");
         adapterType = getIntent().getIntExtra("adapterType", 0);
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER){
             isOffline = true;
             pathNavigation = intent.getStringExtra("pathNavigation");
         }
-        else if (adapterType == Constants.FILE_LINK_ADAPTER) {
-            String serialize = intent.getStringExtra(Constants.EXTRA_SERIALIZE_STRING);
+        else if (adapterType == FILE_LINK_ADAPTER) {
+            String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
             if(serialize!=null) {
                 currentDocument = MegaNode.unserialize(serialize);
                 if (currentDocument != null) {
-                    log("currentDocument NOT NULL");
+                    logDebug("currentDocument NOT NULL");
                 }
                 else {
-                    log("currentDocument is NULL");
+                    logDebug("currentDocument is NULL");
                 }
             }
         }
-        else if (adapterType == Constants.ZIP_ADAPTER) {
+        else if (adapterType == ZIP_ADAPTER) {
             isZip = true;
             pathNavigation = intent.getStringExtra("offlinePathDirectory");
             if (pathNavigation != null) {
@@ -432,10 +444,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             }
         }
-        else if (adapterType == Constants.SEARCH_ADAPTER) {
+        else if (adapterType == SEARCH_ADAPTER) {
             query = intent.getStringExtra("searchQuery");
         }
-        else if (adapterType == Constants.FROM_CHAT){
+        else if (adapterType == FROM_CHAT){
             fromChat = true;
             chatC = new ChatController(this);
             msgId = intent.getLongExtra("msgId", -1);
@@ -468,14 +480,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
-            log("Tb is Null");
+            logWarning("Tb is Null");
             return;
         }
 
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        log("aB.setHomeAsUpIndicator_1");
+        logDebug("aB.setHomeAsUpIndicator");
         aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
@@ -498,7 +510,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             setTitle(fileName);
             isVideo = MimeTypeList.typeForName(fileName).isVideoReproducible();
             String extension = fileName.substring(fileName.length() - 3, fileName.length());
-            log("Extension: " + extension);
+            logDebug("Extension: " + extension);
             if (extension.equals("mp4")) {
                 isMP4 = true;
             } else {
@@ -532,6 +544,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         nextButton = (ImageButton) findViewById(R.id.exo_next);
         nextButton.setOnTouchListener(this);
         playList = (ImageButton) findViewById(R.id.exo_play_list);
+        playList.setVisibility(View.GONE);
         playList.setOnClickListener(this);
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
         fragmentContainer.setVisibility(View.GONE);
@@ -549,15 +562,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             MegaApplication app = (MegaApplication)getApplication();
             megaApi = app.getMegaApi();
 
-            log("Add transfer listener");
+            logDebug("Add transfer listener");
             megaApi.addTransferListener(this);
             megaApi.addGlobalListener(this);
 
             if (mega.privacy.android.app.utils.Util.isOnline(this)){
                 if(megaApi==null){
-                    log("Refresh session - sdk");
+                    logDebug("Refresh session - sdk");
                     Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                    intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                    intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
                     intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intentLogin);
                     finish();
@@ -566,9 +579,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 else{
                     if(megaApi.isLoggedIn()>0){
                         if(megaApi.getRootNode()==null){
-                            log("Refresh session logged in but no fetch - sdk");
+                            logDebug("Refresh session logged in but no fetch - sdk");
                             Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                            intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                            intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
                             intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intentLogin);
                             finish();
@@ -577,15 +590,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                if(isChatEnabled()){
                     if (megaChatApi == null){
                         megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                     }
 
                     if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                        log("Refresh session - karere");
+                        logDebug("Refresh session - karere");
                         Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                        intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                        intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
                         intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intentLogin);
                         finish();
@@ -608,13 +621,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
                     activityManager.getMemoryInfo(mi);
 
-                    if(mi.totalMem>Constants.BUFFER_COMP){
-                        log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    if(mi.totalMem>BUFFER_COMP){
+                        logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                        megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                     }
                     else{
-                        log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                        megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                     }
                 }
                 else if (isFolderLink) {
@@ -626,19 +639,22 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
                     activityManager.getMemoryInfo(mi);
 
-                    if(mi.totalMem>Constants.BUFFER_COMP){
-                        log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                        megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    if(mi.totalMem>BUFFER_COMP){
+                        logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                        megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                     }
                     else{
-                        log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                        megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                        megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                     }
                 }
 
                 if (megaChatApi != null){
                     if (msgId != -1 && chatId != -1){
-                        msgChat = megaChatApi.getMessage(chatId, msgId);
+                        msgChat = megaChatApi.getMessage(chatId, chatId);
+                        if(msgChat==null){
+                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, chatId);
+                        }
                         if (msgChat != null){
                             nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
                             if (isDeleteDialogShow) {
@@ -647,7 +663,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         }
                     }
                     else {
-                        log("msgId or chatId null");
+                        logWarning("msgId or chatId null");
                     }
                 }
 
@@ -656,7 +672,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if (fromChat) {
                         node = nodeChat;
                     }
-                    else if (adapterType == Constants.FILE_LINK_ADAPTER) {
+                    else if (adapterType == FILE_LINK_ADAPTER) {
                         node = currentDocument;
                     }
                     else {
@@ -669,23 +685,23 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         }
                     }
                     else {
-                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_streaming), -1);
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.error_streaming), -1);
                     }
 
                 }
 
                 if (isFolderLink){
-                    log("Folder link node");
+                    logDebug("Folder link node");
                     MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
                     if (dbH == null){
                         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
                     }
                     if (currentDocumentAuth == null){
-                        log("CurrentDocumentAuth is null");
-                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_streaming) + ": node not authorized", -1);
+                        logDebug("CurrentDocumentAuth is null");
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.error_streaming) + ": node not authorized", -1);
                     }
                     else{
-                        log("CurrentDocumentAuth is not null");
+                        logDebug("CurrentDocumentAuth is not null");
                         String url;
                         if (dbH != null && dbH.getCredentials() != null) {
                             url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
@@ -699,7 +715,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
+                logDebug("Overquota delay: " + megaApi.getBandwidthOverquotaDelay());
                 if(megaApi.getBandwidthOverquotaDelay()>0){
                     if(alertDialogTransferOverquota==null){
                         showTransferOverquotaDialog();
@@ -710,7 +726,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             }
         }
-        log("uri: "+uri);
+        logDebug("uri: " + uri);
 
         if (uri.toString().contains("http://")){
             isUrl = true;
@@ -728,7 +744,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             getMediaFilesTask.execute();
         }
         else {
-            playList.setVisibility(View.GONE);
             createPlayer();
         }
 
@@ -779,8 +794,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallUpdate ");
-        if (player != null && player.getPlayWhenReady()) {
+        logDebug("onChatCallUpdate ");
+        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)
+                && (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)
+                && player != null && player.getPlayWhenReady()) {
             player.setPlayWhenReady(false);
         }
     }
@@ -789,16 +806,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         @Override
         protected Void doInBackground(Void... voids) {
-            log("GetMediaFilesTask");
+            logDebug("GetMediaFilesTask");
             MegaNode parentNode;
 
-            if (adapterType == Constants.OFFLINE_ADAPTER){
+            if (adapterType == OFFLINE_ADAPTER){
                 //OFFLINE
-                log("OFFLINE_ADAPTER");
+                logDebug("OFFLINE_ADAPTER");
                 offList = new ArrayList<>();
-                log("PATHNAVIGATION: " + pathNavigation);
+                logDebug("PATHNAVIGATION: " + pathNavigation);
                 offList=dbH.findByPath(pathNavigation);
-                log ("offList.size() = " + offList.size());
+                logDebug ("offList.size() = " + offList.size());
 
                 for(int i=0; i<offList.size();i++){
                     MegaOffline checkOffline = offList.get(i);
@@ -813,7 +830,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if(!offList.isEmpty()) {
                         MegaOffline lastItem = offList.get(offList.size()-1);
                         if(!(lastItem.getHandle().equals("0"))){
-                            log("Export in: "+getExternalStoragePath(OLD_MK_FILE));
+                            logDebug("Export in: " + getExternalStoragePath(OLD_MK_FILE));
                             File file= buildExternalStorageFile(OLD_MK_FILE);
                             if(isFileAvailable(file)){
                                 MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
@@ -822,7 +839,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         }
                     }
                     else{
-                        log("Export in: "+getExternalStoragePath(OLD_MK_FILE));
+                        logDebug("Export in: " + getExternalStoragePath(OLD_MK_FILE));
                         File file= buildExternalStorageFile(OLD_MK_FILE);
                         if(isFileAvailable(file)){
                             MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
@@ -859,7 +876,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
                 size = mediaOffList.size();
             }
-            else if(adapterType == Constants.SEARCH_ADAPTER){
+            else if(adapterType == SEARCH_ADAPTER){
                 mediaHandles = new ArrayList<>();
 
                 ArrayList<MegaNode> nodes = null;
@@ -894,17 +911,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 size = mediaHandles.size();
             }
-            else if(adapterType == Constants.FILE_LINK_ADAPTER){
+            else if(adapterType == FILE_LINK_ADAPTER){
                 if (currentDocument != null) {
-                    log("File link node NOT null");
+                    logDebug("File link node NOT null");
                     size = 1;
                 }
                 else {
                     size = 0;
                 }
             }
-            else if (adapterType == Constants.ZIP_ADAPTER) {
-                log("GetMediaFilesTask ZIP_ADAPTER");
+            else if (adapterType == ZIP_ADAPTER) {
+                logDebug("ZIP_ADAPTER");
                 if (pathNavigation != null) {
                     File[] files = new File(zipFile.getParent()).listFiles();
 
@@ -939,7 +956,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             else{
                 ArrayList<MegaNode> nodes = null;
-                if (adapterType == Constants.FOLDER_LINK_ADAPTER) {
+                if (adapterType == FOLDER_LINK_ADAPTER) {
                     if(megaApiFolder == null){
                         MegaApplication app = (MegaApplication)getApplication();
                         megaApiFolder = app.getMegaApiFolder();
@@ -957,15 +974,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 else {
                     if (parentNodeHandle == -1) {
                         switch (adapterType) {
-                            case Constants.FILE_BROWSER_ADAPTER: {
+                            case FILE_BROWSER_ADAPTER: {
                                 parentNode = megaApi.getRootNode();
                                 break;
                             }
-                            case Constants.RUBBISH_BIN_ADAPTER: {
+                            case RUBBISH_BIN_ADAPTER: {
                                 parentNode = megaApi.getRubbishNode();
                                 break;
                             }
-                            case Constants.SHARED_WITH_ME_ADAPTER: {
+                            case SHARED_WITH_ME_ADAPTER: {
                                 parentNode = megaApi.getInboxNode();
                                 break;
                             }
@@ -1018,11 +1035,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         @Override
         protected void onPostExecute(Void aVoid) {
             if (size > 1) {
-                playList.setVisibility(View.GONE);
                 createPlaylistProgressBar.setVisibility(View.VISIBLE);
-            }
-            else {
-                playList.setVisibility(View.GONE);
             }
 
             mediaSourcePlaylist.clear();
@@ -1031,7 +1044,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void createPlayer () {
-        log("createPlayer");
+        logDebug("createPlayer");
         //Create a default TrackSelector
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
@@ -1083,7 +1096,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (isPlayList && size > 1) {
                 createPlayListTask = new CreatePlayListTask();
                 createPlayListTask.execute();
-                playList.setVisibility(View.GONE);
                 createPlaylistProgressBar.setVisibility(View.VISIBLE);
             }
             else {
@@ -1100,15 +1112,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
             player.addListener(new Player.EventListener() {
                 @Override
-                public void onTimelineChanged(Timeline timeline, Object manifest) {
-                    log("playerListener: onTimelineChanged");
+                public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+                    logDebug("playerListener: onTimelineChanged");
                     updateContainers();
                     enableNextButton();
                 }
 
                 @Override
                 public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-                    log("playerListener: onTracksChanged");
+                    logDebug("playerListener: onTracksChanged");
 
                     updateContainers();
                     enableNextButton();
@@ -1120,22 +1132,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 @Override
                 public void onLoadingChanged(boolean isLoading) {
-                    log("playerListener: onLoadingChanged");
+                    logDebug("playerListener: onLoadingChanged");
                     updateContainers();
                     enableNextButton();
                 }
 
                 @Override
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                    log("playerListener: onPlayerStateChanged: " + playbackState);
+                    logDebug("playbackState: " + playbackState);
 
-                    if (playWhenReady && mega.privacy.android.app.utils.Util.isChatEnabled() && megaChatApi != null) {
-                        MegaHandleList handleList = megaChatApi.getChatCalls();
-                        if(handleList!=null && handleList.size()>0) {
-                            //Not allow to play content when a call is in progress
-                            player.setPlayWhenReady(false);
-                            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
-                        }
+                    if (playWhenReady && isChatEnabled() && megaChatApi != null && participatingInACall(megaChatApi)) {
+                        //Not allow to play content when a call is in progress
+                        player.setPlayWhenReady(false);
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
                     }
 
                     playbackStateSaved = playbackState;
@@ -1179,27 +1188,27 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 @Override
                 public void onRepeatModeChanged(int repeatMode) {
-                    log("playerListener: onRepeatModeChanged");
+                    logDebug("repeatMode: " + repeatMode);
                     updateContainers();
                     enableNextButton();
                 }
 
                 @Override
                 public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-                    log("playerListener: onShuffleModeEnabledChanged");
+                    logDebug("shuffleModeEnabled: " + shuffleModeEnabled);
                     updateContainers();
                     enableNextButton();
                 }
 
                 @Override
                 public void onPlayerError(ExoPlaybackException error) {
-                    log("playerListener: onPlayerError");
+                    logWarning("Audio/Video player error", error);
                     playerError();
                 }
 
                 @Override
                 public void onPositionDiscontinuity(int reason) {
-                    log("playerListener: onPositionDiscontinuity");
+                    logDebug("reason: " + reason);
                     updateContainers();
                     enableNextButton();
 
@@ -1215,14 +1224,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 @Override
                 public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-                    log("playerListener: onPlaybackParametersChanged");
+                    logDebug("playerListener: onPlaybackParametersChanged");
                     updateContainers();
                     enableNextButton();
                 }
 
                 @Override
                 public void onSeekProcessed() {
-                    log("playerListener: onSeekProcessed");
+                    logDebug("playerListener: onSeekProcessed");
                     updateContainers();
                     enableNextButton();
                 }
@@ -1233,7 +1242,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             player.setVideoDebugListener(this);
         }
         else {
-            log("Error creating player");
+            logWarning("Error creating player");
         }
     }
 
@@ -1260,7 +1269,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void updateFileProperties () {
-        log("updateFileProperties");
+        logDebug("updateFileProperties");
         if (!creatingPlaylist && size > 1) {
             if (isOffline) {
                 MegaOffline n = mediaOffList.get(currentWindowIndex);
@@ -1363,7 +1372,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void showErrorDialog() {
-        log("showErrorDialog: Error open video file");
+        logWarning("Error open video file");
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
@@ -1415,26 +1424,26 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public void updateCurrentImage(){
 
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER){
             for (int i=0; i<offList.size(); i++){
-                log("Name: "+fileName+" mOfflist name: "+offList.get(i).getName());
+                logDebug("Name: "+fileName+" mOfflist name: "+offList.get(i).getName());
                 if (offList.get(i).getName().equals(fileName)){
                     getImageView(i, -1);
                     break;
                 }
             }
         }
-        else if (adapterType == Constants.ZIP_ADAPTER) {
+        else if (adapterType == ZIP_ADAPTER) {
             for (int i = 0; i< zipFiles.size(); i++) {
                 if (zipFiles.get(i).getName().equals(fileName)) {
                     getImageView(i, -1);
                 }
             }
         }
-        else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER){
+        else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
             getImageView(0, handle);
         }
-        else if (adapterType == Constants.SEARCH_ADAPTER){
+        else if (adapterType == SEARCH_ADAPTER){
             getImageView(0, handle);
         }
         else {
@@ -1456,9 +1465,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void getImageView (int i, long handle) {
-        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
         intent.putExtra("position", i);
-        intent.putExtra("actionType", Constants.UPDATE_IMAGE_DRAG);
+        intent.putExtra("actionType", UPDATE_IMAGE_DRAG);
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
         intent.putExtra("handle", handle);
@@ -1466,26 +1475,26 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void updateScrollPosition(){
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER){
             for (int i=0; i<offList.size(); i++){
-                log("Name: "+fileName+" mOfflist name: "+offList.get(i).getName());
+                logDebug("Name: " + fileName + " mOfflist name: " + offList.get(i).getName());
                 if (offList.get(i).getName().equals(fileName)){
                     scrollToPosition(i, -1);
                     break;
                 }
             }
         }
-        else if (adapterType == Constants.ZIP_ADAPTER) {
+        else if (adapterType == ZIP_ADAPTER) {
             for (int i = 0; i< zipFiles.size(); i++) {
                 if (zipFiles.get(i).getName().equals(fileName)) {
                     scrollToPosition(i, -1);
                 }
             }
         }
-        else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER){
+        else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
             scrollToPosition(0, handle);
         }
-        else if (adapterType == Constants.SEARCH_ADAPTER){
+        else if (adapterType == SEARCH_ADAPTER){
             scrollToPosition(0, handle);
         }
         else {
@@ -1509,9 +1518,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     void scrollToPosition (int i, long handle) {
         getImageView(i, handle);
-        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
         intent.putExtra("position", i);
-        intent.putExtra("actionType", Constants.SCROLL_TO_POSITION);
+        intent.putExtra("actionType", SCROLL_TO_POSITION);
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount);
@@ -1519,57 +1528,57 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void setImageDragVisibility(int visibility){
-        if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
+        if (adapterType == RUBBISH_BIN_ADAPTER){
             if (RubbishBinFragmentLollipop.imageDrag != null){
                 RubbishBinFragmentLollipop.imageDrag.setVisibility(visibility);
             }
         }
-        else if (adapterType == Constants.INBOX_ADAPTER){
+        else if (adapterType == INBOX_ADAPTER){
             if (InboxFragmentLollipop.imageDrag != null){
                 InboxFragmentLollipop.imageDrag.setVisibility(visibility);
             }
         }
-        else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
+        else if (adapterType == INCOMING_SHARES_ADAPTER){
             if (IncomingSharesFragmentLollipop.imageDrag != null) {
                 IncomingSharesFragmentLollipop.imageDrag.setVisibility(visibility);
             }
         }
-        else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
+        else if (adapterType == OUTGOING_SHARES_ADAPTER){
             if (OutgoingSharesFragmentLollipop.imageDrag != null){
                 OutgoingSharesFragmentLollipop.imageDrag.setVisibility(visibility);
             }
         }
-        else if (adapterType == Constants.CONTACT_FILE_ADAPTER){
+        else if (adapterType == CONTACT_FILE_ADAPTER){
             if (ContactFileListFragmentLollipop.imageDrag != null){
                 ContactFileListFragmentLollipop.imageDrag.setVisibility(visibility);
             }
         }
-        else if (adapterType == Constants.FOLDER_LINK_ADAPTER){
+        else if (adapterType == FOLDER_LINK_ADAPTER){
             if (FolderLinkActivityLollipop.imageDrag != null){
                 FolderLinkActivityLollipop.imageDrag.setVisibility(visibility);
             }
         }
-        else if (adapterType == Constants.SEARCH_ADAPTER){
+        else if (adapterType == SEARCH_ADAPTER){
             if (SearchFragmentLollipop.imageDrag != null){
                 SearchFragmentLollipop.imageDrag.setVisibility(visibility);
             }
         }
-        else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
+        else if (adapterType == FILE_BROWSER_ADAPTER){
             if (FileBrowserFragmentLollipop.imageDrag != null){
                 FileBrowserFragmentLollipop.imageDrag.setVisibility(visibility);
             }
         }
-        else if (adapterType == Constants.PHOTO_SYNC_ADAPTER ||adapterType == Constants.SEARCH_BY_ADAPTER) {
+        else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
             if (CameraUploadFragmentLollipop.imageDrag != null){
                 CameraUploadFragmentLollipop.imageDrag.setVisibility(visibility);
             }
         }
-        else if (adapterType == Constants.OFFLINE_ADAPTER) {
+        else if (adapterType == OFFLINE_ADAPTER) {
             if (OfflineFragmentLollipop.imageDrag != null){
                 OfflineFragmentLollipop.imageDrag.setVisibility(visibility);
             }
         }
-        else if (adapterType == Constants.ZIP_ADAPTER) {
+        else if (adapterType == ZIP_ADAPTER) {
             if (ZipBrowserActivityLollipop.imageDrag != null){
                 ZipBrowserActivityLollipop.imageDrag.setVisibility(visibility);
             }
@@ -1577,57 +1586,57 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void getLocationOnScreen(int[] location){
-        if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
+        if (adapterType == RUBBISH_BIN_ADAPTER){
             if (RubbishBinFragmentLollipop.imageDrag != null) {
                 RubbishBinFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == Constants.INBOX_ADAPTER){
+        else if (adapterType == INBOX_ADAPTER){
             if (InboxFragmentLollipop.imageDrag != null){
                 InboxFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
+        else if (adapterType == INCOMING_SHARES_ADAPTER){
             if (IncomingSharesFragmentLollipop.imageDrag != null) {
                 IncomingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
+        else if (adapterType == OUTGOING_SHARES_ADAPTER){
             if (OutgoingSharesFragmentLollipop.imageDrag != null) {
                 OutgoingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == Constants.CONTACT_FILE_ADAPTER){
+        else if (adapterType == CONTACT_FILE_ADAPTER){
             if (ContactFileListFragmentLollipop.imageDrag != null) {
                 ContactFileListFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == Constants.FOLDER_LINK_ADAPTER){
+        else if (adapterType == FOLDER_LINK_ADAPTER){
             if (FolderLinkActivityLollipop.imageDrag != null) {
                 FolderLinkActivityLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == Constants.SEARCH_ADAPTER){
+        else if (adapterType == SEARCH_ADAPTER){
             if (SearchFragmentLollipop.imageDrag != null){
                 SearchFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
+        else if (adapterType == FILE_BROWSER_ADAPTER){
             if (FileBrowserFragmentLollipop.imageDrag != null){
                 FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER){
+        else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
             if (CameraUploadFragmentLollipop.imageDrag != null) {
                 CameraUploadFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == Constants.OFFLINE_ADAPTER){
+        else if (adapterType == OFFLINE_ADAPTER){
             if (OfflineFragmentLollipop.imageDrag != null){
                 OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == Constants.ZIP_ADAPTER){
+        else if (adapterType == ZIP_ADAPTER){
             if (ZipBrowserActivityLollipop.imageDrag != null){
                 ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
             }
@@ -1656,7 +1665,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }).start();
                 }
                 catch(Exception e){
-                    log("Exception: "+e.getMessage());
+                    logWarning("Exception" + e.getMessage());
                 }
 
             }
@@ -1752,7 +1761,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
 
     public void sortByNameAscending(){
-        log("sortByNameAscending");
+        logDebug("sortByNameAscending");
         ArrayList<String> foldersOrder = new ArrayList<String>();
         ArrayList<String> filesOrder = new ArrayList<String>();
         ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
@@ -1798,7 +1807,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         if (player != null) {
             playWhenReady = player.getPlayWhenReady();
             currentTime = player.getCurrentPosition();
@@ -1895,7 +1904,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         if (tB == null) {
             tB = (Toolbar) findViewById(R.id.call_toolbar);
             if (tB == null) {
-                log("Tb is Null");
+                logWarning("Tb is Null");
                 return;
             }
             tB.setVisibility(View.VISIBLE);
@@ -1923,7 +1932,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        log("onCreateOptionsMenu");
+        logDebug("onCreateOptionsMenu");
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_audiovideoplayer, menu);
@@ -1995,7 +2004,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                log("Searching by text: "+newText);
+                logDebug("newText: " + newText);
                 if (playlistFragment != null && playlistFragment.isAdded()){
                     playlistFragment.setNodesSearch(newText);
                 }
@@ -2027,7 +2036,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             nC = new NodeController(this);
         }
         boolean fromIncoming = false;
-        if (adapterType == Constants.SEARCH_ADAPTER) {
+        if (adapterType == SEARCH_ADAPTER) {
             fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
         }
 
@@ -2045,11 +2054,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
 
         if (!onPlaylist){
-            log("onCreateOptionsMenu NOT on Playlist mode");
+            logDebug("NOT on Playlist mode");
             searchMenuItem.setVisible(false);
 
-            if (adapterType == Constants.OFFLINE_ADAPTER){
-                log("onCreateOptionsMenu OFFLINE_ADAPTER");
+            if (adapterType == OFFLINE_ADAPTER){
+                logDebug("OFFLINE_ADAPTER");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 shareMenuItem.setVisible(true);
@@ -2065,8 +2074,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
-            else if(adapterType == Constants.SEARCH_ADAPTER && !fromIncoming){
-                log("onCreateOptionsMenu SEARCH_ADAPTER");
+            else if(adapterType == SEARCH_ADAPTER && !fromIncoming){
+                logDebug("SEARCH_ADAPTER");
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if (isUrl){
@@ -2090,7 +2099,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 moveMenuItem.setVisible(true);
                 copyMenuItem.setVisible(true);
 
-                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                if(isChatEnabled()){
                     chatMenuItem.setVisible(true);
                 }
                 else{
@@ -2115,8 +2124,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
-            else if (adapterType == Constants.FROM_CHAT){
-                log("onCreateOptionsMenu FROM_CHAT");
+            else if (adapterType == FROM_CHAT){
+                logDebug("FROM_CHAT");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 shareMenuItem.setVisible(false);
@@ -2165,8 +2174,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     chatRemoveMenuItem.setVisible(false);
                 }
             }
-            else if (adapterType == Constants.FILE_LINK_ADAPTER) {
-                log("onCreateOptionsMenu FILE_LINK_ADAPTER");
+            else if (adapterType == FILE_LINK_ADAPTER) {
+                logDebug("FILE_LINK_ADAPTER");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 shareMenuItem.setVisible(false);
@@ -2182,7 +2191,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
-            else if (adapterType == Constants.ZIP_ADAPTER) {
+            else if (adapterType == ZIP_ADAPTER) {
                 propertiesMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
                 shareMenuItem.setVisible(true);
@@ -2198,9 +2207,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
-            else if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
+            else if (adapterType == INCOMING_SHARES_ADAPTER || fromIncoming) {
                 propertiesMenuItem.setVisible(true);
-                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                if(isChatEnabled()){
                     chatMenuItem.setVisible(true);
                 }
                 else{
@@ -2227,7 +2236,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 switch (accessLevel) {
                     case MegaShare.ACCESS_FULL: {
-                        log("access FULL");
+                        logDebug("Access FULL");
                         renameMenuItem.setVisible(true);
                         moveMenuItem.setVisible(true);
                         moveToTrashMenuItem.setVisible(true);
@@ -2235,9 +2244,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         break;
                     }
                     case MegaShare.ACCESS_READ:
-                        log("access read");
+                        logDebug("Access read");
                     case MegaShare.ACCESS_READWRITE: {
-                        log("readwrite");
+                        logDebug("Read & Write");
                         renameMenuItem.setVisible(false);
                         moveMenuItem.setVisible(false);
                         moveToTrashMenuItem.setVisible(false);
@@ -2246,7 +2255,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             }
             else {
-                log("onCreateOptionsMenu else");
+                logDebug("else");
                 boolean shareVisible = true;
                 shareMenuItem.setVisible(true);
 
@@ -2269,7 +2278,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     chatRemoveMenuItem.setVisible(false);
                 }
                 else {
-                    if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+                    if(adapterType==CONTACT_FILE_ADAPTER){
                         shareMenuItem.setVisible(false);
                         shareVisible = false;
                     }
@@ -2286,7 +2295,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         removelinkMenuItem.setVisible(true);
                     }
                     else{
-                        if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+                        if(adapterType==CONTACT_FILE_ADAPTER){
                             getlinkMenuItem.setVisible(false);
                             removelinkMenuItem.setVisible(false);
                         }
@@ -2314,7 +2323,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     else{
                         propertiesMenuItem.setVisible(true);
 
-                        if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+                        if(adapterType==CONTACT_FILE_ADAPTER){
                             removeMenuItem.setVisible(false);
                             node = megaApi.getNodeByHandle(handle);
                             int accessLevel = megaApi.getAccess(node);
@@ -2325,7 +2334,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                                     renameMenuItem.setVisible(true);
                                     moveMenuItem.setVisible(true);
                                     moveToTrashMenuItem.setVisible(true);
-                                    if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                                    if(isChatEnabled()){
                                         chatMenuItem.setVisible(true);
                                     }
                                     else{
@@ -2344,7 +2353,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }
                         else{
-                            if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                            if(isChatEnabled()){
                                 chatMenuItem.setVisible(true);
                             }
                             else{
@@ -2391,7 +2400,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         }
         else {
-            log ("onCreateOptionsMenu on Playlist mode");
+            logDebug("On Playlist mode");
             searchMenuItem.setVisible(true);
             getlinkMenuItem.setVisible(false);
             removelinkMenuItem.setVisible(false);
@@ -2414,23 +2423,23 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        log("onPrepareOptionsMenu");
+        logDebug("onPrepareOptionsMenu");
         return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        log("onOptionsItemSelected");
+        logDebug("onOptionsItemSelected");
 
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {
-                log("onBackPRess");
+                logDebug("onBackPRess");
                 onBackPressed();
                 break;
             }
             case R.id.full_video_viewer_chat:{
-                log("Chat option");
+                logDebug("Chat option");
                 long[] longArray = new long[1];
                 longArray[0] = handle;
 
@@ -2446,9 +2455,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 break;
             }
             case R.id.full_video_viewer_share: {
-                log("Share option");
+                logDebug("Share option");
                 Uri newUri = uri;
-                if (uri.toString().contains(CacheFolderManager.VOICE_CLIP_FOLDER)) {
+                if (uri.toString().contains(VOICE_CLIP_FOLDER)) {
                     MegaNode file = megaApi.getNodeByHandle(handle);
                     String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
                     if (localPath == null) break;
@@ -2460,12 +2469,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 break;
             }
             case R.id.full_video_viewer_properties: {
-                log("Info option");
+                logDebug("Info option");
                 showPropertiesActivity();
                 break;
             }
             case R.id.full_video_viewer_download: {
-                log("Download option");
+                logDebug("Download option");
                 downloadFile();
                 break;
             }
@@ -2499,7 +2508,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             case R.id.full_video_viewer_loop: {
                 if (loopMenuItem.isChecked()){
-                    log("Loop NOT checked");
+                    logDebug("Loop NOT checked");
                     loopMenuItem.setChecked(false);
                     if (player != null) {
                         player.setRepeatMode(Player.REPEAT_MODE_OFF);
@@ -2511,7 +2520,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if (player != null) {
                         player.setRepeatMode(Player.REPEAT_MODE_ONE);
                     }
-                    log("Loop checked");
+                    logDebug("Loop checked");
                     loop = true;
                 }
                 break;
@@ -2542,15 +2551,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void importNode(){
-        log("importNode");
+        logDebug("importNode");
 
         Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
-        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
     }
 
      public void showConfirmationDeleteNode(final long chatId, final MegaChatMessage message){
-        log("showConfirmationDeleteNode");
+         logDebug("Chat ID: " + chatId + ", Message ID: " + message.getMsgId());
 
          DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
              @Override
@@ -2597,7 +2606,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
      }
 
      public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
-         log("askSizeConfirmationBeforeChatDownload");
+         logDebug("Nodes: " + nodeList.size() + ", Size: " + size);
 
          final String parentPathC = parentPath;
          final ArrayList<MegaNode> nodeListC = nodeList;
@@ -2674,11 +2683,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void moveToTrash(){
-        log("moveToTrash");
+        logDebug("moveToTrash");
 
         moveToRubbish = false;
         if (!mega.privacy.android.app.utils.Util.isOnline(this)){
-            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -2761,7 +2770,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
 
     public void showCopy(){
-        log("showCopy");
+        logDebug("showCopy");
 
         ArrayList<Long> handleList = new ArrayList<Long>();
         handleList.add(handle);
@@ -2773,11 +2782,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
-        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_COPY_FOLDER);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
     }
 
     public void showMove(){
-        log("showMove");
+        logDebug("showMove");
 
         ArrayList<Long> handleList = new ArrayList<Long>();
         handleList.add(handle);
@@ -2789,7 +2798,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
-        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_MOVE_FOLDER);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
     }
 
     private void showKeyboardDelayed(final View view) {
@@ -2803,7 +2812,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void showRenameDialog() {
-        log("showRenameDialog");
+        logDebug("showRenameDialog");
         final MegaNode node = megaApi.getNodeByHandle(handle);
 
         LinearLayout layout = new LinearLayout(this);
@@ -2995,7 +3004,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
 
         if(!mega.privacy.android.app.utils.Util.isOnline(this)){
-            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -3014,7 +3023,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         statusDialog = temp;
 
-        log("renaming " + node.getName() + " to " + newName);
+        logDebug("Renaming " + node.getName() + " to " + newName);
 
         megaApi.renameNode(node, newName, this);
     }
@@ -3083,7 +3092,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void showGetLinkActivity(){
-        log("showGetLinkActivity");
+        logDebug("showGetLinkActivity");
         Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
         linkIntent.putExtra("handle", handle);
         startActivity(linkIntent);
@@ -3094,7 +3103,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         if (isOffline){
             i.putExtra("name", fileName);
             i.putExtra("imageId", MimeTypeThumbnail.typeForName(fileName).getIconResourceId());
-            i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+            i.putExtra("adapterType", OFFLINE_ADAPTER);
             i.putExtra("path", path);
             if (pathNavigation != null){
                 i.putExtra("pathNavigation", pathNavigation);
@@ -3115,15 +3124,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 nC = new NodeController(this);
             }
             boolean fromIncoming = false;
-            if (adapterType == Constants.SEARCH_ADAPTER) {
+            if (adapterType == SEARCH_ADAPTER) {
                 fromIncoming = nC.nodeComesFromIncoming(node);
             }
-            if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
-                i.putExtra("from", Constants.FROM_INCOMING_SHARES);
+            if (adapterType == INCOMING_SHARES_ADAPTER || fromIncoming) {
+                i.putExtra("from", FROM_INCOMING_SHARES);
                 i.putExtra("firstLevel", false);
             }
-            else if(adapterType == Constants.INBOX_ADAPTER){
-                i.putExtra("from", Constants.FROM_INBOX);
+            else if(adapterType == INBOX_ADAPTER){
+                i.putExtra("from", FROM_INBOX);
             }
             i.putExtra("name", node.getName());
         }
@@ -3133,7 +3142,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public void downloadFile() {
 
-        if (adapterType == Constants.FILE_LINK_ADAPTER){
+        if (adapterType == FILE_LINK_ADAPTER){
             if (nC == null) {
                 nC = new NodeController(this);
             }
@@ -3145,7 +3154,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if (!hasStoragePermission) {
                     ActivityCompat.requestPermissions(this,
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            Constants.REQUEST_WRITE_STORAGE);
+                            REQUEST_WRITE_STORAGE);
                     handleListM.add(nodeChat.getHandle());
                     return;
                 }
@@ -3165,7 +3174,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if (!hasStoragePermission) {
                     ActivityCompat.requestPermissions(this,
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            Constants.REQUEST_WRITE_STORAGE);
+                            REQUEST_WRITE_STORAGE);
 
                     handleListM.add(node.getHandle());
                     return;
@@ -3186,10 +3195,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
-            case Constants.REQUEST_WRITE_STORAGE:{
+            case REQUEST_WRITE_STORAGE:{
                 boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
                 if (hasStoragePermission) {
-                    if (adapterType == Constants.FILE_LINK_ADAPTER) {
+                    if (adapterType == FILE_LINK_ADAPTER) {
                         if(nC==null){
                         nC = new NodeController(this, isFolderLink);
                     }
@@ -3216,14 +3225,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void intentToSendFile(Uri uri){
-        log("intentToSendFile");
+        logDebug("intentToSendFile");
 
         if(uri!=null){
             if (!isUrl) {
                 Intent share = new Intent(android.content.Intent.ACTION_SEND);
                 share.setType(MimeTypeList.typeForName(fileName).getType()+"/*");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    log("Use provider to share");
+                    logDebug("Use provider to share");
                     share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
                     share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 } else {
@@ -3232,7 +3241,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
             else{
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.not_download), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.not_download), -1);
             }
         }
     }
@@ -3244,13 +3253,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             return;
         }
 
-        if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+        if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
             long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-            log("Send to "+(chatHandles.length+contactHandles.length)+" chats");
+            logDebug("Send to " + (chatHandles.length + contactHandles.length ) +" chats");
 
             long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
-            log("Send "+nodeHandles.length+" nodes");
+            logDebug("Send " + nodeHandles.length + " nodes");
 
             if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
                 if (contactHandles != null && contactHandles.length > 0) {
@@ -3282,7 +3291,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         }
                     }
                     else{
-                        log("Error on sending to chat");
+                        logWarning("Error on sending to chat");
                     }
                 }
                 else {
@@ -3293,38 +3302,23 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             }
         }
-        else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-            log("local folder selected");
+        else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+            logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            if (adapterType == Constants.FILE_LINK_ADAPTER){
+            if (adapterType == FILE_LINK_ADAPTER){
                 if (nC == null) {
                     nC = new NodeController(this);
                 }
                 nC.downloadTo(currentDocument, parentPath, uri.toString());
             }
-            else if (adapterType == Constants.FROM_CHAT) {
-                long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-                if (hashes != null) {
-                    ArrayList<MegaNode> megaNodes = new ArrayList<>();
-                    for (int i=0; i<hashes.length; i++) {
-                        MegaNode node = megaApi.getNodeByHandle(hashes[i]);
-                        if (node != null) {
-                            megaNodes.add(node);
-                        }
-                        else {
-                            log("Node NULL, not added");
-                        }
-                    }
-                    if (megaNodes.size() > 0) {
-                        chatC.checkSizeBeforeDownload(parentPath, megaNodes);
-                    }
-                }
+            else if (adapterType == FROM_CHAT) {
+                chatC.prepareForDownload(intent, parentPath);
             }
             else {
                 String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
                 long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
                 long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-                log("URL: " + url + "___SIZE: " + size);
+                logDebug("URL: " + url + ", SIZE: " + size);
 
                 if(nC==null){
                     nC = new NodeController(this, isFolderLink);
@@ -3332,10 +3326,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
             }
         }
-        else if (requestCode == Constants.REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+        else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
             if(!mega.privacy.android.app.utils.Util.isOnline(this)){
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -3361,9 +3355,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
             }
         }
-        else if (requestCode == Constants.REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+        else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
             if(!mega.privacy.android.app.utils.Util.isOnline(this)){
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -3386,27 +3380,27 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             for(int i=0; i<copyHandles.length;i++){
                 MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
                 if (cN != null){
-                    log("cN != null, i = " + i + " of " + copyHandles.length);
+                    logDebug("cN != null, i = " + i + " of " + copyHandles.length);
                     megaApi.copyNode(cN, parent, this);
                 }
                 else{
-                    log("cN == null, i = " + i + " of " + copyHandles.length);
+                    logDebug("cN == null, i = " + i + " of " + copyHandles.length);
                     try {
                         statusDialog.dismiss();
-                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
                     }
                     catch (Exception ex) {}
                 }
             }
         }
-        else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
-            log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
+        else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
+            logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
             if(!mega.privacy.android.app.utils.Util.isOnline(this)||megaApi==null) {
                 try{
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -3417,67 +3411,69 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if(target == null){
                 target = megaApi.getRootNode();
             }
-            log("TARGET: " + target.getName() + "and handle: " + target.getHandle());
+            logDebug("TARGET: " + target.getName() + "and handle: " + target.getHandle());
             if (nodeChat != null) {
-                log("DOCUMENT: " + nodeChat.getName() + "_" + nodeChat.getHandle());
+                logDebug("DOCUMENT: " + nodeChat.getName() + "_" + nodeChat.getHandle());
                 if (target != null) {
                     megaApi.copyNode(nodeChat, target, this);
                 }
                 else {
-                    log("TARGET: null");
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
+                    logWarning("TARGET: null");
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
                 }
             }
             else{
-                log("DOCUMENT: null");
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
+                logWarning("DOCUMENT: null");
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
             }
         }
     }
 
     @Override
     public void onVideoEnabled(DecoderCounters counters) {
-        log("onVideoEnabled");
+        logDebug("onVideoEnabled");
         video = true;
         updateContainers();
     }
 
     @Override
     public void onVideoDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
-        log("onVideoDecoderInitialized");
+        logDebug("decoderName: " + decoderName + ", initializedTimestampMs:" +
+                initializedTimestampMs + ", initializationDurationMs:" + initializationDurationMs);
         video = true;
         updateContainers();
     }
 
     @Override
     public void onVideoInputFormatChanged(Format format) {
-        log("onVideoInputFormatChanged");
+        logDebug("onVideoInputFormatChanged");
         video = true;
         updateContainers();
     }
 
     @Override
     public void onDroppedFrames(int count, long elapsedMs) {
-        log("onDroppedFrames");
+        logDebug("count: " + count + ", elapsedMs: " + elapsedMs);
     }
 
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-        log("onVideoSizeChanged");
+        logDebug("width: " + width + ", height: " + height + ", unappliedRotationDegrees: " +
+                unappliedRotationDegrees + ", pixelWidthHeightRatio" + pixelWidthHeightRatio);
         video = true;
         updateContainers();
     }
 
     @Override
     public void onRenderedFirstFrame(Surface surface) {
-        log("onRenderedFirstFrame");
+        logDebug("onRenderedFirstFrame");
         video = true;
         updateContainers();
     }
 
     @Override
     public void onVideoDisabled(DecoderCounters counters) {
-        log("onVideoDisabled");
+        logDebug("onVideoDisabled");
         video = false;
         updateContainers();
     }
@@ -3485,21 +3481,25 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     protected void onStop() {
         super.onStop();
-        log("onStop");
+        //pause either video or audio as per UX advise
+        if (player != null && player.getPlayWhenReady()) {
+            player.setPlayWhenReady(false);
+        }
+        logDebug("onStop");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        log("onStart");
+        logDebug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        log("onResume");
+        logDebug("onResume");
         if (!isOffline && !fromChat && !isFolderLink
-                && adapterType != Constants.FILE_LINK_ADAPTER
+                && adapterType != FILE_LINK_ADAPTER
                 && !isZip && !fromDownload) {
             if (megaApi.getNodeByHandle(handle) == null) {
                 finish();
@@ -3511,16 +3511,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     protected void onPause() {
         super.onPause();
-        //pause either video or audio as per UX advise
-        if (player != null && player.getPlayWhenReady()) {
-            player.setPlayWhenReady(false);
-        }
-        log("onPause");
+        logDebug("onPause");
     }
 
     @Override
     protected void onDestroy() {
-        log("onDestroy()");
+        logDebug("onDestroy()");
 
         setImageDragVisibility(View.VISIBLE);
 
@@ -3547,12 +3543,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
 
         super.onDestroy();
     }
 
     public void updateFile (){
-        log("updateFile");
+        logDebug("updateFile");
 
         MegaNode file = null;
 
@@ -3564,7 +3561,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if (aB != null){
                         tB = (Toolbar) findViewById(R.id.call_toolbar);
                         if(tB==null){
-                            log("Tb is Null");
+                            logWarning("Tb is Null");
                             return;
                         }
                         tB.setVisibility(View.VISIBLE);
@@ -3605,13 +3602,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
                         activityManager.getMemoryInfo(mi);
 
-                        if(mi.totalMem>Constants.BUFFER_COMP){
-                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        if(mi.totalMem>BUFFER_COMP){
+                            logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                         }
                         else{
-                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                            logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                         }
 
                         String url = megaApi.httpServerGetLocalLink(file);
@@ -3632,10 +3629,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
     }
 
-    public static void log(String message) {
-        mega.privacy.android.app.utils.Util.log("AudioVideoPlayerLollipop", message);
-    }
-
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -3648,33 +3641,33 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish");
+        logDebug("onRequestFinish");
         if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("File sent correctly");
+                logDebug("File sent correctly");
                 successSent++;
 
             }
             else{
-                log("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
+                logWarning("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
                 errorSent++;
             }
 
             if(countChat==errorSent+successSent){
                 if(successSent==countChat){
                     if(countChat==1){
-                        showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), request.getChatHandle());
+                        showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), request.getChatHandle());
                     }
                     else{
-                        showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), -1);
+                        showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), -1);
                     }
                 }
                 else if(errorSent==countChat){
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_attaching_node_from_cloud), -1);
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_attaching_node_from_cloud), -1);
                 }
                 else{
-                    showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.error_sent_as_message), -1);
+                    showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_sent_as_message), -1);
                 }
             }
         }
@@ -3706,11 +3699,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-        log("onTransferTemporaryError");
+        logDebug("onTransferTemporaryError");
 
         if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
             if (e.getValue() != 0) {
-                log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+                logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 
                 if(alertDialogTransferOverquota==null){
                     showTransferOverquotaDialog();
@@ -3731,7 +3724,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
 
     public void showTransferOverquotaDialog(){
-        log("showTransferOverquotaDialog");
+        logDebug("showTransferOverquotaDialog");
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
@@ -3785,9 +3778,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void showUpgradeAccount(){
-        log("showUpgradeAccount");
+        logDebug("showUpgradeAccount");
         Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
-        upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
+        upgradeIntent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
         startActivity(upgradeIntent);
     }
 
@@ -3821,6 +3814,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
 
             LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+
             setImageDragVisibility(View.VISIBLE);
         }
         else {
@@ -3916,18 +3911,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void openAdvancedDevices (long handleToDownload, boolean highPriority){
-        log("openAdvancedDevices");
+        logDebug("handleToDownload: " + handleToDownload + ", highPriority: " + highPriority);
 //		handleToDownload = handle;
         String externalPath = mega.privacy.android.app.utils.Util.getExternalCardPath();
 
         if(externalPath!=null){
-            log("ExternalPath for advancedDevices: "+externalPath);
+            logDebug("ExternalPath for advancedDevices: " + externalPath);
             MegaNode node = megaApi.getNodeByHandle(handleToDownload);
             if(node!=null){
 
 //				File newFile =  new File(externalPath+"/"+node.getName());
                 File newFile =  new File(node.getName());
-                log("File: "+newFile.getPath());
+                logDebug("File: " + newFile.getPath());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
 
                 // Filter to only show results that can be "opened", such as
@@ -3936,16 +3931,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 // Create a file with the requested MIME type.
                 String mimeType = MimeTypeList.getMimeType(newFile);
-                log("Mimetype: "+mimeType);
+                logDebug("Mimetype: " + mimeType);
                 intent.setType(mimeType);
                 intent.putExtra(Intent.EXTRA_TITLE, node.getName());
                 intent.putExtra("handleToDownload", handleToDownload);
-                intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
+                intent.putExtra(HIGH_PRIORITY_TRANSFER, highPriority);
                 try{
-                    startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
+                    startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);
                 }
                 catch(Exception e){
-                    log("Exception in External SDCARD");
+                    logWarning("Exception in External SDCARD", e);
                     Environment.getExternalStorageDirectory();
                     Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
                     toast.show();
@@ -3953,7 +3948,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         }
         else{
-            log("No external SD card");
+            logWarning("No external SD card");
             Environment.getExternalStorageDirectory();
             Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
             toast.show();
@@ -3961,7 +3956,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
-        log("askSizeConfirmationBeforeDownload");
+        logDebug("askSizeConfirmationBeforeDownload");
 
         final String parentPathC = parentPath;
         final String urlC = url;
@@ -4010,7 +4005,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
-        log("askConfirmationNoAppInstaledBeforeDownload");
+        logDebug("askConfirmationNoAppInstaledBeforeDownload");
 
         final String parentPathC = parentPath;
         final String urlC = url;
@@ -4068,7 +4063,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish");
+        logDebug("onRequestFinish");
 
         if (request.getType() == MegaRequest.TYPE_RENAME){
 
@@ -4078,11 +4073,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
                 updateFile();
             }
             else{
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
             }
         }
         else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -4096,20 +4091,20 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     this.finish();
                 }
                 else{
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                 }
                 moveToRubbish = false;
-                log("move to rubbish request finished");
+                logDebug("Move to rubbish request finished");
             }
             else{
                 if (e.getErrorCode() == MegaError.API_OK){
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
                     finish();
                 }
                 else{
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                 }
-                log("move nodes request finished");
+                logDebug("Move nodes request finished");
             }
         }
         else if (request.getType() == MegaRequest.TYPE_REMOVE){
@@ -4121,14 +4116,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         moveToTrashStatusDialog.dismiss();
                     }
                     catch (Exception ex) {}
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
                 }
                 finish();
             }
             else{
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
             }
-            log("remove request finished");
+            logDebug("Remove request finished");
         }
         else if (request.getType() == MegaRequest.TYPE_COPY){
             try {
@@ -4137,32 +4132,32 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-                log("OVERQUOTA ERROR: "+e.getErrorCode());
+                logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
-                intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+                intent.setAction(ACTION_OVERQUOTA_STORAGE);
                 startActivity(intent);
                 finish();
             }
             else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-                log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+                logWarning("PRE OVERQUOTA ERROR: " + e.getErrorCode());
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
-                intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+                intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
                 startActivity(intent);
                 finish();
             }
             else{
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
             }
-            log("copy nodes request finished");
+            logDebug("copy nodes request finished");
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestTemporaryError");
+        logWarning("onRequestTemporaryError");
     }
 
     @Override
@@ -4172,12 +4167,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        log("onUserAlertsUpdate");
+        logDebug("onUserAlertsUpdate");
     }
 
     @Override
     public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
-        log("onNodesUpdate");
+        logDebug("onNodesUpdate");
         if (megaApi.getNodeByHandle(handle) == null){
             return;
         }
@@ -4231,6 +4226,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.exo_play_list:{
+//                Ignore click before instantiate playlist if something was wrong obtaining the files
+                if ((adapterType == OFFLINE_ADAPTER && (getMediaOffList() == null || getMediaOffList().isEmpty()))
+                        || (adapterType == ZIP_ADAPTER && (getZipMediaFiles() == null || getZipMediaFiles().isEmpty()))
+                        || (getMediaHandles() == null || getMediaHandles().isEmpty())){
+                    break;
+                }
                 handler.removeCallbacks(runnableActionStatusBar);
                 instantiatePlaylist();
                 break;
@@ -4284,7 +4285,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         @Override
         protected Void doInBackground(Void... voids) {
-            log("CreatePlayList doInBackground");
+            logDebug("CreatePlayList doInBackground");
             playListCreated = false;
             creatingPlaylist = true;
             if (mediaSourcePlaylist == null || mediaSourcePlaylist.isEmpty() || concatenatingMediaSource == null) {
@@ -4433,10 +4434,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         @Override
         protected void onPostExecute(Void avoid) {
             super.onPostExecute(avoid);
-            log("CreatePlayList onPostExecute");
+            logDebug("CreatePlayList onPostExecute");
             if (errorCreatingPlaylist && createPlayListErrorCounter < 2) {
                 createPlayListErrorCounter++;
-                log("errorCreatingPlaylist num: "+createPlayListErrorCounter);
+                logWarning("Error creating Playlist num: " + createPlayListErrorCounter);
                 createPlayListTask = new CreatePlayListTask();
                 createPlayListTask.execute();
             }

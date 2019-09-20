@@ -3,14 +3,13 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CloudDrivePagerAdapter extends FragmentStatePagerAdapter {
 
@@ -24,7 +23,7 @@ public class CloudDrivePagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        log("getItem: "+position);
+        logDebug("Position: " + position);
         switch (position){
             case 0: {
                 return FileBrowserFragmentLollipop.newInstance();
@@ -58,9 +57,5 @@ public class CloudDrivePagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return PAGE_COUNT;
-    }
-
-    private static void log(String log) {
-        Util.log("CloudDrivePagerAdapter", log);
     }
 }

@@ -27,7 +27,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,12 +46,15 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
-import mega.privacy.android.app.utils.Util;
+
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class IncomingSharesExplorerFragmentLollipop extends Fragment implements OnClickListener{
@@ -96,7 +98,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	private NewHeaderItemDecoration headerItemDecoration;
 
 	private void activateActionMode(){
-		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -111,7 +112,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			log("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
 
 			switch(item.getItemId()){
@@ -131,24 +131,21 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			log("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
-			Util.changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
+			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			Util.changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
+			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			log("onPrepareActionMode");
 			List<MegaNode> selected = adapter.getSelectedNodes();
 
 			if (selected.size() != 0) {
@@ -187,7 +184,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
 	public static IncomingSharesExplorerFragmentLollipop newInstance() {
-		log("newInstance");
+		logDebug("newInstance");
 		IncomingSharesExplorerFragmentLollipop fragment = new IncomingSharesExplorerFragmentLollipop();
 		return fragment;
 	}
@@ -195,7 +192,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		logDebug("onCreate");
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -232,7 +229,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		log("onCreateView");
+		logDebug("onCreateView");
 
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		
@@ -285,7 +282,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
 
-		MegaPreferences prefs = Util.getPreferences(context);
+		MegaPreferences prefs = getPreferences(context);
 
 		if(prefs != null) {
 			if (prefs.getPreferredSortOthers()!=null) {
@@ -355,9 +352,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}
 
-
-
-		log("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).getDeepBrowserTree());
+		logDebug("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).getDeepBrowserTree());
 		setOptionsBarVisibility();
 		showEmptyScreen();
 
@@ -447,9 +442,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		}
 	}
-	
-	private void findNodes(){
-		log("findNodes");
+
+	public void findNodes(){
+		logDebug("findNodes");
 		((FileExplorerActivityLollipop)context).setDeepBrowserTree(0);
 
 		setOptionsBarVisibility();
@@ -467,8 +462,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 	}
 
+
 	private void sortByMailDescending(ArrayList<MegaNode> nodes){
-		log("sortByNameDescending");
+		logDebug("sortByNameDescending");
 		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
 		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
 
@@ -493,7 +489,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
 	private void findDisabledNodes (){
-		log("findDisabledNodes");
+		logDebug("findDisabledNodes");
 		if (((FileExplorerActivityLollipop) context).isMultiselect()) {
 			return;
 		}
@@ -530,7 +526,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		switch(v.getId()){
 			case R.id.action_text:{
 				if(((FileExplorerActivityLollipop)context).isMultiselect()){
-					log("Send several files to chat");
 					if(adapter.getSelectedItemCount()>0){
 						long handles[] = adapter.getSelectedHandles();
 						((FileExplorerActivityLollipop) context).buttonClick(handles);
@@ -553,10 +548,10 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
 	public void navigateToFolder(long handle) {
-		log("navigateToFolder");
+		logDebug("navigateToFolder");
 
 		((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
-		log("((FileExplorerActivityLollipop)context).deepBrowserTree value: "+((FileExplorerActivityLollipop)context).getDeepBrowserTree());
+		logDebug("((FileExplorerActivityLollipop)context).deepBrowserTree value: "+((FileExplorerActivityLollipop)context).getDeepBrowserTree());
 		setOptionsBarVisibility();
 
 		int lastFirstVisiblePosition = 0;
@@ -567,7 +562,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 		}
 
-		log("Push to stack "+lastFirstVisiblePosition+" position");
+		logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 		lastPositionStack.push(lastFirstVisiblePosition);
 
 		setParentHandle(handle);
@@ -615,7 +610,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
     public void itemClick(View view, int position) {
-		log("------------------itemClick: "+((FileExplorerActivityLollipop)context).getDeepBrowserTree());
 		ArrayList<MegaNode> clickNodes;
 
 		if (((FileExplorerActivityLollipop) context).isSearchExpanded() && searchNodes != null) {
@@ -631,7 +625,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				hideMultipleSelect();
 			}
 			((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
-			log("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).getDeepBrowserTree());
+			logDebug("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).getDeepBrowserTree());
 			setOptionsBarVisibility();
 
 			int lastFirstVisiblePosition = 0;
@@ -642,7 +636,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 			}
 
-			log("Push to stack "+lastFirstVisiblePosition+" position");
+			logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 			lastPositionStack.push(lastFirstVisiblePosition);
 
 			setParentHandle(clickNodes.get(position).getHandle());
@@ -709,9 +703,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			//Is file
 			if(selectFile)
 			{
+
 				MegaNode n = clickNodes.get(position);
 				if(((FileExplorerActivityLollipop)context).isMultiselect()){
-					log("select file and allow multiselection");
 					int togglePosition = position;
 					if (!clickNodes.equals(nodes)) {
 						MegaNode node;
@@ -723,13 +717,11 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 						}
 					}
 					if (adapter.getSelectedItemCount() == 0) {
-						log("activate the actionMode");
 						activateActionMode();
 						adapter.toggleSelection(togglePosition);
 						updateActionModeTitle();
 					}
 					else {
-						log("add to selectedNodes");
 						adapter.toggleSelection(togglePosition);
 
 						List<MegaNode> selectedNodes = adapter.getSelectedNodes();
@@ -739,8 +731,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					}
 				}
 				else{
-					//Seleccionar el fichero para enviar...
-					log("Selected node to send: "+n.getName());
 					((FileExplorerActivityLollipop) context).buttonClick(n.getHandle());
 
 				}
@@ -750,8 +740,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
 	public int onBackPressed(){
-
-		log("deepBrowserTree "+((FileExplorerActivityLollipop)context).getDeepBrowserTree());
+		logDebug("deepBrowserTree "+((FileExplorerActivityLollipop)context).getDeepBrowserTree());
 		((FileExplorerActivityLollipop)context).decreaseDeepBrowserTree();
 
 		if(((FileExplorerActivityLollipop)context).getDeepBrowserTree()==0){
@@ -766,9 +755,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
+				logDebug("Pop of the stack " + lastVisiblePosition + " position");
 			}
-			log("Scroll to "+lastVisiblePosition+" position");
+			logDebug("Scroll to " + lastVisiblePosition + " position");
 
 			if(lastVisiblePosition>=0){
 				if (((FileExplorerActivityLollipop) context).isList()) {
@@ -846,9 +835,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack "+lastVisiblePosition+" position");
+					logDebug("Pop of the stack " + lastVisiblePosition + " position");
 				}
-				log("Scroll to "+lastVisiblePosition+" position");
+				logDebug("Scroll to " + lastVisiblePosition + " position");
 
 				if(lastVisiblePosition>=0){
 					if (((FileExplorerActivityLollipop) context).isList()) {
@@ -916,10 +905,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	 */
 	private void setDisableNodes(ArrayList<Long> disabledNodes) {
 		adapter.setDisableNodes(disabledNodes);
-	}
-	
-	private static void log(String log) {
-		Util.log("IncomingSharesExplorerFragmentLollipop", log);
 	}
 
 	public long getParentHandle() {
@@ -1015,7 +1000,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
 	private void selectAll(){
-		log("selectAll");
 		if (adapter != null){
 			adapter.selectAll();
 
@@ -1030,8 +1014,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
 	private void updateActionModeTitle() {
-		log("updateActionModeTitle");
-
 		List<MegaNode> documents = adapter.getSelectedNodes();
 		int files = 0;
 		int folders = 0;
@@ -1065,7 +1047,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			log("oninvalidate error");
+			logError("oninvalidate error", e);
 		}
 	}
 
@@ -1073,7 +1055,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		adapter.clearSelections();
 		if (actionMode != null) {
@@ -1121,7 +1102,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (megaApi == null || s == null) {
 			return;
 		}
-		log("search getparentHandle: "+getParentHandle());
 		if (getParentHandle() == -1) {
 			searchNodes = new ArrayList<>();
 			for (MegaNode node : nodes) {

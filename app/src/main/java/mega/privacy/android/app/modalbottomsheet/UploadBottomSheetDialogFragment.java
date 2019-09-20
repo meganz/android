@@ -27,9 +27,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.SDCardUtils.*;
 
 public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -109,7 +111,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         switch(v.getId()){
 
             case R.id.upload_from_device_layout:{
-                log("click upload from device");
+                logDebug("Upload from device");
 
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
@@ -118,17 +120,17 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
                 intent.setType("*/*");
 
                 if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                    ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET);
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
-                    ((ContactFileListActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                    ((ContactFileListActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET);
                 }
 
                 dismissAllowingStateLoss();
                 break;
             }
             case R.id.upload_from_system_layout:{
-                log("click upload from_system");
+                logDebug("Upload from_system");
                 final File[] fs = context.getExternalFilesDirs(null);
                 //has SD card
                 if (fs.length > 1) {
@@ -174,20 +176,20 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
                 break;
             }
             case R.id.take_picture_layout:{
-                ((ManagerActivityLollipop) context).fromTakePicture = Constants.TAKE_PICTURE_OPTION;
+                ((ManagerActivityLollipop) context).fromTakePicture = TAKE_PICTURE_OPTION;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
                     if (!hasStoragePermission) {
                         ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                Constants.REQUEST_WRITE_STORAGE);
+                                REQUEST_WRITE_STORAGE);
                     }
 
                     boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
                     if (!hasCameraPermission) {
                         ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                                 new String[]{Manifest.permission.CAMERA},
-                                Constants.REQUEST_CAMERA);
+                                REQUEST_CAMERA);
                     }
 
                     if (hasStoragePermission && hasCameraPermission){
@@ -222,25 +224,10 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         }
 
         if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop)context).startActivityForResult(intent,Constants.REQUEST_CODE_GET_LOCAL);
+            ((ManagerActivityLollipop)context).startActivityForResult(intent,REQUEST_CODE_GET_LOCAL);
         } else if (context instanceof ContactFileListActivityLollipop) {
-            ((ContactFileListActivityLollipop)context).startActivityForResult(intent,Constants.REQUEST_CODE_GET_LOCAL);
+            ((ContactFileListActivityLollipop)context).startActivityForResult(intent,REQUEST_CODE_GET_LOCAL);
         }
-    }
-
-    private String getSDCardRoot(File sd) {
-        String s = sd.getPath();
-        int i = 0,x = 0;
-        for(; x < s.toCharArray().length;x++) {
-            char c = s.toCharArray()[x];
-            if(c == '/') {
-                i++;
-            }
-            if(i == 3) {
-                break;
-            }
-        }
-        return s.substring(0,x);
     }
 
     @Override
@@ -253,9 +240,5 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-    }
-
-    private static void log(String log) {
-        Util.log("UploadBottomSheetDialogFragment", log);
     }
 }

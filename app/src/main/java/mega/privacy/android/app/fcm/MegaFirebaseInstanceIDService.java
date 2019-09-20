@@ -16,15 +16,14 @@ package mega.privacy.android.app.fcm;
  * limitations under the License.
  */
 
-import android.util.Log;
-
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class MegaFirebaseInstanceIDService extends FirebaseInstanceIdService {
@@ -41,7 +40,7 @@ public class MegaFirebaseInstanceIDService extends FirebaseInstanceIdService {
     public void onTokenRefresh() {
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        log("Refreshed TOKEN: " + refreshedToken);
+        logDebug("Refreshed TOKEN: " + refreshedToken);
 
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
@@ -59,18 +58,12 @@ public class MegaFirebaseInstanceIDService extends FirebaseInstanceIdService {
      * @param token The new token.
      */
     private void sendRegistrationToServer(String token) {
-        log("sendRegistration: " + token);
-
         if (megaApi == null){
             megaApi = ((MegaApplication)getApplication()).getMegaApi();
         }
 
-        log("TOKEN: " + token);
+        logDebug("TOKEN: " + token);
         //TODO Check if dbH.getCredentials() != null && ¿rootNode != null? (if not, login & fetchnodes)
-        megaApi.registerPushNotifications(Constants.DEVICE_ANDROID, token);
-    }
-
-    public static void log(String message) {
-        Util.log("MegaFirebaseInstanceIDService", message);
+        megaApi.registerPushNotifications(DEVICE_ANDROID, token);
     }
 }
