@@ -18,12 +18,13 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNodeList;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -60,11 +61,10 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            logDebug("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong("chatId", -1);
-            log("Handle of the chat: "+chatId);
             messageId = savedInstanceState.getLong("messageId", -1);
-            log("Row of the MS message: "+messageId);
+            logDebug("Chat ID: " + chatId + ", Message ID: "+messageId);
             MegaChatMessage messageMega = megaChatApi.getManualSendingMessage(chatId, messageId);
             if(messageMega!=null){
                 selectedMessage = new AndroidMegaChatMessage(messageMega);
@@ -72,13 +72,12 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
             selectedChat = megaChatApi.getChatRoom(chatId);
         }
         else{
-            log("Bundle NULL");
+            logWarning("Bundle NULL");
 
             chatId = ((ChatActivityLollipop) context).idChat;
-            log("Handle of the chat: "+chatId);
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
             MegaChatMessage messageMega = megaChatApi.getManualSendingMessage(chatId, messageId);
-            log("Row of the MS message: "+messageId);
+            logDebug("Chat ID: " + chatId + ", Message ID: "+messageId);
             if(messageMega!=null){
                 selectedMessage = new AndroidMegaChatMessage(messageMega);
             }
@@ -86,11 +85,11 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
         }
 
         if(selectedMessage!=null){
-            log("Selected message ID: " + selectedMessage.getMessage().getMsgId());
-            log("Temporal ID of MS message: " + selectedMessage.getMessage().getTempId());
+            logDebug("Selected message ID: " + selectedMessage.getMessage().getMsgId());
+            logDebug("Temporal ID of MS message: " + selectedMessage.getMessage().getTempId());
         }
         else{
-            log("Error the selectedMessage is NULL");
+            logWarning("Error the selectedMessage is NULL");
             return;
         }
     }
@@ -119,7 +118,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
 
         if(selectedMessage!=null&&selectedChat!=null){
             if(selectedMessage.getMessage().isEdited()){
-                log("Message edited : final id: "+selectedMessage.getMessage().getMsgId()+" temp id: "+selectedMessage.getMessage().getTempId());
+                logDebug("Message edited : final id: " + selectedMessage.getMessage().getMsgId() + " temp id: " + selectedMessage.getMessage().getTempId());
                 originalMsg = megaChatApi.getMessage(selectedChat.getChatId(), selectedMessage.getMessage().getTempId());
                 if(originalMsg!=null){
                     if(originalMsg.isEditable()){
@@ -140,7 +139,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
                     }
                 }
                 else{
-                    log("Null recovering the original msg");
+                    logWarning("Null recovering the original msg");
                     optionRetryLayout.setVisibility(View.GONE);
                     separator.setVisibility(View.GONE);
                 }
@@ -175,12 +174,12 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        logDebug("onClick");
 
         switch(v.getId()){
 
             case R.id.msg_not_sent_retry_layout: {
-                log("retry option click");
+                logDebug("Retry option click");
                 if(selectedMessage!=null&&selectedChat!=null){
                     if(selectedMessage.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
@@ -194,7 +193,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
                             ((ChatActivityLollipop) context).retryNodeAttachment(nodeHandle);
                         }
                         else{
-                            log("Error the nodeList cannot be recovered");
+                            logWarning("Error the nodeList cannot be recovered");
                         }
                     }
                     else if(selectedMessage.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
@@ -217,32 +216,32 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
                         megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
 
                         if(selectedMessage.getMessage().isEdited()){
-                            log("Message is edited --> edit");
+                            logDebug("Message is edited --> edit");
                             if(originalMsg!=null){
                                 ((ChatActivityLollipop) context).editMessageMS(selectedMessage.getMessage().getContent(), originalMsg);
                             }
                         }
                         else{
-                            log("Message NOT edited --> send");
+                            logDebug("Message NOT edited --> send");
                             ((ChatActivityLollipop) context).sendMessage(selectedMessage.getMessage().getContent());
                         }
                     }
                 }
                 else{
-                    log("onClick: Chat or message are NULL");
+                    logWarning("Chat or message are NULL");
                 }
 
                 break;
             }
 
             case R.id.msg_not_sent_delete_layout: {
-                log("delete option click");
+                logDebug("Delete option click");
                 if(selectedMessage!=null&&selectedChat!=null){
                     ((ChatActivityLollipop) context).removeMsgNotSent();
                     megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
                 }
                 else{
-                    log("onClick: Chat or message are NULL");
+                    logWarning("Chat or message are NULL");
                 }
 
                 break;
@@ -268,14 +267,10 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
         outState.putLong("chatId", chatId);
         outState.putLong("messageId", messageId);
-    }
-
-    private static void log(String log) {
-        Util.log("MessageNotSentBottomSheetDialogFragment", log);
     }
 }
