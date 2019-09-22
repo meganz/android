@@ -5,6 +5,7 @@ import android.content.Context;
 import java.io.File;
 
 import mega.privacy.android.app.utils.Util;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
@@ -110,7 +111,7 @@ public class MegaOffline {
 			}
 		}
 		else{
-			log("isFolder type is NULL");
+			logDebug("isFolder type is NULL");
 		}
 		return false;
 	}
@@ -140,9 +141,4 @@ public class MegaOffline {
 			return 0;
 		}
 	}
-
-	private static void log(String log) {
-		Util.log("MegaOffline", log);
-	}
-
 }

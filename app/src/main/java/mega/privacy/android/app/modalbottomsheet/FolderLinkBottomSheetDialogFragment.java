@@ -21,11 +21,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -59,13 +61,13 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            logDebug("Bundle is NOT NULL");
             long handle = savedInstanceState.getLong("handle", -1);
-            log("Handle of the node: "+handle);
+            logDebug("Handle of the node: " + handle);
             node = megaApi.getNodeByHandle(handle);
         }
         else{
-            log("Bundle NULL");
+            logWarning("Bundle NULL");
             if(context instanceof FolderLinkActivityLollipop){
                 node = ((FolderLinkActivityLollipop) context).getSelectedNode();
             }
@@ -99,8 +101,8 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
         optionDownload.setOnClickListener(this);
         optionImport.setOnClickListener(this);
 
-        nodeName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
-        nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+        nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
+        nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
 
         if (dbH != null){
             if (dbH.getCredentials() != null){
@@ -112,30 +114,30 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
         }
 
         if(node!=null){
-            if(Util.isOnline(context)){
+            if(isOnline(context)){
                 nodeName.setText(node.getName());
 
                 if (node.isFolder()) {
-                    nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
+                    nodeInfo.setText(getInfoFolder(node, context, megaApi));
                     nodeThumb.setImageResource(R.drawable.ic_folder_list);
                 }
                 else{
                     long nodeSize = node.getSize();
-                    nodeInfo.setText(Util.getSizeString(nodeSize));
+                    nodeInfo.setText(getSizeString(nodeSize));
 
                     if (node.hasThumbnail()) {
-                        log("Node has thumbnail");
+                        logDebug("Node has thumbnail");
                         RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
                         params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
                         params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
                         params1.setMargins(20, 0, 12, 0);
                         nodeThumb.setLayoutParams(params1);
 
-                        thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                        thumb = getThumbnailFromCache(node);
                         if (thumb != null) {
                             nodeThumb.setImageBitmap(thumb);
                         } else {
-                            thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                            thumb = getThumbnailFromFolder(node, context);
                             if (thumb != null) {
                                 nodeThumb.setImageBitmap(thumb);
                             } else {
@@ -170,9 +172,9 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
         switch(v.getId()){
 
             case R.id.option_download_layout:{
-                log("Download option");
+                logDebug("Download option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ((FolderLinkActivityLollipop) context).downloadNode();
@@ -180,9 +182,9 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
                 break;
             }
             case R.id.option_import_layout:{
-                log("Import option");
+                logDebug("Import option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ((FolderLinkActivityLollipop) context).importNode();
@@ -212,14 +214,10 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
-        log("Handle of the node: "+handle);
+        logDebug("Handle of the node: " + handle);
         outState.putLong("handle", handle);
-    }
-
-    private static void log(String log) {
-        Util.log("FolderLinkBottomSheetDialogFragment", log);
     }
 }
