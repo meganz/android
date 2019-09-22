@@ -239,9 +239,8 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
-import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
-import static mega.privacy.android.app.utils.Util.showSnackBar;
+import static nz.mega.sdk.MegaApiJava.ORDER_CREATION_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_CREATION_DESC;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC;
 import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
@@ -8368,7 +8367,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				for (TextView tv : textViewGroup) {
 					ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) tv.getLayoutParams();
 					tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16 * scaleText));
-					params.setMargins(scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+					params.setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(15, outMetrics), 0, scaleHeightPx(10, outMetrics));
 				}
 
 				//Initialization of check groups
@@ -8403,7 +8402,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					checkedTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16 * scaleText));
 					checkedTextView.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
 					ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) checkedTextView.getLayoutParams();
-					params.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+					params.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
 
 				}
 
@@ -8418,294 +8417,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
         		sortByDialog = builder.create();
         		sortByDialog.show();
-        		if(drawerItem==DrawerItem.CONTACTS){
-        			switch(orderContacts){
-		        		case ORDER_DEFAULT_ASC:{
-		        			ascendingCheck.setChecked(true);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-		        			descendingCheck.setChecked(true);
-		        			break;
-		        		}
-						case MegaApiJava.ORDER_CREATION_ASC:{
-							newestCheck.setChecked(true);
-							break;
-						}
-						case MegaApiJava.ORDER_CREATION_DESC:{
-							oldestCheck.setChecked(true);
-							break;
-						}
-	        		}
-        		}
-        		else if(drawerItem==DrawerItem.SAVED_FOR_OFFLINE){
+				if (drawerItem == DrawerItem.CONTACTS) {
+					setCheckByOrder(orderContacts, checkedTextViewGroup);
+				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
 					logDebug("orderOthers: " + orderOthers);
-        			switch(orderOthers){
-						case ORDER_DEFAULT_ASC: {
-							logDebug("ASCE");
-							ascendingCheck.setChecked(true);
-							break;
-						}
-		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-		        			logDebug("DESC");
-		        			descendingCheck.setChecked(true);
-		        			break;
-		        		}
-						case MegaApiJava.ORDER_MODIFICATION_ASC:{
-							logDebug("CREATION ASC");
-							newestCheck.setChecked(true);
-							break;
-						}
-						case MegaApiJava.ORDER_MODIFICATION_DESC:{
-							logDebug("CREATION DESC");
-							oldestCheck.setChecked(true);
-							break;
-						}
-						case MegaApiJava.ORDER_SIZE_ASC:{
-							logDebug("SIZE ASC");
-							largestCheck.setChecked(true);
-							break;
-						}
-						case MegaApiJava.ORDER_SIZE_DESC:{
-							logDebug("SIZE DESC");
-							smallestCheck.setChecked(true);
-							break;
-						}
-        			}
-        		}
-        		else if(drawerItem==DrawerItem.SHARED_ITEMS){
-					if(viewPagerShares!=null){
+					setCheckByOrder(orderOthers, checkedTextViewGroup);
+				} else if (drawerItem == DrawerItem.SHARED_ITEMS) {
+					if (viewPagerShares != null) {
 						int index = viewPagerShares.getCurrentItem();
-						if(index==1){
-							if (parentHandleOutgoing == -1){
-								switch(orderOthers){
-									case ORDER_DEFAULT_ASC:{
-										logDebug("ASCE");
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										logDebug("DESC");
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										break;
-									}
-								}
+						if (index == 1) {
+							if (parentHandleOutgoing == -1) {
+								setCheckByOrder(orderOthers, checkedTextViewGroup);
+							} else {
+								setCheckByOrder(orderCloud, checkedTextViewGroup);
 							}
-							else{
-								switch(orderCloud){
-									case ORDER_DEFAULT_ASC:{
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(true);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(true);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(true);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(true);
-										smallestCheck.setChecked(false);
-										break;
-									}
-								}
-							}
-						}
-						else{
-							if (parentHandleIncoming == -1){
-								switch(orderOthers){
-									case ORDER_DEFAULT_ASC:{
-										logDebug("ASCE");
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										logDebug("DESC");
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										break;
-									}
-								}
-							}
-							else{
-								switch(orderCloud){
-									case ORDER_DEFAULT_ASC:{
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(true);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(true);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(true);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(true);
-										smallestCheck.setChecked(false);
-										break;
-									}
-								}
+						} else {
+							if (parentHandleIncoming == -1) {
+								setCheckByOrder(orderOthers, checkedTextViewGroup);
+							} else {
+								setCheckByOrder(orderCloud, checkedTextViewGroup);
 							}
 						}
 					}
-				}
-				else if(drawerItem==DrawerItem.CAMERA_UPLOADS||drawerItem==DrawerItem.MEDIA_UPLOADS){
-					switch(orderCamera){
-						case MegaApiJava.ORDER_MODIFICATION_ASC:{
-							logDebug("ASCE");
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(true);
-							break;
-						}
-						case MegaApiJava.ORDER_MODIFICATION_DESC:{
-							logDebug("DESC");
-							newestCheck.setChecked(true);
-							oldestCheck.setChecked(false);
-							break;
-						}
-					}
-				}
-        		else{
+				} else if (drawerItem == DrawerItem.CAMERA_UPLOADS || drawerItem == DrawerItem.MEDIA_UPLOADS) {
+					setCheckByOrder(orderCamera, checkedTextViewGroup);
+				} else {
 					logDebug("orderCloud: " + orderCloud);
-	        		switch(orderCloud){
-		        		case ORDER_DEFAULT_ASC:{
-		        			ascendingCheck.setChecked(true);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(true);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
-
-						case MegaApiJava.ORDER_MODIFICATION_ASC:{
-							ascendingCheck.setChecked(false);
-							descendingCheck.setChecked(false);
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(true);
-							largestCheck.setChecked(false);
-							smallestCheck.setChecked(false);
-							break;
-						}
-						case MegaApiJava.ORDER_MODIFICATION_DESC:{
-							ascendingCheck.setChecked(false);
-							descendingCheck.setChecked(false);
-							newestCheck.setChecked(true);
-							oldestCheck.setChecked(false);
-							largestCheck.setChecked(false);
-							smallestCheck.setChecked(false);
-							break;
-						}
-		        		case MegaApiJava.ORDER_SIZE_ASC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(true);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_SIZE_DESC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(true);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
-	        		}
-	        	}
+					setCheckByOrder(orderCloud, checkedTextViewGroup);
+				}
 
         		final AlertDialog dialog = sortByDialog;
 	        	switch(drawerItem){
@@ -8765,9 +8504,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								newestCheck.setChecked(true);
 								oldestCheck.setChecked(false);
 								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_CREATION_ASC){
+								if(orderContacts!= ORDER_CREATION_ASC){
 									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_CREATION_ASC);
+									selectSortByContacts(ORDER_CREATION_ASC);
 								}
 								if (dialog != null){
 									dialog.dismiss();
@@ -8784,9 +8523,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								newestCheck.setChecked(false);
 								oldestCheck.setChecked(true);
 								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_CREATION_DESC) {
+								if(orderContacts!= ORDER_CREATION_DESC) {
 									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_CREATION_DESC);
+									selectSortByContacts(ORDER_CREATION_DESC);
 								}
 								if (dialog != null){
 									dialog.dismiss();
@@ -8844,7 +8583,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								oldestCheck.setChecked(false);
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
-								if (orderOthers != MegaApiJava.ORDER_CREATION_ASC) {
+								if (orderOthers != ORDER_CREATION_ASC) {
 									selectSortByOffline(ORDER_MODIFICATION_ASC);
 								}
 								if (dialog != null) {
@@ -8862,7 +8601,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								oldestCheck.setChecked(true);
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
-								if (orderOthers != MegaApiJava.ORDER_CREATION_DESC) {
+								if (orderOthers != ORDER_CREATION_DESC) {
 									selectSortByOffline(MegaApiJava.ORDER_MODIFICATION_DESC);
 								}
 								if (dialog != null) {
@@ -9026,7 +8765,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								@Override
 								public void onClick(View v) {
 									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);;
+									descendingCheck.setChecked(false);
 									newestCheck.setChecked(false);
 									oldestCheck.setChecked(true);
 									largestCheck.setChecked(false);
@@ -9248,12 +8987,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		        		break;
 	        		}
-//		        	default:{
-//		        		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
-//			    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
-//			    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
-//			    		break;
-//		        	}
 	        	}
 	        	return true;
 	        }
@@ -18823,4 +18556,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			isDeviceMemoryLow = false;
         }
     }
+    private void setCheckByOrder(int order, ArrayList<CheckedTextView> checkedTextViewList) {
+		switch(order) {
+			case ORDER_DEFAULT_ASC: {
+				//ascendingCheck get checked
+				checkedTextViewList.get(0).setChecked(true);
+				break;
+			}
+			case ORDER_DEFAULT_DESC: {
+				//descendingCheck get checked
+				checkedTextViewList.get(1).setChecked(true);
+				break;
+			}
+			case ORDER_MODIFICATION_ASC:
+			case ORDER_CREATION_ASC: {
+				//newestCheck get checked
+				checkedTextViewList.get(2).setChecked(true);
+				break;
+			}
+			case ORDER_MODIFICATION_DESC:
+			case ORDER_CREATION_DESC: {
+				//oldestCheck get checked
+				checkedTextViewList.get(3).setChecked(true);
+				break;
+			}
+			case ORDER_SIZE_ASC:{
+				//largestCheck get checked
+				checkedTextViewList.get(4).setChecked(true);
+				break;
+			}
+			case ORDER_SIZE_DESC:{
+				//smallestCheck get checked
+				checkedTextViewList.get(5).setChecked(true);
+				break;
+			}
+		}
+	}
 }

@@ -771,7 +771,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void sortByModificationDateDescending() {
-		log("sortByModificationDateDescending");
+		logDebug("sortByModificationDateDescending");
 		sort(ORDER_MODIFICATION_DESC, mOffList, getContext());
 		adapter.setNodes(mOffList);
 		if (adapter != null) {
@@ -780,7 +780,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void sortBySizeAscending() {
-		log("sortBySizeAscending");
+		logDebug("sortBySizeAscending");
 		sort(ORDER_SIZE_ASC, mOffList, getContext());
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
@@ -788,7 +788,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	public void sortBySizeDescending() {
-		log("sortBySizeDescending");
+		logDebug("sortBySizeDescending");
 		sort(ORDER_SIZE_DESC, mOffList, getContext());
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
@@ -1096,7 +1096,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 							try {
 								instream.close();
 							} catch (Exception e) {
-								log("EXCEPTION closing InputStream");
+								logDebug("EXCEPTION closing InputStream");
 							}
 						}
 					}
