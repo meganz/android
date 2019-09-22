@@ -8461,10 +8461,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
 								logDebug("Order contacts value: " + orderContacts);
 								if(orderContacts!=ORDER_DEFAULT_ASC){
 									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
@@ -8480,10 +8476,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
 								logDebug("Order contacts value: " + orderContacts);
 								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_DESC) {
 									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
@@ -8499,10 +8491,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(true);
-								oldestCheck.setChecked(false);
 								logDebug("Order contacts value: " + orderContacts);
 								if(orderContacts!= ORDER_CREATION_ASC){
 									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
@@ -8518,10 +8506,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(true);
 								logDebug("Order contacts value: " + orderContacts);
 								if(orderContacts!= ORDER_CREATION_DESC) {
 									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
@@ -8540,12 +8524,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(false);
 								if (orderOthers != ORDER_DEFAULT_ASC) {
 									selectSortByOffline(ORDER_DEFAULT_ASC);
 								}
@@ -8559,12 +8537,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(true);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(false);
 								if (orderOthers != MegaApiJava.ORDER_DEFAULT_DESC) {
 									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_DESC);
 								}
@@ -8577,12 +8549,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						newestCheck.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(true);
-								oldestCheck.setChecked(false);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(false);
 								if (orderOthers != ORDER_CREATION_ASC) {
 									selectSortByOffline(ORDER_MODIFICATION_ASC);
 								}
@@ -8595,12 +8561,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						oldestCheck.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(true);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(false);
 								if (orderOthers != ORDER_CREATION_DESC) {
 									selectSortByOffline(MegaApiJava.ORDER_MODIFICATION_DESC);
 								}
@@ -8613,12 +8573,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						largestCheck.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								largestCheck.setChecked(true);
-								smallestCheck.setChecked(false);
 								if (orderOthers != MegaApiJava.ORDER_SIZE_ASC) {
 									selectSortByOffline(MegaApiJava.ORDER_SIZE_ASC);
 								}
@@ -8631,12 +8585,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						smallestCheck.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(true);
 								if (orderOthers != MegaApiJava.ORDER_SIZE_DESC) {
 									selectSortByOffline(MegaApiJava.ORDER_SIZE_DESC);
 								}
