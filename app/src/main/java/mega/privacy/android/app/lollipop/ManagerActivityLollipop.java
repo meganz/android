@@ -8466,9 +8466,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
 									selectSortByContacts(ORDER_DEFAULT_ASC);
 								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8481,9 +8480,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
 									selectSortByContacts(MegaApiJava.ORDER_DEFAULT_DESC);
 								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8496,9 +8494,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
 									selectSortByContacts(ORDER_CREATION_ASC);
 								}
-								if (dialog != null){
-									dialog.dismiss();
-								}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8511,9 +8508,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
 									selectSortByContacts(ORDER_CREATION_DESC);
 								}
-								if (dialog != null){
-									dialog.dismiss();
-								}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8527,9 +8523,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (orderOthers != ORDER_DEFAULT_ASC) {
 									selectSortByOffline(ORDER_DEFAULT_ASC);
 								}
-								if (dialog != null) {
-									dialog.dismiss();
-								}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8540,9 +8535,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (orderOthers != MegaApiJava.ORDER_DEFAULT_DESC) {
 									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_DESC);
 								}
-								if (dialog != null) {
-									dialog.dismiss();
-								}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8552,9 +8546,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (orderOthers != ORDER_CREATION_ASC) {
 									selectSortByOffline(ORDER_MODIFICATION_ASC);
 								}
-								if (dialog != null) {
-									dialog.dismiss();
-								}
+
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8564,9 +8558,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (orderOthers != ORDER_CREATION_DESC) {
 									selectSortByOffline(MegaApiJava.ORDER_MODIFICATION_DESC);
 								}
-								if (dialog != null) {
+
 									dialog.dismiss();
-								}
+
 							}
 						});
 
@@ -8576,9 +8570,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (orderOthers != MegaApiJava.ORDER_SIZE_ASC) {
 									selectSortByOffline(MegaApiJava.ORDER_SIZE_ASC);
 								}
-								if (dialog != null) {
+
 									dialog.dismiss();
-								}
+
 							}
 						});
 
@@ -8588,9 +8582,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (orderOthers != MegaApiJava.ORDER_SIZE_DESC) {
 									selectSortByOffline(MegaApiJava.ORDER_SIZE_DESC);
 								}
-								if (dialog != null) {
 									dialog.dismiss();
-								}
+
 							}
 						});
 
@@ -8619,15 +8612,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 								@Override
 								public void onClick(View v) {
-									ascendingCheck.setChecked(true);
-									descendingCheck.setChecked(false);
 									if(orderOthers!= ORDER_DEFAULT_ASC){
 										refreshOthersOrder(ORDER_DEFAULT_ASC);
 									}
 
-									if (dialog != null){
-										dialog.dismiss();
-									}
+									dialog.dismiss();
+
 								}
 							});
 
@@ -8635,15 +8625,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 								@Override
 								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(true);
 									if(orderOthers!=MegaApiJava.ORDER_DEFAULT_DESC){
 										refreshOthersOrder(MegaApiJava.ORDER_DEFAULT_DESC);
 									}
 
-									if (dialog != null){
-										dialog.dismiss();
-									}
+									dialog.dismiss();
+
 								}
 							});
 						}
@@ -8655,18 +8642,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 								@Override
 								public void onClick(View v) {
-									ascendingCheck.setChecked(true);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
 
 									refreshCloudOrder(ORDER_DEFAULT_ASC);
 
-									if (dialog != null){
+
 										dialog.dismiss();
-									}
+
 								}
 							});
 
@@ -8674,18 +8655,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 								@Override
 								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(true);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
 
 									refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
 
-									if (dialog != null){
+
 										dialog.dismiss();
-									}
+
 								}
 							});
 
@@ -8693,18 +8668,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 								@Override
 								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(true);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
 
 									refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
 
-									if (dialog != null){
-										dialog.dismiss();
-									}
+									dialog.dismiss();
+
 								}
 							});
 
@@ -8712,18 +8680,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 								@Override
 								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(true);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
 
 									refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
 
-									if (dialog != null){
-										dialog.dismiss();
-									}
+									dialog.dismiss();
+
 								}
 							});
 
@@ -8732,18 +8693,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 								@Override
 								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(true);
-									smallestCheck.setChecked(false);
 
 									refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
 
-									if (dialog != null){
-										dialog.dismiss();
-									}
+									dialog.dismiss();
+
 								}
 							});
 
@@ -8751,18 +8705,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 								@Override
 								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(true);
 
 									refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
 
-									if (dialog != null){
-										dialog.dismiss();
-									}
+									dialog.dismiss();
+
 								}
 							});
 						}
@@ -8790,9 +8737,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_ASC);
 								}
 
-								if (dialog != null){
-									dialog.dismiss();
-								}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8806,9 +8752,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_DESC);
 								}
 
-								if (dialog != null){
-									dialog.dismiss();
-								}
+								dialog.dismiss();
+
 							}
 						});
 						break;
@@ -8821,18 +8766,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
 
 								refreshCloudOrder(ORDER_DEFAULT_ASC);
 
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8840,18 +8778,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
 
 								refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
 
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8860,18 +8791,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(true);
-								oldestCheck.setChecked(false);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(false);
 
 								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
 
-								if (dialog != null){
-									dialog.dismiss();
-								}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8879,18 +8803,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);;
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(true);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(false);
 
 								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
 
-								if (dialog != null){
-									dialog.dismiss();
-								}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8899,18 +8816,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(true);
-			        			smallestCheck.setChecked(false);
 
 								refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
 
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
+								dialog.dismiss();
+
 							}
 						});
 
@@ -8918,18 +8828,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 							@Override
 							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(true);
 
 			        			refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
 
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
+			        			dialog.dismiss();
+
 							}
 						});
 
