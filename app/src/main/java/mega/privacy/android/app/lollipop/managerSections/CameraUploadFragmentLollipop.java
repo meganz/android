@@ -2089,10 +2089,27 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	    if (adapterGrid != null) {
 	        adapterGrid.setOrder(orderBy);
         }
+	    if(adapterList != null) {
+	        adapterList.setOrder(orderBy);
+        }
     }
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
+
+		Collections.sort(this.nodes, new Comparator<MegaNode>() {
+
+            @Override
+            public int compare(MegaNode o1, MegaNode o2) {
+                if(MimeTypeList.typeForName(o1.getName()).isImage() && !MimeTypeList.typeForName(o2.getName()).isImage()) {
+                    return 1;
+                } else if(!MimeTypeList.typeForName(o1.getName()).isImage() && MimeTypeList.typeForName(o2.getName()).isImage()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        });
 
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			this.nodesArray.clear();
