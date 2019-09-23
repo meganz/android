@@ -39,10 +39,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.utils.OfflineUtils;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener{
 	
@@ -67,7 +69,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		
 		@Override
 		protected Bitmap doInBackground(String... params) {
-			log("doInBackground OfflinePreviewAsyncTask: "+holder.currentPath);
+			logDebug("doInBackground OfflinePreviewAsyncTask: " + holder.currentPath);
 			currentPath = params[0];
 			File currentFile = new File(currentPath);
 			
@@ -90,9 +92,9 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		    
 		    preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
 			if (preview != null){
-				preview = Util.rotateBitmap(preview, orientation);
+				preview = rotateBitmap(preview, orientation);
 				long handle = holder.currentHandle;
-				PreviewUtils.setPreviewCache(handle, preview);
+				setPreviewCache(handle, preview);
 				return preview;
 			}
 			
@@ -101,7 +103,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		
 		@Override
 		protected void onPostExecute(Bitmap preview){
-			log("onPostExecute OfflinePreviewAsyncTask: "+holder.currentPath);
+			logDebug("onPostExecute OfflinePreviewAsyncTask: " + holder.currentPath);
 			if (preview != null){
 				if (holder.currentPath.equals(currentPath)){
 					holder.imgDisplay.setImageBitmap(preview);
@@ -163,16 +165,16 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
-        log ("INSTANTIATE POSITION " + position);
+		logDebug("INSTANTIATE POSITION " + position);
         
         File currentFile;
         if (zipImage){
         	currentFile = new File (paths.get(position));
 			if(currentFile!=null){
-				log("Got zip Image!");
+				logDebug("Got zip Image!");
 			}
 			else{
-				log("zip Image is NULL");
+				logWarning("zip Image is NULL");
 			}
         }
         else{
@@ -202,7 +204,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		}
 
 		if (isGIF){
-			log("isGIF");
+			logDebug("isGIF");
 			holder.isGIF = true;
 			holder.imgDisplay.setVisibility(View.GONE);
 			holder.gifImgDisplay.setVisibility(View.VISIBLE);
@@ -220,8 +222,8 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 				try {
 					holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
 
-					thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
-					preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
+					thumb = getThumbnailFromCache(holder.currentHandle);
+					preview = getPreviewFromCache(holder.currentHandle);
 				} catch (Exception e) {
 				}
 			}
@@ -286,21 +288,21 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
 			if (zipImage){
 				holder.currentPath = paths.get(position);
-				log("ZIP holder.currentPath: "+holder.currentPath);
+				logDebug("ZIP holder.currentPath: " + holder.currentPath);
 			}
 			else{
 				holder.currentPath = mOffList.get(position).getPath();
-				log("holder.currentPath: "+holder.currentPath);
+				logDebug("holder.currentPath: " + holder.currentPath);
 				try{
 					holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
 
-					Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
+					Bitmap thumb = getThumbnailFromCache(holder.currentHandle);
 					if (thumb != null){
 						holder.imgDisplay.setImageBitmap(thumb);
 
 					}
 
-					Bitmap preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
+					Bitmap preview = getPreviewFromCache(holder.currentHandle);
 					if (preview != null){
 						holder.imgDisplay.setImageBitmap(preview);
 					}
@@ -319,13 +321,13 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		visibleImgs.put(position, holder);
 		
         if (zipImage){
-			log("isZipImage");
+			logDebug("isZipImage");
 			try{
 				new OfflinePreviewAsyncTask(holder).execute(currentFile.getAbsolutePath());
 			}
 			catch(Exception e){
 				//Too many AsyncTasks
-				log("OfflinePreviewAsyncTask EXCEPTION");
+				logError("OfflinePreviewAsyncTask EXCEPTION", e);
 			}
 		}
 		
@@ -339,7 +341,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		visibleImgs.remove(position);
         ((ViewPager) container).removeView((RelativeLayout) object);
         System.gc();
-        log ("DESTROY POSITION " + position + " SIZE SPARSE: " + visibleImgs.size());
+		logDebug ("DESTROY POSITION " + position + " SIZE SPARSE: " + visibleImgs.size());
  
     }
 
@@ -354,7 +356,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		logDebug("onClick");
 
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_gif:
@@ -365,8 +367,8 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 			    display.getMetrics(outMetrics);
 			    float density  = activity.getResources().getDisplayMetrics().density;
 				
-			    float scaleW = Util.getScaleW(outMetrics, density);
-			    float scaleH = Util.getScaleH(outMetrics, density);
+			    float scaleW = getScaleW(outMetrics, density);
+			    float scaleH = getScaleH(outMetrics, density);
 
                 ((FullScreenImageViewerLollipop) context).touchImage();
 
@@ -385,9 +387,6 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
 	public void setaBshown(boolean aBshown) {
 		this.aBshown = aBshown;
-	}
-	private static void log(String log) {
-		Util.log("MegaOfflineFullScreenImageAdapterLollipop", log);
 	}
 
 	public boolean isGIF(String name){

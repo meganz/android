@@ -24,6 +24,8 @@ import java.util.Map;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+
 public class SDCardOperator {
 
     public static final String TEST = "test";
@@ -195,12 +197,12 @@ public class SDCardOperator {
         DocumentFile df = parent.findFile(name);
         //alreay exists
         if (df != null && df.length() == file.length()) {
-            log(name + " already exists.");
+            logDebug(name + " already exists.");
             return;
         }
         //update
         if (df != null && df.length() != file.length()) {
-            log("delete former file.");
+            logDebug("delete former file.");
             df.delete();
         }
         Uri uri = parent.createFile(null, name).getUri();
@@ -242,9 +244,5 @@ public class SDCardOperator {
             }
         }
         return folders;
-    }
-
-    public static void log(String log) {
-        Util.log("SDCardOperator", log);
     }
 }

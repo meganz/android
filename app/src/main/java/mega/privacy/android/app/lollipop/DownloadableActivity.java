@@ -16,6 +16,9 @@ import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+
+
 public class DownloadableActivity extends PinActivityLollipop {
 
     private DownloadInfo downloadInfo;
@@ -32,7 +35,7 @@ public class DownloadableActivity extends PinActivityLollipop {
 
     private Uri extractUri(Intent intent, int resultCode) {
         if (intent == null) {
-            log("intent NULL");
+            logDebug("intent NULL");
             if (resultCode != Activity.RESULT_OK) {
                 Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
             } else {
@@ -49,7 +52,7 @@ public class DownloadableActivity extends PinActivityLollipop {
             String uriString = treeUri.toString();
             DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
             if (pickedDir.canWrite()) {
-                log("sd card root uri is " + treeUri);
+                logDebug("sd card root uri is " + treeUri);
                 //save the sd card root uri string
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(this);
                 dbH.setSDCardUri(uriString);
@@ -74,11 +77,11 @@ public class DownloadableActivity extends PinActivityLollipop {
                     }
                 } catch (SDCardOperator.SDCardException e) {
                     e.printStackTrace();
-                    log(e.getMessage());
+                    logError(e.getMessage());
                 }
             }
         } else {
-            log("tree uri is null!");
+            logDebug("tree uri is null!");
         }
     }
 
@@ -88,7 +91,7 @@ public class DownloadableActivity extends PinActivityLollipop {
             String uriString = treeUri.toString();
             DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
             if (pickedDir.canWrite()) {
-                log("sd card root uri is " + treeUri);
+                logDebug("sd card root uri is " + treeUri);
                 //save the sd card root uri string
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(this);
                 dbH.setSDCardUri(uriString);
@@ -119,11 +122,11 @@ public class DownloadableActivity extends PinActivityLollipop {
                     }
                 } catch (SDCardOperator.SDCardException e) {
                     e.printStackTrace();
-                    log(e.getMessage());
+                    logError(e.getMessage());
                 }
             }
         } else {
-            log("tree uri is null!");
+            logDebug("tree uri is null!");
         }
     }
 }

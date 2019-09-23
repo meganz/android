@@ -46,11 +46,8 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -67,7 +64,10 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -128,10 +128,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	HashMap<Long, Uri> storeToAdvacedDevices;
 	HashMap<Long, Boolean> fromMediaViewers;
 
-	private int notificationId = Constants.NOTIFICATION_DOWNLOAD;
-	private int notificationIdFinal = Constants.NOTIFICATION_DOWNLOAD_FINAL;
-	private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID;
-	private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME;
+	private int notificationId = NOTIFICATION_DOWNLOAD;
+	private int notificationIdFinal = NOTIFICATION_DOWNLOAD_FINAL;
+	private String notificationChannelId = NOTIFICATION_CHANNEL_DOWNLOAD_ID;
+	private String notificationChannelName = NOTIFICATION_CHANNEL_DOWNLOAD_NAME;
 	private NotificationCompat.Builder mBuilderCompat;
 	private Notification.Builder mBuilder;
 	private NotificationManager mNotificationManager;
@@ -147,7 +147,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onCreate(){
 		super.onCreate();
-		log("onCreate");
+		logDebug("onCreate");
 
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
@@ -181,7 +181,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onDestroy(){
-		log("onDestroy");
+		logDebug("onDestroy");
 		if((lock != null) && (lock.isHeld()))
 			try{ lock.release(); } catch(Exception ex) {}
 		if((wl != null) && (wl.isHeld()))
@@ -202,17 +202,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
-		log("onStartCommand");
+		logDebug("onStartCommand");
 		canceled = false;
 
 		if(intent == null){
-			log("intent==null");
+			logWarning("intent==null");
 			return START_NOT_STICKY;
 		}
 
 		if (intent.getAction() != null){
 			if (intent.getAction().equals(ACTION_CANCEL)){
-				log("Cancel intent");
+				logDebug("Cancel intent");
 				canceled = true;
 				megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
 				megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
@@ -225,26 +225,27 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private boolean isVoiceClipType(String value) {
-		return (value != null) && (value.contains(Constants.EXTRA_VOICE_CLIP));
+		return (value != null) && (value.contains(EXTRA_VOICE_CLIP));
 	}
 
     protected void onHandleIntent(final Intent intent) {
-        log("onHandleIntent");
-        this.intent = intent;
+        logDebug("onHandleIntent");
+	    this.intent = intent;
+
         long hash = intent.getLongExtra(EXTRA_HASH, -1);
         String url = intent.getStringExtra(EXTRA_URL);
         boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
-		type = intent.getStringExtra(Constants.EXTRA_TRANSFER_TYPE);
+		type = intent.getStringExtra(EXTRA_TRANSFER_TYPE);
 
 		Uri contentUri = null;
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
             contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
         }
 
-        boolean highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false);
+        boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
         boolean fromMV = intent.getBooleanExtra("fromMV", false);
-        log("fromMV: "+fromMV);
+		logDebug("fromMV: " + fromMV);
 
 		megaApi = app.getMegaApi();
 
@@ -260,7 +261,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					isLoggingIn = true;
 					MegaApplication.setLoggingIn(isLoggingIn);
 
-					if (Util.isChatEnabled()) {
+					if (isChatEnabled()) {
 						if (megaChatApi == null) {
 							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 						}
@@ -269,24 +270,24 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
 							ret = megaChatApi.init(gSession);
-							log("result of init ---> " + ret);
+							logDebug("result of init ---> " + ret);
 							chatSettings = dbH.getChatSettings();
 							if (ret == MegaChatApi.INIT_NO_CACHE) {
-								log("condition ret == MegaChatApi.INIT_NO_CACHE");
+								logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
 							} else if (ret == MegaChatApi.INIT_ERROR) {
-								log("condition ret == MegaChatApi.INIT_ERROR");
+								logDebug("condition ret == MegaChatApi.INIT_ERROR");
 								if (chatSettings == null) {
-									log("ERROR----> Switch OFF chat");
+									logError("ERROR----> Switch OFF chat");
 									chatSettings = new ChatSettings();
 									chatSettings.setEnabled(false+"");
 									dbH.setChatSettings(chatSettings);
 								} else {
-									log("ERROR----> Switch OFF chat");
+									logError("ERROR----> Switch OFF chat");
 									dbH.setEnabledChat(false + "");
 								}
 								megaChatApi.logout(this);
 							} else {
-								log("Chat correctly initialized");
+								logDebug("Chat correctly initialized");
 							}
 						}
 					}
@@ -300,7 +301,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					return;
 				}
 				else{
-					log("Another login is processing");
+					logWarning("Another login is processing");
 				}
 				pendingIntents.add(intent);
 				return;
@@ -310,14 +311,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
 
 		if(serialize!=null){
-			log("serializeString: "+serialize);
+			logDebug("serializeString: " + serialize);
 			currentDocument = MegaNode.unserialize(serialize);
 			if(currentDocument != null){
 				hash = currentDocument.getHandle();
-				log("hash after unserialize: "+hash);
+				logDebug("hash after unserialize: " + hash);
 			}
 			else{
-				log("Node is NULL after unserialize");
+				logWarning("Node is NULL after unserialize");
 			}
 		}
 		else{
@@ -337,7 +338,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
 
         if(url != null){
-            log("Public node");
+			logDebug("Public node");
             currentDir = new File(intent.getStringExtra(EXTRA_PATH));
             if (currentDir != null){
                 currentDir.mkdirs();
@@ -347,7 +348,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
 
 		if((currentDocument == null) && (url == null)){
-			log("Node not found");
+			logWarning("Node not found");
 			return;
 		}
 
@@ -356,11 +357,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         currentDir = getDir(currentDocument, intent);
         currentDir.mkdirs();
         if (currentDir.isDirectory()){
-            log("currentDir is Directory");
+			logDebug("currentDir is Directory");
             currentFile = new File(currentDir, megaApi.escapeFsIncompatible(currentDocument.getName()));
         }
         else{
-            log("currentDir is File");
+			logDebug("currentDir is File");
             currentFile = currentDir;
         }
         if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
@@ -368,9 +369,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             targetUris.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_URI));
         }
 
-        log("dir: " + currentDir.getAbsolutePath() + " file: " + currentDocument.getName() + "  Size: " + currentDocument.getSize());
+		logDebug("dir: " + currentDir.getAbsolutePath() + " file: " + currentDocument.getName() + "  Size: " + currentDocument.getSize());
         if(!checkCurrentFile(currentDocument)){
-            log("checkCurrentFile == false");
+			logDebug("checkCurrentFile == false");
 
 			alreadyDownloaded++;
             if ((megaApi.getNumPendingDownloads() == 0) && (megaApiFolder.getNumPendingDownloads() == 0)){
@@ -388,64 +389,64 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
 
         if(contentUri!=null){
-			log("contentUri is NOT null");
+			logDebug("contentUri is NOT null");
             //To download to Advanced Devices
-            log("Download to advanced devices checked");
+			logDebug("Download to advanced devices checked");
             currentDir = new File(intent.getStringExtra(EXTRA_PATH));
             currentDir.mkdirs();
 
             if (currentDir.isDirectory()){
-                log("To download(dir): " + currentDir.getAbsolutePath() + "/");
+				logDebug("To download(dir): " + currentDir.getAbsolutePath() + "/");
             }
             else{
-                log("currentDir is not a directory");
+				logWarning("currentDir is not a directory");
             }
             storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
 
 			if (currentDir.getAbsolutePath().contains(OFFLINE_DIR)){
-				log("currentDir contains OFFLINE_DIR");
+				logDebug("currentDir contains OFFLINE_DIR");
 				openFile = false;
 			}
 			else {
-				log("currentDir is NOT on OFFLINE_DIR: openFile->"+openFile);
+				logDebug("currentDir is NOT on OFFLINE_DIR: openFile->" + openFile);
 			}
 
 			if (isFolderLink){
 				if (dbH.getCredentials() == null) {
 					megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-					log("getCredentials null");
+					logWarning("getCredentials null");
 					return;
 				}
 
-				log("Folder link node");
+				logDebug("Folder link node");
 				MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(currentDocument);
 				if (currentDocumentAuth == null){
-					log("CurrentDocumentAuth is null");
+					logWarning("CurrentDocumentAuth is null");
 					megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 					return;
 				}
 				else{
-					log("CurrentDocumentAuth is not null");
+					logDebug("CurrentDocumentAuth is not null");
 					currentDocument = megaApiFolder.authorizeNode(currentDocument);
 				}
 			}
 
-			log("CurrentDocument is not null");
+			logDebug("CurrentDocument is not null");
 
 			if (highPriority) {
-				String data = isVoiceClipType(type) ? Constants.EXTRA_VOICE_CLIP : "";
+				String data = isVoiceClipType(type) ? EXTRA_VOICE_CLIP : "";
 				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
 			} else {
 				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 			}
         }
         else{
-			log("contentUri NULL");
+			logDebug("contentUri NULL");
             if (currentDir.isDirectory()){
-                log("To download(dir): " + currentDir.getAbsolutePath() + "/");
+				logDebug("To download(dir): " + currentDir.getAbsolutePath() + "/");
 
                 if(currentFile.exists()){
-                    log("The file already exists!");
+					logDebug("The file already exists!");
                     //Check the fingerprint
                     String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
                     String megaFingerprint = megaApi.getFingerprint(currentDocument);
@@ -454,45 +455,45 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     {
                         if(localFingerprint.compareTo(megaFingerprint)!=0)
                         {
-                            log("Delete the old version");
+							logDebug("Delete the old version");
                             currentFile.delete();
                         }
                     }
                 }
 
                 if (currentDocument.isFolder()){
-                    log("IS FOLDER_:_");
+					logDebug("IS FOLDER");
                 }
                 else{
-                    log("IS FILE_:_");
+					logDebug("IS FILE");
                 }
 
 				if (currentDir.getAbsolutePath().contains(OFFLINE_DIR)){
-                	log("currentDir contains OFFLINE_DIR");
+					logDebug("currentDir contains OFFLINE_DIR");
 					openFile = false;
 				}
 				else {
-					log("currentDir is NOT on OFFLINE_DIR: openFile->"+openFile);
+					logDebug("currentDir is NOT on OFFLINE_DIR: openFile->" + openFile);
 				}
 
                 if (isFolderLink){
 
-                    log("Folder link node");
+					logDebug("Folder link node");
                     MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(currentDocument);
                     if (currentDocumentAuth == null){
-                        log("CurrentDocumentAuth is null");
+						logWarning("CurrentDocumentAuth is null");
                         megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
                         return;
                     }
                     else{
-						log("CurrentDocumentAuth is not null");
+						logDebug("CurrentDocumentAuth is not null");
 						currentDocument = megaApiFolder.authorizeNode(currentDocument);
 					}
                 }
 
-                log("CurrentDocument is not null");
+				logDebug("CurrentDocument is not null");
 				if(highPriority){
-					String data = isVoiceClipType(type)? Constants.EXTRA_VOICE_CLIP : "";
+					String data = isVoiceClipType(type)? EXTRA_VOICE_CLIP : "";
 					megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
 				}
 				else{
@@ -501,14 +502,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
             }
             else{
-                log("currentDir is not a directory");
-
+				logWarning("currentDir is not a directory");
             }
         }
     }
 
 	private void onQueueComplete(long handle) {
-		log("onQueueComplete");
+		logDebug("onQueueComplete");
 
 		if((lock != null) && (lock.isHeld()))
 			try{ lock.release(); } catch(Exception ex) {}
@@ -522,9 +522,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		stopSelf();
 
 		int total = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
-		log("onQueueComplete: total of files before reset " + total);
+		logDebug("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
-			log("onQueueComplete: reset total downloads");
+			logDebug("onQueueComplete: reset total downloads");
 			megaApi.resetTotalDownloads();
 			megaApiFolder.resetTotalDownloads();
 			errorCount = 0;
@@ -540,12 +540,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		} else {
 			destDir = new File(intent.getStringExtra(EXTRA_PATH));
 		}
-		log("getDir:save to: " + destDir.getAbsolutePath());
+		logDebug("Save to: " + destDir.getAbsolutePath());
 		return destDir;
 	}
 
 	boolean checkCurrentFile(MegaNode document)	{
-		log("checkCurrentFile");
+		logDebug("checkCurrentFile");
 		if(currentFile.exists() && (document.getSize() == currentFile.length())){
 
 			currentFile.setReadable(true, false);
@@ -556,7 +556,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		if(document.getSize() > ((long)1024*1024*1024*4))
 		{
-			log("show size alert: " + document.getSize());
+			logDebug("Show size alert: " + document.getSize());
 	    	Toast.makeText(getApplicationContext(), getString(R.string.error_file_size_greater_than_4gb),
 	    			Toast.LENGTH_LONG).show();
 	    	Toast.makeText(getApplicationContext(), getString(R.string.error_file_size_greater_than_4gb),
@@ -571,7 +571,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	 * Show download success notification
 	 */
 	private void showCompleteNotification(long handle) {
-		log("showCompleteNotification");
+		logDebug("showCompleteNotification");
 		String notificationTitle, size;
 
         int totalDownloads = megaApi.getTotalDownloads() + megaApiFolder.getTotalDownloads();
@@ -607,7 +607,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		{
 			intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
-			log("Show notification 1");
+			logDebug("Show notification");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
 				channel.setShowBadge(true);
@@ -647,7 +647,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			try {
                 boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
                 if (openFile && autoPlayEnabled) {
-                    log("both openFile and autoPlayEnabled are true");
+					logDebug("Both openFile and autoPlayEnabled are true");
 					Boolean externalFile;
 					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
 						externalFile = true;
@@ -662,7 +662,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
-						log("Download success of zip file!");
+						logDebug("Download success of zip file!");
 
 						if(pathFileToOpen!=null){
 							Intent intentZip;
@@ -682,17 +682,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							Intent intentZip = null;
 
 							intentZip = new Intent(this, ManagerActivityLollipop.class);
-							intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
+							intentZip.setAction(ACTION_EXPLORE_ZIP);
 							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+							intentZip.putExtra(EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
 
 							startActivity(intentZip);
 						}
 
-						log("Lanzo intent al manager.....");
+						logDebug("Launch intent to manager.....");
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
-						log("Pdf file");
+						logDebug("Pdf file");
 
 						if (!fromMV) {
 							Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
@@ -711,7 +711,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							startActivity(pdfIntent);
 						}
 						else {
-							log("Show notification 2");
+							logDebug("Show notification");
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 								NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
 								channel.setShowBadge(true);
@@ -742,7 +742,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
-						log("Video/Audio file");
+						logDebug("Video/Audio file");
 
 						if (!fromMV) {
 							Intent mediaIntent;
@@ -779,7 +779,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								startActivity(mediaIntent);
 							}
 							else {
-								if (MegaApiUtils.isIntentAvailable(this, mediaIntent)) {
+								if (isIntentAvailable(this, mediaIntent)) {
 									startActivity(mediaIntent);
 								}
 								else {
@@ -791,14 +791,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 									}
 									intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 									intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-									if (MegaApiUtils.isIntentAvailable(this, mediaIntent)) {
+									if (isIntentAvailable(this, mediaIntent)) {
 										startActivity(intentShare);
 									}
 								}
 							}
 						}
 						else {
-							log("Show notification 2");
+							logDebug("Show notification");
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 								NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
 								channel.setShowBadge(true);
@@ -829,7 +829,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
-						log("Download is document");
+						logDebug("Download is document");
 
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -839,12 +839,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
+						if (isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else {
 							viewIntent.setAction(Intent.ACTION_GET_CONTENT);
 
-							if (MegaApiUtils.isIntentAvailable(this, viewIntent))
+							if (isIntentAvailable(this, viewIntent))
 								startActivity(viewIntent);
 							else {
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
@@ -859,7 +859,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 						}
 					} else if (MimeTypeList.typeForName(currentFile.getName()).isImage()) {
-						log("Download is IMAGE");
+						logDebug("Download is IMAGE");
 						if (!fromMV){
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							//					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
@@ -871,7 +871,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 							viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-							if (MegaApiUtils.isIntentAvailable(this, viewIntent))
+							if (isIntentAvailable(this, viewIntent))
 								startActivity(viewIntent);
 							else {
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
@@ -886,7 +886,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 						}
 						else {
-							log("Show notification 2");
+							logDebug("Show notification");
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 								NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
 								channel.setShowBadge(true);
@@ -924,7 +924,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isURL()) {
-						log("Is URL file");
+						logDebug("Is URL file");
 						InputStream instream = null;
 
 						try {
@@ -943,13 +943,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 									String url = line2.replace("URL=","");
 
-									log("Is URL - launch browser intent");
+									logDebug("Is URL - launch browser intent");
 									Intent i = new Intent(Intent.ACTION_VIEW);
 									i.setData(Uri.parse(url));
 									startActivity(i);
 								}
 								else{
-									log("Not expected format: Exception on processing url file");
+									logWarning("Not expected format: Exception on processing url file");
 									intent = new Intent(Intent.ACTION_VIEW);
 									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 										intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), "text/plain");
@@ -958,11 +958,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 									}
 									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-									if (MegaApiUtils.isIntentAvailable(this, intent)){
+									if (isIntentAvailable(this, intent)){
 										startActivity(intent);
 									}
 									else{
-										log("No app to url file as text: show notification");
+										logWarning("No app to url file as text: show notification");
 										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 											NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
 											channel.setShowBadge(true);
@@ -1009,11 +1009,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-							if (MegaApiUtils.isIntentAvailable(this, intent)){
+							if (isIntentAvailable(this, intent)){
 								startActivity(intent);
 							}
 							else{
-								log("Exception on processing url file: show notification");
+								logWarning("Exception on processing url file: show notification");
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 									NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
 									channel.setShowBadge(true);
@@ -1055,7 +1055,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 
 					}else {
-						log("Download is OTHER FILE");
+						logDebug("Download is OTHER FILE");
 						intent = new Intent(Intent.ACTION_VIEW);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
@@ -1064,16 +1064,16 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-						if (MegaApiUtils.isIntentAvailable(this, intent))
+						if (isIntentAvailable(this, intent))
 							startActivity(intent);
 						else {
-							log("Not intent available for ACTION_VIEW");
+							logWarning("Not intent available for ACTION_VIEW");
 							intent.setAction(Intent.ACTION_GET_CONTENT);
 
-							if (MegaApiUtils.isIntentAvailable(this, intent))
+							if (isIntentAvailable(this, intent))
 								startActivity(intent);
 							else {
-								log("Not intent available for ACTION_GET_CONTENT");
+								logWarning("Not intent available for ACTION_GET_CONTENT");
 								intent.setAction(Intent.ACTION_SEND);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 									intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
@@ -1085,7 +1085,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 						}
 
-						log("Show notification 2");
+						logDebug("Show notification");
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 							NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
 							channel.setShowBadge(true);
@@ -1125,7 +1125,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 					intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
-					log("Show notification 3");
+					logDebug("Show notification");
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 						NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
 						channel.setShowBadge(true);
@@ -1163,10 +1163,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			catch (Exception e){
 				openFile = true; //Set the openFile to the default
-				log("Exception: " + e.getMessage());
+				logError("Exception", e);
 				intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
-				log("Show notification 4");
+				logDebug("Show notification");
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 					NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
 					channel.setShowBadge(true);
@@ -1220,18 +1220,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		boolean update;
 
 		if(isOverquota){
-			log("Overquota flag! is TRUE");
+			logDebug("Overquota flag! is TRUE");
 			if(downloadedBytesToOverquota<=totalSizeTransferred){
 				update = false;
 			}
 			else{
 				update = true;
-				log("Change overquota flag");
+				logDebug("Change overquota flag");
 				isOverquota = false;
 			}
 		}
 		else{
-			log("NOT overquota flag");
+			logDebug("NOT overquota flag");
 			update = true;
 		}
 
@@ -1246,7 +1246,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 			}
 			int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
-			log("updateProgressNotification: "+progressPercent);
+			logDebug("Progress: " + progressPercent + "%");
 
 			String message = "";
 			if (totalTransfers == 0){
@@ -1260,7 +1260,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			Intent intent;
 			PendingIntent pendingIntent;
 
-			String info = Util.getProgressSize(DownloadService.this, totalSizeTransferred, totalSizePendingTransfer);
+			String info = getProgressSize(DownloadService.this, totalSizeTransferred, totalSizePendingTransfer);
 
 			Notification notification = null;
 
@@ -1269,13 +1269,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(dbH.getCredentials()==null){
 				contentText = getString(R.string.download_touch_to_cancel);
 				intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
-				intent.setAction(Constants.ACTION_CANCEL_DOWNLOAD);
+				intent.setAction(ACTION_CANCEL_DOWNLOAD);
 				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 			}
 			else{
 				contentText = getString(R.string.download_touch_to_show);
 				intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
-				intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
+				intent.setAction(ACTION_SHOW_TRANSFERS);
 				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 			}
 
@@ -1339,7 +1339,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 
 			if (!isForeground) {
-				log("starting foreground!");
+				logDebug("Starting foreground!");
 				try {
 					startForeground(notificationId, notification);
 					isForeground = true;
@@ -1354,18 +1354,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void showTransferOverquotaNotification(){
-		log("showTransferOverquotaNotification");
+		logDebug("showTransferOverquotaNotification");
 
 		long totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApiFolder.getTotalDownloadBytes();
 		long totalSizeTransferred = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
 
 		int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
-		log("updateProgressNotification: "+progressPercent);
+		logDebug("Progress: " + progressPercent + "%");
 
 		Intent intent;
 		PendingIntent pendingIntent;
 
-		String info = Util.getProgressSize(DownloadService.this, totalSizeTransferred, totalSizePendingTransfer);
+		String info = getProgressSize(DownloadService.this, totalSizeTransferred, totalSizePendingTransfer);
 
 		Notification notification = null;
 
@@ -1375,12 +1375,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(megaApi.isLoggedIn()==0 || dbH.getCredentials()==null){
 			dbH.clearEphemeral();
 			intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
-			intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
+			intent.setAction(ACTION_OVERQUOTA_TRANSFER);
 			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 		}
 		else{
 			intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
-			intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
+			intent.setAction(ACTION_OVERQUOTA_TRANSFER);
 			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 		}
 
@@ -1445,13 +1445,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		if (!isForeground) {
-			log("starting foreground");
+			logDebug("Starting foreground");
 			try {
 				startForeground(notificationId, notification);
 				isForeground = true;
 			}
 			catch (Exception e){
-				log("startforeground exception: " + e.getMessage());
+				logError("startForeground exception", e);
 				isForeground = false;
 			}
 		} else {
@@ -1460,7 +1460,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void cancel() {
-		log("cancel");
+		logDebug("cancel");
 		canceled = true;
 		isForeground = false;
 		stopForeground(true);
@@ -1476,7 +1476,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
+		logDebug("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
 
 		if (isVoiceClipType(transfer.getAppData())) return;
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
@@ -1487,7 +1487,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
-		log("onTransferFinish: " + transfer.getNodeHandle() + ", getType = " + transfer.getType());
+		logDebug("Node handle: " + transfer.getNodeHandle() + ", Type = " + transfer.getType());
 
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 
@@ -1497,7 +1497,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(!transfer.isFolderTransfer()){
 				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
-					String size = Util.getSizeString(transfer.getTotalBytes());
+					String size = getSizeString(transfer.getTotalBytes());
 					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
 					dbH.setCompletedTransfer(completedTransfer);
 				}
@@ -1514,13 +1514,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if((wl != null) && (wl.isHeld()))
 					try{ wl.release(); } catch(Exception ex) {}
 
-				log("Download canceled: " + transfer.getNodeHandle());
+				logDebug("Download canceled: " + transfer.getNodeHandle());
 
 				if (isVoiceClip) {
-					resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
+					resultTransfersVoiceClip(transfer.getNodeHandle(), ERROR_VOICE_CLIP_TRANSFER);
 					File localFile = buildVoiceClipFile(this, transfer.getFileName());
 					if (isFileAvailable(localFile)) {
-						log("deleteOwnVoiceClip : exists");
+						logDebug("Delete own voiceclip : exists");
 						localFile.delete();
 					}
 				} else {
@@ -1532,13 +1532,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			else{
 				if (error.getErrorCode() == MegaError.API_OK) {
-					log("Download OK nodeHandle: " + transfer.getNodeHandle());
+					logDebug("Download OK - Node handle: " + transfer.getNodeHandle());
 
 					if(isVoiceClip) {
-						resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER);
+						resultTransfersVoiceClip(transfer.getNodeHandle(), SUCCESSFUL_VOICE_CLIP_TRANSFER);
 					}
 
-					log("DOWNLOADFILE: " + path);
+                    logDebug("DOWNLOADFILE: " + path);
                     String targetPath = targetPaths.get(path);
                     String uri = targetUris.get(path);
                     //need to move downloaded file to a location on sd card.
@@ -1555,32 +1555,32 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                             path = sdCardOperator.move(targetPath, source);
                             File newFile = new File(path);
                             if (newFile.exists() && newFile.length() == source.length()) {
-                                log("move to sd card successfully.");
+                                logDebug("move to sd card successfully.");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            log(e.getMessage());
+                            logError(e.getMessage());
                         } finally {
-                            log("delete downloaded file.");
+                            logDebug("delete downloaded file.");
                             source.delete();
                         }
                     }
 					//To update thumbnails for videos
 					if(isVideoFile(transfer.getPath())){
-						log("Is video!!!");
+						logDebug("Is video!!!");
 						MegaNode videoNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 						if (videoNode != null){
 							if(!videoNode.hasThumbnail()){
-								log("The video has not thumb");
-								ThumbnailUtilsLollipop.createThumbnailVideo(this, path, megaApi, transfer.getNodeHandle());
+                                logDebug("The video has not thumb");
+								ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
 							}
 						}
 						else{
-							log("videoNode is NULL");
+							logWarning("videoNode is NULL");
 						}
 					}
 					else{
-						log("NOT video!");
+						logDebug("NOT video!");
 					}
 
 					File resultFile = new File(path);
@@ -1615,14 +1615,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								f.getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
 							@Override
 							public void onScanCompleted(String path, Uri uri) {
-								log("File was scanned successfully");
+								logDebug("File was scanned successfully");
 							}
 						});
 					}
 					catch (Exception e){}
 
 					if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
-						log("Now copy the file to the SD Card");
+						logDebug("Now copy the file to the SD Card");
 						openFile=false;
 						Uri tranfersUri = storeToAdvacedDevices.get(transfer.getNodeHandle());
 						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
@@ -1630,7 +1630,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					if(transfer.getPath().contains(OFFLINE_DIR)){
-						log("YESSSS it is Offline file");
+						logDebug("It is Offline file");
 						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 						offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
@@ -1647,12 +1647,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 				else
 				{
-					log("Download ERROR: " + transfer.getNodeHandle());
+					logError("Download ERROR: " + transfer.getNodeHandle());
 					if(isVoiceClip){
-						resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
+						resultTransfersVoiceClip(transfer.getNodeHandle(), ERROR_VOICE_CLIP_TRANSFER);
 						File localFile = buildVoiceClipFile(this, transfer.getFileName());
 						if (isFileAvailable(localFile)) {
-							log("deleteOwnVoiceClip : exists");
+							logDebug("Delete own voice clip : exists");
 							localFile.delete();
 						}
 					}else{
@@ -1673,15 +1673,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void resultTransfersVoiceClip(long nodeHandle, int result){
-		log("resultTransfersVoiceClip:nodeHandle =  "+nodeHandle+", the result is "+result);
-		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
-		intent.putExtra(Constants.EXTRA_NODE_HANDLE, nodeHandle);
-		intent.putExtra(Constants.EXTRA_RESULT_TRANSFER, result);
+		logDebug("nodeHandle =  " + nodeHandle + ", the result is " + result);
+		Intent intent = new Intent(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
+		intent.putExtra(EXTRA_NODE_HANDLE, nodeHandle);
+		intent.putExtra(EXTRA_RESULT_TRANSFER, result);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 
 	private void alterDocument(Uri uri, String fileName) {
-		log("alterUri");
+		logDebug("alterUri");
 	    try {
 
 	    	File tempFolder = getCacheFolder(getApplicationContext(), TEMPORAL_FOLDER);
@@ -1689,7 +1689,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	    	String sourceLocation = tempFolder.getAbsolutePath() + File.separator +fileName;
 
-	    	log("Gonna copy: "+sourceLocation);
+			logDebug("Gonna copy: " + sourceLocation);
 
 	        ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(uri, "w");
 	        FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
@@ -1726,7 +1726,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 			if (canceled) {
-				log("Transfer cancel: " + transfer.getNodeHandle());
+				logDebug("Transfer cancel: " + transfer.getNodeHandle());
 
 				if((lock != null) && (lock.isHeld()))
 					try{ lock.release(); } catch(Exception ex) {}
@@ -1747,20 +1747,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-		log(transfer.getPath() + "\nDownload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
+		logWarning("Download Temporary Error - Node Handle: " + transfer.getNodeHandle() +
+				"\nError: " + e.getErrorCode() + " " + e.getErrorString());
 
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 			if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 				if (e.getValue() != 0) {
-					log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+					logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 
 					UserCredentials credentials = dbH.getCredentials();
 					if(credentials!=null){
-						log("Credentials is NOT null");
+						logDebug("Credentials is NOT null");
 					}
 					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
 					isOverquota = true;
-					log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
+					logDebug("Downloaded bytes to reach overquota: " + downloadedBytesToOverquota);
 					showTransferOverquotaNotification();
 				}
 			}
@@ -1769,21 +1770,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getRequestString());
+		logDebug("onRequestStart: " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
+		logDebug("onRequestFinish");
 
 		if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
-			log("TYPE_PAUSE_TRANSFERS finished");
+			logDebug("TYPE_PAUSE_TRANSFERS finished");
 			if (e.getErrorCode() == MegaError.API_OK){
 				cancel();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
-			log("TYPE_CANCEL_TRANSFERS finished");
+			logDebug("TYPE_CANCEL_TRANSFERS finished");
 			if (e.getErrorCode() == MegaError.API_OK){
 				cancel();
 			}
@@ -1791,12 +1792,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Fast login OK");
-				log("Calling fetchNodes from CameraSyncService");
+				logDebug("Fast login OK");
+				logDebug("Calling fetchNodes from CameraSyncService");
 				megaApi.fetchNodes(this);
 			}
 			else{
-				log("ERROR: " + e.getErrorString());
+				logError("ERROR: " + e.getErrorString());
 				isLoggingIn = false;
 				MegaApplication.setLoggingIn(isLoggingIn);
 //				finish();
@@ -1808,19 +1809,19 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if(chatSettings!=null) {
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
-						log("Chat enabled-->connect");
+						logDebug("Chat enabled-->connect");
 						megaChatApi.connectInBackground(this);
 						isLoggingIn = false;
 						MegaApplication.setLoggingIn(isLoggingIn);
 					}
 					else{
-						log("Chat NOT enabled - readyToManager");
+						logDebug("Chat NOT enabled - readyToManager");
 						isLoggingIn = false;
 						MegaApplication.setLoggingIn(isLoggingIn);
 					}
 				}
 				else{
-					log("chatSettings NULL - readyToManager");
+					logWarning("chatSettings NULL - readyToManager");
 					isLoggingIn = false;
 					MegaApplication.setLoggingIn(isLoggingIn);
 				}
@@ -1831,16 +1832,16 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				pendingIntents.clear();
 			}
 			else{
-				log("ERROR: " + e.getErrorString());
+				logError("ERROR: " + e.getErrorString());
 				isLoggingIn = false;
 				MegaApplication.setLoggingIn(isLoggingIn);
 //				finish();
 			}
 		}
 		else{
-			log("Public node received");
+			logDebug("Public node received");
 			if (e.getErrorCode() != MegaError.API_OK) {
-				log("Public node error");
+				logError("Public node error");
 				return;
 			}
 			else {
@@ -1849,21 +1850,22 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if(node!=null){
 					if (currentDir.isDirectory()){
 						currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName()));
-						log("node.getName(): " + node.getName());
+						logDebug("node.getName(): " + node.getName());
+
 					}
 					else{
 						currentFile = currentDir;
-						log("CURREN");
+						logDebug("CURREN");
 					}
                     if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
                         targetPaths.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_PATH));
                         targetUris.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_URI));
                     }
-					log("Public node download launched");
+                    logDebug("Public node download launched");
 					if(!wl.isHeld()) wl.acquire();
 					if(!lock.isHeld()) lock.acquire();
 					if (currentDir.isDirectory()){
-						log("To downloadPublic(dir): " + currentDir.getAbsolutePath() + "/");
+						logDebug("To downloadPublic(dir): " + currentDir.getAbsolutePath() + "/");
 						megaApi.startDownload(node, currentDir.getAbsolutePath() + "/", this);
 					}
 				}
@@ -1875,16 +1877,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError: " + request.getName());
-	}
-
-	public static void log(String log){
-		Util.log("DownloadService", log);
+		logWarning("Node handle: " + request.getNodeHandle());
 	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		log("onRequestUpdate");
+		logDebug("onRequestUpdate");
 	}
 
 	@Override
@@ -1911,10 +1909,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			MegaApplication.setLoggingIn(isLoggingIn);
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Connected to chat!");
+				logDebug("Connected to chat!");
 			}
 			else{
-				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+				logError("ERROR WHEN CONNECTING " + e.getErrorString());
 			}
 		}
 	}
@@ -1930,7 +1928,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void refreshSettingsFragment() {
-		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+		Intent intent = new Intent(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		intent.setAction(SettingsFragmentLollipop.ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}

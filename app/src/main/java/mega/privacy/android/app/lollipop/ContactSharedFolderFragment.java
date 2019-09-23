@@ -26,11 +26,13 @@ import java.util.Stack;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class ContactSharedFolderFragment extends ContactFileBaseFragment {
@@ -46,7 +48,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
-        log("ContactSharedFolderFragment: onCreateView");
+        logDebug("ContactSharedFolderFragment: onCreateView");
         handler = new Handler();
         View v = null;
         if (userEmail != null) {
@@ -78,7 +80,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             listView.setItemAnimator(new DefaultItemAnimator());
             
             if (adapter == null) {
-                adapter = new MegaNodeAdapter(context,this,contactNodes,-1,listView,aB,Constants.CONTACT_SHARED_FOLDER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+                adapter = new MegaNodeAdapter(context,this,contactNodes,-1,listView,aB,CONTACT_SHARED_FOLDER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
                 
             } else {
                 adapter.setNodes(contactNodes);
@@ -115,7 +117,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     }
     
     public void showOptionsPanel(MegaNode sNode) {
-        log("showOptionsPanel");
+        logDebug("Node handle: " + sNode.getHandle());
         ((ContactInfoActivityLollipop)context).showOptionsPanel(sNode);
     }
     
@@ -143,7 +145,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     }
     
     public void hideMultipleSelect() {
-        log("hideMultipleSelect");
+        logDebug("hideMultipleSelect");
         adapter.setMultipleSelect(false);
         if (actionMode != null) {
             actionMode.finish();
@@ -180,7 +182,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     public void itemClick(int position,int[] screenPosition,ImageView imageView) {
         
         if (adapter.isMultipleSelect()) {
-            log("multiselect ON");
+            logDebug("Multiselect ON");
             adapter.toggleSelection(position);
             
             List<MegaNode> selectedNodes = adapter.getSelectedNodes();
@@ -242,8 +244,8 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         try {
             actionMode.invalidate();
         } catch (NullPointerException e) {
+            logError("Invalidate error", e);
             e.printStackTrace();
-            log("oninvalidate error");
         }
         // actionMode.
     }
@@ -315,16 +317,16 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_browser_action, menu);
-            Util.changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 1);
+            changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 1);
             return true;
         }
         
         @Override
         public void onDestroyActionMode(ActionMode arg0) {
-            log("onDestroyActionMode");
+            logDebug("onDestroyActionMode");
             clearSelections();
             adapter.setMultipleSelect(false);
-            Util.changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 2);
+            changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 2);
         }
         
         @Override
@@ -415,7 +417,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     }
     
     public void activateActionMode(){
-        log("activateActionMode");
+        logDebug("activateActionMode");
         if (!adapter.isMultipleSelect()){
             adapter.setMultipleSelect(true);
             actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());

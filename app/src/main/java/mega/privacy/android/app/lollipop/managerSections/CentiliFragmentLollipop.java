@@ -26,8 +26,6 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.utils.DBUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -39,6 +37,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
+
+import static mega.privacy.android.app.utils.DBUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class CentiliFragmentLollipop extends Fragment implements MegaRequestListenerInterface, MegaGlobalListenerInterface {
 	
@@ -72,13 +74,13 @@ WebView myWebView;
 		dbH = DatabaseHandler.getDbHandler(context);
 		
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		logDebug("onCreate");
 	}
 	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		logDebug("onCreateView");
 
 		DecimalFormat df = new DecimalFormat("#.##");  
 
@@ -95,8 +97,8 @@ WebView myWebView;
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
+		float scaleW = getScaleW(outMetrics, density);
+		float scaleH = getScaleH(outMetrics, density);
 
 		View v = null;
 		v = inflater.inflate(R.layout.activity_fortumo_payment, container, false);
@@ -106,8 +108,8 @@ WebView myWebView;
 //        WebSettings webSettings = myWebView.getSettings();
 //        webSettings.setJavaScriptEnabled(true);
 
-		if(DBUtil.callToPricing(context)){
-			log("megaApi.getPricing SEND");
+		if(callToPricing(context)){
+			logDebug("megaApi.getPricing SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}else{
 			getPaymentId();
@@ -121,7 +123,7 @@ WebView myWebView;
 	}
 
 	public void getPaymentId(){
-		log("getPaymentId");
+		logDebug("getPaymentId");
 		if(myAccountInfo==null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
@@ -137,7 +139,7 @@ WebView myWebView;
 			Product account = p.get(i);
 			if ((account.getLevel()==4) && (account.getMonths()==1)){
 				long planHandle = account.getHandle();
-				long lastPublicHandle = Util.getLastPublicHandle(attributes);
+				long lastPublicHandle = getLastPublicHandle(attributes);
 				if (lastPublicHandle == -1){
 					megaApi.getPaymentId(planHandle, this);
 				}
@@ -145,7 +147,7 @@ WebView myWebView;
 					megaApi.getPaymentId(planHandle, lastPublicHandle, this);
 				}
 				megaApi.getPaymentId(planHandle, this);
-				log("megaApi.getPaymentId(" + planHandle + ", " + lastPublicHandle + ")");
+				logDebug("megaApi.getPaymentId(" + planHandle + ", " + lastPublicHandle + ")");
 			}
 		}
 	}
@@ -164,10 +166,10 @@ WebView myWebView;
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		
-		log("REQUEST: " + request.getName() + "__" + request.getRequestString());
+
+		logDebug("REQUEST: " + request.getName() + "__" + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
-			log("PAYMENT ID: " + request.getLink());
+			logDebug("PAYMENT ID: " + request.getLink());
 //			Toast.makeText(context, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
 
 			/*INICIO FORTUMO*/
@@ -206,10 +208,6 @@ WebView myWebView;
 		context = activity;
 		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}
-	
-	public static void log(String message) {
-		Util.log("CentiliFragment", message);
-	}
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
@@ -218,7 +216,7 @@ WebView myWebView;
 
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-		log("onUserAlertsUpdate");
+		logDebug("onUserAlertsUpdate");
 	}
 
 	@Override
