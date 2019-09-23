@@ -1114,7 +1114,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(title!=null){
 				logDebug("ChatRoom id: "+chat.getChatId());
 				logDebug("chat timestamp: "+chat.getLastTimestamp());
-				String date = TimeUtils.formatDateAndTime(context,chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
+				String date = formatDateAndTime(context,chat.getLastTimestamp(), DATE_LONG_FORMAT);
 				logDebug("date timestamp: "+date);
 				int maxAllowed = ChatUtil.getMaxAllowed(title);
 				((ViewHolderNormalChatList)holder).textViewContactName.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});

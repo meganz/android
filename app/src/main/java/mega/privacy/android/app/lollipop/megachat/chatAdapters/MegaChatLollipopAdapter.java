@@ -680,7 +680,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout titleContactMessage;
 
         TextView timeContactText;
-        TextView nameContactText;
+        private EmojiTextView nameContactText;
 
         RoundedImageView contactImageView;
         private EmojiTextView contactInitialLetter;
@@ -1014,10 +1014,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contactImageView = v.findViewById(R.id.contact_thumbnail);
             holder.contactInitialLetter = v.findViewById(R.id.contact_initial_letter);
-            holder.contactInitialLetter.setEmojiSize(Util.px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
+            holder.contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
 
             holder.timeContactText = v.findViewById(R.id.contact_message_chat_time_text);
             holder.nameContactText = v.findViewById(R.id.contact_message_chat_name_text);
+            holder.nameContactText.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
 
             holder.contentContactMessageLayout = v.findViewById(R.id.content_contact_message_layout);
             holder.contentContactMessageText = v.findViewById(R.id.content_contact_message_text);

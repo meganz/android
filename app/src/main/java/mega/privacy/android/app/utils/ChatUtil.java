@@ -175,7 +175,6 @@ public class ChatUtil {
     }
 
     public static String getFirstLetter(String title) {
-        log("getFirstLetter");
         String resultTitle = EmojiUtilsShortcodes.emojify(title);
         resultTitle = resultTitle.trim();
         if (resultTitle.isEmpty()) return "";

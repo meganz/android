@@ -303,7 +303,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
 			nameText = (EmojiTextView) findViewById(R.id.chat_contact_properties_name_text);
-			nameText.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+			nameText.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 			emailText =(TextView) findViewById(R.id.chat_contact_properties_email_text);
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){

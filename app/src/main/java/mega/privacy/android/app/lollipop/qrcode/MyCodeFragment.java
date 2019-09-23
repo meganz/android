@@ -381,8 +381,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         UserCredentials credentials = dbH.getCredentials();
         String fullName;
         if(credentials!=null){
-            log("createDefaultAvatar()");
-
             fullName = credentials.getFirstName();
             if (fullName == null) {
                 fullName = credentials.getLastName();
