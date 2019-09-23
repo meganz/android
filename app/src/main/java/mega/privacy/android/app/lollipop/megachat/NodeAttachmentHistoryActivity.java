@@ -1247,11 +1247,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			showProgressForwarding();
 
 			long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
-			logDebug("Send " + idMessages.length + " messages");
-
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			logDebug("Send to " + chatHandles.length + " chats");
-
 			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
 
 			if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {

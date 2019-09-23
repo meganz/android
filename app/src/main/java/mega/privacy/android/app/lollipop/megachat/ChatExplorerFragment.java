@@ -742,14 +742,6 @@ public class ChatExplorerFragment extends Fragment {
                     }
                 }
 
-                if (adapterList == null){
-                    logWarning("AdapterList is NULL");
-                    adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
-                }
-                else{
-                    adapterList.setItems(items);
-                }
-
                 if (addedItemsSaved != null && !addedItemsSaved.isEmpty()) {
                     for (String id : addedItemsSaved) {
                         for (ChatExplorerListItem item : items) {
@@ -764,13 +756,6 @@ public class ChatExplorerFragment extends Fragment {
                         }
                     }
                 }
-
-                if (adapterAdded == null) {
-                    adapterAdded = new MegaChipChatExplorerAdapter(context, chatExplorerFragment, addedItems);
-                }
-                else {
-                    adapterAdded.setItems(addedItems);
-                }
             }
 
             return null;
@@ -778,6 +763,20 @@ public class ChatExplorerFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            if (adapterList == null){
+                logWarning("AdapterList is NULL");
+                adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
+            }
+            else{
+                adapterList.setItems(items);
+            }
+
+            if (adapterAdded == null) {
+                adapterAdded = new MegaChipChatExplorerAdapter(context, chatExplorerFragment, addedItems);
+            }
+            else {
+                adapterAdded.setItems(addedItems);
+            }
 
             addedList.setAdapter(adapterAdded);
             int position;
