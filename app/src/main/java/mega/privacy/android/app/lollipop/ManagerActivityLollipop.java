@@ -18245,24 +18245,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				checkedTextViewList.get(1).setChecked(true);
 				break;
 			}
-			case ORDER_MODIFICATION_ASC:
-			case ORDER_CREATION_ASC: {
+			case ORDER_MODIFICATION_DESC:
+			case ORDER_CREATION_DESC: {
 				//newestCheck get checked
 				checkedTextViewList.get(2).setChecked(true);
 				break;
 			}
-			case ORDER_MODIFICATION_DESC:
-			case ORDER_CREATION_DESC: {
+			case ORDER_MODIFICATION_ASC:
+			case ORDER_CREATION_ASC: {
 				//oldestCheck get checked
 				checkedTextViewList.get(3).setChecked(true);
 				break;
 			}
-			case ORDER_SIZE_ASC:{
+			case ORDER_SIZE_DESC:{
 				//largestCheck get checked
 				checkedTextViewList.get(4).setChecked(true);
 				break;
 			}
-			case ORDER_SIZE_DESC:{
+			case ORDER_SIZE_ASC:{
 				//smallestCheck get checked
 				checkedTextViewList.get(5).setChecked(true);
 				break;
