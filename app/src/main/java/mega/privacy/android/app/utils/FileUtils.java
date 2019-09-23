@@ -32,6 +32,7 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class FileUtils {
 
@@ -53,7 +54,7 @@ public class FileUtils {
 
         if (f == null) return;
 
-        log("deleteFolderAndSubfolders: " + f.getAbsolutePath());
+        logDebug("deleteFolderAndSubfolders: " + f.getAbsolutePath());
         if (f.isDirectory() && f.listFiles() != null) {
             for (File c : f.listFiles()) {
                 deleteFolderAndSubfolders(context, c);
@@ -76,7 +77,7 @@ public class FileUtils {
                 mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 context.sendBroadcast(mediaScanIntent);
             } catch (Exception e) {
-                log("Exception while deleting media scanner file: " + e.getMessage());
+                logError("Exception while deleting media scanner file", e);
             }
 
         }
@@ -113,7 +114,7 @@ public class FileUtils {
         }
         catch (IOException e)
         {
-            log("File write failed: " + e.toString());
+            logError("File write failed", e);
             return null;
         }
     }
@@ -138,7 +139,7 @@ public class FileUtils {
             }
             return size;
         }
-        log("Dir size: "+size);
+        logDebug("Dir size: " + size);
         return size;
     }
 
@@ -270,7 +271,7 @@ public class FileUtils {
     }
 
     public static void copyFile(File source, File dest) throws IOException{
-        log("copyFile");
+        logDebug("copyFile");
 
         if (!source.getAbsolutePath().equals(dest.getAbsolutePath())){
             FileChannel inputChannel = null;
@@ -288,13 +289,13 @@ public class FileUtils {
     }
 
     public static boolean isVideoFile(String path) {
-        log("isVideoFile: "+path);
+        logDebug("isVideoFile: " + path);
         try{
             String mimeType = URLConnection.guessContentTypeFromName(path);
             return mimeType != null && mimeType.indexOf("video") == 0;
         }
         catch(Exception e){
-            log("Exception: "+e.getMessage());
+            logError("Exception", e);
             return false;
         }
     }
@@ -432,14 +433,14 @@ public class FileUtils {
     }
 
     public static void purgeDirectory(File dir) {
-        log("removing cache files ");
+        logDebug("Removing cache files");
         if(!dir.exists()){
             return;
         }
 
         try{
             for (File file: dir.listFiles()) {
-                log("removing " + file.getAbsolutePath());
+                logDebug("Removing " + file.getAbsolutePath());
                 if (file.isDirectory()) {
                     purgeDirectory(file);
                 }
@@ -461,13 +462,9 @@ public class FileUtils {
                 result = true;
             }
         } catch (IOException e) {
-            log("Error appending string data to file ");
+            logError("Error appending string data to file", e);
             e.printStackTrace();
         }
         return result;
-    }
-
-    public static void log(String message) {
-        Util.log("FileUtils", message);
     }
 }
