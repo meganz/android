@@ -9,7 +9,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
 
@@ -31,7 +33,7 @@ public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        log("getItem: "+position);
+        logDebug("Position: " + position);
         if(chatFirst){
             switch (position){
                 case 0:{
@@ -97,15 +99,11 @@ public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        if(Util.isChatEnabled()){
+        if(isChatEnabled()){
             return PAGE_COUNT;
         }
         else{
             return PAGE_COUNT-1;
         }
-    }
-
-    private static void log(String log) {
-        Util.log("FileExplorerPagerAdapter", log);
     }
 }

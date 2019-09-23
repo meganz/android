@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mega.privacy.android.app.utils.Util;
 
 public final class EmojiUtils {
   private static final Pattern SPACE_REMOVAL = Pattern.compile("[\\s]");
@@ -54,10 +53,5 @@ public final class EmojiUtils {
 
   private EmojiUtils() {
     throw new AssertionError("No instances.");
-  }
-
-
-  public static void log(String message) {
-    Util.log("EmojiManager EmojiUtils", message);
   }
 }

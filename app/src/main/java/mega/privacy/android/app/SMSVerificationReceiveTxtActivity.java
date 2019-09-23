@@ -46,9 +46,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.SMSVerificationActivity.ENTERED_PHONE_NUMBER;
-import static mega.privacy.android.app.SMSVerificationActivity.SELECTED_COUNTRY_CODE;
-import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
+import static mega.privacy.android.app.SMSVerificationActivity.*;
+import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
 
@@ -65,7 +65,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        log("onCreate");
+        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         //navigation bar
@@ -440,7 +440,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
 
     @Override
     public void onBackPressed() {
-        log("onBackPressed");
+        logDebug("onBackPressed");
         super.onBackPressed();
         if (allowResend) {
             finish();
@@ -450,15 +450,15 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
 
     @Override
     public void onClick(View v) {
-        log("on click ");
+        logDebug("on click ");
         switch (v.getId()) {
             case R.id.verify_account_back_button: {
-                log("verify_account_back_button clicked");
+                logDebug("verify_account_back_button clicked");
                 backButtonClicked();
                 break;
             }
             case R.id.verify_account_confirm_button: {
-                log("verify_account_confirm_button clicked");
+                logDebug("verify_account_confirm_button clicked");
                 confirmButtonClicked();
                 break;
             }
@@ -469,7 +469,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
 
     @Override
     public boolean onLongClick(View v) {
-        log("onLongClick");
+        logDebug("onLongClick");
         switch (v.getId()) {
             case R.id.verify_account_input_code_first:
             case R.id.verify_account_input_code_second:
@@ -487,7 +487,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
 
     @Override
     public void onFocusChange(View v,boolean hasFocus) {
-        log("onFocusChange");
+        logDebug("onFocusChange");
         switch (v.getId()) {
             case R.id.pass_first: {
                 if (hasFocus) {
@@ -531,20 +531,20 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            log("nav back pressed");
+            logDebug("nav back pressed");
             backButtonClicked();
         }
         return super.onOptionsItemSelected(item);
     }
 
     void pasteClipboard() {
-        log("pasteClipboard");
+        logDebug("pasteClipboard");
         pinLongClick = false;
         ClipboardManager clipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
         ClipData clipData = clipboard.getPrimaryClip();
         if (clipData != null) {
             String code = clipData.getItemAt(0).getText().toString();
-            log("code: " + code);
+            logDebug("code: " + code);
             if (code != null && code.length() == 6) {
                 boolean areDigits = true;
                 for (int i = 0;i < 6;i++) {
@@ -573,7 +573,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     }
 
     private void hideError() {
-        log("hideError");
+        logDebug("hideError");
         isErrorShown = false;
         pinError.setVisibility(View.GONE);
         firstPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
@@ -585,7 +585,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     }
 
     private void showError(String errorMessage) {
-        log("showError");
+        logDebug("showError");
         firstTime = false;
         isErrorShown = true;
         firstPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
@@ -596,13 +596,13 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         sixthPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
         pinError.setVisibility(View.VISIBLE);
         if (errorMessage != null) {
-            log("error message is " + errorMessage);
+            logDebug("error message is " + errorMessage);
             pinError.setText(errorMessage);
         }
     }
 
     private void validateVerificationCode() {
-        log("validateVerificationCode");
+        logDebug("validateVerificationCode");
         if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1
                 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1) {
             Util.hideKeyboard(this);
@@ -614,7 +614,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             sb.append(fifthPin.getText());
             sb.append(sixthPin.getText());
             String pin = sb.toString().trim();
-            log("PIN: " + pin);
+            logDebug("PIN: " + pin);
             if (pin != null) {
                 megaApi.checkSMSVerificationCode(pin,this);
                 return;
@@ -624,17 +624,17 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     }
 
     private void confirmButtonClicked() {
-        log("confirmButtonClicked");
+        logDebug("confirmButtonClicked");
         validateVerificationCode();
     }
 
     private void backButtonClicked() {
-        log("backButtonClicked");
+        logDebug("backButtonClicked");
         finish();
     }
 
     private void showResendAndBackButton() {
-        log("showResendAndBackButton");
+        logDebug("showResendAndBackButton");
         backButton.setVisibility(View.VISIBLE);
         resendTextView.setVisibility(View.VISIBLE);
         actionBar.setHomeButtonEnabled(true);
@@ -642,17 +642,12 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     }
 
     private void hideResendAndBackButton() {
-        log("hideResendAndBackButton");
+        logDebug("hideResendAndBackButton");
         backButton.setVisibility(View.GONE);
         resendTextView.setVisibility(View.GONE);
         actionBar.setHomeButtonEnabled(false);
         actionBar.setDisplayHomeAsUpEnabled(false);
     }
-
-    public static void log(String message) {
-        Util.log("SMSVerificationReceiveTxtActivity",message);
-    }
-
 
     @Override
     public void onRequestStart(MegaApiJava api,MegaRequest request) {
@@ -668,16 +663,16 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     public void onRequestFinish(final MegaApiJava api,MegaRequest request,MegaError e) {
         confirmButton.setClickable(true);
         if (request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
-            log("send verification code,get " +  e.getErrorCode());
+            logDebug("send verification code,get " +  e.getErrorCode());
             if (e.getErrorCode() == MegaError.API_EEXPIRED) {
-                log("the code has been verified.");
+                logDebug("the code has been verified.");
                 showError(getString(R.string.verify_account_error_code_verified));
             } else if (e.getErrorCode() == MegaError.API_EACCESS) {
                 showError(getString(R.string.verify_account_error_reach_limit));
             } else if (e.getErrorCode() == MegaError.API_EEXIST) {
                 showError(getString(R.string.verify_account_error_phone_number_register));
             } else if (e.getErrorCode() == MegaError.API_OK) {
-                log("verification successful");
+                logDebug("verification successful");
                 Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 showSnackbar(Constants.SNACKBAR_TYPE,inputContainer,getString(R.string.verify_account_successfully),-1);
@@ -702,7 +697,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                     }
                 }, 2000);
             } else {
-                log("invalid code");
+                logDebug("invalid code");
                 showError(getString(R.string.verify_account_error_invalid_code));
             }
         }

@@ -19,8 +19,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class SMSVerificationFragment extends Fragment implements View.OnClickListener{
@@ -45,7 +46,7 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
         v.findViewById(R.id.not_now_button_2).setOnClickListener(this);
 
         boolean isAchievementUser = megaApi.isAchievementsEnabled();
-        log("is achievement user: " + isAchievementUser);
+        logDebug("is achievement user: " + isAchievementUser);
         if (isAchievementUser) {
             msg.setText(R.string.sms_add_phone_number_dialog_msg_achievement_user);
         } else {
@@ -65,7 +66,7 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.enable_button:
-                log("to sms verification");
+                logDebug("to sms verification");
                 startActivity(new Intent(context, SMSVerificationActivity.class));
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -76,14 +77,10 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
                 }, 1000);
                 break;
             case R.id.not_now_button_2:
-                log("don't verify now");
+                logDebug("don't verify now");
                 ((ManagerActivityLollipop)context).askForAccess();
                 ((ManagerActivityLollipop)context).destroySMSVerificationFragment();
                 break;
         }
-    }
-
-    private static void log(String log) {
-        Util.log("SMSVerificationFragment", log);
     }
 }

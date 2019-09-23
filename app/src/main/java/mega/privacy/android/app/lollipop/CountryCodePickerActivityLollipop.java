@@ -30,6 +30,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.adapters.CountryListAdapter;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+
 public class CountryCodePickerActivityLollipop extends PinActivityLollipop implements CountryListAdapter.CountrySelectedCallback {
     private final String SAVED_QUERY_STRING = "SAVED_QUERY_STRING";
     private static List<Country> countries;
@@ -156,7 +158,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                log("onQueryTextSubmit: " + query);
+                logDebug("onQueryTextSubmit: " + query);
                 InputMethodManager imm = (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
                 View view = getCurrentFocus();
                 if (view == null) {

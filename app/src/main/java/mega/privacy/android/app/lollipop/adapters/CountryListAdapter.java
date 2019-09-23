@@ -11,7 +11,6 @@ import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
-import mega.privacy.android.app.utils.Util;
 
 public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.CountryHolder> {
     
@@ -81,9 +80,5 @@ public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.
         public CountryHolder(View itemView) {
             super(itemView);
         }
-    }
-
-    private void log(String message) {
-        Util.log("CountryListAdapter", message);
     }
 }
