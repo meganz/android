@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -42,11 +43,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.utils.CacheFolderManager;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -58,7 +54,12 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
 	
@@ -101,17 +102,17 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
     	
 		@Override
 		protected Integer doInBackground(Long... params){
-			log("PreviewAsyncTask()-doInBackground");
+			logDebug("PreviewAsyncTask()-doInBackground");
 			handle = params[0];
 			MegaNode node = megaApi.getNodeByHandle(handle);
-			preview = PreviewUtils.getPreviewFromFolder(node, activity);
+			preview = getPreviewFromFolderFullImage(node, activity);
 			
 			if (preview != null){
 				return 0;
 			}
 			else{
 				if (pendingPreviews.contains(node.getHandle())){
-					log("the preview is already downloaded or added to the list");
+					logDebug("The preview is already downloaded or added to the list");
 					return 1;
 				}
 				else{
@@ -122,7 +123,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		@Override
 		protected void onPostExecute(Integer param){
-			log("PreviewAsyncTask()-onPostExecute");
+			logDebug("PreviewAsyncTask()-onPostExecute");
 
 			if (param == 0){
 				int position = 0;
@@ -137,16 +138,21 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				}
 				
 				if (holderIsVisible){
-					PreviewUtils.previewCache.put(handle, preview);
-					visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
+					previewCache.put(handle, preview);
+                    if (preview != null) {
+                        visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
+                    } else {
+                        logWarning("Preview can't be loaded. Device low memory.");
+                        Toast.makeText(context, R.string.not_load_preview_low_memory, Toast.LENGTH_SHORT).show();
+                    }
 					visibleImgs.get(position).progressBar.setVisibility(View.GONE);
 					visibleImgs.get(position).downloadProgressBar.setVisibility(View.GONE);
 				}
 			}
 			else if(param == 2){
 				MegaNode node = megaApi.getNodeByHandle(handle);
-				File previewFile = new File(PreviewUtils.getPreviewFolder(activity), node.getBase64Handle()+".jpg");
-				log("GET PREVIEW OF HANDLE: " + node.getHandle());
+				File previewFile = new File(getPreviewFolder(activity), node.getBase64Handle()+".jpg");
+				logDebug("GET PREVIEW OF HANDLE: " + node.getHandle());
 				pendingPreviews.add(node.getHandle());
 				megaApi.getPreview(node,  previewFile.getAbsolutePath(), megaFullScreenImageAdapter);				
 			}
@@ -161,14 +167,14 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
     	
 		@Override
 		protected Integer doInBackground(Long... params){
-			log("PreviewDownloadAsyncTask()-doInBackground");
+			logDebug("PreviewDownloadAsyncTask()-doInBackground");
 
 			handle = params[0];
 			MegaNode node = megaApi.getNodeByHandle(handle);
 			if (node == null){
 				return 3;
 			}
-			preview = PreviewUtils.getPreviewFromFolder(node, activity);
+			preview = getPreviewFromFolderFullImage(node, activity);
 			
 			if (preview != null){
 				return 0;
@@ -178,13 +184,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				
 				if (isFileAvailable(destination)){
 					if (destination.length() == node.getSize()){
-						File previewDir = PreviewUtils.getPreviewFolder(activity);
+						File previewDir = getPreviewFolder(activity);
 						File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
-						log("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
+						logDebug("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
 						boolean previewCreated = MegaUtilsAndroid.createPreview(destination, previewFile);
 						
 						if (previewCreated){
-							preview = PreviewUtils.getBitmapForCache(previewFile, activity);
+							preview = getBitmapForCacheFullImage(previewFile, activity);
 							destination.delete();
 							return 0;
 						}
@@ -199,7 +205,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				}
 
 				if (pendingFullImages.contains(node.getHandle())){
-					log("the image is already downloaded or added to the list");
+					logDebug("The image is already downloaded or added to the list");
 					return 1;
 				}
 				else{
@@ -210,7 +216,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		@Override
 		protected void onPostExecute(Integer param){
-			log("PreviewDownloadAsyncTask()-onPostExecute");
+			logDebug("PreviewDownloadAsyncTask()-onPostExecute");
 
 			if (param == 0 || param == 1){
 				int position = 0;
@@ -228,10 +234,20 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					if(param == 0)
 					{
 						if (visibleImgs.get(position).isGIF){
-							visibleImgs.get(position).gifImgDisplay.setImageBitmap(preview);
+                            if (preview != null) {
+                                visibleImgs.get(position).gifImgDisplay.setImageBitmap(preview);
+                            } else {
+                                logWarning("Preview can't be loaded. Device low memory.");
+                                Toast.makeText(context, R.string.not_load_preview_low_memory, Toast.LENGTH_SHORT).show();
+                            }
 						}
 						else {
-							visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
+                            if (preview != null) {
+                                visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
+                            } else {
+                                logWarning("Preview can't be loaded. Device low memory.");
+                                Toast.makeText(context, R.string.not_load_preview_low_memory, Toast.LENGTH_SHORT).show();
+                            }
 						}
 					}
 					if (visibleImgs.get(position).isGIF){
@@ -246,8 +262,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			else if (param == 2){
 				MegaNode node = megaApi.getNodeByHandle(handle);
 				pendingFullImages.add(handle);
-				log("Node handle: " + node.getHandle());
-				String previewFolder = CacheFolderManager.getCacheFolder(context, CacheFolderManager.PREVIEW_FOLDER).getAbsolutePath() + File.separator;
+				logDebug("Node handle: " + node.getHandle());
+				String previewFolder = getCacheFolder(context, PREVIEW_FOLDER).getAbsolutePath() + File.separator;
 				megaApi.startDownload(node, previewFolder, megaFullScreenImageAdapter);
 			}
 		}
@@ -257,14 +273,14 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		@Override
 		protected String[] doInBackground(String... params) {
-			log("AttachPreviewTask()-doInBackground");
+			logDebug("AttachPreviewTask()-doInBackground");
 			long handle = Long.parseLong(params[0]);
 			String localPath = params[1];
 			
 			MegaNode node = megaApi.getNodeByHandle(handle);
 			File fullImage = new File(localPath);
 			
-			File previewDir = PreviewUtils.getPreviewFolder(activity);
+			File previewDir = getPreviewFolder(activity);
 			File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
 			boolean previewCreated = MegaUtilsAndroid.createPreview(fullImage, previewFile);
 			
@@ -277,7 +293,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		@Override
 		protected void onPostExecute(String[] params) {
-			log("AttachPreviewTask()-onPostExecute");
+			logDebug("AttachPreviewTask()-onPostExecute");
 
 			long handle = Long.parseLong(params[0]);
 			boolean previewCreated = Boolean.parseBoolean(params[1]);
@@ -296,10 +312,15 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			if (holderIsVisible) {
 				if(previewCreated) {
 					MegaNode node = megaApi.getNodeByHandle(handle);
-					File previewDir = PreviewUtils.getPreviewFolder(activity);
+					File previewDir = getPreviewFolder(activity);
 					File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
-					Bitmap bitmap = PreviewUtils.getBitmapForCache(previewFile, activity);
-					visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
+					Bitmap bitmap = getBitmapForCacheFullImage(previewFile, activity);
+                    if (bitmap != null) {
+                        visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
+                    } else {
+                        logWarning("Preview can't be loaded. Device low memory.");
+                        Toast.makeText(context, R.string.not_load_preview_low_memory, Toast.LENGTH_SHORT).show();
+                    }
 				}
 				
 				visibleImgs.get(position).progressBar.setVisibility(View.GONE);
@@ -332,7 +353,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 
 	public void refreshImageHandles(ArrayList<Long> imageHandles){
-		log("refreshImageHandles");
+		logDebug("refreshImageHandles");
 		this.imageHandles = imageHandles;
 		visibleImgs.clear();
 		notifyDataSetChanged();
@@ -345,7 +366,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
-        log ("instantiateItem POSITION " + position);
+		logDebug ("POSITION " + position);
 
 		MegaNode node = megaApi.getNodeByHandle(imageHandles.get(position));
 		if (isFolderLink){
@@ -366,7 +387,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		if ((node == null)&&(!isFileLink)){
 			Intent intent = new Intent(activity, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
+			intent.putExtra("visibleFragment", TOUR_FRAGMENT);
 	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 	        activity.startActivity(intent);
@@ -388,7 +409,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		Bitmap preview = null;
 
 		if ((node == null) && isFileLink) {
-			log("isFileLink");
+			logDebug("isFileLink");
 
 			if (MimeTypeList.typeForName(fileLink.getName()).isGIF()) {
 				holder.isGIF = true;
@@ -414,13 +435,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 				activityManager.getMemoryInfo(mi);
 
-				if (mi.totalMem > Constants.BUFFER_COMP) {
-					log("Total mem: " + mi.totalMem + " allocate 32 MB");
-					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+				if (mi.totalMem > BUFFER_COMP) {
+					logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
 				}
 				else {
-					log("Total mem: " + mi.totalMem + " allocate 16 MB");
-					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
 				}
 				String url = megaApi.httpServerGetLocalLink(fileLink);
 				if (url != null) {
@@ -478,7 +499,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 
 				boolean isOnMegaDownloads = false;
 				String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
-				log("isOnMegaDownloads: " + isOnMegaDownloads + " nodeName: " + node.getName() + " localPath: " + localPath);
+				logDebug("isOnMegaDownloads: " + isOnMegaDownloads + " nodeName: " + node.getName() + " localPath: " + localPath);
 				if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))) {
 
 					final ProgressBar pb = holder.progressBar;
@@ -513,13 +534,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
                         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
                         activityManager.getMemoryInfo(mi);
 
-                        if (mi.totalMem > Constants.BUFFER_COMP) {
-                            log("Total mem: " + mi.totalMem + " allocate 32 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        if (mi.totalMem > BUFFER_COMP) {
+							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                         }
                         else {
-                            log("Total mem: " + mi.totalMem + " allocate 16 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                         }
                         url = megaApi.httpServerGetLocalLink(node);
                     }
@@ -532,13 +553,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
                         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
                         activityManager.getMemoryInfo(mi);
 
-                        if (mi.totalMem > Constants.BUFFER_COMP) {
-                            log("Total mem: " + mi.totalMem + " allocate 32 MB");
-                            megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        if (mi.totalMem > BUFFER_COMP) {
+							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                            megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                         }
                         else {
-                            log("Total mem: " + mi.totalMem + " allocate 16 MB");
-                            megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                            megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                         }
                         url = megaApiFolder.httpServerGetLocalLink(node);
                     }
@@ -597,21 +618,21 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		holder.gifImgDisplay.setVisibility(View.GONE);
 		holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 
-		thumb = ThumbnailUtils.getThumbnailFromCache(node);
+		thumb = getThumbnailFromCache(node);
 		if (thumb != null) {
 			holder.imgDisplay.setImageBitmap(thumb);
 		}
 		else {
-			thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
+			thumb = getThumbnailFromFolder(node, activity);
 			if (thumb != null) {
 				holder.imgDisplay.setImageBitmap(thumb);
 			}
 		}
 
 		if (node.hasPreview()) {
-			preview = PreviewUtils.getPreviewFromCache(node);
+			preview = getPreviewFromCache(node);
 			if (preview != null) {
-				PreviewUtils.previewCache.put(node.getHandle(), preview);
+				previewCache.put(node.getHandle(), preview);
 				holder.imgDisplay.setImageBitmap(preview);
 				holder.progressBar.setVisibility(View.GONE);
 			}
@@ -620,14 +641,14 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					new PreviewAsyncTask().execute(node.getHandle());
 				} catch (Exception ex) {
 					//Too many AsyncTasks
-					log("Too many AsyncTasks");
+					logError("Too many AsyncTasks", ex);
 				}
 			}
 		}
 		else {
-			preview = PreviewUtils.getPreviewFromCache(node);
+			preview = getPreviewFromCache(node);
 			if (preview != null) {
-				PreviewUtils.previewCache.put(node.getHandle(), preview);
+				previewCache.put(node.getHandle(), preview);
 				holder.imgDisplay.setImageBitmap(preview);
 				holder.progressBar.setVisibility(View.GONE);
 			}
@@ -636,7 +657,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					new PreviewDownloadAsyncTask().execute(node.getHandle());
 				} catch (Exception ex) {
 					//Too many AsyncTasks
-					log("Too many AsyncTasks");
+					logError("Too many AsyncTasks", ex);
 				}
 			}
 		}
@@ -645,21 +666,21 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	public Bitmap setImageResource(MegaNode node, ViewHolderFullImage holder){
 
 		Bitmap preview;
-		Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(node);
+		Bitmap thumb = getThumbnailFromCache(node);
 		if (thumb == null){
-			thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
+			thumb = getThumbnailFromFolder(node, activity);
 		}
 
 		if (node.hasPreview()){
-			preview = PreviewUtils.getPreviewFromCache(node);
+			preview = getPreviewFromCache(node);
 			if (preview != null){
-				PreviewUtils.previewCache.put(node.getHandle(), preview);
+				previewCache.put(node.getHandle(), preview);
 			}
 		}
 		else {
-			preview = PreviewUtils.getPreviewFromCache(node);
+			preview = getPreviewFromCache(node);
 			if (preview != null) {
-				PreviewUtils.previewCache.put(node.getHandle(), preview);
+				previewCache.put(node.getHandle(), preview);
 			}
 		}
 		if (preview != null) {
@@ -673,14 +694,14 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	
 	@Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-		log ("destroyItem: position " + position + " visibleImgs.size(): " + visibleImgs.size());
+		logDebug ("position " + position + " visibleImgs.size(): " + visibleImgs.size());
 		visibleImgs.remove(position);
         ((ViewPager) container).removeView((RelativeLayout) object);
         System.gc();
     }
 
 	public ImageView getVisibleImage(int position){
-		log("getVisibleImage");
+		logDebug("position: " + position);
 		if (visibleImgs.get(position) != null){
 			if (visibleImgs.get(position).isGIF){
 				return visibleImgs.get(position).gifImgDisplay;
@@ -693,13 +714,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 
 	public Long getImageHandle(int position) {
-		log("getImageHandle");
+		logDebug("position: " + position);
 		return imageHandles.get(position);
 	}
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		logDebug("onClick");
 
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_gif:
@@ -710,8 +731,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			    display.getMetrics(outMetrics);
 			    float density  = activity.getResources().getDisplayMetrics().density;
 				
-			    float scaleW = Util.getScaleW(outMetrics, density);
-			    float scaleH = Util.getScaleH(outMetrics, density);
+			    float scaleW = getScaleW(outMetrics, density);
+			    float scaleH = getScaleH(outMetrics, density);
 
 				((FullScreenImageViewerLollipop) context).touchImage();
 
@@ -739,23 +760,19 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	public void setMenuVisible(boolean menuVisible) {
 		this.menuVisible = menuVisible;
 	}
-	
-	private static void log(String log) {
-		Util.log("MegaFullScreenImageAdapter", log);
-	}
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getRequestString());
-		log("onRequestStart: Node: " + request.getNodeHandle());
+		logDebug("onRequestStart: " + request.getRequestString());
+		logDebug("Node Handle: " + request.getNodeHandle());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		
-		log("onRequestFinish: " + request.getRequestString());
-		log("onRequestFinish: Node: " + request.getNodeHandle() + "_" + request.getName());
+
+		logDebug("onRequestFinish: " + request.getRequestString());
+		logDebug("Node Handle: " + request.getNodeHandle());
 
 		long handle = request.getNodeHandle();
 		MegaNode node = api.getNodeByHandle(handle);
@@ -763,12 +780,12 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		pendingPreviews.remove(handle);
 		
 		if (e.getErrorCode() == MegaError.API_OK){
-			File previewDir = PreviewUtils.getPreviewFolder(activity);
+			File previewDir = getPreviewFolder(activity);
 			File preview = new File(previewDir, node.getBase64Handle()+".jpg");
 			
 			if (preview.exists()) {
 				if (preview.length() > 0) {
-					log("GET PREVIEW FINISHED. HANDLE: " + handle + " visibleImgs.size(): " + visibleImgs.size());
+					logDebug("GET PREVIEW FINISHED. HANDLE: " + handle + " visibleImgs.size(): " + visibleImgs.size());
 					int position = 0;
 					boolean holderIsVisible = false;
 					for(int i = 0; i < visibleImgs.size(); i++) {
@@ -781,22 +798,26 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					}
 					
 					if (holderIsVisible){
-						Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, activity);
-						PreviewUtils.previewCache.put(handle, bitmap);						
-						visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
+						Bitmap bitmap = getBitmapForCacheFullImage(preview, activity);
+                        if (bitmap != null) {
+                            visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
+                        } else {
+                            logWarning("Preview can't be loaded. Device low memory.");
+                            Toast.makeText(context, R.string.not_load_preview_low_memory, Toast.LENGTH_SHORT).show();
+                        }
 						visibleImgs.get(position).progressBar.setVisibility(View.GONE);
 					}
 				}
 			}
 		}
 		else{
-			log("ERROR FINISH: " + e.getErrorCode() + "_" + e.getErrorString());
+			logError("ERROR FINISH: " + e.getErrorCode() + "_" + e.getErrorString());
 			try{
 				new PreviewDownloadAsyncTask().execute(handle);
 			}
 			catch(Exception ex){
 				//Too many AsyncTasks
-				log("Too many AsyncTasks");
+				logError("Too many AsyncTasks", ex);
 			}
 		}
 	}
@@ -804,9 +825,9 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError: " + request.getRequestString());
-		log("Node: " + request.getNodeHandle() + "_" + request.getName());
-		log("ERROR: " + e.getErrorCode() + "_" + e.getErrorString());
+		logWarning("onRequestTemporaryError: " + request.getRequestString());
+		logWarning("Node Handle: " + request.getNodeHandle());
+		logError("ERROR: " + e.getErrorCode() + "_" + e.getErrorString());
 	}
 
 	@Override
@@ -816,7 +837,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			return;
 		}
 
-		log("Download started : " + transfer.getFileName() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
+		logDebug("Download started : " + transfer.getNodeHandle() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
 		long handle = transfer.getNodeHandle();
 		int position = 0;
 		boolean holderIsVisible = false;
@@ -845,17 +866,17 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		long handle = transfer.getNodeHandle();
 		
 		pendingFullImages.remove(handle);
-//		ThumbnailUtils.pendingThumbnails.remove(handle);
+//		pendingThumbnails.remove(handle);
 		
 		if (e.getErrorCode() == MegaError.API_OK){
-			log ("Download finished OK: " + transfer.getFileName() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
+			logDebug("Download finished OK: " + transfer.getNodeHandle() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
 			
 			try{
 				new AttachPreviewTask().execute(handle+"", transfer.getPath());
 			}
 			catch(Exception ex){
 				//Too many AsyncTasks
-				log("Too many AsyncTasks");
+				logError("Too many AsyncTasks", ex);
 			}
 		}		
 			
@@ -901,7 +922,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
-		log ("TEMPORARY ERROR (" + transfer.getFileName() + "): " + e.getErrorCode() + "_" + e.getErrorString());
+		logWarning ("TEMPORARY ERROR (" + transfer.getNodeHandle() + "): " + e.getErrorCode() + "_" + e.getErrorString());
 //		Util.showErrorAlertDialog("Temporary error: " + e.getErrorString(), true, activity);
 	}
 
