@@ -8343,24 +8343,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	}
 	        	return true;
 	        }
-	        case R.id.action_menu_sort_by:{
+			case R.id.action_menu_sort_by: {
 
 				AlertDialog sortByDialog;
 				LayoutInflater inflater = getLayoutInflater();
-				View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
+				View dialogLayout = inflater.inflate(R.layout.sortby_dialog, null);
 
 				//Initialization of titles
 				ArrayList<TextView> textViewGroup = new ArrayList<>();
-				TextView sortByNameTV = dialoglayout.findViewById(R.id.sortby_dialog_name_text);
+				TextView sortByNameTV = dialogLayout.findViewById(R.id.sortby_dialog_name_text);
 				sortByNameTV.setText(getString(R.string.sortby_name));
 				textViewGroup.add(sortByNameTV);
 
-				TextView sortByDateTV = dialoglayout.findViewById(R.id.sortby_dialog_date_text);
+				TextView sortByDateTV = dialogLayout.findViewById(R.id.sortby_dialog_date_text);
 				sortByDateTV.setText(getString(R.string.sortby_modification_date));
 				textViewGroup.add(sortByDateTV);
 
 
-				TextView sortBySizeTV = dialoglayout.findViewById(R.id.sortby_dialog_size_text);
+				TextView sortBySizeTV = dialogLayout.findViewById(R.id.sortby_dialog_size_text);
 				sortBySizeTV.setText(getString(R.string.sortby_size));
 				textViewGroup.add(sortBySizeTV);
 
@@ -8373,27 +8373,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				//Initialization of check groups
 				ArrayList<CheckedTextView> checkedTextViewGroup = new ArrayList<>();
 
-				final CheckedTextView ascendingCheck = dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
+				final CheckedTextView ascendingCheck = dialogLayout.findViewById(R.id.sortby_dialog_ascending_check);
 				ascendingCheck.setText(getString(R.string.sortby_name_ascending));
 				checkedTextViewGroup.add(ascendingCheck);
 
-				final CheckedTextView descendingCheck = dialoglayout.findViewById(R.id.sortby_dialog_descending_check);
+				final CheckedTextView descendingCheck = dialogLayout.findViewById(R.id.sortby_dialog_descending_check);
 				descendingCheck.setText(getString(R.string.sortby_name_descending));
 				checkedTextViewGroup.add(descendingCheck);
 
-				final CheckedTextView newestCheck = dialoglayout.findViewById(R.id.sortby_dialog_newest_check);
+				final CheckedTextView newestCheck = dialogLayout.findViewById(R.id.sortby_dialog_newest_check);
 				newestCheck.setText(getString(R.string.sortby_date_newest));
 				checkedTextViewGroup.add(newestCheck);
 
-				final CheckedTextView oldestCheck = dialoglayout.findViewById(R.id.sortby_dialog_oldest_check);
+				final CheckedTextView oldestCheck = dialogLayout.findViewById(R.id.sortby_dialog_oldest_check);
 				oldestCheck.setText(getString(R.string.sortby_date_oldest));
 				checkedTextViewGroup.add(oldestCheck);
 
-				final CheckedTextView largestCheck = dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
+				final CheckedTextView largestCheck = dialogLayout.findViewById(R.id.sortby_dialog_largest_first_check);
 				largestCheck.setText(getString(R.string.sortby_size_largest_first));
 				checkedTextViewGroup.add(largestCheck);
 
-				final CheckedTextView smallestCheck = dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
+				final CheckedTextView smallestCheck = dialogLayout.findViewById(R.id.sortby_dialog_smallest_first_check);
 				smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
 				checkedTextViewGroup.add(smallestCheck);
 
@@ -8406,441 +8406,305 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				}
 
-        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        		builder.setView(dialoglayout);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setView(dialogLayout);
 				TextView textViewTitle = new TextView(ManagerActivityLollipop.this);
 				textViewTitle.setText(getString(R.string.action_sort_by));
 				textViewTitle.setTextSize(20);
 				textViewTitle.setTextColor(0xde000000);
 				textViewTitle.setPadding(scaleWidthPx(23, outMetrics), scaleHeightPx(20, outMetrics), 0, 0);
-        		builder.setCustomTitle(textViewTitle);
+				builder.setCustomTitle(textViewTitle);
 
-        		sortByDialog = builder.create();
-        		sortByDialog.show();
-				if (drawerItem == DrawerItem.CONTACTS) {
-					setCheckByOrder(orderContacts, checkedTextViewGroup);
-				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-					logDebug("orderOthers: " + orderOthers);
-					setCheckByOrder(orderOthers, checkedTextViewGroup);
-				} else if (drawerItem == DrawerItem.SHARED_ITEMS) {
-					if (viewPagerShares != null) {
-						int index = viewPagerShares.getCurrentItem();
-						if (index == 1) {
-							if (parentHandleOutgoing == -1) {
-								setCheckByOrder(orderOthers, checkedTextViewGroup);
-							} else {
-								setCheckByOrder(orderCloud, checkedTextViewGroup);
-							}
-						} else {
-							if (parentHandleIncoming == -1) {
-								setCheckByOrder(orderOthers, checkedTextViewGroup);
-							} else {
-								setCheckByOrder(orderCloud, checkedTextViewGroup);
-							}
-						}
-					}
-				} else if (drawerItem == DrawerItem.CAMERA_UPLOADS || drawerItem == DrawerItem.MEDIA_UPLOADS) {
-					setCheckByOrder(orderCamera, checkedTextViewGroup);
-				} else {
-					logDebug("orderCloud: " + orderCloud);
-					setCheckByOrder(orderCloud, checkedTextViewGroup);
-				}
+				sortByDialog = builder.create();
+				sortByDialog.show();
 
-        		final AlertDialog dialog = sortByDialog;
-	        	switch(drawerItem){
-		        	case CONTACTS:{
-						sortByDateTV.setText(getString(R.string.sortby_date));
-						sortByDateTV.setVisibility(View.VISIBLE);
-		        		newestCheck.setVisibility(View.VISIBLE);
-		        		oldestCheck.setVisibility(View.VISIBLE);
-		        		sortBySizeTV.setVisibility(View.GONE);
-		        		largestCheck.setVisibility(View.GONE);
-		        		smallestCheck.setVisibility(View.GONE);
+				final AlertDialog dialog = sortByDialog;
 
-		        		ascendingCheck.setOnClickListener(new OnClickListener() {
+				ascendingCheck.setOnClickListener(new OnClickListener() {
 
-							@Override
-							public void onClick(View v) {
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=ORDER_DEFAULT_ASC){
-									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
+					@Override
+					public void onClick(View v) {
+						switch (drawerItem) {
+							case CONTACTS: {
+								if (orderContacts != ORDER_DEFAULT_ASC) {
 									selectSortByContacts(ORDER_DEFAULT_ASC);
 								}
-								dialog.dismiss();
-
+								break;
 							}
-						});
-
-		        		descendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_DESC) {
-									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_DEFAULT_DESC);
-								}
-								dialog.dismiss();
-
-							}
-						});
-
-						newestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!= ORDER_CREATION_ASC){
-									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
-									selectSortByContacts(ORDER_CREATION_ASC);
-								}
-								dialog.dismiss();
-
-							}
-						});
-
-						oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!= ORDER_CREATION_DESC) {
-									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
-									selectSortByContacts(ORDER_CREATION_DESC);
-								}
-								dialog.dismiss();
-
-							}
-						});
-
-		        		break;
-		        	}
-					case SAVED_FOR_OFFLINE: {
-						ascendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
+							case SAVED_FOR_OFFLINE: {
 								if (orderOthers != ORDER_DEFAULT_ASC) {
 									selectSortByOffline(ORDER_DEFAULT_ASC);
 								}
-								dialog.dismiss();
-
+								break;
 							}
-						});
-
-						descendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								if (orderOthers != MegaApiJava.ORDER_DEFAULT_DESC) {
-									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_DESC);
+							case SHARED_ITEMS: {
+								if (firstNavigationLevel) {
+									if (orderOthers != ORDER_DEFAULT_ASC) {
+										refreshOthersOrder(ORDER_DEFAULT_ASC);
+									}
+								} else {
+									refreshCloudOrder(ORDER_DEFAULT_ASC);
 								}
-								dialog.dismiss();
-
+								break;
 							}
-						});
+							case CLOUD_DRIVE:
+							case INBOX:
+							case RUBBISH_BIN: {
+								refreshCloudOrder(ORDER_DEFAULT_ASC);
+								break;
+							}
+						}
+						dialog.dismiss();
 
-						newestCheck.setOnClickListener(new OnClickListener() {
-							@Override
-							public void onClick(View v) {
+					}
+				});
+
+				descendingCheck.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						switch (drawerItem) {
+							case CONTACTS: {
+								if (orderContacts != MegaApiJava.ORDER_DEFAULT_DESC) {
+									selectSortByContacts(ORDER_DEFAULT_DESC);
+								}
+								break;
+							}
+							case SAVED_FOR_OFFLINE: {
+								if (orderOthers != MegaApiJava.ORDER_DEFAULT_DESC) {
+									selectSortByOffline(ORDER_DEFAULT_DESC);
+								}
+								break;
+							}
+							case SHARED_ITEMS: {
+								if (firstNavigationLevel) {
+									if (orderOthers != MegaApiJava.ORDER_DEFAULT_DESC) {
+										refreshOthersOrder(MegaApiJava.ORDER_DEFAULT_DESC);
+									}
+								} else {
+									refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
+								}
+							}
+							case CLOUD_DRIVE:
+							case INBOX:
+							case RUBBISH_BIN: {
+								refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
+								break;
+							}
+						}
+						dialog.dismiss();
+					}
+				});
+
+				newestCheck.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						switch (drawerItem) {
+							case CONTACTS: {
+								if (orderContacts != ORDER_CREATION_ASC) {
+									selectSortByContacts(ORDER_CREATION_ASC);
+								}
+								break;
+							}
+							case SAVED_FOR_OFFLINE: {
 								if (orderOthers != ORDER_CREATION_ASC) {
 									selectSortByOffline(ORDER_MODIFICATION_ASC);
 								}
-
-								dialog.dismiss();
-
+								break;
 							}
-						});
+							case SHARED_ITEMS: {
+								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
+								break;
+							}
+							case MEDIA_UPLOADS:
+							case CAMERA_UPLOADS: {
+								if (orderCamera != MegaApiJava.ORDER_MODIFICATION_DESC) {
+									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_DESC);
+								}
+								break;
+							}
+							case CLOUD_DRIVE:
+							case INBOX:
+							case RUBBISH_BIN: {
+								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
+								break;
+							}
+						}
+						dialog.dismiss();
+					}
+				});
 
-						oldestCheck.setOnClickListener(new OnClickListener() {
-							@Override
-							public void onClick(View v) {
+				oldestCheck.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						switch (drawerItem) {
+							case CONTACTS: {
+								if (orderContacts != ORDER_CREATION_DESC) {
+									selectSortByContacts(ORDER_CREATION_DESC);
+								}
+								break;
+							}
+							case SAVED_FOR_OFFLINE: {
 								if (orderOthers != ORDER_CREATION_DESC) {
 									selectSortByOffline(MegaApiJava.ORDER_MODIFICATION_DESC);
 								}
-
-									dialog.dismiss();
-
+								break;
 							}
-						});
+							case SHARED_ITEMS: {
+								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
+								break;
+							}
+							case MEDIA_UPLOADS:
+							case CAMERA_UPLOADS: {
+								if (orderCamera != MegaApiJava.ORDER_MODIFICATION_ASC) {
+									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_ASC);
+								}
+								break;
+							}
+							case CLOUD_DRIVE:
+							case INBOX:
+							case RUBBISH_BIN: {
+								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
+								break;
+							}
+						}
+						dialog.dismiss();
+					}
+				});
 
-						largestCheck.setOnClickListener(new OnClickListener() {
-							@Override
-							public void onClick(View v) {
+				largestCheck.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						switch (drawerItem) {
+							case SAVED_FOR_OFFLINE: {
 								if (orderOthers != MegaApiJava.ORDER_SIZE_ASC) {
 									selectSortByOffline(MegaApiJava.ORDER_SIZE_ASC);
 								}
-
-									dialog.dismiss();
-
+								break;
 							}
-						});
+							case SHARED_ITEMS: {
+								refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
+								break;
+							}
+							case CLOUD_DRIVE:
+							case INBOX:
+							case RUBBISH_BIN: {
+								refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
+								break;
+							}
+						}
+						dialog.dismiss();
+					}
+				});
 
-						smallestCheck.setOnClickListener(new OnClickListener() {
-							@Override
-							public void onClick(View v) {
+				smallestCheck.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						switch (drawerItem) {
+							case SAVED_FOR_OFFLINE: {
 								if (orderOthers != MegaApiJava.ORDER_SIZE_DESC) {
 									selectSortByOffline(MegaApiJava.ORDER_SIZE_DESC);
 								}
-									dialog.dismiss();
-
 							}
-						});
+							case SHARED_ITEMS: {
+								refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
+								break;
+							}
+							case CLOUD_DRIVE:
+							case INBOX:
+							case RUBBISH_BIN: {
+								refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
+								break;
+							}
+						}
+						dialog.dismiss();
+					}
+				});
 
+				switch (drawerItem) {
+					case CONTACTS: {
+						setCheckByOrder(orderContacts, checkedTextViewGroup);
 						break;
 					}
-		        	case SHARED_ITEMS: {
-
-						if(firstNavigationLevel){
-
-							if (viewPagerShares.getCurrentItem()==0){
+					case SAVED_FOR_OFFLINE: {
+						setCheckByOrder(orderOthers, checkedTextViewGroup);
+						break;
+					}
+					case SHARED_ITEMS: {
+						if (viewPagerShares != null) {
+							int index = viewPagerShares.getCurrentItem();
+							if (index == 1) {
+								if (parentHandleOutgoing == -1) {
+									setCheckByOrder(orderOthers, checkedTextViewGroup);
+								} else {
+									setCheckByOrder(orderCloud, checkedTextViewGroup);
+								}
+							} else {
+								if (parentHandleIncoming == -1) {
+									setCheckByOrder(orderOthers, checkedTextViewGroup);
+								} else {
+									setCheckByOrder(orderCloud, checkedTextViewGroup);
+								}
+							}
+						}
+						break;
+					}
+					case CAMERA_UPLOADS:
+					case MEDIA_UPLOADS: {
+						setCheckByOrder(orderCamera, checkedTextViewGroup);
+						break;
+					}
+					default: {
+						setCheckByOrder(orderCloud, checkedTextViewGroup);
+						break;
+					}
+				}
+				switch (drawerItem) {
+					case CONTACTS: {
+						sortByDateTV.setText(getString(R.string.sortby_date));
+						sortByDateTV.setVisibility(View.VISIBLE);
+						newestCheck.setVisibility(View.VISIBLE);
+						oldestCheck.setVisibility(View.VISIBLE);
+						sortBySizeTV.setVisibility(View.GONE);
+						largestCheck.setVisibility(View.GONE);
+						smallestCheck.setVisibility(View.GONE);
+						break;
+					}
+					case SHARED_ITEMS: {
+						if (firstNavigationLevel) {
+							if (viewPagerShares.getCurrentItem() == 0) {
 								//Incoming Shares
 								sortByNameTV.setText(getString(R.string.sortby_owner_mail));
-							}
-							else{
+							} else {
 								sortByNameTV.setText(getString(R.string.sortby_name));
 							}
-
 							sortByDateTV.setVisibility(View.GONE);
 							newestCheck.setVisibility(View.GONE);
 							oldestCheck.setVisibility(View.GONE);
 							sortBySizeTV.setVisibility(View.GONE);
 							largestCheck.setVisibility(View.GONE);
 							smallestCheck.setVisibility(View.GONE);
-
-							ascendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									if(orderOthers!= ORDER_DEFAULT_ASC){
-										refreshOthersOrder(ORDER_DEFAULT_ASC);
-									}
-
-									dialog.dismiss();
-
-								}
-							});
-
-							descendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									if(orderOthers!=MegaApiJava.ORDER_DEFAULT_DESC){
-										refreshOthersOrder(MegaApiJava.ORDER_DEFAULT_DESC);
-									}
-
-									dialog.dismiss();
-
-								}
-							});
-						}
-						else{
+						} else {
 							logDebug("No first level navigation on Incoming Shares");
 							sortByNameTV.setText(getString(R.string.sortby_name));
-
-							ascendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-
-									refreshCloudOrder(ORDER_DEFAULT_ASC);
-
-
-										dialog.dismiss();
-
-								}
-							});
-
-							descendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-
-									refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
-
-
-										dialog.dismiss();
-
-								}
-							});
-
-							newestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-
-									refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
-
-									dialog.dismiss();
-
-								}
-							});
-
-							oldestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-
-									refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
-
-									dialog.dismiss();
-
-								}
-							});
-
-
-							largestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-
-									refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
-
-									dialog.dismiss();
-
-								}
-							});
-
-							smallestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-
-									refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
-
-									dialog.dismiss();
-
-								}
-							});
 						}
-
-		        		break;
-
-		        	}
+						break;
+					}
 					case MEDIA_UPLOADS:
-					case CAMERA_UPLOADS:{
-
+					case CAMERA_UPLOADS: {
 						sortByNameTV.setVisibility(View.GONE);
 						ascendingCheck.setVisibility(View.GONE);
 						descendingCheck.setVisibility(View.GONE);
 						sortBySizeTV.setVisibility(View.GONE);
 						largestCheck.setVisibility(View.GONE);
 						smallestCheck.setVisibility(View.GONE);
-
-						oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-								descendingCheck.setChecked(false);
-								if(orderCamera!=MegaApiJava.ORDER_MODIFICATION_ASC){
-									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_ASC);
-								}
-
-								dialog.dismiss();
-
-							}
-						});
-
-						newestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(true);
-								if(orderCamera!=MegaApiJava.ORDER_MODIFICATION_DESC){
-									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_DESC);
-								}
-
-								dialog.dismiss();
-
-							}
-						});
 						break;
 					}
-		        	case CLOUD_DRIVE:
-		        	case INBOX:
-                    case RUBBISH_BIN:{
-
-		        		ascendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-
-								refreshCloudOrder(ORDER_DEFAULT_ASC);
-
-								dialog.dismiss();
-
-							}
-						});
-
-		        		descendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-
-								refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
-
-								dialog.dismiss();
-
-							}
-						});
-
-
-						newestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-
-								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
-
-								dialog.dismiss();
-
-							}
-						});
-
-						oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-
-								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
-
-								dialog.dismiss();
-
-							}
-						});
-
-
-		        		largestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-
-								refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
-
-								dialog.dismiss();
-
-							}
-						});
-
-		        		smallestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-
-			        			refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
-
-			        			dialog.dismiss();
-
-							}
-						});
-
-		        		break;
-	        		}
-	        	}
-	        	return true;
-	        }
+				}
+				return true;
+			}
 			case R.id.action_search_by_date:{
 				Intent intent = new Intent(this, SearchByDateActivityLollipop.class);
 				startActivityForResult(intent, ACTION_SEARCH_BY_DATE);
