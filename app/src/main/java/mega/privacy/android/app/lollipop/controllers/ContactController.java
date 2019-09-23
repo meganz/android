@@ -22,14 +22,16 @@ import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ContactController {
 
@@ -39,7 +41,7 @@ public class ContactController {
     MegaPreferences prefs = null;
 
     public ContactController(Context context){
-        log("ContactController created");
+        logDebug("ContactController created");
         this.context = context;
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -59,10 +61,11 @@ public class ContactController {
             longArray.add(users.get(i).getEmail());
         }
         intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER);
+        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
     }
 
     public void pickFileToSend(List<MegaUser> users){
+        logDebug("pickFileToSend");
 
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FILE);
@@ -71,17 +74,17 @@ public class ContactController {
             longArray.add(users.get(i).getEmail());
         }
         intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
-        log("pickFileToSend");
+
         if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
+            ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
         }
         else if(context instanceof ContactInfoActivityLollipop){
-            ((ContactInfoActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
+            ((ContactInfoActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
         }
     }
 
     public void removeContact(MegaUser c){
-        log("removeContact");
+        logDebug("removeContact");
         final ArrayList<MegaNode> inShares = megaApi.getInShares(c);
         if(inShares.size() != 0)
         {
@@ -102,11 +105,9 @@ public class ContactController {
 
 
     public void removeMultipleContacts(final ArrayList<MegaUser> contacts){
-        log("removeMultipleContacts");
-
         MultipleRequestListener removeMultipleListener = null;
         if(contacts.size()>1){
-            log("remove multiple contacts");
+            logDebug("Remove multiple contacts");
             removeMultipleListener = new MultipleRequestListener(-1, context);
             for(int j=0; j<contacts.size();j++){
 
@@ -124,7 +125,7 @@ public class ContactController {
             }
         }
         else{
-            log("remove one contact");
+            logDebug("Remove one contact");
 
             final MegaUser c= contacts.get(0);
 
@@ -141,11 +142,9 @@ public class ContactController {
     }
 
     public void reinviteMultipleContacts(final List<MegaContactRequest> requests){
-        log("reinviteMultipleContacts");
-
         MultipleRequestListener reinviteMultipleListener = null;
         if(requests.size()>1){
-            log("reinvite multiple request");
+            logDebug("Reinvite multiple request");
             reinviteMultipleListener = new MultipleRequestListener(-1, context);
             for(int j=0; j<requests.size();j++){
 
@@ -155,7 +154,7 @@ public class ContactController {
             }
         }
         else{
-            log("reinvite one request");
+            logDebug("Reinvite one request");
 
             final MegaContactRequest request= requests.get(0);
 
@@ -164,11 +163,9 @@ public class ContactController {
     }
 
     public void deleteMultipleSentRequestContacts(final List<MegaContactRequest> requests){
-        log("deleteMultipleSentRequestContacts");
-
         MultipleRequestListener deleteMultipleListener = null;
         if(requests.size()>1){
-            log("delete multiple request");
+            logDebug("Delete multiple request");
             deleteMultipleListener = new MultipleRequestListener(-1, context);
             for(int j=0; j<requests.size();j++){
 
@@ -178,7 +175,7 @@ public class ContactController {
             }
         }
         else{
-            log("delete one request");
+            logDebug("Delete one request");
 
             final MegaContactRequest request= requests.get(0);
 
@@ -187,11 +184,9 @@ public class ContactController {
     }
 
     public void acceptMultipleReceivedRequest(final List<MegaContactRequest> requests){
-        log("acceptMultipleReceivedRequest");
-
         MultipleRequestListener acceptMultipleListener = null;
         if(requests.size()>1){
-            log("accept multiple request");
+            logDebug("Accept multiple request");
             acceptMultipleListener = new MultipleRequestListener(-1, context);
             for(int j=0; j<requests.size();j++){
 
@@ -200,7 +195,7 @@ public class ContactController {
             }
         }
         else{
-            log("accept one request");
+            logDebug("Accept one request");
 
             final MegaContactRequest request= requests.get(0);
             acceptInvitationContact(request);
@@ -208,11 +203,9 @@ public class ContactController {
     }
 
     public void declineMultipleReceivedRequest(final List<MegaContactRequest> requests){
-        log("declineMultipleReceivedRequest");
-
         MultipleRequestListener declineMultipleListener = null;
         if(requests.size()>1){
-            log("decline multiple request");
+            logDebug("Decline multiple request");
             declineMultipleListener = new MultipleRequestListener(-1, context);
             for(int j=0; j<requests.size();j++){
 
@@ -221,7 +214,7 @@ public class ContactController {
             }
         }
         else{
-            log("decline one request");
+            logDebug("Decline one request");
 
             final MegaContactRequest request= requests.get(0);
             declineInvitationContact(request);
@@ -229,11 +222,9 @@ public class ContactController {
     }
 
     public void ignoreMultipleReceivedRequest(final List<MegaContactRequest> requests){
-        log("ignoreMultipleReceivedRequest");
-
         MultipleRequestListener ignoreMultipleListener = null;
         if(requests.size()>1){
-            log("ignore multiple request");
+            logDebug("Ignore multiple request");
             ignoreMultipleListener = new MultipleRequestListener(-1, context);
             for(int j=0; j<requests.size();j++){
 
@@ -242,7 +233,7 @@ public class ContactController {
             }
         }
         else{
-            log("ignore one request");
+            logDebug("Ignore one request");
 
             final MegaContactRequest request= requests.get(0);
             ignoreInvitationContact(request);
@@ -250,11 +241,11 @@ public class ContactController {
     }
 
     public void inviteContact(String contactEmail){
-        log("inviteContact");
+        logDebug("inviteContact");
 
         if(context instanceof ManagerActivityLollipop){
-            if (!Util.isOnline(context)){
-                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            if (!isOnline(context)){
+                ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -275,13 +266,13 @@ public class ContactController {
     }
 
     public void inviteMultipleContacts(ArrayList<String> contactEmails){
-        log("inviteMultipleContacts");
+        logDebug("inviteMultipleContacts");
 
         MultipleRequestListener inviteMultipleListener = null;
 
         if(context instanceof ManagerActivityLollipop){
-            if (!Util.isOnline(context)){
-                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            if (!isOnline(context)){
+                ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -300,8 +291,8 @@ public class ContactController {
             }
         }
         else if(context instanceof ChatActivityLollipop){
-            if (!Util.isOnline(context)){
-                ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            if (!isOnline(context)){
+                ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -316,7 +307,7 @@ public class ContactController {
             }
         }
         else if(context instanceof ContactAttachmentActivityLollipop){
-            if (!Util.isOnline(context)){
+            if (!isOnline(context)){
                 ((ContactAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
                 return;
             }
@@ -332,7 +323,7 @@ public class ContactController {
             }
         }
         else if(context instanceof AchievementsActivity){
-            if (!Util.isOnline(context)){
+            if (!isOnline(context)){
                 ((AchievementsActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
                 return;
             }
@@ -348,7 +339,7 @@ public class ContactController {
             }
         }
         else if (context instanceof AddContactActivityLollipop) {
-            if (!Util.isOnline(context)){
+            if (!isOnline(context)){
                 ((AddContactActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
                 return;
             }
@@ -367,21 +358,21 @@ public class ContactController {
 
 
     public void addContactDB(String email){
-        log("addContactDB");
+        logDebug("addContactDB");
 
         MegaUser user = megaApi.getContact(email);
         if(user!=null){
-            log("User to add: "+user.getEmail());
+            logDebug("User to add: " + user.getEmail());
             //Check the user is not previously in the DB
             if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
-                log("The contact NOT exists -> add to DB");
+                logDebug("The contact NOT exists -> add to DB");
                 MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
                 dbH.setContact(megaContactDB);
                 megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
                 megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
             }
             else{
-                log("The contact already exists -> update");
+                logDebug("The contact already exists -> update");
                 megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
                 megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
             }
@@ -390,27 +381,27 @@ public class ContactController {
 
 
     public void acceptInvitationContact(MegaContactRequest c){
-        log("acceptInvitationContact");
+        logDebug("acceptInvitationContact");
         megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_ACCEPT, (ManagerActivityLollipop) context);
     }
 
     public void declineInvitationContact(MegaContactRequest c){
-        log("declineInvitationContact");
+        logDebug("declineInvitationContact");
         megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_DENY, (ManagerActivityLollipop) context);
     }
 
     public void ignoreInvitationContact(MegaContactRequest c){
-        log("ignoreInvitationContact");
+        logDebug("ignoreInvitationContact");
         megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_IGNORE, (ManagerActivityLollipop) context);
     }
 
     public void reinviteContact(MegaContactRequest c){
-        log("inviteContact");
+        logDebug("inviteContact");
         megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_REMIND, (ManagerActivityLollipop) context);
     }
 
     public void removeInvitationContact(MegaContactRequest c){
-        log("removeInvitationContact");
+        logDebug("removeInvitationContact");
         megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, (ManagerActivityLollipop) context);
     }
 
@@ -437,8 +428,8 @@ public class ContactController {
             }
 
             if (fullName.trim().length() <= 0){
-                log("1- Full name empty");
-                log("2-Put email as fullname");
+                logWarning("Full name empty");
+                logDebug("Put email as fullname");
                 String mail = contactDB.getMail();
                 if(mail==null){
                     mail="";
@@ -474,8 +465,8 @@ public class ContactController {
         }
 
         if (fullName.trim().length() <= 0){
-            log("1- Full name empty");
-            log("2-Put email as fullname");
+            logWarning("Full name empty");
+            logDebug("Put email as fullname");
 
             if(mail==null){
                 mail="";
@@ -508,9 +499,5 @@ public class ContactController {
                 megaApi.share(node, userId, newPermission, changeListener);
             }
         }
-    }
-
-    public static void log(String message) {
-        Util.log("ContactController", message);
     }
 }

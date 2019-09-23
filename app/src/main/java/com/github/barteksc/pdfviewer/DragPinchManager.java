@@ -256,8 +256,4 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
             scrollHandle.hideDelayed();
         }
     }
-
-    public static void log(String log) {
-        Util.log("DragPinchManager", log);
-    }
 }

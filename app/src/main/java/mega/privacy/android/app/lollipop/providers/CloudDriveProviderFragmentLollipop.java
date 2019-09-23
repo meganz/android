@@ -36,10 +36,12 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.providers.FileProviderActivity;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class CloudDriveProviderFragmentLollipop extends Fragment{
@@ -73,7 +75,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 	Handler handler;
 
 	public void activateActionMode(){
-		log("activateActionMode");
+		logDebug("activateActionMode");
 		if(!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -85,16 +87,16 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			log("onCreateActionMode");
+			logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
-			Util.changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
+			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
 			return true;
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			log("onPrepareActionMode");
+			logDebug("onPrepareActionMode");
 			List<MegaNode> selected = adapter.getSelectedNodes();
 
 			boolean showDownload = false;
@@ -155,12 +157,12 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			log("onActionItemClicked");
+			logDebug("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
 
 			switch (item.getItemId()) {
 				case R.id.action_mode_close_button: {
-					log("on close button");
+					logDebug("Close button");
 				}
 				case R.id.cab_menu_select_all: {
 					selectAll();
@@ -177,15 +179,15 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			log("onDestroyActionMode");
+			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			Util.changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
+			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
 		}
 	}
 
 	public static CloudDriveProviderFragmentLollipop newInstance() {
-		log("newInstance");
+		logDebug("newInstance");
 		CloudDriveProviderFragmentLollipop fragment = new CloudDriveProviderFragmentLollipop();
 		return fragment;
 	}
@@ -193,7 +195,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		logDebug("onCreate");
 	
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -211,7 +213,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		log("onCreateView");
+		logDebug("onCreateView");
 				
 		View v = inflater.inflate(R.layout.fragment_clouddriveprovider, container, false);	
 		
@@ -236,7 +238,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 
 		if (context instanceof FileProviderActivity){
 			parentHandle = ((FileProviderActivity)context).getParentHandle();
-			log("The parent handle is: "+parentHandle);
+			logDebug("The parent handle is: " + parentHandle);
 		}
 	
 		if (parentHandle == -1)
@@ -280,7 +282,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		}
 
 		if (adapter == null){
-			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView, Constants.CLOUD_DRIVE_PROVIDER_ADAPTER);
+			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView, CLOUD_DRIVE_PROVIDER_ADAPTER);
 		}
 
 		listView.setAdapter(adapter);
@@ -305,7 +307,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 //	}	
 
 	public void changeActionBarTitle(String folder){
-		log("changeActionBarTitle");
+		logDebug("changeActionBarTitle");
 		if (context instanceof FileProviderActivity){
 			int tabShown = ((FileProviderActivity)context).getTabShown();
 
@@ -322,9 +324,9 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
     }
 
     public void itemClick(int position) {
-		log("itemClick");
+		logDebug("itemClick");
 		if(adapter.isMultipleSelect()){
-			log("multiselect ON");
+			logDebug("Multiselect ON");
 			adapter.toggleSelection(position);
 
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
@@ -348,7 +350,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 
 				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 
-				log("Push to stack "+lastFirstVisiblePosition+" position");
+				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
 				String path=n.getName();
@@ -380,7 +382,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 	}
 
 	public int onBackPressed(){
-		log("onBackPressed");
+		logDebug("onBackPressed");
 		
 		parentHandle = adapter.getParentHandle();
 		
@@ -409,9 +411,9 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
+				logDebug("Pop of the stack " + lastVisiblePosition + " position");
 			}
-			log("Scroll to "+lastVisiblePosition+" position");
+			logDebug("Scroll to " + lastVisiblePosition + " position");
 
 			if(lastVisiblePosition>=0){
 					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
@@ -426,11 +428,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		else{
 			return 0;
 		}
-	}
-	
-	
-	private static void log(String log) {
-		Util.log("CloudDriveProviderFragment", log);
 	}
 	
 	public long getParentHandle(){
@@ -516,7 +513,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 	}
 
 	public void hideMultipleSelect(){
-		log("hideMultipleSelect");
+		logDebug("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 
 		if (actionMode != null) {
@@ -525,7 +522,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 	}
 
 	public void selectAll(){
-		log("selectAll");
+		logDebug("selectAll");
 		if(adapter != null){
 			adapter.selectAll();
 		}
@@ -540,9 +537,9 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 	}
 
 	private void updateActionModeTitle() {
-		log("updateActionModeTitle");
+		logDebug("updateActionModeTitle");
 		if (actionMode == null || getActivity() == null) {
-			log("RETURN");
+			logWarning("RETURN: actionMode == null || getActivity() == null");
 			return;
 		}
 
@@ -576,7 +573,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			log("oninvalidate error");
+			logError("Invalidate error", e);
 		}
 
 	}
@@ -587,5 +584,4 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			((FileProviderActivity)context).activateButton(false);
 		}
 	}
-
 }
