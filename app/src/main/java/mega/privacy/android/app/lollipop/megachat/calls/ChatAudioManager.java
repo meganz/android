@@ -13,7 +13,6 @@ import android.os.Vibrator;
 import java.io.IOException;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
 
@@ -39,21 +38,20 @@ public class ChatAudioManager {
 
     public void initializeAudioManager() {
         if (audioManager != null) return;
-        logDebug("initializeAudioManager");
+        logDebug("Initializing audio manager...");
         audioManager = (AudioManager) myContext.getSystemService(Context.AUDIO_SERVICE);
     }
 
     public void setAudioManagerValues(MegaChatCall call, MegaHandleList listCallsRequest, MegaHandleList listCallsRing) {
 
         int callStatus = call.getStatus();
+        logDebug("Call status: " + callStatus);
         if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-            logDebug("setAudioManagerValues:REQUEST_SENT");
             if (listCallsRing != null && listCallsRing.size() > 0) {
                 stopAudioSignals();
             }
             outgoingCallSound();
         } else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-            logDebug("setAudioManagerValues:RING_IN");
             if (listCallsRequest == null || listCallsRequest.size() < 1) {
                 incomingCallSound();
             }
@@ -65,7 +63,6 @@ public class ChatAudioManager {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) return;
         initializeAudioManager();
         if (audioManager == null) return;
-        logDebug("outgoingCallSound");
         audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), 0);
         Resources res = myContext.getResources();
         AssetFileDescriptor afd = res.openRawResourceFd(R.raw.outgoing_voice_video_call);
@@ -74,12 +71,14 @@ public class ChatAudioManager {
         mediaPlayer.setLooping(true);
         try {
             mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            logDebug("Preparing mediaPlayer");
             mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
-            logError("error preparing mediaPlayer");
+            logError("Error preparing mediaPlayer", e);
+            return;
         }
-        logDebug("outgoingCallSound: start Sound");
+        logDebug("Start outgoing call sound");
         mediaPlayer.start();
 
     }
@@ -88,7 +87,6 @@ public class ChatAudioManager {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) return;
         initializeAudioManager();
         if (audioManager == null) return;
-        logDebug("incomingCallSound");
         Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         if (ringtoneUri == null) return;
         mediaPlayer = new MediaPlayer();
@@ -97,18 +95,20 @@ public class ChatAudioManager {
 
         try {
             mediaPlayer.setDataSource(myContext, ringtoneUri);
+            logDebug("Preparing mediaPlayer");
             mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
-            logError("error preparing mediaPlayer");
+            logError("Error preparing mediaPlayer", e);
+            return;
         }
-
-        logDebug("incomingCallSound - start Sound");
+        logDebug("Start incoming call sound");
         mediaPlayer.start();
     }
 
     private void checkVibration() {
-        logDebug("checkVibration");
+        logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(AudioManager.STREAM_RING));
+
         if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT) {
             if (vibrator == null || !vibrator.hasVibrator()) return;
             stopVibration();
@@ -123,7 +123,6 @@ public class ChatAudioManager {
         if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0) {
             return;
         }
-
         startVibration();
     }
 
@@ -131,13 +130,12 @@ public class ChatAudioManager {
         if (vibrator != null) return;
         vibrator = (Vibrator) myContext.getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator == null || !vibrator.hasVibrator()) return;
-        logDebug("startVibration");
+        logDebug("Vibration begins");
         long[] pattern = {0, 1000, 500, 500, 1000};
         vibrator.vibrate(pattern, 0);
     }
 
     public void stopAudioSignals() {
-        logDebug("stopAudioSignals");
         stopSound();
         stopVibration();
         audioManager.setMode(AudioManager.MODE_NORMAL);
@@ -146,24 +144,26 @@ public class ChatAudioManager {
     private void stopSound() {
         try {
             if (mediaPlayer != null) {
+                logDebug("Stopping sound...");
                 mediaPlayer.stop();
                 mediaPlayer.reset();
                 mediaPlayer.release();
                 mediaPlayer = null;
             }
         } catch (Exception e) {
-            logWarning("Exception stopping player");
+            logWarning("Exception stopping player", e);
         }
     }
 
     private void stopVibration() {
         try {
             if (vibrator != null && vibrator.hasVibrator()) {
+                logDebug("Canceling vibration...");
                 vibrator.cancel();
                 vibrator = null;
             }
         } catch (Exception e) {
-            logWarning("Exception canceling vibrator");
+            logWarning("Exception canceling vibrator", e);
         }
     }
 
