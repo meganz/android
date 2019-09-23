@@ -8494,7 +8494,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								break;
 							}
 							case SAVED_FOR_OFFLINE: {
-								selectSortByOffline(ORDER_MODIFICATION_ASC);
+								selectSortByOffline(ORDER_MODIFICATION_DESC);
 								break;
 							}
 							case CLOUD_DRIVE:
@@ -8524,7 +8524,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								break;
 							}
 							case SAVED_FOR_OFFLINE: {
-								selectSortByOffline(ORDER_MODIFICATION_DESC);
+								selectSortByOffline(ORDER_MODIFICATION_ASC);
 								break;
 							}
 							case CLOUD_DRIVE:
@@ -8549,7 +8549,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					public void onClick(View v) {
 						switch (drawerItem) {
 							case SAVED_FOR_OFFLINE: {
-								selectSortByOffline(ORDER_SIZE_ASC);
+								selectSortByOffline(ORDER_SIZE_DESC);
 								break;
 							}
 							case CLOUD_DRIVE:
@@ -8569,9 +8569,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					public void onClick(View v) {
 						switch (drawerItem) {
 							case SAVED_FOR_OFFLINE: {
-								if (orderOthers != ORDER_SIZE_DESC) {
-									selectSortByOffline(ORDER_SIZE_DESC);
-								}
+								selectSortByOffline(ORDER_SIZE_ASC);
+
 							}
 							case CLOUD_DRIVE:
 							case INBOX:

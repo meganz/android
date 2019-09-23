@@ -773,7 +773,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	public void sortByModificationDateDescending() {
 		logDebug("sortByModificationDateDescending");
 		sort(ORDER_MODIFICATION_DESC, mOffList, getContext());
-		adapter.setNodes(mOffList);
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
 		}

@@ -682,14 +682,14 @@ public class OfflineUtils {
         Comparator<MegaOffline> modificationDateComparator = new Comparator<MegaOffline>() {
             @Override
             public int compare(MegaOffline o1, MegaOffline o2) {
-                return Long.compare(o2.getModificationDate(context), o1.getModificationDate(context));
+                return Long.compare(o1.getModificationDate(context), o2.getModificationDate(context));
             }
         };
 
         Comparator<MegaOffline> sizeComparator = new Comparator<MegaOffline>() {
             @Override
             public int compare(MegaOffline o1, MegaOffline o2) {
-                return Long.compare(o2.getSize(context), o1.getSize(context));
+                return Long.compare(o1.getSize(context), o2.getSize(context));
             }
         };
 
