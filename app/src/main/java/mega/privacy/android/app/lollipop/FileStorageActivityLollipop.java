@@ -63,8 +63,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
@@ -122,9 +122,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private File path;
 	private String camSyncLocalPath;
 	private File root;
-//	DisplayMetrics outMetrics;
 	private RelativeLayout viewContainer;
-//	private TextView windowTitle;
 	private Button button;
 	private TextView contentText;
 	private RecyclerView listView;
@@ -380,7 +378,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		tB = (Toolbar) findViewById(R.id.toolbar_filestorage);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-//		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 		
@@ -432,8 +429,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}		
 		emptyImageView = (ImageView) findViewById(R.id.file_storage_empty_image);
 		emptyTextView = (TextView) findViewById(R.id.file_storage_empty_text);
-//		emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//		emptyTextView.setText(R.string.file_browser_empty_folder);
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 		}else{
@@ -516,27 +511,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		    path = new File(sdRoot);
         }
 
-		if (cameraFolderSettings){
-//			if (camSyncLocalPath != null){
-//				if (camSyncLocalPath.compareTo("") == 0){
-//					if (Environment.getExternalStorageDirectory() != null){
-//						path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-//					}
-//				}
-//				else{
-//					path = new File(camSyncLocalPath);
-//					if (path == null){
-//						if (Environment.getExternalStorageDirectory() != null){
-//							path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-//						}
-//					}
-//				}
-//			}
-//			else{
-				if (Environment.getExternalStorageDirectory() != null){
-					path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-				}
-//			}
+		if (cameraFolderSettings) {
+			if (Environment.getExternalStorageDirectory() != null) {
+				path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+			}
 		}
 		
 		if (path == null){
@@ -676,49 +654,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			adapter.clearSelections();
 		}
 	}
-	
-	/*
-	 * File system document representation
-	 */
-	public static class FileDocument {
-		private File file;
-		private MimeTypeList mimeType;
-
-		public FileDocument(File file) {
-			this.file = file;
-		}
-
-		public File getFile() {
-			return file;
-		}
-
-		public boolean isHidden() {
-			return getName().startsWith(".");
-		}
-
-		public boolean isFolder() {
-			return file.isDirectory();
-		}
-
-		public long getSize() {
-			return file.length();
-		}
-
-		public long getTimestampInMillis() {
-			return file.lastModified();
-		}
-
-		public String getName() {
-			return file.getName();
-		}
-
-		public MimeTypeList getMimeType() {
-			if (mimeType == null) {
-				mimeType = MimeTypeList.typeForName(getName());
-			}
-			return mimeType;
-		}
-	}
 
 	/*
 	 * Comparator to sort the files
@@ -739,7 +674,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		switch (v.getId()) {
 			case R.id.file_storage_button:{
-//				log("onClick: "+path.getAbsolutePath());
                 //don't record last upload folder for SD card upload
                 if(!hasSDCard) {
                     dbH.setLastUploadFolder(path.getAbsolutePath());
@@ -781,21 +715,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 							return null;	
 						}
 						
-//						public ArrayList<String> getFiles(File folder)
-//						{
-//							ArrayList<String> selectedFiles = new ArrayList<String>();
-//							File[] files= folder.listFiles();
-//							for (int i = 0; i < files.length; i++) {
-//							      if (files[i].isFile()) {
-//							    	  selectedFiles.add(files[i].getAbsolutePath());
-//							      } else if (files[i].isDirectory()) {
-//							    	  selectedFiles.addAll(getFiles(folder));
-//							      }
-//
-//							}
-//							return selectedFiles;
-//						}
-						
 						@Override
 						public void onPostExecute(Void a)
 						{
@@ -821,53 +740,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	        return true;
 	    }
 	    return super.onKeyDown(keyCode, event);
-	} 
-	
-	// Update bottom button text and state
-	private void updateButton() {
-		int folders = 0;
-		int files = 0;
-//		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//		FileDocument document;
-//		for (int i = 0; i < checkedItems.size(); i++) {
-//			if (checkedItems.valueAt(i) != true) {
-//				continue;
-//			}
-//			int position = checkedItems.keyAt(i);
-//			document = adapter.getDocumentAt(position);
-//			if(document == null)
-//			{
-//				continue;
-//			}
-//			
-//			if (document.getFile().isDirectory()) {
-//				log(document.getFile().getAbsolutePath() + " of file");
-//				folders++;
-//			} else {
-//				files++;
-//			}
-//		}
-//		
-//		if (files > 0 || folders > 0) {
-//			String filesString = files + " " + getResources().getQuantityString(R.plurals.general_num_files, files);
-//
-//			String foldersString = folders + " " + getResources().getQuantityString(R.plurals.general_num_folders, folders);
-//
-//			String buttonText = getString(R.string.general_upload) + " ";
-//
-//			if (files == 0) {
-//				buttonText += foldersString;
-//			} else if (folders == 0) {
-//				buttonText += filesString;
-//			} else {
-//				buttonText += foldersString + ", " + filesString;
-//			}
-//			button.setText(buttonText);
-//			showButton();
-//		} 
-//		else {
-//			hideButton();
-//		}
 	}
 
 	public void itemClick(int position) {
@@ -885,7 +757,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			if (selected.size() > 0){
 				updateActionModeTitle();
 			}
-//			adapterList.notifyDataSetChanged();
 		}
 		else{
 			if (document.isFolder()) {
@@ -906,12 +777,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				adapter.toggleSelection(position);
 				updateActionModeTitle();
 				adapter.notifyDataSetChanged();
-				
-				// Select file if mode is PICK_FILE
-//				ArrayList<String> files = new ArrayList<String>();
-//				files.add(document.getFile().getAbsolutePath());
-//				dbH.setLastUploadFolder(path.getAbsolutePath());
-//				setResultFiles(files);
 			}
 		}		
 	}
