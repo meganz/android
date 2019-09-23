@@ -8426,22 +8426,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					public void onClick(View v) {
 						switch (drawerItem) {
 							case CONTACTS: {
-								if (orderContacts != ORDER_DEFAULT_ASC) {
-									selectSortByContacts(ORDER_DEFAULT_ASC);
-								}
+								selectSortByContacts(ORDER_DEFAULT_ASC);
 								break;
 							}
 							case SAVED_FOR_OFFLINE: {
-								if (orderOthers != ORDER_DEFAULT_ASC) {
-									selectSortByOffline(ORDER_DEFAULT_ASC);
-								}
+								selectSortByOffline(ORDER_DEFAULT_ASC);
 								break;
 							}
 							case SHARED_ITEMS: {
 								if (firstNavigationLevel) {
-									if (orderOthers != ORDER_DEFAULT_ASC) {
-										refreshOthersOrder(ORDER_DEFAULT_ASC);
-									}
+									refreshOthersOrder(ORDER_DEFAULT_ASC);
 								} else {
 									refreshCloudOrder(ORDER_DEFAULT_ASC);
 								}
@@ -8465,30 +8459,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					public void onClick(View v) {
 						switch (drawerItem) {
 							case CONTACTS: {
-								if (orderContacts != MegaApiJava.ORDER_DEFAULT_DESC) {
-									selectSortByContacts(ORDER_DEFAULT_DESC);
-								}
+								selectSortByContacts(ORDER_DEFAULT_DESC);
 								break;
 							}
 							case SAVED_FOR_OFFLINE: {
-								if (orderOthers != MegaApiJava.ORDER_DEFAULT_DESC) {
-									selectSortByOffline(ORDER_DEFAULT_DESC);
-								}
+								selectSortByOffline(ORDER_DEFAULT_DESC);
 								break;
 							}
 							case SHARED_ITEMS: {
 								if (firstNavigationLevel) {
-									if (orderOthers != MegaApiJava.ORDER_DEFAULT_DESC) {
-										refreshOthersOrder(MegaApiJava.ORDER_DEFAULT_DESC);
-									}
+									refreshOthersOrder(ORDER_DEFAULT_DESC);
 								} else {
-									refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
+									refreshCloudOrder(ORDER_DEFAULT_DESC);
 								}
 							}
 							case CLOUD_DRIVE:
 							case INBOX:
 							case RUBBISH_BIN: {
-								refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
+								refreshCloudOrder(ORDER_DEFAULT_DESC);
 								break;
 							}
 						}
@@ -8502,32 +8490,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					public void onClick(View v) {
 						switch (drawerItem) {
 							case CONTACTS: {
-								if (orderContacts != ORDER_CREATION_ASC) {
-									selectSortByContacts(ORDER_CREATION_ASC);
-								}
+								selectSortByContacts(ORDER_CREATION_ASC);
 								break;
 							}
 							case SAVED_FOR_OFFLINE: {
-								if (orderOthers != ORDER_CREATION_ASC) {
-									selectSortByOffline(ORDER_MODIFICATION_ASC);
-								}
+								selectSortByOffline(ORDER_MODIFICATION_ASC);
 								break;
 							}
+							case CLOUD_DRIVE:
+							case INBOX:
+							case RUBBISH_BIN:
 							case SHARED_ITEMS: {
 								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
 								break;
 							}
 							case MEDIA_UPLOADS:
 							case CAMERA_UPLOADS: {
-								if (orderCamera != MegaApiJava.ORDER_MODIFICATION_DESC) {
-									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_DESC);
-								}
-								break;
-							}
-							case CLOUD_DRIVE:
-							case INBOX:
-							case RUBBISH_BIN: {
-								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
+								selectSortUploads(MegaApiJava.ORDER_MODIFICATION_DESC);
 								break;
 							}
 						}
@@ -8541,32 +8520,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					public void onClick(View v) {
 						switch (drawerItem) {
 							case CONTACTS: {
-								if (orderContacts != ORDER_CREATION_DESC) {
-									selectSortByContacts(ORDER_CREATION_DESC);
-								}
+								selectSortByContacts(ORDER_CREATION_DESC);
 								break;
 							}
 							case SAVED_FOR_OFFLINE: {
-								if (orderOthers != ORDER_CREATION_DESC) {
-									selectSortByOffline(MegaApiJava.ORDER_MODIFICATION_DESC);
-								}
-								break;
-							}
-							case SHARED_ITEMS: {
-								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
-								break;
-							}
-							case MEDIA_UPLOADS:
-							case CAMERA_UPLOADS: {
-								if (orderCamera != MegaApiJava.ORDER_MODIFICATION_ASC) {
-									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_ASC);
-								}
+								selectSortByOffline(ORDER_MODIFICATION_DESC);
 								break;
 							}
 							case CLOUD_DRIVE:
 							case INBOX:
-							case RUBBISH_BIN: {
-								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
+							case RUBBISH_BIN:
+							case SHARED_ITEMS: {
+								refreshCloudOrder(ORDER_MODIFICATION_ASC);
+								break;
+							}
+							case MEDIA_UPLOADS:
+							case CAMERA_UPLOADS: {
+								selectSortUploads(ORDER_MODIFICATION_ASC);
 								break;
 							}
 						}
@@ -8579,19 +8549,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					public void onClick(View v) {
 						switch (drawerItem) {
 							case SAVED_FOR_OFFLINE: {
-								if (orderOthers != MegaApiJava.ORDER_SIZE_ASC) {
-									selectSortByOffline(MegaApiJava.ORDER_SIZE_ASC);
-								}
-								break;
-							}
-							case SHARED_ITEMS: {
-								refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
+								selectSortByOffline(ORDER_SIZE_ASC);
 								break;
 							}
 							case CLOUD_DRIVE:
 							case INBOX:
-							case RUBBISH_BIN: {
-								refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
+							case RUBBISH_BIN:
+							case SHARED_ITEMS: {
+								refreshCloudOrder(ORDER_SIZE_DESC);
 								break;
 							}
 						}
@@ -8604,18 +8569,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					public void onClick(View v) {
 						switch (drawerItem) {
 							case SAVED_FOR_OFFLINE: {
-								if (orderOthers != MegaApiJava.ORDER_SIZE_DESC) {
-									selectSortByOffline(MegaApiJava.ORDER_SIZE_DESC);
+								if (orderOthers != ORDER_SIZE_DESC) {
+									selectSortByOffline(ORDER_SIZE_DESC);
 								}
-							}
-							case SHARED_ITEMS: {
-								refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
-								break;
 							}
 							case CLOUD_DRIVE:
 							case INBOX:
-							case RUBBISH_BIN: {
-								refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
+							case RUBBISH_BIN:
+							case SHARED_ITEMS: {
+								refreshCloudOrder(ORDER_SIZE_ASC);
 								break;
 							}
 						}
