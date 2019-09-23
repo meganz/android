@@ -36,11 +36,13 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     private MegaSurfaceRenderer localRenderer;
     private ImageView microIcon;
 
+
+
     public static LocalCameraCallFragment newInstance(long chatId) {
-        logDebug("chatId: " + chatId);
+        logDebug("Chat ID "+chatId);
         LocalCameraCallFragment f = new LocalCameraCallFragment();
         Bundle args = new Bundle();
-        args.putLong("Chat ID", chatId);
+        args.putLong("chatId", chatId);
         f.setArguments(args);
         return f;
     }
