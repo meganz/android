@@ -28,8 +28,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaCompletedTransfersAdapter;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class CompletedTransfersFragmentLollipop extends Fragment {
@@ -69,11 +70,11 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		super.onCreate(savedInstanceState);
-		log("onCreate");		
+		logDebug("onCreate");
 	}
 
 	public static CompletedTransfersFragmentLollipop newInstance() {
-		log("newInstance");
+		logDebug("newInstance");
 		CompletedTransfersFragmentLollipop fragment = new CompletedTransfersFragmentLollipop();
 		return fragment;
 	}
@@ -156,9 +157,9 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	}
 
 	public void setCompletedTransfers(){
-		log("setCompletedTransfers");
-
-		tL = dbH.getCompletedTransfers();
+		logDebug("setCompletedTransfers");
+		tL.clear();
+		tL.addAll(dbH.getCompletedTransfers());
 
 		if(tL!=null){
 			if (tL.size() == 0){
@@ -180,7 +181,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	}
 
 	public void updateCompletedTransfers(){
-		log("updateCompletedTransfers");
+		logDebug("updateCompletedTransfers");
 
 		setCompletedTransfers();
 		adapter.notifyDataSetChanged();
@@ -209,7 +210,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	}
 
     public void transferFinish(AndroidCompletedTransfer transfer){
-		log("transferFinish");
+		logDebug("transferFinish");
 		if(tL!=null){
 			tL.add(0,transfer);
 		}
@@ -248,8 +249,4 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 			return false;
 		}
 	}
-	private static void log(String log) {
-		Util.log("CompletedTransfersFragmentLollipop", log);
-	}
-
 }

@@ -280,9 +280,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Grootte</string>
-    <string name="file_properties_info_modified" context="when was the file modified">Gewijzigd</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Laatst aangepast</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Toegevoegd</string>
-    <string name="file_properties_info_created" context="when the file was created">Gecreëerd</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -632,7 +631,7 @@
     <string name="menu_take_picture" context="menu item">Maak een foto</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Alleen via Wi-Fi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele dataverbinding</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi of mobiele data</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Overslaan</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
@@ -642,8 +641,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Bestanden uploaden van media mappen</string>
-	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
-	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Bezig met zoeken naar te uploaden bestanden</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Camera-uploads initialiseren</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -651,7 +650,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Opslag</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Slot</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Videocompressie verbruikt veel energie, MEGA zal u eraan herinneren uw apparaat op te laden als de video\'s die moeten worden gecomprimeerd groter zijn dan %s.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compressie verbruikt veel stroom; MEGA vereist dat u uw apparaat actief oplaadt als de te comprimeren video\'s groter zijn dan %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Geavanceerd</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Cache wissen</string>
@@ -688,7 +687,7 @@
     <string name="settings_empty_folder" context="settings option">Kies een map</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele dataverbinding</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi of mobiele data</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Alleen via Wi-Fi</item>
     </string-array>
 
@@ -701,7 +700,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Alleen tijden het laden</string>
-    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Vereist dat ik mijn apparaat actief oplaad</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Behoud bestandsnamen als in het apparaat</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Lokale Camera folder</string>
@@ -1080,10 +1079,10 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacten worden verwijderd van de gedeelde map</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacten correct verwijderd van de gedeelde map</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;en %d contacten waren niet succesvol verwijderd</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacten waren niet succesvol verwijderd</string>
 
-	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
-	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Machtigingen bijgewerkt voor %d contacten</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Bijwerken van %d contacten mislukt</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Contacten laden van de telefoon&#8230;</string>
 
@@ -1799,7 +1798,7 @@
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media kwaliteit</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Kwaliteit</string>
-    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads heeft toegang nodig tot uw foto\'s en andere media op uw apparaat. Gaar naar de instellingen pagina en geef toestemming.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Originele kwaliteit</item>
         <item context="the options of medium quality multimedia file to  upload.">Medium kwaliteit</item>
@@ -2142,7 +2141,7 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">De minimale periode is 7 dagen.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">De minimale periode is 7 dagen en uw maximum is 30 dagen.</string>
-	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">De minimale grootte is %1$s en de maximale grootte is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Verwijder bestanden ouder dan</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d dagen</string>
@@ -2273,11 +2272,11 @@
 
 	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Niet genoeg opslagruimte</string>
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Niet genoeg opslagruimte om videocompressie uit te voeren</string>
-	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
-	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">De totale video grootte van de video\'s die gecomprimeerd moeten woorden overtreft %s, sluit uw apparaat aan om verder te gaan.</string>
-	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
-	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
-	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Videocompressie is te groot</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">De totale grootte van de te comprimeren video\'s zijn groter dan %s. Geef uw apparaat op om door te gaan.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Deze instelling gaat van kracht wanneer Camera Uploads de volgende keer wordt uitgevoerd</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s is gecomprimeerd</string>
+	<string name="title_compress_video" context="notification title when compressing video">Video\'s comprimeren %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Ongeldige map geselecteerd</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
@@ -2470,8 +2469,6 @@
     <string name="hint_action_search" context="Hint of the Search view">Zoeken&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Antwoord</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Negeren</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Audio oproep beginnen&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Video oproep beginnen&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s heeft deze oproep gedempt</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Gedempt</string>
 
@@ -2522,4 +2519,9 @@
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Het is niet mogelijk om spraakberichten op te nemen tijdens een oproep die gaande is.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Er is een fout opgetreden bij het uploaden van het spraakbericht.</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Inkomende oproep</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Laden</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Een ogenblik geduld a.u.b&#8230;</string>
 </resources>

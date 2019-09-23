@@ -16,26 +16,25 @@ import java.nio.ByteBuffer;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class LocalCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface {
 
-    int width = 0;
-    int height = 0;
-    Bitmap bitmap;
-    MegaChatApiAndroid megaChatApi;
-    Context context;
-    long chatId;
-
-    public SurfaceView localFullScreenSurfaceView;
-    MegaSurfaceRenderer localRenderer;
+    private SurfaceView localFullScreenSurfaceView;
+    private int width = 0;
+    private int height = 0;
+    private Bitmap bitmap;
+    private MegaChatApiAndroid megaChatApi;
+    private Context context;
+    private long chatId;
+    private MegaSurfaceRenderer localRenderer;
 
     public static LocalCameraCallFullScreenFragment newInstance(long chatId) {
-        log("newInstance");
+        logDebug("newInstance");
         LocalCameraCallFullScreenFragment f = new LocalCameraCallFullScreenFragment();
         Bundle args = new Bundle();
         args.putLong("chatId", chatId);
@@ -44,34 +43,31 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     }
 
     @Override
-    public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+    public void onCreate(Bundle savedInstanceState) {
+        logDebug("onCreate");
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
         }
 
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
         super.onCreate(savedInstanceState);
-        log("after onCreate called super");
+        logDebug("After onCreate called super");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        if (!isAdded()) {
-            return null;
-        }
+        if (!isAdded()) return null;
 
         View v = inflater.inflate(R.layout.fragment_local_camera_call_full_screen, container, false);
 
-        localFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
+        localFullScreenSurfaceView = v.findViewById(R.id.surface_local_video);
         localFullScreenSurfaceView.setZOrderMediaOverlay(true);
         SurfaceHolder localSurfaceHolder = localFullScreenSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localFullScreenSurfaceView);
-
-        log("onCreateView() addChatLocalVideoListener chatId: "+chatId);
+        logDebug("addChatLocalVideoListener Chat ID: " + chatId);
         megaChatApi.addChatLocalVideoListener(chatId, this);
 
         return v;
@@ -79,9 +75,8 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
-        if((width == 0) || (height == 0)){
-            return;
-        }
+        if ((width == 0) || (height == 0)) return;
+
 
         if (this.width != width || this.height != height) {
             this.width = width;
@@ -100,23 +95,17 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
                     }
                     this.bitmap = localRenderer.CreateBitmap(width, height);
                     holder.setFixedSize(holderWidth, holderHeight);
-                }
-                else{
+                } else {
                     this.width = -1;
                     this.height = -1;
                 }
             }
         }
+        if (bitmap == null) return;
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+        localRenderer.DrawBitmap(false, true);
 
-        if (bitmap != null) {
-            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-
-            // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
-            // The renderer has been modified a bit and an update of WebRTC could break our app
-            localRenderer.DrawBitmap(false, true);
-        }
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -125,33 +114,29 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     }
 
     @Override
-    public void onDestroy(){
-        log("onDestroy()");
+    public void onDestroy() {
+        logDebug("onDestroy()");
         removeSurfaceView();
         super.onDestroy();
     }
+
     @Override
     public void onResume() {
-        log("onResume");
-        this.width=0;
-        this.height=0;
+        logDebug("onResume");
+        this.width = 0;
+        this.height = 0;
         localFullScreenSurfaceView.setVisibility(View.VISIBLE);
 
         super.onResume();
     }
-    public void removeSurfaceView(){
-        log("removeSurfaceView()");
-        if(localFullScreenSurfaceView.getParent()!=null){
-            if(localFullScreenSurfaceView.getParent().getParent()!=null){
-                log("removeSurfaceView() removeView chatId: "+chatId);
-                ((ViewGroup)localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
-            }
+
+    public void removeSurfaceView() {
+        logDebug("removeSurfaceView()");
+        if (localFullScreenSurfaceView.getParent() != null && localFullScreenSurfaceView.getParent().getParent() != null) {
+            logDebug("removeView Chat ID: " + chatId);
+            ((ViewGroup) localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
         }
         localFullScreenSurfaceView.setVisibility(View.GONE);
-        megaChatApi.removeChatVideoListener(chatId, -1, -1,this);
-    }
-
-    private static void log(String log) {
-        Util.log("LocalCameraCallFullScreenFragment", log);
+        megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
     }
 }

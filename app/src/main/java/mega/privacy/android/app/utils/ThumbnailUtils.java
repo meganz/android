@@ -12,6 +12,7 @@ import java.util.HashMap;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -20,6 +21,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 /*
@@ -116,15 +118,15 @@ public class ThumbnailUtils {
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-			
-			log("Downloading thumbnail finished");
+
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
 //			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 				
 				if (holder != null){
@@ -140,7 +142,7 @@ public class ThumbnailUtils {
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.imgDisplay.startAnimation(fadeInAnimation);
 									adapter.notifyDataSetChanged();
-									log("Thumbnail update");
+									logDebug("Thumbnail update");
 								}
 							}
 						}
@@ -148,7 +150,7 @@ public class ThumbnailUtils {
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -172,7 +174,7 @@ public class ThumbnailUtils {
         if(!isFileAvailable(thumbDir)) {
             thumbDir = getCacheFolder(context, THUMBNAIL_FOLDER);
         }
-		log("getThumbFolder(): thumbDir= " + thumbDir);
+		logDebug("getThumbFolder(): thumbDir= " + thumbDir);
 		return thumbDir;
 	}
 	
@@ -232,8 +234,4 @@ public class ThumbnailUtils {
 		File file;
 		MegaNode document;
 	}
-
-	private static void log(String log) {
-		Util.log("ThumbnailUtils", log);
-	}	
 }
