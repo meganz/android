@@ -1,7 +1,6 @@
 package mega.privacy.android.app.components;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.CheckBox;
@@ -41,9 +40,5 @@ public class LinearLayoutCheckable extends LinearLayout implements Checkable {
 		if (_checkbox != null) {
 			_checkbox.toggle();
 		}
-	}
-	
-	public static void log(String message) {
-		Util.log("LinearLayoutCheckable", message);
 	}
 }

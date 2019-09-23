@@ -31,11 +31,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.VersionsFileActivity;
-import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapter.ViewHolderVersion> implements OnClickListener, View.OnLongClickListener {
 
@@ -76,21 +78,21 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	}
 
 	public void toggleAllSelection(int pos) {
-		log("toggleAllSelection: "+pos);
+		logDebug("Position: " + pos);
 		final int positionToflip = pos;
 
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			log("PUT pos: "+pos);
+			logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 		}
 
 		VersionsFileAdapter.ViewHolderVersion view = (VersionsFileAdapter.ViewHolderVersion) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
-			log("Start animation: "+pos+" multiselection state: "+isMultipleSelect());
+			logDebug("Start animation: " + pos + " multiselection state: " + isMultipleSelect());
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
@@ -100,12 +102,12 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					log("onAnimationEnd");
+					logDebug("onAnimationEnd");
 					if (selectedItems.size() <= 0){
-						log("toggleAllSelection: hideMultipleSelect");
+						logDebug("hideMultipleSelect");
 						((VersionsFileActivity) context).hideMultipleSelect();
 					}
-					log("toggleAllSelection: notified item changed");
+					logDebug("notified item changed");
 					notifyItemChanged(positionToflip);
 				}
 
@@ -117,28 +119,28 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 			view.imageView.startAnimation(flipAnimation);
 		}
 		else{
-			log("NULL view pos: "+positionToflip);
+			logWarning("NULL view pos: " + positionToflip);
 			notifyItemChanged(pos);
 		}
 
 	}
 
 	public void toggleSelection(int pos) {
-		log("toggleSelection: "+pos);
+		logDebug("Position: " + pos);
 
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			log("PUT pos: "+pos);
+			logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
 
 		VersionsFileAdapter.ViewHolderVersion view = (VersionsFileAdapter.ViewHolderVersion) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
-			log("Start animation: "+pos);
+			logDebug("Start animation: " + pos);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
@@ -163,7 +165,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 		}
 		else{
-			log("view is null - not animation");
+			logWarning("View is null - not animation");
 		}
 	}
 
@@ -176,7 +178,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	}
 
 	public void clearSelections() {
-		log("clearSelections");
+		logDebug("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(isItemChecked(i)){
 				toggleAllSelection(i);
@@ -246,7 +248,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	}
 
 	public void setNodes(ArrayList<MegaNode> nodes) {
-		log("setNodes");
+		logDebug("setNodes");
 		this.nodes = nodes;
 //		contentTextFragment.setText(getInfoFolder(node));
 		notifyDataSetChanged();
@@ -254,7 +256,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 	@Override
 	public ViewHolderVersion onCreateViewHolder(ViewGroup parent, int viewType) {
-		log("onCreateViewHolder");
+		logDebug("onCreateViewHolder");
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -289,7 +291,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	
 	@Override
 	public void onBindViewHolder(ViewHolderVersion holder, int position) {
-		log("onBindViewHolder");
+		logDebug("Position: " + position);
 
 		MegaNode node = (MegaNode) getItem(position);
 		holder.document = node.getHandle();
@@ -321,7 +323,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		holder.textViewFileSize.setText("");
 
 		long nodeSize = node.getSize();
-		String fileInfo = Util.getSizeString(nodeSize) + " . " + getNodeDate(node);
+		String fileInfo = getSizeString(nodeSize) + " . " + getNodeDate(node);
 		holder.textViewFileSize.setText(fileInfo);
 
 		RelativeLayout.LayoutParams paramsLarge = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -331,17 +333,17 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		paramsLarge.setMargins(leftLarge, 0, 0, 0);
 
 		if (!multipleSelect) {
-			log("Not multiselect");
+			logDebug("Not multiselect");
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 			holder.imageView.setLayoutParams(paramsLarge);
 
-			log("Check the thumb");
+			logDebug("Check the thumb");
 
 			if (node.hasThumbnail()) {
-				log("Node has thumbnail");
+				logDebug("Node has thumbnail");
 
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
+				thumb = getThumbnailFromCache(node);
 				if (thumb != null) {
 					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -354,7 +356,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 					holder.imageView.setImageBitmap(thumb);
 
 				} else {
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+					thumb = getThumbnailFromFolder(node, context);
 					if (thumb != null) {
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -386,8 +388,8 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 					}
 				}
 			} else {
-				log("Node NOT thumbnail");
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
+				logDebug("Node NOT thumbnail");
+				thumb = getThumbnailFromCache(node);
 				if (thumb != null) {
 					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -401,7 +403,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 
 				} else {
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+					thumb = getThumbnailFromFolder(node, context);
 					if (thumb != null) {
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -426,7 +428,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 			}
 		}
 		else {
-			log("Multiselection ON");
+			logDebug("Multiselection ON");
 			if(this.isItemChecked(position)){
 				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 
@@ -436,13 +438,13 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 			else{
 				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 
-				log("Check the thumb");
+				logDebug("Check the thumb");
 				holder.imageView.setLayoutParams(paramsLarge);
 
 				if (node.hasThumbnail()) {
-					log("Node has thumbnail");
+					logDebug("Node has thumbnail");
 
-					thumb = ThumbnailUtils.getThumbnailFromCache(node);
+					thumb = getThumbnailFromCache(node);
 					if (thumb != null) {
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -455,7 +457,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 						holder.imageView.setImageBitmap(thumb);
 
 					} else {
-						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+						thumb = getThumbnailFromFolder(node, context);
 						if (thumb != null) {
 							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -487,9 +489,9 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 						}
 					}
 				} else {
-					log("Node NOT thumbnail");
+					logDebug("Node NOT thumbnail");
 
-					thumb = ThumbnailUtils.getThumbnailFromCache(node);
+					thumb = getThumbnailFromCache(node);
 					if (thumb != null) {
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -502,7 +504,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 						holder.imageView.setImageBitmap(thumb);
 
 					} else {
-						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+						thumb = getThumbnailFromFolder(node, context);
 						if (thumb != null) {
 							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -515,7 +517,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 							holder.imageView.setImageBitmap(thumb);
 
 						} else {
-							log("NOT thumbnail");
+							logDebug("NOT thumbnail");
 							holder.imageView.setLayoutParams(paramsLarge);
 							holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
@@ -560,14 +562,14 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		logDebug("onClick");
 
 		ViewHolderVersion holder = (ViewHolderVersion) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
-		log("onClick -> Current position: "+currentPosition);
+		logDebug("Current position: " + currentPosition);
 
 		if(currentPosition<0){
-			log("Current position error - not valid value");
+			logError("Current position error - not valid value");
 			return;
 		}
 
@@ -576,8 +578,8 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		switch (v.getId()) {
 			case R.id.version_file_three_dots_layout:{
 
-				log("onClick: version_file_three_dots: "+currentPosition);
-				if(!Util.isOnline(context)){
+				logDebug("version_file_three_dots: " + currentPosition);
+				if(!isOnline(context)){
 					((VersionsFileActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
 					return;
 				}
@@ -621,7 +623,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 	public String getNodeDate(MegaNode node){
 
-		Calendar calendar = Util.calculateDateFromTimestamp(node.getModificationTime());
+		Calendar calendar = calculateDateFromTimestamp(node.getModificationTime());
 		String format3 = new SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault()).format(calendar.getTime());
 		return format3;
 	}
@@ -639,16 +641,12 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	}
 
 	public void setMultipleSelect(boolean multipleSelect) {
-		log("setMultipleSelect: "+multipleSelect);
+		logDebug("multipleSelect: " + multipleSelect);
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 		}
 		if(this.multipleSelect){
 			selectedItems = new SparseBooleanArray();
 		}
-	}
-
-	private static void log(String log) {
-		Util.log("VersionsFileAdapter", log);
 	}
 }

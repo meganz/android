@@ -28,6 +28,8 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+
 public class SetPasswordDialog extends AlertDialog implements View.OnClickListener {
 
     private AlertDialog mDialog;
@@ -110,7 +112,7 @@ public class SetPasswordDialog extends AlertDialog implements View.OnClickListen
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                log("onTextChanged: " + s.toString() + ":" + start + ":" + before + ":" + count);
+                logDebug("onTextChanged: " + s.toString() + ":" + start + ":" + before + ":" + count);
                 if (s.length() > 0) {
                     String temp = s.toString();
                     containerPasswordElements.setVisibility(View.VISIBLE);
@@ -422,9 +424,5 @@ public class SetPasswordDialog extends AlertDialog implements View.OnClickListen
                 mCallback.onConfirmed(userPassword.getText().toString());
             }
         }
-    }
-
-    private void log(String log) {
-        Util.log("SetPasswordDialog", log);
     }
 }
