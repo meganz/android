@@ -1385,7 +1385,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 									fileLinkFragmentContainer.setVisibility(View.VISIBLE);
 
 									fileLinkNameView.setText(pN.getName());
-									fileLinkSizeTextView.setText(Formatter.formatFileSize(this, pN.getSize()));
+									fileLinkSizeTextView.setText(getSizeString(pN.getSize()));
 
 									fileLinkIconView.setImageResource(MimeTypeList.typeForName(pN.getName()).getIconResourceId());
 

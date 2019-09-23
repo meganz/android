@@ -584,7 +584,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else{
 			notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification, totalDownloads, totalDownloads);
-			String totalBytes = Formatter.formatFileSize(DownloadService.this, megaApi.getTotalDownloadedBytes()+megaApiFolder.getTotalDownloadedBytes());
+			String totalBytes = getSizeString(megaApi.getTotalDownloadedBytes()+megaApiFolder.getTotalDownloadedBytes());
 			size = getString(R.string.general_total_size, totalBytes);
 		}
 

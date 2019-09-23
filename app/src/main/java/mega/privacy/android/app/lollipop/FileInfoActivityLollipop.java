@@ -1515,7 +1515,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			contentTextView.setText(getInfoFolder(node, this));
 
 			long sizeFile=megaApi.getSize(node);
-			sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));
+			sizeTextView.setText(getSizeString(sizeFile));
 
 			iconToolbarView.setImageResource(imageId);
 
@@ -2927,7 +2927,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		if (node.isFolder()){
 			long sizeFile=megaApi.getSize(node);
-			sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));
+			sizeTextView.setText(getSizeString(sizeFile));
 
 			contentTextView.setText(getInfoFolder(node, this));
 

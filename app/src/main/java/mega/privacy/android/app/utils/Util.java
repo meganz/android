@@ -560,8 +560,8 @@ public class Util {
 	public static String getProgressSize(Context context, long progress,
 			long size) {
 		return String.format("%s/%s",
-				Formatter.formatFileSize(context, progress),
-				Formatter.formatFileSize(context, size));
+				getSizeString(progress),
+				getSizeString(size));
 	}
 	
 	/*
