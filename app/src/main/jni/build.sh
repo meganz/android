@@ -4,8 +4,8 @@ set -e
 ##################################################
 ### SET THE PATH TO YOUR ANDROID NDK DIRECTORY ###
 ##################################################
-NDK_ROOT32=${HOME}/ndk/android-ndk-r14b
-NDK_ROOT64=${HOME}/ndk/android-ndk-r16b
+NDK_ROOT32=${HOME}/android-ndk32
+NDK_ROOT64=${HOME}/android-ndk64
 ##################################################
 
 NDK_BUILD32=${NDK_ROOT32}/ndk-build

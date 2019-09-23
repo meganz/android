@@ -62,15 +62,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
-import static mega.privacy.android.app.utils.FileUtils.buildExternalStorageFile;
-import static mega.privacy.android.app.utils.FileUtils.copyFile;
-import static mega.privacy.android.app.utils.FileUtils.deleteFolderAndSubfolders;
-import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
-import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
-import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class NodeController {
 

@@ -93,7 +93,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
-import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.content.Context.*;
 
 
 public class Util {

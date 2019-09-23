@@ -66,15 +66,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
-import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
-import static mega.privacy.android.app.utils.OfflineUtils.OFFLINE_DIR;
-import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
-import static mega.privacy.android.app.utils.OfflineUtils.saveOfflineChatFile;
-import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 /*
  * Background service to download files

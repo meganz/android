@@ -81,16 +81,12 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaTransfer;
 
-import static mega.privacy.android.app.MegaPreferences.MEDIUM;
-import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
-import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
-import static mega.privacy.android.app.utils.FileUtils.buildDefaultDownloadDir;
-import static mega.privacy.android.app.utils.FileUtils.purgeDirectory;
-import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
-import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
-import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
+import static mega.privacy.android.app.MegaPreferences.*;
+import static mega.privacy.android.app.jobservices.SyncRecord.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {

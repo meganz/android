@@ -30,7 +30,7 @@ public class DownloadableActivity extends PinActivityLollipop {
         this.linkInfo = linkInfo;
     }
 
-    protected void onRequestSDCardWritePermission(Intent intent, int resultCode, NodeController nC) {
+    private Uri extractUri(Intent intent, int resultCode) {
         if (intent == null) {
             log("intent NULL");
             if (resultCode != Activity.RESULT_OK) {
@@ -38,58 +38,82 @@ public class DownloadableActivity extends PinActivityLollipop {
             } else {
                 Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
             }
-            return;
+            return null;
         }
-        Uri treeUri = intent.getData();
-        String uriString = treeUri.toString();
+        return intent.getData();
+    }
+
+    protected void onRequestSDCardWritePermission(Intent intent, int resultCode, NodeController nC) {
+        Uri treeUri = extractUri(intent, resultCode);
         if (treeUri != null) {
+            String uriString = treeUri.toString();
             DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
             if (pickedDir.canWrite()) {
                 log("sd card root uri is " + treeUri);
                 //save the sd card root uri string
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(this);
-                dbH.setSDCardUri(treeUri.toString());
+                dbH.setSDCardUri(uriString);
                 try {
                     SDCardOperator sdCardOperator = new SDCardOperator(this);
-                    if (nC != null) {
-                        if (downloadInfo != null) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                nC.requestLocalFolder(downloadInfo, sdCardOperator.getSDCardRoot(), null);
-                            } else {
-                                String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
-                                dbH.setStorageDownloadLocation(path);
-                                nC.checkSizeBeforeDownload(path, uriString, null, downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
-                            }
-                        } else if (linkInfo != null) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                nC.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
-                            } else {
-                                String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
-                                dbH.setStorageDownloadLocation(path);
-                                nC.downloadTo(linkInfo.getNode(), path, uriString, linkInfo.getUrl());
-                            }
+                    if (downloadInfo != null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            nC.requestLocalFolder(downloadInfo, sdCardOperator.getSDCardRoot(), null);
+                        } else {
+                            String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
+                            dbH.setStorageDownloadLocation(path);
+                            nC.checkSizeBeforeDownload(path, uriString, null, downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
+                        }
+                    } else if (linkInfo != null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            nC.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
+                        } else {
+                            String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
+                            dbH.setStorageDownloadLocation(path);
+                            nC.downloadTo(linkInfo.getNode(), path, uriString, linkInfo.getUrl());
+                        }
+                    }
+                } catch (SDCardOperator.SDCardException e) {
+                    e.printStackTrace();
+                    log(e.getMessage());
+                }
+            }
+        } else {
+            log("tree uri is null!");
+        }
+    }
+
+    protected void onRequestSDCardWritePermission(Intent intent, int resultCode) {
+        Uri treeUri = extractUri(intent, resultCode);
+        if (treeUri != null) {
+            String uriString = treeUri.toString();
+            DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
+            if (pickedDir.canWrite()) {
+                log("sd card root uri is " + treeUri);
+                //save the sd card root uri string
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(this);
+                dbH.setSDCardUri(uriString);
+                try {
+                    SDCardOperator sdCardOperator = new SDCardOperator(this);
+
+                    NodeController controller = new NodeController(this);
+                    String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
+                    //file link
+                    if (linkInfo != null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            controller.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
+                        } else {
+                            dbH.setStorageDownloadLocation(path);
+                            controller.downloadTo(linkInfo.getNode(), path, uriString, linkInfo.getUrl());
                         }
                     } else {
-                        NodeController controller = new NodeController(this);
-                        String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
-                        //file link
-                        if (linkInfo != null) {
+                        //folder link
+                        if (this instanceof FolderLinkActivityLollipop) {
+                            FolderLinkActivityLollipop activity = (FolderLinkActivityLollipop) this;
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                controller.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
+                                activity.toSelectFolder(downloadInfo.getHashes(), downloadInfo.getSize(), sdCardOperator.getSDCardRoot(), null);
                             } else {
                                 dbH.setStorageDownloadLocation(path);
-                                controller.downloadTo(linkInfo.getNode(), path, uriString, linkInfo.getUrl());
-                            }
-                        } else {
-                            //folder link
-                            if (this instanceof FolderLinkActivityLollipop) {
-                                FolderLinkActivityLollipop activity = (FolderLinkActivityLollipop) this;
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    activity.toSelectFolder(downloadInfo.getHashes(), downloadInfo.getSize(), sdCardOperator.getSDCardRoot(), null);
-                                } else {
-                                    dbH.setStorageDownloadLocation(path);
-                                    activity.downloadTo(path, uriString, null, downloadInfo.getSize(), downloadInfo.getHashes());
-                                }
+                                activity.downloadTo(path, uriString, null, downloadInfo.getSize(), downloadInfo.getHashes());
                             }
                         }
                     }
@@ -100,8 +124,6 @@ public class DownloadableActivity extends PinActivityLollipop {
             }
         } else {
             log("tree uri is null!");
-            Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
         }
     }
-
 }

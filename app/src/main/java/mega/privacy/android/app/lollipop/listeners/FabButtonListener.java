@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 

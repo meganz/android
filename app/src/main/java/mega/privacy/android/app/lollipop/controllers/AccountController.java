@@ -51,7 +51,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.Constants.ACTION_LOG_OUT;
+import static mega.privacy.android.app.utils.Constants.*;
 
 public class AccountController implements View.OnClickListener{
 

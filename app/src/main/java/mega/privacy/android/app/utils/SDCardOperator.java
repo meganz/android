@@ -65,7 +65,7 @@ public class SDCardOperator {
         sdCardRoot = Util.getSDCardRoot(downloadRoot);
     }
 
-    public void initDocumentFileRoot(String  uriString) throws SDCardException {
+    public void initDocumentFileRoot(String uriString) throws SDCardException {
         if (TextUtils.isEmpty(uriString)) {
             throw new SDCardException("Haven't got sd card root uri!");
         } else {
@@ -77,7 +77,7 @@ public class SDCardOperator {
                     throw new SDCardException("Permission required!");
                 }
             } catch (Exception e) {
-                if(!(e instanceof SDCardException)) {
+                if (!(e instanceof SDCardException)) {
                     throw new SDCardException("Invalid uri string.", e);
                 } else {
                     throw e;
@@ -104,12 +104,12 @@ public class SDCardOperator {
 
     public boolean canWriteWithFile(String target) {
         boolean canWrite = new File(target).canWrite();
-        if(!canWrite) {
+        if (!canWrite) {
             return false;
         }
         // test if really can write on this path.
         canWrite = new File(target, TEST).mkdir();
-        if(!canWrite) {
+        if (!canWrite) {
             return false;
         } else {
             return new File(target, TEST).delete();
@@ -151,12 +151,12 @@ public class SDCardOperator {
         return root;
     }
 
-    public static void requestSDCardPermission(String sdCardRoot,Context context, Fragment fragment) {
+    public static void requestSDCardPermission(String sdCardRoot, Context context, Fragment fragment) {
         Intent intent = getRequestPermissionIntent(context, sdCardRoot);
         fragment.startActivityForResult(intent, Constants.REQUEST_CODE_TREE);
     }
 
-    public static void requestSDCardPermission(String sdCardRoot,Context context, Activity activity) {
+    public static void requestSDCardPermission(String sdCardRoot, Context context, Activity activity) {
         Intent intent = getRequestPermissionIntent(context, sdCardRoot);
         activity.startActivityForResult(intent, Constants.REQUEST_CODE_TREE);
     }
@@ -165,7 +165,7 @@ public class SDCardOperator {
         Intent intent = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             StorageManager sm = context.getSystemService(StorageManager.class);
-            if(sm != null) {
+            if (sm != null) {
                 StorageVolume volume = sm.getStorageVolume(new File(sdCardRoot));
                 if (volume != null) {
                     intent = volume.createAccessIntent(null);
