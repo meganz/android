@@ -5865,10 +5865,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public boolean isOnRecents () {
-    	if (getDrawerItem() == DrawerItem.CLOUD_DRIVE && getTabItemCloud() == RECENTS_TAB && isRecentsAdded()) return true;
+	public boolean isOnRecents() {
+		if (getDrawerItem() == DrawerItem.CLOUD_DRIVE && getTabItemCloud() == RECENTS_TAB ) return true;
 
-    	return false;
+		return false;
 	}
 
 	private boolean isCloudAdded () {
