@@ -40,8 +40,6 @@ import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
 import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC;
 import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineUtils {
 
@@ -656,6 +654,12 @@ public class OfflineUtils {
     }
 
 
+    /**
+     * sort the list of MegaOffline Node according to different order
+     *
+     * @param order    the passed order
+     * @param mOffList the list required to be sorted
+     */
     public static void sort(int order, ArrayList<MegaOffline> mOffList, final Context context) {
         ArrayList<MegaOffline> foldersOrder = new ArrayList<>();
         ArrayList<MegaOffline> filesOrder = new ArrayList<>();

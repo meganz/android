@@ -8420,6 +8420,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				final AlertDialog dialog = sortByDialog;
 
+				//Check listeners setting
 				ascendingCheck.setOnClickListener(new OnClickListener() {
 
 					@Override
@@ -18235,8 +18236,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			isDeviceMemoryLow = false;
         }
     }
-    private void setCheckByOrder(int order, ArrayList<CheckedTextView> checkedTextViewList) {
-		switch(order) {
+
+
+	/**
+	 * set list of checked text view which one to be checked
+	 *
+	 * @param order               the order
+	 * @param checkedTextViewList the list of checkedTextViews
+	 */
+	private void setCheckByOrder(int order, ArrayList<CheckedTextView> checkedTextViewList) {
+		switch (order) {
 			case ORDER_DEFAULT_ASC: {
 				//ascendingCheck get checked
 				checkedTextViewList.get(0).setChecked(true);
@@ -18259,12 +18268,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				checkedTextViewList.get(3).setChecked(true);
 				break;
 			}
-			case ORDER_SIZE_DESC:{
+			case ORDER_SIZE_DESC: {
 				//largestCheck get checked
 				checkedTextViewList.get(4).setChecked(true);
 				break;
 			}
-			case ORDER_SIZE_ASC:{
+			case ORDER_SIZE_ASC: {
 				//smallestCheck get checked
 				checkedTextViewList.get(5).setChecked(true);
 				break;
