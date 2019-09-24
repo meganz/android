@@ -991,6 +991,19 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
+	private void setCreateFolderVisibility() {
+		if (intent == null) {
+			return;
+		}
+
+		if(intent.getAction().equals(ACTION_MULTISELECT_FILE)||intent.getAction().equals(ACTION_SELECT_FILE)){
+			createFolderMenuItem.setVisible(false);
+		}
+		else{
+			createFolderMenuItem.setVisible(true);
+		}
+	}
+
 	@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 		logDebug("onPrepareOptionsMenuLollipop");
@@ -1009,12 +1022,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				}
 				else{
 					//CLOUD TAB
-					if(intent.getAction().equals(ACTION_MULTISELECT_FILE)||intent.getAction().equals(ACTION_SELECT_FILE)){
-						createFolderMenuItem.setVisible(false);
-					}
-					else{
-						createFolderMenuItem.setVisible(true);
-					}
+					setCreateFolderVisibility();
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
@@ -1026,12 +1034,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			else if(index==1){
 				if(isChatFirst){
 					//CLOUD TAB
-					if(intent.getAction().equals(ACTION_MULTISELECT_FILE)||intent.getAction().equals(ACTION_SELECT_FILE)){
-						createFolderMenuItem.setVisible(false);
-					}
-					else{
-						createFolderMenuItem.setVisible(true);
-					}
+					setCreateFolderVisibility();
 					newChatMenuItem.setVisible(false);
 				}
 				else{
@@ -1052,12 +1055,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 								case MegaShare.ACCESS_OWNER:
 								case MegaShare.ACCESS_READWRITE:
 								case MegaShare.ACCESS_FULL:
-									if(intent.getAction().equals(ACTION_MULTISELECT_FILE)||intent.getAction().equals(ACTION_SELECT_FILE)){
-										createFolderMenuItem.setVisible(false);
-									}
-									else{
-										createFolderMenuItem.setVisible(true);
-									}
+									setCreateFolderVisibility();
 									break;
 
 								case MegaShare.ACCESS_READ:
@@ -1114,7 +1112,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 		else{
 			if (cDriveExplorer != null && !importFileF){
-				createFolderMenuItem.setVisible(true);
+				setCreateFolderVisibility();
 			}
 			else if (importFileF) {
 				if (importFragmentSelected != -1 ) {
@@ -3318,8 +3316,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		isList = !isList;
 		dbH.setPreferredViewList(isList);
 		updateManagerView();
-		supportInvalidateOptionsMenu();
 		refreshView();
+		supportInvalidateOptionsMenu();
 	}
 
 	private void refreshView () {

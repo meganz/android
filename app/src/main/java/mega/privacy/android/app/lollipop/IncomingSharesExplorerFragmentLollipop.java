@@ -313,13 +313,14 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, recyclerView, selectFile);
 		}
 		else{
+			adapter.setListFragment(recyclerView);
 			adapter.setParentHandle(parentHandle);
 			adapter.setSelectFile(selectFile);
 		}
+
+        recyclerView.setAdapter(adapter);
+        fastScroller.setRecyclerView(recyclerView);
 		adapter.setNodes(nodes);
-		adapter.setPositionClicked(-1);
-		recyclerView.setAdapter(adapter);
-		fastScroller.setRecyclerView(recyclerView);
 
 		findDisabledNodes();
 

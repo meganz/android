@@ -62,8 +62,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	MegaApiAndroid megaApi;
 	MegaPreferences prefs;
 
-
-	int positionClicked;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
 	ArrayList<MegaNode> nodes;
@@ -136,7 +134,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		this.parentHandle = _parentHandle;
 		this.listFragment = listView;
 		this.selectFile = selectFile;
-		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
 		this.fragment = fragment;
@@ -169,8 +166,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	
 	@Override
 	public ViewHolderExplorerLollipop onCreateViewHolder(ViewGroup parent, int viewType) {
-
-	    listFragment = (RecyclerView) parent;
 
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -742,17 +737,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		}
 	}
 
-	public int getPositionClicked (){
-    	return positionClicked;
-    }
-
-    public void setPositionClicked(int p){
-    	positionClicked = p;
-    }
-
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = insertPlaceHolderNode(nodes);
-		positionClicked = -1;
 		notifyDataSetChanged();
 		visibilityFastScroller();
 	}
@@ -882,22 +868,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	}
 
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
-	    if (nodes == null) {
-	        return null;
-        }
-        int folderCount = 0;
-        for (MegaNode node : nodes) {
-            if (node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-        }
+        int folderCount = getFolderCount();
         int spanCount = 2;
         if (listFragment instanceof NewGridRecyclerView) {
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
         }
+
         placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
 
         if (folderCount > 0 && placeholderCount != 0 && !((FileExplorerActivityLollipop) context).isList()) {
@@ -934,5 +910,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             return node.getName().substring(0,1);
         }
         return null;
+    }
+
+    public void setListFragment(RecyclerView listFragment) {
+        this.listFragment = listFragment;
     }
 }
