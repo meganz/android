@@ -8584,6 +8584,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				});
 
+				//Chected Textview changes
 				switch (drawerItem) {
 					case CONTACTS: {
 						setCheckByOrder(orderContacts, checkedTextViewGroup);
@@ -8622,6 +8623,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 				}
+
+				//TextView changes
 				switch (drawerItem) {
 					case CONTACTS: {
 						sortByDateTV.setText(getString(R.string.sortby_date));

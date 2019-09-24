@@ -4,7 +4,7 @@ import android.content.Context;
 
 import java.io.File;
 
-import mega.privacy.android.app.utils.Util;
+import static mega.privacy.android.app.utils.FileUtils.getDirSize;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
@@ -136,7 +136,11 @@ public class MegaOffline {
 	public long getSize(Context context) {
 		File offlineNode = getOfflineFile(context, this);
 		if (offlineNode.exists()) {
-			return offlineNode.length();
+			if (offlineNode.isFile()) {
+				return offlineNode.length();
+			} else {
+				return getDirSize(offlineNode);
+			}
 		} else {
 			return 0;
 		}
