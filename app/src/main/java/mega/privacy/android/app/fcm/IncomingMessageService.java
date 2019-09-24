@@ -17,8 +17,10 @@ import com.google.firebase.messaging.RemoteMessage;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class IncomingMessageService extends IncomingCallService {
     
@@ -29,10 +31,10 @@ public class IncomingMessageService extends IncomingCallService {
     @Override
     public int onStartCommand(Intent intent,int flags,int startId) {
         ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        log("network available: " + (cm.getActiveNetworkInfo() != null));
+        logDebug("Network available: " + (cm.getActiveNetworkInfo() != null));
         if (cm.getActiveNetworkInfo() != null) {
-            log(cm.getActiveNetworkInfo().getState() + "");
-            log(cm.getActiveNetworkInfo().getDetailedState() + "");
+            logDebug(cm.getActiveNetworkInfo().getState() + "");
+            logDebug(cm.getActiveNetworkInfo().getDetailedState() + "");
         }
         
         PowerManager pm = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
@@ -55,7 +57,7 @@ public class IncomingMessageService extends IncomingCallService {
         NotificationManager mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,Constants.NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE,importance);
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE,importance);
             mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
             if (mNotificationManager != null) {
                 mNotificationManager.createNotificationChannel(notificationChannel);
@@ -68,7 +70,7 @@ public class IncomingMessageService extends IncomingCallService {
     }
     
     private void checkMessage() {
-        if (Util.isChatEnabled()) {
+        if (isChatEnabled()) {
             
             try {
                 String silent;
@@ -77,7 +79,7 @@ public class IncomingMessageService extends IncomingCallService {
                 } else {
                     silent = "0"; //beep
                 }
-                log("Silent payload: " + silent);
+                logDebug("Silent payload: " + silent);
                 
                 if (silent != null) {
                     if (silent.equals("1")) {
@@ -86,28 +88,28 @@ public class IncomingMessageService extends IncomingCallService {
                         beep = true;
                     }
                 } else {
-                    log("NO DATA on the PUSH");
+                    logWarning("NO DATA on the PUSH");
                     beep = true;
                 }
             } catch (Exception e) {
-                log("ERROR:remoteSilentParameter");
+                logError("ERROR:remoteSilentParameter", e);
                 beep = true;
             }
-            
-            log("notification should beep: " + beep);
+
+            logDebug("Notification should beep: " + beep);
             showMessageNotificationAfterPush = true;
             
             UserCredentials credentials = dbH.getCredentials();
             String gSession = credentials.getSession();
             if (megaApi.getRootNode() == null) {
-                log("RootNode = null");
+                logWarning("RootNode = null");
                 performLoginProccess(gSession);
             } else {
                 //Leave the flag showMessageNotificationAfterPush as it is
                 //If true - wait until connection finish
                 //If false, no need to change it
-                log("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
-                log("(2)Call to pushReceived");
+                logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
+                logDebug("Call to pushReceived");
                 megaChatApi.pushReceived(beep);
                 beep = false;
             }
@@ -121,10 +123,10 @@ public class IncomingMessageService extends IncomingCallService {
                             stop();
                             boolean shown = ((MegaApplication)getApplication()).isChatNotificationReceived();
                             if (!shown) {
-                                log("Show simple notification - no connection finished");
+                                logDebug("Show simple notification - no connection finished");
                                 chatNotificationBuilder.showSimpleNotification();
                             } else {
-                                log("Notification already shown");
+                                logDebug("Notification already shown");
                             }
                         }
                     },
