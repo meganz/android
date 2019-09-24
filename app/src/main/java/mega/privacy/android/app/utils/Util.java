@@ -312,6 +312,7 @@ public class Util {
 			}
 			return bmRotated;
 		} catch (Exception e) {
+			logError("Exception creating rotated bitmap", e);
 			e.printStackTrace();
 			return null;
 		}

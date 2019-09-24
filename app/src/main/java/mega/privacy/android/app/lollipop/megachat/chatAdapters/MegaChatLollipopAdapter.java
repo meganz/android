@@ -380,6 +380,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     exif = new ExifInterface(currentFile.getAbsolutePath());
                     orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
                 } catch (IOException e) {
+                    logWarning("EXCEPTION", e);
                 }
 
                 // Calculate inSampleSize
@@ -396,8 +397,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (preview != null) {
                         //put preview bitmap to memory cache
                         setPreviewCache(fingerprintCache, preview);
-                        //save preview file as folder cache
-                        putRotatedPreviewToFolder(filePath, preview, megaApi, context);
                         return true;
                     }
                     return false;
@@ -429,8 +428,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
                         //put preview bitmap to memory cache
                         setPreviewCache(fingerprintCache, preview);
-                        //save preview file as folder cache
-                        putRotatedPreviewToFolder(filePath, preview, megaApi, context);
                         return true;
                     } else if (!result) {
                         logWarning("Not Compress");
@@ -444,6 +441,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             out.close();
                         }
                     } catch (Exception e) {
+                        logWarning("Error closing FileOutputStream", e);
                     }
                 }
             } else if (MimeTypeList.typeForName(filePath).isVideo()) {
@@ -472,8 +470,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
                                 //put preview bitmap to memory cache
                                 setPreviewCache(fingerprintCache, bmPreview);
-                                //save preview file as folder cache
-                                putRotatedPreviewToFolder(filePath, bmPreview, megaApi, context);
                                 return true;
                             } else {
                                 return false;
@@ -486,7 +482,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     out.close();
                                 }
                             } catch (IOException e) {
-                                logError("Error", e);
+                                logError("Error closing FileOutputStream", e);
                             }
                         }
 
@@ -1446,22 +1442,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.GONE);
 
-                    preview = getPreviewFromCacheAndFolder(path, context, megaApi);
+                        preview = getPreview(path, context);
 
-                    if (preview != null) {
-                        setUploadingPreview((ViewHolderMessageChat) holder, preview);
-                        logDebug("preview!");
-                    } else {
-                        logWarning("No preview!");
-                        if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
-                            ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
-                        }
-                        try {
-                            new ChatUploadingPreviewAsyncTask(this, position).execute(path);
-
+                        if (preview != null) {
+                            setUploadingPreview((ViewHolderMessageChat) holder, preview);
+                            logDebug("preview!");
+                        } else {
+                            logWarning("No preview!");
+                            if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
+                                ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.VISIBLE);
+                                ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
+                            }
+                            try {
+                                new ChatUploadingPreviewAsyncTask(this, position).execute(path);
                             } catch (Exception e) {
-                                //Too many AsyncTasks
+                                logWarning("Error creating preview (Too many AsyncTasks)", e);
                             }
                         }
                     } else {

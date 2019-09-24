@@ -10,9 +10,8 @@ import android.provider.MediaStore;
 import android.view.Display;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.PreviewCache;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -23,7 +22,9 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class PreviewUtils {
-	
+
+	private static MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+
 	public static File previewDir;
 	public static PreviewCache previewCache = new PreviewCache();
 
@@ -52,71 +53,50 @@ public class PreviewUtils {
 		previewCache.put(handle, bitmap);
 	}
 
-    public static Bitmap getPreviewFromFolder(MegaNode node, Context context){
-	    Bitmap bmp = previewCache.get(node.getHandle());
-	    if(bmp == null) {
-            File previewDir = getPreviewFolder(context);
-            File preview = new File(previewDir, node.getBase64Handle()+".jpg");
-            if (preview.exists()){
-                if (preview.length() > 0){
-                    bmp = getBitmapForCache(preview, context);
-                    if (bmp == null) {
-                        preview.delete();
-                    }
-                    else{
-                        previewCache.put(node.getHandle(), bmp);
-                    }
-                }
-            }
-        }
-        return bmp;
-    }
+	/**
+	 * Get the preview of a node.
+	 * @param node Node from which want to get the preview.
+	 * @param context The current context.
+	 * @return The bitmap of the preview.
+	 */
+	public static Bitmap getPreviewFromFolder(MegaNode node, Context context) {
+		return getPreview(node.getHandle(), context);
+	}
 
-	public static Bitmap getPreviewFromCacheAndFolder(String path, Context context, MegaApiAndroid megaApi) {
-		long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(path));
-		Bitmap bitmap = previewCache.get(fingerprintCache);
-		if (bitmap == null) {
+	/**
+	 * Get the preview of a local file.
+	 * @param localPath Local path of the file from which want to get the preview.
+	 * @param context The current context.
+	 * @return The bitmap of the preview.
+	 */
+	public static Bitmap getPreview(String localPath, Context context) {
+		long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(localPath));
+		return getPreview(fingerprintCache, context);
+	}
+
+	/**
+	 * Get a preview using a handle as identifier.
+	 * @param handle Handle of the node from which want to get the preview.
+	 * @param context The current context.
+	 * @return The bitmap of the preview.
+	 */
+	private static Bitmap getPreview(long handle, Context context) {
+		Bitmap bmp = previewCache.get(handle);
+		if (bmp == null) {
 			File previewDir = getPreviewFolder(context);
-			File preview = new File(previewDir, fingerprintCache + ".jpg");
+			File preview = new File(previewDir, handle + ".jpg");
 			if (preview.exists()) {
 				if (preview.length() > 0) {
-					bitmap = getBitmapForCache(preview, context);
-					if (bitmap == null) {
+					bmp = getBitmapForCache(preview, context);
+					if (bmp == null) {
 						preview.delete();
 					} else {
-						previewCache.put(fingerprintCache, bitmap);
+						previewCache.put(handle, bmp);
 					}
 				}
 			}
 		}
-		return bitmap;
-	}
-
-	public static void putRotatedPreviewToFolder(String path, Bitmap rotatedBitmap, MegaApiAndroid megaApi, Context context) {
-		long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(path));
-		File previewDir = getPreviewFolder(context);
-		File preview = new File(previewDir, fingerprintCache + ".jpg");
-		FileOutputStream outStream = null;
-		try {
-			outStream = new FileOutputStream(preview);
-			boolean result = rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
-			if (result) {
-				logDebug("Put rotated bitmap to folder cache successfully");
-			} else {
-				logWarning("Put rotated bitmap to folder cache failed");
-			}
-		} catch (Exception ex) {
-			logError("EXCEPTION", ex);
-		} finally {
-			if (outStream != null) {
-				try {
-					outStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-					logError("EXCEPTION", e);
-				}
-			}
-		}
+		return bmp;
 	}
 
 	public static Bitmap createVideoPreview(String filePath, int kind) {
