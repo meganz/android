@@ -46,13 +46,15 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
+import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnClickListener{
+public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements OnClickListener{
 
 	private Context context;
 	private MegaApiAndroid megaApi;
@@ -95,7 +97,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 	private NewHeaderItemDecoration headerItemDecoration;
 
-	private void activateActionMode(){
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
+	}
+
+	public void activateActionMode(){
 		logDebug("activateActionMode");
 
 		if (!adapter.isMultipleSelect()){
@@ -106,6 +113,11 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				activateButton(true);
 			}
 		}
+	}
+
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -1004,10 +1016,16 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 	}
 
-	private void updateActionModeTitle() {
-		logDebug("updateActionModeTitle");
+	@Override
+	protected void updateActionModeTitle() {
+		if (actionMode == null || getActivity() == null) {
+			return;
+		}
 
 		List<MegaNode> documents = adapter.getSelectedNodes();
+
+		if (documents == null) return;
+
 		int files = 0;
 		int folders = 0;
 		for (MegaNode document : documents) {
@@ -1171,10 +1189,13 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		if (headerItemDecoration == null) {
 			headerItemDecoration = new NewHeaderItemDecoration(context);
-			recyclerView.addItemDecoration(headerItemDecoration);
+		} else {
+			recyclerView.removeItemDecoration(headerItemDecoration);
 		}
+
 		headerItemDecoration.setType(type);
 		headerItemDecoration.setKeys(sections);
+		recyclerView.addItemDecoration(headerItemDecoration);
 	}
 
 	public FastScroller getFastScroller() {

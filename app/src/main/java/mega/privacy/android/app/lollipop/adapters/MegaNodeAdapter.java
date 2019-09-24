@@ -55,6 +55,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -361,24 +362,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      */
     @Override
     public int getFolderCount() {
-        return getFolderCount(nodes);
-    }
-
-    /*
-     * The method to calculate how many nodes are folders in array list
-     */
-    public int getFolderCount(ArrayList<MegaNode> nodes) {
-        int folderCount = 0;
-        if (nodes == null) return folderCount;
-        for (MegaNode node : nodes) {
-            if (node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-        }
-        return folderCount;
+        return getNumberOfFolders(nodes);
     }
 
     /**
@@ -389,7 +373,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * @return Nodes list with placeholder.
      */
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
-        int folderCount = getFolderCount(nodes);
+        int folderCount = getFolderCount();
         int spanCount = 2;
         if (listFragment instanceof NewGridRecyclerView) {
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();

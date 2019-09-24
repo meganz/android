@@ -47,9 +47,10 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider {
+public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 	
 	final public static int CLOUD_EXPLORER = 0;
 	final public static int INCOMING_SHARES_EXPLORER = 1;
@@ -79,6 +80,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	private SparseBooleanArray selectedItems;
 
 	RecyclerView listFragment;
+
+	private int placeholderCount;
 
     /*public static view holder class*/
     public class ViewHolderExplorerLollipop extends RecyclerView.ViewHolder{
@@ -650,29 +653,49 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		return 0;
 	}
 
-	public List<Integer> getSelectedItems() {
-		List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-		for (int i = 0; i < selectedItems.size(); i++) {
-			items.add(selectedItems.keyAt(i));
-		}
-		return items;
-	}
+	@Override
+    public List<Integer> getSelectedItems() {
 
-	/*
+        if (selectedItems != null) {
+            List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+            for (int i = 0; i < selectedItems.size(); i++) {
+                items.add(selectedItems.keyAt(i));
+            }
+            return items;
+        }
+
+        return null;
+    }
+
+    @Override
+    public int getFolderCount() {
+        return getNumberOfFolders(nodes);
+    }
+
+    @Override
+    public int getPlaceholderCount() {
+        return placeholderCount;
+    }
+
+    /*
 	 * Get list of all selected nodes
 	 */
 	public List<MegaNode> getSelectedNodes() {
-		ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
+	    if (selectedItems != null) {
+            ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
 
-		for (int i = 0; i < selectedItems.size(); i++) {
-			if (selectedItems.valueAt(i) == true) {
-				MegaNode document = getNodeAt(selectedItems.keyAt(i));
-				if (document != null){
-					nodes.add(document);
-				}
-			}
-		}
-		return nodes;
+            for (int i = 0; i < selectedItems.size(); i++) {
+                if (selectedItems.valueAt(i) == true) {
+                    MegaNode document = getNodeAt(selectedItems.keyAt(i));
+                    if (document != null) {
+                        nodes.add(document);
+                    }
+                }
+            }
+            return nodes;
+        }
+
+	    return null;
 	}
 
 	public long[] getSelectedHandles() {
@@ -875,7 +898,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         if (listFragment instanceof NewGridRecyclerView) {
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
         }
-        int placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+        placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
 
         if (folderCount > 0 && placeholderCount != 0 && !((FileExplorerActivityLollipop) context).isList()) {
             //Add placeholder at folders' end.
