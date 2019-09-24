@@ -96,6 +96,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class Util {
@@ -265,9 +266,9 @@ public class Util {
         	if (secStore.compareTo("") == 0){
         		return null;
         	}
-	        log("getExternalCardPath secStore: "+secStore);
+			logDebug("secStore: " + secStore);
 	        File path = new File(secStore);
-	        log("getFreeSize: "+path.getUsableSpace());
+			logDebug("getFreeSize: " + path.getUsableSpace());
 	        if(path.getUsableSpace()>0)
 	        {
 	        	return path.getAbsolutePath();
@@ -552,58 +553,6 @@ public class Util {
         return fileLoggerKarere;
     }
 
-	/*
-	 * Global log handler
-	 */
-	public static void log(String origin, String message) {
-		MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
-
-//		try {
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//			String currentDateandTime = sdf.format(new Date());
-//
-//			message = "(" + currentDateandTime + ") - " + message;
-//		}
-//		catch (Exception e){}
-
-//		File logFile=null;
-//		if (DEBUG) {
-//			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
-//		}
-
-//		if (fileLogger) {
-//			//Send the log to a file
-//
-//			File dirFile = buildExternalStorageFile(LOG_DIR);
-//			if (!dirFile.exists()) {
-//				dirFile.mkdirs();
-//				logFile = new File(dirFile, "log.txt");
-//				if (!logFile.exists()) {
-//					try {
-//						logFile.createNewFile();
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//			} else {
-//				logFile = new File(dirFile, "log.txt");
-//				if (!logFile.exists()) {
-//					try {
-//						logFile.createNewFile();
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//
-//			if (logFile != null && logFile.exists()) {
-//				appendStringToFile(origin + ": " + message + "\n", logFile);
-//			}
-//		}
-	}
-	
 	public static void brandAlertDialog(AlertDialog dialog) {
 	    try {
 	        Resources resources = dialog.getContext().getResources();
@@ -753,7 +702,7 @@ public class Util {
 				  }
 			  }
 		  } catch (Exception ex) {
-			  log("Error getting local IP address: " + ex.toString());
+			  logError("Error getting local IP address", ex);
 		  }
 		  return null;
    }
@@ -1166,7 +1115,7 @@ public class Util {
 	}
 	
 	public static boolean checkBitSet(BitSet paymentBitSet, int position){
-		log("checkBitSet");
+		logDebug("checkBitSet");
 		if (paymentBitSet != null){
 			if (paymentBitSet.get(position)){
 				return true;
@@ -1188,7 +1137,7 @@ public class Util {
 				try{
 					long currentTime = System.currentTimeMillis()/1000;
 					long lastPublicHandleTimeStamp = Long.parseLong(attributes.getLastPublicHandleTimeStamp());
-					log("currentTime: " + currentTime + " _ " + lastPublicHandleTimeStamp);
+					logDebug("currentTime: " + currentTime + " _ " + lastPublicHandleTimeStamp);
 					if ((currentTime - lastPublicHandleTimeStamp) < 86400){
 						if (Long.parseLong(attributes.getLastPublicHandle()) != -1){
 							lastPublicHandle = Long.parseLong(attributes.getLastPublicHandle());
@@ -1246,7 +1195,7 @@ public class Util {
 	 * Validate email
 	 */
 	public static String getEmailError(String value, Context context) {
-		log("getEmailError");
+		logDebug("getEmailError");
 		if (value.length() == 0) {
 			return context.getString(R.string.error_enter_email);
 		}
@@ -1282,7 +1231,7 @@ public class Util {
 	}
 
 	public static void showAlert(Context context, String message, String title) {
-		log("showAlert");
+		logDebug("showAlert");
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		if(title!=null){
 			builder.setTitle(title);
@@ -1293,7 +1242,7 @@ public class Util {
 	}
 
 	public static long calculateTimestampMinDifference(String timeStamp) {
-		log("calculateTimestampDifference");
+		logDebug("calculateTimestampDifference");
 
 		Long actualTimestamp = System.currentTimeMillis()/1000;
 
@@ -1317,7 +1266,7 @@ public class Util {
 
 	public static long calculateTimestamp(String time)
 	{
-		log("calculateTimestamp: "+time);
+		logDebug("calculateTimestamp: " + time);
 		long unixtime;
 		DateFormat dfm = new SimpleDateFormat("yyyyMMddHHmm");
 		dfm.setTimeZone( TimeZone.getDefault());//Specify your timezone
@@ -1329,21 +1278,21 @@ public class Util {
 		}
 		catch (ParseException e)
 		{
-			log("ParseException!!!");
+			logError("ParseException!!!", e);
 		}
 		return 0;
 	}
 
 	public static Calendar calculateDateFromTimestamp (long timestamp){
-		log("calculateTimestamp: "+timestamp);
+		logDebug("calculateTimestamp: " + timestamp);
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(timestamp*1000);
-		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
+		logDebug("Calendar: " + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.MONTH));
 		return cal;
 	}
 
 	public static boolean isChatEnabled (){
-		log("isChatEnabled");
+		logDebug("isChatEnabled");
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(context);
 		}
@@ -1353,18 +1302,18 @@ public class Util {
 		if(chatSettings!=null){
 			if(chatSettings.getEnabled()!=null){
 				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-				log("A - chatEnabled: " + chatEnabled);
+				logDebug("A - chatEnabled: " + chatEnabled);
 				return chatEnabled;
 			}
 			else{
 				chatEnabled=true;
-				log("B - chatEnabled: " + chatEnabled);
+				logDebug("B - chatEnabled: " + chatEnabled);
 				return chatEnabled;
 			}
 		}
 		else{
 			chatEnabled=true;
-			log("C - chatEnabled: " + chatEnabled);
+			logDebug("C - chatEnabled: " + chatEnabled);
 			return chatEnabled;
 		}
 	}
@@ -1436,7 +1385,7 @@ public class Util {
 	//restrict the scale factor to below 1.1 to allow user to have some level of freedom and also prevent ui issues
 	public static void setAppFontSize(Activity activity) {
 		float scale = activity.getResources().getConfiguration().fontScale;
-		log("system font size scale is " + scale);
+		logDebug("System font size scale is " + scale);
 
 		float newScale;
 
@@ -1446,7 +1395,7 @@ public class Util {
 			newScale = (float) 1.1;
 		}
 
-		log("new font size new scale is " + newScale);
+		logDebug("New font size new scale is " + newScale);
 		Configuration configuration = activity.getResources().getConfiguration();
 		configuration.fontScale = newScale;
 
@@ -1490,7 +1439,7 @@ public class Util {
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
 			if(context instanceof ManagerActivityLollipop){
-				log("Show dialog to cancel transfers before logging OUT");
+				logDebug("Show dialog to cancel transfers before logging OUT");
 				builder.setMessage(R.string.logout_warning_abort_transfers);
 				builder.setPositiveButton(R.string.action_logout, new DialogInterface.OnClickListener() {
 					@Override
@@ -1500,7 +1449,7 @@ public class Util {
 				});
 			}
 			else{
-				log("Show dialog to cancel transfers before logging IN");
+				logDebug("Show dialog to cancel transfers before logging IN");
 				builder.setMessage(R.string.login_warning_abort_transfers);
 				builder.setPositiveButton(R.string.login_text, new DialogInterface.OnClickListener() {
 					@Override
@@ -1523,7 +1472,7 @@ public class Util {
 	}
 
 	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
-		log("changeStatusBarColor");
+		logDebug("changeStatusBarColor");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -1558,7 +1507,7 @@ public class Util {
 	}
 
 	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
-		log("createDefaultAvatar color: '"+color+"' firstLetter: '"+firstLetter+"'");
+		logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
@@ -1576,12 +1525,12 @@ public class Util {
 		paintText.setStyle(Paint.Style.FILL);
 
 		if(color!=null){
-			log("The color to set the avatar is "+color);
+			logDebug("The color to set the avatar is " + color);
 			paintCircle.setColor(Color.parseColor(color));
 			paintCircle.setAntiAlias(true);
 		}
 		else{
-			log("Default color to the avatar");
+			logDebug("Default color to the avatar");
 			paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 			paintCircle.setAntiAlias(true);
 		}
@@ -1595,7 +1544,7 @@ public class Util {
 
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-		log("Draw letter: "+firstLetter);
+		logDebug("Draw letter: " + firstLetter);
 		Rect bounds = new Rect();
 
 		paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -1640,7 +1589,7 @@ public class Util {
         } else if (context instanceof BaseActivity) {
             View rootView = getRootViewFromContext(context);
             if (rootView == null) {
-                log("unable to show snack bar, view does not exist");
+				logWarning("Unable to show snack bar, view does not exist");
             } else {
                 ((BaseActivity)context).showSnackbar(snackbarType,rootView,message,idChat);
             }
@@ -1659,7 +1608,7 @@ public class Util {
                 rootView = ((ViewGroup)((BaseActivity)context).findViewById(android.R.id.content)).getChildAt(0);//get first view
             }
         } catch (Exception e) {
-            log("getRootViewFromContext " + e.getMessage());
+			logError("ERROR", e);
         }
         return rootView;
     }
@@ -1721,7 +1670,7 @@ public class Util {
 		try {
 			builder.append(Math.round(Float.parseFloat(degreesSplit[2].replace(",", "."))));
 		} catch (Exception e) {
-			log("Error rounding seconds in coordinates: " + e.toString());
+			logWarning("Error rounding seconds in coordinates", e);
 			builder.append(degreesSplit[2]);
 		}
 
@@ -1754,7 +1703,7 @@ public class Util {
         try {
             return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
         } catch (IllegalArgumentException ex) {
-            log("IllegalArgument Exception is thrown");
+            logFatal("IllegalArgument Exception is thrown", ex);
             return false;
         }
     }
@@ -1788,10 +1737,6 @@ public class Util {
 		return false;
 	}
 
-	private static void log(String message) {
-		log("Util", message);
-	}
-
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
@@ -1804,7 +1749,7 @@ public class Util {
     }
 
     public static void showKeyboardDelayed(final View view) {
-        log("showKeyboardDelayed");
+		logDebug("showKeyboardDelayed");
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override

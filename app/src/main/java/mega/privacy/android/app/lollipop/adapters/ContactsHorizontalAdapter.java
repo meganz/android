@@ -31,6 +31,8 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+
 public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHorizontalAdapter.ContactViewHolder> implements View.OnClickListener {
 
     private Activity context;
@@ -83,7 +85,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         notifyDataSetChanged();
 
         String email = holder.contactMail;
-        log("sent invite to: " + email);
+        logDebug("sent invite to: " + email);
         //ignore the callback
         megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
         Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
@@ -105,7 +107,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                 if (bitmap == null) {
                     if (avatar.delete()) {
-                        log("delete avatar successfully.");
+                        logDebug("delete avatar successfully.");
                     }
                     megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
                 } else {
@@ -132,7 +134,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     }
 
     public MegaContactGetter.MegaContact getItem(int position) {
-        log("getItem");
+        logDebug("getItem");
         return contacts.get(position);
     }
 
@@ -157,9 +159,5 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             return "";
         }
         return String.valueOf(name.charAt(0));
-    }
-
-    private static void log(String log) {
-        Util.log("ContactsHorizontalAdapter", log);
     }
 }

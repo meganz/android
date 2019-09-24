@@ -67,12 +67,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MANUAL_INPUT_EMAIL;
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MANUAL_INPUT_PHONE;
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT;
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT;
-import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_BASE_URL;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class InviteContactActivity extends PinActivityLollipop implements MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
@@ -131,7 +128,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
             try {
                 super.onLayoutChildren(recycler, state);
             } catch (IndexOutOfBoundsException e) {
-                log("IndexOutOfBoundsException in RecyclerView happens");
+                logDebug("IndexOutOfBoundsException in RecyclerView happens");
             }
         }
     }
@@ -139,7 +136,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        log("onCreate");
+        logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
         dbH = DatabaseHandler.getDbHandler(this);
@@ -291,7 +288,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        log("onCreateOptionsMenu");
+        logDebug("onCreateOptionsMenu");
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_invite_contact, menu);
@@ -305,7 +302,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        log("onOptionsItemSelected");
+        logDebug("onOptionsItemSelected");
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {
@@ -313,7 +310,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
                 break;
             }
             case R.id.action_more: {
-                log("more button clicked - share invitation through other app");
+                logDebug("more button clicked - share invitation through other app");
                 String message = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -352,7 +349,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(KEY_PHONE_CONTACTS, phoneContacts);
         outState.putParcelableArrayList(KEY_MEGA_CONTACTS, megaContacts);
@@ -365,12 +362,12 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
     @Override
     public void onBackPressed() {
-        log("onBackPressed");
+        logDebug("onBackPressed");
         finish();
     }
 
     private void setTitleAB() {
-        log("setTitleAB");
+        logDebug("setTitleAB");
         if (aB != null) {
             if (addedContacts.size() > 0) {
                 aB.setSubtitle(getResources().getQuantityString(R.plurals.num_contacts_selected, addedContacts.size(), addedContacts.size()));
@@ -381,7 +378,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void setRecyclersVisibility() {
-        log("setRecyclersVisibility " + totalContacts.size());
+        logDebug("setRecyclersVisibility " + totalContacts.size());
         if (totalContacts.size() > 0) {
             containerContacts.setVisibility(View.VISIBLE);
         } else {
@@ -390,7 +387,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void queryIfHasReadContactsPermissions() {
-        log("queryIfHasReadContactsPermissions");
+        logDebug("queryIfHasReadContactsPermissions");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
             if (hasReadContactsPermission) {
@@ -406,14 +403,14 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void prepareToGetContacts() {
-        log("prepareToGetContacts");
+        logDebug("prepareToGetContacts");
         setEmptyStateVisibility(true);
         progressBar.setVisibility(View.VISIBLE);
         new GetPhoneContactsTask().execute();
     }
 
     private void visibilityFastScroller() {
-        log("visibilityFastScroller");
+        logDebug("visibilityFastScroller");
         fastScroller.setRecyclerView(recyclerViewList);
         if (totalContacts.size() < MIN_LIST_SIZE_FOR_FAST_SCROLLER) {
             fastScroller.setVisibility(View.GONE);
@@ -423,13 +420,13 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void setPhoneAdapterContacts(ArrayList<InvitationContactInfo> contacts) {
-        log("setPhoneAdapterContacts");
+        logDebug("setPhoneAdapterContacts");
         invitationContactsAdapter.setContactData(contacts);
         invitationContactsAdapter.notifyDataSetChanged();
     }
 
     private void showEmptyTextView() {
-        log("showEmptyTextView");
+        logDebug("showEmptyTextView");
         String textToShow = getString(R.string.context_empty_contacts).toUpperCase();
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
@@ -437,7 +434,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
             textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
             textToShow = textToShow.replace("[/B]", "</font>");
         } catch (Exception e) {
-            log(e.toString());
+            logError(e.toString());
         }
 
         Spanned result;
@@ -450,7 +447,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void setEmptyStateVisibility(boolean visible) {
-        log("setEmptyStateVisibility");
+        logDebug("setEmptyStateVisibility");
         if (visible) {
             emptyImageView.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.VISIBLE);
@@ -463,14 +460,14 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void initScanQR() {
-        log("initScanQR");
+        logDebug("initScanQR");
         Intent intent = new Intent(this, QRCodeActivity.class);
         intent.putExtra(INVITE_CONTACT_SCAN_QR, true);
         startActivityForResult(intent, SCAN_QR_FOR_INVITE_CONTACTS);
     }
 
     private void refreshKeyboard() {
-        log("refreshKeyboard");
+        logDebug("refreshKeyboard");
         int imeOptions = typeContactEditText.getImeOptions();
         typeContactEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -488,13 +485,13 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
     private boolean isValidEmail(CharSequence target) {
         boolean result = target != null && Constants.EMAIL_ADDRESS.matcher(target).matches();
-        log("isValidEmail" + result);
+        logDebug("isValidEmail" + result);
         return result;
     }
 
     private boolean isValidPhone(CharSequence target) {
         boolean result = target != null && target.length() > PHONE_NUMBER_MIN_LENGTH;
-        log("isValidPhone" + result);
+        logDebug("isValidPhone" + result);
         return result;
     }
 
@@ -505,7 +502,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        log("onTextChanged: s is " + s.toString() + "start: " + start + " before: " + before + " count: " + count);
+        logDebug("onTextChanged: s is " + s.toString() + "start: " + start + " before: " + before + " count: " + count);
         if (!TextUtils.isEmpty(s)) {
             String temp = s.toString();
             char last = s.charAt(s.length() - 1);
@@ -525,7 +522,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
                     Util.hideKeyboard(this, 0);
                 }
             } else {
-                log("Last character is: " + last);
+                logDebug("Last character is: " + last);
             }
         }
 
@@ -548,7 +545,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             String s = v.getText().toString();
             String processedStrong = s.trim();
-            log("s: " + s);
+            logDebug("s: " + s);
             if (TextUtils.isEmpty(s)) {
                 Util.hideKeyboard(this, 0);
             } else {
@@ -612,13 +609,13 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.layout_scan_qr: {
-                log("Scan QR code pressed");
+                logDebug("Scan QR code pressed");
                 initScanQR();
                 break;
             }
             case R.id.fab_button_next: {
                 enableFabButton(false);
-                log("invite Contacts");
+                logDebug("invite Contacts");
                 inviteContacts(addedContacts);
                 Util.hideKeyboard(this, 0);
                 break;
@@ -628,17 +625,17 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        log("onRequestPermissionsResult");
+        logDebug("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case Constants.REQUEST_READ_CONTACTS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    log("Permission granted");
+                    logDebug("Permission granted");
                     isPermissionGranted = true;
                     prepareToGetContacts();
                     noPermissionHeader.setVisibility(View.GONE);
                 } else {
-                    log("Permission denied");
+                    logDebug("Permission denied");
                     setEmptyStateVisibility(true);
                     emptyTextView.setText(R.string.no_contacts_permissions);
                     emptyImageView.setVisibility(View.VISIBLE);
@@ -652,7 +649,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     @Override
     public void onItemClick(View view, int position) {
         InvitationContactInfo invitationContactInfo = invitationContactsAdapter.getItem(position);
-        log("on Item click at " + position + " name is " + invitationContactInfo.getName());
+        logDebug("on Item click at " + position + " name is " + invitationContactInfo.getName());
         if (isContactAdded(invitationContactInfo)) {
             addedContacts.remove(invitationContactInfo);
         } else {
@@ -676,7 +673,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private ArrayList<InvitationContactInfo> megaContactToContactInfo(List<MegaContactGetter.MegaContact> megaContacts) {
-        log("megaContactToContactInfo " + megaContacts.size());
+        logDebug("megaContactToContactInfo " + megaContacts.size());
         ArrayList<InvitationContactInfo> result = new ArrayList<>();
         if (megaContacts.size() > 0) {
             InvitationContactInfo megaContactHeader = new InvitationContactInfo(ID_MEGA_CONTACTS_HEADER, getString(R.string.contacts_mega), TYPE_MEGA_CONTACT_HEADER);
@@ -701,7 +698,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private ArrayList<InvitationContactInfo> localContactToContactInfo(List<ContactsUtil.LocalContact> localContacts) {
-        log("megaContactToContactInfo " + localContacts.size());
+        logDebug("megaContactToContactInfo " + localContacts.size());
         ArrayList<InvitationContactInfo> result = new ArrayList<>();
         if (localContacts.size() > 0) {
             InvitationContactInfo megaContactHeader = new InvitationContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), TYPE_MEGA_CONTACT_HEADER);
@@ -758,7 +755,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
         @Override
         protected Void doInBackground(Void... voids) {
-            log("GetPhoneContactsTask doInBackground");
+            logDebug("GetPhoneContactsTask doInBackground");
 
             isGettingLocalContact = true;
 
@@ -779,7 +776,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
         @Override
         protected void onPostExecute(Void avoid) {
-            log("onPostExecute GetPhoneContactsTask");
+            logDebug("onPostExecute GetPhoneContactsTask");
             isGettingLocalContact = false;
             onGetContactCompleted();
             getMegaContact();
@@ -790,7 +787,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
         @Override
         protected Void doInBackground(Void... voids) {
-            log("FilterContactsTask doInBackground");
+            logDebug("FilterContactsTask doInBackground");
             String query = inputString == null ? null : inputString.toLowerCase();
             ArrayList<InvitationContactInfo> megaContacts = new ArrayList<>();
             ArrayList<InvitationContactInfo> phoneContacts = new ArrayList<>();
@@ -832,21 +829,21 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
         @Override
         protected void onPostExecute(Void voids) {
-            log("onPostExecute FilterContactsTask");
+            logDebug("onPostExecute FilterContactsTask");
             refreshList();
             visibilityFastScroller();
         }
     }
 
     private void startFilterTask() {
-        log("startFilterTask");
+        logDebug("startFilterTask");
         inputString = typeContactEditText.getText().toString();
         filterContactsTask = new FilterContactsTask();
         filterContactsTask.execute();
     }
 
     private View createContactTextView(String name, final int id) {
-        log("createTextView contact name is " + name);
+        logDebug("createTextView contact name is " + name);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -876,7 +873,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void refreshAddedContactsView() {
-        log("refreshAddedContactsView");
+        logDebug("refreshAddedContactsView");
         itemContainer.removeAllViews();
         for (int i = 0; i < addedContacts.size(); i++) {
             InvitationContactInfo invitationContactInfo = addedContacts.get(i);
@@ -894,7 +891,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void refreshInviteContactButton() {
-        log("refreshInviteContactButton");
+        logDebug("refreshInviteContactButton");
         String stringInEditText = typeContactEditText.getText().toString();
         boolean isStringValidNow = stringInEditText.length() == 0
                 || isValidEmail(stringInEditText)
@@ -903,7 +900,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private boolean isContactAdded(InvitationContactInfo invitationContactInfo) {
-        log("isContactAdded contact name is " + invitationContactInfo.getName());
+        logDebug("isContactAdded contact name is " + invitationContactInfo.getName());
         for (InvitationContactInfo addedContact : addedContacts) {
             if (addedContact.getId() == invitationContactInfo.getId() &&
                     addedContact.getDisplayInfo().equalsIgnoreCase(invitationContactInfo.getDisplayInfo())) {
@@ -914,12 +911,12 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void refreshList() {
-        log("refresh list");
+        logDebug("refresh list");
         setPhoneAdapterContacts(filteredContacts);
     }
 
     private void inviteContacts(ArrayList<InvitationContactInfo> addedContacts) {
-        log("inviteContacts");
+        logDebug("inviteContacts");
 
         // Email/phone contacts to be invited
 
@@ -949,12 +946,12 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void invitePhoneContacts(ArrayList<String> phoneNumbers) {
-        log("invitePhoneContacts");
+        logDebug("invitePhoneContacts");
         StringBuilder recipents = new StringBuilder("smsto:");
         for (String phone : phoneNumbers) {
             recipents.append(phone);
             recipents.append(";");
-            log("setResultPhoneContacts: " + phone);
+            logDebug("setResultPhoneContacts: " + phone);
         }
         String smsBody = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
         Intent smsIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse(recipents.toString()));
@@ -979,13 +976,13 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT) {
-            log("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
+            logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
             if (e.getErrorCode() == MegaError.API_OK) {
                 numberSent++;
-                log("OK INVITE CONTACT: " + request.getEmail());
+                logDebug("OK INVITE CONTACT: " + request.getEmail());
             } else {
                 numberNotSent++;
-                log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+                logDebug("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
             }
             if (numberSent + numberNotSent == numberToSend) {
                 if (numberToSend == 1) {
@@ -1026,7 +1023,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     private void inviteEmailContacts(ArrayList<String> emails) {
         numberToSend = emails.size();
         for (String email : emails) {
-            log("setResultEmailContacts: " + email);
+            logDebug("setResultEmailContacts: " + email);
             megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, this);
         }
     }
@@ -1036,7 +1033,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void addContactInfo(String inputString, int type) {
-        log("addContactInfo inputString is " + inputString + " type is " + type);
+        logDebug("addContactInfo inputString is " + inputString + " type is " + type);
         InvitationContactInfo info = null;
         if (type == TYPE_MANUAL_INPUT_EMAIL) {
             info = new InvitationContactInfo(inputString.hashCode(), "", TYPE_MANUAL_INPUT_EMAIL, inputString, defaultLocalContactAvatarColor);
@@ -1067,7 +1064,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void enableFabButton(Boolean enableFabButton) {
-        log("enableFabButton: " + enableFabButton);
+        logDebug("enableFabButton: " + enableFabButton);
         int lintColor = enableFabButton ? R.color.accentColor : R.color.disable_fab_invite_contact;
         fabButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(lintColor)));
         fabButton.setEnabled(enableFabButton);
@@ -1083,9 +1080,5 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         filteredContacts.addAll(megaContacts);
         filteredContacts.addAll(phoneContacts);
         totalContacts.addAll(filteredContacts);
-    }
-
-    public static void log(String message) {
-        Util.log("InviteContactActivity", message);
     }
 }

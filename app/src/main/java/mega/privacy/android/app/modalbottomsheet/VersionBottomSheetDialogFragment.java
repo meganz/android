@@ -26,10 +26,12 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -61,19 +63,19 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        log("onCreate");
+        logDebug("onCreate");
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            logDebug("Bundle is NOT NULL");
             long handle = savedInstanceState.getLong("handle", -1);
-            log("Handle of the node: "+handle);
+            logDebug("Handle of the node: " + handle);
             node = megaApi.getNodeByHandle(handle);
         }
         else{
-            log("Bundle NULL");
+            logWarning("Bundle NULL");
             if(context instanceof VersionsFileActivity){
                 node = ((VersionsFileActivity) context).getSelectedNode();
             }
@@ -86,7 +88,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
     public void setupDialog(final Dialog dialog, int style) {
 
         super.setupDialog(dialog, style);
-        log("setupDialog");
+        logDebug("setupDialog");
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -113,31 +115,31 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
         LinearLayout separatorRevert = (LinearLayout) contentView.findViewById(R.id.separator_revert);
 
-        nodeName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
-        nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+        nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
+        nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
 
         if(node!=null) {
-            log("node is NOT null");
+            logDebug("Node is NOT null");
 
             nodeName.setText(node.getName());
 
             long nodeSize = node.getSize();
-            String fileInfo = Util.getSizeString(nodeSize) + " . " + getNodeDate(node);
+            String fileInfo = getSizeString(nodeSize) + " . " + getNodeDate(node);
             nodeInfo.setText(fileInfo);
 
             if (node.hasThumbnail()) {
-                log("Node has thumbnail");
+                logDebug("Node has thumbnail");
                 RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
                 params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
                 params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
                 params1.setMargins(20, 0, 12, 0);
                 nodeThumb.setLayoutParams(params1);
 
-                thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                thumb = getThumbnailFromCache(node);
                 if (thumb != null) {
                     nodeThumb.setImageBitmap(thumb);
                 } else {
-                    thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                    thumb = getThumbnailFromFolder(node, context);
                     if (thumb != null) {
                         nodeThumb.setImageBitmap(thumb);
                     } else {
@@ -167,7 +169,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
         }
         else{
-            log("Node NULL");
+            logWarning("Node NULL");
         }
     }
 
@@ -177,9 +179,9 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
         switch(v.getId()){
 
             case R.id.option_download_layout:{
-                log("Download option");
+                logDebug("Download option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
@@ -188,9 +190,9 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
                 break;
             }
             case R.id.option_revert_layout:{
-                log("Revert option");
+                logDebug("Revert option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ((VersionsFileActivity) context).revertVersion();
@@ -198,9 +200,9 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
                 break;
             }
             case R.id.option_delete_layout:{
-                log("Delete option");
+                logDebug("Delete option");
                 if(node==null){
-                    log("The selected node is NULL");
+                    logWarning("The selected node is NULL");
                     return;
                 }
                 ((VersionsFileActivity) context).showConfirmationRemoveVersion();
@@ -215,7 +217,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
     public String getNodeDate(MegaNode node){
 
-        Calendar calendar = Util.calculateDateFromTimestamp(node.getModificationTime());
+        Calendar calendar = calculateDateFromTimestamp(node.getModificationTime());
         String format3 = new SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault()).format(calendar.getTime());
         return format3;
     }
@@ -223,7 +225,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
     @Override
     public void onAttach(Activity activity) {
-        log("onAttach");
+        logDebug("onAttach");
         super.onAttach(activity);
         this.context = activity;
     }
@@ -237,14 +239,10 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
-        log("Handle of the node: "+handle);
+        logDebug("Handle of the node: " + handle);
         outState.putLong("handle", handle);
-    }
-
-    private static void log(String log) {
-        Util.log("ContactFileListBottomSheetDialogFragment", log);
     }
 }

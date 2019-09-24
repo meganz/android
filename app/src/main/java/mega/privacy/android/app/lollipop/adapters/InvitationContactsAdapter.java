@@ -31,11 +31,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT;
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT;
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationContactsAdapter.ViewHolderPhoneContactsLollipop> implements MegaRequestListenerInterface {
 
@@ -91,7 +89,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
         @Override
         public void onClick(View v) {
-            log("CI contact get clicked");
+            logDebug("CI contact get clicked");
             int position = getAdapterPosition();
             if (callback != null && position >= 0 && position < contactData.size()) {
                 InvitationContactInfo invitationContactInfo = contactData.get(position);
@@ -181,7 +179,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private ViewHolderPhoneContactsLollipop createHeaderHolder(ViewGroup parentView) {
-        log("create Header Holder");
+        logDebug("create Header Holder");
         View rowView = inflater.inflate(R.layout.contact_list_section_header, parentView, false);
         ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
         holder.headerTextView = rowView.findViewById(R.id.section_header);
@@ -191,7 +189,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private ViewHolderPhoneContactsLollipop createContactHolder(ViewGroup parentView) {
-        log("create Contact Holder");
+        logDebug("create Contact Holder");
         View rowView = inflater.inflate(R.layout.contact_explorer_item, parentView, false);
         ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
         holder.contactLayout = rowView.findViewById(R.id.contact_list_item_layout);
@@ -230,7 +228,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
             // create default one if unable to get user pre-set avatar
             if (bitmap == null) {
-                log("create default avatar as unable to get user pre-set one");
+                logDebug("create default avatar as unable to get user pre-set one");
                 String initial = contact.getInitial();
                 String color = contact.getAvatarColor();
                 bitmap = Util.createDefaultAvatar(color, initial);
@@ -242,7 +240,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private Bitmap createPhoneContactBitmap(long id) {
-        log("createPhoneContactBitmap");
+        logDebug("createPhoneContactBitmap");
         InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
                 ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id));
         Bitmap photo = null;
@@ -258,7 +256,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private void setItemHighlighted(View view) {
-        log("setItemHighlighted");
+        logDebug("setItemHighlighted");
         view.setBackgroundColor(context.getResources().getColor(R.color.contactSelected));
         ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
         Bitmap image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_select_avatar);
@@ -268,7 +266,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private void setItemNormal(View view, Bitmap bitmap) {
-        log("setItemNormal");
+        logDebug("setItemNormal");
         view.setBackgroundColor(context.getResources().getColor(R.color.white));
         if (bitmap != null) {
             ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
@@ -277,12 +275,12 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private Bitmap getMegaUserAvatar(InvitationContactInfo contact) {
-        log("getMegaUserAvatar");
+        logDebug("getMegaUserAvatar");
         String email = contact.getDisplayInfo();
         File avatar = buildAvatarFile(context, email + IMAGE_EXTENSION);
         String path = avatar.getAbsolutePath();
         if (FileUtils.isFileAvailable(avatar)) {
-            log("avatar exists in: " + avatar.getAbsolutePath());
+            logDebug("avatar exists in: " + avatar.getAbsolutePath());
             BitmapFactory.Options bOpts = new BitmapFactory.Options();
             Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
             if (bitmap == null) {
@@ -295,9 +293,5 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
             megaApi.getUserAvatar(email, path, this);
         }
         return null;
-    }
-
-    private static void log(String message) {
-        Util.log("InvitationContactsAdapter", message);
     }
 }

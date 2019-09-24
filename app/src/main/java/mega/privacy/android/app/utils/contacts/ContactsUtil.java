@@ -13,6 +13,8 @@ import java.util.List;
 
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+
 public class ContactsUtil {
 
     public static class LocalContact {
@@ -89,7 +91,7 @@ public class ContactsUtil {
         Cursor cursor = resolver.query(contactsUri, new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME}, null, null, null);
         LocalContact contact;
         if (cursor != null) {
-            log("has " + cursor.getCount() + " contacts");
+            logDebug("has " + cursor.getCount() + " contacts");
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0);
                 String name = cursor.getString(1);
@@ -156,9 +158,5 @@ public class ContactsUtil {
             }
         });
         return localContacts;
-    }
-
-    private static void log(String message) {
-        Util.log("ContactsUtil", message);
     }
 }

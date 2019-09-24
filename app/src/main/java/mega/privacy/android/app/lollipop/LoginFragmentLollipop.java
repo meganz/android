@@ -56,7 +56,6 @@ import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -78,6 +77,9 @@ import nz.mega.sdk.MegaUser;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener, AbortPendingTransferCallback {
 
@@ -201,13 +203,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onAbortConfirm() {
-        log("onAbortConfirm");
+        logDebug("onAbortConfirm");
         megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
         megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
         submitForm();
@@ -215,23 +217,23 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onAbortCancel() {
-        log("onAbortCancel");
+        logDebug("onAbortCancel");
     }
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            log("context is null");
+            logWarning("context is null");
             return;
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        logDebug("onCreateView");
 
         is2FAEnabled = false;
         accountConfirmed = false;
@@ -241,7 +243,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         UserCredentials credentials = dbH.getCredentials();
         if (credentials != null) {
-            log("Credentials NOT null");
+            logDebug("Credentials NOT null");
             firstTime = false;
         }
         else{
@@ -250,7 +252,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         chatSettings = dbH.getChatSettings();
         if(chatSettings==null){
-            log("chatSettings is null --> enable chat by default");
+            logDebug("chatSettings is null --> enable chat by default");
             chatSettings = new ChatSettings();
             dbH.setChatSettings(chatSettings);
         }
@@ -260,8 +262,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-        scaleW = Util.getScaleW(outMetrics, density);
-        scaleH = Util.getScaleH(outMetrics, density);
+        scaleW = getScaleW(outMetrics, density);
+        scaleH = getScaleH(outMetrics, density);
 
         View v = inflater.inflate(R.layout.fragment_login, container, false);
 
@@ -419,27 +421,27 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         forgotPassLayout = (RelativeLayout) v.findViewById(R.id.forgot_pass_full_layout);
         forgotPassTitle = (TextView) v.findViewById(R.id.title_forgot_pass_layout);
         RelativeLayout.LayoutParams forgotPassTitleParams = (RelativeLayout.LayoutParams)forgotPassTitle.getLayoutParams();
-        forgotPassTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(70, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        forgotPassTitleParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(70, outMetrics), scaleWidthPx(24, outMetrics), 0);
         forgotPassTitle.setLayoutParams(forgotPassTitleParams);
 
         forgotPassFirstP = (TextView) v.findViewById(R.id.first_par_forgot_pass_layout);
         RelativeLayout.LayoutParams firstParParams = (RelativeLayout.LayoutParams)forgotPassFirstP.getLayoutParams();
-        firstParParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        firstParParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
         forgotPassFirstP.setLayoutParams(firstParParams);
 
         forgotPassSecondP = (TextView) v.findViewById(R.id.second_par_forgot_pass_layout);
         RelativeLayout.LayoutParams secondParParams = (RelativeLayout.LayoutParams)forgotPassSecondP.getLayoutParams();
-        secondParParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        secondParParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
         forgotPassSecondP.setLayoutParams(secondParParams);
 
         forgotPassAction = (TextView) v.findViewById(R.id.action_forgot_pass_layout);
         RelativeLayout.LayoutParams actionParams = (RelativeLayout.LayoutParams)forgotPassAction.getLayoutParams();
-        actionParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(25, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        actionParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(25, outMetrics), scaleWidthPx(24, outMetrics), 0);
         forgotPassAction.setLayoutParams(actionParams);
 
         yesMK = (Button) v.findViewById(R.id.yes_MK_button);
         LinearLayout.LayoutParams yesMKParams = (LinearLayout.LayoutParams)yesMK.getLayoutParams();
-        yesMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
+        yesMKParams.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(25, outMetrics), 0, 0);
         yesMK.setLayoutParams(yesMKParams);
         yesMK.setOnClickListener(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -448,7 +450,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         noMK = (Button) v.findViewById(R.id.no_MK_button);
         LinearLayout.LayoutParams noMKParams = (LinearLayout.LayoutParams)noMK.getLayoutParams();
-        noMKParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
+        noMKParams.setMargins(scaleWidthPx(16, outMetrics), scaleHeightPx(25, outMetrics), 0, 0);
         noMK.setLayoutParams(noMKParams);
         noMK.setOnClickListener(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -458,22 +460,22 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         parkAccountLayout = (RelativeLayout) v.findViewById(R.id.park_account_layout);
         parkAccountTitle = (TextView) v.findViewById(R.id.title_park_account_layout);
         RelativeLayout.LayoutParams parkAccountTitleParams = (RelativeLayout.LayoutParams)parkAccountTitle.getLayoutParams();
-        parkAccountTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(70, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        parkAccountTitleParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(70, outMetrics), scaleWidthPx(24, outMetrics), 0);
         parkAccountTitle.setLayoutParams(parkAccountTitleParams);
 
         parkAccountFirstP = (TextView) v.findViewById(R.id.first_par_park_account_layout);
         RelativeLayout.LayoutParams parkAccountFParams = (RelativeLayout.LayoutParams)parkAccountFirstP.getLayoutParams();
-        parkAccountFParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        parkAccountFParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
         parkAccountFirstP.setLayoutParams(parkAccountFParams);
 
         parkAccountSecondP = (TextView) v.findViewById(R.id.second_par_park_account_layout);
         RelativeLayout.LayoutParams parkAccountSParams = (RelativeLayout.LayoutParams)parkAccountSecondP.getLayoutParams();
-        parkAccountSParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+        parkAccountSParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
         parkAccountSecondP.setLayoutParams(parkAccountSParams);
 
         parkAccountButton = (Button) v.findViewById(R.id.park_account_button);
         RelativeLayout.LayoutParams parkButtonParams = (RelativeLayout.LayoutParams)parkAccountButton.getLayoutParams();
-        parkButtonParams.setMargins(0, Util.scaleHeightPx(25, outMetrics),  Util.scaleWidthPx(24, outMetrics), 0);
+        parkButtonParams.setMargins(0, scaleHeightPx(25, outMetrics),  scaleWidthPx(24, outMetrics), 0);
         parkAccountButton.setLayoutParams(parkButtonParams);
         parkAccountButton.setOnClickListener(this);
 
@@ -712,7 +714,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             public void afterTextChanged(Editable s) {
                 if (sixthPin.length()!=0){
                     sixthPin.setCursorVisible(true);
-                    Util.hideKeyboard((LoginActivityLollipop)context, 0);
+                    hideKeyboard((LoginActivityLollipop)context, 0);
 
                     if (pinLongClick) {
                         pasteClipboard();
@@ -733,79 +735,79 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb1.width = Util.scaleWidthPx(42, outMetrics);
+            paramsb1.width = scaleWidthPx(42, outMetrics);
         }
         else {
-            paramsb1.width = Util.scaleWidthPx(25, outMetrics);
+            paramsb1.width = scaleWidthPx(25, outMetrics);
         }
         firstPin.setLayoutParams(paramsb1);
         LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
-        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
         firstPin.setLayoutParams(textParams);
 
         secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb2.width = Util.scaleWidthPx(42, outMetrics);
+            paramsb2.width = scaleWidthPx(42, outMetrics);
         }
         else {
-            paramsb2.width = Util.scaleWidthPx(25, outMetrics);
+            paramsb2.width = scaleWidthPx(25, outMetrics);
         }
         secondPin.setLayoutParams(paramsb2);
         textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
-        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
         secondPin.setLayoutParams(textParams);
         secondPin.setEt(firstPin);
 
         thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb3.width = Util.scaleWidthPx(42, outMetrics);
+            paramsb3.width = scaleWidthPx(42, outMetrics);
         }
         else {
-            paramsb3.width = Util.scaleWidthPx(25, outMetrics);
+            paramsb3.width = scaleWidthPx(25, outMetrics);
         }
         thirdPin.setLayoutParams(paramsb3);
         textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
-        textParams.setMargins(0, 0, Util.scaleWidthPx(25, outMetrics), 0);
+        textParams.setMargins(0, 0, scaleWidthPx(25, outMetrics), 0);
         thirdPin.setLayoutParams(textParams);
         thirdPin.setEt(secondPin);
 
         fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb4.width = Util.scaleWidthPx(42, outMetrics);
+            paramsb4.width = scaleWidthPx(42, outMetrics);
         }
         else {
-            paramsb4.width = Util.scaleWidthPx(25, outMetrics);
+            paramsb4.width = scaleWidthPx(25, outMetrics);
         }
         fourthPin.setLayoutParams(paramsb4);
         textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
-        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
         fourthPin.setLayoutParams(textParams);
         fourthPin.setEt(thirdPin);
 
         fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb5.width = Util.scaleWidthPx(42, outMetrics);
+            paramsb5.width = scaleWidthPx(42, outMetrics);
         }
         else {
-            paramsb5.width = Util.scaleWidthPx(25, outMetrics);
+            paramsb5.width = scaleWidthPx(25, outMetrics);
         }
         fifthPin.setLayoutParams(paramsb5);
         textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
-        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
         fifthPin.setLayoutParams(textParams);
         fifthPin.setEt(fourthPin);
 
         sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb6.width = Util.scaleWidthPx(42, outMetrics);
+            paramsb6.width = scaleWidthPx(42, outMetrics);
         }
         else {
-            paramsb6.width = Util.scaleWidthPx(25, outMetrics);
+            paramsb6.width = scaleWidthPx(25, outMetrics);
         }
         sixthPin.setLayoutParams(paramsb6);
         textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
@@ -817,117 +819,117 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if(intentReceived!=null){
             action = intentReceived.getAction();
             if(action!=null) {
-                log("action is: "+action);
-                if (Constants.ACTION_CONFIRM.equals(action)) {
+                logDebug("action is: " + action);
+                if (ACTION_CONFIRM.equals(action)) {
                     handleConfirmationIntent(intentReceived);
                     return v;
-                } else if (action.equals(Constants.ACTION_RESET_PASS)) {
+                } else if (action.equals(ACTION_RESET_PASS)) {
                     String link = intentReceived.getDataString();
                     if (link != null) {
-                        log("link to resetPass: " + link);
+                        logDebug("Link to resetPass: " + link);
                         showDialogInsertMKToChangePass(link);
                         return v;
                     }
-                } else if (action.equals(Constants.ACTION_PASS_CHANGED)) {
+                } else if (action.equals(ACTION_PASS_CHANGED)) {
                     int result = intentReceived.getIntExtra("RESULT", -20);
                     if (result == 0) {
-                        log("Show success mesage");
+                        logDebug("Show success mesage");
                         ((LoginActivityLollipop)context).showSnackbar(getString(R.string.pass_changed_alert));
                         return v;
                     } else if (result == MegaError.API_EARGS) {
-                        log("Incorrect arguments!");
+                        logWarning("Incorrect arguments!");
                         ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
                         return v;
                     } else if (result == MegaError.API_EKEY) {
-                        log("Incorrect MK when changing pass");
+                        logWarning("Incorrect MK when changing pass");
 //                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.incorrect_MK));
                         ((LoginActivityLollipop)context).showAlertIncorrectRK();
                         return v;
                     } else {
-                        log("Error when changing pass - show error message");
+                        logError("Error when changing pass - show error message");
                         ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
                         return v;
                     }
-                } else if (action.equals(Constants.ACTION_PARK_ACCOUNT)) {
+                } else if (action.equals(ACTION_PARK_ACCOUNT)) {
                     String link = intentReceived.getDataString();
                     if (link != null) {
-                        log("link to parkAccount: " + link);
+                        logDebug("Link to parkAccount: " + link);
                         showConfirmationParkAccount(link);
                         return v;
                     } else {
-                        log("Error when parking account - show error message");
-                        Util.showAlert(context, getString(R.string.general_text_error), getString(R.string.general_error_word));
+                        logError("Error when parking account - show error message");
+                        showAlert(context, getString(R.string.general_text_error), getString(R.string.general_error_word));
                         return v;
                     }
                 }
-                else if (action.equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
+                else if (action.equals(ACTION_CANCEL_DOWNLOAD)) {
                     ((LoginActivityLollipop)context).showConfirmationCancelAllTransfers();
 
                 }
             }
             else{
-                log("ACTION NULL");
+                logWarning("ACTION NULL");
             }
         }
         else{
-            log("No INTENT");
+            logWarning("No INTENT");
         }
 
-        log("et_user.getText(): " + et_user.getText());
+        logDebug("et_user.getText(): " + et_user.getText());
         if (credentials != null && !((LoginActivityLollipop) context).isBackFromLoginPage){
-            log("Credentials NOT null");
+            logDebug("Credentials NOT null");
             if ((intentReceived != null) && (action != null)){
-                if (action.equals(Constants.ACTION_REFRESH)){
+                if (action.equals(ACTION_REFRESH)){
                     MegaApplication.setLoggingIn(true);
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startLoginInProcess();
                     return v;
                 }
-                else if (action.equals(Constants.ACTION_REFRESH_STAGING)){
+                else if (action.equals(ACTION_REFRESH_STAGING)){
                     twoFA = true;
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startFastLogin();
                     return v;
                 }
-                else if (action.equals(Constants.ACTION_ENABLE_CHAT)){
-                    log("with credentials -> intentReceived ACTION_ENABLE_CHAT");
+                else if (action.equals(ACTION_ENABLE_CHAT)){
+                    logDebug("With credentials -> intentReceived ACTION_ENABLE_CHAT");
                     enableChat();
                     return v;
                 }
                 else{
 
-                    if(action.equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
+                    if(action.equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
                         url = intentReceived.getDataString();
                     }
-                    else if(action.equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
+                    else if(action.equals(ACTION_IMPORT_LINK_FETCH_NODES)){
                         url = intentReceived.getDataString();
                     }
-                    else if(action.equals(Constants.ACTION_CHANGE_MAIL)){
-                        log("intent received ACTION_CHANGE_MAIL");
+                    else if(action.equals(ACTION_CHANGE_MAIL)){
+                        logDebug("intent received ACTION_CHANGE_MAIL");
                         url = intentReceived.getDataString();
                     }
-                    else if(action.equals(Constants.ACTION_CANCEL_ACCOUNT)){
-                        log("intent received ACTION_CANCEL_ACCOUNT");
+                    else if(action.equals(ACTION_CANCEL_ACCOUNT)){
+                        logDebug("intent received ACTION_CANCEL_ACCOUNT");
                         url = intentReceived.getDataString();
                     }
-                    else if (action.equals(Constants.ACTION_FILE_PROVIDER)){
+                    else if (action.equals(ACTION_FILE_PROVIDER)){
                         uriData = intentReceived.getData();
                         extras = intentReceived.getExtras();
                         url = null;
                     }
-                    else if(action.equals(Constants.ACTION_OPEN_HANDLE_NODE)){
+                    else if(action.equals(ACTION_OPEN_HANDLE_NODE)){
                         url = intentReceived.getDataString();
                     }
-                    else if(action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                    else if(action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
                         uriData = intentReceived.getData();
                     }
-                    else if(action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                    else if(action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
                         uriData = intentReceived.getData();
                     }
-                    else if(action.equals(Constants.ACTION_OPEN_CHAT_LINK)) {
+                    else if(action.equals(ACTION_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
                     }
-                    else if (action.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
+                    else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
                         idChatToJoin = intentReceived.getLongExtra("idChatToJoin", -1);
                     }
@@ -944,7 +946,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //								}
 //								intent.setData(uriData);
 //							}
-                            if (action.equals(Constants.ACTION_FILE_PROVIDER)){
+                            if (action.equals(ACTION_FILE_PROVIDER)){
                                 intent = new Intent(context, FileProviderActivity.class);
                                 if(extras != null)
                                 {
@@ -952,23 +954,23 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 }
                                 intent.setData(uriData);
                             }
-                            else if (action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                            else if (action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
                                 intent = new Intent(context, FileLinkActivityLollipop.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = Constants.ACTION_OPEN_MEGA_LINK;
+                                action = ACTION_OPEN_MEGA_LINK;
                                 intent.setData(uriData);
                             }
-                            else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                            else if (action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
                                 intent = new Intent(context, FolderLinkActivityLollipop.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+                                action = ACTION_OPEN_MEGA_FOLDER_LINK;
                                 intent.setData(uriData);
                             }
-                            else  if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
+                            else  if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = Constants.ACTION_OPEN_CONTACTS_SECTION;
-                                if(intentReceived.getLongExtra(Constants.CONTACT_HANDLE, -1) != -1){
-                                    intent.putExtra(Constants.CONTACT_HANDLE, intentReceived.getLongExtra(Constants.CONTACT_HANDLE, -1));
+                                action = ACTION_OPEN_CONTACTS_SECTION;
+                                if(intentReceived.getLongExtra(CONTACT_HANDLE, -1) != -1){
+                                    intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
                                 }
                             }
 
@@ -985,7 +987,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             ((LoginActivityLollipop) context).startCameraUploadService(false, 5 * 60 * 1000);
                         }
 
-                        log("Empty completed transfers data");
+                        logDebug("Empty completed transfers data");
                         dbH.emptyCompletedTransfers();
 
                         this.startActivity(intent);
@@ -1001,11 +1003,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 MegaNode rootNode = megaApi.getRootNode();
                 if (rootNode != null && !((LoginActivityLollipop)context).isFetchingNodes){
 
-                    log("rootNode != null");
+                    logDebug("rootNode != null");
                     Intent intent = new Intent(context, ManagerActivityLollipop.class);
                     if (action != null){
 
-                        if (action.equals(Constants.ACTION_FILE_PROVIDER)){
+                        if (action.equals(ACTION_FILE_PROVIDER)){
                             intent = new Intent(context, FileProviderActivity.class);
                             if(extras != null)
                             {
@@ -1013,22 +1015,22 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             }
                             intent.setData(uriData);
                         }
-                        else if (action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                        else if (action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
                             intent = new Intent(context, FileLinkActivityLollipop.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            action = Constants.ACTION_OPEN_MEGA_LINK;
+                            action = ACTION_OPEN_MEGA_LINK;
                             intent.setData(uriData);
                         }
-                        else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                        else if (action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
                             intent = new Intent(context, FolderLinkActivityLollipop.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+                            action = ACTION_OPEN_MEGA_FOLDER_LINK;
                             intent.setData(uriData);
                         }
-                        else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
+                        else if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            if(intentReceived.getLongExtra(Constants.CONTACT_HANDLE, -1) != -1){
-                                intent.putExtra(Constants.CONTACT_HANDLE, intentReceived.getLongExtra(Constants.CONTACT_HANDLE, -1));
+                            if(intentReceived.getLongExtra(CONTACT_HANDLE, -1) != -1){
+                                intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
                             }
                         }
                         intent.setAction(action);
@@ -1052,26 +1054,26 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                     }
 
-                    log("Empty completed transfers data");
+                    logDebug("Empty completed transfers data");
                     dbH.emptyCompletedTransfers();
                     this.startActivity(intent);
                     ((LoginActivityLollipop) context).finish();
                 }
                 else{
-                    log("rootNode == null");
+                    logWarning("rootNode == null");
                     startFastLogin();
                     return v;
                 }
             }
         }
         else {
-            log("Credentials IS NULL");
+            logDebug("Credentials IS NULL");
             if ((intentReceived != null)) {
-                log("INTENT NOT NULL");
+                logDebug("INTENT NOT NULL");
                 if (action != null) {
-                    log("ACTION NOT NULL");
+                    logDebug("ACTION NOT NULL");
                     Intent intent;
-                    if (action.equals(Constants.ACTION_FILE_PROVIDER)) {
+                    if (action.equals(ACTION_FILE_PROVIDER)) {
                         intent = new Intent(context, FileProviderActivity.class);
                         if (extras != null) {
                             intent.putExtras(extras);
@@ -1079,10 +1081,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         intent.setData(uriData);
                         intent.setAction(action);
                     }
-                    else if (action.equals(Constants.ACTION_FILE_EXPLORER_UPLOAD)) {
+                    else if (action.equals(ACTION_FILE_EXPLORER_UPLOAD)) {
                         ((LoginActivityLollipop)context).showSnackbar(getString(R.string.login_before_share));
                     }
-                    else if (action.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
+                    else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
                         idChatToJoin = intentReceived.getLongExtra("idChatToJoin", -1);
                     }
@@ -1094,7 +1096,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             submitForm(true);
         }
 
-        log("END onCreateView");
+        logDebug("END onCreateView");
         return v;
     }
 
@@ -1184,9 +1186,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     void permitVerify(){
-        log("permitVerify");
+        logDebug("permitVerify");
         if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-            Util.hideKeyboard((LoginActivityLollipop)context, 0);
+            hideKeyboard((LoginActivityLollipop)context, 0);
             if (sb.length()>0) {
                 sb.delete(0, sb.length());
             }
@@ -1197,9 +1199,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             sb.append(fifthPin.getText());
             sb.append(sixthPin.getText());
             pin = sb.toString();
-            log("PIN: "+pin);
+
             if (!isErrorShown && pin != null){
-                log("login with factor login");
+                logDebug("Login with factor login");
                 verify2faProgressBar.setVisibility(View.VISIBLE);
                 MegaApplication.setLoggingIn(true);
                 megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
@@ -1219,7 +1221,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void startLoginInProcess(){
-        log("startLoginInProcess");
+        logDebug("startLoginInProcess");
 
         UserCredentials credentials = dbH.getCredentials();
         lastEmail = credentials.getEmail();
@@ -1244,14 +1246,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void enableChat(){
-        log("enableChat");
+        logDebug("enableChat");
 
         UserCredentials credentials = dbH.getCredentials();
         lastEmail = credentials.getEmail();
         gSession = credentials.getSession();
 
         if (!MegaApplication.isLoggingIn()) {
-            log("enableChat:isLogginIn false");
+            logDebug("isLogginIn false");
             MegaApplication.setLoggingIn(true);
 
             loginLogin.setVisibility(View.GONE);
@@ -1270,64 +1272,63 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            if(Util.isChatEnabled()){
-                log("enableChat: Chat is ENABLED");
+            if(isChatEnabled()){
+                logDebug("Chat is ENABLED");
                 if (megaChatApi == null){
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
-                log("INIT STATE: "+megaChatApi.getInitState());
-                log("addChatListener");
+                logDebug("INIT STATE: " + megaChatApi.getInitState());
+                logDebug("addChatListener");
                 megaChatApi.addChatListener(this);
 
                 int ret = megaChatApi.getInitState();
 
                 if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
                     ret = megaChatApi.init(gSession);
-                    log("enableChat: result of init ---> "+ret);
+                    logDebug("result of init ---> " + ret);
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
-                        log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
+                        logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
-                        log("enableChat: condition ret == MegaChatApi.INIT_ERROR");
+                        logDebug("condition ret == MegaChatApi.INIT_ERROR");
                         // chat cannot initialize, disable chat completely
                         if(chatSettings==null) {
-                            log("1 - enableChat: ERROR----> Switch OFF chat");
+                            logWarning("ERROR----> Switch OFF chat");
                             chatSettings = new ChatSettings();
                             chatSettings.setEnabled(false+"");
                             dbH.setChatSettings(chatSettings);
                         }
                         else{
-                            log("2 - enableChat: ERROR----> Switch OFF chat");
+                            logWarning("ERROR----> Switch OFF chat");
                             dbH.setEnabledChat(false + "");
                         }
                         megaChatApi.logout(this);
                     }
                     else{
-                        log("enableChat: condition ret == OK -- chat correctly initialized");
+                        logDebug("enableChat: condition ret == OK -- chat correctly initialized");
                     }
                 }
                 else{
-                    log("2 - Do not init, chat already initialized");
-
+                    logDebug("Do not init, chat already initialized");
                 }
             }
             else{
-                log("enableChat: Chat is NOT ENABLED");
+                logDebug("Chat is NOT ENABLED");
             }
             fetchingNodesText.setVisibility(View.VISIBLE);
-            log("enableChat: Call to fechtNodes");
+            logDebug("Call to fechtNodes");
             megaApi.fetchNodes(this);
         }
         else{
-            log("Another login is processing");
+            logWarning("Another login is processing");
         }
     }
 
     public void startFastLogin(){
-        log("startFastLogin");
+        logDebug("startFastLogin");
         UserCredentials credentials = dbH.getCredentials();
         lastEmail = credentials.getEmail();
         gSession = credentials.getSession();
@@ -1351,66 +1352,66 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
             MegaApplication.setLoggingIn(true);
 
-            if(Util.isChatEnabled()){
-                log("startFastLogin: Chat is ENABLED");
+            if(isChatEnabled()){
+                logDebug("Chat is ENABLED");
                 if (megaChatApi == null){
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
 
                 int ret = megaChatApi.getInitState();
                 if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
-                    log("initial: INIT STATE: "+ret);
+                    logDebug("INIT STATE: "+ret);
 
                     ret = megaChatApi.init(gSession);
 
-                    log("startFastLogin: result of init ---> "+ret);
+                    logDebug("result of init ---> "+ret);
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
-                        log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
+                        logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
                         // chat cannot initialize, disable chat completely
-                        log("startFastLogin: condition ret == MegaChatApi.INIT_ERROR");
+                        logDebug("condition ret == MegaChatApi.INIT_ERROR");
                         if(chatSettings==null) {
-                            log("1 - startFastLogin: ERROR----> Switch OFF chat");
+                            logWarning("ERROR----> Switch OFF chat");
                             chatSettings = new ChatSettings();
                             chatSettings.setEnabled(false+"");
                             dbH.setChatSettings(chatSettings);
                         }
                         else{
-                            log("2 - startFastLogin: ERROR----> Switch OFF chat");
+                            logWarning("ERROR----> Switch OFF chat");
                             dbH.setEnabledChat(false + "");
                         }
                         megaChatApi.logout(this);
                     }
                     else{
-                        log("startFastLogin: condition ret == OK -- chat correctly initialized");
+                        logDebug("condition ret == OK -- chat correctly initialized");
                     }
-                    log("After init: "+ret);
+                    logDebug("After init: " + ret);
                 }
                 else{
-                    log("Do not init, chat already initialized: "+ret);
+                    logDebug("Do not init, chat already initialized: " + ret);
                 }
             }
             else{
-                log("startFastLogin: Chat is NOT ENABLED");
+                logWarning("Chat is NOT ENABLED");
             }
             disableLoginButton();
             megaApi.fastLogin(gSession, this);
-            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(Constants.ACTION_REFRESH_STAGING))  {
-                log("megaChatApi.refreshUrl()");
+            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_REFRESH_STAGING))  {
+                logDebug("megaChatApi.refreshUrl()");
                 megaChatApi.refreshUrl();
             }
         }
         else{
-            log("Another login is proccessing");
+            logWarning("Another login is proccessing");
         }
     }
 
     private void submitForm(boolean fromConfirmAccount) {
-        log("submitForm - " + fromConfirmAccount + " email: " + this.emailTemp + "__" + this.passwdTemp);
+        logDebug("fromConfirmAccount - " + fromConfirmAccount + " email: " + this.emailTemp + "__" + this.passwdTemp);
 
         lastEmail = this.emailTemp;
         lastPassword = this.passwdTemp;
@@ -1420,7 +1421,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 
-        if(!Util.isOnline(context))
+        if(!isOnline(context))
         {
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
@@ -1450,7 +1451,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
 
-        log("generating keys");
+        logDebug("Generating keys");
 
         onKeysGenerated(lastEmail, lastPassword);
     }
@@ -1460,7 +1461,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 
-        if(!Util.isOnline(context))
+        if(!isOnline(context))
         {
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
@@ -1493,13 +1494,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         lastEmail = et_user.getText().toString().toLowerCase(Locale.ENGLISH).trim();
         lastPassword = et_password.getText().toString();
 
-        log("generating keys");
+        logDebug("Generating keys");
 
         onKeysGenerated(lastEmail, lastPassword);
     }
 
     private void onKeysGenerated(String email, String password) {
-        log("onKeysGenerated");
+        logDebug("onKeysGenerated");
 
         this.lastEmail = email;
         this.lastPassword = password;
@@ -1508,7 +1509,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             onKeysGeneratedLogin(email, password);
         }
         else{
-            if(!Util.isOnline(context)){
+            if(!isOnline(context)){
                 ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
                 return;
             }
@@ -1527,7 +1528,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            log("fastConfirm");
+            logDebug("fastConfirm");
             megaApi.confirmAccount(confirmLink, lastPassword, this);
         }
     }
@@ -1564,9 +1565,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void onKeysGeneratedLogin(final String email, final String password) {
-        log("onKeysGeneratedLogin");
+        logDebug("onKeysGeneratedLogin");
 
-        if(!Util.isOnline(context)){
+        if(!isOnline(context)){
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
@@ -1592,33 +1593,33 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            log("fastLogin con publicKey y privateKey");
+            logDebug("fastLogin with publicKey & privateKey");
             resumeSesion = false;
 
-            if(Util.isChatEnabled()){
-                log("onKeysGeneratedLogin: Chat is ENABLED");
+            if(isChatEnabled()){
+                logDebug("Chat is ENABLED");
                 if (megaChatApi == null){
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
                 int ret = megaChatApi.init(null);
-                log("onKeysGeneratedLogin: result of init ---> "+ret);
+                logDebug("result of init ---> "+ret);
                 if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
-                    log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
+                    logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
                     disableLoginButton();
                     megaApi.login(lastEmail, lastPassword, this);
                 }
                 else{
-                    log("ERROR INIT CHAT: " + ret);
+                    logWarning("ERROR INIT CHAT: " + ret);
                     megaChatApi.logout(this);
 
                     if(chatSettings==null) {
-                        log("1 - ERROR----> Switch OFF chat");
+                        logWarning("ERROR ----> Switch OFF chat");
                         chatSettings = new ChatSettings();
                         chatSettings.setEnabled(false+"");
                         dbH.setChatSettings(chatSettings);
                     }
                     else{
-                        log("2 - ERROR----> Switch OFF chat");
+                        logWarning("ERROR ----> Switch OFF chat");
                         dbH.setEnabledChat(false + "");
                     }
                     disableLoginButton();
@@ -1626,7 +1627,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
             }
             else{
-                log("onKeysGeneratedLogin: Chat is NOT ENABLED");
+                logWarning("Chat is NOT ENABLED");
                 disableLoginButton();
                 megaApi.login(lastEmail, lastPassword, this);
             }
@@ -1654,7 +1655,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void disableLoginButton() {
-        log("disable login button");
+        logDebug("Disable login button");
         //disbale login button
         bLogin.setBackground(context.getDrawable(R.drawable.background_button_disable));
         bLogin.setEnabled(false);
@@ -1665,7 +1666,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void enableLoginButton() {
-        log("enable login button");
+        logDebug("Enable login button");
         bLogin.setEnabled(true);
         bLogin.setBackground(context.getDrawable(R.drawable.background_accent_button));
         loginInProgressPb.setVisibility(View.GONE);
@@ -1678,7 +1679,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     public void onRegisterClick(View v){
         //Change fragmentVisible in the activity
-        ((LoginActivityLollipop)context).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT);
+        ((LoginActivityLollipop)context).showFragment(CREATE_ACCOUNT_FRAGMENT);
     }
 
     /*
@@ -1689,7 +1690,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if (value.length() == 0) {
             return getString(R.string.error_enter_email);
         }
-        if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
+        if (!EMAIL_ADDRESS.matcher(value).matches()) {
             return getString(R.string.error_invalid_email);
         }
         return null;
@@ -1720,7 +1721,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         switch(v.getId()) {
             case R.id.button_login_login: {
-                log("click on button_login_login");
+                logDebug("Click on button_login_login");
                 hidePasswordIfVisible();
                 loginClicked = true;
                 backWhileLogin = false;
@@ -1728,18 +1729,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.button_create_account_login:{
-                log("click on button_create_account_login");
+                logDebug("Click on button_create_account_login");
                 hidePasswordIfVisible();
                 onRegisterClick(v);
                 break;
             }
             case R.id.park_account_button:{
-                log("click to park account");
+                logDebug("Click to park account");
                 showDialogInsertMail(false);
                 break;
             }
             case R.id.button_forgot_pass:{
-                log("click on button_forgot_pass");
+                logDebug("Click on button_forgot_pass");
                 hidePasswordIfVisible();
                 try {
                     String url = "https://mega.nz/recovery";
@@ -1757,12 +1758,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.yes_MK_button:{
-                log("click on yes_MK_button");
+                logDebug("Click on yes_MK_button");
                 showDialogInsertMail(true);
                 break;
             }
             case R.id.no_MK_button:{
-                log("click on no_MK_button");
+                logDebug("Click on no_MK_button");
                 showParkAccountLayout();
                 break;
             }
@@ -1779,7 +1780,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 }
                                 else{
                                     dbH.setFileLoggerKarere(false);
-                                    Util.setFileLoggerKarere(false);
+                                    setFileLoggerKarere(false);
                                     numberOfClicksKarere = 0;
                                     MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
                                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
@@ -1794,7 +1795,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                     }
                     else{
-                        log("attrs is NULL");
+                        logWarning("attrs is NULL");
                         ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
                     }
                 }
@@ -1813,7 +1814,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 }
                                 else{
                                     dbH.setFileLoggerSDK(false);
-                                    Util.setFileLoggerSDK(false);
+                                    setFileLoggerSDK(false);
                                     numberOfClicksSDK = 0;
                                     MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
                                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
@@ -1828,7 +1829,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                     }
                     else{
-                        log("attrs is NULL");
+                        logWarning("attrs is NULL");
                         ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                     }
                 }
@@ -1867,7 +1868,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
 
     public void showForgotPassLayout(){
-        log("showForgotPassLayout");
+        logDebug("showForgotPassLayout");
         loginLoggingIn.setVisibility(View.GONE);
         loginLogin.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.GONE);
@@ -1876,7 +1877,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void hideForgotPassLayout(){
-        log("hideForgotPassLayout");
+        logDebug("hideForgotPassLayout");
         loginLoggingIn.setVisibility(View.GONE);
         forgotPassLayout.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.GONE);
@@ -1886,7 +1887,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void showParkAccountLayout(){
-        log("showParkAccountLayout");
+        logDebug("showParkAccountLayout");
         loginLoggingIn.setVisibility(View.GONE);
         loginLogin.setVisibility(View.GONE);
         forgotPassLayout.setVisibility(View.GONE);
@@ -1895,7 +1896,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void hideParkAccountLayout(){
-        log("hideParkAccountLayout");
+        logDebug("hideParkAccountLayout");
         loginLoggingIn.setVisibility(View.GONE);
         forgotPassLayout.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.GONE);
@@ -1908,7 +1909,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
      * Get email address from confirmation code and set to emailView
      */
     private void updateConfirmEmail(String link) {
-        if(!Util.isOnline(context)){
+        if(!isOnline(context)){
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
@@ -1925,7 +1926,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         prepareNodesText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
         loginProgressBar.setVisibility(View.VISIBLE);
-        log("querySignupLink");
+        logDebug("querySignupLink");
         megaApi.querySignupLink(link, this);
     }
 
@@ -1933,7 +1934,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
  * Handle intent from confirmation email
  */
     public void handleConfirmationIntent(Intent intent) {
-        confirmLink = intent.getStringExtra(Constants.EXTRA_CONFIRMATION);
+        confirmLink = intent.getStringExtra(EXTRA_CONFIRMATION);
         loginTitle.setText(R.string.login_confirm_account);
         bLogin.setText(getString(R.string.login_confirm_account).toUpperCase(Locale.getDefault()));
         updateConfirmEmail(confirmLink);
@@ -1941,7 +1942,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach");
+        logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
 
@@ -1951,7 +1952,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
-        if (Util.isChatEnabled()) {
+        if (isChatEnabled()) {
             if (megaChatApi == null) {
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
@@ -1960,7 +1961,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onAttach(Activity context) {
-        log("onAttach Activity");
+        logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
 
@@ -1970,7 +1971,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
-        if (Util.isChatEnabled()){
+        if (isChatEnabled()){
             if (megaChatApi == null) {
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
@@ -1987,8 +1988,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         }
         catch(Exception e){
-            log("TIMER EXCEPTION");
-            log(e.getMessage());
+            logError("TIMER EXCEPTION", e);
         }
 //		log("onRequestUpdate: " + request.getRequestString());
         if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -1997,7 +1997,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 firstRequestUpdate = false;
             }
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
-            loginFetchNodesProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
+            loginFetchNodesProgressBar.getLayoutParams().width = px2dp((250*scaleW), outMetrics);
             if (request.getTotalBytes() > 0){
                 double progressValue = 100.0 * request.getTransferredBytes() / request.getTotalBytes();
                 if ((progressValue > 99) || (progressValue < 0)){
@@ -2014,35 +2014,35 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public void readyToManager(){
         closeCancelDialog();
         if(confirmLink==null && !accountConfirmed){
-            log("confirmLink==null");
+            logDebug("confirmLink==null");
 
-            log("OK fetch nodes");
-            log("value of resumeSession: "+resumeSesion);
+            logDebug("OK fetch nodes");
+            logDebug("value of resumeSession: " + resumeSesion);
 
             if((action!=null)&&(url!=null)) {
-                log("(1) Empty completed transfers data");
+                logDebug("Empty completed transfers data");
                 dbH.emptyCompletedTransfers();
 
-                if (action.equals(Constants.ACTION_CHANGE_MAIL)) {
-                    log("Action change mail after fetch nodes");
+                if (action.equals(ACTION_CHANGE_MAIL)) {
+                    logDebug("Action change mail after fetch nodes");
                     Intent changeMailIntent = new Intent(context, ManagerActivityLollipop.class);
-                    changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
+                    changeMailIntent.setAction(ACTION_CHANGE_MAIL);
                     changeMailIntent.setData(Uri.parse(url));
                     startActivity(changeMailIntent);
                     ((LoginActivityLollipop) context).finish();
                 }
-                else if(action.equals(Constants.ACTION_RESET_PASS)) {
-                    log("Action reset pass after fetch nodes");
+                else if(action.equals(ACTION_RESET_PASS)) {
+                    logDebug("Action reset pass after fetch nodes");
                     Intent resetPassIntent = new Intent(context, ManagerActivityLollipop.class);
-                    resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+                    resetPassIntent.setAction(ACTION_RESET_PASS);
                     resetPassIntent.setData(Uri.parse(url));
                     startActivity(resetPassIntent);
                     ((LoginActivityLollipop) context).finish();
                 }
-                else if(action.equals(Constants.ACTION_CANCEL_ACCOUNT)) {
-                    log("Action cancel Account after fetch nodes");
+                else if(action.equals(ACTION_CANCEL_ACCOUNT)) {
+                    logDebug("Action cancel Account after fetch nodes");
                     Intent cancelAccountIntent = new Intent(context, ManagerActivityLollipop.class);
-                    cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
+                    cancelAccountIntent.setAction(ACTION_CANCEL_ACCOUNT);
                     cancelAccountIntent.setData(Uri.parse(url));
                     startActivity(cancelAccountIntent);
                     ((LoginActivityLollipop) context).finish();
@@ -2050,7 +2050,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
 
             if (!backWhileLogin){
-                log("NOT backWhileLogin");
+                logDebug("NOT backWhileLogin");
                 if (parentHandle != -1){
                     Intent intent = new Intent();
                     intent.putExtra("PARENT_HANDLE", parentHandle);
@@ -2060,16 +2060,16 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 else{
                     Intent intent = null;
                     if (firstTime){
-                        log("First time");
+                        logDebug("First time");
                         intent = new Intent(context,ManagerActivityLollipop.class);
                         intent.putExtra("firstLogin", true);
                         if (action != null){
-                            log("Action not NULL");
-                            if (action.equals(Constants.ACTION_EXPORT_MASTER_KEY)){
-                                log("ACTION_EXPORT_MK");
+                            logDebug("Action not NULL");
+                            if (action.equals(ACTION_EXPORT_MASTER_KEY)){
+                                logDebug("ACTION_EXPORT_MK");
                                 intent.setAction(action);
                             }
-                            else if (action.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK) && url != null) {
+                            else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK) && url != null) {
                                 intent.setAction(action);
                                 intent.setData(Uri.parse(url));
                                 if (idChatToJoin != -1) {
@@ -2106,10 +2106,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
 
                         if (!initialCam){
-                            log("NOT initialCam");
+                            logDebug("NOT initialCam");
                             intent = new Intent(context,ManagerActivityLollipop.class);
                             if (action != null){
-                                log("The action is: "+action);
+                                logDebug("The action is: " + action);
 //										if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
 //											intent = new Intent(this, FileExplorerActivityLollipop.class);
 //											if(extras != null)
@@ -2118,7 +2118,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //											}
 //											intent.setData(uriData);
 //										}
-                                if (action.equals(Constants.ACTION_FILE_PROVIDER)){
+                                if (action.equals(ACTION_FILE_PROVIDER)){
                                     intent = new Intent(context, FileProviderActivity.class);
                                     if(extras != null){
                                         intent.putExtras(extras);
@@ -2127,21 +2127,21 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                         intent.setData(uriData);
                                     }
                                 }
-                                else if (action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                                else if (action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
                                     intent = new Intent(context, FileLinkActivityLollipop.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     intent.setData(uriData);
                                 }
-                                else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                                else if (action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
                                     intent = new Intent(context, FolderLinkActivityLollipop.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+                                    action = ACTION_OPEN_MEGA_FOLDER_LINK;
                                     intent.setData(uriData);
                                 }
-                                else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
-                                    intent.putExtra(Constants.CONTACT_HANDLE, intentReceived.getLongExtra(Constants.CONTACT_HANDLE, -1));
+                                else if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
+                                    intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
                                 }
-                                else if (action.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
+                                else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                                     if (idChatToJoin != -1) {
                                         intent.putExtra("idChatToJoin", idChatToJoin);
                                     }
@@ -2152,14 +2152,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 }
                             }
                             else{
-                                log("The intent action is NULL");
+                                logWarning("The intent action is NULL");
                             }
                         }
                         else{
-                            log("initialCam YESSSS");
+                            logDebug("initialCam YESSSS");
                             intent = new Intent(context,ManagerActivityLollipop.class);
                             if (action != null){
-                                log("The action is: "+action);
+                                logDebug("The action is: " + action);
                                 intent.setAction(action);
                             }
                             if (url != null){
@@ -2169,11 +2169,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     }
 
-                    log("(2) Empty completed transfers data");
+                    logDebug("Empty completed transfers data");
                     dbH.emptyCompletedTransfers();
 
                     if (twoFA){
-                        intent.setAction(Constants.ACTION_REFRESH_STAGING);
+                        intent.setAction(ACTION_REFRESH_STAGING);
                         twoFA = false;
                     }
 
@@ -2183,23 +2183,23 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         }
         else{
-            log("Go to ChooseAccountFragment");
+            logDebug("Go to ChooseAccountFragment");
             accountConfirmed = false;
-            ((LoginActivityLollipop)context).showFragment(Constants.CHOOSE_ACCOUNT_FRAGMENT);
+            ((LoginActivityLollipop)context).showFragment(CHOOSE_ACCOUNT_FRAGMENT);
         }
     }
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request)
     {
-        log("onRequestStart: " + request.getRequestString());
+        logDebug("onRequestStart: " + request.getRequestString());
         if(request.getType() == MegaRequest.TYPE_LOGIN) {
             disableLoginButton();
         }
         if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 //			loginProgressBar.setVisibility(View.GONE);
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
-            loginFetchNodesProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
+            loginFetchNodesProgressBar.getLayoutParams().width = px2dp((250*scaleW), outMetrics);
             loginFetchNodesProgressBar.setProgress(0);
             LoginActivityLollipop.isFetchingNodes = true;
             disableLoginButton();
@@ -2216,15 +2216,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         }
         catch(Exception e){
-            log("TIMER EXCEPTION");
-            log(e.getMessage());
+            logError("TIMER EXCEPTION", e);
         }
 
-        log("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
+        logDebug("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
-                log("terminate login process when login");
+                logWarning("Terminate login process when login");
                 return;
             }
             if (error.getErrorCode() != MegaError.API_OK) {
@@ -2236,11 +2235,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 String errorMessage = "";
 
                 if (error.getErrorCode() == MegaError.API_ESID){
-                    log("MegaError.API_ESID "+getString(R.string.error_server_expired_session));
+                    logWarning("MegaError.API_ESID " + getString(R.string.error_server_expired_session));
                     ((LoginActivityLollipop)context).showAlertLoggedOut();
                 }
                 else if (error.getErrorCode() == MegaError.API_EMFAREQUIRED){
-                    log("require 2fa");
+                    logDebug("require 2fa");
                     is2FAEnabled = true;
                     ((LoginActivityLollipop) context).showAB(tB);
                     loginLogin.setVisibility(View.GONE);
@@ -2287,9 +2286,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     else{
                         errorMessage = error.getErrorString();
                     }
-                    log("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
+                    logError("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
 
-                    if (Util.isChatEnabled()) {
+                    if (isChatEnabled()) {
                         if (megaChatApi != null) {
                             megaChatApi.logout(this);
                         }
@@ -2302,12 +2301,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
 
                     if(chatSettings==null) {
-                        log("1 - Reset chat setting enable");
+                        logDebug("Reset chat setting enable");
                         chatSettings = new ChatSettings();
                         dbH.setChatSettings(chatSettings);
                     }
                     else{
-                        log("2 - Reset chat setting enable");
+                        logDebug("Reset chat setting enable");
                         dbH.setEnabledChat(true + "");
                     }
                 }
@@ -2345,7 +2344,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 gSession = megaApi.dumpSession();
 
-                log("Logged in with session");
+                logDebug("Logged in with session");
 
 //				String session = megaApi.dumpSession();
 //				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();
@@ -2370,38 +2369,38 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 megaApi.fetchNodes(this);
             }
         } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
-            log("TYPE_LOGOUT");
+            logDebug("TYPE_LOGOUT");
             if (error.getErrorCode() == MegaError.API_OK){
                 AccountController.localLogoutApp(context.getApplicationContext());
             }
         }
         else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
-            log("TYPE_GET_RECOVERY_LINK");
+            logDebug("TYPE_GET_RECOVERY_LINK");
             if (error.getErrorCode() == MegaError.API_OK){
-                log("The recovery link has been sent");
-                Util.showAlert(context, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+                logDebug("The recovery link has been sent");
+                showAlert(context, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
             }
             else if (error.getErrorCode() == MegaError.API_ENOENT){
-                log("No account with this mail: "+error.getErrorString()+" "+error.getErrorCode());
-                Util.showAlert(context, getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
+                logError("No account with this mail: "+error.getErrorString()+" "+error.getErrorCode());
+                showAlert(context, getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
             }
             else{
-                log("Error when asking for recovery pass link");
-                log(error.getErrorString() + "___" + error.getErrorCode());
-                Util.showAlert(context,getString(R.string.general_text_error), getString(R.string.general_error_word));
+                logError("Error when asking for recovery pass link");
+                logError(error.getErrorString() + "___" + error.getErrorCode());
+                showAlert(context,getString(R.string.general_text_error), getString(R.string.general_error_word));
             }
         }
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
-                log("terminate login process when fetch nodes");
+                logDebug("Terminate login process when fetch nodes");
                 return;
             }
             LoginActivityLollipop.isFetchingNodes = false;
             MegaApplication.setLoggingIn(false);
 
             if (error.getErrorCode() == MegaError.API_OK){
-                log("ok fetch nodes");
+                logDebug("Ok fetch nodes");
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
 
                 gSession = megaApi.dumpSession();
@@ -2416,7 +2415,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 dbH.saveCredentials(credentials);
 
-                log("readyToManager");
+                logDebug("readyToManager");
                 readyToManager();
 
             }else{
@@ -2424,7 +2423,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     confirmLogoutDialog.dismiss();
                 }
                 enableLoginButton();
-                log("Error fetch nodes: "+error.getErrorCode());
+                logError("Error fetch nodes: " + error.getErrorCode());
                 String errorMessage;
                 if (error.getErrorCode() == MegaError.API_ESID){
                     errorMessage = getString(R.string.error_server_expired_session);
@@ -2455,9 +2454,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 confirmingAccountText.setVisibility(View.GONE);
 
                 if (error.getErrorCode() == MegaError.API_EACCESS){
-                    log("Error API_EACCESS");
+                    logError("Error API_EACCESS");
                     if(((LoginActivityLollipop)context).accountBlocked!=null){
-                        log("Account blocked");
+                        logError("Account blocked");
                     }
                     else{
                         errorMessage = error.getErrorString();
@@ -2471,18 +2470,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
 
                 if(chatSettings==null) {
-                    log("1 - Reset chat setting enable");
+                    logDebug("Reset chat setting enable");
                     chatSettings = new ChatSettings();
                     dbH.setChatSettings(chatSettings);
                 }
                 else{
-                    log("2 - Reset chat setting enable");
+                    logDebug("Reset chat setting enable");
                     dbH.setEnabledChat(true + "");
                 }
             }
         }
         else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
-            log("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
+            logDebug("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
             String s = "";
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
@@ -2498,7 +2497,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             serversBusyText.setVisibility(View.GONE);
 
             if(error.getErrorCode() == MegaError.API_OK){
-                log("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError API_OK");
+                logDebug("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError API_OK");
                 if (request.getFlag()) {
                     bForgotPass.setVisibility(View.VISIBLE);
                     loginProgressBar.setVisibility(View.GONE);
@@ -2518,14 +2517,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 et_password.requestFocus();
             }
             else{
-                log("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError not API_OK "+error.getErrorCode());
-                ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
+                logWarning("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError not API_OK " + error.getErrorCode());
+                LoginActivityLollipop loginActivityLollipop = (LoginActivityLollipop) context;
+                if (error.getErrorCode() == MegaError.API_ENOENT) {
+                    loginActivityLollipop.showSnackbar(getString(R.string.reg_link_expired));
+                } else {
+                    loginActivityLollipop.showSnackbar(error.getErrorString());
+                }
                 confirmLink = null;
             }
         }
         else if (request.getType() == MegaRequest.TYPE_CONFIRM_ACCOUNT){
             if (error.getErrorCode() == MegaError.API_OK){
-                log("fastConfirm finished - OK");
+                logDebug("fastConfirm finished - OK");
                 onKeysGeneratedLogin(lastEmail, lastPassword);
             }
             else{
@@ -2560,7 +2564,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
     {
-        log("onRequestTemporaryError: " + request.getRequestString() + e.getErrorCode());
+        logWarning("onRequestTemporaryError: " + request.getRequestString() + e.getErrorCode());
 
 //		if (request.getType() == MegaRequest.TYPE_LOGIN){
 //
@@ -2573,15 +2577,15 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             timer = new CountDownTimer(10000, 2000) {
 
                 public void onTick(long millisUntilFinished) {
-                    log("TemporaryError one more");
+                    logDebug("TemporaryError one more");
                 }
 
                 public void onFinish() {
-                    log("the timer finished, message shown");
+                    logDebug("The timer finished, message shown");
                     try {
                         serversBusyText.setVisibility(View.VISIBLE);
                         if(error.getErrorCode()==MegaError.API_EAGAIN){
-                            log("onRequestTemporaryError:onFinish:API_EAGAIN: :value: "+error.getValue());
+                            logWarning("onRequestTemporaryError:onFinish:API_EAGAIN: :value: " + error.getValue());
                             if(error.getValue() == MegaApiJava.RETRY_CONNECTIVITY){
                                 serversBusyText.setText(getString(R.string.login_connectivity_issues));
                                 loginInProgressInfo.setText(getString(R.string.login_connectivity_issues));
@@ -2613,48 +2617,47 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
             }.start();
         }catch (Exception exception){
-            log(exception.getMessage());
-            log("EXCEPTION when starting count");
+            logError("EXCEPTION when starting count", exception);
         }
     }
 
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-        log("onRequestStart(CHAT) type:" +request.getType());
+        logDebug("Type:" + request.getType());
     }
 
     @Override
     public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-        log("onRequestUpdate(CHAT) type: " +request.getType());
+        logDebug("Type: " + request.getType());
     }
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish(CHAT)");
+        logDebug("onRequestFinish(CHAT)");
 
         if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
 
             ((MegaApplication) ((Activity)context).getApplication()).disableMegaChatApi();
-            Util.resetAndroidLogger();
+            resetAndroidLogger();
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestTemporaryError(CHAT) type: " +request.getRequestString() + "error: " + e.getErrorCode());
+        logWarning("Type: " + request.getType() + ", Error: " + e.getErrorCode());
     }
 
 
     public void showDialogInsertMail(final boolean reset){
-        log("showDialogInsertMail");
+        logDebug("reset: " + reset);
 
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+        params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
         final EditText input = new EditText(context);
         layout.addView(input, params);
@@ -2680,7 +2683,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
         params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+        params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
         textError.setLayoutParams(params_text_error);
 
         textError.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
@@ -2720,12 +2723,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-                log("OK RESET PASSWORD");
+                logDebug("OK RESET PASSWORD");
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String value = input.getText().toString().trim();
                     String emailError = Util.getEmailError(value, context);
                     if (emailError != null) {
-                        log("mail incorrect");
+                        logWarning("Mail incorrect");
 //                        input.setError(emailError);
                         input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(emailError);
@@ -2733,18 +2736,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         input.requestFocus();
                     } else {
                         if(reset){
-                            log("ask for link to reset pass");
+                            logDebug("Ask for link to reset pass");
                             megaApi.resetPassword(value, true, loginFragment);
                         }
                         else{
-                            log("ask for link to park account");
+                            logDebug("Ask for link to park account");
                             megaApi.resetPassword(value, false, loginFragment);
                         }
                         insertMailDialog.dismiss();
                     }
                 }
                 else{
-                    log("other IME" + actionId);
+                    logDebug("Other IME" + actionId);
                 }
                 return false;
             }
@@ -2786,7 +2789,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                Util.hideKeyboard((LoginActivityLollipop)context, InputMethodManager.HIDE_NOT_ALWAYS);
+                hideKeyboard((LoginActivityLollipop)context, InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -2801,11 +2804,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         insertMailDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                log("OK BTTN PASSWORD");
+                logDebug("OK BTTN PASSWORD");
                 String value = input.getText().toString().trim();
                 String emailError = Util.getEmailError(value, context);
                 if (emailError != null) {
-                    log("mail incorrect");
+                    logWarning("Mail incorrect");
 //                    input.setError(emailError);
                     input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                     textError.setText(emailError);
@@ -2813,11 +2816,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     input.requestFocus();
                 } else {
                     if(reset){
-                        log("ask for link to reset pass");
+                        logDebug("Ask for link to reset pass");
                         megaApi.resetPassword(value, true, loginFragment);
                     }
                     else{
-                        log("ask for link to park account");
+                        logDebug("Ask for link to park account");
                         megaApi.resetPassword(value, false, loginFragment);
                     }
 
@@ -2831,7 +2834,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
      * Display keyboard
      */
     private void showKeyboardDelayed(final View view) {
-        log("showKeyboardDelayed");
+        logDebug("showKeyboardDelayed");
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -2841,7 +2844,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void hideKeyboardDelayed(final View view) {
-        log("showKeyboardDelayed");
+        logDebug("showKeyboardDelayed");
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -2853,7 +2856,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void showConfirmationParkAccount(String link){
-        log("showConfirmationParkAccount");
+        logDebug("link: " + link);
 
         final String linkUrl = link;
 
@@ -2862,9 +2865,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
-                        log("Call to Change Password Activity: "+linkUrl);
+                        logDebug("Call to Change Password Activity: " + linkUrl);
                         Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
-                        intent.setAction(Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT);
+                        intent.setAction(ACTION_RESET_PASS_FROM_PARK_ACCOUNT);
                         intent.setData(Uri.parse(linkUrl));
                         startActivity(intent);
                         break;
@@ -2884,14 +2887,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void showDialogInsertMKToChangePass(String link){
-        log("showDialogInsertMKToChangePass");
+        logDebug("link: " + link);
 
         final String linkUrl = link;
 
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
         final EditText input = new EditText(context);
         layout.addView(input, params);
@@ -2908,18 +2911,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             @Override
             public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    log("IME OK BTTN PASSWORD");
+                    logDebug("IME OK BTTN PASSWORD");
                     String value = input.getText().toString().trim();
                     if(value.equals("")||value.isEmpty()){
-                        log("input is empty");
+                        logWarning("Input is empty");
                         input.setError(getString(R.string.invalid_string));
                         input.requestFocus();
                     }
                     else {
 
-                        log("positive button pressed - reset pass");
+                        logDebug("Positive button pressed - reset pass");
                         Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
-                        intent.setAction(Constants.ACTION_RESET_PASS_FROM_LINK);
+                        intent.setAction(ACTION_RESET_PASS_FROM_LINK);
                         intent.setData(Uri.parse(linkUrl));
                         intent.putExtra("MK", value);
                         startActivity(intent);
@@ -2927,7 +2930,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
                 else{
-                    log("other IME" + actionId);
+                    logDebug("Other IME" + actionId);
                 }
                 return false;
             }
@@ -2946,7 +2949,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                Util.hideKeyboard((LoginActivityLollipop)context, InputMethodManager.HIDE_NOT_ALWAYS);
+                hideKeyboard((LoginActivityLollipop)context, InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
         builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -2957,17 +2960,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             @Override
             public void onClick(View v) {
 
-                log("OK BTTN PASSWORD");
+                logDebug("OK BTTN PASSWORD");
                 String value = input.getText().toString().trim();
                 if(value.equals("")||value.isEmpty()){
-                    log("input is empty");
+                    logWarning("Input is empty");
                     input.setError(getString(R.string.invalid_string));
                     input.requestFocus();
                 }
                 else {
-                    log("positive button pressed - reset pass");
+                    logDebug("Positive button pressed - reset pass");
                     Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
-                    intent.setAction(Constants.ACTION_RESET_PASS_FROM_LINK);
+                    intent.setAction(ACTION_RESET_PASS_FROM_LINK);
                     intent.setData(Uri.parse(linkUrl));
                     intent.putExtra("MK", value);
                     startActivity(intent);
@@ -2983,7 +2986,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         {
             megaApi.removeRequestListener(this);
         }
-        if(Util.isChatEnabled()){
+        if(isChatEnabled()){
             if(megaChatApi!=null){
                 megaChatApi.removeChatListener(this);
             }
@@ -3028,9 +3031,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public int onBackPressed() {
-        log("onBackPressed");
+        logDebug("onBackPressed");
         //refresh, point to staging server, enable chat. block the back button
-        if (Constants.ACTION_REFRESH.equals(action) || Constants.ACTION_REFRESH_STAGING.equals(action) || Constants.ACTION_ENABLE_CHAT.equals(action)){
+        if (ACTION_REFRESH.equals(action) || ACTION_REFRESH_STAGING.equals(action) || ACTION_ENABLE_CHAT.equals(action)){
             return -1;
         }
         //login is in process
@@ -3043,24 +3046,24 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         else{
 
             if(forgotPassLayout.getVisibility()==View.VISIBLE){
-                log("Forgot Pass layout is VISIBLE");
+                logDebug("Forgot Pass layout is VISIBLE");
                 hideForgotPassLayout();
                 return 1;
             }
             if(on2faPage) {
-                log("back from 2fa page");
+                logDebug("Back from 2fa page");
                 showConfirmLogoutDialog();
                 return 2;
             }
 
             if(parkAccountLayout.getVisibility()==View.VISIBLE){
-                log("Park account layout is VISIBLE");
+                logDebug("Park account layout is VISIBLE");
                 hideParkAccountLayout();
                 return 1;
             }
 
             ((LoginActivityLollipop) context).isBackFromLoginPage = true;
-            ((LoginActivityLollipop) context).showFragment(Constants.TOUR_FRAGMENT);
+            ((LoginActivityLollipop) context).showFragment(TOUR_FRAGMENT);
             return 1;
         }
     }
@@ -3088,19 +3091,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-        log("onChatInitStateUpdate: "+newState);
+        logDebug("newState: " + newState);
 
         if(isAdded()){
             if (newState == MegaChatApi.INIT_ERROR) {
                 // chat cannot initialize, disable chat completely
-                log("newState == MegaChatApi.INIT_ERROR");
                 if (chatSettings == null) {
-                    log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+                    logWarning("ERROR ----> Switch OFF chat");
                     chatSettings = new ChatSettings();
                     chatSettings.setEnabled(false+"");
                     dbH.setChatSettings(chatSettings);
                 } else {
-                    log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+                    logWarning("ERROR ----> Switch OFF chat");
                     dbH.setEnabledChat(false + "");
                 }
                 if(megaChatApi!=null){
@@ -3194,13 +3196,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     void pasteClipboard() {
-        log("pasteClipboard");
+        logDebug("pasteClipboard");
         pinLongClick = false;
         ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
         ClipData clipData = clipboard.getPrimaryClip();
         if (clipData != null) {
             String code = clipData.getItemAt(0).getText().toString();
-            log("code: "+code);
+            logDebug("code: " + code);
             if (code != null && code.length() == 6) {
                 boolean areDigits = true;
                 for (int i=0; i<6; i++) {
@@ -3247,11 +3249,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     private void performLogin(){
         if (validateForm()) {
-            Util.checkPendingTransfer(megaApi, getContext(), this);
+            checkPendingTransfer(megaApi, getContext(), this);
         }
-    }
-
-    private static void log(String log) {
-        Util.log("LoginFragmentLollipop", log);
     }
 }

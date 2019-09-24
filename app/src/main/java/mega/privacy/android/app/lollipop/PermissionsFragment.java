@@ -19,8 +19,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class PermissionsFragment extends Fragment implements View.OnClickListener {
 
@@ -71,7 +73,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         display.getMetrics(metrics);
 
         View v = inflater.inflate(R.layout.fragment_permissions, container, false);
-        ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
+        ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
 
         setupLayout = v.findViewById(R.id.setup_fragment_container);
         Button notNowButton, setupButton, notNow2Button, enableButton;
@@ -126,7 +128,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             writeGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             cameraGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA);
             microphoneGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.RECORD_AUDIO);
-            contactsGranted = Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, this.getActivity());
+            contactsGranted = checkPermissionGranted(Manifest.permission.READ_CONTACTS, this.getActivity());
 
             if (!readGranted || !writeGranted) {
                 items[numItems] = READ_WRITE;
@@ -166,7 +168,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         }
 
         if (isAllowingAccessShown) {
-            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
         }
 
         if (numItems == 1) {
@@ -184,7 +186,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 break;
             }
             case R.id.setup_button: {
-                ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+                ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
                 showAllowAccessLayout();
                 break;
             }
@@ -246,19 +248,21 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    void askForMediaPermissions() {
-        if (!readGranted && !writeGranted) {
-            log("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
+    void askForMediaPermissions () {
+        if (!readGranted && !writeGranted)  {
+            logDebug("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                     PERMISSIONS_FRAGMENT);
-        } else if (!writeGranted) {
-            log("WRITE_EXTERNAL_STORAGE");
+        }
+        else if (!writeGranted) {
+            logDebug("WRITE_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_FRAGMENT);
-        } else if (!readGranted) {
-            log("READ_EXTERNAL_STORAGE");
+        }
+        else if (!readGranted) {
+            logDebug("READ_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     PERMISSIONS_FRAGMENT);
@@ -267,14 +271,14 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
     void askForCameraPermission() {
         if (!cameraGranted) {
-            log("CAMERA");
+            logDebug("CAMERA");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_FRAGMENT);
         }
     }
 
     void askForCallsPermissions() {
         if (!microphoneGranted) {
-            log("RECORD_AUDIO");
+            logDebug("RECORD_AUDIO");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.RECORD_AUDIO},
                     PERMISSIONS_FRAGMENT);
@@ -283,7 +287,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
     void askForContactsPermissions() {
         if (!contactsGranted) {
-            log("CONTACT");
+            logDebug("Ask for CONTACT permission");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_FRAGMENT);
         }
     }
@@ -326,9 +330,5 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-    }
-
-    private static void log(String log) {
-        Util.log("PermissionsFragment", log);
     }
 }

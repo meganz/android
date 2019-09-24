@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -19,6 +18,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringMap;
 import nz.mega.sdk.MegaStringTable;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaContactGetter implements MegaRequestListenerInterface {
 
@@ -160,7 +161,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("start: " + request.getRequestString());
+        logDebug("start: " + request.getRequestString());
     }
 
     @Override
@@ -189,7 +190,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     //the normalized phone number is the key
                     contact.localName = map.get(list.get(0));
 
-                    log("contact: " + contact);
+                    logDebug("contact: " + contact);
                     megaContacts.add(contact);
                 }
                 if (megaContacts.size() > 0) {
@@ -199,13 +200,13 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                         api.getUserEmail(getUserHandler(firstContact.id), this);
                     }
                 } else {
-                    log("no mega contacts.");
+                    logDebug("no mega contacts.");
                     if (updater != null) {
                         updater.noContacts();
                     }
                 }
             } else {
-                log("get registered contacts faild with error code: " + e.getErrorCode());
+                logDebug("get registered contacts faild with error code: " + e.getErrorCode());
                 if (updater != null) {
                     updater.onException(e.getErrorCode(), request.getRequestString());
                 }
@@ -222,10 +223,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                         }
                     }
                 } else {
-                    log("Contact's email is empty!");
+                    logDebug("Contact's email is empty!");
                 }
             } else {
-                log("get contact's email faild with error code: " + e.getErrorCode());
+                logDebug("get contact's email faild with error code: " + e.getErrorCode());
                 if (updater != null) {
                     updater.onException(e.getErrorCode(), request.getRequestString());
                 }
@@ -281,16 +282,16 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     public void getMegaContacts(MegaApiAndroid api, long period) {
         if(api.getRootNode() == null) {
-            log("haven't logged in, return");
+            logDebug("haven't logged in, return");
             return;
         }
         if (System.currentTimeMillis() - lastSyncTimestamp > period && !requestInProgress) {
             requestInProgress = true;
-            log("getMegaContacts request from server");
+            logDebug("getMegaContacts request from server");
             api.getRegisteredContacts(getRequestParameter(getLocalContacts()), this);
         } else {
             if(!requestInProgress) {
-                log("getMegaContacts load from database");
+                logDebug("getMegaContacts load from database");
                 if (updater != null) {
                     ArrayList<MegaContact> list = dbH.getMegaContacts();
                     list = filterOut(api, list);
@@ -319,16 +320,12 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 }
             }
         }
-        log("local contacts size is: " + stringMap.size());
+        logDebug("local contacts size is: " + stringMap.size());
         return stringMap;
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
-    }
-
-    private static void log(String message) {
-        Util.log("MegaContactGetter", message);
     }
 }
