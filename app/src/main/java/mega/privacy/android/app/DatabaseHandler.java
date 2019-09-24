@@ -22,10 +22,12 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.*;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
@@ -211,10 +213,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public static synchronized DatabaseHandler getDbHandler(Context context){
 
-    	log("getDbHandler");
+        logDebug("getDbHandler");
 
     	if (instance == null){
-    		log("INSTANCE IS NULL");
+            logDebug("INSTANCE IS NULL");
     		instance = new DatabaseHandler(context);
     	}
 
@@ -229,7 +231,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 
-		log("onCreate");
+        logDebug("onCreate");
         String CREATE_OFFLINE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_OFFLINE + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_OFF_HANDLE + " TEXT," + KEY_OFF_PATH + " TEXT," + KEY_OFF_NAME + " TEXT," +
         		KEY_OFF_PARENT + " INTEGER," + KEY_OFF_TYPE + " INTEGER, " + KEY_OFF_INCOMING + " INTEGER, " + KEY_OFF_HANDLE_INCOMING + " INTEGER "+")";
@@ -318,7 +320,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		log("onUpgrade");
+        logDebug("onUpgrade");
 
 //		UserCredentials userCredentials = null;
 //
@@ -449,18 +451,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			//Changes to encrypt the Offline table
 			ArrayList<MegaOffline> offlinesOld = this.getOfflineFilesOld(db);
 
-			log("Clear the table offline");
+            logDebug("Clear the table offline");
 			this.clearOffline(db);
 
 			for(int i=0; i<offlinesOld.size();i++){
 				MegaOffline offline = offlinesOld.get(i);
 
 				if(offline.getType()==null||offline.getType().equals("0")||offline.getType().equals("1")){
-					log("Not encrypted: "+offline.getName());
+                    logDebug("Not encrypted: " + offline.getName());
 					this.setOfflineFile(offline, db);	//using the method that encrypts
 				}
 				else{
-					log("Encrypted: "+offline.getName());
+                    logDebug("Encrypted: " + offline.getName());
 					this.setOfflineFileOld(offline, db);	//using the OLD method that doesn't encrypt
 				}
 			}
@@ -471,11 +473,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PIN_LOCK_TYPE + " TEXT;");
 
 			if(this.isPinLockEnabled(db)){
-				log("PIN enabled!");
-				db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + " = '" + encrypt(Constants.PIN_4) + "';");
+                logDebug("PIN enabled!");
+				db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + " = '" + encrypt(PIN_4) + "';");
 			}
 			else{
-				log("PIN NOT enabled!");
+                logDebug("PIN NOT enabled!");
 				db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + " = '" + encrypt("") + "';");
 			}
 		}
@@ -687,10 +689,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			return null;
 		}
 		try {
-			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
+			byte[] encrypted = aes_encrypt(getAesKey(),original.getBytes());
 			return Base64.encodeToString(encrypted, Base64.DEFAULT);
 		} catch (Exception e) {
-			log("ee");
+            logError("Error encrypting DB field", e);
 			e.printStackTrace();
 			return null;
 		}
@@ -1073,7 +1075,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void saveMyEmail(String email) {
-		log("saveEmail: "+email);
+        logDebug("saveEmail: " + email);
 		String selectQuery = "SELECT * FROM " + TABLE_CREDENTIALS;
 		ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -1138,10 +1140,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		try {
 			byte[] encoded = Base64.decode(encodedString, Base64.DEFAULT);
-			byte[] original = Util.aes_decrypt(getAesKey(), encoded);
+			byte[] original = aes_decrypt(getAesKey(), encoded);
 			return new String(original);
 		} catch (Exception e) {
-			log("de");
+            logError("Error decrypting DB field", e);
+            e.printStackTrace();
 			return null;
 		}
 	}
@@ -1236,7 +1239,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public MegaPreferences getPreferences(){
-		log("getPreferences");
+        logDebug("getPreferences");
 		MegaPreferences prefs = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
@@ -1294,7 +1297,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public ChatSettings getChatSettings(){
-		log("getChatSettings");
+        logDebug("getChatSettings");
 		ChatSettings chatSettings = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
@@ -1315,7 +1318,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setChatSettings(ChatSettings chatSettings){
-		log("setChatSettings");
+        logDebug("setChatSettings");
 
         db.execSQL("DELETE FROM " + TABLE_CHAT_SETTINGS);
 
@@ -1331,7 +1334,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setEnabledChat(String enabled){
-		log("setEnabledChat");
+        logDebug("setEnabledChat");
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
 		ContentValues values = new ContentValues();
@@ -1349,7 +1352,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setSendOriginalAttachments(String originalAttachments){
-		log("setEnabledChat");
+        logDebug("setEnabledChat");
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
 		ContentValues values = new ContentValues();
@@ -1426,7 +1429,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public int setWrittenTextItem(String handle, String text){
-		log("setWrittenTextItem: "+text+" "+handle);
+        logDebug("setWrittenTextItem: "+ text + " " + handle);
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_ITEM_WRITTEN_TEXT, encrypt(text));
@@ -1450,7 +1453,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //	}
 
 	public int setNotificationEnabledChatItem(String enabled, String handle){
-		log("setNotificationEnabledChatItem: "+enabled+" "+handle);
+        logDebug("setNotificationEnabledChatItem: " + enabled + " " + handle);
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_ITEM_NOTIFICATIONS, encrypt(enabled));
@@ -1458,11 +1461,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public ChatItemPreferences findChatPreferencesByHandle (String handle){
-		log("findChatPreferencesByHandle: "+handle);
+        logDebug("findChatPreferencesByHandle: " + handle);
 		ChatItemPreferences prefs = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_ITEMS + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
-		log("QUERY: "+selectQuery);
+        logDebug("QUERY: " + selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		if (!cursor.equals(null)){
@@ -1471,7 +1474,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				int id = Integer.parseInt(cursor.getString(0));
 				String chatHandle = decrypt(cursor.getString(1));
 				String notificationsEnabled = decrypt(cursor.getString(2));
-				log("notificationsEnabled: "+notificationsEnabled);
+                logDebug("notificationsEnabled: " + notificationsEnabled);
 				String ringtone = decrypt(cursor.getString(3));
 				String notificationsSound = decrypt(cursor.getString(4));
 				String writtenText = decrypt(cursor.getString(5));
@@ -1486,7 +1489,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public boolean areNotificationsEnabled (String handle){
-		log("areNotificationsEnabled: "+handle);
+        logDebug("areNotificationsEnabled: " + handle);
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_ITEMS + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -1556,7 +1559,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
 	public boolean isPinLockEnabled(SQLiteDatabase db){
-		log("getPinLockEnabled");
+        logDebug("getPinLockEnabled");
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -1583,7 +1586,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setSmallGridCamera (boolean smallGridCamera){
-		log("setSmallGridCamera");
+        logDebug("setSmallGridCamera");
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
@@ -1601,7 +1604,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
 	public boolean isSmallGridCamera (){
-		log("isSmallGridCamera");
+        logDebug("isSmallGridCamera");
 
 		String selectQuery = "SELECT " + KEY_SMALL_GRID_CAMERA + " FROM " + TABLE_PREFERENCES + " WHERE " + KEY_ID + " = '1'";
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -1628,7 +1631,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setAttributes (MegaAttributes attr){
-		log("setAttributes");
+        logDebug("setAttributes");
         ContentValues values = new ContentValues();
         values.put(KEY_ATTR_ONLINE, encrypt(attr.getOnline()));
         values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
@@ -1708,7 +1711,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //	}
 
 	public int setNonContactFirstName (String name, String handle){
-		log("setContactName: "+name+" "+handle);
+        logDebug("setContactName: " + name + " " + handle);
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_NONCONTACT_FIRSTNAME, encrypt(name));
@@ -1753,11 +1756,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //	}
 
 	public NonContactInfo findNonContactByHandle(String handle){
-		log("findNONContactByHandle: "+handle);
+        logDebug("findNONContactByHandle: " + handle);
 		NonContactInfo noncontact = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_NON_CONTACTS + " WHERE " + KEY_NONCONTACT_HANDLE + " = '" + encrypt(handle)+ "'";
-		log("QUERY: "+selectQuery);
+        logDebug("QUERY: " + selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		if (!cursor.equals(null)){
@@ -1780,7 +1783,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setContact (MegaContactDB contact){
-		log("setContacts: "+contact.getMail());
+        logDebug("setContacts: " + contact.getMail());
         ContentValues values = new ContentValues();
         values.put(KEY_CONTACT_HANDLE, encrypt(contact.getHandle()));
         values.put(KEY_CONTACT_MAIL, encrypt(contact.getMail()));
@@ -1794,7 +1797,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public int setContactName (String name, String mail){
-		log("setContactName: "+name+" "+mail);
+        logDebug("setContactName: " + name + " " + mail);
 
 		ContentValues values = new ContentValues();
 	    values.put(KEY_CONTACT_NAME, encrypt(name));
@@ -1820,7 +1823,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public int setContactMail (long handle, String mail){
-		log("setContactMail: "+handle+" "+mail);
+        logDebug("setContactMail: " + handle + " " + mail);
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_CONTACT_MAIL, encrypt(mail));
@@ -1828,11 +1831,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public MegaContactDB findContactByHandle(String handle){
-		log("findContactByHandle: "+handle);
+        logDebug("findContactByHandle: " + handle);
 		MegaContactDB contacts = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_HANDLE + " = '" + encrypt(handle) + "'";
-		log("QUERY: "+selectQuery);
+        logDebug("QUERY: " + selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		if (!cursor.equals(null)){
@@ -1860,11 +1863,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public MegaContactDB findContactByEmail(String mail){
-		log("findContactByEmail: "+mail);
+        logDebug("findContactByEmail: " + mail);
 		MegaContactDB contacts = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'";
-		log("QUERY: "+selectQuery);
+        logDebug("QUERY: " + selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		if (!cursor.equals(null)){
@@ -1892,7 +1895,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public long setOfflineFile (MegaOffline offline){
-		log("setOfflineFile: "+offline.getHandle());
+        logDebug("setOfflineFile: " + offline.getHandle());
         ContentValues values = new ContentValues();
 
         MegaOffline checkInsert = null;
@@ -2064,7 +2067,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public MegaOffline findByHandle(long handle){
-		log("findByHandle: "+handle);
+        logDebug("findByHandle: " + handle);
 
 		MegaOffline offline = null;
 
@@ -2570,7 +2573,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_LAST_CLOUD_FOLDER_HANDLE + "= '" + encrypt(folderHandle + "") + "' WHERE " + KEY_ID + " = '1'";
 			db.execSQL(UPDATE_PREFERENCES_TABLE);
-			log("KEY_LAST_CLOUD_FOLDER_HANDLE UPLOAD FOLDER: " + UPDATE_PREFERENCES_TABLE);
+            logDebug("KEY_LAST_CLOUD_FOLDER_HANDLE UPLOAD FOLDER: " + UPDATE_PREFERENCES_TABLE);
 		}
 		else{
 	        values.put(KEY_LAST_CLOUD_FOLDER_HANDLE, encrypt(folderHandle + ""));
@@ -2613,7 +2616,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setCamSyncEnabled (boolean enabled){
-		log("setCamSyncEnabled: "+enabled);
+        logDebug("setCamSyncEnabled: " + enabled);
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -2630,7 +2633,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setSecondaryUploadEnabled (boolean enabled){
-		log("setSecondaryUploadEnabled: "+enabled);
+        logDebug("setSecondaryUploadEnabled: " + enabled);
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -2662,7 +2665,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setSecondaryFolderHandle (long handle){
-		log("setSecondaryFolderHandle: "+handle);
+        logDebug("setSecondaryFolderHandle: " + handle);
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -2701,7 +2704,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_URI_EXTERNAL_SD_CARD + "= '" + encrypt(uriExternalSDCard) + "' WHERE " + KEY_ID + " = '1'";
 			db.execSQL(UPDATE_PREFERENCES_TABLE);
-			log("KEY_URI_EXTERNAL_SD_CARD URI: " + UPDATE_PREFERENCES_TABLE);
+            logDebug("KEY_URI_EXTERNAL_SD_CARD URI: " + UPDATE_PREFERENCES_TABLE);
 		}
 		else{
 	        values.put(KEY_URI_EXTERNAL_SD_CARD, encrypt(uriExternalSDCard));
@@ -2727,7 +2730,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPinLockType (String pinLockType){
-		log("setPinLockType");
+        logDebug("setPinLockType");
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -2744,7 +2747,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setSecondaryFolderPath (String localPath){
-		log("setSecondaryFolderPath: "+localPath);
+        logDebug("setSecondaryFolderPath: " + localPath);
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -2785,7 +2788,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	private void setAccountDetailsTimeStamp (long accountDetailsTimeStamp){
-		log("setAccountDetailsTimeStamp");
+        logDebug("setAccountDetailsTimeStamp");
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
@@ -2803,7 +2806,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPaymentMethodsTimeStamp (){
-		log("setPaymentMethodsTimeStamp");
+        logDebug("setPaymentMethodsTimeStamp");
 		long paymentMethodsTimeStamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
@@ -2822,7 +2825,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPricingTimestamp (){
-		log("setPricingTimestamp");
+        logDebug("setPricingTimestamp");
 		long creditCardTimestamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
@@ -2841,7 +2844,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setExtendedAccountDetailsTimestamp (){
-		log("setExtendedAccountDetailsTimestamp");
+        logDebug("setExtendedAccountDetailsTimestamp");
 		long extendedAccountDetailsTimestamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
@@ -2860,7 +2863,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void resetExtendedAccountDetailsTimestamp (){
-		log("resetExtendedAccountDetailsTimestamp");
+        logDebug("resetExtendedAccountDetailsTimestamp");
 		long extendedAccountDetailsTimestamp = -1;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
@@ -2879,22 +2882,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
     public void setCamSyncTimeStamp(long camSyncTimeStamp) {
-        log("setCamSyncTimeStamp: " + camSyncTimeStamp);
+        logDebug("setCamSyncTimeStamp: " + camSyncTimeStamp);
         setLongValue(TABLE_PREFERENCES, KEY_CAM_SYNC_TIMESTAMP, camSyncTimeStamp);
     }
 
     public void setCamVideoSyncTimeStamp(long camVideoSyncTimeStamp) {
-        log("setCamVideoSyncTimeStamp: " + camVideoSyncTimeStamp);
+        logDebug("setCamVideoSyncTimeStamp: " + camVideoSyncTimeStamp);
         setLongValue(TABLE_PREFERENCES, KEY_CAM_VIDEO_SYNC_TIMESTAMP, camVideoSyncTimeStamp);
     }
 
     public void setSecSyncTimeStamp(long secSyncTimeStamp) {
-        log("setSecSyncTimeStamp: " + secSyncTimeStamp);
+        logDebug("setSecSyncTimeStamp: " + secSyncTimeStamp);
         setLongValue(TABLE_PREFERENCES, KEY_SEC_SYNC_TIMESTAMP, secSyncTimeStamp);
     }
 
     public void setSecVideoSyncTimeStamp (long secVideoSyncTimeStamp){
-        log("setSecVideoSyncTimeStamp: " + secVideoSyncTimeStamp);
+        logDebug("setSecVideoSyncTimeStamp: " + secVideoSyncTimeStamp);
         setLongValue(TABLE_PREFERENCES,KEY_SEC_VIDEO_SYNC_TIMESTAMP,secVideoSyncTimeStamp);
     }
 
@@ -3014,7 +3017,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ASK_SIZE_DOWNLOAD + "='" + encrypt(askSizeDownload) + "' WHERE " + KEY_ID + " ='1'";
 			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+            logDebug("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 		}
 		else{
 			values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(askSizeDownload));
@@ -3030,7 +3033,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ASK_NOAPP_DOWNLOAD + "='" + encrypt(askNoAppDownload) + "' WHERE " + KEY_ID + " ='1'";
 			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+            logDebug("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 		}
 		else{
 			values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(askNoAppDownload));
@@ -3046,7 +3049,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_INTENTS + "='" + encrypt(Integer.toString(attemp) + "") + "' WHERE " + KEY_ID + " ='1'";
 			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+            logDebug("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 		}
 		else{
 			values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attemp) + ""));
@@ -3062,7 +3065,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_SDK + "='" + encrypt(fileLoggerSDK + "") + "' WHERE " + KEY_ID + " ='1'";
 			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+            logDebug("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 		}
 		else{
 			values.put(KEY_FILE_LOGGER_SDK, encrypt(fileLoggerSDK + ""));
@@ -3078,7 +3081,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_KARERE + "='" + encrypt(fileLoggerKarere + "") + "' WHERE " + KEY_ID + " ='1'";
 			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+            logDebug("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 		}
 		else{
 			values.put(KEY_FILE_LOGGER_KARERE, encrypt(fileLoggerKarere + ""));
@@ -3094,7 +3097,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_USE_HTTPS_ONLY + "='" + encrypt(useHttpsOnly + "") + "' WHERE " + KEY_ID + " ='1'";
 			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+            logDebug("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 		}
 		else{
 			values.put(KEY_USE_HTTPS_ONLY, encrypt(useHttpsOnly + ""));
@@ -3196,7 +3199,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 	public void setLastPublicHandleTimeStamp (){
-		log("setLastPublicHandleTimeStamp");
+        logDebug("setLastPublicHandleTimeStamp");
 		long lastPublicHandleTimeStamp = System.currentTimeMillis()/1000;
 
 		setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp);
@@ -3252,7 +3255,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_INVALIDATE_SDK_CACHE + "='" + encrypt(invalidateSdkCache + "") + "' WHERE " + KEY_ID + " ='1'";
 			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+            logDebug("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 		}
 		else{
 			values.put(KEY_INVALIDATE_SDK_CACHE, encrypt(invalidateSdkCache + ""));
@@ -3384,11 +3387,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public PendingMessageSingle findPendingMessageById(long messageId){
-		log("findPendingMessageById");
+        logDebug("findPendingMessageById");
 //		String id = messageId+"";
 		PendingMessageSingle pendMsg = null;
 		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " +KEY_ID + " ='"+ messageId+"'";
-		log("QUERY: "+selectQuery);
+        logDebug("QUERY: " + selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		if (!cursor.equals(null)){
@@ -3431,7 +3434,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String where = KEY_ID + "=" +idMessage;
 
 		int rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
-		log("Rows updated: "+rows);
+        logDebug("Rows updated: " + rows);
 	}
 
 	public void updatePendingMessageOnTransferFinish(long idMessage, String nodeHandle, int state) {
@@ -3442,28 +3445,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String where = KEY_ID + "=" +idMessage;
 
 		int rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
-		log("Rows updated: "+rows);
+        logDebug("Rows updated: " + rows);
 	}
 
 	public void updatePendingMessageOnAttach(long idMessage, String temporalId, int state) {
 
 		ContentValues values = new ContentValues();
-		log("----The id of my pending message to update: "+temporalId);
+        logDebug("ID of my pending message to update: " + temporalId);
 		values.put(KEY_PENDING_MSG_TEMP_KARERE, encrypt(temporalId));
 		values.put(KEY_PENDING_MSG_STATE, state);
 		String where = KEY_ID + "=" +idMessage;
 
 		int rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
-		log("Rows updated: "+rows);
+        logDebug("Rows updated: " + rows);
 	}
 
 	public ArrayList<AndroidMegaChatMessage> findPendingMessagesNotSent(long idChat) {
-		log("findPendingMessagesNotSent");
+        logDebug("findPendingMessagesNotSent");
 		ArrayList<AndroidMegaChatMessage> pendMsgs = new ArrayList<>();
 		String chat = idChat + "";
 
 		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " + KEY_PENDING_MSG_STATE + " < " + PendingMessageSingle.STATE_SENT + " AND " + KEY_ID_CHAT + " ='" + encrypt(chat) + "'";
-		log("QUERY: " + selectQuery);
+        logDebug("QUERY: " + selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (!cursor.equals(null)) {
 			if (cursor.moveToFirst()) {
@@ -3498,17 +3501,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 		}
 		cursor.close();
-		log("Found: "+pendMsgs.size());
+        logDebug("Found: " + pendMsgs.size());
 		return pendMsgs;
 	}
 
 	public long findPendingMessageByIdTempKarere(long idTemp){
-		log("findPendingMessageById: "+idTemp);
+        logDebug("findPendingMessageById: " + idTemp);
 		String idPend = idTemp+"";
 		long id = -1;
 
 		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " + KEY_PENDING_MSG_TEMP_KARERE + " = '" + encrypt(idPend) + "'";
-		log("QUERY: "+selectQuery);
+		logDebug("QUERY: "+selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		if (!cursor.equals(null)){
@@ -3522,14 +3525,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void removeSentPendingMessages(){
-		log("removeSentPendingMessages");
+		logDebug("removeSentPendingMessages");
 		int rows = db.delete(TABLE_PENDING_MSG_SINGLE, KEY_PENDING_MSG_STATE + "="+PendingMessageSingle.STATE_SENT, null);
 	}
 
 	public void removePendingMessageByChatId(long idChat){
-		log("removePendingMessageByChatId");
+		logDebug("removePendingMessageByChatId");
 		int rows = db.delete(TABLE_PENDING_MSG_SINGLE, KEY_PENDING_MSG_ID_CHAT + "="+idChat, null);
-
 	}
 
 	public void removePendingMessageById(long idMsg){
@@ -3551,7 +3553,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void setAutoPlayEnabled(String enabled){
-        log("setAutoPlayEnabled");
+		logDebug("setAutoPlayEnabled");
 
         String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
@@ -3566,9 +3568,4 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         cursor.close();
     }
-
-
-	private static void log(String log) {
-		Util.log("DatabaseHandler", log);
-	}
 }

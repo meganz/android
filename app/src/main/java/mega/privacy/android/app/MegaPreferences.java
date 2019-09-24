@@ -1,6 +1,6 @@
 package mega.privacy.android.app;
 
-import mega.privacy.android.app.utils.Util;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaPreferences{
 	
@@ -247,15 +247,12 @@ public class MegaPreferences{
 	}
 
 	public String getMegaHandleSecondaryFolder() {
-		log("getMegaHandleSecondaryFolder "+megaHandleSecondaryFolder);
+		logDebug("getMegaHandleSecondaryFolder " + megaHandleSecondaryFolder);
 		return megaHandleSecondaryFolder;
 	}
 
 	public void setMegaHandleSecondaryFolder(String megaHandleSecondaryFolder) {
 		this.megaHandleSecondaryFolder = megaHandleSecondaryFolder;
-	}
-	private static void log(String log) {
-		Util.log("Preferences", log);
 	}
 
 	public String getSecSyncTimeStamp() {
