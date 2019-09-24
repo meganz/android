@@ -741,21 +741,6 @@ public class ChatExplorerFragment extends Fragment {
                         items.add(i, recents.get(i));
                     }
                 }
-
-                if (addedItemsSaved != null && !addedItemsSaved.isEmpty()) {
-                    for (String id : addedItemsSaved) {
-                        for (ChatExplorerListItem item : items) {
-                            if (!item.isHeader() && item.getId().equals(id)) {
-                                addedItems.add(item);
-                                int position = adapterList.getPosition(item);
-                                if (position != -1) {
-                                    adapterList.toggleSelection(position);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
             }
 
             return null;
@@ -779,50 +764,86 @@ public class ChatExplorerFragment extends Fragment {
             }
 
             addedList.setAdapter(adapterAdded);
-            int position;
-            if (recents != null && !recents.isEmpty()) {
-                position = recents.size();
-            }
-            else {
-                position = -1;
-            }
-            positionDividerItemDecoration = new PositionDividerItemDecoration(context, outMetrics, position);
-            simpleDividerItemDecoration = new SimpleDividerItemDecoration(context, outMetrics);
-            listView.addItemDecoration(positionDividerItemDecoration);
-            listView.setAdapter(adapterList);
 
-            if (adapterAdded.getItemCount() == 0) {
-                setFirstLayoutVisibility(View.VISIBLE);
-
-                if(context instanceof  ChatExplorerActivity){
-                    ((ChatExplorerActivity)context).setToolbarSubtitle(null);
-                }
-                else if (context instanceof FileExplorerActivityLollipop){
-                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
-                }
-            }
-            else {
-                setFirstLayoutVisibility(View.GONE);
-
-                if(context instanceof  ChatExplorerActivity){
-                    ((ChatExplorerActivity)context).showFabButton(true);
-                    ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-                }
-                else if (context instanceof FileExplorerActivityLollipop){
-                    ((FileExplorerActivityLollipop) context).showFabButton(true);
-                    ((FileExplorerActivityLollipop) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-                }
+            if (addedItemsSaved != null && !addedItemsSaved.isEmpty()) {
+                new RecoverSavedItemsTask().execute();
+                return;
             }
 
-            if (context instanceof ChatExplorerActivity) {
-                ((ChatExplorerActivity) context).isPendingToOpenSearchView();
+            setFinalViews();
+        }
+    }
+
+    private void setFinalViews() {
+        int position;
+        if (recents != null && !recents.isEmpty()) {
+            position = recents.size();
+        }
+        else {
+            position = -1;
+        }
+        positionDividerItemDecoration = new PositionDividerItemDecoration(context, outMetrics, position);
+        simpleDividerItemDecoration = new SimpleDividerItemDecoration(context, outMetrics);
+        listView.addItemDecoration(positionDividerItemDecoration);
+        listView.setAdapter(adapterList);
+
+        if (adapterAdded.getItemCount() == 0) {
+            setFirstLayoutVisibility(View.VISIBLE);
+
+            if(context instanceof  ChatExplorerActivity){
+                ((ChatExplorerActivity)context).setToolbarSubtitle(null);
             }
-            else if (context instanceof FileExplorerActivityLollipop) {
-                ((FileExplorerActivityLollipop) context).isPendingToOpenSearchView();
+            else if (context instanceof FileExplorerActivityLollipop){
+                ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
             }
-            contentLayout.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
-            setListVisibility();
+        }
+        else {
+            setFirstLayoutVisibility(View.GONE);
+
+            if(context instanceof  ChatExplorerActivity){
+                ((ChatExplorerActivity)context).showFabButton(true);
+                ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+            }
+            else if (context instanceof FileExplorerActivityLollipop){
+                ((FileExplorerActivityLollipop) context).showFabButton(true);
+                ((FileExplorerActivityLollipop) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+            }
+        }
+
+        if (context instanceof ChatExplorerActivity) {
+            ((ChatExplorerActivity) context).isPendingToOpenSearchView();
+        }
+        else if (context instanceof FileExplorerActivityLollipop) {
+            ((FileExplorerActivityLollipop) context).isPendingToOpenSearchView();
+        }
+        contentLayout.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+        setListVisibility();
+    }
+
+    private class RecoverSavedItemsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            for (String id : addedItemsSaved) {
+                for (ChatExplorerListItem item : items) {
+                    if (!item.isHeader() && item.getId().equals(id)) {
+                        addedItems.add(item);
+                        int position = adapterList.getPosition(item);
+                        if (position != -1) {
+                            adapterList.toggleSelection(position);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            setFinalViews();
         }
     }
 
