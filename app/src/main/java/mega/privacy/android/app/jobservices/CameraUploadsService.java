@@ -249,9 +249,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         mContext = getApplicationContext();
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
-        initService();
         startForeground(notificationId,mNotification);
-        
+        initService();
+
         if (megaApi == null) {
             logError("megaApi is null");
             finish();
