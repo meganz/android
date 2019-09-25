@@ -244,7 +244,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public int onStartCommand(Intent intent,int flags,int startId) {
-        logDebug("public int onStartCommand(Intent intent, int flags, int startId)");
+        logDebug("Starting CU service (flags: " + flags + ", startId: " + startId + ")");
         isServiceRunning = true;
         mContext = getApplicationContext();
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
