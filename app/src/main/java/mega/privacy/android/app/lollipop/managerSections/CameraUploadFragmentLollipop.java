@@ -717,9 +717,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
             if (prefs.getPreferredSortCameraUpload() != null) {
                 orderBy = Integer.parseInt(prefs.getPreferredSortCameraUpload());
-                log("The orderCamera preference is: " + orderBy);
+                logDebug("The orderCamera preference is: " + orderBy);
             } else {
-                log("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
+                logDebug("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
             }
 		}
 

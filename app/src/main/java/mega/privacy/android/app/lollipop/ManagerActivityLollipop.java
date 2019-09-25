@@ -195,7 +195,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -2035,9 +2034,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
             if (prefs.getPreferredSortCameraUpload() != null) {
                 orderCamera = Integer.parseInt(prefs.getPreferredSortCameraUpload());
-                log("The orderCamera preference is: " + orderCamera);
+                logDebug("The orderCamera preference is: " + orderCamera);
             } else {
-                log("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
+                logDebug("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
             }
 			if(prefs.getPreferredSortOthers()!=null){
 				orderOthers = Integer.parseInt(prefs.getPreferredSortOthers());
@@ -17481,7 +17480,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
     public void setOrderCamera(int orderCamera) {
-        log("setOrderCamera");
+        logDebug("setOrderCamera");
         this.orderCamera = orderCamera;
         if (prefs != null) {
             prefs.setPreferredSortCameraUpload(String.valueOf(orderCamera));
