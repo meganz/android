@@ -77,7 +77,7 @@ public class JobUtil {
         boolean isOverQuota = isOverquota(context);
         boolean hasReadPermission = Util.hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
         boolean isEnabled = isCameraUploadEnabled(context);
-        logDebug("startCameraUploadService isOverQuota:" + isOverQuota +
+        logDebug("isOverQuota:" + isOverQuota +
                 ", hasStoragePermission:" + hasReadPermission +
                 ", isCameraUploadEnabled:" + isEnabled +
                 ", isRunning:" + CameraUploadsService.isServiceRunning);
