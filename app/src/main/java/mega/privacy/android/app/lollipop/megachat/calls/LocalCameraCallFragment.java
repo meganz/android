@@ -22,6 +22,7 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 
 
 public class LocalCameraCallFragment extends Fragment implements MegaChatVideoListenerInterface {
@@ -42,7 +43,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         logDebug("Chat ID "+chatId);
         LocalCameraCallFragment f = new LocalCameraCallFragment();
         Bundle args = new Bundle();
-        args.putLong("chatId", chatId);
+        args.putLong(CHAT_ID, chatId);
         f.setArguments(args);
         return f;
     }
@@ -53,7 +54,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
         }
         Bundle args = getArguments();
-        this.chatId = args.getLong("chatId", -1);
+        this.chatId = args.getLong(CHAT_ID, -1);
         logDebug("Chat ID: " + chatId);
         super.onCreate(savedInstanceState);
         logDebug("After onCreate called super");
