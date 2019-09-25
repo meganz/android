@@ -54,6 +54,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollip
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter.ViewHolderTransfer;
+import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
@@ -427,6 +428,17 @@ public class ThumbnailUtilsLollipop {
 					if (viewHolderMediaBucket.getDocument() == handle) {
 						viewHolderMediaBucket.setImage(bitmap);
 						viewHolderMediaBucket.getThumbnail().startAnimation(fadeInAnimation);
+					}
+				}
+				else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
+					MultipleBucketAdapter.ViewHolderMultipleBucket viewHolderMultipleBucket = (MultipleBucketAdapter.ViewHolderMultipleBucket) holder;
+					if (viewHolderMultipleBucket.getDocument() == handle) {
+						viewHolderMultipleBucket.setImageThumbnail(bitmap);
+						if (((MultipleBucketAdapter) adapter).isMedia()) {
+							viewHolderMultipleBucket.getThumbnailMedia().startAnimation(fadeInAnimation);
+						} else {
+							viewHolderMultipleBucket.getThumbnailList().startAnimation(fadeInAnimation);
+						}
 					}
 				}
 
@@ -1245,6 +1257,9 @@ public class ThumbnailUtilsLollipop {
 			else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
 				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
 			}
+			else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
+			}
 		}
 	}
 
@@ -1306,6 +1321,9 @@ public class ThumbnailUtilsLollipop {
 		}
 		else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
 			((MediaRecentsAdapter.ViewHolderMediaBucket) holder).setImage(bitmap);
+		}
+		else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
+			((MultipleBucketAdapter.ViewHolderMultipleBucket) holder).setImageThumbnail(bitmap);
 		}
 
 		thumbnailCache.put(document.getHandle(), bitmap);

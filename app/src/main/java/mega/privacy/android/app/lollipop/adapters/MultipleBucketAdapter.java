@@ -86,6 +86,18 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                 this.thumbnailList.setImageBitmap(image);
             }
         }
+
+        public ImageView getThumbnailList() {
+            return thumbnailList;
+        }
+
+        public ImageView getThumbnailMedia() {
+            return thumbnailMedia;
+        }
+    }
+
+    public boolean isMedia() {
+        return isMedia;
     }
 
     @Override
