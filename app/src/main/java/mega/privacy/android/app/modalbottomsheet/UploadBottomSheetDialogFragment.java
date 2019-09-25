@@ -12,13 +12,9 @@ import android.widget.LinearLayout;
 
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -65,24 +61,24 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         switch (v.getId()) {
 
             case R.id.upload_from_device_layout: {
-                log("click upload from device");
+                logDebug("click upload from device");
                 listener.uploadFromDevice();
                 dismissAllowingStateLoss();
                 break;
             }
             case R.id.upload_from_system_layout: {
-                log("click upload from_system");
+                logDebug("click upload from_system");
                 listener.uploadFromSystem();
                 break;
             }
 
             case R.id.take_picture_layout: {
-                log("Click take picture");
+                logDebug("Click take picture");
                 listener.takePictureAndUpload();
                 break;
             }
             case R.id.new_folder_layout: {
-                log("Click create new folder");
+                logDebug("Click create new folder");
                 listener.showNewFolderDialog();
                 break;
             }
@@ -104,9 +100,5 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         super.onAttach(context);
         this.context = context;
         listener = (UploadBottomSheetDialogActionListener) context;
-    }
-
-    private static void log(String log) {
-        Util.log("UploadBottomSheetDialogFragment", log);
     }
 }

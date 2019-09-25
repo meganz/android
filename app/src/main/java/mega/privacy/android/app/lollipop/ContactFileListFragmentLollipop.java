@@ -47,14 +47,15 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
@@ -78,7 +79,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	Handler handler;
 
 	public void activateActionMode(){
-		log("activateActionMode");
+		logDebug("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -86,7 +87,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	public void updateScrollPosition(int position) {
-		log("updateScrollPosition");
+		logDebug("Position: " + position);
 		if (adapter != null && mLayoutManager != null){
 			mLayoutManager.scrollToPosition(position);
 		}
@@ -94,7 +95,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 
 	public ImageView getImageDrag(int position) {
-		log("getImageDrag");
+		logDebug("Position: " + position);
 		if (adapter != null && mLayoutManager != null) {
 			View v = mLayoutManager.findViewByPosition(position);
 			if (v != null) {
@@ -174,18 +175,18 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			fab.setVisibility(View.GONE);
-			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 1);
+			changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 1);
 			checkScroll();
 			return true;
 		}
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
+			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
-			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 3);
+			changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 3);
 			checkScroll();
 		}
 
@@ -300,7 +301,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		logDebug("onCreateView");
 		View v = null;
 		handler = new Handler();
 		if (userEmail != null){
@@ -381,7 +382,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			}
 
 			if (adapter == null) {
-				adapter = new MegaNodeAdapter(context, this, contactNodes, parentHandle,listView, aB,Constants.CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, contactNodes, parentHandle,listView, aB,CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 
 			} else {
 				adapter.setNodes(contactNodes);
@@ -413,7 +414,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	public void changeActionBarElevation(boolean whitElevation){
 		if (aB == null) return;
 		if (whitElevation) {
-			aB.setElevation(Util.px2dp(4, outMetrics));
+			aB.setElevation(px2dp(4, outMetrics));
 		}
 		else {
 			aB.setElevation(0);
@@ -421,7 +422,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	public void showOptionsPanel(MegaNode sNode){
-		log("showOptionsPanel");
+		logDebug("Node handle: " + sNode.getHandle());
 		((ContactFileListActivityLollipop)context).showOptionsPanel(sNode);
 	}
 
@@ -488,7 +489,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 
 		if (adapter.isMultipleSelect()){
-			log("multiselect ON");
+			logDebug("Multiselect ON");
 			adapter.toggleSelection(position);
 
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
@@ -504,7 +505,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 
-				log("Push to stack "+lastFirstVisiblePosition+" position");
+				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
 				((ContactFileListActivityLollipop)context).setTitleActionBar(n.getName());
@@ -561,7 +562,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 				if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isImage()) {
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER);
+					intent.putExtra("adapterType", CONTACT_FILE_ADAPTER);
 					if (megaApi.getParentNode(contactNodes.get(position)).getType() == MegaNode.TYPE_ROOT) {
 						intent.putExtra("parentNodeHandle", -1L);
 					} else {
@@ -575,7 +576,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoReproducible()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
 					MegaNode file = contactNodes.get(position);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					log("FILENAME: " + file.getName());
+					logDebug("Node Handle: " + file.getHandle());
 
 					//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 					Intent mediaIntent;
@@ -594,7 +595,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
 					mediaIntent.putExtra("position", position);
-					mediaIntent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER);
+					mediaIntent.putExtra("adapterType", CONTACT_FILE_ADAPTER);
 					if (megaApi.getParentNode(contactNodes.get(position)).getType() == MegaNode.TYPE_ROOT) {
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					} else {
@@ -604,7 +605,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
-					mediaIntent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER);
+					mediaIntent.putExtra("adapterType", CONTACT_FILE_ADAPTER);
 					imageDrag = imageView;
 					boolean isOnMegaDownloads = false;
 					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
@@ -632,13 +633,13 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 						activityManager.getMemoryInfo(mi);
 
-						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						if(mi.totalMem>BUFFER_COMP){
+							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
 						}
 						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
 						}
 
 						String url = megaApi.httpServerGetLocalLink(file);
@@ -651,11 +652,11 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						startActivity(mediaIntent);
 					}
 					else {
-						if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+						if (isIntentAvailable(context, mediaIntent)){
 							startActivity(mediaIntent);
 						}
 						else{
-							((ContactFileListActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available));
+							((ContactFileListActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available));
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(contactNodes.get(position).getHandle());
@@ -667,11 +668,11 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					MegaNode file = contactNodes.get(position);
 
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+					logDebug("NODE HANDLE: " + file.getHandle() + ", TYPE: " + mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 					pdfIntent.putExtra("inside", true);
-					pdfIntent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER);
+					pdfIntent.putExtra("adapterType", CONTACT_FILE_ADAPTER);
 					boolean isOnMegaDownloads = false;
 					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
@@ -697,13 +698,13 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 						activityManager.getMemoryInfo(mi);
 
-						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						if(mi.totalMem>BUFFER_COMP){
+							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
 						}
 						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
 						}
 
 						String url = megaApi.httpServerGetLocalLink(file);
@@ -712,7 +713,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					pdfIntent.putExtra("HANDLE", file.getHandle());
 					pdfIntent.putExtra("screenPosition", screenPosition);
 					imageDrag = imageView;
-					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
+					if (isIntentAvailable(context, pdfIntent)){
 						startActivity(pdfIntent);
 					}
 					else{
@@ -726,7 +727,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isURL()){
-					log("Is URL file");
+					logDebug("Is URL file");
 					MegaNode file = contactNodes.get(position);
 
 					boolean isOnMegaDownloads = false;
@@ -735,7 +736,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					log("isOnMegaDownloads: "+isOnMegaDownloads);
+					logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						InputStream instream = null;
@@ -756,13 +757,13 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 									String url = line2.replace("URL=","");
 
-									log("Is URL - launch browser intent");
+									logDebug("Is URL - launch browser intent");
 									Intent i = new Intent(Intent.ACTION_VIEW);
 									i.setData(Uri.parse(url));
 									startActivity(i);
 								}
 								else{
-									log("Not expected format: Exception on processing url file");
+									logWarning("Not expected format: Exception on processing url file");
 									Intent intent = new Intent(Intent.ACTION_VIEW);
 									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
@@ -771,7 +772,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 									}
 									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-									if (MegaApiUtils.isIntentAvailable(context, intent)){
+									if (isIntentAvailable(context, intent)){
 										startActivity(intent);
 									}
 									else{
@@ -792,7 +793,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 							}
 							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-							if (MegaApiUtils.isIntentAvailable(context, intent)){
+							if (isIntentAvailable(context, intent)){
 								startActivity(intent);
 							}
 							else{
@@ -807,7 +808,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 							try {
 								instream.close();
 							} catch (IOException e) {
-								log("EXCEPTION closing InputStream");
+								logError("EXCEPTION closing InputStream", e);
 							}
 						}
 					}
@@ -828,7 +829,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	public int onBackPressed() {
-		log("onBackPressed");
+		logDebug("onBackPressed");
 
 		parentHandle = adapter.getParentHandle();
 		((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
@@ -837,7 +838,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
             return 0;
         }
 		if (parentHandleStack.isEmpty()) {
-			log("return 0");
+			logDebug("return 0");
 			fab.setVisibility(View.GONE);
 			return 0;
 		} else {
@@ -854,16 +855,16 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack "+lastVisiblePosition+" position");
+					logDebug("Pop of the stack " + lastVisiblePosition + " position");
 				}
-				log("Scroll to "+lastVisiblePosition+" position");
+				logDebug("Scroll to " + lastVisiblePosition + " position");
 
 				if(lastVisiblePosition>=0){
 					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 				((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 				adapter.setParentHandle(parentHandle);
-				log("return 2");
+				logDebug("return 2");
 				return 2;
 			} else {
 				contactNodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));
@@ -873,9 +874,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack "+lastVisiblePosition+" position");
+					logDebug("Pop of the stack " + lastVisiblePosition + " position");
 				}
-				log("Scroll to "+lastVisiblePosition+" position");
+				logDebug("Scroll to " + lastVisiblePosition + " position");
 
 				if(lastVisiblePosition>=0){
 					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
@@ -883,7 +884,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 				((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				showFabButton(megaApi.getNodeByHandle(parentHandle));
-				log("return 3");
+				logDebug("return 3");
 				return 3;
 			}
 		}
@@ -942,8 +943,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
+			logError("Invalidate error", e);
 			e.printStackTrace();
-			log("oninvalidate error");
 		}
 		// actionMode.
 	}
@@ -955,7 +956,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
     }
 
 	public void hideMultipleSelect() {
-		log("hideMultipleSelect");
+		logDebug("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
@@ -969,7 +970,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	public void showFabButton(MegaNode node){
-		log("showFabButton");
+		logDebug("Node handle: " + node.getHandle());
 		int accessLevel = megaApi.getAccess(node);
 
 		if(accessLevel== MegaShare.ACCESS_READ){

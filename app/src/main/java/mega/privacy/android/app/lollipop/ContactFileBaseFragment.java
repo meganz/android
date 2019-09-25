@@ -24,7 +24,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ContactFileBaseFragment extends RotatableFragment {
     
@@ -51,7 +52,7 @@ public class ContactFileBaseFragment extends RotatableFragment {
     protected MegaNodeAdapter adapter;
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("ContactFileBaseFragment onCreate");
+        logDebug("ContactFileBaseFragment onCreate");
         super.onCreate(savedInstanceState);
         
         if (megaApi == null){
@@ -152,10 +153,6 @@ public class ContactFileBaseFragment extends RotatableFragment {
         
         return info;
     }
-    
-    public static void log(String log) {
-        Util.log("ContactFileListFragmentLollipop", log);
-    }
 
     @Override
     protected RotatableAdapter getAdapter() {
@@ -164,7 +161,7 @@ public class ContactFileBaseFragment extends RotatableFragment {
 
     @Override
     public void activateActionMode() {
-        log("activateActionMode");
+        logDebug("activateActionMode");
     }
 
     @Override

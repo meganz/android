@@ -83,6 +83,10 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
+
 
 public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight, UploadBottomSheetDialogActionListener {
 
@@ -141,14 +145,14 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		log("onSaveInstanceState");
+		logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 		outState.putLong(PARENT_HANDLE, parentHandle);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		log("onCreateOptionsMenuLollipop");
+		logDebug("onCreateOptionsMenuLollipop");
 
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
@@ -172,7 +176,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		log("onOptionsItemSelected");
+		logDebug("onOptionsItemSelected");
 		int id = item.getItemId();
 		switch (id) {
 			case android.R.id.home: {
@@ -212,18 +216,18 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void showNewFolderDialog() {
-		log("showNewFolderDialog");
+		logDebug("showNewFolderDialog");
 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
 		final EditText input = new EditText(this);
 		layout.addView(input, params);
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
 		final RelativeLayout error_layout = new RelativeLayout(ContactFileListActivityLollipop.this);
 		layout.addView(error_layout, params1);
@@ -246,7 +250,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
+		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(ContactFileListActivityLollipop.this, R.color.login_warning));
@@ -349,9 +353,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	private void createFolder(String title) {
 
-		log("createFolder");
-		if (!Util.isOnline(this)) {
-			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+		logDebug("createFolder");
+		if (!isOnline(this)) {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -364,7 +368,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 
 		if (parentNode != null) {
-			log("parentNode != null: " + parentNode.getName());
+			logDebug("parentNode != null: " + parentNode.getName());
 			boolean exists = false;
 			ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
 			for (int i = 0; i < nL.size(); i++) {
@@ -385,13 +389,13 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 				megaApi.createFolder(title, parentNode, this);
 			} else {
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_already_exists));
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_already_exists));
 			}
 		} else {
-			log("parentNode == null: " + parentHandle);
+			logWarning("parentNode == null: " + parentHandle);
 			parentNode = megaApi.getRootNode();
 			if (parentNode != null) {
-				log("megaApi.getRootNode() != null");
+				logDebug("megaApi.getRootNode() != null");
 				boolean exists = false;
 				ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
 				for (int i = 0; i < nL.size(); i++) {
@@ -412,7 +416,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 					megaApi.createFolder(title, parentNode, this);
 				} else {
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_already_exists));
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_already_exists));
 				}
 			} else {
 				return;
@@ -444,9 +448,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				actionType = intent.getIntExtra("actionType", -1);
 
 				if (position != -1) {
-					if (adapterType == Constants.CONTACT_FILE_ADAPTER) {
+					if (adapterType == CONTACT_FILE_ADAPTER) {
 						if (cflF != null && cflF.isAdded()) {
-							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+							if (actionType == UPDATE_IMAGE_DRAG) {
 								imageDrag = cflF.getImageDrag(position);
 								if (cflF.imageDrag != null) {
 									cflF.imageDrag.setVisibility(View.VISIBLE);
@@ -455,7 +459,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 									cflF.imageDrag = imageDrag;
 									cflF.imageDrag.setVisibility(View.GONE);
 								}
-							} else if (actionType == Constants.SCROLL_TO_POSITION) {
+							} else if (actionType == SCROLL_TO_POSITION) {
 								cflF.updateScrollPosition(position);
 							}
 						}
@@ -472,7 +476,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					screenPosition[2] = imageDrag.getWidth();
 					screenPosition[3] = imageDrag.getHeight();
 
-					Intent intent1 = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+					Intent intent1 = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
 					intent1.putExtra("screenPosition", screenPosition);
 					LocalBroadcastManager.getInstance(contactPropertiesMainActivity).sendBroadcast(intent1);
 				}
@@ -483,7 +487,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		log("onCreate first");
+		logDebug("onCreate first");
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState == null) {
 			this.setParentHandle(-1);
@@ -497,24 +501,24 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 
 		if (megaApi == null || megaApi.getRootNode() == null) {
-			log("Refresh session - sdk");
+			logDebug("Refresh session - sdk");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+			intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
 			return;
 		}
 
-		if (Util.isChatEnabled()) {
+		if (isChatEnabled()) {
 			if (megaChatApi == null) {
 				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 			}
 
 			if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-				log("Refresh session - karere");
+				logDebug("Refresh session - karere");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+				intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
@@ -526,7 +530,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		contactPropertiesMainActivity = this;
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 
 		handler = new Handler();
 
@@ -535,8 +539,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		display.getMetrics(outMetrics);
 		float density = getResources().getDisplayMetrics().density;
 
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
+		float scaleW = getScaleW(outMetrics, density);
+		float scaleH = getScaleH(outMetrics, density);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -551,7 +555,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			//Set toolbar
 			tB = (Toolbar) findViewById(R.id.toolbar_main_contact_properties);
 			if (tB == null) {
-				log("Toolbar is NULL");
+				logWarning("Toolbar is NULL");
 			}
 
 			setSupportActionBar(tB);
@@ -570,12 +574,12 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				aB.setDisplayShowHomeEnabled(true);
 				setTitleActionBar(null);
 			} else {
-				log("aB is NULL!!!!");
+				logWarning("aB is NULL!!!!");
 			}
 
 			fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_contact_properties);
 
-			log("Shared Folders are:");
+			logDebug("Shared Folders are:");
 			coordinatorLayout.setFitsSystemWindows(true);
 
 			cflF = (ContactFileListFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cflF");
@@ -593,7 +597,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void showUploadPanel() {
-		log("showUploadPanel");
+		logDebug("showUploadPanel");
 		if (!Util.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 			Util.requestPermission(this, Constants.REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
 		} else {
@@ -608,7 +612,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	protected void onResume() {
-		log("onResume");
+		logDebug("onResume");
 		super.onResume();
 
 		Intent intent = getIntent();
@@ -621,7 +625,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		log("onRequestPermissionsResult");
+		logDebug("onRequestPermissionsResult");
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		if (grantResults.length <= 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
 			return;
@@ -636,7 +640,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				break;
 			}
 			case Constants.REQUEST_READ_WRITE_STORAGE: {
-				log("REQUEST_READ_WRITE_STORAGE");
+				logDebug("REQUEST_READ_WRITE_STORAGE");
 				onGetReadWritePermission();
 				break;
 			}
@@ -645,13 +649,13 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	protected void onNewIntent(Intent intent) {
-		log("onNewIntent");
+		logDebug("onNewIntent");
 		super.onNewIntent(intent);
 		setIntent(intent);
 	}
 
 	public void showConfirmationLeaveIncomingShare(final MegaNode n) {
-		log("showConfirmationLeaveIncomingShare");
+		logDebug("showConfirmationLeaveIncomingShare");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -676,7 +680,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void showConfirmationLeaveIncomingShare(final ArrayList<Long> handleList) {
-		log("showConfirmationLeaveIncomingShare");
+		logDebug("showConfirmationLeaveIncomingShare");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -740,7 +744,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	protected void onDestroy() {
-		log("onDestroy()");
+		logDebug("onDestroy()");
 
 		super.onDestroy();
 
@@ -754,11 +758,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		log("onPrepareOptionsMenu----------------------------------");
+		logDebug("onPrepareOptionsMenu----------------------------------");
 
 		if (cflF != null) {
 			if (cflF.isVisible()) {
-				log("visible ContacFileListProperties");
+				logDebug("visible ContacFileListProperties");
 				if (shareMenuItem != null) {
 					shareMenuItem.setVisible(true);
 					viewSharedItem.setVisible(false);
@@ -785,10 +789,10 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void moveToTrash(final ArrayList<Long> handleList) {
-		log("moveToTrash: ");
+		logDebug("moveToTrash: ");
 		moveToRubbish = true;
-		if (!Util.isOnline(this)) {
-			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+		if (!isOnline(this)) {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -797,31 +801,31 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		//Check if the node is not yet in the rubbish bin (if so, remove it)
 		if (handleList != null) {
 			if (handleList.size() > 1) {
-				log("MOVE multiple: " + handleList.size());
-				moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_SEND_RUBBISH, this);
+				logDebug("MOVE multiple: " + handleList.size());
+				moveMultipleListener = new MultipleRequestListener(MULTIPLE_SEND_RUBBISH, this);
 				for (int i = 0;
 					 i < handleList.size();
 					 i++) {
 					megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), megaApi.getRubbishNode(), moveMultipleListener);
 				}
 			} else {
-				log("MOVE single");
+				logDebug("MOVE single");
 				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), megaApi.getRubbishNode(), this);
 
 			}
 		} else {
-			log("handleList NULL");
+			logWarning("handleList NULL");
 			return;
 		}
 	}
 
 	public void showRenameDialog(final MegaNode document, String text) {
-		log("showRenameDialog");
+		logDebug("showRenameDialog");
 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
 		input.setSingleLine();
@@ -861,7 +865,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		layout.addView(input, params);
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
 		final RelativeLayout error_layout = new RelativeLayout(ContactFileListActivityLollipop.this);
 		layout.addView(error_layout, params1);
@@ -884,7 +888,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
+		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(ContactFileListActivityLollipop.this, R.color.login_warning));
@@ -920,7 +924,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					log("actionId is IME_ACTION_DONE");
+					logDebug("actionId is IME_ACTION_DONE");
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
 						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
@@ -980,8 +984,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			return;
 		}
 
-		if (!Util.isOnline(this)) {
-			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+		if (!isOnline(this)) {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -999,7 +1003,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 		statusDialog = temp;
 
-		log("renaming " + document.getName() + " to " + newName);
+		logDebug("Renaming " + document.getName() + " to " + newName);
 
 		megaApi.renameNode(document, newName, this);
 	}
@@ -1035,13 +1039,13 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			if (intent == null) {
 				return;
 			}
-			log("local folder selected");
+			logDebug("Local folder selected");
 			String parentPath = intent
 					.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-			log("URL: " + url + "___SIZE: " + size);
+			logDebug("URL: " + url + "___SIZE: " + size);
 
 			if (nC == null) {
 				nC = new NodeController(this);
@@ -1051,8 +1055,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			if (intent == null) {
 				return;
 			}
-			if (!Util.isOnline(this)) {
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+			if (!isOnline(this)) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -1074,19 +1078,19 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			for (int i = 0;
 				 i < copyHandles.length;
 				 i++) {
-				log("NODO A COPIAR: " + megaApi.getNodeByHandle(copyHandles[i]).getName());
-				log("DONDE: " + parent.getName());
-				log("NODOS: " + copyHandles[i] + "_" + parent.getHandle());
+				logDebug("NODE TO COPY: " + megaApi.getNodeByHandle(copyHandles[i]).getName());
+				logDebug("WHERE: " + parent.getName());
+				logDebug("NODES: " + copyHandles[i] + "_" + parent.getHandle());
 				MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
 				if (cN != null) {
-					log("cN != null");
+					logDebug("cN != null");
 					megaApi.copyNode(cN, parent, this);
 				} else {
-					log("cN == null");
+					logWarning("cN == null");
 					try {
 						statusDialog.dismiss();
 						if (cflF != null && cflF.isVisible()) {
-							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_sent_node));
+							showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_sent_node));
 						}
 					} catch (Exception ex) {
 					}
@@ -1096,8 +1100,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			if (intent == null) {
 				return;
 			}
-			if (!Util.isOnline(this)) {
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+			if (!isOnline(this)) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -1139,8 +1143,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			if (intent == null) {
 				return;
 			}
-			if (!Util.isOnline(this)) {
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+			if (!isOnline(this)) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -1167,15 +1171,15 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 						statusDialog = temp;
 						permissionsDialog.dismiss();
 
-						log("item " + item);
+						logDebug("item " + item);
 
 						switch (item) {
 							case 0: {
 								for (int i = 0; i < selectedContacts.size(); i++) {
 									MegaUser user = megaApi.getContact(selectedContacts.get(i));
-									log("user: " + user);
-									log("useremail: " + userEmail);
-									log("parentNode: " + parent.getName() + "_" + parent.getHandle());
+									logDebug("user: " + user);
+									logDebug("useremail: " + userEmail);
+									logDebug("parentNode: " + parent.getName() + "_" + parent.getHandle());
 									megaApi.share(parent, user, MegaShare.ACCESS_READ, contactPropertiesMainActivity);
 								}
 								break;
@@ -1228,8 +1232,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				if (file.isDirectory()) {
 					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
 					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, file.getName());
-					log("FOLDER: EXTRA_FILEPATH: " + file.getAbsolutePath());
-					log("FOLDER: EXTRA_NAME: " + file.getName());
+					logDebug("FOLDER: EXTRA_FILEPATH: " + file.getAbsolutePath());
+					logDebug("FOLDER: EXTRA_NAME: " + file.getName());
 				} else {
 					ShareInfo info = ShareInfo.infoFromFile(file);
 					if (info == null) {
@@ -1239,25 +1243,25 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 					uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
 
-					log("FILE: EXTRA_FILEPATH: " + info.getFileAbsolutePath());
-					log("FILE: EXTRA_NAME: " + info.getTitle());
-					log("FILE: EXTRA_SIZE: " + info.getSize());
+					logDebug("FILE: EXTRA_FILEPATH: " + info.getFileAbsolutePath());
+					logDebug("FILE: EXTRA_NAME: " + info.getTitle());
+					logDebug("FILE: EXTRA_SIZE: " + info.getSize());
 				}
 
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				log("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_began));
+				logDebug("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began));
 				startService(uploadServiceIntent);
 				i++;
 			}
 		} else if (requestCode == Constants.TAKE_PHOTO_CODE) {
-			log("TAKE_PHOTO_CODE");
+			logDebug("TAKE_PHOTO_CODE");
 			if (resultCode == Activity.RESULT_OK) {
 				long parentHandle = cflF.getParentHandle();
 				UploadUtil.uploadTakePicture(this, parentHandle, megaApi);
 			} else {
-				log("TAKE_PHOTO_CODE--->ERROR!");
+				logWarning("TAKE_PHOTO_CODE--->ERROR!");
 			}
 
 		}
@@ -1273,16 +1277,16 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 		if (parentNode == null) {
-			Util.showErrorAlertDialog(
+			showErrorAlertDialog(
 					getString(R.string.error_temporary_unavaible), false, this);
 			return;
 		}
 
 		if (infos == null) {
-			Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
+			showErrorAlertDialog(getString(R.string.upload_can_not_open),
 					false, this);
 		} else {
-			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_began));
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began));
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -1311,7 +1315,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-		log("onUserAlertsUpdate");
+		logDebug("onUserAlertsUpdate");
 	}
 
 	@Override
@@ -1329,29 +1333,25 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	}
 
-	public static void log(String log) {
-		Util.log("ContactFileListActivityLollipop", log);
-	}
-
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		if (request.getType() == MegaRequest.TYPE_MOVE) {
-			log("move request start");
+			logDebug("Move request start");
 		} else if (request.getType() == MegaRequest.TYPE_REMOVE) {
-			log("remove request start");
+			logDebug("Remove request start");
 		} else if (request.getType() == MegaRequest.TYPE_EXPORT) {
-			log("export request start");
+			logDebug("Export request start");
 		} else if (request.getType() == MegaRequest.TYPE_RENAME) {
-			log("rename request start");
+			logDebug("Rename request start");
 		} else if (request.getType() == MegaRequest.TYPE_COPY) {
-			log("copy request start");
+			logDebug("Copy request start");
 		} else if (request.getType() == MegaRequest.TYPE_SHARE) {
-			log("share request start");
+			logDebug("Share request start");
 		}
 	}
 
 	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList) {
-		log("askConfirmationMoveToRubbish");
+		logDebug("askConfirmationMoveToRubbish");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -1382,19 +1382,19 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				builder.show();
 			}
 		} else {
-			log("handleList NULL");
+			logWarning("handleList NULL");
 			return;
 		}
 	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		log("onRequestUpdate");
+		logDebug("onRequestUpdate");
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
+		logDebug("onRequestFinish");
 
 		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
 			try {
@@ -1404,12 +1404,12 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 			if (e.getErrorCode() == MegaError.API_OK) {
 				if (cflF != null && cflF.isVisible()) {
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created));
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_created));
 					cflF.setNodes();
 				}
 			} else {
 				if (cflF != null && cflF.isVisible()) {
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_no_created));
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_no_created));
 					cflF.setNodes();
 				}
 			}
@@ -1424,16 +1424,16 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				if (cflF != null && cflF.isVisible()) {
 					cflF.clearSelections();
 					cflF.hideMultipleSelect();
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_renamed));
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_renamed));
 				}
 			} else {
 				if (cflF != null && cflF.isVisible()) {
 					cflF.clearSelections();
 					cflF.hideMultipleSelect();
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_renamed));
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_renamed));
 				}
 			}
-			log("rename nodes request finished");
+			logDebug("Rename nodes request finished");
 		} else if (request.getType() == MegaRequest.TYPE_COPY) {
 			try {
 				statusDialog.dismiss();
@@ -1444,31 +1444,31 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				if (cflF != null && cflF.isVisible()) {
 					cflF.clearSelections();
 					cflF.hideMultipleSelect();
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied));
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied));
 				}
 			} else {
 				if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
-					log("OVERQUOTA ERROR: " + e.getErrorCode());
+					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+					intent.setAction(ACTION_OVERQUOTA_STORAGE);
 					startActivity(intent);
 					finish();
 				} else if (e.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-					log("PRE OVERQUOTA ERROR: " + e.getErrorCode());
+					logWarning("PRE OVERQUOTA ERROR: " + e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+					intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
 					startActivity(intent);
 					finish();
 				} else {
 					if (cflF != null && cflF.isVisible()) {
 						cflF.clearSelections();
 						cflF.hideMultipleSelect();
-						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
 					}
 				}
 			}
 
-			log("copy nodes request finished");
+			logDebug("Copy nodes request finished");
 		} else if (request.getType() == MegaRequest.TYPE_MOVE) {
 			try {
 				statusDialog.dismiss();
@@ -1476,12 +1476,12 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 
 			if (moveToRubbish) {
-				log("Finish move to Rubbish!");
+				logDebug("Finish move to Rubbish!");
 				if (e.getErrorCode() == MegaError.API_OK) {
 					if (cflF != null && cflF.isVisible()) {
 						cflF.clearSelections();
 						cflF.hideMultipleSelect();
-						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish));
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish));
 					}
 				} else {
 					if (cflF != null && cflF.isVisible()) {
@@ -1494,18 +1494,18 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					if (cflF != null && cflF.isVisible()) {
 						cflF.clearSelections();
 						cflF.hideMultipleSelect();
-						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved));
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved));
 					}
 				} else {
 					if (cflF != null && cflF.isVisible()) {
 						cflF.clearSelections();
 						cflF.hideMultipleSelect();
-						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved));
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved));
 					}
 				}
 			}
 			moveToRubbish = false;
-			log("move request finished");
+			logDebug("Move request finished");
 		} else if (request.getType() == MegaRequest.TYPE_SHARE) {
 			try {
 				statusDialog.dismiss();
@@ -1515,7 +1515,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			if (e.getErrorCode() == MegaError.API_OK) {
 				cflF.clearSelections();
 				cflF.hideMultipleSelect();
-				log("Shared folder correctly: " + request.getNodeHandle());
+				logDebug("Shared folder correctly: " + request.getNodeHandle());
 				Toast.makeText(this, getString(R.string.context_correctly_shared), Toast.LENGTH_SHORT).show();
 			} else {
 				cflF.clearSelections();
@@ -1528,7 +1528,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError");
+		logDebug("onRequestTemporaryError");
 	}
 
 	@Override
@@ -1550,7 +1550,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void showOptionsPanel(MegaNode node) {
-		log("showOptionsPanel");
+		logDebug("showOptionsPanel");
 		if (node != null) {
 			this.selectedNode = node;
 			ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
@@ -1582,14 +1582,14 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		if (cflF != null) {
 			return cflF.isEmptyParentHandleStack();
 		}
-		log("Fragment NULL");
+		logDebug("Fragment NULL");
 		return true;
 	}
 
 	public void setTitleActionBar(String title) {
 		if (aB != null) {
 			if (title == null) {
-				log("reset title and subtitle");
+				logDebug("Reset title and subtitle");
 				aB.setTitle(R.string.title_incoming_shares_with_explorer);
 				aB.setSubtitle(fullName);
 
@@ -1628,16 +1628,16 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void openAdvancedDevices(long handleToDownload, boolean highPriority) {
-		log("openAdvancedDevices");
-		String externalPath = Util.getExternalCardPath();
+		logDebug("handleToDownload: " + handleToDownload + ", highPriority: " + highPriority);
+		String externalPath = getExternalCardPath();
 
 		if (externalPath != null) {
-			log("ExternalPath for advancedDevices: " + externalPath);
+			logDebug("ExternalPath for advancedDevices: " + externalPath);
 			MegaNode node = megaApi.getNodeByHandle(handleToDownload);
 			if (node != null) {
 
 				File newFile = new File(node.getName());
-				log("File: " + newFile.getPath());
+				logDebug("File: " + newFile.getPath());
 				Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
 
 				// Filter to only show results that can be "opened", such as
@@ -1646,22 +1646,22 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 				// Create a file with the requested MIME type.
 				String mimeType = MimeTypeList.getMimeType(newFile);
-				log("Mimetype: " + mimeType);
+				logDebug("Mimetype: " + mimeType);
 				intent.setType(mimeType);
 				intent.putExtra(Intent.EXTRA_TITLE, node.getName());
 				intent.putExtra("handleToDownload", handleToDownload);
-				intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
+				intent.putExtra(HIGH_PRIORITY_TRANSFER, highPriority);
 				try {
-					startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
+					startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);
 				} catch (Exception e) {
-					log("Exception in External SDCARD");
+					logError("Exception in External SDCARD", e);
 					Environment.getExternalStorageDirectory();
 					Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
 					toast.show();
 				}
 			}
 		} else {
-			log("No external SD card");
+			logWarning("No external SD card");
 			Environment.getExternalStorageDirectory();
 			Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
 			toast.show();
@@ -1669,7 +1669,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long[] hashes, final boolean highPriority) {
-		log("askSizeConfirmationBeforeDownload");
+		logDebug("askSizeConfirmationBeforeDownload");
 
 		final String parentPathC = parentPath;
 		final String urlC = url;
@@ -1680,7 +1680,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
 		final CheckBox dontShowAgain = new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
@@ -1690,7 +1690,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		builder.setView(confirmationLayout);
 
-		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
+		builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
 		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -1716,7 +1716,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void askConfirmationNoAppInstaledBeforeDownload(String parentPath, String url, long size, long[] hashes, String nodeToDownload, final boolean highPriority) {
-		log("askConfirmationNoAppInstaledBeforeDownload");
+		logDebug("askConfirmationNoAppInstaledBeforeDownload");
 
 		final String parentPathC = parentPath;
 		final String urlC = url;
@@ -1727,7 +1727,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
 		final CheckBox dontShowAgain = new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));

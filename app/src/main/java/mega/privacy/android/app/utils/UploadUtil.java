@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Environment;
 
 import java.io.File;
 
@@ -18,6 +17,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFile;
 import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class UploadUtil {
 
@@ -31,7 +31,7 @@ public class UploadUtil {
      */
 
     public static void uploadFile(Context context, String filePath, long parentHandle, MegaApiAndroid megaApi) {
-        log("uploadTakePicture, parentHandle: " + parentHandle);
+        logDebug("uploadTakePicture, parentHandle: " + parentHandle);
 
         if (parentHandle == -1) {
             parentHandle = megaApi.getRootNode().getHandle();
@@ -54,7 +54,7 @@ public class UploadUtil {
      * @param megaApi The Mega Api to upload the picture
      */
     public static void uploadTakePicture(Context context, long parentHandle, MegaApiAndroid megaApi) {
-        log("uploadTakePicture");
+        logDebug("uploadTakePicture");
         File imgFile = getCacheFile(context, TEMPORAL_FOLDER, "picture.jpg");
         if (!isFileAvailable(imgFile)) {
             Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.general_error), -1);
@@ -62,7 +62,7 @@ public class UploadUtil {
         }
 
         String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-        log("Taken picture Name: "+name);
+        logDebug("Taken picture Name: "+name);
         File newFile = buildTempFile(context, name);
         imgFile.renameTo(newFile);
 
@@ -168,9 +168,5 @@ public class UploadUtil {
             intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT, sdRoot);
         }
         activity.startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
-    }
-
-    public static void log(String message) {
-        Util.log("UploadUtil", message);
     }
 }
