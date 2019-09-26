@@ -20,6 +20,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class LocalCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface {
@@ -37,7 +38,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         logDebug("Chat id: " + chatId);
         LocalCameraCallFullScreenFragment f = new LocalCameraCallFullScreenFragment();
         Bundle args = new Bundle();
-        args.putLong("chatId", chatId);
+        args.putLong(CHAT_ID, chatId);
         f.setArguments(args);
         return f;
     }
@@ -49,7 +50,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         }
 
         Bundle args = getArguments();
-        this.chatId = args.getLong("chatId", -1);
+        this.chatId = args.getLong(CHAT_ID, -1);
         logDebug("Chat id: " + chatId);
         super.onCreate(savedInstanceState);
     }

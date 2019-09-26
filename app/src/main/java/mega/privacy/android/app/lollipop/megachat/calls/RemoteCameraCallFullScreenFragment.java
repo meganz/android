@@ -20,6 +20,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
@@ -41,9 +42,9 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
 
         RemoteCameraCallFullScreenFragment f = new RemoteCameraCallFullScreenFragment();
         Bundle args = new Bundle();
-        args.putLong("chatId", chatId);
-        args.putLong("peerid", peerid);
-        args.putLong("clientid", clientid);
+        args.putLong(CHAT_ID, chatId);
+        args.putLong(PEER_ID, peerid);
+        args.putLong(CLIENT_ID, clientid);
         f.setArguments(args);
         return f;
     }
@@ -55,9 +56,9 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         }
 
         Bundle args = getArguments();
-        this.chatId = args.getLong("chatId", -1);
-        this.peerid = args.getLong("peerid", -1);
-        this.clientid = args.getLong("clientid", -1);
+        this.chatId = args.getLong(CHAT_ID, -1);
+        this.peerid = args.getLong(PEER_ID, -1);
+        this.clientid = args.getLong(CLIENT_ID, -1);
         logDebug("Chat ID: " + chatId);
         super.onCreate(savedInstanceState);
     }
