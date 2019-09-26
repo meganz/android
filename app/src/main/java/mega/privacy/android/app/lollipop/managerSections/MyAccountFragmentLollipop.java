@@ -74,6 +74,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
 	
@@ -113,6 +114,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	private LinearLayout achievementsSeparator;
 
 	private LinearLayout parentLinearLayout;
+
+	private LinearLayout businessAccountContainer;
+	private TextView businessAccountTypeText;
+	private LinearLayout businessAccountStatusContainer;
+	private LinearLayout businessAccountStatusSeparator;
+	private TextView businessAccountStatusText;
+	private TextView businessAccountRenewsText;
+	private TextView businessAccountRenewsDateText;
+
 
 	private ArrayList<MegaUser> lastContacted;
 	
@@ -246,6 +256,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro));
 		upgradeButton.setOnClickListener(this);
 
+		businessAccountContainer = v.findViewById(R.id.business_account_container);
+		businessAccountTypeText = v.findViewById(R.id.business_account_type_text);
+		businessAccountStatusContainer = v.findViewById(R.id.business_account_status_container);
+		businessAccountStatusSeparator = v.findViewById(R.id.business_account_status_separator);
+		businessAccountStatusText = v.findViewById(R.id.business_account_status_text);
+		businessAccountRenewsText = v.findViewById(R.id.business_account_renews_on_label);
+		businessAccountRenewsDateText = v.findViewById(R.id.business_account_renews_date_text);
+
 		achievementsLayout = v.findViewById(R.id.my_account_achievements_layout);
 		achievementsSeparator = v.findViewById(R.id.my_account_achievements_separator);
 
@@ -289,16 +307,45 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			accountTypeSeparator.setVisibility(View.GONE);
 			achievementsLayout.setVisibility(View.GONE);
 			achievementsSeparator.setVisibility(View.GONE);
+			businessAccountContainer.setVisibility(View.VISIBLE);
+
+			if (megaApi.isMasterBusinessAccount()) {
+				businessAccountStatusContainer.setVisibility(View.VISIBLE);
+				businessAccountStatusSeparator.setVisibility(View.VISIBLE);
+				businessAccountTypeText.setText(R.string.admin_label);
+
+				int status = megaApi.getBusinessStatus();
+
+				switch (status) {
+					case BUSINESS_STATUS_EXPIRED:
+						status = R.string.expired_label;
+						break;
+					case BUSINESS_STATUS_INACTIVE:
+						status = R.string.inactive_label;
+						break;
+					case BUSINESS_STATUS_ACTIVE:
+						status = R.string.active_label;
+						break;
+					case BUSINESS_STATUS_GRACE_PERIOD:
+						status = R.string.grace_label;
+						break;
+				}
+				businessAccountStatusText.setText(status);
+			} else {
+				businessAccountStatusContainer.setVisibility(View.GONE);
+				businessAccountStatusSeparator.setVisibility(View.GONE);
+				businessAccountTypeText.setText(R.string.user_label);
+			}
 		} else {
 			accountTypeLayout.setVisibility(View.VISIBLE);
-			achievementsSeparator.setVisibility(View.VISIBLE);
+			accountTypeSeparator.setVisibility(View.VISIBLE);
+			businessAccountContainer.setVisibility(View.GONE);
 
-			if(megaApi.isAchievementsEnabled()){
+			if (megaApi.isAchievementsEnabled()) {
 				achievementsLayout.setVisibility(View.VISIBLE);
 				achievementsLayout.setOnClickListener(this);
 				achievementsSeparator.setVisibility(View.VISIBLE);
-			}
-			else{
+			} else {
 				achievementsLayout.setVisibility(View.GONE);
 				achievementsSeparator.setVisibility(View.GONE);
 			}

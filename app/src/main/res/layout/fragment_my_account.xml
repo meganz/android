@@ -47,7 +47,9 @@
 							android:maxLines="1"
 							android:singleLine="true"
 							android:textColor="@color/name_my_account"
-							android:textSize="16sp"/>
+							android:textSize="16sp"
+							android:fontFamily="sans-serif-light"
+							android:textStyle="bold"/>
 						<ImageView
 							android:id="@+id/my_account_edit_icon"
 							android:layout_width="wrap_content"
@@ -156,12 +158,148 @@
 					</RelativeLayout>
 				</RelativeLayout>
 			</LinearLayout>
+
 			<LinearLayout
 				android:id="@+id/my_account_type_separator"
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
 				android:background="@color/divider_upgrade_account"
 				android:orientation="horizontal"/>
+
+			<LinearLayout
+				android:id="@+id/business_account_container"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
+
+				<LinearLayout
+					android:id="@+id/business_account_type_container"
+					android:layout_width="match_parent"
+					android:layout_height="80dp"
+					android:orientation="vertical">
+
+					<TextView
+						android:id="@+id/business_account_label"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/black_55_alpha"
+						android:text="@string/account_label"
+						android:layout_marginTop="14dp"/>
+
+					<LinearLayout
+						android:id="@+id/business_account_layout"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						android:layout_marginTop="8dp">
+
+						<TextView
+							android:id="@+id/business_account_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_weight="1"
+							android:textSize="16sp"
+							android:textColor="@color/black_85_alpha"
+							android:text="@string/business_label"
+							android:textAllCaps="true"
+							android:fontFamily="sans-serif-light"
+							android:textStyle="bold"/>
+
+						<TextView
+							android:id="@+id/business_account_type_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_weight="1"
+							android:textSize="16sp"
+							android:textColor="@color/accentColor"
+							android:textAllCaps="true"
+							android:gravity="right"/>
+
+					</LinearLayout>
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/business_account_type_separator"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="@color/divider_upgrade_account"
+					android:orientation="horizontal"/>
+
+				<LinearLayout
+					android:id="@+id/business_account_status_container"
+					android:layout_width="match_parent"
+					android:layout_height="80dp"
+					android:orientation="vertical">
+
+					<LinearLayout
+						android:id="@+id/business_account_status_layout"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						android:layout_marginTop="14dp">
+
+						<TextView
+							android:id="@+id/business_account_status_label"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_weight="1"
+							android:textSize="14sp"
+							android:textColor="@color/black_55_alpha"
+							android:text="@string/status_label"/>
+
+						<TextView
+							android:id="@+id/business_account_renews_on_label"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_weight="1"
+							android:textSize="14sp"
+							android:textColor="@color/black_55_alpha"
+							android:text="@string/renews_on"
+							android:gravity="right"/>
+
+					</LinearLayout>
+
+					<LinearLayout
+						android:id="@+id/business_account_renews_layout"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						android:layout_marginTop="8dp">
+
+						<TextView
+							android:id="@+id/business_account_status_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_weight="1"
+							android:textSize="16sp"
+							android:textColor="@color/black_85_alpha"
+							android:fontFamily="sans-serif-light"
+							android:textStyle="bold"/>
+
+						<TextView
+							android:id="@+id/business_account_renews_date_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_weight="1"
+							android:textSize="16sp"
+							android:textColor="@color/accentColor"
+							android:gravity="right"/>
+
+					</LinearLayout>
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/business_account_status_separator"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="@color/divider_upgrade_account"
+					android:orientation="horizontal"/>
+
+			</LinearLayout>
+
 			<LinearLayout
 				android:id="@+id/my_account_achievements_layout"
 				android:layout_width="match_parent"

@@ -1582,7 +1582,7 @@
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Account Base Quota</string>
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">No files in Camera Uploads</string>
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">%1$d d left</string>
-    <string name="expired_achievement" context="state to indicate the achievement has expired">Expired</string>
+    <string name="expired_label" context="State to indicate something has expired (achivements of business status account for instance)">Expired</string>
 
     <string name="setting_title_use_https_only" context="title of the advanced setting to choose the use of https">Don’t use HTTP</string>
     <string name="setting_subtitle_use_https_only" context="subtitle of the advanced setting to choose the use of https">Enable this option only if your transfers don’t start. In normal circumstances HTTP is satisfactory as all transfers are already encrypted.</string>
@@ -2528,4 +2528,13 @@
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Please wait&#8230;</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+
+    <string name="account_label" context="Head label to show the business account type">Account</string>
+    <string name="business_label" context="Label in My Account section to show user account type">Business</string>
+    <string name="admin_label" context="">Admin</string>
+    <string name="user_label" context="">User</string>
+    <string name="status_label" context="Head label to show the business status type">Status</string>
+    <string name="inactive_label" context="State to indicate something is inactive (business status account for instance)">Inactive</string>
+    <string name="active_label" context="State to indicate something is active (business status account for instance)">Active</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>
 </resources>
