@@ -12719,35 +12719,37 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return;
 		}
 		if (usedSpaceLayout != null) {
-
-			String textToShow = String.format(getResources().getString(R.string.used_space), ((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted(), ((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
-			try{
-				textToShow = textToShow.replace("[A]", "<font color=\'#00bfa5\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
-			}
-			catch (Exception e){}
-			Spanned result = null;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-			} else {
-				result = Html.fromHtml(textToShow);
-			}
-			spaceTV.setText(result);
-			int progress = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc();
-			long usedSpace = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedStorage();
-			logDebug("Progress: " + progress + ", Used space: " + usedSpace);
-			usedSpacePB.setProgress(progress);
-			if (progress >=0 && usedSpace >=0) {
-				usedSpaceLayout.setVisibility(View.VISIBLE);
-				logDebug("usedSpaceLayout is VISIBLE");
-			}
-			else {
+			if (megaApi.isBusinessAccount()) {
 				usedSpaceLayout.setVisibility(View.GONE);
-				logDebug("usedSpaceLayout is GONE");
+			} else {
+
+				String textToShow = String.format(getResources().getString(R.string.used_space), ((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted(), ((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
+				try {
+					textToShow = textToShow.replace("[A]", "<font color=\'#00bfa5\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				} catch (Exception e) {
+				}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				spaceTV.setText(result);
+				int progress = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc();
+				long usedSpace = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedStorage();
+				logDebug("Progress: " + progress + ", Used space: " + usedSpace);
+				usedSpacePB.setProgress(progress);
+				if (progress >= 0 && usedSpace >= 0) {
+					usedSpaceLayout.setVisibility(View.VISIBLE);
+					logDebug("usedSpaceLayout is VISIBLE");
+				} else {
+					usedSpaceLayout.setVisibility(View.GONE);
+					logDebug("usedSpaceLayout is GONE");
+				}
 			}
-//				String usedSpaceString = getString(R.string.used_space, used, total);
 		}
 		else{
 			logWarning("usedSpaceLayout is NULL");

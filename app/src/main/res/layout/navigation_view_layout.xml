@@ -57,6 +57,7 @@
                 android:layout_below="@id/navigation_drawer_user_account_relative_layout_profile_avatar"
                 android:gravity="center_vertical"
                 android:layout_marginTop="16dp"
+                android:layout_marginBottom="20dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -96,8 +97,7 @@
                     android:id="@+id/manager_used_space_bar"
                     style="@style/UsedSpaceProgressBar"
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginTop="20dp"/>
+                    android:layout_height="2dp"/>
 
                 <TextView
                     android:id="@+id/navigation_drawer_space"
@@ -109,13 +109,6 @@
                     android:textStyle="bold"
                     android:textSize="13sp"/>
             </RelativeLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/nv_used_space_layout"
-                android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account"/>
 
         </RelativeLayout>
         

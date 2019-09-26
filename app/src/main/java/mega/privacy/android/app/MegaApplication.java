@@ -1392,6 +1392,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				intent.putExtra("state", state);
 				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 			}
+		} else if (event.getType() == MegaEvent.EVENT_BUSINESS_STATUS) {
+
 		}
 	}
 
