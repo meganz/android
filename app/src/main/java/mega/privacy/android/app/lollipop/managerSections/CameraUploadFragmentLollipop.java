@@ -714,12 +714,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						}
 					}
 				}
-			}
-            if (prefs.getPreferredSortCameraUpload() != null) {
-                orderBy = Integer.parseInt(prefs.getPreferredSortCameraUpload());
-                logDebug("The orderCamera preference is: " + orderBy);
-            } else {
-                logDebug("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
+                if (prefs.getPreferredSortCameraUpload() != null) {
+                    orderBy = Integer.parseInt(prefs.getPreferredSortCameraUpload());
+                    logDebug("The orderCamera preference is: " + orderBy);
+                } else {
+                    logDebug("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
+                }
             }
 		}
 
@@ -997,6 +997,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			if (adapterList == null) {
 				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, CAMERA_UPLOAD_ADAPTER);
+			    adapterList.setOrder(orderBy);
 			} else {
 				if (context != adapterList.getContext()) {
 					logDebug("Attached activity changed");
@@ -1272,6 +1273,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterGrid == null) {
 				logDebug("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
 				adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, CAMERA_UPLOAD_ADAPTER, itemInformationList.size(), countTitles, itemInformationList, defaultPath);
+				adapterGrid.setOrder(orderBy);
 				adapterGrid.setHasStableIds(true);
 			} else {
 				logDebug("ADAPTERGRID.MONTHPICS = " + monthPics.size());
@@ -2083,23 +2085,23 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	        adapterList.setOrder(orderBy);
         }
     }
-	
+
+    private Comparator<MegaNode> typeComparator = new Comparator<MegaNode>() {
+
+        @Override
+        public int compare(MegaNode o1, MegaNode o2) {
+            if(MimeTypeList.typeForName(o1.getName()).isImage() && !MimeTypeList.typeForName(o2.getName()).isImage()) {
+                return 1;
+            } else if(!MimeTypeList.typeForName(o1.getName()).isImage() && MimeTypeList.typeForName(o2.getName()).isImage()) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+    };
+
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
-
-		Collections.sort(this.nodes, new Comparator<MegaNode>() {
-
-            @Override
-            public int compare(MegaNode o1, MegaNode o2) {
-                if(MimeTypeList.typeForName(o1.getName()).isImage() && !MimeTypeList.typeForName(o2.getName()).isImage()) {
-                    return 1;
-                } else if(!MimeTypeList.typeForName(o1.getName()).isImage() && MimeTypeList.typeForName(o2.getName()).isImage()) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            }
-        });
 
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			this.nodesArray.clear();

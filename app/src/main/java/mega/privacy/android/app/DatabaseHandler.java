@@ -2518,16 +2518,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
-    public void setPreferredSortCameraUpload (String order){
+    public void setPreferredSortCameraUpload(String order) {
+        logDebug("set sort camera upload order: " + order);
         String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
             String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CAMERA_UPLOAD + "= '" + encrypt(order) + "' WHERE " + KEY_ID + " = '1'";
             db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
-        }
-        else{
+        } else {
             values.put(KEY_PREFERRED_SORT_CAMERA_UPLOAD, encrypt(order));
             db.insert(TABLE_PREFERENCES, null, values);
         }
