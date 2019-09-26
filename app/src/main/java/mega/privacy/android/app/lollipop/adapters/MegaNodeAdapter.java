@@ -373,19 +373,31 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * @return Nodes list with placeholder.
      */
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
-        int folderCount = getFolderCount();
+        if (adapterType == ITEM_VIEW_TYPE_LIST) {
+            placeholderCount = 0;
+            return nodes;
+        }
+
+        int folderCount = getNumberOfFolders(nodes);
         int spanCount = 2;
+
         if (listFragment instanceof NewGridRecyclerView) {
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
         }
+
         placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
 
         if (folderCount > 0 && placeholderCount != 0 && adapterType == ITEM_VIEW_TYPE_GRID) {
             //Add placeholder at folders' end.
             for (int i = 0;i < placeholderCount;i++) {
-                nodes.add(folderCount + i,null);
+                try {
+                    nodes.add(folderCount + i,null);
+                } catch (IndexOutOfBoundsException e) {
+                    logError("Inserting placeholders [nodes.size]: " + nodes.size() + " [folderCount+i]: " + (folderCount + i), e);
+                }
             }
         }
+
         return nodes;
     }
 

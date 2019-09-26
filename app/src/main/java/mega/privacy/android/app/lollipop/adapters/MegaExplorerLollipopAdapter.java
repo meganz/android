@@ -868,8 +868,14 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	}
 
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
-        int folderCount = getFolderCount();
+	    if (((FileExplorerActivityLollipop) context).isList()) {
+	        placeholderCount = 0;
+	        return nodes;
+        }
+
+        int folderCount = getNumberOfFolders(nodes);
         int spanCount = 2;
+
         if (listFragment instanceof NewGridRecyclerView) {
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
         }
@@ -879,9 +885,14 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         if (folderCount > 0 && placeholderCount != 0 && !((FileExplorerActivityLollipop) context).isList()) {
             //Add placeholder at folders' end.
             for (int i = 0;i < placeholderCount;i++) {
-                nodes.add(folderCount + i,null);
+                try {
+                    nodes.add(folderCount + i,null);
+                } catch (IndexOutOfBoundsException e) {
+                    logError("Inserting placeholders [nodes.size]: " + nodes.size() + " [folderCount+i]: " + (folderCount + i), e);
+                }
             }
         }
+
         return nodes;
     }
 
