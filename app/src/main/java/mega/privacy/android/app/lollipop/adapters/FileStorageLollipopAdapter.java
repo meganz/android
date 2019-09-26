@@ -21,22 +21,27 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.FileDocument;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapter.OnItemClickListener;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+
 
 /*
  * Adapter for FilestorageActivity list
  */
 public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorageLollipopAdapter.ViewHolderFileStorage> implements OnClickListener {
-		
+
 	private Context context;
+	private MegaApiAndroid megaApi;
 	private List<FileDocument> currentFiles;
 	private Mode mode;
 	OnItemClickListener mItemClickListener;
@@ -44,40 +49,43 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	private SparseBooleanArray selectedItems;
 	int positionClicked;
 	boolean multipleSelect;
-	
+
 	public FileStorageLollipopAdapter(Context context, RecyclerView listView, Mode mode2) {
 		this.mode = mode2;
 		this.listFragment = listView;
 		this.context = context;
-	}	
-	
-	/*private view holder class*/
-    class ViewHolderFileStorage extends RecyclerView.ViewHolder implements View.OnClickListener{
-    	
+		if (this.megaApi == null) {
+			this.megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+	}
+
+	/*public view holder class*/
+    public class ViewHolderFileStorage extends RecyclerView.ViewHolder implements View.OnClickListener{
+
     	public ImageView imageView;
     	public TextView textViewFileName;
     	public TextView textViewFileSize;
     	public RelativeLayout itemLayout;
-    	public FileDocument document;    	
-    	
+    	public FileDocument document;
+
     	public ViewHolderFileStorage(View itemView) {
 			super(itemView);
             itemView.setOnClickListener(this);
 		}
-    	
+
     	@Override
 		public void onClick(View v) {
 			if(mItemClickListener != null){
 				mItemClickListener.onItemClick(v, getPosition());
-			}			
+			}
 		}
     }
-	
+
 	@Override
 	public ViewHolderFileStorage onCreateViewHolder(ViewGroup parent, int viewType) {
-		
+
 		listFragment = (RecyclerView) parent;
-		
+
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -94,11 +102,11 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 		holder.textViewFileName.getLayoutParams().width = px2dp((260*scaleW), outMetrics);
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
-			
+
 		v.setTag(holder);
 		return holder;
-	}	
-	
+	}
+
 	@Override
 	public void onBindViewHolder(ViewHolderFileStorage holder, int position){
 
@@ -114,7 +122,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			long documentSize = document.getSize();
 			holder.textViewFileSize.setText(getSizeString(documentSize));
 		}
-		
+
 		if(mode == Mode.PICK_FILE)
 		{
 			if(document.getFile().canRead() == false){
@@ -131,8 +139,9 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 				else{
 					//Document is FILE
 					holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+					ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, document, holder, this.megaApi ,this, position);
 				}
-			}	
+			}
 			else{
 				setViewAlpha(holder.imageView, 1);
 				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
@@ -169,16 +178,18 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 						else{
 							holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 							holder.itemLayout.setBackgroundColor(Color.WHITE);
+							ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, document, holder, this.megaApi, this, position);
 						}
 					}
 					else{
 						holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
+						ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, document, holder, this.megaApi, this, position);
 					}
 				}
 			}
 		}
-		else 
+		else
 		{
 			if(!isEnabled(position)){
 				holder.itemLayout.setEnabled(false);
@@ -187,7 +198,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 				logDebug("Position: " + position + " is ENABLED");
 				holder.itemLayout.setEnabled(true);
 			}
-			if (document.isFolder()){	
+			if (document.isFolder()){
 				holder.imageView.setImageResource(R.drawable.ic_folder_list);
 				setViewAlpha(holder.imageView, 1);
 				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
@@ -197,11 +208,11 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 				holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());	
 				setViewAlpha(holder.imageView, .4f);
 				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-			}			
-			
-		}		
-	}	
-	
+			}
+
+		}
+	}
+
 	// Set new files on folder change
 	public void setFiles(List<FileDocument> newFiles) {
 		logDebug("setFiles");
@@ -219,16 +230,16 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			listFragment.setVisibility(View.GONE);
 		}
 	}
-	
+
 	public FileDocument getDocumentAt(int position) {
 		if(currentFiles == null || position >= currentFiles.size())
 		{
 			return null;
 		}
-		
+
 		return currentFiles.get(position);
 	}
-	
+
 	@Override
 	public int getItemCount() {
 		if (currentFiles == null) {
@@ -237,7 +248,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		int size = currentFiles.size();
 		return size == 0 ? 1 : size;
 	}
-	
+
 	public int getPositionClicked() {
 		return positionClicked;
 	}
@@ -265,7 +276,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 
 		return true;
 	}
-	
+
 	public void toggleSelection(int pos) {
 		logDebug("Position: " + pos);
 		if (selectedItems.get(pos, false)) {
@@ -346,7 +357,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			notifyItemChanged(pos);
 		}
 	}
-	
+
 	public void selectAll(){
 		for (int i= 0; i<this.getItemCount();i++){
 			if(!isItemChecked(i)){
@@ -363,7 +374,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			}
 		}
 	}
-	
+
 	private boolean isItemChecked(int position) {
         return selectedItems.get(position);
     }
@@ -378,14 +389,14 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			items.add(selectedItems.keyAt(i));
 		}
 		return items;
-	}	
-	
+	}
+
 	/*
 	 * Get list of all selected nodes
 	 */
 	public List<FileDocument> getSelectedDocuments() {
 		ArrayList<FileDocument> nodes = new ArrayList<FileDocument>();
-		
+
 		for (int i = 0; i < selectedItems.size(); i++) {
 			if (selectedItems.valueAt(i) == true) {
 				FileDocument document = getDocumentAt(selectedItems.keyAt(i));
@@ -396,19 +407,19 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		}
 		return nodes;
 	}
-	
+
 	/*
 	 * Get list of all selected nodes
 	 */
 	public int getSelectedCount() {
-		
+
 		if (selectedItems!=null){
 			return selectedItems.size();
 		}
 
 		return -1;
 	}
-	
+
 	public boolean isMultipleSelect() {
 		return multipleSelect;
 	}
@@ -422,11 +433,11 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			selectedItems = new SparseBooleanArray();
 		}
 	}
-	
+
 	public Object getItem(int position) {
 		return currentFiles.get(position);
 	}
-	
+
 	@Override
 	public void onClick(View v) {
 		logDebug("click!");
@@ -436,7 +447,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		final FileDocument doc = (FileDocument) getItem(currentPosition);
 		logDebug("In position: " + currentPosition + " document: " + doc.getName());
 
-		switch (v.getId()) {		
+		switch (v.getId()) {
 			case R.id.file_explorer_item_layout:{
 				((FileStorageActivityLollipop) context).itemClick(currentPosition);
 				break;
