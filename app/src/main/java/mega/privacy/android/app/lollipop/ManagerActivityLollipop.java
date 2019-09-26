@@ -7694,7 +7694,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							long cameraUploadHandle = cuFL.getPhotoSyncHandle();
 							MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 							if (nps != null){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+								ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 								cuFL.setNodes(nodes);
 								isSearchEnabled=false;
 								setToolbarTitle();
@@ -7708,7 +7708,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							long cameraUploadHandle = muFLol.getPhotoSyncHandle();
 							MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 							if (nps != null){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+								ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 								muFLol.setNodes(nodes);
 								setToolbarTitle();
 								isSearchEnabled=false;
@@ -13692,7 +13692,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				long cameraUploadHandle = cuFL.getPhotoSyncHandle();
 				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 				if (nps != null){
-					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 					if((searchByDate) != null && (searchDate!=null)){
 						ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
 						cuFL.setNodes(nodesSearch);
@@ -13713,7 +13713,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				long cameraUploadHandle = muFLol.getPhotoSyncHandle();
 				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 				if (nps != null){
-					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 					if((searchByDate) != null && (searchDate!=null)){
 						ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
 						muFLol.setNodes(nodesSearch);
@@ -16993,7 +16993,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			logDebug("Camera Uploads Handle: " + cameraUploadHandle);
 			if (nps != null){
 				logDebug("nps != null");
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 
 				if(firstNavigationLevel){
 					cuFL.setNodes(nodes);
@@ -17024,7 +17024,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			logDebug("Media Uploads Handle: " + cameraUploadHandle);
 			if (nps != null){
 				logDebug("nps != null");
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 				if(firstNavigationLevel){
 					muFLol.setNodes(nodes);
 				}else{
