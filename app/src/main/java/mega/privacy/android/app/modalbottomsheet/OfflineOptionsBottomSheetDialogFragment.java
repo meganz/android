@@ -178,9 +178,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 nodeInfo.setText(getSizeString(nodeSize));
             }
 
-            logDebug("Set node thumb");
             if (file.isFile()){
-                logDebug("...........................Busco Thumb");
                 if (MimeTypeList.typeForName(nodeOffline.getName()).isImage()){
                     Bitmap thumb = null;
                     if (file.exists()){

@@ -250,7 +250,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
-	private final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
+	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
 	final int CLOUD_DRIVE_BNV = 0;
 	final int CAMERA_UPLOADS_BNV = 1;

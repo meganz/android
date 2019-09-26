@@ -145,26 +145,29 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.print_MK_button:{
-                logDebug("Copy Master Key button");
-                ((ManagerActivityLollipop)context).hideMKLayout();
+                hideMKLayout();
                 AccountController aC = new AccountController(context);
                 aC.printRK();
                 break;
             }
             case R.id.copy_MK_button:{
-                logDebug("Copy Master Key button");
-                ((ManagerActivityLollipop)context).hideMKLayout();
+                hideMKLayout();
                 AccountController aC = new AccountController(context);
                 aC.copyMK(false);
                 break;
             }
             case R.id.save_MK_button:{
-                logDebug("Save Master Key button");
-                ((ManagerActivityLollipop)context).hideMKLayout();
+                hideMKLayout();
                 AccountController aC = new AccountController(context);
                 aC.saveRkToFileSystem();
                 break;
             }
+        }
+    }
+
+    private void hideMKLayout() {
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).hideMKLayout();
         }
     }
 }

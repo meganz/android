@@ -423,13 +423,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		positionClicked = -1;	
 		notifyDataSetChanged();
 	}
-
-	private void addMasterKeyAsOffline(ArrayList<MegaOffline> mOffList) {
-		if (isFileAvailable(buildExternalStorageFile(getRecoveryKeyFileName()))) {
-			MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(getRecoveryKeyFileName()), getRecoveryKeyFileName(), 0, "0", 0, "0");
-			mOffList.add(masterKeyFile);
-		}
-	}
 	
 	@Override
 	public ViewHolderOffline onCreateViewHolder(ViewGroup parent, int viewType) {

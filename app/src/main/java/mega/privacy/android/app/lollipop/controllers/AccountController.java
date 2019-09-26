@@ -138,8 +138,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void printRK(){
-        Bitmap rKBitmap = null;
-        rKBitmap = createRkBitmap();
+        Bitmap rKBitmap = createRkBitmap();
 
         if (rKBitmap != null){
             PrintHelper printHelper = new PrintHelper(context);
