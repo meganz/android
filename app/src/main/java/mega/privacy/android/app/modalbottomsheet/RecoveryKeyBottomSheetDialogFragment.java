@@ -35,7 +35,6 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
     public LinearLayout optionCopyToClipboard;
     public LinearLayout optionSaveToFileSystem;
     public LinearLayout optionPrint;
-    public LinearLayout optionOffline;
 
     MegaApiAndroid megaApi;
 
@@ -61,43 +60,19 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
             case R.id.recovery_key_saveTo_fileSystem_layout:{
                 logDebug("Option save to File System");
                 AccountController aC = new AccountController(getContext());
-                aC.saveRkToFileSystem(false);
+                aC.saveRkToFileSystem();
                 break;
             }
             case R.id.recovery_key_print_layout:{
                 logDebug("Option print RK");
-                printRK();
-                break;
-            }
-            case R.id.recovery_key_offline_layout: {
                 AccountController aC = new AccountController(getContext());
-                aC.exportMK(null, false);
+                aC.printRK();
                 break;
             }
         }
 
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-    public void printRK(){
-        Bitmap rKBitmap = null;
-        AccountController aC = new AccountController(getContext());
-        rKBitmap = aC.createRkBitmap();
-
-        if (rKBitmap != null){
-            PrintHelper printHelper = new PrintHelper(getActivity());
-            final Context context = getContext();
-            printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
-            printHelper.printBitmap("rKPrint", rKBitmap, new PrintHelper.OnPrintFinishCallback() {
-                @Override
-                public void onFinish() {
-                    if (context instanceof TestPasswordActivity) {
-                        ((TestPasswordActivity) context).passwordReminderSucceeded();
-                    }
-                }
-            });
-        }
     }
 
     @Override
@@ -120,38 +95,14 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionPrint = (LinearLayout) contentView.findViewById(R.id.recovery_key_print_layout);
         optionCopyToClipboard= (LinearLayout) contentView.findViewById(R.id.recovery_key_copytoclipboard_layout);
         optionSaveToFileSystem = (LinearLayout) contentView.findViewById(R.id.recovery_key_saveTo_fileSystem_layout);
-        optionOffline = (LinearLayout) contentView.findViewById(R.id.recovery_key_offline_layout);
 
         optionPrint.setOnClickListener(this);
         optionCopyToClipboard.setOnClickListener(this);
         optionSaveToFileSystem.setOnClickListener(this);
-        optionOffline.setOnClickListener(this);
 
-        if (getContext() instanceof TestPasswordActivity && !((TestPasswordActivity) getContext()).isLogout()) {
-            optionOffline.setVisibility(View.VISIBLE);
-        }
-        else {
-            contentView.findViewById(R.id.separator_offline).setVisibility(View.GONE);
-            optionOffline.setVisibility(View.GONE);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-            optionPrint.setVisibility(View.VISIBLE);
-        }
-        else {
-            optionPrint.setVisibility(View.GONE);
-        }
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//
-//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-//        }
-//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//        }
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, getContext(), 48));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
