@@ -26,10 +26,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -63,13 +65,13 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            logDebug("Bundle is NOT NULL");
             long handle = savedInstanceState.getLong("handle", -1);
-            log("Handle of the request: "+handle);
+            logDebug("Handle of the request: " + handle);
             request = megaApi.getContactRequestByHandle(handle);
         }
         else{
-            log("Bundle NULL");
+            logWarning("Bundle NULL");
             if(context instanceof ManagerActivityLollipop){
                 request = ((ManagerActivityLollipop) context).getSelectedRequest();
             }
@@ -101,8 +103,8 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionReinvite = (LinearLayout) contentView.findViewById(R.id.contact_list_option_reinvite_layout);
         optionDelete= (LinearLayout) contentView.findViewById(R.id.contact_list_option_delete_request_layout);
 
-        titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
-        titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+        titleNameContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
+        titleMailContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
 
         optionReinvite.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
@@ -128,14 +130,14 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         }
         else{
-            log("Request NULL");
+            logWarning("Request NULL");
         }
     }
 
     public void addAvatarRequestPanel(MegaContactRequest request){
 
         ////DEfault AVATAR
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
@@ -186,9 +188,9 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
         switch(v.getId()){
 
             case R.id.contact_list_option_reinvite_layout:{
-                log("click reinvite");
+                logDebug("Click reinvite");
                 if(request==null){
-                    log("Selected request NULL");
+                    logWarning("Selected request NULL");
                     return;
                 }
 
@@ -196,9 +198,9 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
                 break;
             }
             case R.id.contact_list_option_delete_request_layout:{
-                log("optionDelete");
+                logDebug("Option Delete");
                 if(request==null){
-                    log("Selected request NULL");
+                    logWarning("Selected request NULL");
                     return;
                 }
                 ((ManagerActivityLollipop)context).showConfirmationRemoveContactRequest(request);
@@ -225,14 +227,10 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         long handle = request.getHandle();
-        log("Handle of the request: "+handle);
+        logDebug("Handle of the request: " + handle);
         outState.putLong("handle", handle);
-    }
-
-    private static void log(String log) {
-        Util.log("SentRequestBottomSheetDialogFragment", log);
     }
 }
