@@ -93,7 +93,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	private TextView typeAccount;
 	private TextView infoEmail;
-	private TextView usedSpace;
 	private TextView lastSession;
 	private TextView connections;
 
@@ -250,7 +249,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		typeLayout = v.findViewById(R.id.my_account_account_type_layout);
 		typeAccount = v.findViewById(R.id.my_account_account_type_text);
 
-		usedSpace = v.findViewById(R.id.my_account_used_space);
 		upgradeButton = v.findViewById(R.id.my_account_account_type_button);
 
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro));
@@ -312,6 +310,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
     @Override
     public void onResume() {
         super.onResume();
+        if (scrollView != null) {
+        	scrollView.post(new Runnable() {
+				@Override
+				public void run() {
+					scrollView.fullScroll(View.FOCUS_UP);
+				}
+			});
+		}
+
         //Refresh
 		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
 		refreshAccountInfo();
@@ -440,8 +447,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if (!myAccountInfo.isBusinessStatusReceived()) {
 			businessAccountManagementAlert.setVisibility(View.GONE);
 			typeAccount.setText(getString(R.string.recovering_info));
+			typeAccount.setAllCaps(false);
 			upgradeButton.setVisibility(View.GONE);
-			usedSpace.setVisibility(View.GONE);
 			achievementsLayout.setVisibility(View.GONE);
 			achievementsSeparator.setVisibility(View.GONE);
 			businessAccountContainer.setVisibility(View.GONE);
@@ -509,7 +516,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		accountTypeLayout.setVisibility(View.VISIBLE);
 		accountTypeSeparator.setVisibility(View.VISIBLE);
 		upgradeButton.setVisibility(View.VISIBLE);
-		usedSpace.setVisibility(View.VISIBLE);
 		businessAccountContainer.setVisibility(View.GONE);
 
 		permitEditNameAndEmail();
@@ -524,44 +530,36 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		if (myAccountInfo.getAccountType() < 0 || myAccountInfo.getAccountType() > 4) {
 			typeAccount.setText(getString(R.string.recovering_info));
+			typeAccount.setAllCaps(false);
 		} else {
 			switch (myAccountInfo.getAccountType()) {
-
 				case 0: {
-					typeAccount.setText(R.string.my_account_free);
+					typeAccount.setText(R.string.free_account);
 					break;
 				}
 
 				case 1: {
-					typeAccount.setText(getString(R.string.my_account_pro1));
+					typeAccount.setText(getString(R.string.pro1_account));
 					break;
 				}
 
 				case 2: {
-					typeAccount.setText(getString(R.string.my_account_pro2));
+					typeAccount.setText(getString(R.string.pro2_account));
 					break;
 				}
 
 				case 3: {
-					typeAccount.setText(getString(R.string.my_account_pro3));
+					typeAccount.setText(getString(R.string.pro3_account));
 					break;
 				}
 
 				case 4: {
-					typeAccount.setText(getString(R.string.my_account_prolite));
+					typeAccount.setText(getString(R.string.prolite_account));
 					break;
 				}
-
 			}
+			typeAccount.setAllCaps(true);
 		}
-
-		if (myAccountInfo.getUsedFormatted().trim().length() <= 0) {
-			usedSpace.setText(getString(R.string.recovering_info));
-		} else {
-			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
-			usedSpace.setText(usedSpaceString);
-		}
-
 	}
 
 	@Override

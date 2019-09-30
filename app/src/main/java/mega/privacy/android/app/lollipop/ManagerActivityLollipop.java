@@ -2141,12 +2141,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
-		}
-		else {
-            upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_grey_button));
-		}
+        upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
         upgradeAccount.setOnClickListener(this);
 
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
@@ -12715,15 +12710,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(isFinishing()){
 			return;
 		}
+
 		if (((MegaApplication) getApplication()) == null || ((MegaApplication) getApplication()).getMyAccountInfo() == null) {
 			return;
 		}
-		if (usedSpaceLayout != null) {
-			if (megaApi.isBusinessAccount()) {
-				usedSpaceLayout.setVisibility(View.GONE);
-			} else {
 
-				String textToShow = String.format(getResources().getString(R.string.used_space), ((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted(), ((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
+		MyAccountInfo info = ((MegaApplication) getApplication()).getMyAccountInfo();
+		View settingsSeparator = null;
+
+		if (nV != null) {
+			settingsSeparator = nV.findViewById(R.id.settings_separator);
+		}
+
+		if (usedSpaceLayout != null) {
+			if (!info.isBusinessStatusReceived() || megaApi.isBusinessAccount()) {
+				usedSpaceLayout.setVisibility(View.GONE);
+				upgradeAccount.setVisibility(View.GONE);
+				if (settingsSeparator != null) {
+					settingsSeparator.setVisibility(View.GONE);
+				}
+			} else {
+				upgradeAccount.setVisibility(View.VISIBLE);
+				if (settingsSeparator != null) {
+					settingsSeparator.setVisibility(View.GONE);
+				}
+
+				String textToShow = String.format(getResources().getString(R.string.used_space), info.getUsedFormatted(), info.getTotalFormatted());
 				try {
 					textToShow = textToShow.replace("[A]", "<font color=\'#00bfa5\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -12738,8 +12750,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					result = Html.fromHtml(textToShow);
 				}
 				spaceTV.setText(result);
-				int progress = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc();
-				long usedSpace = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedStorage();
+				int progress = info.getUsedPerc();
+				long usedSpace = info.getUsedStorage();
 				logDebug("Progress: " + progress + ", Used space: " + usedSpace);
 				usedSpacePB.setProgress(progress);
 				if (progress >= 0 && usedSpace >= 0) {
@@ -12756,7 +12768,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
-			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() < ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory()){
+			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() < info.getLevelInventory()){
 				if (maxP != null){
 					logDebug("ORIGINAL JSON:" + maxP.getOriginalJson());
 
@@ -14569,12 +14581,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (upgradeAccount != null) {
 			upgradeAccount.setEnabled(true);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
-            }
-            else {
-                upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_grey_button));
-            }
+			upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
 			upgradeAccount.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
 		}
 	}

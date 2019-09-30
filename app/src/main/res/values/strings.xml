@@ -2539,4 +2539,7 @@
     <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Usage</string>
+    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
+    <string name="overall_usage_label" context="Title of overall usage section in Storage">Overall usage</string>
+    <string name="transfer_label" context="Title of transfer section in Storage">Transfer</string>
 </resources>
