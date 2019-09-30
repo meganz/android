@@ -393,7 +393,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					menu.findItem(R.id.cab_menu_download).setVisible(false);
 					menu.findItem(R.id.cab_menu_share).setVisible(false);
 
-					if(selected.size() == adapter.getItemCountWithoutRK()){
+					if(selected.size() == adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
 					}else{
@@ -420,7 +420,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					menu.findItem(R.id.cab_menu_delete).setVisible(true);
 					menu.findItem(R.id.cab_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					if(selected.size()==adapter.getItemCountWithoutRK()){
+					if(selected.size()==adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
 					}else{
@@ -824,26 +824,18 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 		if (adapter.isMultipleSelect()){
 			logDebug("Multiselect");
-			MegaOffline item = mOffList.get(position);
-			if(!(item.getHandle().equals("0"))){
-				adapter.toggleSelection(position);
-				List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
-				if (selectedNodes.size() > 0){
-					updateActionModeTitle();
 
-				}
+			adapter.toggleSelection(position);
+			List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
+			if (selectedNodes.size() > 0){
+				updateActionModeTitle();
+
 			}
 		}
 		else{
 			MegaOffline currentNode = mOffList.get(position);
-			File currentFile;
-			
-			if(currentNode.getHandle().equals("0")){
-				logDebug("Click on Master Key");
-				openFile(buildExternalStorageFile(RK_FILE));
-				return;
-			}
-			currentFile = getOfflineFile(context, currentNode);
+			File currentFile = getOfflineFile(context, currentNode);
+
 			if(isFileAvailable(currentFile) && currentFile.isDirectory()){
 
 				int lastFirstVisiblePosition;
@@ -1463,14 +1455,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		logDebug("getItemCount");
 		if(adapter != null){
 			return adapter.getItemCount();
-		}
-		return 0;
-	}
-
-	public int getItemCountWithoutRK(){
-		logDebug("getItemCountWithoutRK");
-		if(adapter != null){
-			return adapter.getItemCountWithoutRK();
 		}
 		return 0;
 	}
