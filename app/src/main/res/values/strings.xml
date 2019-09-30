@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">Error. Please, try again.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">The secondary media folder does not exist, please choose a new folder</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">No external storage detected</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You do not have permission to upload</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
     <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Backup Recovery Key</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove Recovery Key</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">The Recovery Key file has been removed</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been cancelled</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">We were unable to cancel your subscription. Please contact support&#64;mega.nz for assistance</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close other sessions</string>
@@ -2526,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Loading</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Please wait&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>

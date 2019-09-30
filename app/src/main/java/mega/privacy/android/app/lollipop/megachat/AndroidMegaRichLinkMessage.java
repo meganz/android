@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.CHAT_LINK_REGEXS;
@@ -17,6 +16,8 @@ import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_REGEXS;
 import static mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS;
 import static mega.privacy.android.app.utils.Constants.FOLDER_DOWNLOAD_LINK_REGEXS;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class AndroidMegaRichLinkMessage {
 
@@ -95,7 +96,7 @@ public class AndroidMegaRichLinkMessage {
         Matcher m = Patterns.WEB_URL.matcher(text);
         while (m.find()) {
             String url = m.group();
-            log("URL extracted: " + url);
+            logDebug("URL extracted: " + url);
             if (isFileLink(url)) {
                 return links.toArray(new String[links.size()]);
             }
@@ -114,8 +115,7 @@ public class AndroidMegaRichLinkMessage {
             urlIn = URLDecoder.decode(urlIn, "UTF-8");
         }
         catch (Exception e) {
-            log("Error decoding URL: " + urlIn);
-            log(e.toString());
+            logError("Error decoding URL: " + urlIn, e);
         }
 
         urlIn.replace(' ', '+');
@@ -137,7 +137,7 @@ public class AndroidMegaRichLinkMessage {
         Matcher m = Patterns.WEB_URL.matcher(urlIn);
         while (m.find()) {
             String url = m.group();
-            log("URL extracted: " + url);
+            logDebug("URL extracted: " + url);
             if (isFileLink(url)) {
                 return url;
             }
@@ -191,9 +191,4 @@ public class AndroidMegaRichLinkMessage {
     public void setNumParticipants(long numParticipants) {
         this.numParticipants = numParticipants;
     }
-
-    private static void log(String log) {
-        Util.log("AndroidMegaRichLinkMessage", log);
-    }
-
 }

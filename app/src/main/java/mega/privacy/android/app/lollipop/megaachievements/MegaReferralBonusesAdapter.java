@@ -28,8 +28,6 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -38,7 +36,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferralBonusesAdapter.ViewHolderReferralBonuses>{
@@ -65,12 +66,12 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 
 		@Override
 		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-			log("onRequestStart()");
+			logDebug("onRequestStart()");
 		}
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-			log("onRequestFinish()");
+			logDebug("onRequestFinish()");
 			if (e.getErrorCode() == MegaError.API_OK){
 				boolean avatarExists = false;
 
@@ -102,7 +103,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		@Override
 		public void onRequestTemporaryError(MegaApiJava api,
 				MegaRequest request, MegaError e) {
-			log("onRequestTemporaryError");
+			logWarning("onRequestTemporaryError");
 		}
 
 		@Override
@@ -153,7 +154,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 	ViewHolderReferralBonusesList holderList = null;
 	@Override
 	public MegaReferralBonusesAdapter.ViewHolderReferralBonuses onCreateViewHolder(ViewGroup parent, int viewType) {
-		log("onCreateViewHolder");
+		logDebug("onCreateViewHolder");
 
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -171,11 +172,11 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		holderList.textViewDaysLeft = (TextView) v.findViewById(R.id.referral_bonus_days_left);
 
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			log("onCreate: Landscape configuration");
-			holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+			logDebug("Landscape configuration");
+			holderList.textViewContactName.setMaxWidth(scaleWidthPx(280, outMetrics));
 		}
 		else{
-			holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
+			holderList.textViewContactName.setMaxWidth(scaleWidthPx(230, outMetrics));
 		}
 
 		holderList.itemLayout.setTag(holderList);
@@ -188,7 +189,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 
 	@Override
 	public void onBindViewHolder(ViewHolderReferralBonuses holder, int position) {
-		log("onBindViewHolderList");
+		logDebug("onBindViewHolderList");
 		((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
 
@@ -205,12 +206,12 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		}
 		else{
 			//No name, ask for it and later refresh!!
-			log("CONTACT DB is null");
+			logWarning("CONTACT DB is null");
 			fullName = holder.contactMail;
 		}
 
 
-		log("contact: "+holder.contactMail +" name: "+fullName);
+		logDebug("Contact: " + holder.contactMail + " name: " + fullName);
 
 
 		holder.textViewContactName.setText(fullName);
@@ -234,7 +235,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
                     megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
                 }
 				else{
-					log("Do not ask for user avatar - its in cache: "+avatar.getAbsolutePath());
+					logDebug("Do not ask for user avatar - its in cache: " + avatar.getAbsolutePath());
 					holder.contactInitialLetter.setVisibility(View.GONE);
 					((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(bitmap);
 				}
@@ -248,8 +249,8 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		}
 
 
-		holder.textViewStorage.setText(Util.getSizeString(referralBonus.getStorage()));
-		holder.textViewTransfer.setText(Util.getSizeString(referralBonus.getTransfer()));
+		holder.textViewStorage.setText(getSizeString(referralBonus.getStorage()));
+		holder.textViewTransfer.setText(getSizeString(referralBonus.getTransfer()));
 
 		if(referralBonus.getDaysLeft()<=15){
 			holderList.textViewDaysLeft.setTextColor(ContextCompat.getColor(context,R.color.login_title));
@@ -267,19 +268,19 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 	}
 
 	public void createDefaultAvatar(ViewHolderReferralBonuses holder, MegaUser contact, String fullName){
-		log("createDefaultAvatar()");
+		logDebug("createDefaultAvatar()");
 
-		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
 		String color = megaApi.getUserAvatarColor(contact);
 		if(color!=null){
-			log("The color to set the avatar is "+color);
+			logDebug("The color to set the avatar is " + color);
 			p.setColor(Color.parseColor(color));
 		}
 		else{
-			log("Default color to the avatar");
+			logDebug("Default color to the avatar");
 			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 		}
 
@@ -298,7 +299,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		float density  = context.getResources().getDisplayMetrics().density;
 
 		int avatarTextSize = getAvatarTextSize(density);
-		log("DENSITY: " + density + ":::: " + avatarTextSize);
+		logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
 
 		String firstLetter = fullName.charAt(0) + "";
 		firstLetter = firstLetter.toUpperCase(Locale.getDefault());
@@ -349,7 +350,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 	}
 
 	public void setPositionClicked(int p) {
-		log("setPositionClicked: "+p);
+		logDebug("setPositionClicked: " + p);
 		positionClicked = p;
 		notifyDataSetChanged();
 	}
@@ -366,19 +367,15 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 //	}
 //
 	public void setReferralBonuses (ArrayList<ReferralBonus> referralBonuses){
-		log("setReferralBonuses");
+		logDebug("setReferralBonuses");
 		this.referralBonuses = referralBonuses;
 		positionClicked = -1;
 		notifyDataSetChanged();
 	}
 
 	public Object getItem(int position) {
-		log("getItem");
+		logDebug("getItem");
 		return referralBonuses.get(position);
-	}
-
-	private static void log(String log) {
-		Util.log("MegaReferralBonusesAdapter", log);
 	}
 
 	public RecyclerView getListFragment() {

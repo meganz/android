@@ -19,9 +19,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaTransfer;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class TransfersBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -83,12 +84,12 @@ public class TransfersBottomSheetDialogFragment extends BottomSheetDialogFragmen
         optionCancel = (LinearLayout) contentView.findViewById(R.id.transfers_cancel_layout);
 
         if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-            log("show PLAY button");
+            logDebug("Show PLAY button");
             iconPause.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
             textPause.setText(getString(R.string.option_to_resume_transfers));
         }
         else{
-            log("show PAUSE button");
+            logDebug("Show PAUSE button");
             iconPause.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
             textPause.setText(getString(R.string.option_to_pause_transfers));
         }
@@ -120,23 +121,23 @@ public class TransfersBottomSheetDialogFragment extends BottomSheetDialogFragmen
         switch(v.getId()){
 
             case R.id.transfers_manager_option_layout:{
-                log("option manager layout");
+                logDebug("Option manager layout");
                 ((ManagerActivityLollipop) getActivity()).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.TRANSFERS);
                 dismissAllowingStateLoss();
                 break;
             }
             case R.id.transfers_pause_layout:{
-                log("option pause/play");
+                logDebug("Option pause/play");
                 ((ManagerActivityLollipop) context).changeTransfersStatus();
                 break;
             }
             case R.id.transfers_clear_layout:{
-                log("option clear transfers");
+                logDebug("Option clear transfers");
                 ((ManagerActivityLollipop) context).showConfirmationClearCompletedTransfers();
                 break;
             }
             case R.id.transfers_cancel_layout:{
-                log("option cancel ALL transfers");
+                logDebug("Option cancel ALL transfers");
                 ((ManagerActivityLollipop) context).showConfirmationCancelAllTransfers();
                 break;
             }
@@ -159,9 +160,5 @@ public class TransfersBottomSheetDialogFragment extends BottomSheetDialogFragmen
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-    }
-
-    private static void log(String log) {
-        Util.log("MyAccountBottomSheetDialogFragment", log);
     }
 }

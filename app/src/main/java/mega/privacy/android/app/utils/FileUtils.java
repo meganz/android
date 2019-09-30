@@ -25,29 +25,36 @@ import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class FileUtils {
 
     public static final String MAIN_DIR = File.separator + "MEGA";
 
-    public static final String DOWNLOAD_DIR = File.separator + "MEGA" + File.separator + "MEGA Downloads";
+    public static final String DOWNLOAD_DIR = MAIN_DIR + File.separator + "MEGA Downloads";
 
-    public static final String LOG_DIR = File.separator + "MEGA" + File.separator + "MEGA Logs";
+    public static final String LOG_DIR = MAIN_DIR + File.separator + "MEGA Logs";
 
-    public static final String OLD_MK_FILE = File.separator + "MEGA" + File.separator + "MEGAMasterKey.txt";
+    public static final String OLD_MK_FILE = MAIN_DIR + File.separator + "MEGAMasterKey.txt";
 
-    public static final String RK_FILE = File.separator + "MEGA" + File.separator + "MEGARecoveryKey.txt";
+    public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
+
+    public static String getRecoveryKeyFileName() {
+        return MegaApplication.getInstance().getApplicationContext().getString(R.string.general_rk) + ".txt";
+    }
 
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
 
         if (f == null) return;
 
-        log("deleteFolderAndSubfolders: " + f.getAbsolutePath());
+        logDebug("deleteFolderAndSubfolders: " + f.getAbsolutePath());
         if (f.isDirectory() && f.listFiles() != null) {
             for (File c : f.listFiles()) {
                 deleteFolderAndSubfolders(context, c);
@@ -70,7 +77,7 @@ public class FileUtils {
                 mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 context.sendBroadcast(mediaScanIntent);
             } catch (Exception e) {
-                log("Exception while deleting media scanner file: " + e.getMessage());
+                logError("Exception while deleting media scanner file", e);
             }
 
         }
@@ -107,7 +114,7 @@ public class FileUtils {
         }
         catch (IOException e)
         {
-            log("File write failed: " + e.toString());
+            logError("File write failed", e);
             return null;
         }
     }
@@ -132,7 +139,7 @@ public class FileUtils {
             }
             return size;
         }
-        log("Dir size: "+size);
+        logDebug("Dir size: " + size);
         return size;
     }
 
@@ -264,7 +271,7 @@ public class FileUtils {
     }
 
     public static void copyFile(File source, File dest) throws IOException{
-        log("copyFile");
+        logDebug("copyFile");
 
         if (!source.getAbsolutePath().equals(dest.getAbsolutePath())){
             FileChannel inputChannel = null;
@@ -282,13 +289,13 @@ public class FileUtils {
     }
 
     public static boolean isVideoFile(String path) {
-        log("isVideoFile: "+path);
+        logDebug("isVideoFile: " + path);
         try{
             String mimeType = URLConnection.guessContentTypeFromName(path);
             return mimeType != null && mimeType.indexOf("video") == 0;
         }
         catch(Exception e){
-            log("Exception: "+e.getMessage());
+            logError("Exception", e);
             return false;
         }
     }
@@ -426,14 +433,14 @@ public class FileUtils {
     }
 
     public static void purgeDirectory(File dir) {
-        log("removing cache files ");
+        logDebug("Removing cache files");
         if(!dir.exists()){
             return;
         }
 
         try{
             for (File file: dir.listFiles()) {
-                log("removing " + file.getAbsolutePath());
+                logDebug("Removing " + file.getAbsolutePath());
                 if (file.isDirectory()) {
                     purgeDirectory(file);
                 }
@@ -455,13 +462,9 @@ public class FileUtils {
                 result = true;
             }
         } catch (IOException e) {
-            log("Error appending string data to file ");
+            logError("Error appending string data to file", e);
             e.printStackTrace();
         }
         return result;
-    }
-
-    public static void log(String message) {
-        Util.log("FileUtils", message);
     }
 }
