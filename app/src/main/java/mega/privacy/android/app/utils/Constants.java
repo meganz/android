@@ -133,8 +133,8 @@ public class Constants {
 
     public static final int REQUEST_DOWNLOAD_FOLDER = 7;
 
-    public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
     public static final int REQUEST_READ_WRITE_STORAGE = 9;
+
     public static final int REQUEST_CAMERA_UPLOAD = 10;
     public static final int REQUEST_CAMERA_ON_OFF = 11;
     public static final int REQUEST_CAMERA_ON_OFF_FIRST_TIME = 12;
@@ -151,6 +151,7 @@ public class Constants {
     public static final int TYPE_ERROR_RECORD = 3;
 
     public static final int PRO_LITE = 4;
+
     public static final int FREE = 0;
     public static final int PRO_I = 1;
     public static final int PRO_II = 2;
@@ -221,6 +222,8 @@ public class Constants {
 
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
+    public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN = "INTENT_FILTER_UPDATE_FULL_SCREEN";
+
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS = "INTENT_UPDATE_2FA_SETTINGS";
     public static final String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE = "INTENT_CONNECTIVITY_CHANGE";

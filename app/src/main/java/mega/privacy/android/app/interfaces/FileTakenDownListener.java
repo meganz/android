@@ -16,12 +16,7 @@ public interface FileTakenDownListener {
     class FileTakenDownNotificationHandler {
         private static AlertDialog alertDialogTakenDown = null;
 
-        private static void log(String message, Activity activity) {
-            Util.log(activity.getLocalClassName(), message);
-        }
-
         public static void showTakenDownDialog(Activity activity, final FileTakenDownListener listener) {
-            log("showTransferOverquotaDialog", activity);
 
             if (activity == null) {
                 return;
