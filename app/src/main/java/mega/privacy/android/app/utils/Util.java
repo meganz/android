@@ -498,15 +498,6 @@ public class Util {
 		
 		return sizeString;
 	}
-    
-	public static String getDateString(long date){
-		DateFormat datf = DateFormat.getDateTimeInstance();
-		String dateString = "";
-		
-		dateString = datf.format(new Date(date*1000));
-		
-		return dateString;
-	}
 
 	public static void setContext(Context c){
 		context = c;

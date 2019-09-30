@@ -2529,7 +2529,7 @@
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 
-    <string name="account_label" context="Head label to show the business account type">Account</string>
+    <string name="account_label" context="Head label to show the business account type">Account type</string>
     <string name="business_label" context="Label in My Account section to show user account type">Business</string>
     <string name="admin_label" context="">Admin</string>
     <string name="user_label" context="">User</string>
@@ -2537,4 +2537,6 @@
     <string name="inactive_label" context="State to indicate something is inactive (business status account for instance)">Inactive</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">Active</string>
     <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>
+    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
+    <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Usage</string>
 </resources>

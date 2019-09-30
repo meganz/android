@@ -360,9 +360,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 						logDebug("onRequest TYPE_ACCOUNT_DETAILS: " + myAccountInfo.getUsedPerc());
 					}
 
-					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-					intent.putExtra("actionType", UPDATE_ACCOUNT_DETAILS);
-					LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+					sendBroadcastUpdateAccountDetails();
 				}
 			}
 		}
@@ -373,6 +371,12 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			logDebug("BackgroundRequestListener: onRequestTemporaryError: " + request.getRequestString());
 		}
 		
+	}
+
+	private void sendBroadcastUpdateAccountDetails() {
+		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+		intent.putExtra("actionType", UPDATE_ACCOUNT_DETAILS);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
 	public void launchExternalLogout(){
@@ -1393,7 +1397,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 			}
 		} else if (event.getType() == MegaEvent.EVENT_BUSINESS_STATUS) {
-
+			myAccountInfo.setBusinessStatusReceived(true);
+			sendBroadcastUpdateAccountDetails();
 		}
 	}
 

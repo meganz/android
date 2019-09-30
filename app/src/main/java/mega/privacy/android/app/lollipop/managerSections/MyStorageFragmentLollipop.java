@@ -34,8 +34,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.TimeUtils.*;
 
 public class MyStorageFragmentLollipop extends Fragment {
 
@@ -167,11 +166,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 		TextView previousVersionLbl = (TextView) v.findViewById(R.id.my_storage_account_previous_versions_title);
         previousVersionLbl.setText(getResources().getQuantityString(R.plurals.header_previous_section_item, 2));
 
-//		storageAvailableText = (TextView) v.findViewById(R.id.my_storage_account_space_text);
-//		RelativeLayout.LayoutParams bottomParams = (RelativeLayout.LayoutParams)progressBar.getLayoutParams();
-//		bottomParams.setMargins(0, 0, 0, scaleHeightPx(32, outMetrics));
-//		progressBar.setLayoutParams(bottomParams);
-
 		if(myAccountInfo==null){
 			logWarning("MyAccountInfo is NULL");
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
@@ -211,10 +205,8 @@ public class MyStorageFragmentLollipop extends Fragment {
 			typeAccountText.setText(getString(R.string.recovering_info));
 			expirationAccountText.setText(getString(R.string.recovering_info));
 			typeAccountIcon.setVisibility(View.GONE);
-//			storageAvailableText.setText(getString(R.string.recovering_info));
 		}
 		else{
-//			storageAvailableText.setText(myAccountInfo.getTotalFormatted());
 
 			logDebug("ExpirationTime: " + getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 			logDebug("Subscription cycle: " + myAccountInfo.getAccountInfo().getSubscriptionCycle());
@@ -247,28 +239,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 				}
 			}
 		}
-
-
-//		if (getPaymentMethodsBoolean == true){
-//			if (upgradeButton != null){
-//				if ((myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
-//					Time now = new Time();
-//					now.setToNow();
-//					if (myAccountInfo.getAccountType() != 0){
-//						if (now.toMillis(false) >= (myAccountInfo.getAccountInfo().getProExpiration()*1000)){
-//							if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-//								upgradeButton.setVisibility(View.VISIBLE);
-//							}
-//						}
-//					}
-//					else{
-//						if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-//							upgradeButton.setVisibility(View.VISIBLE);
-//						}
-//					}
-//				}
-//			}
-//		}
 
 		if(myAccountInfo.getUsedFormatted().trim().length()<=0){
 			totalUsedSpace.setText(getString(R.string.recovering_info));

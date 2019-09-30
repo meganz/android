@@ -18,6 +18,7 @@ import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class MyAccountInfo {
@@ -46,6 +47,7 @@ public class MyAccountInfo {
     boolean inventoryFinished = false;
     boolean accountDetailsFinished = false;
     boolean getPaymentMethodsBoolean = false;
+    private boolean businessStatusReceived = false;
 
     MegaApiAndroid megaApi;
 
@@ -590,4 +592,11 @@ public class MyAccountInfo {
         return usedStorage;
     }
 
+    public void setBusinessStatusReceived(boolean businessStatusReceived) {
+        this.businessStatusReceived = businessStatusReceived;
+    }
+
+    public boolean isBusinessStatusReceived() {
+        return businessStatusReceived;
+    }
 }

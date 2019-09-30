@@ -195,5 +195,7 @@
 
     <color name="black_55_alpha">#8C000000</color>
     <color name="black_85_alpha">#D9000000</color>
-
+    <color name="business_alert_background">#FFF6F6F6</color>
+    <color name="expired_red">#FFE1000F</color>
+    <color name="grace_yellow">#FFF29907</color>
 </resources>

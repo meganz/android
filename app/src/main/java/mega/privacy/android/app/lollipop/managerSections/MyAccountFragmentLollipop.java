@@ -73,6 +73,7 @@ import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -115,6 +116,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	private LinearLayout parentLinearLayout;
 
+	private LinearLayout businessAccountManagementAlert;
 	private LinearLayout businessAccountContainer;
 	private TextView businessAccountTypeText;
 	private LinearLayout businessAccountStatusContainer;
@@ -127,7 +129,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	private ArrayList<MegaUser> lastContacted;
 	
 	private DisplayMetrics outMetrics;
-	private float density;
 
 	private MegaApiAndroid megaApi;
 	private MegaChatApiAndroid megaChatApi;
@@ -176,7 +177,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		density = ((Activity) context).getResources().getDisplayMetrics().density;
 
 		View v = inflater.inflate(R.layout.fragment_my_account, container, false);
 
@@ -256,6 +256,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro));
 		upgradeButton.setOnClickListener(this);
 
+		businessAccountManagementAlert = v.findViewById(R.id.business_account_management_container);
 		businessAccountContainer = v.findViewById(R.id.business_account_container);
 		businessAccountTypeText = v.findViewById(R.id.business_account_type_text);
 		businessAccountStatusContainer = v.findViewById(R.id.business_account_status_container);
@@ -265,6 +266,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		businessAccountRenewsDateText = v.findViewById(R.id.business_account_renews_date_text);
 
 		achievementsLayout = v.findViewById(R.id.my_account_achievements_layout);
+		achievementsLayout.setOnClickListener(this);
 		achievementsSeparator = v.findViewById(R.id.my_account_achievements_separator);
 
 		lastSessionLayout = v.findViewById(R.id.my_account_last_session_layout);
@@ -301,66 +303,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         lastContactsGridView.setHasFixedSize(false);
         
         lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
-
-		if (megaApi.isBusinessAccount()) {
-			accountTypeLayout.setVisibility(View.GONE);
-			accountTypeSeparator.setVisibility(View.GONE);
-			achievementsLayout.setVisibility(View.GONE);
-			achievementsSeparator.setVisibility(View.GONE);
-			businessAccountContainer.setVisibility(View.VISIBLE);
-
-			if (megaApi.isMasterBusinessAccount()) {
-				businessAccountStatusContainer.setVisibility(View.VISIBLE);
-				businessAccountStatusSeparator.setVisibility(View.VISIBLE);
-				businessAccountTypeText.setText(R.string.admin_label);
-
-				int status = megaApi.getBusinessStatus();
-
-				switch (status) {
-					case BUSINESS_STATUS_EXPIRED:
-						status = R.string.expired_label;
-						break;
-					case BUSINESS_STATUS_INACTIVE:
-						status = R.string.inactive_label;
-						break;
-					case BUSINESS_STATUS_ACTIVE:
-						status = R.string.active_label;
-						break;
-					case BUSINESS_STATUS_GRACE_PERIOD:
-						status = R.string.grace_label;
-						break;
-				}
-				businessAccountStatusText.setText(status);
-			} else {
-				businessAccountStatusContainer.setVisibility(View.GONE);
-				businessAccountStatusSeparator.setVisibility(View.GONE);
-				businessAccountTypeText.setText(R.string.user_label);
-			}
-		} else {
-			accountTypeLayout.setVisibility(View.VISIBLE);
-			accountTypeSeparator.setVisibility(View.VISIBLE);
-			businessAccountContainer.setVisibility(View.GONE);
-
-			if (megaApi.isAchievementsEnabled()) {
-				achievementsLayout.setVisibility(View.VISIBLE);
-				achievementsLayout.setOnClickListener(this);
-				achievementsSeparator.setVisibility(View.VISIBLE);
-			} else {
-				achievementsLayout.setVisibility(View.GONE);
-				achievementsSeparator.setVisibility(View.GONE);
-			}
-		}
-
-		if (!megaApi.isBusinessAccount() || (megaApi.isBusinessAccount() && megaApi.isMasterBusinessAccount())) {
-			nameView.setOnClickListener(this);
-			infoEmail.setOnClickListener(this);
-			editImageView.setVisibility(View.VISIBLE);
-			editImageView.setOnClickListener(this);
-		} else {
-			nameView.setOnClickListener(null);
-			infoEmail.setOnClickListener(null);
-			editImageView.setVisibility(View.GONE);
-		}
 
 		setAccountDetails();
 
@@ -470,41 +412,142 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
-	public void setAccountDetails(){
-		logDebug("setAccountDetails");
+	private void permitEditNameAndEmail() {
+		nameView.setOnClickListener(this);
+		infoEmail.setOnClickListener(this);
+		editImageView.setVisibility(View.VISIBLE);
+		editImageView.setOnClickListener(this);
+	}
 
-		if((getActivity() == null) || (!isAdded())){
+	public void setAccountDetails() {
+
+		if ((getActivity() == null) || (!isAdded())) {
 			logWarning("Fragment MyAccount NOT Attached!");
 			return;
 		}
-		//Set account details
-		if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
-			typeAccount.setText(getString(R.string.recovering_info));
-		}
-		else{
-			switch(myAccountInfo.getAccountType()){
 
-				case 0:{
+		if (myAccountInfo.getLastSessionFormattedDate() != null) {
+			if (myAccountInfo.getLastSessionFormattedDate().trim().length() <= 0) {
+				lastSession.setText(getString(R.string.recovering_info));
+			} else {
+				lastSession.setText(myAccountInfo.getLastSessionFormattedDate());
+			}
+		} else {
+			lastSession.setText(getString(R.string.recovering_info));
+		}
+
+		//Set account details
+		if (!myAccountInfo.isBusinessStatusReceived()) {
+			businessAccountManagementAlert.setVisibility(View.GONE);
+			typeAccount.setText(getString(R.string.recovering_info));
+			upgradeButton.setVisibility(View.GONE);
+			usedSpace.setVisibility(View.GONE);
+			achievementsLayout.setVisibility(View.GONE);
+			achievementsSeparator.setVisibility(View.GONE);
+			businessAccountContainer.setVisibility(View.GONE);
+			return;
+		}
+
+		if (megaApi.isBusinessAccount()) {
+			accountTypeLayout.setVisibility(View.GONE);
+			accountTypeSeparator.setVisibility(View.GONE);
+			achievementsLayout.setVisibility(View.GONE);
+			achievementsSeparator.setVisibility(View.GONE);
+			businessAccountContainer.setVisibility(View.VISIBLE);
+
+			if (megaApi.isMasterBusinessAccount()) {
+				businessAccountManagementAlert.setVisibility(View.VISIBLE);
+				permitEditNameAndEmail();
+				businessAccountStatusContainer.setVisibility(View.VISIBLE);
+				businessAccountStatusSeparator.setVisibility(View.VISIBLE);
+				businessAccountTypeText.setText(R.string.admin_label);
+
+				int status = megaApi.getBusinessStatus();
+
+				switch (status) {
+					case BUSINESS_STATUS_EXPIRED:
+						status = R.string.expired_label;
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.expired_red));
+						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.black_55_alpha));
+						break;
+					case BUSINESS_STATUS_ACTIVE:
+						status = R.string.active_label;
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.black_85_alpha));
+						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.black_85_alpha));
+						break;
+					case BUSINESS_STATUS_GRACE_PERIOD:
+						status = R.string.grace_label;
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.grace_yellow));
+						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.grace_yellow));
+						break;
+				}
+				businessAccountStatusText.setText(status);
+
+				if (myAccountInfo.getSubscriptionRenewTime() > 0) {
+					businessAccountRenewsText.setVisibility(View.VISIBLE);
+					businessAccountRenewsDateText.setVisibility(View.VISIBLE);
+					businessAccountRenewsDateText.setText(formatDate(context, myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
+				} else {
+					businessAccountRenewsText.setVisibility(View.GONE);
+					businessAccountRenewsDateText.setVisibility(View.GONE);
+				}
+			} else {
+				businessAccountManagementAlert.setVisibility(View.GONE);
+				nameView.setOnClickListener(null);
+				infoEmail.setOnClickListener(null);
+				editImageView.setVisibility(View.GONE);
+
+				businessAccountStatusContainer.setVisibility(View.GONE);
+				businessAccountStatusSeparator.setVisibility(View.GONE);
+				businessAccountTypeText.setText(R.string.user_label);
+			}
+
+			return;
+		}
+
+		businessAccountManagementAlert.setVisibility(View.GONE);
+		accountTypeLayout.setVisibility(View.VISIBLE);
+		accountTypeSeparator.setVisibility(View.VISIBLE);
+		upgradeButton.setVisibility(View.VISIBLE);
+		usedSpace.setVisibility(View.VISIBLE);
+		businessAccountContainer.setVisibility(View.GONE);
+
+		permitEditNameAndEmail();
+
+		if (megaApi.isAchievementsEnabled()) {
+			achievementsLayout.setVisibility(View.VISIBLE);
+			achievementsSeparator.setVisibility(View.VISIBLE);
+		} else {
+			achievementsLayout.setVisibility(View.GONE);
+			achievementsSeparator.setVisibility(View.GONE);
+		}
+
+		if (myAccountInfo.getAccountType() < 0 || myAccountInfo.getAccountType() > 4) {
+			typeAccount.setText(getString(R.string.recovering_info));
+		} else {
+			switch (myAccountInfo.getAccountType()) {
+
+				case 0: {
 					typeAccount.setText(R.string.my_account_free);
 					break;
 				}
 
-				case 1:{
+				case 1: {
 					typeAccount.setText(getString(R.string.my_account_pro1));
 					break;
 				}
 
-				case 2:{
+				case 2: {
 					typeAccount.setText(getString(R.string.my_account_pro2));
 					break;
 				}
 
-				case 3:{
+				case 3: {
 					typeAccount.setText(getString(R.string.my_account_pro3));
 					break;
 				}
 
-				case 4:{
+				case 4: {
 					typeAccount.setText(getString(R.string.my_account_prolite));
 					break;
 				}
@@ -512,70 +555,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}
 
-//		if (getPaymentMethodsBoolean == true){
-//			if (upgradeButton != null){
-//				if ((myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
-//					Time now = new Time();
-//					now.setToNow();
-//					if (myAccountInfo.getAccountType() != 0){
-//						if (now.toMillis(false) >= (myAccountInfo.getAccountInfo().getProExpiration()*1000)){
-//							if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-//								upgradeButton.setVisibility(View.VISIBLE);
-//							}
-//						}
-//					}
-//					else{
-//						if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-//							upgradeButton.setVisibility(View.VISIBLE);
-//						}
-//					}
-//				}
-//			}
-//		}
-		if(myAccountInfo.getUsedFormatted().trim().length()<=0){
+		if (myAccountInfo.getUsedFormatted().trim().length() <= 0) {
 			usedSpace.setText(getString(R.string.recovering_info));
-		}
-		else{
+		} else {
 			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
 			usedSpace.setText(usedSpaceString);
 		}
 
-		if(myAccountInfo.getLastSessionFormattedDate()!=null) {
-			if (myAccountInfo.getLastSessionFormattedDate().trim().length() <= 0) {
-				lastSession.setText(getString(R.string.recovering_info));
-			} else {
-				lastSession.setText(myAccountInfo.getLastSessionFormattedDate());
-			}
-		}
-		else{
-			lastSession.setText(getString(R.string.recovering_info));
-		}
-		///////////
-	}
-
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-		
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
-		}
-		
-		return (int)textSize;
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils;
 
 import android.content.Context;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -17,12 +18,13 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class TimeUtils implements Comparator<Calendar> {
 
-    public static int TIME=0;
-    public static int DATE=TIME+1;
+    public static final int TIME = 0;
+    public static final int DATE = TIME + 1;
 
-    public static int DATE_LONG_FORMAT=0;
-    public static int DATE_SHORT_FORMAT=1;
-    public static int DATE_SHORT_SHORT_FORMAT=2;
+    public static final int DATE_LONG_FORMAT = 0;
+    public static final int DATE_SHORT_FORMAT = 1;
+    public static final int DATE_SHORT_SHORT_FORMAT = 2;
+    public static final int DATE_MM_DD_YYYY_FORMAT = 3;
 
     int type;
 
@@ -129,15 +131,23 @@ public class TimeUtils implements Comparator<Calendar> {
     public static String formatDate(Context context, long timestamp, int format){
 
         java.text.DateFormat df;
-        if(format == DATE_LONG_FORMAT){
-            df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
-        }else if(format == DATE_SHORT_SHORT_FORMAT){
-            df = new SimpleDateFormat("d MMM");
 
-        }else{
-            df = new SimpleDateFormat("EEE d MMM");
-
-            //df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
+        switch (format) {
+            case DATE_LONG_FORMAT:
+                df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
+                break;
+            case DATE_SHORT_FORMAT:
+                df = new SimpleDateFormat("EEE d MMM");
+                break;
+            case DATE_SHORT_SHORT_FORMAT:
+                df = new SimpleDateFormat("d MMM");
+                break;
+            case DATE_MM_DD_YYYY_FORMAT:
+                df = new SimpleDateFormat("MMM d, YYYY");
+                break;
+            default:
+                df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
+                break;
         }
 
         Calendar cal = calculateDateFromTimestamp(timestamp);
@@ -147,25 +157,21 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar calYesterday = Calendar.getInstance();
         calYesterday.add(Calendar.DATE, -1);
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
-        if(tc.compare(cal, calToday)==0) {
+
+        if (tc.compare(cal, calToday) == 0) {
             return context.getString(R.string.label_today);
-        }
-        else if(tc.compare(cal, calYesterday)==0){
+        } else if (tc.compare(cal, calYesterday) == 0) {
             return context.getString(R.string.label_yesterday);
-        }
-        else{
-            if(tc.calculateDifferenceDays(cal, calToday)<7){
-                Date date = cal.getTime();
-                String dayWeek = new SimpleDateFormat("EEEE").format(date);
-                return dayWeek;
-            }
-            else{
-                TimeZone tz = cal.getTimeZone();
-                df.setTimeZone(tz);
-                Date date = cal.getTime();
-                String formattedDate = df.format(date);
-                return formattedDate;
-            }
+        } else if (tc.calculateDifferenceDays(cal, calToday) < 7) {
+            Date date = cal.getTime();
+            String dayWeek = new SimpleDateFormat("EEEE").format(date);
+            return dayWeek;
+        } else {
+            TimeZone tz = cal.getTimeZone();
+            df.setTimeZone(tz);
+            Date date = cal.getTime();
+            String formattedDate = df.format(date);
+            return formattedDate;
         }
     }
 
@@ -301,5 +307,14 @@ public class TimeUtils implements Comparator<Calendar> {
                 return formattedDate;
             }
         }
+    }
+
+    public static String getDateString(long date){
+        DateFormat datf = DateFormat.getDateTimeInstance();
+        String dateString = "";
+
+        dateString = datf.format(new Date(date*1000));
+
+        return dateString;
     }
 }
