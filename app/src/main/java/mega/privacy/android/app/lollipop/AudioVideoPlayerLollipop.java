@@ -1810,6 +1810,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         logDebug("onSaveInstanceState");
         if (player != null) {
             playWhenReady = player.getPlayWhenReady();
+
+            // Pause either video or audio as per UX advise
+            if (playWhenReady) {
+                player.setPlayWhenReady(false);
+            }
+
             currentTime = player.getCurrentPosition();
         }
         if (createPlayListTask != null && createPlayListTask.getStatus() == AsyncTask.Status.RUNNING){
@@ -3481,10 +3487,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     protected void onStop() {
         super.onStop();
-        //pause either video or audio as per UX advise
-        if (player != null && player.getPlayWhenReady()) {
-            player.setPlayWhenReady(false);
-        }
         logDebug("onStop");
     }
 
