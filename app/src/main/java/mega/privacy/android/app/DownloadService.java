@@ -824,6 +824,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+							viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						}
 
 						if (isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
