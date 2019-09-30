@@ -26,9 +26,6 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -42,6 +39,11 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatExplorerActivity extends PinActivityLollipop implements View.OnClickListener, MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
@@ -76,7 +78,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        log("onCreate first");
+        logDebug("onCreate first");
         super.onCreate(savedInstanceState);
 
         if (megaApi == null){
@@ -84,23 +86,23 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         }
 
         if(megaApi==null||megaApi.getRootNode()==null){
-            log("Refresh session - sdk");
+            logDebug("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
             return;
         }
-        if(Util.isChatEnabled()){
+        if(isChatEnabled()){
             if (megaChatApi == null){
                 megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
             }
 
             if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                log("Refresh session - karere");
+                logDebug("Refresh session - karere");
                 Intent intent = new Intent(this, LoginActivityLollipop.class);
-                intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
@@ -132,7 +134,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             aB.setDisplayHomeAsUpEnabled(true);
         }
         else{
-            log("aB is null");
+            logWarning("aB is null");
         }
 
         showFabButton(false);
@@ -140,22 +142,22 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         Intent intent = getIntent();
 
         if(intent!=null){
-            log("Intent received");
+            logDebug("Intent received");
             if(intent.getAction()!=null){
-                if(intent.getAction()== Constants.ACTION_FORWARD_MESSAGES){
+                if(intent.getAction()== ACTION_FORWARD_MESSAGES){
                     messagesIds = intent.getLongArrayExtra("ID_MESSAGES");
-                    log("No of messages to forward: "+messagesIds.length);
+                    logDebug("Number of messages to forward: " + messagesIds.length);
                     chatIdFrom = intent.getLongExtra("ID_CHAT_FROM", -1);
                 }
             }
             else{
                 nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
                 if(nodeHandles!=null){
-                    log("Node handle is: "+nodeHandles[0]);
+                    logDebug("Node handle is: " + nodeHandles[0]);
                 }
                 userHandles = intent.getLongArrayExtra("USER_HANDLES");
                 if(userHandles!=null){
-                    log("User handles size: "+userHandles.length);
+                    logDebug("User handles size: " + userHandles.length);
                 }
             }
         }
@@ -193,13 +195,13 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        log("onCreateOptionsMenuLollipop");
+        logDebug("onCreateOptionsMenuLollipop");
 
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.file_explorer_action, menu);
         searchMenuItem = menu.findItem(R.id.cab_menu_search);
-        searchMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
+        searchMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
         createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
         newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
 
@@ -239,8 +241,8 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                log("onQueryTextSubmit: "+query);
-                Util.hideKeyboard(chatExplorerActivity, 0);
+                logDebug("Query: " + query);
+                hideKeyboard(chatExplorerActivity, 0);
                 return true;
             }
 
@@ -266,7 +268,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        log("onOptionsItemSelected");
+        logDebug("onOptionsItemSelected");
 
         switch (item.getItemId()) {
             case android.R.id.home: {
@@ -285,14 +287,14 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                         }
                         else{
                             Intent in = new Intent(this, AddContactActivityLollipop.class);
-                            in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-                            startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
+                            in.putExtra("contactType", CONTACT_TYPE_MEGA);
+                            startActivityForResult(in, REQUEST_CREATE_CHAT);
                         }
                     }
                 }
                 else{
-                    log("Online but not megaApi");
-                    Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                    logWarning("Online but not megaApi");
+                    showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 }
             }
         }
@@ -301,13 +303,13 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        log("-------------------onActivityResult " + requestCode + "____" + resultCode);
+        logDebug("onActivityResult " + requestCode + "____" + resultCode);
 
-        if (requestCode == Constants.REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
-            log("onActivityResult REQUEST_CREATE_CHAT OK");
+        if (requestCode == REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
+            logDebug("REQUEST_CREATE_CHAT OK");
 
             if (intent == null) {
-                log("Return.....");
+                logWarning("Return.....");
                 return;
             }
 
@@ -317,12 +319,12 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 if(contactsData.size()==1){
                     MegaUser user = megaApi.getContact(contactsData.get(0));
                     if(user!=null){
-                        log("Chat with contact: "+contactsData.size());
+                        logDebug("Chat with contact: " + contactsData.size());
                         startOneToOneChat(user);
                     }
                 }
                 else{
-                    log("Create GROUP chat");
+                    logDebug("Create GROUP chat");
                     MegaChatPeerList peers = MegaChatPeerList.createInstance();
                     for (int i=0; i<contactsData.size(); i++){
                         MegaUser user = megaApi.getContact(contactsData.get(i));
@@ -330,7 +332,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
                         }
                     }
-                    log("create group chat with participants: "+peers.size());
+                    logDebug("Create group chat with participants: " + peers.size());
 
                     final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
                     final boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
@@ -346,7 +348,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                                 megaChatApi.createPublicChat(peers, chatTitle, listener);
                             }
                             else{
-                                Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
+                                showAlert(this, getString(R.string.message_error_set_title_get_link), null);
                             }
                         }
                         else{
@@ -359,16 +361,16 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     public void startOneToOneChat(MegaUser user){
-        log("startOneToOneChat");
+        logDebug("User Handle: " + user.getHandle());
         MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
         if(chat==null){
-            log("No chat, create it!");
+            logDebug("No chat, create it!");
             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
             megaChatApi.createChat(false, peers, this);
         }
         else{
-            log("There is already a chat, open it!");
+            logDebug("There is already a chat, open it!");
             showSnackbar(getString(R.string.chat_already_exists));
         }
     }
@@ -378,7 +380,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     public void chooseChats(ArrayList<ChatExplorerListItem> listItems) {
-        log("chooseChats");
+        logDebug("chooseChats");
 
         Intent intent = new Intent();
 
@@ -424,7 +426,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         }
 
         setResult(RESULT_OK, intent);
-        log("finish!");
+        logDebug("finish!");
         finish();
     }
 
@@ -443,13 +445,9 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         }
     }
 
-    public static void log(String log) {
-        Util.log("ChatExplorerActivity", log);
-    }
-
     @Override
     public void onClick(View v) {
-        log("onClick");
+        logDebug("onClick");
 
         switch(v.getId()) {
             case R.id.fab_chat_explorer: {
@@ -472,15 +470,15 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                         }
                         else{
                             Intent intent = new Intent(this, AddContactActivityLollipop.class);
-                            intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+                            intent.putExtra("contactType", CONTACT_TYPE_MEGA);
                             intent.putExtra("onlyCreateGroup", true);
-                            startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT);
+                            startActivityForResult(intent, REQUEST_CREATE_CHAT);
                         }
                     }
                 }
                 else{
-                    log("Online but not megaApi");
-                    Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                    logWarning("Online but not megaApi");
+                    showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 }
                 break;
             }
@@ -499,19 +497,19 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish(CHAT)");
+        logDebug("onRequestFinish(CHAT)");
 
        if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
-            log("Create chat request finish.");
+           logDebug("Create chat request finish.");
            onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
         }
     }
 
     public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean publicLink){
-        log("onRequestFinishCreateChat");
+        logDebug("onRequestFinishCreateChat");
 
         if(errorCode==MegaChatError.ERROR_OK){
-            log("Chat CREATED.");
+            logDebug("Chat CREATED.");
 
             //Update chat view
             if(chatExplorerFragment!=null && chatExplorerFragment.isAdded()){
@@ -520,7 +518,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             showSnackbar(getString(R.string.new_group_chat_created));
         }
         else{
-            log("EEEERRRRROR WHEN CREATING CHAT " + errorCode);
+            logError("ERROR WHEN CREATING CHAT " + errorCode);
             showSnackbar(getString(R.string.create_chat_error));
         }
     }
@@ -559,7 +557,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
-            String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
+            String formattedDate = lastGreenDate(this, lastGreen);
             if (userhandle != megaChatApi.getMyUserHandle()) {
                 chatExplorerFragment = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag("chatExplorerFragment");
                 if (chatExplorerFragment != null) {

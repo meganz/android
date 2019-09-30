@@ -3,7 +3,6 @@ package mega.privacy.android.app.components.twemoji;
 import android.support.annotation.NonNull;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.utils.Util;
 
 public final class EmojiRange {
   public final int start;
@@ -35,9 +34,4 @@ public final class EmojiRange {
     result = 31 * result + emoji.hashCode();
     return result;
   }
-
-  public static void log(String message) {
-    Util.log("EmojiRange", message);
-  }
-
 }

@@ -8,9 +8,6 @@ import android.webkit.MimeTypeMap;
 
 import java.util.HashMap;
 
-import mega.privacy.android.app.utils.Util;
-
-
 /*
  * Mime type for files
  */
@@ -214,9 +211,4 @@ public class MimeTypeThumbnail {
 	public boolean isGIF () {
 		return extension.equals("gif");
 	}
-
-	public static void log(String message) {
-		Util.log("MimeType", message);
-	}
-
 }
