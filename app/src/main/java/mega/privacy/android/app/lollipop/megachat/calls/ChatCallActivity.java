@@ -1575,7 +1575,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void statusButton(FloatingActionButton button, int visibility) {
-        if (button.getVisibility() == visibility) return;
+//        if (button.getVisibility() == visibility) return;
         logDebug("statusButton");
 
         if (visibility == View.VISIBLE) {
