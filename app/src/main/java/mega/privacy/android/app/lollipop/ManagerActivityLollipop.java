@@ -110,9 +110,11 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -190,12 +192,10 @@ import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -237,17 +237,9 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static nz.mega.sdk.MegaApiJava.ORDER_CREATION_ASC;
-import static nz.mega.sdk.MegaApiJava.ORDER_CREATION_DESC;
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC;
-import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
-import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
-import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC;
-import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC;
+import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -8386,40 +8378,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 
 				//Initialization of check groups
-				ArrayList<CheckedTextView> checkedTextViewGroup = new ArrayList<>();
+				Map<Integer, CheckedTextView> checkedTextViewGroup = new HashMap<>();
 
 				final CheckedTextView ascendingCheck = dialogLayout.findViewById(R.id.sortby_dialog_ascending_check);
 				ascendingCheck.setText(getString(R.string.sortby_name_ascending));
-				checkedTextViewGroup.add(ascendingCheck);
+				setCheckedTextViewStyke(ascendingCheck);
+				checkedTextViewGroup.put(ORDER_DEFAULT_ASC, ascendingCheck);
 
 				final CheckedTextView descendingCheck = dialogLayout.findViewById(R.id.sortby_dialog_descending_check);
 				descendingCheck.setText(getString(R.string.sortby_name_descending));
-				checkedTextViewGroup.add(descendingCheck);
+				setCheckedTextViewStyke(descendingCheck);
+				checkedTextViewGroup.put(ORDER_DEFAULT_DESC, descendingCheck);
 
 				final CheckedTextView newestCheck = dialogLayout.findViewById(R.id.sortby_dialog_newest_check);
 				newestCheck.setText(getString(R.string.sortby_date_newest));
-				checkedTextViewGroup.add(newestCheck);
+				setCheckedTextViewStyke(newestCheck);
+				checkedTextViewGroup.put(ORDER_MODIFICATION_DESC, newestCheck);
+				checkedTextViewGroup.put(ORDER_CREATION_DESC, newestCheck);
 
 				final CheckedTextView oldestCheck = dialogLayout.findViewById(R.id.sortby_dialog_oldest_check);
 				oldestCheck.setText(getString(R.string.sortby_date_oldest));
-				checkedTextViewGroup.add(oldestCheck);
+				setCheckedTextViewStyke(oldestCheck);
+				checkedTextViewGroup.put(ORDER_MODIFICATION_ASC, oldestCheck);
+				checkedTextViewGroup.put(ORDER_CREATION_ASC, oldestCheck);
 
 				final CheckedTextView largestCheck = dialogLayout.findViewById(R.id.sortby_dialog_largest_first_check);
 				largestCheck.setText(getString(R.string.sortby_size_largest_first));
-				checkedTextViewGroup.add(largestCheck);
+				setCheckedTextViewStyke(largestCheck);
+				checkedTextViewGroup.put(ORDER_SIZE_DESC, largestCheck);
 
 				final CheckedTextView smallestCheck = dialogLayout.findViewById(R.id.sortby_dialog_smallest_first_check);
 				smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
-				checkedTextViewGroup.add(smallestCheck);
-
-				for (CheckedTextView checkedTextView : checkedTextViewGroup) {
-					checkedTextView.setChecked(false);
-					checkedTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16 * scaleText));
-					checkedTextView.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-					ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) checkedTextView.getLayoutParams();
-					params.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-				}
+				setCheckedTextViewStyke(smallestCheck);
+				checkedTextViewGroup.put(ORDER_SIZE_ASC, smallestCheck);
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setView(dialogLayout);
@@ -18173,45 +18164,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 
 	/**
+	 * The method is to set the style of checkedTextView in option menu
+	 * @param checkedTextView
+	 */
+    private void setCheckedTextViewStyke(CheckedTextView checkedTextView) {
+		checkedTextView.setChecked(false);
+		checkedTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16 * scaleText));
+		checkedTextView.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
+		ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) checkedTextView.getLayoutParams();
+		params.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
+	}
+	/**
 	 * set list of checked text view which one to be checked
 	 *
 	 * @param order               the order
-	 * @param checkedTextViewList the list of checkedTextViews
+	 * @param checkedTextViewList the map of checkedTextViews
 	 */
-	private void setCheckByOrder(int order, ArrayList<CheckedTextView> checkedTextViewList) {
-		switch (order) {
-			case ORDER_DEFAULT_ASC: {
-				//ascendingCheck get checked
-				checkedTextViewList.get(0).setChecked(true);
-				break;
-			}
-			case ORDER_DEFAULT_DESC: {
-				//descendingCheck get checked
-				checkedTextViewList.get(1).setChecked(true);
-				break;
-			}
-			case ORDER_MODIFICATION_DESC:
-			case ORDER_CREATION_DESC: {
-				//newestCheck get checked
-				checkedTextViewList.get(2).setChecked(true);
-				break;
-			}
-			case ORDER_MODIFICATION_ASC:
-			case ORDER_CREATION_ASC: {
-				//oldestCheck get checked
-				checkedTextViewList.get(3).setChecked(true);
-				break;
-			}
-			case ORDER_SIZE_DESC: {
-				//largestCheck get checked
-				checkedTextViewList.get(4).setChecked(true);
-				break;
-			}
-			case ORDER_SIZE_ASC: {
-				//smallestCheck get checked
-				checkedTextViewList.get(5).setChecked(true);
-				break;
-			}
+	private void setCheckByOrder(int order, Map<Integer, CheckedTextView> checkedTextViewList) {
+		CheckedTextView checkedTextView = checkedTextViewList.get(order);
+		if (checkedTextView != null) {
+			checkedTextView.setChecked(true);
 		}
 	}
 }
