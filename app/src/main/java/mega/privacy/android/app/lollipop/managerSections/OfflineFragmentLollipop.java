@@ -63,7 +63,6 @@ import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -71,12 +70,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC;
-import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
-import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
-import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC;
-import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC;
+import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineFragmentLollipop extends RotatableFragment{
@@ -102,8 +96,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	String pathNavigation = null;
 	TextView contentText;
 	int orderGetChildren;
-	private static String DB_FILE = "0";
-	private static String DB_FOLDER = "1";
+	private static final String DB_FILE = "0";
+	private static final String DB_FOLDER = "1";
 	private MegaApiAndroid megaApi;
 	private RelativeLayout contentTextLayout;
 
@@ -746,52 +740,41 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 	}
 
-	public void sortByNameAscending() {
-		logDebug("sortByNameAscending");
-		sort(ORDER_DEFAULT_ASC, mOffList, getContext());
+	private void sortBy(int order) {
+		sort(order, mOffList, getContext());
 		if (adapter != null) {
 			adapter.setNodes(mOffList);
 		}
+	}
+
+	public void sortByNameAscending() {
+		logDebug("sortByNameAscending");
+		sortBy(ORDER_DEFAULT_ASC);
 	}
 
 	public void sortByNameDescending() {
 		logDebug("sortByNameDescending");
-		sort(ORDER_DEFAULT_DESC, mOffList, getContext());
-		if (adapter != null) {
-			adapter.setNodes(mOffList);
-		}
+		sortBy(ORDER_DEFAULT_DESC);
 	}
 
 	public void sortByModificationDateAscending() {
 		logDebug("sortByModificationDateAscending");
-		sort(ORDER_MODIFICATION_ASC, mOffList, getContext());
-		if (adapter != null) {
-			adapter.setNodes(mOffList);
-		}
+		sortBy(ORDER_MODIFICATION_ASC);
 	}
 
 	public void sortByModificationDateDescending() {
 		logDebug("sortByModificationDateDescending");
-		sort(ORDER_MODIFICATION_DESC, mOffList, getContext());
-		if (adapter != null) {
-			adapter.setNodes(mOffList);
-		}
+		sortBy(ORDER_MODIFICATION_DESC);
 	}
 
 	public void sortBySizeAscending() {
 		logDebug("sortBySizeAscending");
-		sort(ORDER_SIZE_ASC, mOffList, getContext());
-		if (adapter != null) {
-			adapter.setNodes(mOffList);
-		}
+		sortBy(ORDER_SIZE_ASC);
 	}
 
 	public void sortBySizeDescending() {
 		logDebug("sortBySizeDescending");
-		sort(ORDER_SIZE_DESC, mOffList, getContext());
-		if (adapter != null) {
-			adapter.setNodes(mOffList);
-		}
+		sortBy(ORDER_SIZE_DESC);
 	}
 
 	public boolean isFolder(String path){
