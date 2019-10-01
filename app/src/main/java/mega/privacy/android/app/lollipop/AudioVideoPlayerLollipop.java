@@ -651,9 +651,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 if (megaChatApi != null){
                     if (msgId != -1 && chatId != -1){
-                        msgChat = megaChatApi.getMessage(chatId, chatId);
+                        msgChat = megaChatApi.getMessage(chatId, msgId);
                         if(msgChat==null){
-                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, chatId);
+                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                         }
                         if (msgChat != null){
                             nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
