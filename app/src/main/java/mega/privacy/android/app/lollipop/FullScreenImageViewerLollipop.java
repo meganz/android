@@ -1355,7 +1355,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
+            Collections.sort(nodes, new Comparator<MegaNode>() {
+                @Override
+                public int compare(MegaNode o1, MegaNode o2) {
+                    MimeTypeList o1Type = MimeTypeList.typeForName(o1.getName());
+                    MimeTypeList o2Type = MimeTypeList.typeForName(o2.getName());
 
+                    if(o1Type.isImage() && o2Type.isVideo()) {
+                        return 1;
+                    } else if(o1Type.isVideo() && o2Type.isImage()) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            });
 //			if (fromShared){
 //				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 //					nodes = sortByMailDescending(nodes);
