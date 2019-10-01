@@ -931,7 +931,13 @@
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
     -->
 
-    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">This email address is already in use. Please enter another email address.</string>
+    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">This email address is already in use.</string>
+
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">You have already requested a confirmation link for that email address.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">The new and the old email must not match.</string>
+
+
 
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">This is the last step to change your email. Please enter your password below.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Change email</string>

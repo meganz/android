@@ -1181,6 +1181,9 @@ public class Util {
 		if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
 			return context.getString(R.string.error_invalid_email);
 		}
+		if (value.equals(dbH.getCredentials().getEmail())) {
+			return context.getString(R.string.mail_same_as_old);
+		}
 		return null;
 	}
 

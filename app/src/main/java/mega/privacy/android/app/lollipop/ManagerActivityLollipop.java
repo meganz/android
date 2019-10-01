@@ -15849,13 +15849,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				showAlert(this, getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
 			}
-			else if(e.getErrorCode() == MegaError.API_EEXIST || e.getErrorCode() == MegaError.API_EACCESS){
+			else if(e.getErrorCode() == MegaError.API_EACCESS){
 				logWarning("The new mail already exists");
 				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
 				showAlert(this, getString(R.string.mail_already_used), getString(R.string.email_verification_title));
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXIST){
+				logWarning("The new mail already exists");
+				hideKeyboard(managerActivity, 0);
+				if (verify2FADialog != null && verify2FADialog.isShowing()) {
+					verify2FADialog.dismiss();
+				}
+				showAlert(this, getString(R.string.mail_changed_confirm_requested), getString(R.string.email_verification_title));
 			}
 			else if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED){
 				if (is2FAEnabled()){
