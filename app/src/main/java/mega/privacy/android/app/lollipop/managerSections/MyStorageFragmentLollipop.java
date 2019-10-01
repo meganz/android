@@ -6,8 +6,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -31,6 +29,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class MyStorageFragmentLollipop extends Fragment {
 
@@ -40,7 +39,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 	private MegaUser myUser;
 
-	private LinearLayout parentLinearLayout;
 	private TextView transferQuotaUsedText;
 
 	private RelativeLayout inboxStorageLayout;
@@ -51,6 +49,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 	private TextView incomingUsedText;
 	private TextView rubbishUsedText;
 	private TextView previousVersionsText;
+	private LinearLayout rubbishSeparator;
 
 	private RelativeLayout previousVersionsLayout;
 	
@@ -96,6 +95,8 @@ public class MyStorageFragmentLollipop extends Fragment {
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
+		megaApi.getFileVersionsOption((ManagerActivityLollipop)context);
+
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -120,8 +121,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 			return null;
 		}
 
-		parentLinearLayout = v.findViewById(R.id.my_storage_parent_linear_layout);
-
 		/* Used space */
 		totalUsedSpace = v.findViewById(R.id.used_storage_text);
 
@@ -136,6 +135,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 		rubbishUsedText = v.findViewById(R.id.my_storage_account_rubbish_storage_text);
 		previousVersionsLayout = v.findViewById(R.id.previous_versions_storage_container);
 		previousVersionsText = v.findViewById(R.id.my_storage_account_previous_versions_text);
+		rubbishSeparator = v.findViewById(R.id.rubbish_separator);
 
 		if(myAccountInfo==null){
 			logWarning("MyAccountInfo is NULL");
@@ -189,18 +189,15 @@ public class MyStorageFragmentLollipop extends Fragment {
 			} else {
 				String usedSpaceString = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedFormatted(), myAccountInfo.getTotalFormatted());
 				try {
-					usedSpaceString = usedSpaceString.replace("[A]", "<font color=\'#000000\'>");
-					usedSpaceString = usedSpaceString.replace("[/A]", "</font>");
+					usedSpaceString = usedSpaceString.replace("[A]", "<b><font face=\"sans-serif-light\">");
+					usedSpaceString = usedSpaceString.replace("[/A]", "</font></b>");
+					usedSpaceString = usedSpaceString.replace("[B]", "<font color=\'#000000\'>");
+					usedSpaceString = usedSpaceString.replace("[/B]", "</font>");
 				} catch (Exception e) {
-				}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(usedSpaceString, Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(usedSpaceString);
+					logWarning("Exception formatting string", e);
 				}
 
-				totalUsedSpace.setText(result);
+				totalUsedSpace.setText(getSpannedHtmlText(usedSpaceString));
 			}
 		}
 
@@ -224,13 +221,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 		rubbishUsedText.setText(myAccountInfo.getFormattedUsedRubbish());
 		incomingUsedText.setText(myAccountInfo.getFormattedUsedIncoming());
 
-		if(myAccountInfo.getPreviousVersionsSize()>0){
-			previousVersionsText.setText(myAccountInfo.getFormattedPreviousVersionsSize());
-			previousVersionsLayout.setVisibility(View.VISIBLE);
-		}
-		else{
-			previousVersionsLayout.setVisibility(View.GONE);
-		}
+		refreshVersionsInfo();
 
 		if(myAccountInfo.getAccountType()==0){
 			transferQuotaUsedText.setText(context.getString(R.string.not_available));
@@ -249,18 +240,15 @@ public class MyStorageFragmentLollipop extends Fragment {
 			} else {
 				String textToShow = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedTransferFormatted(), myAccountInfo.getTotalTansferFormatted());
 				try {
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[A]", "<b><font face=\"sans-serif-light\">");
+					textToShow = textToShow.replace("[/A]", "</font></b>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
 				} catch (Exception e) {
-				}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
+					logWarning("Exception formatting string", e);
 				}
 
-				transferQuotaUsedText.setText(result);
+				transferQuotaUsedText.setText(getSpannedHtmlText(textToShow));
 			}
 		}
 	}
@@ -271,11 +259,13 @@ public class MyStorageFragmentLollipop extends Fragment {
 	        return;
         }
 
-		if(myAccountInfo.getPreviousVersionsSize()>0){
+		if(MegaApplication.isDisableFileVersions() == 0){
+			rubbishSeparator.setVisibility(View.VISIBLE);
 			previousVersionsText.setText(myAccountInfo.getFormattedPreviousVersionsSize());
 			previousVersionsLayout.setVisibility(View.VISIBLE);
 		}
 		else{
+			rubbishSeparator.setVisibility(View.GONE);
 			previousVersionsLayout.setVisibility(View.GONE);
 		}
 	}
@@ -294,48 +284,4 @@ public class MyStorageFragmentLollipop extends Fragment {
 		this.context = context;
 	}
 
-	public int onBackPressed(){
-		logDebug("onBackPressed");
-
-//		if(exportMKLayout.getVisibility()==View.VISIBLE){
-//			log("Master Key layout is VISIBLE");
-//			hideMKLayout();
-//			return 1;
-//		}
-
-		return 0;
-	}
-
-	public String getDescription(ArrayList<MegaNode> nodes){
-		int numFolders = 0;
-		int numFiles = 0;
-
-		for (int i=0;i<nodes.size();i++){
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
-			}
-		}
-		else {
-			if (numFiles == 0){
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
-			}
-			else{
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
-			}
-		}
-
-		return info;
-	}
 }

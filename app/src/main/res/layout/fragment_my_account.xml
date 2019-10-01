@@ -274,6 +274,40 @@
 					android:orientation="horizontal"/>
 
 				<LinearLayout
+					android:id="@+id/expiry_renew_layout"
+					android:layout_width="match_parent"
+					android:layout_height="48dp"
+					android:orientation="horizontal">
+
+					<TextView
+						android:id="@+id/expiry_renew_text"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:layout_gravity="center_vertical"
+						android:textSize="14sp"
+						android:textColor="@color/black_55_alpha"/>
+
+					<TextView
+						android:id="@+id/expiry_renew_date"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:layout_gravity="center_vertical"
+						android:gravity="right"
+						android:textSize="16sp"
+						android:textColor="@color/black_55_alpha"/>
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/expiry_renew_separator"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="@color/divider_upgrade_account"
+					android:orientation="horizontal"/>
+
+				<LinearLayout
 					android:id="@+id/business_account_container"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"

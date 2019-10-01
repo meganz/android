@@ -58,6 +58,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -93,6 +94,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	private TextView typeAccount;
 	private TextView infoEmail;
+	private TextView expiryRenewText;
+	private TextView expiryRenewDate;
 	private TextView lastSession;
 	private TextView connections;
 
@@ -105,6 +108,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	private LinearLayout accountTypeLayout;
 	private LinearLayout accountTypeSeparator;
+	private LinearLayout expiryRenewLayout;
+	private LinearLayout expiryRenewSeparator;
 	private LinearLayout typeLayout;
 	private LinearLayout lastSessionLayout;
     private RelativeLayout connectionsLayout;
@@ -245,6 +250,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		accountTypeLayout = v.findViewById(R.id.my_account_account_type_layout_container);
 		accountTypeSeparator = v.findViewById(R.id.my_account_type_separator);
+
+		expiryRenewLayout = v.findViewById(R.id.expiry_renew_layout);
+		expiryRenewSeparator = v.findViewById(R.id.expiry_renew_separator);
+		expiryRenewText = v.findViewById(R.id.expiry_renew_text);
+		expiryRenewDate = v.findViewById(R.id.expiry_renew_date);
 
 		typeLayout = v.findViewById(R.id.my_account_account_type_layout);
 		typeAccount = v.findViewById(R.id.my_account_account_type_text);
@@ -452,6 +462,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			achievementsLayout.setVisibility(View.GONE);
 			achievementsSeparator.setVisibility(View.GONE);
 			businessAccountContainer.setVisibility(View.GONE);
+			expiryRenewLayout.setVisibility(View.GONE);
+			expiryRenewSeparator.setVisibility(View.GONE);
 			return;
 		}
 
@@ -461,6 +473,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			achievementsLayout.setVisibility(View.GONE);
 			achievementsSeparator.setVisibility(View.GONE);
 			businessAccountContainer.setVisibility(View.VISIBLE);
+			expiryRenewLayout.setVisibility(View.GONE);
+			expiryRenewSeparator.setVisibility(View.GONE);
 
 			if (megaApi.isMasterBusinessAccount()) {
 				businessAccountManagementAlert.setVisibility(View.VISIBLE);
@@ -533,32 +547,43 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			typeAccount.setAllCaps(false);
 		} else {
 			switch (myAccountInfo.getAccountType()) {
-				case 0: {
+				case 0:
 					typeAccount.setText(R.string.free_account);
 					break;
-				}
 
-				case 1: {
+				case 1:
 					typeAccount.setText(getString(R.string.pro1_account));
 					break;
-				}
 
-				case 2: {
+				case 2:
 					typeAccount.setText(getString(R.string.pro2_account));
 					break;
-				}
 
-				case 3: {
+				case 3:
 					typeAccount.setText(getString(R.string.pro3_account));
 					break;
-				}
 
-				case 4: {
+				case 4:
 					typeAccount.setText(getString(R.string.prolite_account));
 					break;
-				}
 			}
 			typeAccount.setAllCaps(true);
+		}
+
+		if (myAccountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
+				&& myAccountInfo.getSubscriptionRenewTime() > 0) {
+			expiryRenewLayout.setVisibility(View.VISIBLE);
+			expiryRenewSeparator.setVisibility(View.VISIBLE);
+			expiryRenewText.setText(getString(R.string.renews_on));
+			expiryRenewDate.setText(formatDate(context, myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
+		} else if (myAccountInfo.getProExpirationTime() > 0) {
+			expiryRenewLayout.setVisibility(View.VISIBLE);
+			expiryRenewSeparator.setVisibility(View.VISIBLE);
+			expiryRenewText.setText(getString(R.string.expires_on));
+			expiryRenewDate.setText(formatDate(context, myAccountInfo.getProExpirationTime(), DATE_MM_DD_YYYY_FORMAT));
+		} else {
+			expiryRenewLayout.setVisibility(View.GONE);
+			expiryRenewSeparator.setVisibility(View.GONE);
 		}
 	}
 

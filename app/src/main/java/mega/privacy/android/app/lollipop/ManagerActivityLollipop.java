@@ -15685,6 +15685,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(sttFLol!=null){
 						sttFLol.updateEnabledFileVersions();
 					}
+
+					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
+					if(mStorageFLol!=null){
+						mStorageFLol.refreshVersionsInfo();
+					}
 				}
 				else{
 					logDebug("File versioning attribute changed correctly");
@@ -15884,6 +15889,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
 				if(sttFLol!=null){
 					sttFLol.updateEnabledFileVersions();
+				}
+
+				mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
+				if(mStorageFLol!=null){
+					mStorageFLol.refreshVersionsInfo();
 				}
 			}
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){

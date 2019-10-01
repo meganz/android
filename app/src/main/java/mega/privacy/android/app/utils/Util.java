@@ -35,9 +35,11 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.format.Formatter;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
@@ -1708,4 +1710,13 @@ public class Util {
             }
         }, 50);
     }
+
+    public static Spanned getSpannedHtmlText(String string) {
+
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
+		}
+
+		return Html.fromHtml(string);
+	}
 }
