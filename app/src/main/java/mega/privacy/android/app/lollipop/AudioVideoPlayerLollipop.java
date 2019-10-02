@@ -459,7 +459,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             chatId = intent.getLongExtra("chatId", -1);
         }
         else if (adapterType == RECENTS_ADAPTER) {
-            nodeHandles = intent.getLongArrayExtra("nodeHandles");
+            nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
             if (nodeHandles == null || nodeHandles.length <= 0) isPlayList = false;
         }
 

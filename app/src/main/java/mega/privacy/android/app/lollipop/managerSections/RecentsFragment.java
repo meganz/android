@@ -344,9 +344,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = context;
     }
 
     private long[] getBucketNodeHandles(boolean areImages) {
@@ -387,7 +387,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             intent.putExtra("adapterType", RECENTS_ADAPTER);
             intent.putExtra("handle", node.getHandle());
             if (isMedia) {
-                intent.putExtra("nodeHandles", getBucketNodeHandles(true));
+                intent.putExtra(NODE_HANDLES, getBucketNodeHandles(true));
             }
 
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -408,7 +408,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             intent.putExtra("adapterType", RECENTS_ADAPTER);
             intent.putExtra("FILENAME", node.getName());
             if (isMedia) {
-                intent.putExtra("nodeHandles", getBucketNodeHandles(false));
+                intent.putExtra(NODE_HANDLES, getBucketNodeHandles(false));
                 intent.putExtra(IS_PLAYLIST, true);
             } else {
                 intent.putExtra(IS_PLAYLIST, false);

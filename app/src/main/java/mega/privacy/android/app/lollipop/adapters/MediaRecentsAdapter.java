@@ -44,7 +44,9 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         this.nodes = nodeList;
         this.bucket = bucket;
 
-        megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+        megaApi = MegaApplication.getInstance().getMegaApi();
+
+        outMetrics = context.getResources().getDisplayMetrics();
     }
 
     public class ViewHolderMediaBucket extends RecyclerView.ViewHolder {
@@ -73,7 +75,6 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
 
     @Override
     public MediaRecentsAdapter.ViewHolderMediaBucket onCreateViewHolder(ViewGroup parent, int viewType) {
-        outMetrics = context.getResources().getDisplayMetrics();
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_media_bucket, parent, false);
         ViewHolderMediaBucket holder = new ViewHolderMediaBucket(v);

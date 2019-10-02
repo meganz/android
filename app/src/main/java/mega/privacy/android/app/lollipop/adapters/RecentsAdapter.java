@@ -53,7 +53,9 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         this.fragment = fragment;
         setItems(items);
 
-        megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+        megaApi = MegaApplication.getInstance().getMegaApi();
+
+        outMetrics = context.getResources().getDisplayMetrics();
     }
 
     public class ViewHolderBucket extends RecyclerView.ViewHolder {
@@ -101,7 +103,6 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     public RecentsAdapter.ViewHolderBucket onCreateViewHolder(ViewGroup parent, int viewType) {
         logDebug("onCreateViewHolder");
 
-        outMetrics = context.getResources().getDisplayMetrics();
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bucket, parent, false);
         ViewHolderBucket holder = new ViewHolderBucket(v);
 
@@ -253,6 +254,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             userAction = userAction.replace("[A]", "<font color=\'#7a7a7a\'>");
             userAction = userAction.replace("[/A]", "</font>");
         } catch (Exception e) {
+            logError("Exception formatting string", e);
         }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {

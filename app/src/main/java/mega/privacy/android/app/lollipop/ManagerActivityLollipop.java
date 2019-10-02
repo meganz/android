@@ -254,6 +254,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
+	private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
 	private final String INDEX_CLOUD = "INDEX_CLOUD";
 
 	private final int ERROR_TAB = -1;
@@ -1756,7 +1757,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else {
 			setDeepBrowserTreeRecents(0);
 		}
-		outState.putInt("deepBrowserTreeRecents", deepBrowserTreeRecents);
+		outState.putInt(DEEP_BROWSER_TREE_RECENTS, deepBrowserTreeRecents);
 
 		if (viewPagerCloud != null) {
 			indexCloud = viewPagerCloud.getCurrentItem();
@@ -1866,7 +1867,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			logDebug("savedInstanceState -> parentHandleOutgoing: " + parentHandleOutgoing);
 			parentHandleSearch = savedInstanceState.getLong("parentHandleSearch", -1);
 			parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
-			deepBrowserTreeRecents = savedInstanceState.getInt("deepBrowserTreeRecents", 0);
+			deepBrowserTreeRecents = savedInstanceState.getInt(DEEP_BROWSER_TREE_RECENTS, 0);
 			if (deepBrowserTreeRecents > 0) {
 				setBucketSaved((BucketSaved) savedInstanceState.getSerializable("bucketSaved"));
 			}

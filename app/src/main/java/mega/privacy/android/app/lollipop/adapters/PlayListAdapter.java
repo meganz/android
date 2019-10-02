@@ -189,8 +189,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             holder.textViewFileName.setText(offNode.getName());
             holder.textViewFileSize.setText(getSizeString(mediaFile.length()));
 
-            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && querySearch.equals("")
-                    || (((PlaylistFragment) fragment).isSearchOpen() || !querySearch.equals("")) && (offNode.getName().equals(offNodeChecked.getName()))){
+            if (isCurrentChecked(position, querySearch, offNode.getName().equals(offNodeChecked.getName()))){
                 holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
                 holder.textViewFileSize.setVisibility(View.GONE);
                 holder.textViewState.setVisibility(View.VISIBLE);
@@ -212,8 +211,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             holder.textViewFileName.setText(zipFile.getName());
             holder.textViewFileSize.setText(getSizeString(zipFile.length()));
 
-            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && querySearch.equals("")
-                    || (((PlaylistFragment) fragment).isSearchOpen() || !querySearch.equals("")) && (zipFile.getName().equals(zipChecked.getName()))) {
+            if (isCurrentChecked(position, querySearch, zipFile.getName().equals(zipChecked.getName()))) {
                 holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
                 holder.textViewFileSize.setVisibility(View.GONE);
                 holder.textViewState.setVisibility(View.VISIBLE);
@@ -235,8 +233,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             holder.textViewFileName.setText(node.getName());
             holder.textViewFileSize.setText(getSizeString(node.getSize()));
 
-            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && querySearch.equals("")
-                    || (((PlaylistFragment) fragment).isSearchOpen() || !querySearch.equals("")) && (node.getName().equals(nodeChecked.getName()))){
+            if (isCurrentChecked(position, querySearch, node.getName().equals(nodeChecked.getName()))){
                 holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
                 holder.textViewFileSize.setVisibility(View.GONE);
                 holder.textViewState.setVisibility(View.VISIBLE);
@@ -333,6 +330,16 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 }
             }
         }
+    }
+
+    private boolean isCurrentChecked(int position, String querySearch, boolean isNodeChecked) {
+
+        if (position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen() && querySearch.equals("")
+                || ((((PlaylistFragment) fragment).isSearchOpen() || !querySearch.equals("")) && isNodeChecked)) {
+            return true;
+        }
+
+        return false;
     }
 
     public Object getItem(int position) {

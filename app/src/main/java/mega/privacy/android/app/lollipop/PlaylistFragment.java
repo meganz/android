@@ -234,7 +234,7 @@ public class PlaylistFragment extends Fragment{
         }
         String querySearch = ((AudioVideoPlayerLollipop) context).getQuerySearch();
         if (!querySearch.equals("")) {
-            aB.setTitle(getString(R.string.action_search) + ": " + querySearch);
+            aB.setTitle(getString(R.string.hint_action_search) + " " + querySearch);
             setNodesSearch(querySearch);
         }
         return v;

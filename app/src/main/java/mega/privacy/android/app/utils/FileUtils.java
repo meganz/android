@@ -41,6 +41,16 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class FileUtils {
 
+    public static final String MAIN_DIR = File.separator + "MEGA";
+
+    public static final String DOWNLOAD_DIR = File.separator + "MEGA" + File.separator + "MEGA Downloads";
+
+    public static final String LOG_DIR = File.separator + "MEGA" + File.separator + "MEGA Logs";
+
+    public static final String OLD_MK_FILE = File.separator + "MEGA" + File.separator + "MEGAMasterKey.txt";
+
+    public static final String RK_FILE = File.separator + "MEGA" + File.separator + "MEGARecoveryKey.txt";
+
     public static boolean isAudioOrVideo(MegaNode node) {
         if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio())
             return true;
@@ -83,9 +93,9 @@ public class FileUtils {
         File mediaFile = new File(localPath);
 
         Uri mediaFileUri;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+        try {
             mediaFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile);
-        } else {
+        } catch (IllegalArgumentException e) {
             mediaFileUri = Uri.fromFile(mediaFile);
         }
 
@@ -196,17 +206,6 @@ public class FileUtils {
         return false;
     }
 
-
-    public static final String MAIN_DIR = File.separator + "MEGA";
-
-    public static final String DOWNLOAD_DIR = File.separator + "MEGA" + File.separator + "MEGA Downloads";
-
-    public static final String LOG_DIR = File.separator + "MEGA" + File.separator + "MEGA Logs";
-
-    public static final String OLD_MK_FILE = File.separator + "MEGA" + File.separator + "MEGAMasterKey.txt";
-
-    public static final String RK_FILE = File.separator + "MEGA" + File.separator + "MEGARecoveryKey.txt";
-
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
 
         if (f == null) return;
@@ -225,9 +224,9 @@ public class FileUtils {
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                 File fileToDelete = new File(f.getAbsolutePath());
                 Uri contentUri;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                try {
                     contentUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", fileToDelete);
-                } else {
+                } catch (IllegalArgumentException e) {
                     contentUri = Uri.fromFile(fileToDelete);
                 }
                 mediaScanIntent.setData(contentUri);

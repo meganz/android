@@ -49,6 +49,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         setNodes(nodes);
 
         megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+
+        outMetrics = context.getResources().getDisplayMetrics();
     }
 
     public class ViewHolderMultipleBucket extends RecyclerView.ViewHolder {
@@ -103,7 +105,6 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
     @Override
     public ViewHolderMultipleBucket onCreateViewHolder(ViewGroup parent, int viewType) {
         logDebug("onCreateViewHolder");
-        outMetrics = context.getResources().getDisplayMetrics();
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_multiple_bucket, parent, false);
         ViewHolderMultipleBucket holder = new ViewHolderMultipleBucket(v);
 
@@ -134,6 +135,23 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
         holder.document = node.getHandle();
 
+        Bitmap thumbnail = getThumbnailFromCache(node);
+        if (thumbnail == null) {
+            thumbnail = getThumbnailFromFolder(node, context);
+            if (thumbnail == null) {
+                try {
+                    if (node.hasThumbnail()) {
+                        thumbnail = getThumbnailFromMegaList(node, context, holder, megaApi, this);
+                    } else {
+                        createThumbnailList(context, node, holder, megaApi, this);
+                    }
+                } catch (Exception e) {
+                    logError("Error getting or creating node thumbnail", e);
+                    e.printStackTrace();
+                }
+            }
+        }
+
         if (isMedia) {
             holder.mediaView.setVisibility(View.VISIBLE);
             holder.listView.setVisibility(View.GONE);
@@ -151,42 +169,31 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                 size = outMetrics.widthPixels / 6;
             }
             size -= px2dp(2, outMetrics);
-            logDebug("outMetrics.widthPixels: " + outMetrics.widthPixels + " final size: " + size);
+
             holder.thumbnailMedia.getLayoutParams().width = size;
             holder.thumbnailMedia.getLayoutParams().height = size;
-            holder.thumbnailMedia.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+
+            if (thumbnail != null) {
+                holder.setImageThumbnail(thumbnail);
+            } else {
+                holder.thumbnailMedia.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+            }
         } else {
             holder.mediaView.setVisibility(View.GONE);
             holder.listView.setVisibility(View.VISIBLE);
             holder.nameText.setText(node.getName());
             holder.infoText.setText(getSizeString(node.getSize()) + " · " + formatTime(node.getCreationTime()));
 
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnailList.getLayoutParams();
-            params.width = params.height = px2dp(48, outMetrics);
-            int margin = px2dp(12, outMetrics);
-            params.setMargins(margin, margin, margin, 0);
-            holder.thumbnailList.setLayoutParams(params);
-            holder.thumbnailList.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-        }
-
-        Bitmap thumbnail = getThumbnailFromCache(node);
-        if (thumbnail == null) {
-            thumbnail = getThumbnailFromFolder(node, context);
-            if (thumbnail == null) {
-                try {
-                    if (node.hasThumbnail()) {
-                        thumbnail = getThumbnailFromMegaList(node, context, holder, megaApi, this);
-                    } else {
-                        createThumbnailList(context, node, holder, megaApi, this);
-                    }
-                } catch (Exception e) {
-                    logError("Error getting or creating node thumbnail", e);
-                    e.printStackTrace();
-                }
+            if (thumbnail != null) {
+                holder.setImageThumbnail(thumbnail);
+            } else {
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnailList.getLayoutParams();
+                params.width = params.height = px2dp(48, outMetrics);
+                int margin = px2dp(12, outMetrics);
+                params.setMargins(margin, margin, margin, 0);
+                holder.thumbnailList.setLayoutParams(params);
+                holder.thumbnailList.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             }
-        }
-        if (thumbnail != null) {
-            holder.setImageThumbnail(thumbnail);
         }
     }
 

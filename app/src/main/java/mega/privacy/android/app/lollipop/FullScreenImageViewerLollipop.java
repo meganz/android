@@ -1232,7 +1232,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			long handle = intent.getLongExtra("handle", -1);
 			if (handle == -1) finish();
 
-			long[] nodeHandles = intent.getLongArrayExtra("nodeHandles");
+			long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 			if (nodeHandles != null && nodeHandles.length > 0) {
 				for (int i = 0; i < nodeHandles.length; i++) {
 					if (nodeHandles[i] != -1) {
