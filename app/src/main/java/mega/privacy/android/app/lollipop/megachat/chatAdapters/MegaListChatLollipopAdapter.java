@@ -2627,8 +2627,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							CharSequence indexedText = TextUtils.concat(name, myMessage);
-                            ((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-                            ((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, false);
 						}
 					}
