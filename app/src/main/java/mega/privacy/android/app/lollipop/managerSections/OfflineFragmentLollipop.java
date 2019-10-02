@@ -662,18 +662,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					emptyTextView.setVisibility(View.VISIBLE);						
 				}
 				else{
-					File offlineDirectory = null;
-					String path = getOfflineAbsolutePath(context, currentNode);
-											
 					for(int i=0; i<mOffList.size();i++){
-						if (Environment.getExternalStorageDirectory() != null){
-							offlineDirectory = new File(path + mOffList.get(i).getPath()+mOffList.get(i).getName());
-						}
-						else{
-							offlineDirectory = context.getFilesDir();
-						}	
+						File offlineFile = getOfflineFile(context, mOffList.get(i));
 
-						if (!offlineDirectory.exists()){
+						if (!isFileAvailable(offlineFile)){
 							//Updating the DB because the file does not exist
 							dbH.removeById(mOffList.get(i).getId());
 							mOffList.remove(i);

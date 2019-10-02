@@ -6531,7 +6531,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					takePicture.setVisible(false);
 				}
 				selectMenuItem.setVisible(true);
-				searchMenuItem.setVisible(true);
 
 				//Hide
 				searchByDate.setVisible(false);
@@ -6551,10 +6550,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (fbFLol!=null && fbFLol.getItemCount()>0){
 					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
+					searchMenuItem.setVisible(true);
 				}
 				else{
 					selectMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
+					searchMenuItem.setVisible(false);
 				}
 
 				if (isList){
@@ -6579,7 +6580,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 
 				clearRubbishBinMenuitem.setVisible(true);
-				searchMenuItem.setVisible(true);
 
 				//Hide
 				searchByDate.setVisible(false);
@@ -6613,11 +6613,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sortByMenuItem.setVisible(true);
 					selectMenuItem.setVisible(true);
 					clearRubbishBinMenuitem.setVisible(true);
+					searchMenuItem.setVisible(true);
 				}
 				else{
 					sortByMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
+					searchMenuItem.setVisible(false);
 				}
 
 				rubbishBinMenuItem.setVisible(false);
@@ -6645,12 +6647,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(oFLol != null && oFLol.getItemCount()>0){
 						sortByMenuItem.setVisible(true);
 						selectMenuItem.setVisible(true);
+						searchMenuItem.setVisible(true);
 					}
 					else{
 						sortByMenuItem.setVisible(false);
 						selectMenuItem.setVisible(false);
+						searchMenuItem.setVisible(false);
 					}
-					searchMenuItem.setVisible(true);
 				}
 
 				//Hide
@@ -6854,10 +6857,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if(iFLol != null && iFLol.getItemCount()>0){
 					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
+					searchMenuItem.setVisible(true);
 				}
 				else{
 					selectMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
+					searchMenuItem.setVisible(false);
 				}
 
 				if (isList){
@@ -6869,7 +6874,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 				}
 
-				searchMenuItem.setVisible(true);
 				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
@@ -6950,14 +6954,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (inSFLol != null && inSFLol.isAdded() && inSFLol.getItemCount() > 0) {
 							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
+							searchMenuItem.setVisible(true);
 
 						}
 						else {
 							selectMenuItem.setVisible(false);
 							sortByMenuItem.setVisible(false);
+							searchMenuItem.setVisible(false);
 
 						}
-						searchMenuItem.setVisible(true);
 
 						//Hide
 						searchByDate.setVisible(false);
@@ -7009,14 +7014,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (outSFLol != null && outSFLol.isAdded() && outSFLol.getItemCount() > 0) {
 							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
-
+							searchMenuItem.setVisible(true);
 						}
 						else {
 							selectMenuItem.setVisible(false);
 							sortByMenuItem.setVisible(false);
-
+							searchMenuItem.setVisible(false);
 						}
-						searchMenuItem.setVisible(true);
 
 						//Hide
 						searchByDate.setVisible(false);
@@ -7054,6 +7058,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				int index = viewPagerContacts.getCurrentItem();
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
+				searchMenuItem.setVisible(false);
 				if (index == 0){
 					logDebug("TAB CONTACTS");
 					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
@@ -7065,7 +7070,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}else{
 						thumbViewMenuItem.setVisible(false);
 					}					upgradeAccountMenuItem.setVisible(true);
-					searchMenuItem.setVisible(false);
 					scanQRcodeMenuItem.setVisible(true);
 
 					if (cFLol != null&& cFLol.getItemCount()>0) {
@@ -7133,7 +7137,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					searchByDate.setVisible(false);
 					sortByMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
-					searchMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					createFolderMenuItem.setVisible(false);
@@ -7170,7 +7173,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					//Hide
 					searchByDate.setVisible(false);
-					searchMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
