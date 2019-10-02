@@ -342,6 +342,7 @@ public class Constants {
     public static final long BUFFER_COMP = 1073741824;      // 1 GB
     public static final int MAX_BUFFER_16MB = 16777216; // 16 MB
     public static final int MAX_BUFFER_32MB = 33554432; // 32 MB
+    public static final int MAX_AUTOAWAY_TIMEOUT = 1457; //in minute, the max value supported by SDK
 
     public static final String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 

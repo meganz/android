@@ -11740,7 +11740,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         View v = inflater.inflate(R.layout.dialog_autoaway, null);
         builder.setView(v);
 
-        final RelativeLayout error = (RelativeLayout) v.findViewById(R.id.autoaway_error);
+        final RelativeLayout error = v.findViewById(R.id.autoaway_error);
         final EditText input = v.findViewById(R.id.autoaway_edittext);
         input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -11815,10 +11815,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	boolean validAutoaway(String value) {
-		if (Integer.parseInt(value) > 0) {
-			return true;
-		}
-	    return false;
+		int timeout = Integer.parseInt(value);
+		return timeout > 0 && timeout <= MAX_AUTOAWAY_TIMEOUT;
     }
 
 	public void setAutoAwayValue(String value, boolean cancelled){
