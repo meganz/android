@@ -25,9 +25,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ImportFilesFragment;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.ViewHolderImportFiles>  {
 
@@ -58,7 +59,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
             holder = (ViewHolderImportFiles) objects[1];
 
             if (file != null) {
-                File childThumbDir = new File(ThumbnailUtils.getThumbFolder(context), ImportFilesFragment.THUMB_FOLDER);
+                File childThumbDir = new File(getThumbFolder(context), ImportFilesFragment.THUMB_FOLDER);
                 if (childThumbDir != null) {
                     if (!childThumbDir.exists()) {
                         childThumbDir.mkdirs();
@@ -135,7 +136,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
         holder.thumbnail.setImageResource(MimeTypeList.typeForName(file.getTitle()).getIconResourceId());
 
         if (MimeTypeList.typeForName(file.getTitle()).isImage() || MimeTypeList.typeForName(file.getTitle()).isVideo() || MimeTypeList.typeForName(file.getTitle()).isVideoReproducible()) {
-            File childThumbDir = new File(ThumbnailUtils.getThumbFolder(context), ImportFilesFragment.THUMB_FOLDER);
+            File childThumbDir = new File(getThumbFolder(context), ImportFilesFragment.THUMB_FOLDER);
             if (childThumbDir != null) {
                 if (!childThumbDir.exists()) {
                     childThumbDir.mkdirs();
@@ -160,7 +161,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
         }
         else {
             holder.itemLayout.setVisibility(View.VISIBLE);
-            params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Util.px2dp(56, outMetrics));
+            params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, px2dp(56, outMetrics));
             holder.itemLayout.setLayoutParams(params);
         }
     }
@@ -218,9 +219,5 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
 
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener){
         this.mItemClickListener = mItemClickListener;
-    }
-
-    private static void log(String log) {
-        Util.log("ImportFilesAdapter", log);
     }
 }

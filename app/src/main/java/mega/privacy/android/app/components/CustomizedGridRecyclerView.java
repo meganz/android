@@ -14,13 +14,9 @@ package mega.privacy.android.app.components;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.View;
 import android.view.ViewGroup;
-
-import mega.privacy.android.app.utils.Util;
 
 public class CustomizedGridRecyclerView extends RecyclerView {
 
@@ -114,9 +110,5 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 	@Override
 	public CustomizedGridLayoutManager getLayoutManager() {
 		return manager;
-	}
-
-	private static void log(String txt){
-		Util.log("CustomizedGridRecyclerView", txt);
 	}
 }
