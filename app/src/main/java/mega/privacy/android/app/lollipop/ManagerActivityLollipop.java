@@ -4061,7 +4061,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		params_text_error_email.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         params_text_error_email.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error_email.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error_email.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
+		params_text_error_email.setMargins(scaleWidthPx(3, outMetrics), 0,scaleWidthPx(20, outMetrics),0);
 		textError_email.setLayoutParams(params_text_error_email);
 
 		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
@@ -4316,6 +4316,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				String valueLastName = inputLastName.getText().toString().trim();
 				String value = inputMail.getText().toString().trim();
 				String emailError = getEmailError(value, managerActivity);
+				if (emailError == null) {
+					emailError = comparedToCurrentEmail(value, managerActivity);
+				}
 				if (emailError != null) {
 //					inputMail.setError(emailError);
 					inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);

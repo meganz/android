@@ -1181,6 +1181,13 @@ public class Util {
 		if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
 			return context.getString(R.string.error_invalid_email);
 		}
+		return null;
+	}
+
+	/*
+	 * compare the current mail to newly changed email
+	 */
+	public static String comparedToCurrentEmail(String value, Context context) {
 		if (value.equals(dbH.getCredentials().getEmail())) {
 			return context.getString(R.string.mail_same_as_old);
 		}
