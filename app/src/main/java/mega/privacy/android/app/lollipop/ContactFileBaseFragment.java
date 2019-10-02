@@ -16,11 +16,13 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ContactFileBaseFragment extends Fragment{
     
@@ -41,12 +43,12 @@ public class ContactFileBaseFragment extends Fragment{
     protected int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
     protected DatabaseHandler dbH = null;
     protected MegaPreferences prefs = null;
-    protected String downloadLocationDefaultPath = Util.downloadDIR;
+    protected String downloadLocationDefaultPath;
     protected DisplayMetrics outMetrics;
     
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("ContactFileBaseFragment onCreate");
+        logDebug("ContactFileBaseFragment onCreate");
         super.onCreate(savedInstanceState);
         
         if (megaApi == null){
@@ -59,19 +61,8 @@ public class ContactFileBaseFragment extends Fragment{
         
         dbH = DatabaseHandler.getDbHandler(context);
         prefs = dbH.getPreferences();
-        if (prefs != null){
-            log("prefs != null");
-            if (prefs.getStorageAskAlways() != null){
-                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-                    log("askMe==false");
-                    if (prefs.getStorageDownloadLocation() != null){
-                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-                        }
-                    }
-                }
-            }
-        }
+
+        downloadLocationDefaultPath = getDownloadLocation(context);
         
         lastPositionStack = new Stack<>();
     
@@ -157,9 +148,5 @@ public class ContactFileBaseFragment extends Fragment{
         }
         
         return info;
-    }
-    
-    public static void log(String log) {
-        Util.log("ContactFileListFragmentLollipop", log);
     }
 }

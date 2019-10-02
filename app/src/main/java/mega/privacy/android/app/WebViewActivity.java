@@ -5,31 +5,26 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.WebView;
 
-import mega.privacy.android.app.utils.Util;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
+public class WebViewActivity extends Activity {
 
-public class WebViewActivity extends Activity{
+    WebView myWebView;
 
-	WebView myWebView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        logDebug("onCreate");
+        super.onCreate(savedInstanceState);
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
-		super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_fortumo_payment);
+        myWebView = findViewById(R.id.webview);
 
-	   	setContentView(R.layout.activity_fortumo_payment);
-		myWebView = (WebView) findViewById(R.id.webview);
-
-		Intent intent = getIntent();
-		if (intent != null) {
-			String url = intent.getDataString();
-			log("URL: " + url);
-			myWebView.getSettings().setJavaScriptEnabled(true);
-			myWebView.loadUrl(url);
-		}
-	}
-
-	public static void log(String message) {
-		Util.log("WebViewActivity", message);
-	}
+        Intent intent = getIntent();
+        if (intent != null) {
+            String url = intent.getDataString();
+            logDebug("URL: " + url);
+            myWebView.getSettings().setJavaScriptEnabled(true);
+            myWebView.loadUrl(url);
+        }
+    }
 }

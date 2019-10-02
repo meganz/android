@@ -13,13 +13,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
-import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.print.PrintHelper;
 import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
@@ -43,20 +42,16 @@ import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.JobUtil;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.Constants.ACTION_LOG_OUT;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class AccountController implements View.OnClickListener{
 
@@ -72,7 +67,7 @@ public class AccountController implements View.OnClickListener{
     Button recoveryKeyExportedButton;
 
     public AccountController(Context context){
-        log("AccountController created");
+        logDebug("AccountController created");
         this.context = context;
 
         if (megaApi == null){
@@ -99,9 +94,9 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void deleteAccount(){
-        log("deleteAccount");
+        logDebug("deleteAccount");
         if (((ManagerActivityLollipop) context).is2FAEnabled()){
-            ((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.CANCEL_ACCOUNT_2FA);
+            ((ManagerActivityLollipop) context).showVerifyPin2FA(CANCEL_ACCOUNT_2FA);
         }
         else {
             megaApi.cancelAccount((ManagerActivityLollipop) context);
@@ -109,31 +104,31 @@ public class AccountController implements View.OnClickListener{
     }
 
     public void confirmDeleteAccount(String link, String pass){
-        log("confirmDeleteAccount");
+        logDebug("confirmDeleteAccount");
         megaApi.confirmCancelAccount(link, pass, (ManagerActivityLollipop)context);
     }
 
     public void confirmChangeMail(String link, String pass){
-        log("confirmChangeMail");
+        logDebug("confirmChangeMail");
         megaApi.confirmChangeEmail(link, pass, (ManagerActivityLollipop)context);
     }
 
     public boolean existsAvatar() {
         File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
         if (isFileAvailable(avatar)) {
-            log("avatar exists in: " + avatar.getAbsolutePath());
+            logDebug("Avatar exists in: " + avatar.getAbsolutePath());
             return true;
         }
         return false;
     }
 
     public void removeAvatar() {
-        log("removeAvatar");
+        logDebug("removeAvatar");
         File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
         File qrFile = buildQrFile(context,megaApi.getMyEmail() + "QRcode.jpg");
 
         if (isFileAvailable(avatar)) {
-            log("avatar to delete: " + avatar.getAbsolutePath());
+            logDebug("Avatar to delete: " + avatar.getAbsolutePath());
             avatar.delete();
         }
         if (isFileAvailable(qrFile)) {
@@ -142,19 +137,34 @@ public class AccountController implements View.OnClickListener{
         megaApi.setAvatar(null,(ManagerActivityLollipop)context);
     }
 
-    public void exportMK(String path, boolean fromOffline){
-        log("exportMK");
-        if (!Util.isOnline(context)){
+    public void printRK(){
+        Bitmap rKBitmap = createRkBitmap();
+
+        if (rKBitmap != null){
+            PrintHelper printHelper = new PrintHelper(context);
+            printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
+            printHelper.printBitmap("rKPrint", rKBitmap, new PrintHelper.OnPrintFinishCallback() {
+                @Override
+                public void onFinish() {
+                    if (context instanceof TestPasswordActivity) {
+                        ((TestPasswordActivity) context).passwordReminderSucceeded();
+                    }
+                }
+            });
+        }
+    }
+
+    public void exportMK(String path){
+        logDebug("exportMK");
+        if (!isOnline(context)){
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             }
             else if (context instanceof TestPasswordActivity) {
                 ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
             }
             return;
         }
-
-        boolean pathNull = false;
 
         String key = megaApi.exportMasterKey();
         if (context instanceof ManagerActivityLollipop) {
@@ -167,24 +177,13 @@ public class AccountController implements View.OnClickListener{
 
         BufferedWriter out;
         try {
-            String mainDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + Util.mainDIR;
-            File mainDir = new File(mainDirPath);
-            log("Path main Dir: " + mainDirPath);
-            mainDir.mkdirs();
-
-            if (path == null){
-                path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-                pathNull = true;
-            }
-            log("Export in: "+path);
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     if (context instanceof ManagerActivityLollipop) {
-                        ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                        ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
                     }
                     else if (context instanceof TestPasswordActivity) {
-                        ActivityCompat.requestPermissions((TestPasswordActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                        ActivityCompat.requestPermissions((TestPasswordActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
                     }
                     return;
                 }
@@ -200,7 +199,7 @@ public class AccountController implements View.OnClickListener{
             File file = new File(path);
             if(availableFreeSpace < file.length()) {
                 if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_not_enough_free_space), -1);
+                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_not_enough_free_space), -1);
                 }
                 else if (context instanceof TestPasswordActivity) {
                     ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
@@ -214,106 +213,34 @@ public class AccountController implements View.OnClickListener{
             out.close();
 
             if (context instanceof ManagerActivityLollipop) {
-                if (pathNull){
-                    ((ManagerActivityLollipop) context).invalidateOptionsMenu();
-                    MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                    if (mAF != null) {
-                        mAF.setMkButtonText();
-                    }
-                    showConfirmationExportedDialog();
-                }
-                else if(fromOffline) {
-                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.save_MK_confirmation), -1);
-                }
-                else{
-                    showConfirmDialogRecoveryKeySaved();
-                }
+                ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.save_MK_confirmation), -1);
             }
             else if (context instanceof TestPasswordActivity) {
-                if (pathNull) {
-                    showConfirmationExportedDialog();
-                }
-                else {
-                    ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
-                    ((TestPasswordActivity) context).passwordReminderSucceeded();
-                }
+                ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+                ((TestPasswordActivity) context).passwordReminderSucceeded();
             }
 
         }catch (FileNotFoundException e) {
             e.printStackTrace();
-            log("ERROR: " + e.getMessage());
+            logError("ERROR", e);
         }catch (IOException e) {
             e.printStackTrace();
-            log("ERROR: " + e.getMessage());
+            logError("ERROR", e);
         }
     }
 
-    void showConfirmationExportedDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        LayoutInflater inflater = null;
-        if (context instanceof ManagerActivityLollipop) {
-            inflater = ((ManagerActivityLollipop) context).getLayoutInflater();
-        }
-        else if (context instanceof TestPasswordActivity) {
-            inflater = ((TestPasswordActivity) context).getLayoutInflater();
-        }
-        View v = inflater.inflate(R.layout.dialog_recovery_key_exported, null);
-        builder.setView(v);
-
-        recoveryKeyExportedButton = (Button) v.findViewById(R.id.dialog_recovery_key_button);
-        recoveryKeyExportedButton.setOnClickListener(this);
-
-        recoveryKeyExportedDialog = builder.create();
-        recoveryKeyExportedDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                if (context instanceof TestPasswordActivity) {
-                    ((TestPasswordActivity) context).passwordReminderSucceeded();
-                }
-            }
-        });
-        recoveryKeyExportedDialog.show();
-    }
-
-//    public void updateMK(){
-//        log("updateMK");
-//
-//        String key = megaApi.exportMasterKey();
-//        BufferedWriter out;
-//        try {
-//
-//            final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-//            log("Export in: "+path);
-//            FileWriter fileWriter= new FileWriter(path);
-//            out = new BufferedWriter(fileWriter);
-//            if(out==null){
-//                log("Error!!!");
-//                return;
-//            }
-//            out.write(key);
-//            out.close();
-//
-//        }catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    public void renameMK(){
-        log("renameMK");
-
-        final String oldPath = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-        File oldMKFile = new File(oldPath);
-
-        final String newPath = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-        File newMKFile = new File(newPath);
-
-        oldMKFile.renameTo(newMKFile);
+    /**
+     * Rename the old MK or RK file to the new RK file name.
+     * @param oldFile Old MK or RK file to be renamed
+     */
+    public void renameRK(File oldFile){
+        logDebug("renameRK");
+        File newRKFile = new File(oldFile.getParentFile(), getRecoveryKeyFileName());
+        oldFile.renameTo(newRKFile);
     }
 
     public void copyMK(boolean logout){
-        log("copyMK");
+        logDebug("copyMK");
         String key = megaApi.exportMasterKey();
         if (context instanceof ManagerActivityLollipop) {
             if (key != null) {
@@ -325,11 +252,11 @@ public class AccountController implements View.OnClickListener{
                     showConfirmDialogRecoveryKeySaved();
                 }
                 else {
-                    Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+                    showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
                 }
             }
             else {
-                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
+                showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
             }
         }
         else if (context instanceof TestPasswordActivity) {
@@ -353,29 +280,25 @@ public class AccountController implements View.OnClickListener{
         }
     }
 
-    public void saveRkToFileSystem (boolean fromOffline) {
-        log("saveRkToFileSystem");
+    public void saveRkToFileSystem () {
+        logDebug("saveRkToFileSystem");
+
         Intent intent = new Intent(context, FileStorageActivityLollipop.class);
         intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
         if (context instanceof TestPasswordActivity){
-            ((TestPasswordActivity) context).startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER);
+            ((TestPasswordActivity) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
         }
         else if (context instanceof ManagerActivityLollipop){
-            if(fromOffline){
-                ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_SAVE_MK_FROM_OFFLINE);
-            }
-            else{
-                ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER);
-            }
+            ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
         }
         else if (context instanceof TwoFactorAuthenticationActivity){
-            ((TwoFactorAuthenticationActivity) context).startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER);
+            ((TwoFactorAuthenticationActivity) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
         }
     }
 
     public void copyRkToClipboard () {
-        log("copyRkToClipboard");
+        logDebug("copyRkToClipboard");
         if (context instanceof  ManagerActivityLollipop) {
             copyMK(false);
         }
@@ -385,7 +308,7 @@ public class AccountController implements View.OnClickListener{
         else if (context instanceof TwoFactorAuthenticationActivity) {
             Intent intent = new Intent(context, ManagerActivityLollipop.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.setAction(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD);
+            intent.setAction(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD);
             intent.putExtra("logout", false);
             context.startActivity(intent);
             ((TwoFactorAuthenticationActivity) context).finish();
@@ -393,7 +316,7 @@ public class AccountController implements View.OnClickListener{
     }
 
     public Bitmap createRkBitmap (){
-        log("createRkBitmap");
+        logDebug("createRkBitmap");
 
         Bitmap rKBitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888);
         String key = megaApi.exportMasterKey();
@@ -415,7 +338,7 @@ public class AccountController implements View.OnClickListener{
             }
         }
         else {
-            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
+            showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
         }
 
         return null;
@@ -446,92 +369,33 @@ public class AccountController implements View.OnClickListener{
         builder.show();
     }
 
-    public void removeMK() {
-        log("removeMK");
-        final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-        final File f = new File(path);
-        f.delete();
-
-        //Check if old MK file exists
-        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-        final File fOldMK = new File(pathOldMK);
-        if(fOldMK.exists()){
-            log("The old file of MK was also removed");
-            f.delete();
-        }
-
-        String message = context.getString(R.string.toast_master_key_removed);
-        ((ManagerActivityLollipop) context).invalidateOptionsMenu();
-        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-        if(mAF!=null && mAF.isAdded()){
-            mAF.setMkButtonText();
-        }
-        Util.showAlert(((ManagerActivityLollipop) context), message, null);
-    }
-
     public void killAllSessions(Context context){
-        log("killAllSessions");
+        logDebug("killAllSessions");
         megaApi.killSession(-1, (ManagerActivityLollipop) context);
     }
 
     static public void localLogoutApp(Context context){
-        log("localLogoutApp");
+        logDebug("localLogoutApp");
 
         try {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
             notificationManager.cancelAll();
         }
         catch(Exception e){
-            log("EXCEPTION removing all the notifications");
+            logError("EXCEPTION removing all the notifications", e);
+            e.printStackTrace();
         }
 
-        File offlineDirectory = null;
-        if (Environment.getExternalStorageDirectory() != null){
-            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
-        }
-        else{
-            offlineDirectory = context.getFilesDir();
-        }
-
-        try {
-            Util.deleteFolderAndSubfolders(context, offlineDirectory);
-        } catch (IOException e) {}
-
-        File thumbDir = ThumbnailUtils.getThumbFolder(context);
-        File previewDir = PreviewUtils.getPreviewFolder(context);
-
-        try {
-            Util.deleteFolderAndSubfolders(context, thumbDir);
-        } catch (IOException e) {}
-
-        try {
-            Util.deleteFolderAndSubfolders(context, previewDir);
-        } catch (IOException e) {}
+        File privateDir = context.getFilesDir();
+        removeFolder(context, privateDir);
 
         File externalCacheDir = context.getExternalCacheDir();
+        removeFolder(context, externalCacheDir);
+
         File cacheDir = context.getCacheDir();
-        try {
-            Util.deleteFolderAndSubfolders(context, externalCacheDir);
-        } catch (IOException e) {}
+        removeFolder(context, cacheDir);
 
-        try {
-            Util.deleteFolderAndSubfolders(context, cacheDir);
-        } catch (IOException e) {}
-
-        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-        final File fMKOld = new File(pathOldMK);
-        if (fMKOld.exists()){
-            log("Old MK file removed!");
-            fMKOld.delete();
-        }
-
-        final String pathMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-        final File fMK = new File(pathMK);
-        if (fMK.exists()){
-            log("MK file removed!");
-            fMK.delete();
-        }
+        removeOldTempFolders(context);
 
         try{
             Intent cancelTransfersIntent = new Intent(context, DownloadService.class);
@@ -543,7 +407,7 @@ public class AccountController implements View.OnClickListener{
         }
         catch(IllegalStateException e){
             //If the application is in a state where the service can not be started (such as not in the foreground in a state when services are allowed) - included in API 26
-            log("Cancelling services not allowed by the OS: "+e.getMessage());
+            logWarning("Cancelling services not allowed by the OS", e);
         }
 
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
@@ -552,8 +416,9 @@ public class AccountController implements View.OnClickListener{
         if (dbH.getPreferences() != null){
             dbH.clearPreferences();
             dbH.setFirstTime(false);
-            JobUtil.stopRunningCameraUploadService(context);
+            stopRunningCameraUploadService(context);
         }
+
         dbH.clearOffline();
 
         dbH.clearContacts();
@@ -574,8 +439,17 @@ public class AccountController implements View.OnClickListener{
         dbH.setEnabledChat(true + "");
     }
 
+    public static void removeFolder(Context context, File folder) {
+        try {
+            deleteFolderAndSubfolders(context, folder);
+        } catch (IOException e) {
+            logError("Exception deleting" + folder.getName() + "directory", e);
+            e.printStackTrace();
+        }
+    }
+
     static public void logout(Context context, MegaApiAndroid megaApi) {
-        log("logout");
+        logDebug("logout");
 
         MegaApplication application = (MegaApplication) ((Activity)context).getApplication();
         //Clear num verions after logout
@@ -601,18 +475,15 @@ public class AccountController implements View.OnClickListener{
             megaApi.logout();
         }
 
-        localLogoutApp(context);
-
         Intent intent = new Intent();
         intent.setAction(ACTION_LOG_OUT);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     static public void logoutConfirmed(Context context){
-        log("logoutConfirmed");
+        logDebug("logoutConfirmed");
 
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-        dbH.clearChatSettings();
+        localLogoutApp(context);
 
         PackageManager m = context.getPackageManager();
         String s = context.getPackageName();
@@ -620,7 +491,7 @@ public class AccountController implements View.OnClickListener{
             PackageInfo p = m.getPackageInfo(s, 0);
             s = p.applicationInfo.dataDir;
         } catch (PackageManager.NameNotFoundException e) {
-            log("Error Package name not found " + e);
+            logDebug("Error Package name not found " + e);
         }
 
         File appDir = new File(s);
@@ -633,33 +504,33 @@ public class AccountController implements View.OnClickListener{
     }
 
     public int updateUserAttributes(String oldFirstName, String newFirstName, String oldLastName, String newLastName, String oldMail, String newMail){
-        log("updateUserAttributes");
+        logDebug("updateUserAttributes");
         MyAccountFragmentLollipop myAccountFragmentLollipop = ((ManagerActivityLollipop)context).getMyAccountFragment();
         if(!oldFirstName.equals(newFirstName)){
-            log("Changes in first name");
+            logDebug("Changes in first name");
             if(myAccountFragmentLollipop!=null){
                 count++;
                 megaApi.setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, newFirstName, (ManagerActivityLollipop)context);
             }
         }
         if(!oldLastName.equals(newLastName)){
-            log("Changes in last name");
+            logDebug("Changes in last name");
             if(myAccountFragmentLollipop!=null){
                 count++;
                 megaApi.setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, newLastName, (ManagerActivityLollipop)context);
             }
         }
         if(!oldMail.equals(newMail)){
-            log("Changes in mail, new mail: "+newMail);
+            logDebug("Changes in mail, new mail: " + newMail);
             if (((ManagerActivityLollipop) context).is2FAEnabled()){
                 ((ManagerActivityLollipop) context).setNewMail(newMail);
-                ((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.CHANGE_MAIL_2FA);
+                ((ManagerActivityLollipop) context).showVerifyPin2FA(CHANGE_MAIL_2FA);
             }
             else {
                 megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);
             }
         }
-        log("The number of attributes to change is: "+count);
+        logDebug("The number of attributes to change is: " + count);
         return count;
     }
 
@@ -669,10 +540,6 @@ public class AccountController implements View.OnClickListener{
 
     static public void setCount(int countUa) {
         count = countUa;
-    }
-
-    public static void log(String message) {
-        Util.log("AccountController", message);
     }
 
     @Override

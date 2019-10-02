@@ -226,7 +226,6 @@
 	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Розмір:</string>
 	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Вміст:</string>
 	<string name="file_properties_info_added" context="when was the file added in MEGA">Додано:</string>
-	<string name="file_properties_info_modified" context="when was the file modified">Змінено:</string>
 	<!--<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">Немає публічних ланок</string>-->
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Публічна ланка</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Повний доступ</string>

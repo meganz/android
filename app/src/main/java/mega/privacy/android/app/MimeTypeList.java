@@ -10,9 +10,6 @@ import android.webkit.MimeTypeMap;
 import java.io.File;
 import java.util.HashMap;
 
-import mega.privacy.android.app.utils.Util;
-
-
 /*
  * Mime type for files
  */
@@ -217,7 +214,7 @@ public class MimeTypeList {
 	 * Check is MimeType of voice type
 	 */
 	public boolean isAudioVoiceClip() {
-		return type.startsWith("audio/") || extension.equals("m4a");
+		return extension.equals("m4a");
 	}
 
 	public boolean isAudioNotSupported() {
@@ -258,9 +255,4 @@ public class MimeTypeList {
 	public boolean isGIF () {
 		return extension.equals("gif");
 	}
-
-	public static void log(String message) {
-		Util.log("MimeType", message);
-	}
-
 }

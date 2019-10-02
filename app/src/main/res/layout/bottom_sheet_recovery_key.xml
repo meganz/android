@@ -137,44 +137,6 @@
                     android:textSize="16sp"/>
             </LinearLayout>
 
-            <View
-                android:id="@+id/separator_offline"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:background="@color/sliding_panel_separator"/>
-
-            <LinearLayout
-                android:id="@+id/recovery_key_offline_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/recovery_key_offline_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:alpha="0.54"
-                    android:src="@drawable/ic_b_save_offline"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/recovery_key_offline_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
-                    android:text="@string/save_for_offline"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
-            </LinearLayout>
-
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
