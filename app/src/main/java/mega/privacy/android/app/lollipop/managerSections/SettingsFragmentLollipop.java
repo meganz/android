@@ -1165,7 +1165,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		logInfo("Updating size after clean the Rubbish Bin");
 		String emptyString = "0 " + getString(R.string.label_file_size_byte);
 		rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, emptyString));
-		((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo().setFormattedUsedRubbish(emptyString);
+		MegaApplication.getInstance().getMyAccountInfo().setFormattedUsedRubbish(emptyString);
 	}
 
 	@Override
