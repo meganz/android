@@ -28,6 +28,7 @@ import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -43,13 +44,17 @@ public class FileUtils {
 
     public static final String MAIN_DIR = File.separator + "MEGA";
 
-    public static final String DOWNLOAD_DIR = File.separator + "MEGA" + File.separator + "MEGA Downloads";
+    public static final String DOWNLOAD_DIR = MAIN_DIR + File.separator + "MEGA Downloads";
 
-    public static final String LOG_DIR = File.separator + "MEGA" + File.separator + "MEGA Logs";
+    public static final String LOG_DIR = MAIN_DIR + File.separator + "MEGA Logs";
 
-    public static final String OLD_MK_FILE = File.separator + "MEGA" + File.separator + "MEGAMasterKey.txt";
+    public static final String OLD_MK_FILE = MAIN_DIR + File.separator + "MEGAMasterKey.txt";
 
-    public static final String RK_FILE = File.separator + "MEGA" + File.separator + "MEGARecoveryKey.txt";
+    public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
+
+    public static String getRecoveryKeyFileName() {
+        return MegaApplication.getInstance().getApplicationContext().getString(R.string.general_rk) + ".txt";
+    }
 
     public static boolean isAudioOrVideo(MegaNode node) {
         if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio())

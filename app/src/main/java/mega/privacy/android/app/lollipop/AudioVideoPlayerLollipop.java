@@ -828,28 +828,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                if (offList != null){
-                    if(!offList.isEmpty()) {
-                        MegaOffline lastItem = offList.get(offList.size()-1);
-                        if(!(lastItem.getHandle().equals("0"))){
-                            logDebug("Export in: " + getExternalStoragePath(OLD_MK_FILE));
-                            File file= buildExternalStorageFile(OLD_MK_FILE);
-                            if(isFileAvailable(file)){
-                                MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
-                                offList.add(masterKeyFile);
-                            }
-                        }
-                    }
-                    else{
-                        logDebug("Export in: " + getExternalStoragePath(OLD_MK_FILE));
-                        File file= buildExternalStorageFile(OLD_MK_FILE);
-                        if(isFileAvailable(file)){
-                            MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
-                            offList.add(masterKeyFile);
-                        }
-                    }
-                }
-
                 if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
                     sortByNameDescending();
                 }
