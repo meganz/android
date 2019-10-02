@@ -392,7 +392,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					menu.findItem(R.id.cab_menu_download).setVisible(false);
 					menu.findItem(R.id.cab_menu_share).setVisible(false);
 
-					if(selected.size() == adapter.getItemCountWithoutRK()){
+					if(selected.size() == adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
 					}else{
@@ -419,7 +419,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					menu.findItem(R.id.cab_menu_delete).setVisible(true);
 					menu.findItem(R.id.cab_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					if(selected.size()==adapter.getItemCountWithoutRK()){
+					if(selected.size()==adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
 					}else{
@@ -569,6 +569,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}else{
 			emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 		}
+
 		String textToShow = getString(R.string.context_empty_offline);
 		try {
 			textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
@@ -607,14 +608,12 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 		if (adapter.isMultipleSelect()){
 			logDebug("Multiselect");
-			MegaOffline item = mOffList.get(position);
-			if(!(item.getHandle().equals("0"))){
-				adapter.toggleSelection(position);
-				List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
-				if (selectedNodes.size() > 0){
-					updateActionModeTitle();
 
-				}
+			adapter.toggleSelection(position);
+			List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
+			if (selectedNodes.size() > 0){
+				updateActionModeTitle();
+
 			}
 		}
 		else{
@@ -624,16 +623,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 
 			MegaOffline currentNode = mOffList.get(position);
-			File currentFile=null;
-			
-			if(currentNode.getHandle().equals("0")){
-				logDebug("Click on Master Key");
-				openFile(buildExternalStorageFile(RK_FILE));
-//				viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
-//				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
-				return;
-			}
-			currentFile = getOfflineFile(context, currentNode);
+			File currentFile = getOfflineFile(context, currentNode);
+
 			if(isFileAvailable(currentFile) && currentFile.isDirectory()){
 				int lastFirstVisiblePosition = 0;
 				if(((ManagerActivityLollipop)context).isList){
@@ -1127,14 +1118,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		logDebug("getItemCount");
 		if(adapter != null){
 			return adapter.getItemCount();
-		}
-		return 0;
-	}
-
-	public int getItemCountWithoutRK(){
-		logDebug("getItemCountWithoutRK");
-		if(adapter != null){
-			return adapter.getItemCountWithoutRK();
 		}
 		return 0;
 	}

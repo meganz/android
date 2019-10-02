@@ -45,7 +45,6 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-
 public class TestPasswordActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
 
     LinearLayout passwordReminderLayout;
@@ -341,10 +340,9 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
                 logDebug("parentPath no NULL");
-                String[] split = RK_FILE.split(File.separator);
-                parentPath = parentPath+"/"+split[split.length-1];
+                parentPath = parentPath + File.separator + getRecoveryKeyFileName();
                 AccountController ac = new AccountController(this);
-                ac.exportMK(parentPath, false);
+                ac.exportMK(parentPath);
             }
         }
     }
