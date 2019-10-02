@@ -20,10 +20,11 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -63,11 +64,10 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
         }
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            logDebug("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong("chatId", -1);
-            log("Handle of the chat: "+chatId);
             messageId = savedInstanceState.getLong("messageId", -1);
-            log("Row of the MS message: "+messageId);
+            logDebug("Chat ID: " + chatId + "Message ID: " + messageId);
 //            MegaChatMessage messageMega = megaChatApi.getManualSendingMessage(chatId, messageId);
 //            if(messageMega!=null){
 //                selectedMessage = new AndroidMegaChatMessage(messageMega);
@@ -75,11 +75,11 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
             selectedChat = megaChatApi.getChatRoom(chatId);
         }
         else{
-            log("Bundle NULL");
+            logWarning("Bundle NULL");
 
             chatId = ((ChatActivityLollipop) context).idChat;
-            log("Handle of the chat: "+chatId);
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
+            logDebug("Chat ID: " + chatId + "Message ID: " + messageId);
 
 //            MegaChatMessage messageMega = megaChatApi.getManualSendingMessage(chatId, messageId);
 //            log("Row of the MS message: "+messageId);
@@ -183,12 +183,12 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        logDebug("onClick");
 
         switch(v.getId()){
 
             case R.id.msg_not_sent_retry_layout: {
-                log("retry option click");
+                logDebug("Retry option click");
 //                if(selectedMessage!=null&&selectedChat!=null){
 //                    log("selectedMessage content: "+selectedMessage.getMessage().getContent());
 //
@@ -215,7 +215,7 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
             }
 
             case R.id.msg_not_sent_delete_layout: {
-                log("delete option click");
+                logDebug("Delete option click");
 //                if(selectedMessage!=null&&selectedChat!=null){
 //                    ((ChatActivityLollipop) context).removeMsgNotSent();
 //                    megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
@@ -249,14 +249,10 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
         outState.putLong("chatId", chatId);
         outState.putLong("messageId", messageId);
-    }
-
-    private static void log(String log) {
-        Util.log("PendingMessageBottomSheetDialogFragment", log);
     }
 }

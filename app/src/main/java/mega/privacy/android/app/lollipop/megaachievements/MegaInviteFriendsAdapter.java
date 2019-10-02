@@ -3,12 +3,6 @@ package mega.privacy.android.app.lollipop.megaachievements;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -19,24 +13,15 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFriendsAdapter.ViewHolderChips> implements View.OnClickListener {
@@ -81,7 +66,7 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 	@Override
 	public MegaInviteFriendsAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-		log("onCreateViewHolder");
+		logDebug("onCreateViewHolder");
 
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -94,11 +79,11 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 		holderList.textViewName = (TextView) v.findViewById(R.id.name_chip);
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			log("Landscape");
-			holderList.textViewName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+			logDebug("Landscape");
+			holderList.textViewName.setMaxWidth(scaleWidthPx(260, outMetrics));
 		}else{
-			log("Portrait");
-			holderList.textViewName.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
+			logDebug("Portrait");
+			holderList.textViewName.setMaxWidth(scaleWidthPx(230, outMetrics));
 		}
 
 		holderList.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
@@ -114,7 +99,7 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 	@Override
 	public void onBindViewHolder(ViewHolderChips holder, int position) {
-		log("onBindViewHolderList");
+		logDebug("onBindViewHolderList");
 
 		String name = (String) getItem(position);
 		holder.textViewName.setText(name);
@@ -122,15 +107,15 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 	@Override
 	public void onClick(View v) {
-		log("onClick");
+		logDebug("onClick");
 
 		MegaInviteFriendsAdapter.ViewHolderChips holder = (MegaInviteFriendsAdapter.ViewHolderChips) v.getTag();
 		if(holder!=null){
 			int currentPosition = holder.getLayoutPosition();
-			log("onClick -> Current position: "+currentPosition);
+			logDebug("Current position: " + currentPosition);
 
 			if(currentPosition<0){
-				log("Current position error - not valid value");
+				logWarning("Current position error - not valid value");
 				return;
 			}
 			switch (v.getId()) {
@@ -141,9 +126,8 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 			}
 		}
 		else{
-			log("Error. Holder is Null");
+			logWarning("Error. Holder is Null");
 		}
-
 	}
 
 	private int getAvatarTextSize (float density){
@@ -186,7 +170,7 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 	}
 
 	public void setPositionClicked(int p) {
-		log("setPositionClicked: "+p);
+		logDebug("setPositionClicked: " + p);
 		positionClicked = p;
 		notifyDataSetChanged();
 	}
@@ -203,19 +187,15 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 //	}
 //
 	public void setNames (ArrayList<String> names){
-		log("setNames");
+		logDebug("setNames");
 		this.names = names;
 
 		notifyDataSetChanged();
 	}
 
 	public Object getItem(int position) {
-		log("getItem");
+		logDebug("getItem");
 		return names.get(position);
-	}
-
-	private static void log(String log) {
-		Util.log("MegaInviteFriendsAdapter", log);
 	}
 
 	public RecyclerView getListFragment() {
