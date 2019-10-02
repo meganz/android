@@ -1,9 +1,11 @@
 package mega.privacy.android.app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
+import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -16,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
@@ -48,7 +51,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     private String selectedCountryCode, selectedCountryName, selectedDialCode;
     private ArrayList<String> countryCodeList;
     private boolean pendingSelectingCountryCode = false;
-    
+    private String inferredCountryCode;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +64,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED,false);
         }
         logDebug("is user locked " + isUserLocked);
-        
+
         //divider
         divider1 = findViewById(R.id.verify_account_divider1);
         divider2 = findViewById(R.id.verify_account_divider2);
@@ -70,7 +73,12 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         titleCountryCode = findViewById(R.id.verify_account_country_label);
         titlePhoneNumber = findViewById(R.id.verify_account_phone_number_label);
         selectedCountry = findViewById(R.id.verify_account_selected_country);
-        
+
+        TelephonyManager tm = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
+        if(tm != null) {
+            inferredCountryCode = tm.getNetworkCountryIso();
+        }
+        megaApi.getCountryCallingCodes(this);
         //set helper text
         helperText = findViewById(R.id.verify_account_helper);
         if (isUserLocked) {
@@ -389,7 +397,17 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                     StringBuffer contentBuffer = new StringBuffer();
                     contentBuffer.append(key + ":");
                     for (int j = 0; j < listMap.get(key).size(); j++) {
-                        contentBuffer.append(listMap.get(key).get(j) + ",");
+                        String dialCode = listMap.get(key).get(j);
+                        if(key.equalsIgnoreCase(inferredCountryCode)) {
+                            Locale locale = new Locale("", inferredCountryCode);
+                            selectedCountryName = locale.getDisplayName();
+                            selectedCountryCode = key;
+                            selectedDialCode = "+" + dialCode;
+
+                            String label = selectedCountryName + " (" + selectedDialCode + ")";
+                            selectedCountry.setText(label);
+                        }
+                        contentBuffer.append(dialCode + ",");
                     }
                     codedCountryCode.add(contentBuffer.toString());
                 }
