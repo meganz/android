@@ -931,7 +931,7 @@
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
     -->
 
-    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">This email address is already in use.</string>
+    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. This email address is already in use.</string>
 
     <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">You have already requested a confirmation link for that email address.</string>
 
