@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
@@ -23,6 +24,7 @@ import java.util.Locale;
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -76,7 +78,13 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
 
         TelephonyManager tm = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
         if(tm != null) {
-            inferredCountryCode = tm.getNetworkCountryIso();
+            // grant the country code from SIM first.
+            inferredCountryCode = tm.getSimCountryIso();
+            if(TextUtils.isEmpty(inferredCountryCode)) {
+                //grant by network.
+                inferredCountryCode = tm.getNetworkCountryIso();
+            }
+            logDebug("Inferred Country Code is: " + inferredCountryCode);
         }
         megaApi.getCountryCallingCodes(this);
         //set helper text
