@@ -16372,6 +16372,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				logDebug("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_emptied), -1);
 				resetAccountDetailsTimeStamp(getApplicationContext());
+				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
+				if (sttFLol != null) {
+					sttFLol.resetRubbishInfo();
+				}
 			}
 			else{
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_no_emptied), -1);
