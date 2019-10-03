@@ -84,7 +84,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
-
+	private static final long ANIMATION_DURATION = 400L;
 	boolean fromChatSavedInstance = false;
 	int[] screenPosition;
 	int mLeftDelta;
@@ -550,7 +550,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	public void runEnterAnimation() {
 		logDebug("runEnterAnimation");
-		final long duration = 600;
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
 				tB.animate().translationY(-220).setDuration(0)
@@ -586,7 +585,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		ivShadow.setAlpha(0);
 
-		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
+		viewPager.animate().setDuration(ANIMATION_DURATION).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
 			@Override
 			public void run() {
 				showActionBar();
@@ -596,7 +595,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		});
 
-		ivShadow.animate().setDuration(duration).alpha(1);
+		ivShadow.animate().setDuration(ANIMATION_DURATION).alpha(1);
 	}
 
 	@Override
@@ -1005,14 +1004,15 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	protected void hideActionBar(){
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
-				tB.animate().translationY(-220).setDuration(400L)
+				tB.animate().translationY(-220).setDuration(ANIMATION_DURATION)
 						.withEndAction(new Runnable() {
 							@Override
 							public void run() {
 								aB.hide();
 							}
 						}).start();
-				bottomLayout.animate().translationY(220).setDuration(400L).start();
+				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -1022,8 +1022,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (aB != null && !aB.isShowing()) {
 			aB.show();
 			if(tB != null) {
-				tB.animate().translationY(0).setDuration(400L).start();
-				bottomLayout.animate().translationY(0).setDuration(400L).start();
+				tB.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+				bottomLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 
 		}
