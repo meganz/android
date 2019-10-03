@@ -1049,28 +1049,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 
-			if (mOffList != null){
-				if(!mOffList.isEmpty()) {
-					MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-					if(!(lastItem.getHandle().equals("0"))){
-						logDebug("Export in: " + getExternalStoragePath(OLD_MK_FILE));
-						File file= buildExternalStorageFile(OLD_MK_FILE);
-						if(isFileAvailable(file)){
-							MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
-							mOffList.add(masterKeyFile);
-						}
-					}
-				}
-				else{
-					logDebug("Export in: " + getExternalStoragePath(OLD_MK_FILE));
-					File file= buildExternalStorageFile(OLD_MK_FILE);
-					if(isFileAvailable(file)){
-						MegaOffline masterKeyFile = new MegaOffline("0", getExternalStoragePath(OLD_MK_FILE), "MEGARecoveryKey.txt", 0, "0", 0, "0");
-						mOffList.add(masterKeyFile);
-					}
-				}
-			}
-
 			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 				sortByNameDescending();
 			}

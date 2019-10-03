@@ -13,6 +13,8 @@ import android.support.v4.content.ContextCompat;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,9 +31,15 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.getNodePath;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineUtils {
 
@@ -643,5 +651,115 @@ public class OfflineUtils {
     private static File findOldOfflineFile(MegaOffline offlineNode) {
         String path = getOldTempFolder(MAIN_DIR).getAbsolutePath() + File.separator;
         return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
+    }
+
+
+    /**
+     * sort the list of MegaOffline Node according to different order
+     *
+     * @param order    the passed order
+     * @param mOffList the list required to be sorted
+     */
+    public static void sort(int order, ArrayList<MegaOffline> mOffList, final Context context) {
+        ArrayList<MegaOffline> foldersOrder = new ArrayList<>();
+        ArrayList<MegaOffline> filesOrder = new ArrayList<>();
+        ArrayList<MegaOffline> tempOffline = new ArrayList<>();
+
+        //Remove MK before sorting
+        if (mOffList.size() > 0) {
+            MegaOffline lastItem = mOffList.get(mOffList.size() - 1);
+            if (lastItem.getHandle().equals("0")) {
+                mOffList.remove(mOffList.size() - 1);
+            }
+        } else {
+            return;
+        }
+
+        for (MegaOffline node : mOffList) {
+            if (node.getType().equals("1")) {
+                foldersOrder.add(node);
+            } else {
+                filesOrder.add(node);
+            }
+        }
+
+        Comparator<MegaOffline> modificationDateComparator = new Comparator<MegaOffline>() {
+            @Override
+            public int compare(MegaOffline o1, MegaOffline o2) {
+                return Long.compare(o1.getModificationDate(context), o2.getModificationDate(context));
+            }
+        };
+
+        Comparator<MegaOffline> sizeComparator = new Comparator<MegaOffline>() {
+            @Override
+            public int compare(MegaOffline o1, MegaOffline o2) {
+                return Long.compare(o1.getSize(context), o2.getSize(context));
+            }
+        };
+
+        Comparator<MegaOffline> nameComparator = new Comparator<MegaOffline>() {
+            @Override
+            public int compare(MegaOffline o1, MegaOffline o2) {
+                String name1 = o1.getName();
+                String name2 = o2.getName();
+                if (name1.length() > name2.length()) {
+                    return 1;
+                } else if (name1.length() < name2.length()) {
+                    return -1;
+                } else return name1.compareTo(name2);
+            }
+        };
+
+        Comparator comparator = nameComparator;
+        switch (order) {
+            case ORDER_DEFAULT_ASC:
+            case ORDER_DEFAULT_DESC: {
+                comparator = nameComparator;
+                break;
+            }
+            case ORDER_MODIFICATION_ASC:
+            case ORDER_MODIFICATION_DESC: {
+                comparator = modificationDateComparator;
+                break;
+            }
+            case ORDER_SIZE_ASC:
+            case ORDER_SIZE_DESC: {
+                comparator = sizeComparator;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+        Collections.sort(foldersOrder, comparator);
+
+        Collections.sort(filesOrder, comparator);
+
+        Boolean isDescending = false;
+        switch (order) {
+            case ORDER_DEFAULT_DESC:
+            case ORDER_MODIFICATION_DESC:
+            case ORDER_SIZE_DESC: {
+                isDescending = true;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+
+        if (isDescending) {
+            Collections.reverse(foldersOrder);
+            Collections.reverse(filesOrder);
+        }
+
+        tempOffline.addAll(foldersOrder);
+
+        tempOffline.addAll(filesOrder);
+
+        mOffList.clear();
+        mOffList.addAll(tempOffline);
     }
 }

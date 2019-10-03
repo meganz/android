@@ -1,6 +1,13 @@
 package mega.privacy.android.app;
 
+import android.content.Context;
+
+import java.io.File;
+
+import static mega.privacy.android.app.utils.FileUtils.getDirSize;
 import static mega.privacy.android.app.utils.LogUtil.*;
+
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
 public class MegaOffline {
 	
@@ -115,5 +122,27 @@ public class MegaOffline {
 
 	public void setOrigin(int origin) {
 		this.origin = origin;
+	}
+
+	public long getModificationDate(Context context) {
+		File offlineNode = getOfflineFile(context, this);
+		if (offlineNode.exists()) {
+			return offlineNode.lastModified();
+		} else {
+			return 0;
+		}
+	}
+
+	public long getSize(Context context) {
+		File offlineNode = getOfflineFile(context, this);
+		if (offlineNode.exists()) {
+			if (offlineNode.isFile()) {
+				return offlineNode.length();
+			} else {
+				return getDirSize(offlineNode);
+			}
+		} else {
+			return 0;
+		}
 	}
 }
