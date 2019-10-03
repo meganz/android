@@ -670,11 +670,10 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="navigation_drawer_add_phone_number_label" context="label of button in navigation drawer that ask user to add their phone number">Add phone number</string>
-	<string name="navigation_drawer_add_phone_number_helper" context="label of button in navigation drawer that ask user to add their phone number">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you one MEGA</string>
+	<string name="navigation_drawer_add_phone_number_helper" context="Text to explain the benefits of adding phone number">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you one MEGA</string>
 	<string name="verify_account_title" context="Title of verify phone number page">Verify your account</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
-	<string name="verify_account_helper_add_new" context="Text to explain to user why to verify phone number (add new phone number use case)">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
-	<string name="verify_account_helper_learn_more" context="label of a button that use to open a web page to let user to know more.">&#160;Learn More</string>
+	<string name="verify_account_helper_add_new" context="Text to explain the benefits of adding phone number">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
 	<string name="verify_account_counry_label" context="Country list button label">Country</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>
 	<string name="verify_account_next_button" context="button label - go to next page">Next</string>
@@ -684,7 +683,7 @@
 	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
     <string name="verify_account_not_loading_country_code" context="error message if the country code cannot be fetched">Country codes could not be fetched.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
-	<string name="verify_account_already_verified" context="error message if user click next button without enter a verified phone number">Your phone number has been verified</string>
+	<string name="verify_account_already_verified" context="error message if user proceeds with an already added phone number">Your phone number has been verified</string>
 	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Please type the verification code sent to</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Verify your account</string>
 	<string name="verify_account_incorrect_code" context="error message when user entered an incorrect verification code">Wrong code. Please try again or resend.</string>
@@ -694,7 +693,7 @@
 	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
 	<string name="verify_account_verify_limit" context="error message that will show to user when per code to be verified more than twice">Only two attempts to verify per code</string>
 	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
-	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code is invalid">Wrong code. Please try again or resend.</string>
+	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
 	<string name="verify_account_successfully" context="verify phone number successfully">Your phone number has been verified successfully</string>
 
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
@@ -843,7 +842,7 @@
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Address 2 (optional)</string>
     <string name="city_cc" context="Hint text of the city edittext for billing purposes">City</string>
     <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">State / Province</string>
-    <string name="country_cc_hint" context="Hint text of the country edittext for billing purposes">Country</string>
+    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Country</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Postal code</string>
 
     <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your payment details:</string>
@@ -1631,11 +1630,11 @@
 
     <string name="paragraph_info_achievement_install_desktop" context="info paragraph about the achievement install megasync">When you install MEGAsync you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
     <string name="paragraph_info_achievement_install_mobile_app" context="info paragraph about the achievement install mobile app">When you install our mobile app you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. We provide mobiles apps for iOS, Android and Windows Phone.</string>
-    <string name="paragraph_info_achievement_add_phone" context="info paragraph about the achievement add phone number">When you verify your phone number you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days.</string>
+    <string name="paragraph_info_achievement_add_phone" context="info paragraph about the achievement 'add phone number'. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">When you verify your phone number you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days.</string>
 
     <string name="result_paragraph_info_achievement_install_desktop" context="info paragraph about the completed achievement install megasync">You have received %1$s storage space and %2$s transfer quota for installing our MEGA desktop app.</string>
     <string name="result_paragraph_info_achievement_install_mobile_app" context="info paragraph about the completed achievement install mobile app">You have received %1$s storage space and %2$s transfer quota for installing our mobile app.</string>
-    <string name="result_paragraph_info_achievement_add_phone" context="info paragraph about the completed achievement add phone number">You have received %1$s storage space and %2$s transfer quota for verifying your phone number.</string>
+    <string name="result_paragraph_info_achievement_add_phone" context="info paragraph about the completed achievement of 'add phone number'. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">You have received %1$s storage space and %2$s transfer quota for verifying your phone number.</string>
     <string name="result_paragraph_info_achievement_registration" context="info paragraph about the completed achievement registration">You have received %1$s storage space as your free registration bonus.</string>
 
     <string name="expiration_date_for_achievements" context="info paragraph about the completed achievement registration">Bonus expires in %1$d days</string>
@@ -2551,10 +2550,10 @@
 	</plurals>
 
     <string name="sms_add_phone_number_dialog_title" context="Dialog title for adding phone number">Add phone number</string>
-    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text for scenario 1 &amp; 2 for achievement users">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
-    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text for scenario 1 &amp; 2 for non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
-    <string name="sms_add_phone_number_dialog_btn_add" context="Add phone number">ADD</string>
-    <string name="sms_add_phone_number_dialog_btn_not_now" context="Add phone number">NOT NOW</string>
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_btn_add" context="Dialog button add phone number">ADD</string>
+    <string name="sms_add_phone_number_dialog_btn_not_now" context="Dialog button don't add phone number for now">NOT NOW</string>
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 
