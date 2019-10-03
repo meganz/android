@@ -703,7 +703,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Only when charging</string>
-    <string name="settings_camera_upload_remove_gps" context="Option to choose that if the camera sync will remove the GPS info within the pictures to be uploaded">Remove location tags</string>
+    <string name="settings_camera_upload_remove_gps" context="Title of 'Remove location tags' setting option. Once enabled, Camera Uploads will remove the location info from pictures those are being uploaded">Remove location tags</string>
     <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to actively charge my device</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
 
