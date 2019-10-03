@@ -61,7 +61,6 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
-import mega.privacy.android.app.utils.ChatUtil;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -99,6 +98,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
@@ -1398,6 +1398,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			}
 		} else if (event.getType() == MegaEvent.EVENT_BUSINESS_STATUS) {
 			myAccountInfo.setBusinessStatusReceived(true);
+			int status = megaApi.getBusinessStatus();
+			if (status == BUSINESS_STATUS_EXPIRED || megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD){
+				myAccountInfo.setShouldShowBusinessAlert(true);
+			}
 			sendBroadcastUpdateAccountDetails();
 		}
 	}

@@ -117,6 +117,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
+import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -195,7 +196,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -245,9 +245,12 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
+
+    private static final String BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN";
 
 	final int CLOUD_DRIVE_BNV = 0;
 	final int CAMERA_UPLOADS_BNV = 1;
@@ -660,6 +663,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private TextView openLinkErrorText;
 	private Button openLinkOpenButton;
 
+	private boolean isBusinessGraceAlertShown = false;
+	AlertDialog businessGraceAlert;
+
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -728,6 +734,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if(sttFLol!=null){
 							sttFLol.setRubbishInfo();
 						}
+
+						checkBusinessStatus();
 					}
 				}
 				else if(actionType == UPDATE_CREDIT_CARD_SUBSCRIPTION){
@@ -1792,6 +1800,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			outState.putBoolean("openLinkDialogIsErrorShown", openLinkDialogIsErrorShown);
 		}
+
+		outState.putBoolean(BUSINESS_GRACE_ALERT_SHOWN, isBusinessGraceAlertShown);
 	}
 
 	@Override
@@ -1865,6 +1875,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			accountFragmentPreUpgradeAccount = savedInstanceState.getInt("accountFragmentPreUpgradeAccount", -1);
 			comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", -1);
 			openLinkDialogIsShown = savedInstanceState.getBoolean("openLinkDialogIsShown", false);
+			isBusinessGraceAlertShown = savedInstanceState.getBoolean(BUSINESS_GRACE_ALERT_SHOWN, false);
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -3088,8 +3099,60 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
+		checkBusinessStatus();
+
 		logDebug("END onCreate");
 	}
+
+    private void checkBusinessStatus() {
+        if (isBusinessGraceAlertShown) {
+            showBusinessGraceAlert();
+            return;
+        }
+
+        MyAccountInfo myAccountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
+
+        if (myAccountInfo != null && myAccountInfo.shouldShowBusinessAlert()) {
+            int status = megaApi.getBusinessStatus();
+            if (status == BUSINESS_STATUS_EXPIRED) {
+                myAccountInfo.setShouldShowBusinessAlert(false);
+                startActivity(new Intent(this, BusinessExpiredAlertActivity.class));
+            } else if (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD) {
+                myAccountInfo.setShouldShowBusinessAlert(false);
+                showBusinessGraceAlert();
+            }
+        }
+    }
+
+    private void showBusinessGraceAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View v = inflater.inflate(R.layout.dialog_business_grace_alert, null);
+        builder.setView(v);
+
+        Button dismissButton = v.findViewById(R.id.dismiss_button);
+        dismissButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    businessGraceAlert.dismiss();
+                    isBusinessGraceAlertShown = false;
+                } catch (Exception e) {
+                    logWarning("Exception dismissing businessGraceAlert", e);
+                }
+            }
+        });
+
+
+        businessGraceAlert = builder.create();
+        businessGraceAlert.setCanceledOnTouchOutside(false);
+        try {
+            businessGraceAlert.show();
+        }catch (Exception e){
+            logWarning("Exception showing businessGraceAlert", e);
+        }
+        isBusinessGraceAlertShown = true;
+    }
 
 	private void openContactLink (long handle) {
     	if (handle == -1) {
@@ -7585,6 +7648,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				playTransfersMenuIcon.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 			}
+		}
+
+		if (megaApi.isBusinessAccount()) {
+			upgradeAccountMenuItem.setVisible(false);
 		}
 
 		logDebug("Call to super onCreateOptionsMenu");
@@ -12375,7 +12442,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which){
 		        case DialogInterface.BUTTON_POSITIVE: {
-					nC.leaveIncomingShare(n);
+					nC.leaveIncomingShare(managerActivity, n);
 					break;
 				}
 		        case DialogInterface.BUTTON_NEGATIVE:
@@ -16040,8 +16107,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			if (e.getErrorCode() == MegaError.API_OK) {
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_contact_removed), -1);
-			}
-			else{
+			} else if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_remove_business_contact, request.getEmail()), -1);
+			} else{
 				logError("Error deleting contact");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_contact_not_removed), -1);
 			}
@@ -16300,8 +16368,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				refreshAfterRemoving();
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
 				resetAccountDetailsTimeStamp(getApplicationContext());
-			}
-			else{
+			} else if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
+				showSnackbar(SNACKBAR_TYPE, e.getErrorString(), -1);
+			} else{
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
 			}
 			logDebug("Remove request finished");

@@ -1721,8 +1721,20 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             }
         }
 		else if(request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
-			logDebug("Contact removed");
-			finish();
+			if (e.getErrorCode() == MegaError.API_OK) {
+				finish();
+			}  else if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_remove_business_contact, request.getEmail()), -1);
+			}  else{
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_contact_not_removed), -1);
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_REMOVE) {
+			if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
+				showSnackbar(SNACKBAR_TYPE, e.getErrorString(), -1);
+			} else{
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
+			}
 		}
 	}
 
@@ -1941,7 +1953,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE: {
-                        megaApi.remove(n);
+                        megaApi.remove(n, contactInfoActivityLollipop);
                         break;
                     }
                     case DialogInterface.BUTTON_NEGATIVE:

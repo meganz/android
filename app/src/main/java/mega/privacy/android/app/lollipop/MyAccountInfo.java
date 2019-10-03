@@ -48,6 +48,7 @@ public class MyAccountInfo {
     boolean accountDetailsFinished = false;
     boolean getPaymentMethodsBoolean = false;
     private boolean businessStatusReceived = false;
+    private boolean shouldShowBusinessAlert = false;
 
     MegaApiAndroid megaApi;
 
@@ -598,5 +599,13 @@ public class MyAccountInfo {
 
     public boolean isBusinessStatusReceived() {
         return businessStatusReceived;
+    }
+
+    public void setShouldShowBusinessAlert(boolean shouldShowBusinessAlert) {
+        this.shouldShowBusinessAlert = shouldShowBusinessAlert;
+    }
+
+    public boolean shouldShowBusinessAlert() {
+        return shouldShowBusinessAlert;
     }
 }

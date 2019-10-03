@@ -1520,8 +1520,13 @@ public class NodeController {
         return -1;
     }
 
-    public void leaveIncomingShare (final MegaNode n){
+    public void leaveIncomingShare (Context context, final MegaNode n){
         logDebug("Node handle: " + n.getHandle());
+
+        if (context instanceof ManagerActivityLollipop) {
+            megaApi.remove(n, (ManagerActivityLollipop) context);
+            return;
+        }
 
         megaApi.remove(n);
     }

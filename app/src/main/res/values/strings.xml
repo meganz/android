@@ -2542,4 +2542,13 @@
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
     <string name="overall_usage_label" context="Title of overall usage section in Storage">Overall usage</string>
     <string name="transfer_label" context="Title of transfer section in Storage">Transfer</string>
+
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA in a desktop browser for more information.</string>
+    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Your business account is expired</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired. Details for the administrator of the Business account">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
+    <string name="expired_user_business_text" context="A dialog message which is shown to sub-users of expired business accounts.">Your account is currently <b>suspended</b>. You can only browse your data.</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view your Camera Uploads in your user account</string>
+    <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Something went wrong</string>
+    <string name="expired_user_business_dialog_text" context="A dialog message which is shown to sub-users of expired business accounts.">Contact your business account administrator to resolve the issue and activate your account.</string>
 </resources>
