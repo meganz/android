@@ -27,6 +27,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -245,7 +246,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         if (node == null) return "";
 
         String name = node.getName();
-        if (name != null && !name.isEmpty()) return name.substring(0, 1);
+        if (!isTextEmpty(name)) return name.substring(0, 1);
 
         return "";
     }

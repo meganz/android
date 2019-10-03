@@ -384,6 +384,7 @@ public class Constants {
     public static final String SECOND_CALL = "SECOND_CALL";
 
     public static final String NODE_HANDLES = "NODE_HANDLES";
+    public static final String HANDLE = "handle";
 
 	public static final String[] FILE_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#!.+$",

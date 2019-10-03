@@ -1207,7 +1207,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			getImageHandles(nodes,savedInstanceState);
 		}
 		else if (adapterType == RECENTS_ADAPTER) {
-			long handle = intent.getLongExtra("handle", -1);
+			long handle = intent.getLongExtra(HANDLE, -1);
 			if (handle == -1) finish();
 
 			long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
@@ -1909,7 +1909,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		if (getIntent() != null) {
 			getIntent().putExtra("position", positionG);
 			if (adapterType == RECENTS_ADAPTER) {
-				getIntent().putExtra("handle", imageHandles.get(positionG));
+				getIntent().putExtra(HANDLE, imageHandles.get(positionG));
 			}
 		}
 		savedInstanceState.putInt("adapterType", adapterType);

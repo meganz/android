@@ -385,7 +385,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
             intent.putExtra("adapterType", RECENTS_ADAPTER);
-            intent.putExtra("handle", node.getHandle());
+            intent.putExtra(HANDLE, node.getHandle());
             if (isMedia) {
                 intent.putExtra(NODE_HANDLES, getBucketNodeHandles(true));
             }
