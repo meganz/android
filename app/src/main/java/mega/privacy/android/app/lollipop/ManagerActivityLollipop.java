@@ -8386,6 +8386,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				sortBySizeTV.setText(getString(R.string.sortby_size));
 				textViewGroup.add(sortBySizeTV);
 
+                TextView sortByTypeTV = dialogLayout.findViewById(R.id.sortby_dialog_type_text);
+                sortByTypeTV.setText(getString(R.string.sortby_type));
+                textViewGroup.add(sortByTypeTV);
+
 				for (TextView tv : textViewGroup) {
 					ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) tv.getLayoutParams();
 					tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16 * scaleText));
@@ -8426,6 +8430,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
 				setCheckedTextViewStyke(smallestCheck);
 				checkedTextViewGroup.put(ORDER_SIZE_ASC, smallestCheck);
+
+                final CheckedTextView photoCheck = dialogLayout.findViewById(R.id.sortby_dialog_photo_check);
+                photoCheck.setText(getString(R.string.sortby_type_photo_first));
+                setCheckedTextViewStyke(photoCheck);
+                checkedTextViewGroup.put(ORDER_TYPE_PHOTO, photoCheck);
+
+                final CheckedTextView videoCheck = dialogLayout.findViewById(R.id.sortby_dialog_video_check);
+                videoCheck.setText(getString(R.string.sortby_type_video_first));
+                setCheckedTextViewStyke(videoCheck);
+                checkedTextViewGroup.put(ORDER_TYPE_VIDEO, videoCheck);
+
+                //only for camera upload fragment
+                sortByTypeTV.setVisibility(View.GONE);
+                photoCheck.setVisibility(View.GONE);
+                videoCheck.setVisibility(View.GONE);
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setView(dialogLayout);
@@ -8606,6 +8625,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				});
 
+                photoCheck.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        switch (drawerItem) {
+                            case CAMERA_UPLOADS:
+                            case MEDIA_UPLOADS: {
+                                selectSortUploads(ORDER_TYPE_PHOTO);
+                                break;
+                            }
+                        }
+                        dialog.dismiss();
+                    }
+                });
+
+                videoCheck.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        switch (drawerItem) {
+                            case CAMERA_UPLOADS:
+                            case MEDIA_UPLOADS: {
+                                selectSortUploads(ORDER_TYPE_VIDEO);
+                                break;
+                            }
+                        }
+                        dialog.dismiss();
+                    }
+                });
+
 				//Chected Textview changes
 				switch (drawerItem) {
 					case CONTACTS: {
@@ -8687,6 +8734,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						sortBySizeTV.setVisibility(View.GONE);
 						largestCheck.setVisibility(View.GONE);
 						smallestCheck.setVisibility(View.GONE);
+                        sortByTypeTV.setVisibility(View.VISIBLE);
+                        photoCheck.setVisibility(View.VISIBLE);
+                        videoCheck.setVisibility(View.VISIBLE);
 						break;
 					}
 				}

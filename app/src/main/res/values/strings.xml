@@ -806,6 +806,10 @@
     <string name="sortby_size_largest_first" context="sort files by size largest first">Largest</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">Smallest</string>
 
+    <string name="sortby_type" context="category in sort by action">Media type</string>
+    <string name="sortby_type_photo_first" context="sort media files by photo first">Photos</string>
+    <string name="sortby_type_video_first" context="sort mdedia files by video first">Videos</string>
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
 

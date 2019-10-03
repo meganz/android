@@ -107,5 +107,38 @@
 			android:layout_marginBottom="22dp"
 			android:theme="@style/ColorControlStyle"/>
 
+        <TextView
+            android:id="@+id/sortby_dialog_type_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="normal"/>
+
+        <CheckedTextView
+            android:id="@+id/sortby_dialog_photo_check"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+            android:ellipsize="marquee"
+            android:gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:fontFamily="sans-serif"
+            android:textColor="#de000000"
+            android:theme="@style/ColorControlStyle"/>
+
+        <CheckedTextView
+            android:id="@+id/sortby_dialog_video_check"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+            android:ellipsize="marquee"
+            android:gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:fontFamily="sans-serif"
+            android:textColor="#de000000"
+            android:layout_marginBottom="22dp"
+            android:theme="@style/ColorControlStyle"/>
+
 	</LinearLayout>
 </ScrollView>
