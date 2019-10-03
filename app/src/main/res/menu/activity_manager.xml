@@ -62,13 +62,6 @@
 		MEGA:showAsAction="never" />
 
 	<item
-		android:id="@+id/action_menu_remove_MK"
-		android:orderInCategory="95"
-		android:title="@string/action_remove_master_key"
-		android:icon="@drawable/ic_action_bar_null"
-		MEGA:showAsAction="never" />
-
-	<item
 		android:id="@+id/action_add"
 		android:orderInCategory="100"
 		android:title="@string/action_add"
