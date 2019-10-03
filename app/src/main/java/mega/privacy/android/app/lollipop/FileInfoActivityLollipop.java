@@ -139,6 +139,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
     // The flag to indicate whether select chat is processing
     private static boolean isSelectingChat = false;
+    private final static String KEY_SELECTED_SHARE_HANDLE = "KEY_SELECTED_SHARE_HANDLE";
 
     NodeController nC;
 
@@ -893,6 +894,20 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             refreshProperties();
             supportInvalidateOptionsMenu();
 
+        }
+
+        if(savedInstanceState != null){
+            long handle = savedInstanceState.getLong(KEY_SELECTED_SHARE_HANDLE, -1);
+            if(handle == -1 || node == null){
+                return;
+            }
+            ArrayList<MegaShare> list = megaApi.getOutShares(node);
+            for (MegaShare share: list) {
+                if(handle == share.getNodeHandle()){
+                    selectedShare = share;
+                    break;
+                }
+            }
         }
 	}
 	
@@ -3053,16 +3068,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	}
 
-//	@Override
-//	protected void onResume() {
-//		log("onResume-FileInfoActivityLollipop");
-//		super.onResume();
-//
-//        if (adapterType != OFFLINE_ADAPTER){
-//            refreshProperties();
-//            supportInvalidateOptionsMenu();
-//        }
-//	}
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+	    super.onSaveInstanceState(outState);
+	    if(selectedShare != null && node != null){
+            outState.putLong(KEY_SELECTED_SHARE_HANDLE, selectedShare.getNodeHandle());
+        }
+    }
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
