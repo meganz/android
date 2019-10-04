@@ -595,6 +595,7 @@
                     android:layout_margin="13dp"/>
 
                 <TextView
+                    android:id="@+id/fileNameRK"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
@@ -602,8 +603,7 @@
                     android:textColor="@color/name_my_account"
                     android:fontFamily="roboto"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginRight="25dp"
-                    android:text="@string/general_rk"/>
+                    android:layout_marginRight="25dp"/>
                 
             </LinearLayout>
 
