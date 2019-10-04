@@ -4061,7 +4061,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		params_text_error_email.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         params_text_error_email.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error_email.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error_email.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
+		params_text_error_email.setMargins(scaleWidthPx(3, outMetrics), 0,scaleWidthPx(20, outMetrics),0);
 		textError_email.setLayoutParams(params_text_error_email);
 
 		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
@@ -4316,6 +4316,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				String valueLastName = inputLastName.getText().toString().trim();
 				String value = inputMail.getText().toString().trim();
 				String emailError = getEmailError(value, managerActivity);
+				if (emailError == null) {
+					emailError = comparedToCurrentEmail(value, managerActivity);
+				}
 				if (emailError != null) {
 //					inputMail.setError(emailError);
 					inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
@@ -15849,13 +15852,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				showAlert(this, getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
 			}
-			else if(e.getErrorCode() == MegaError.API_EEXIST){
+			else if(e.getErrorCode() == MegaError.API_EACCESS){
 				logWarning("The new mail already exists");
 				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
 				showAlert(this, getString(R.string.mail_already_used), getString(R.string.email_verification_title));
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXIST){
+				logWarning("Email change already requested (confirmation link already sent).");
+				hideKeyboard(managerActivity, 0);
+				if (verify2FADialog != null && verify2FADialog.isShowing()) {
+					verify2FADialog.dismiss();
+				}
+				showAlert(this, getString(R.string.mail_changed_confirm_requested), getString(R.string.email_verification_title));
 			}
 			else if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED){
 				if (is2FAEnabled()){
