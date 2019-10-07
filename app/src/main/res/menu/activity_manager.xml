@@ -76,10 +76,10 @@
 		MEGA:showAsAction="never" />
 
 	<item
-		android:id="@+id/action_menu_new_chat"
+		android:id="@+id/action_menu_invite"
 		android:orderInCategory="100"
 		MEGA:showAsAction="never"
-		android:title="@string/group_chat_start_conversation_label"
+		android:title="@string/invite_option_label"
 		android:icon="@drawable/ic_action_bar_null" />
 
 	<item

@@ -1308,7 +1308,7 @@
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without a connection.</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
-
+    <string name="invite_option_label" context="Label for the option of action menu to go to invite contact page">Invite</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
 
     <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">Invitation accepted</string>
