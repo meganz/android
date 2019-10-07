@@ -88,6 +88,7 @@
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
+    <string name="confirm_to_send" context="Button label, confirm to send invitation to contact">Send</string>
 
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload</string>
@@ -2125,6 +2126,9 @@
         <item context="one file" quantity="one">Choose File</item>
         <item context="more files" quantity="other">Choose Files</item>
     </plurals>
+
+    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">Send invitation to %1$s?</string>
+    <string name="message_confirm_send_invitation" context="Message in the confirmation dialog of sending invitation to a contact">If you confirm, the invitation will be sent.</string>
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Choose folder</string>
 

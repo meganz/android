@@ -1,9 +1,11 @@
 package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -79,16 +81,43 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     @Override
     public void onClick(View v) {
         ContactViewHolder holder = (ContactViewHolder) v.getTag();
-        int currentPosition = holder.getAdapterPosition();
-        contacts.remove(currentPosition);
-        recentChatsFragment.onContactsCountChange(contacts);
-        notifyDataSetChanged();
+        showConfirmSentDialog(holder);
+    }
 
-        String email = holder.contactMail;
-        logDebug("sent invite to: " + email);
-        //ignore the callback
-        megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
-        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
+    private void showConfirmSentDialog(final ContactViewHolder holder) {
+        final int position = holder.getAdapterPosition();
+        final MegaContactGetter.MegaContact contact = contacts.get(position);
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        contacts.remove(position);
+                        recentChatsFragment.onContactsCountChange(contacts);
+                        notifyDataSetChanged();
+
+                        String email = holder.contactMail;
+                        logDebug("sent invite to: " + email);
+                        //ignore the callback
+                        megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
+                        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        dialog.dismiss();
+                        break;
+                }
+            }
+        };
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        String title = String.format(context.getString(R.string.title_confirm_send_invitation),contact.getLocalName());
+        builder.setTitle(title);
+        builder.setMessage(context.getResources().getString(R.string.message_confirm_send_invitation));
+        builder.setPositiveButton(R.string.confirm_to_send, dialogClickListener);
+        builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+        builder.show();
     }
 
     @Override
