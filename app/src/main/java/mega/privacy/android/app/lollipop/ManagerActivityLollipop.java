@@ -599,7 +599,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem logoutMenuItem;
 	private MenuItem forgotPassMenuItem;
 	private MenuItem inviteMenuItem;
-	private MenuItem setStatusMenuItem;
 	private MenuItem clearCompletedTransfers;
 	private MenuItem scanQRcodeMenuItem;
 	private MenuItem rubbishBinMenuItem;
@@ -6418,7 +6417,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		forgotPassMenuItem.setVisible(false);
 
 		inviteMenuItem = menu.findItem(R.id.action_menu_invite);
-		setStatusMenuItem = menu.findItem(R.id.action_menu_set_status);
 
 	    if (drawerItem == null){
 	    	if (bNV != null){
@@ -6505,7 +6503,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				gridSmallLargeMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 			}
 			else if(drawerItem == DrawerItem.RUBBISH_BIN){
 				logDebug("In Rubbish");
@@ -6561,7 +6558,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				rubbishBinMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 				logDebug("In Offline");
@@ -6614,7 +6610,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				gridSmallLargeMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 				logDebug("In Camera Uploads");
@@ -6695,7 +6690,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 				logDebug("In Media Uploads");
@@ -6776,7 +6770,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 			}
 
 			else if (drawerItem == DrawerItem.INBOX){
@@ -6829,7 +6822,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.SHARED_ITEMS){
 				//Lollipop
@@ -6979,13 +6971,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.CONTACTS){
 				logDebug("CONTACTS");
 				int index = viewPagerContacts.getCurrentItem();
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 				if (index == 0){
 					logDebug("TAB CONTACTS");
 					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
@@ -7152,7 +7142,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 
 				if (searchExpand) {
 					openSearchView();
@@ -7215,7 +7204,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				clearCompletedTransfers.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
 
 				if(accountFragment==MY_ACCOUNT_FRAGMENT){
@@ -7288,7 +7276,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 
 				cancelAllTransfersMenuItem.setVisible(true);
 
@@ -7358,7 +7345,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				playTransfersMenuIcon.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 				inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.CHAT){
 				logDebug("In Chat Section");
@@ -7370,7 +7356,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						openSearchView();
 						inviteMenuItem.setVisible(false);
 						selectMenuItem.setVisible(false);
-						setStatusMenuItem.setVisible(false);
 					}
 					else {
 						if (isOnline(this)) {
@@ -7380,11 +7365,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							} else {
 								selectMenuItem.setVisible(false);
 							}
-							setStatusMenuItem.setVisible(true);
 						} else {
 							inviteMenuItem.setVisible(false);
 							selectMenuItem.setVisible(false);
-							setStatusMenuItem.setVisible(false);
 						}
 					}
 
@@ -7431,7 +7414,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					//Hide ALL
 					searchByDate.setVisible(false);
 					inviteMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
@@ -7463,9 +7445,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				//Hide all
 				inviteMenuItem.setVisible(false);
 				selectMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 				selectMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 				searchByDate.setVisible(false);
 				addContactMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
@@ -7504,10 +7484,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (rChatFL != null) {
 						if (isOnline(this)) {
 							selectMenuItem.setVisible(true);
-							setStatusMenuItem.setVisible(true);
 						} else {
 							selectMenuItem.setVisible(false);
-							setStatusMenuItem.setVisible(false);
 						}
 					}
 
@@ -7544,7 +7522,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					//Hide ALL
 					searchByDate.setVisible(false);
 					inviteMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
@@ -7577,7 +7554,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				//Hide ALL
 				searchByDate.setVisible(false);
 				inviteMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
 				selectMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
@@ -7833,7 +7809,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 					inviteMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
@@ -7907,30 +7882,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (drawerItem == DrawerItem.CHAT){
                     logDebug("to InviteContactActivity");
                     startActivityForResult(new Intent(context, InviteContactActivity.class), Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
-				}
-
-				return true;
-			}
-			case R.id.action_menu_set_status:{
-				if (drawerItem == DrawerItem.CHAT){
-					logDebug("Action set status");
-					showPresenceStatusDialog();
-//					drawerItem = DrawerItem.SETTINGS;
-//					if (nV != null){
-//						Menu nVMenu = nV.getMenu();
-////						MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
-////						chat.setTitle(getString(R.string.section_chat));
-//						MenuItem mi = nVMenu.findItem(R.id.navigation_item_chat);
-//						if (mi != null){
-//							mi.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_chat));
-//							mi.setChecked(false);
-//						}
-//						MenuItem settings = nVMenu.findItem(R.id.navigation_item_settings);
-//						settings.setChecked(true);
-//						settings.setIcon(ContextCompat.getDrawable(this, R.drawable.settings_red));
-//					}
-//					scrollToChat = true;
-//					selectDrawerItemLollipop(drawerItem);
 				}
 
 				return true;
@@ -11260,6 +11211,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //		brandAlertDialog(cancelDialog);
 	}
 
+	//todo Ash - use to set chat status
 	public void showPresenceStatusDialog(){
 		logDebug("showPresenceStatusDialog");
 

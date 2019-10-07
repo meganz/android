@@ -83,13 +83,6 @@
 		android:icon="@drawable/ic_action_bar_null" />
 
 	<item
-		android:id="@+id/action_menu_set_status"
-		android:orderInCategory="100"
-		MEGA:showAsAction="never"
-		android:title="@string/set_status_option_label"
-		android:icon="@drawable/ic_action_bar_null" />
-
-	<item
 		android:id="@+id/action_add_contact"
 		android:orderInCategory="100"
 		android:title="@string/menu_add_contact"
