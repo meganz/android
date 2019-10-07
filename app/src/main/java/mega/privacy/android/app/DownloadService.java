@@ -1475,6 +1475,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
 		logDebug("Node handle: " + transfer.getNodeHandle() + ", Type = " + transfer.getType());
 
+		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
+			LocalBroadcastManager.getInstance(getApplicationContext())
+					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+		}
+
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 
 			boolean isVoiceClip = isVoiceClipType(transfer.getAppData());

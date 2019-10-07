@@ -21,6 +21,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Formatter;
 
 import com.shockwave.pdfium.PdfDocument;
@@ -739,6 +740,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onTransferFinish(final MegaApiJava api, final MegaTransfer transfer, MegaError error) {
 		logDebug("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
+
+		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
+			LocalBroadcastManager.getInstance(getApplicationContext())
+					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+		}
+
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 
             if(isTransferBelongsToFolderTransfer(transfer)){

@@ -219,6 +219,12 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				MegaError e) {
 			logDebug("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
 
+			if (e.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
+				LocalBroadcastManager.getInstance(getApplicationContext())
+						.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+				return;
+			}
+
 			if (request.getType() == MegaRequest.TYPE_LOGOUT){
 				if (e.getErrorCode() == MegaError.API_EINCOMPLETE){
 					if (request.getParamType() == MegaError.API_ESSL) {

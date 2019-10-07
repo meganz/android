@@ -38,6 +38,20 @@
             android:textSize="15sp"
             android:textColor="@color/black_55_alpha" />
 
+        <TextView
+            android:id="@+id/expired_subtext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginTop="9dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:textSize="15sp"
+            android:textColor="@color/black_55_alpha"
+            android:text="@string/expired_user_business_text_2"/>
+
+
         <Button
             android:id="@+id/expired_dismiss_button"
             android:layout_width="wrap_content"

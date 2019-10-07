@@ -664,7 +664,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private Button openLinkOpenButton;
 
 	private boolean isBusinessGraceAlertShown = false;
-	AlertDialog businessGraceAlert;
+	private AlertDialog businessGraceAlert;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -3125,7 +3125,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     }
 
     private void showBusinessGraceAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	logDebug("showBusinessGraceAlert");
+    	if (isBusinessGraceAlertShown) {
+    		return;
+		}
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_business_grace_alert, null);
         builder.setView(v);
@@ -3134,15 +3139,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         dismissButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+            	isBusinessGraceAlertShown = false;
                 try {
                     businessGraceAlert.dismiss();
-                    isBusinessGraceAlertShown = false;
                 } catch (Exception e) {
                     logWarning("Exception dismissing businessGraceAlert", e);
                 }
             }
         });
-
 
         businessGraceAlert = builder.create();
         businessGraceAlert.setCanceledOnTouchOutside(false);
