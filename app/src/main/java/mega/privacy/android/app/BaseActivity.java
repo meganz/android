@@ -55,6 +55,8 @@ public class BaseActivity extends AppCompatActivity {
     private AlertDialog expiredBusinessAlert;
     private boolean isExpiredBusinessAlertShown = false;
 
+    private boolean isPaused = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
@@ -90,6 +92,7 @@ public class BaseActivity extends AppCompatActivity {
         logDebug("onPause");
 
         checkMegaApiObjects();
+        isPaused = true;
         super.onPause();
     }
 
@@ -101,7 +104,7 @@ public class BaseActivity extends AppCompatActivity {
         setAppFontSize(this);
 
         checkMegaApiObjects();
-
+        isPaused = false;
         retryConnectionsAndSignalPresence();
     }
 
@@ -438,7 +441,7 @@ public class BaseActivity extends AppCompatActivity {
      *
      */
     private void showExpiredBusinessAlert(){
-        if (isExpiredBusinessAlertShown) {
+        if (isPaused || isExpiredBusinessAlertShown) {
             return;
         }
 
@@ -469,5 +472,9 @@ public class BaseActivity extends AppCompatActivity {
         expiredBusinessAlert = builder.create();
         expiredBusinessAlert.show();
         isExpiredBusinessAlertShown = true;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
     }
 }
