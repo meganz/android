@@ -25,7 +25,7 @@ public class MyAccountPageAdapter extends FragmentPagerAdapter {
         this.context = context;
 
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = MegaApplication.getInstance().getMegaApi();
         }
     }
 
