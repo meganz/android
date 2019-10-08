@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">تفعيل الحساب</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">إعداد قائمة الملف</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">الرجاء تسجيل الدخول للمشاركة مع MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">رابط التأكيد خاصتك لم يعد صالحاً. قد يكون حسابك مفعلاً مسبقاً أو قد تكون قد ألغيت تسجيل حسابك.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">المعاينة لم تتحمل بعد، الرجاء الانتظار ياغالي</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">رجاء، سجل خروجك قبل إنشاء الحساب</string>
 
@@ -631,11 +633,11 @@
     <string name="menu_take_picture" context="menu item">التقاط صورة</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">شبكة الوايرلس فقط</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">شبكة الوايرلس او خطة البيانات</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">شبكة الوايرلس او بيانات الموبايل</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">حسنا</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">تخطى</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">ايقاف</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">رفع الألبوم  قيد التنفيذ</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">جاري تنفيذ ترفيعات الكاميرا</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">هل تريد إيقاف عمليات ترفيع صور الكاميرا؟</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -687,7 +689,7 @@
     <string name="settings_empty_folder" context="settings option">اختر مجلد</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">شبكة الوايرلس او خطة البيانات</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">شبكة الوايرلس او بيانات الموبايل</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">شبكة الوايرلس فقط</item>
     </string-array>
 
@@ -1796,7 +1798,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">المحادثة يتم رفعها</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">جودة وسائط ضمن المحادثات</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">جودة فيديوهات المحادثة</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Quality</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">جاري التحميل</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">يُرجى الانتظار&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>

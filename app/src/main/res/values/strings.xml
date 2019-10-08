@@ -632,12 +632,12 @@
 
     <string name="menu_take_picture" context="menu item">Take picture</string>
 
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">WiFi only</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi or mobile data</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload in progress</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Uploads in progress</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to stop Camera Uploads?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -689,8 +689,8 @@
     <string name="settings_empty_folder" context="settings option">Choose folder</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi or mobile data</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">WiFi only</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</item>
     </string-array>
 
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">File Upload</string>
@@ -932,6 +932,12 @@
     -->
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. This email address is already in use.</string>
+
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">You have already requested a confirmation link for that email address.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">The new and the old email must not match</string>
+
+
 
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">This is the last step to change your email. Please enter your password below.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Change email</string>
@@ -1798,7 +1804,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Chat uploading</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media quality</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat video quality</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Quality</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -2322,7 +2328,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Call Started</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL key error</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public WiFi with additional requirements.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public Wi-Fi with additional requirements.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
 

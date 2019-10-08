@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activarea contului</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Se pregătește lista de fișiere</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Te rugăm să te autentifici pentru a partaja cu MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Linkul tău de confirmare nu mai este valid. Este posibil ca contul tău să fie deja activat sau s-ar putea să fi anulat înregistrarea.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -214,7 +215,7 @@
     <string name="error_enter_username" context="Warning dialog">Te rugăm să îți introduci numele</string>
     <string name="error_enter_userlastname" context="Warning dialog">Te rugăm să introduci numele.</string>
     <string name="error_short_password" context="when creating the account">Parola este prea scurtă</string>
-    <string name="error_passwords_dont_match" context="when creating the account">Parolele nu se potrivesc</string>
+    <string name="error_passwords_dont_match" context="when creating the account">Parolele nu coincid</string>
     <string name="error_email_registered" contect="when creating the account">Această adresă de e-mail a înregistrat deja un cont cu MEGA</string>
 
     <!--
@@ -279,7 +280,7 @@
     <!--
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
-    <string name="file_properties_info_size_file" context="Refers to the size of a file.">Mărime</string>
+    <string name="file_properties_info_size_file" context="Refers to the size of a file.">Dimensiune</string>
     <string name="file_properties_info_last_modified" context="When the file was last modified">Ultima modificare</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Adăugat</string>
     <!--
@@ -590,7 +591,7 @@
     <!--
     <string name="my_account_change_password_OK" context="Success text">Password changed successfully</string>
     -->
-    <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">Parola nu se potrivește</string>
+    <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">Parola nu coincide</string>
 
     <!--
     <string name="upgrade_activity" context="title of the Upgrade screen">PRO Membership</string>
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Previzualizarea nu a fost descărcată încă. Te rugăm să aștepți</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Te rugăm să te deconectezi înainte de a crea contul</string>
 
@@ -630,12 +632,12 @@
 
     <string name="menu_take_picture" context="menu item">Realizează fotografie</string>
 
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Doar Wi-Fi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi sau plan de date</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Numai Wi-Fi</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi sau plan de date</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">Ok</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Omite</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Oprește</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Încărcare cameră în curs</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Încărcări cameră în curs</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Vrei să oprești încărcări cameră?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -687,8 +689,8 @@
     <string name="settings_empty_folder" context="settings option">Alege folderul</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi sau plan de date</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">Doar Wi-Fi</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi sau plan de date</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Numai Wi-Fi</item>
     </string-array>
 
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Încarcă fișier(e)</string>
@@ -733,11 +735,11 @@
         <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Cod PIN greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Cod PIN greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Codurile PIN nu se potrivesc</string>
+    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Codurile PIN nu coincid</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Introdu codul PIN</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Reintrodu codul PIN</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Introdu codul nou PIN</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Reintrodu codul nou PIN</string>
+    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Introdu noul cod PIN</string>
+    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Reintrodu noul cod PIN</string>
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">Toate datele tale locale vor fi șterse și vei fi deconectat în %1d secunde</string>
 
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Despre</string>
@@ -800,7 +802,7 @@
     <string name="sortby_date_newest" context="sort files by date newest first">Cele mai noi</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Cele mai vechi</string>
 
-    <string name="sortby_size" context="category in sort by action">Mărime</string>
+    <string name="sortby_size" context="category in sort by action">Dimensiune</string>
     <string name="sortby_size_largest_first" context="sort files by size largest first">Cele mai mari</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">Cele mai mici</string>
 
@@ -917,13 +919,13 @@
     <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">Introdu parola nouă</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">Acest link de recuperare a expirat, te rugăm să încerci din nou.</string>
 
-    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Cheia de recuperare va fi folosită pentru a-ți reseta parola. Te rugăm să introduci parola nouă.</string>
+    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Cheia de recuperare va fi folosită pentru a-ți reseta parola. Te rugăm să introduci noua parolă.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Vei primi un link de recuperare care îți va permite să resetezi parola.</string>
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Upgradează</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Upgradează acum</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Îmbunătățește-ți capacitatea în cloud![A]Obține mai mult spațiu și cotă de transfer cu un cont PRO!</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Cheia de recuperare a fost păstrată ca backup în: %1s.[A]Cât timp fișierul rămâne în această cale, îl vei găsi în secțiunea Salvate pentru offline.[A]Notă: Aceasta va fi ștearsă dacă te deconectezi, te rugăm să o stochezi într-un loc sigur.</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">I s-a făcut backup cheii de recuperare în: %1s.[A]Cât timp fișierul rămâne în această cale, o vei găsi în secțiunea Salvate pentru offline.[A]Notă: Aceasta va fi ștearsă dacă te deconectezi, te rugăm să o stochezi într-un loc sigur.</string>
 
     <!--
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
@@ -946,7 +948,7 @@
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Alege poza</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Șterge poza</string>
 
-    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">Cheia furnizată nu se potrivește contului. Te rugăm să te asiguri că folosești cheia de recuperare corectă și să încerci din nou.</string>
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">Cheia furnizată nu corespunde acestui cont. Te rugăm să te asiguri că folosești cheia de recuperare corectă și să încerci din nou.</string>
     <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">Cheie de recuperare nevalidă</string>
 
     <string name="option_full_link" context="Alert Dialog to get link">Link cu cheie</string>
@@ -1395,7 +1397,7 @@
 		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">%1$d foldere încărcate</item>
 	</plurals>
 
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">Mărime totală: %1$s</string>
+    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">Dimensiune totală: %1$s</string>
 
     <plurals name="upload_service_failed" context="Text of the notification shown when the upload service has finished with any transfer error">
         <item context="Singular" quantity="one">%1$d fișier neîncărcat</item>
@@ -1506,7 +1508,7 @@
     <string name="delete_button" context="Button in My Account section to confirm the account deletion">Șterge</string>
 
     <string name="file_properties_info_info_file">Informații</string>
-    <string name="file_properties_info_size" context="Refers to the size of a file.">Mărime totală</string>
+    <string name="file_properties_info_size" context="Refers to the size of a file.">Dimensiune totală</string>
     <string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Conține</string>
     <string name="file_properties_shared_folder_public_link_name">Link</string>
 
@@ -1796,7 +1798,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Încărcare pe chat</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calitatea media a chatului</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calitate video în chaturi</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Calitate video</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Încărcări cameră are nevoie să îți acceseze fotografiile și alt conținut media de pe dispozitiv. Te rugăm să mergi la pagina de setări și să acorzi permisiunea.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -2141,11 +2143,11 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Perioada minimă este de 7 zile.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Perioada minimă este de 7 zile și perioada maximă este de 30 de zile.</string>
-	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">Mărimea minimă este %1$s și mărimea maximă este %2$s.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">Dimensiunea minimă este %1$s și dimensiunea maximă este %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Elimină fișierele mai vechi de</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d zile</string>
-	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notifică-mă când mărimea este mai mare de</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notifică-mă când dimensiunea este mai mare de</string>
 
 	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Dacă videoclipurile spre comprimare sunt mai mari de</string>
 
@@ -2272,8 +2274,8 @@
 
 	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Spațiu de stocare insuficient</string>
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Spațiu de stocare insuficient pentru a efecta comprimarea video.</string>
-	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Mărimea comprimării video este prea mare</string>
-	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">Mărimea totală a videoclipurilor care urmează să fie comprimate depășește %s, te rugăm să pui dispozitivul la încărcare pentru a continua.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Dimensiunea comprimării video este prea mare</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">Dimensiunea totală a videoclipurilor care urmează să fie comprimate depășește %s, te rugăm să pui dispozitivul la încărcare pentru a continua.</string>
 	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Această setare se va aplica data viitoare când rulează Încărcări cameră</string>
 	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s a fost comprimat</string>
 	<string name="title_compress_video" context="notification title when compressing video">Se comprimă videoclipurile %1$d/%2$d</string>
@@ -2320,7 +2322,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Apel început</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Eroare privind cheia SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA nu se poate conecta securizat prin SSL. S-ar putea să fii pe WiFi public cu cerințe suplimentare.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA nu se poate conecta securizat prin SSL. S-ar putea să fii pe o rețea Wi-Fi publică cu cerințe suplimentare.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Nicio [/B][A]notificare[/A][B].[/B]</string>
 
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Se încarcă</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Te rugăm să astepți&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>
