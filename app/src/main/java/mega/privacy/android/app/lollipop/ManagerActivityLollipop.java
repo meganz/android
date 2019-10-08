@@ -8401,45 +8401,45 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				final CheckedTextView ascendingCheck = dialogLayout.findViewById(R.id.sortby_dialog_ascending_check);
 				ascendingCheck.setText(getString(R.string.sortby_name_ascending));
-				setCheckedTextViewStyke(ascendingCheck);
+				setCheckedTextViewStyle(ascendingCheck);
 				checkedTextViewGroup.put(ORDER_DEFAULT_ASC, ascendingCheck);
 
 				final CheckedTextView descendingCheck = dialogLayout.findViewById(R.id.sortby_dialog_descending_check);
 				descendingCheck.setText(getString(R.string.sortby_name_descending));
-				setCheckedTextViewStyke(descendingCheck);
+				setCheckedTextViewStyle(descendingCheck);
 				checkedTextViewGroup.put(ORDER_DEFAULT_DESC, descendingCheck);
 
 				final CheckedTextView newestCheck = dialogLayout.findViewById(R.id.sortby_dialog_newest_check);
 				newestCheck.setText(getString(R.string.sortby_date_newest));
-				setCheckedTextViewStyke(newestCheck);
+				setCheckedTextViewStyle(newestCheck);
 				checkedTextViewGroup.put(ORDER_MODIFICATION_DESC, newestCheck);
 				checkedTextViewGroup.put(ORDER_CREATION_DESC, newestCheck);
 
 				final CheckedTextView oldestCheck = dialogLayout.findViewById(R.id.sortby_dialog_oldest_check);
 				oldestCheck.setText(getString(R.string.sortby_date_oldest));
-				setCheckedTextViewStyke(oldestCheck);
+				setCheckedTextViewStyle(oldestCheck);
 				checkedTextViewGroup.put(ORDER_MODIFICATION_ASC, oldestCheck);
 				checkedTextViewGroup.put(ORDER_CREATION_ASC, oldestCheck);
 
 				final CheckedTextView largestCheck = dialogLayout.findViewById(R.id.sortby_dialog_largest_first_check);
 				largestCheck.setText(getString(R.string.sortby_size_largest_first));
-				setCheckedTextViewStyke(largestCheck);
+				setCheckedTextViewStyle(largestCheck);
 				checkedTextViewGroup.put(ORDER_SIZE_DESC, largestCheck);
 
 				final CheckedTextView smallestCheck = dialogLayout.findViewById(R.id.sortby_dialog_smallest_first_check);
 				smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
-				setCheckedTextViewStyke(smallestCheck);
+				setCheckedTextViewStyle(smallestCheck);
 				checkedTextViewGroup.put(ORDER_SIZE_ASC, smallestCheck);
 
                 final CheckedTextView photoCheck = dialogLayout.findViewById(R.id.sortby_dialog_photo_check);
                 photoCheck.setText(getString(R.string.sortby_type_photo_first));
-                setCheckedTextViewStyke(photoCheck);
-                checkedTextViewGroup.put(ORDER_TYPE_PHOTO, photoCheck);
+                setCheckedTextViewStyle(photoCheck);
+                checkedTextViewGroup.put(ORDER_PHOTO_DESC, photoCheck);
 
                 final CheckedTextView videoCheck = dialogLayout.findViewById(R.id.sortby_dialog_video_check);
                 videoCheck.setText(getString(R.string.sortby_type_video_first));
-                setCheckedTextViewStyke(videoCheck);
-                checkedTextViewGroup.put(ORDER_TYPE_VIDEO, videoCheck);
+                setCheckedTextViewStyle(videoCheck);
+                checkedTextViewGroup.put(ORDER_VIDEO_DESC, videoCheck);
 
                 //only for camera upload fragment
                 sortByTypeTV.setVisibility(View.GONE);
@@ -8631,7 +8631,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         switch (drawerItem) {
                             case CAMERA_UPLOADS:
                             case MEDIA_UPLOADS: {
-                                selectSortUploads(ORDER_TYPE_PHOTO);
+                                selectSortUploads(ORDER_PHOTO_DESC);
                                 break;
                             }
                         }
@@ -8645,7 +8645,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         switch (drawerItem) {
                             case CAMERA_UPLOADS:
                             case MEDIA_UPLOADS: {
-                                selectSortUploads(ORDER_TYPE_VIDEO);
+                                selectSortUploads(ORDER_VIDEO_DESC);
                                 break;
                             }
                         }
@@ -18243,7 +18243,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 * The method is to set the style of checkedTextView in option menu
 	 * @param checkedTextView
 	 */
-    private void setCheckedTextViewStyke(CheckedTextView checkedTextView) {
+    private void setCheckedTextViewStyle(CheckedTextView checkedTextView) {
 		checkedTextView.setChecked(false);
 		checkedTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16 * scaleText));
 		checkedTextView.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));

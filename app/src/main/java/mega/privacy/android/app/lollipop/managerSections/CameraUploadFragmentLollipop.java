@@ -137,9 +137,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	private int orderBy = MegaApiJava.ORDER_MODIFICATION_DESC;
 
-	//video or image comes first. Default value -1 don't sort by file type.
-	private int orderByType = -1;
-
 //	long parentHandle = -1;
 //	private boolean firstTimeCam = false;
 
@@ -1173,21 +1170,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
-                Collections.sort(this.nodes, new Comparator<MegaNode>() {
-                    @Override
-                    public int compare(MegaNode o1, MegaNode o2) {
-                        MimeTypeList o1Type = MimeTypeList.typeForName(o1.getName());
-                        MimeTypeList o2Type = MimeTypeList.typeForName(o2.getName());
-
-                        if(o1Type.isImage() && o2Type.isVideo()) {
-                            return 1;
-                        } else if(o1Type.isVideo() && o2Type.isImage()) {
-                            return -1;
-                        } else {
-                            return 0;
-                        }
-                    }
-                });
 			}
 			else{
 				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
@@ -1775,7 +1757,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
 
 							}
-							String localPath = findVideoLocalPath(context, psHMegaNode);
+                            String localPath = null;
+                            try {
+                                localPath = findVideoLocalPath(context, psHMegaNode);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                logWarning(e.getMessage());
+                            }
                             if (localPath != null && checkFingerprint(megaApi,psHMegaNode,localPath)) {
 								File mediaFile = new File(localPath);
 
@@ -2104,42 +2092,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
         }
     }
 
-    private Comparator<MegaNode> typeComparator = new Comparator<MegaNode>() {
-
-        @Override
-        public int compare(MegaNode o1, MegaNode o2) {
-            if(MimeTypeList.typeForName(o1.getName()).isImage() && !MimeTypeList.typeForName(o2.getName()).isImage()) {
-                return 1;
-            } else if(!MimeTypeList.typeForName(o1.getName()).isImage() && MimeTypeList.typeForName(o2.getName()).isImage()) {
-                return -1;
-            } else {
-                return 0;
-            }
-        }
-    };
-
-	private void videoFirst() {
-
-    }
-
-
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
-        Collections.sort(this.nodes, new Comparator<MegaNode>() {
-            @Override
-            public int compare(MegaNode o1, MegaNode o2) {
-                MimeTypeList o1Type = MimeTypeList.typeForName(o1.getName());
-                MimeTypeList o2Type = MimeTypeList.typeForName(o2.getName());
-
-                if(o1Type.isImage() && o2Type.isVideo()) {
-                    return 1;
-                } else if(o1Type.isVideo() && o2Type.isImage()) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            }
-        });
 
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			this.nodesArray.clear();
