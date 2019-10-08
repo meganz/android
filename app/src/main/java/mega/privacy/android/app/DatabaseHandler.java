@@ -80,6 +80,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CHARGING_ON_SIZE = "chargingOnSize";
     private static final String KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = "shouldclearcamsyncrecords";
     private static final String KEY_KEEP_FILE_NAMES = "keepFileNames";
+    private static final String KEY_SHOW_INVITE_BANNER = "showinvitebanner";
     private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
     private static final String KEY_PIN_LOCK_TYPE = "pinlocktype";
     private static final String KEY_PIN_LOCK_CODE = "pinlockcode";
@@ -297,7 +298,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_CHARGING_ON_SIZE + " TEXT,"                   //34
                 + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       //35
                 + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //36
-                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT" + ")";     //37
+                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //37
+                + KEY_SHOW_INVITE_BANNER + " TEXT" + ")";           //38
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -708,6 +710,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if(oldVersion <= 45) {
             db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
+
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SHOW_INVITE_BANNER + " TEXT;");
+            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOW_INVITE_BANNER + " = '" + encrypt("true") + "';");
         }
 	}
 
@@ -1383,12 +1388,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String shouldClearCameraSyncRecords = decrypt(cursor.getString(35));
 			String camVideoSyncTimeStamp = decrypt(cursor.getString(36));
 			String secVideoSyncTimeStamp = decrypt(cursor.getString(37));
+			String closeInviteBanner = decrypt(cursor.getString(38));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
 					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,shouldClearCameraSyncRecords,camVideoSyncTimeStamp,
-                    secVideoSyncTimeStamp,isAutoPlayEnabled);
+                    secVideoSyncTimeStamp,isAutoPlayEnabled,closeInviteBanner);
 		}
 		cursor.close();
 
@@ -3647,6 +3653,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         else{
             values.put(KEY_AUTO_PLAY, encrypt(enabled + ""));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
+    }
+
+    public void setShowInviteBanner(String show){
+        logDebug("setCloseInviteBanner");
+
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOW_INVITE_BANNER + "='" + encrypt(show + "") + "' WHERE " + KEY_ID + " ='1'";
+            db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+        }
+        else{
+            values.put(KEY_SHOW_INVITE_BANNER, encrypt(show + ""));
             db.insert(TABLE_PREFERENCES, null, values);
         }
         cursor.close();

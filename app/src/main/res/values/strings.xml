@@ -2427,7 +2427,7 @@
         <item context="Singular of local contact. 1 contact" quantity="one">%d Contact found on MEGA</item>
         <item context="Plural of local contact. 2 contacts" quantity="other">%d Contacts found on MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">You don\'t have any contact on MEGA, invite them now!</string>
+    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Invite contact now?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
 

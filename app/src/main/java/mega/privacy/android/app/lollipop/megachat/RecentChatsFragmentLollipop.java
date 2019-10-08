@@ -23,6 +23,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -107,7 +108,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private ScrollView emptyLayoutContainer;
 
     //Invite bar
+    private View bannerContainer;
     private ImageView collapseBtn;
+    private ImageView closeBtn;
     private TextView inviteTitle;
     private FrameLayout invitationContainer;
     private RelativeLayout requestPermissionLayout;
@@ -116,7 +119,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private RelativeLayout contactsListLayout;
     private RecyclerView contactsList;
     private ImageView moreContacts;
-    private ImageView moreContactsTitle;
+    private TextView moreContactsTitle;
 
     public static final int CONTACTS_COUNT = 4;
 
@@ -221,11 +224,17 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             return;
         }
         if (megaContacts.size() > 0) {
+            logDebug("get " + megaContacts.size() + " matched contacts.");
+            // change the settings, when have new matched contact.
+            dbH.setShowInviteBanner("true");
+
             onContactsCountChange(megaContacts);
             expandContainer();
+            bannerContainer.setVisibility(View.VISIBLE);
             requestPermissionLayout.setVisibility(View.GONE);
             contactsListLayout.setVisibility(View.VISIBLE);
             collapseBtn.setVisibility(View.VISIBLE);
+            closeBtn.setVisibility(View.GONE);
             inviteTitle.setClickable(true);
             moreContactsTitle.setVisibility(View.GONE);
 
@@ -258,11 +267,17 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Override
     public void noContacts() {
-        invitationContainer.setVisibility(View.GONE);
-        inviteTitle.setText(R.string.no_local_contacts_on_mega);
-        inviteTitle.setClickable(true);
-        collapseBtn.setVisibility(View.INVISIBLE);
-        moreContactsTitle.setVisibility(View.VISIBLE);
+        if(showInviteBanner()) {
+            bannerContainer.setVisibility(View.VISIBLE);
+            invitationContainer.setVisibility(View.GONE);
+            inviteTitle.setText(R.string.no_local_contacts_on_mega);
+            inviteTitle.setClickable(true);
+            collapseBtn.setVisibility(View.INVISIBLE);
+            closeBtn.setVisibility(View.VISIBLE);
+            moreContactsTitle.setVisibility(View.VISIBLE);
+        } else {
+            bannerContainer.setVisibility(View.GONE);
+        }
     }
 
     public void onContactsCountChange(List<MegaContactGetter.MegaContact> megaContacts) {
@@ -277,7 +292,17 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     public void checkScroll() {
         if (listView != null) {
-            if (context instanceof ArchivedChatsActivity) {
+            if (context instanceof ManagerActivityLollipop) {
+                if(bannerContainer.getVisibility() == View.GONE) {
+                    if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+                        ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                    } else {
+                        ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                    }
+                } else {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                }
+            } else if (context instanceof ArchivedChatsActivity) {
                 if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                     ((ArchivedChatsActivity) context).changeActionBarElevation(true);
                 } else {
@@ -379,8 +404,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
 
         //Invitation bar
+        bannerContainer = v.findViewById(R.id.invite_banner_container);
         collapseBtn = v.findViewById(R.id.collapse_btn);
         collapseBtn.setOnClickListener(this);
+        closeBtn = v.findViewById(R.id.close_btn);
+        closeBtn.setOnClickListener(this);
         inviteTitle = v.findViewById(R.id.invite_title);
         inviteTitle.setOnClickListener(this);
         requestPermissionLayout = v.findViewById(R.id.request_permission_layout);
@@ -395,7 +423,21 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         moreContacts.setOnClickListener(this);
         moreContactsTitle = v.findViewById(R.id.more_contacts_title);
         moreContactsTitle.setOnClickListener(this);
+        if(showInviteBanner()) {
+            bannerContainer.setVisibility(View.VISIBLE);
+        } else {
+            bannerContainer.setVisibility(View.GONE);
+        }
         return v;
+    }
+
+    private boolean showInviteBanner() {
+        String showInviteBannerString = dbH.getPreferences().getShowInviteBanner();
+        if(!TextUtils.isEmpty(showInviteBannerString)) {
+            return Boolean.parseBoolean(showInviteBannerString);
+        } else {
+            return true;
+        }
     }
 
     private void adjustLandscape() {
@@ -855,6 +897,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         isExpand = true;
                     }
                 }
+                break;
+            case R.id.close_btn:
+                dbH.setShowInviteBanner("false");
+                bannerContainer.setVisibility(View.GONE);
                 break;
             case R.id.allow_button:
                 logDebug("request contact permission!");

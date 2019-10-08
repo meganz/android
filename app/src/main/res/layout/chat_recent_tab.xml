@@ -16,10 +16,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/invite_banner_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:orientation="horizontal">
+                android:layout_height="56dp">
                 <ImageView
                     android:id="@+id/collapse_btn"
                     android:layout_width="24dp"
@@ -29,6 +33,16 @@
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:src="@drawable/ic_collapse_acc"/>
+                <ImageView
+                    android:id="@+id/close_btn"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="28dp"
+                    android:src="@drawable/arrow_collapse"
+                    android:visibility="gone" />
                 <TextView
                     android:id="@+id/invite_title"
                     android:layout_width="wrap_content"
@@ -44,16 +58,19 @@
                     android:text="@string/see_local_contacts_on_mega"
                     android:layout_centerVertical="true"
                     android:textColor="@color/name_my_account"/>
-                <ImageView
+                <TextView
                     android:id="@+id/more_contacts_title"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="8dp"
-                    android:layout_gravity="center_vertical"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/ic_right_arrow"
-                    android:visibility="gone"/>
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="20dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/invite_option_label"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accentColor"
+                    android:visibility="gone" />
             </RelativeLayout>
             <FrameLayout
                 android:id="@+id/contacts_list_container"
@@ -133,6 +150,7 @@
                 android:background="#1F000000"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"/>
+            </LinearLayout>
         </android.support.design.widget.AppBarLayout>
 
         <ScrollView
