@@ -297,7 +297,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         density = getResources().getDisplayMetrics().density;
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
-
+        aB = ((AppCompatActivity) context).getSupportActionBar();
         emptyLayoutContainer = v.findViewById(R.id.scroller);
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
         fastScroller = (FastScroller) v.findViewById(R.id.fastscroll_chat);
@@ -998,7 +998,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity) activity).getSupportActionBar();
     }
 
 
@@ -1006,7 +1005,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-        aB = ((AppCompatActivity) context).getSupportActionBar();
     }
 
     public void listItemUpdate(MegaChatListItem item) {
@@ -1662,6 +1660,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }
         refreshMegaContactsList();
+        setStatus();
         super.onResume();
     }
 
