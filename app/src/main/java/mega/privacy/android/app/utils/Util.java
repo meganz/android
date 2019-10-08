@@ -1184,6 +1184,16 @@ public class Util {
 		return null;
 	}
 
+	/*
+	 * compare the current mail to newly changed email
+	 */
+	public static String comparedToCurrentEmail(String value, Context context) {
+		if (value.equals(dbH.getCredentials().getEmail())) {
+			return context.getString(R.string.mail_same_as_old);
+		}
+		return null;
+	}
+
 	public static int getAvatarTextSize (float density){
 		float textSize = 0.0f;
 
