@@ -661,9 +661,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
         } else {
 			logDebug("Grid View");
             View v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);
-			linearLayoutRecycler = (LinearLayout) v.findViewById(R.id.linear_layout_recycler);
+			linearLayoutRecycler = v.findViewById(R.id.linear_layout_recycler);
             recyclerView = (NewGridRecyclerView)v.findViewById(R.id.file_grid_view_browser);
-            fastScroller = (FastScroller)v.findViewById(R.id.fastscroll);
+            fastScroller = v.findViewById(R.id.fastscroll);
             
             recyclerView.setPadding(0,0,0,scaleHeightPx(80,outMetrics));
             
@@ -680,9 +680,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 				}
 			});
             
-            emptyImageView = (ImageView)v.findViewById(R.id.file_grid_empty_image);
-            emptyTextView = (LinearLayout)v.findViewById(R.id.file_grid_empty_text);
-            emptyTextViewFirst = (TextView)v.findViewById(R.id.file_grid_empty_text_first);
+            emptyImageView = v.findViewById(R.id.file_grid_empty_image);
+            emptyTextView = v.findViewById(R.id.file_grid_empty_text);
+            emptyTextViewFirst = v.findViewById(R.id.file_grid_empty_text_first);
 
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context,this,nodes,((ManagerActivityLollipop)context).parentHandleBrowser,recyclerView,aB,FILE_BROWSER_ADAPTER,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);

@@ -665,7 +665,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             counterShares--;
                             optionClearShares.setVisibility(View.GONE);
                             optionRename.setVisibility(View.VISIBLE);
-                            //optionMove.setVisibility(View.GONE);
 
                             if (dBT > 0) {
                                 optionRubbishBin.setVisibility(View.VISIBLE);
@@ -878,6 +877,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             case MegaShare.ACCESS_READWRITE: {
                                 logDebug("LEVEL 0 - readwrite");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
+                                break;
                             }
                         }
                     }

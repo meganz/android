@@ -1321,7 +1321,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 
-		if (imageHandles.size() == 0) finish();
+		if (imageHandles.isEmpty()) finish();
 
 		if (positionG >= imageHandles.size()) positionG = 0;
 

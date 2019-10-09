@@ -156,7 +156,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -2704,7 +2703,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if (resultCode == Activity.RESULT_OK) {
                 logDebug("TAKE_PHOTO_CODE ");
                 onCaptureImageResult();
-//                uploadPicture(finalUri);
 
             } else {
                 logError("TAKE_PHOTO_CODE--->ERROR!");
@@ -3523,7 +3521,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void activateActionMode(){
-        logDebug("activateActionMode");
         if (!adapter.isMultipleSelect()){
             adapter.setMultipleSelect(true);
             actionMode = startSupportActionMode(new ActionBarCallBack());
@@ -4017,7 +4014,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * Disable selection
      */
     public void hideMultipleSelect() {
-        logDebug("hideMultipleSelect");
         adapter.setMultipleSelect(false);
         if (actionMode != null) {
             actionMode.finish();
@@ -5435,6 +5431,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 clearHistory(androidMsg);
             }
             else{
+
+                disableMultiselection();
+
                 if(msg.isDeleted()){
                     logDebug("Message deleted!!");
                 }
@@ -5502,6 +5501,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 logDebug("resultModify: " + resultModify);
             }
         }
+    }
+
+    private void disableMultiselection(){
+        if(adapter == null || !adapter.isMultipleSelect()) return;
+        clearSelections();
+        hideMultipleSelect();
     }
 
     @Override
@@ -5602,6 +5607,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             adapter.removeMessage(indexToChange + 1, messages);
+            disableMultiselection();
         } else {
             logWarning("index to change not found");
         }
@@ -6517,23 +6523,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 logDebug("previousUserHandleToCompare: " + previousUserHandleToCompare);
 
-//                if(previousMessage.getInfoToShow()!=AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING){
-//                    msg.setShowAvatar(true);
-//                }
-//                else{
-                    if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CALL_ENDED) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CALL_STARTED) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CHAT_TITLE)) {
+                if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CALL_ENDED) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CALL_STARTED) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CHAT_TITLE)) {
+                    msg.setShowAvatar(true);
+                    logDebug("Set: " + true);
+                } else {
+                    if (previousUserHandleToCompare == userHandleToCompare) {
+                        msg.setShowAvatar(false);
+                        logDebug("Set: " + false);
+                    }else{
                         msg.setShowAvatar(true);
                         logDebug("Set: " + true);
-                    } else {
-                        if (previousUserHandleToCompare == userHandleToCompare) {
-                            msg.setShowAvatar(false);
-                            logDebug("Set: " + false);
-                        }else{
-                            msg.setShowAvatar(true);
-                            logDebug("Set: " + true);
-                        }
                     }
-//                }
+                }
             }
             else{
                 logWarning("No previous message");
@@ -6793,12 +6794,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
             removeProgressDialog();
 
-            if(adapter!=null){
-                if(adapter.isMultipleSelect()){
-                    clearSelections();
-                    hideMultipleSelect();
-                }
-            }
+            disableMultiselection();
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 logDebug("File sent correctly");
@@ -7446,12 +7442,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(chatHandle==idChat){
             logDebug("Chat already opened");
 
-            if(adapter!=null){
-                if(adapter.isMultipleSelect()){
-                    clearSelections();
-                    hideMultipleSelect();
-                }
-            }
+            disableMultiselection();
 
             if(text!=null){
                 showSnackbar(SNACKBAR_TYPE, text, -1);
@@ -7473,10 +7464,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 finish();
             }
             else{
-                if(adapter.isMultipleSelect()){
-                    clearSelections();
-                    hideMultipleSelect();
-                }
+                disableMultiselection();
                 if(text!=null){
                     showSnackbar(SNACKBAR_TYPE, text, -1);
                 }

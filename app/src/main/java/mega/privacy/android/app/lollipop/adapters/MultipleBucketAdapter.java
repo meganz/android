@@ -49,7 +49,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         this.isMedia = isMedia;
         setNodes(nodes);
 
-        megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+        megaApi = MegaApplication.getInstance().getMegaApi();
 
         outMetrics = context.getResources().getDisplayMetrics();
     }
