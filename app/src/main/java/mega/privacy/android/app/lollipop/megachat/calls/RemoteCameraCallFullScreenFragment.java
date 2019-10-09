@@ -52,7 +52,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
         Bundle args = getArguments();
@@ -94,26 +94,25 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
-            if(remoteFullScreenSurfaceView != null) {
-                SurfaceHolder holder = remoteFullScreenSurfaceView.getHolder();
-                if (holder != null) {
-                    int viewWidth = remoteFullScreenSurfaceView.getWidth();
-                    int viewHeight = remoteFullScreenSurfaceView.getHeight();
-                    if ((viewWidth != 0) && (viewHeight != 0)) {
-                        int holderWidth = viewWidth < width ? viewWidth : width;
-                        int holderHeight = holderWidth * viewHeight / viewWidth;
-                        if (holderHeight > viewHeight) {
-                            holderHeight = viewHeight;
-                            holderWidth = holderHeight * viewWidth / viewHeight;
-                        }
-                        this.bitmap = remoteRenderer.CreateBitmap(width, height);
-                        holder.setFixedSize(holderWidth, holderHeight);
-                    } else {
-                        this.width = -1;
-                        this.height = -1;
+            SurfaceHolder holder = remoteFullScreenSurfaceView.getHolder();
+            if (holder != null) {
+                int viewWidth = remoteFullScreenSurfaceView.getWidth();
+                int viewHeight = remoteFullScreenSurfaceView.getHeight();
+                if ((viewWidth != 0) && (viewHeight != 0)) {
+                    int holderWidth = viewWidth < width ? viewWidth : width;
+                    int holderHeight = holderWidth * viewHeight / viewWidth;
+                    if (holderHeight > viewHeight) {
+                        holderHeight = viewHeight;
+                        holderWidth = holderHeight * viewWidth / viewHeight;
                     }
+                    this.bitmap = remoteRenderer.CreateBitmap(width, height);
+                    holder.setFixedSize(holderWidth, holderHeight);
+                } else {
+                    this.width = -1;
+                    this.height = -1;
                 }
             }
+
         }
         if (bitmap == null) return;
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
@@ -137,21 +136,16 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
     public void onResume() {
         this.width = 0;
         this.height = 0;
-        if(remoteFullScreenSurfaceView != null) {
-            remoteFullScreenSurfaceView.setVisibility(View.VISIBLE);
-        }
-
+        remoteFullScreenSurfaceView.setVisibility(View.VISIBLE);
         super.onResume();
     }
 
     public void removeSurfaceView() {
-        if(remoteFullScreenSurfaceView != null){
-            if (remoteFullScreenSurfaceView.getParent() != null && remoteFullScreenSurfaceView.getParent().getParent() != null) {
-                logDebug("Removing suface view");
-                ((ViewGroup) remoteFullScreenSurfaceView.getParent()).removeView(remoteFullScreenSurfaceView);
-            }
-            remoteFullScreenSurfaceView.setVisibility(View.GONE);
+        if (remoteFullScreenSurfaceView.getParent() != null && remoteFullScreenSurfaceView.getParent().getParent() != null) {
+            logDebug("Removing suface view");
+            ((ViewGroup) remoteFullScreenSurfaceView.getParent()).removeView(remoteFullScreenSurfaceView);
         }
+        remoteFullScreenSurfaceView.setVisibility(View.GONE);
         logDebug("Removing remote video listener");
         megaChatApi.removeChatVideoListener(chatId, peerid, clientid, this);
     }

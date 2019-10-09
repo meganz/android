@@ -46,7 +46,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
         Bundle args = getArguments();
@@ -81,26 +81,25 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
-            if(localFullScreenSurfaceView != null) {
-                SurfaceHolder holder = localFullScreenSurfaceView.getHolder();
-                if (holder != null) {
-                    int viewWidth = localFullScreenSurfaceView.getWidth();
-                    int viewHeight = localFullScreenSurfaceView.getHeight();
-                    if ((viewWidth != 0) && (viewHeight != 0)) {
-                        int holderWidth = viewWidth < width ? viewWidth : width;
-                        int holderHeight = holderWidth * viewHeight / viewWidth;
-                        if (holderHeight > viewHeight) {
-                            holderHeight = viewHeight;
-                            holderWidth = holderHeight * viewWidth / viewHeight;
-                        }
-                        this.bitmap = localRenderer.CreateBitmap(width, height);
-                        holder.setFixedSize(holderWidth, holderHeight);
-                    } else {
-                        this.width = -1;
-                        this.height = -1;
+            SurfaceHolder holder = localFullScreenSurfaceView.getHolder();
+            if (holder != null) {
+                int viewWidth = localFullScreenSurfaceView.getWidth();
+                int viewHeight = localFullScreenSurfaceView.getHeight();
+                if ((viewWidth != 0) && (viewHeight != 0)) {
+                    int holderWidth = viewWidth < width ? viewWidth : width;
+                    int holderHeight = holderWidth * viewHeight / viewWidth;
+                    if (holderHeight > viewHeight) {
+                        holderHeight = viewHeight;
+                        holderWidth = holderHeight * viewWidth / viewHeight;
                     }
+                    this.bitmap = localRenderer.CreateBitmap(width, height);
+                    holder.setFixedSize(holderWidth, holderHeight);
+                } else {
+                    this.width = -1;
+                    this.height = -1;
                 }
             }
+
         }
         if (bitmap == null) return;
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
@@ -124,21 +123,16 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     public void onResume() {
         this.width = 0;
         this.height = 0;
-        if(localFullScreenSurfaceView != null) {
-            localFullScreenSurfaceView.setVisibility(View.VISIBLE);
-        }
-
+        localFullScreenSurfaceView.setVisibility(View.VISIBLE);
         super.onResume();
     }
 
     public void removeSurfaceView() {
-        if(localFullScreenSurfaceView != null){
-            if (localFullScreenSurfaceView.getParent() != null && localFullScreenSurfaceView.getParent().getParent() != null) {
-                logDebug("Removing suface view");
-                ((ViewGroup) localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
-            }
-            localFullScreenSurfaceView.setVisibility(View.GONE);
+        if (localFullScreenSurfaceView.getParent() != null && localFullScreenSurfaceView.getParent().getParent() != null) {
+            logDebug("Removing suface view");
+            ((ViewGroup) localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
         }
+        localFullScreenSurfaceView.setVisibility(View.GONE);
         logDebug("Removing local video listener");
         megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
     }

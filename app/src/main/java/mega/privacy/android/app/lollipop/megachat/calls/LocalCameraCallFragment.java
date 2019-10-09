@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
@@ -12,15 +11,12 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import java.nio.ByteBuffer;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
-
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 
@@ -51,7 +47,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
         Bundle args = getArguments();
         this.chatId = args.getLong(CHAT_ID, -1);
@@ -88,26 +84,25 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
-            if(localSurfaceView!=null) {
-                SurfaceHolder holder = localSurfaceView.getHolder();
-                if (holder != null) {
-                    int viewWidth = localSurfaceView.getWidth();
-                    int viewHeight = localSurfaceView.getHeight();
-                    if ((viewWidth != 0) && (viewHeight != 0)) {
-                        int holderWidth = viewWidth < width ? viewWidth : width;
-                        int holderHeight = holderWidth * viewHeight / viewWidth;
-                        if (holderHeight > viewHeight) {
-                            holderHeight = viewHeight;
-                            holderWidth = holderHeight * viewWidth / viewHeight;
-                        }
-                        this.bitmap = localRenderer.CreateBitmap(width, height);
-                        holder.setFixedSize(holderWidth, holderHeight);
-                    } else {
-                        this.width = -1;
-                        this.height = -1;
+            SurfaceHolder holder = localSurfaceView.getHolder();
+            if (holder != null) {
+                int viewWidth = localSurfaceView.getWidth();
+                int viewHeight = localSurfaceView.getHeight();
+                if ((viewWidth != 0) && (viewHeight != 0)) {
+                    int holderWidth = viewWidth < width ? viewWidth : width;
+                    int holderHeight = holderWidth * viewHeight / viewWidth;
+                    if (holderHeight > viewHeight) {
+                        holderHeight = viewHeight;
+                        holderWidth = holderHeight * viewWidth / viewHeight;
                     }
+                    this.bitmap = localRenderer.CreateBitmap(width, height);
+                    holder.setFixedSize(holderWidth, holderHeight);
+                } else {
+                    this.width = -1;
+                    this.height = -1;
                 }
             }
+
         }
 
         if (bitmap == null) return;
@@ -132,10 +127,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     public void onResume() {
         this.width = 0;
         this.height = 0;
-        if(localSurfaceView != null) {
-            localSurfaceView.setVisibility(View.VISIBLE);
-        }
-
+        localSurfaceView.setVisibility(View.VISIBLE);
         super.onResume();
     }
 
@@ -152,13 +144,12 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         if (microIcon != null) {
             microIcon.setVisibility(View.GONE);
         }
-        if (localSurfaceView != null) {
-            if (localSurfaceView.getParent() != null && localSurfaceView.getParent().getParent() != null) {
-                logDebug("Removing suface view");
-                ((ViewGroup) localSurfaceView.getParent()).removeView(localSurfaceView);
-            }
-            localSurfaceView.setVisibility(View.GONE);
+        if (localSurfaceView.getParent() != null && localSurfaceView.getParent().getParent() != null) {
+            logDebug("Removing suface view");
+            ((ViewGroup) localSurfaceView.getParent()).removeView(localSurfaceView);
         }
+        localSurfaceView.setVisibility(View.GONE);
+
         logDebug("Removing local video listener");
         megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
     }
