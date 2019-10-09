@@ -35,8 +35,9 @@
                     android:src="@drawable/ic_collapse_acc"/>
                 <ImageView
                     android:id="@+id/close_btn"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:paddingTop="2dp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:layout_gravity="center_vertical"
