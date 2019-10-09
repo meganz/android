@@ -35,6 +35,7 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.Spannable;
@@ -1759,4 +1760,11 @@ public class Util {
             }
         }, 50);
     }
+
+	public static void resetActionBar(ActionBar aB) {
+		if (aB != null) {
+			aB.setDisplayShowCustomEnabled(false);
+			aB.setDisplayShowTitleEnabled(true);
+		}
+	}
 }

@@ -22,6 +22,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -120,6 +121,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private RecyclerView contactsList;
     private ImageView moreContacts;
     private TextView moreContactsTitle;
+    private TextView actionBarTitle, actionBarSubtitle;
 
     public static final int CONTACTS_COUNT = 4;
 
@@ -385,7 +387,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 }
             } else {
                 //Archived chats section
-                aB.setSubtitle(null);
                 listView.setPadding(0, scaleHeightPx(8, outMetrics), 0, 0);
             }
 
@@ -1038,14 +1039,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
         }
     }
-    /////END Multiselect/////
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
-    }
-
 
     @Override
     public void onAttach(Context context) {
@@ -1415,33 +1408,37 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (aB != null) {
                 switch (status) {
                     case MegaChatApi.STATUS_ONLINE: {
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.online_status)));
+                        setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.online_status)));
                         break;
                     }
                     case MegaChatApi.STATUS_AWAY: {
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.away_status)));
+                        setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.away_status)));
                         break;
                     }
                     case MegaChatApi.STATUS_BUSY: {
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.busy_status)));
+                        setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.busy_status)));
                         break;
                     }
                     case MegaChatApi.STATUS_OFFLINE: {
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.offline_status)));
+                        setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.offline_status)));
                         break;
                     }
                     case MegaChatApi.STATUS_INVALID: {
                         if (!isOnline(context)) {
-                            aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
+                            setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         } else {
                             if (megaChatApi == null) {
-                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                                setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
                             } else if (megaChatApi.getConnectionState() == MegaChatApi.CONNECTING) {
-                                aB.setSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
+                                setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
                             } else if (megaChatApi.getConnectionState() == MegaChatApi.DISCONNECTED) {
-                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                                setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
                             } else {
-                                aB.setSubtitle(null);
+                                //todo show snackbar
+                                if(context instanceof ManagerActivityLollipop){
+                                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_unable_to_change_status), -1);
+
+                                }
                             }
                         }
                         break;
@@ -1449,20 +1446,18 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     default: {
 
                         if (!isOnline(context) || megaApi == null || megaApi.getRootNode() == null) {
-                            aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
+                            setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         } else {
                             if (megaChatApi == null) {
-                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                                setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
                             } else if (megaChatApi.getConnectionState() == MegaChatApi.CONNECTING) {
-                                aB.setSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
+                                setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
                             } else if (megaChatApi.getConnectionState() == MegaChatApi.DISCONNECTED) {
-                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                                setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
                             } else {
                                 int initStatus = megaChatApi.getInitState();
                                 if (initStatus == MegaChatApi.INIT_WAITING_NEW_SESSION || initStatus == MegaChatApi.INIT_NO_CACHE) {
-                                    aB.setSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
-                                } else {
-                                    aB.setSubtitle(null);
+                                    setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
                                 }
                             }
                         }
@@ -1692,10 +1687,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             (listView.getLayoutManager()).scrollToPosition(0);
         }
         lastFirstVisiblePosition = 0;
-
-        if (aB != null && aB.getTitle() != null) {
-            aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
-        }
         ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         if (context instanceof ManagerActivityLollipop) {
@@ -1706,6 +1697,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }
         refreshMegaContactsList();
+        setCustomisedActionBar();
         setStatus();
         super.onResume();
     }
@@ -2123,6 +2115,40 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 listView.setVisibility(View.VISIBLE);
                 emptyLayout.setVisibility(View.GONE);
             }
+        }
+    }
+
+    public void setCustomisedActionBar() {
+        if (aB != null) {
+            aB.setDisplayShowCustomEnabled(true);
+            aB.setDisplayShowTitleEnabled(false);
+
+            aB.setCustomView(R.layout.chat_action_bar);
+            View v = aB.getCustomView();
+            actionBarTitle = v.findViewById(R.id.ab_title);
+            setCustomisedActionBarTitle(adjustForLargeFont(getString(R.string.section_chat).toUpperCase()));
+            actionBarSubtitle = v.findViewById(R.id.ab_subtitle);
+            setStatus();
+            v.findViewById(R.id.ab_subtitle_container).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (context != null && context instanceof ManagerActivityLollipop) {
+                        ((ManagerActivityLollipop) context).showPresenceStatusDialog();
+                    }
+                }
+            });
+        }
+    }
+
+    private void setCustomisedActionBarTitle(SpannableString title){
+        if(actionBarTitle != null){
+            actionBarTitle.setText(title);
+        }
+    }
+
+    private void setCustomisedActionBarSubtitle(SpannableString subtitle){
+        if(actionBarSubtitle != null){
+            actionBarSubtitle.setText(subtitle);
         }
     }
 }

@@ -4380,11 +4380,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		ft.replace(R.id.fragment_container, f, fTag);
 		ft.commitNowAllowingStateLoss();
 		// refresh manually
-		if(f instanceof RecentChatsFragmentLollipop) {
-		    if(f.isResumed()) {
-                ((RecentChatsFragmentLollipop) f).refreshMegaContactsList();
-            }
-        }
+		if (f instanceof RecentChatsFragmentLollipop) {
+			RecentChatsFragmentLollipop rcf = (RecentChatsFragmentLollipop) f;
+			if (rcf.isResumed()) {
+				rcf.refreshMegaContactsList();
+				rcf.setCustomisedActionBar();
+			}
+		}
 	}
 
 	void refreshFragment (String fTag) {
@@ -5569,6 +5571,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		logDebug("Item: " + item);
 
 		((MegaApplication)getApplication()).setRecentChatVisible(false);
+		resetActionBar(aB);
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -11211,7 +11214,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //		brandAlertDialog(cancelDialog);
 	}
 
-	//todo Ash - use to set chat status
 	public void showPresenceStatusDialog(){
 		logDebug("showPresenceStatusDialog");
 

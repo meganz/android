@@ -188,6 +188,7 @@
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Invalid email address</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Please enter your password</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">No network connection</string>
+    <string name="error_unable_to_change_status" context="Error message for unknown host error when user is trying to change online status">Unable to change the status.</string>
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">You have been logged out on this device from another location</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calculating encryption keys</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connecting to the server</string>
