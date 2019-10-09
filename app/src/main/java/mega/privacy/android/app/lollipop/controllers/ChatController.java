@@ -71,11 +71,10 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatController {
 
-    Context context;
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-    DatabaseHandler dbH;
-    MegaPreferences prefs = null;
+    private Context context;
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
+    private DatabaseHandler dbH;
 
     public ChatController(Context context){
         logDebug("ChatController created");
@@ -1483,7 +1482,7 @@ public class ChatController {
         intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
         intent.setClass(context, FileStorageActivityLollipop.class);
-        intent.putStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES,serializedNodes);
+        intent.putStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES, serializedNodes);
 
         if(context instanceof ChatActivityLollipop){
             ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
@@ -1536,7 +1535,7 @@ public class ChatController {
 
     private ArrayList<String> serializeNodes(ArrayList<MegaNode> nodeList) {
         ArrayList<String> serializedNodes = new ArrayList<>();
-        for(MegaNode node : nodeList) {
+        for (MegaNode node : nodeList) {
             serializedNodes.add(node.serialize());
         }
         return serializedNodes;
@@ -1544,8 +1543,8 @@ public class ChatController {
 
     private ArrayList<MegaNode> unSerializeNodes(ArrayList<String> serializedNodes) {
         ArrayList<MegaNode> nodeList = new ArrayList<>();
-        if(serializedNodes != null) {
-            for(String nodeString : serializedNodes) {
+        if (serializedNodes != null) {
+            for (String nodeString : serializedNodes) {
                 nodeList.add(MegaNode.unserialize(nodeString));
             }
         }
