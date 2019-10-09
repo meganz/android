@@ -5546,24 +5546,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 		if (rChatFL == null){
-			logWarning("New REcentChatFragment");
 			rChatFL = RecentChatsFragmentLollipop.newInstance();
 			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
 		}
 		else{
-			logDebug("REcentChatFragment is not null");
+			refreshFragment(FragmentTag.RECENT_CHAT.getTag());
 			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
-//			rChatFL.setChats();
-			rChatFL.setStatus();
 		}
-		logDebug("Show chats");
-		drawerLayout.closeDrawer(Gravity.LEFT);
-	}
 
-	public void setBottomNavigationCurrentItem (int item) {
-		if (bNV != null) {
-			bNV.setCurrentItem(item);
-		}
+		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
 	public void setBottomNavigationMenuItemChecked (int item) {
