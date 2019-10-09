@@ -989,7 +989,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else{
 
-                    idChat = newIntent.getLongExtra("CHAT_ID", -1);
+                    long newIdChat = newIntent.getLongExtra("CHAT_ID", -1);
+
+                    if(idChat != newIdChat){
+                        megaChatApi.closeChatRoom(idChat, this);
+                        idChat = newIdChat;
+                    }
                     myUserHandle = megaChatApi.getMyUserHandle();
 
                     if(savedInstanceState!=null) {
@@ -1134,7 +1139,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             initializeInputText();
-
             megaChatApi.closeChatRoom(idChat, this);
             boolean result = megaChatApi.openChatRoom(idChat, this);
 
@@ -7053,12 +7057,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(megaApi != null) {
             megaApi.removeRequestListener(this);
         }
-        if (megaChatApi != null) {
-            megaChatApi.closeChatRoom(idChat, this);
-            MegaApplication.setClosedChat(true);
-            megaChatApi.removeChatListener(this);
-            megaChatApi.removeChatCallListener(this);
-        }
+
 
         super.onDestroy();
     }
@@ -7072,7 +7071,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 megaChatApi.logout();
             }
         }
-
         megaChatApi.closeChatRoom(idChat, this);
         MegaApplication.setClosedChat(true);
         megaChatApi.removeChatListener(this);
@@ -7145,13 +7143,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     long newidChat = intent.getLongExtra("CHAT_ID", -1);
                     if(intent.getAction().equals(ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(ACTION_OPEN_CHAT_LINK) || idChat != newidChat) {
                         cleanBuffers();
-                        adapter.notifyDataSetChanged();
-                        closeChat(false);
-                        MegaApplication.setOpenChatId(-1);
-                        initAfterIntent(intent, null);
                     }
-                    if((messagesPlaying!=null) && (!messagesPlaying.isEmpty())){
-                        for(MessageVoiceClip m:messagesPlaying){
+                    if (messagesPlaying != null && !messagesPlaying.isEmpty()) {
+                        for (MessageVoiceClip m : messagesPlaying) {
                             m.getMediaPlayer().release();
                             m.setMediaPlayer(null);
                         }
