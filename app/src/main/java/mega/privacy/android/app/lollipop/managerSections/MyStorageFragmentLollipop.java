@@ -16,15 +16,12 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -177,7 +174,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		if(myAccountInfo.getUsedFormatted().trim().length()<=0){
 			totalUsedSpace.setText(getString(R.string.recovering_info));
-			totalUsedSpace.setTextColor(getResources().getColor(R.color.black_85_alpha));
+			totalUsedSpace.setTextColor(getResources().getColor(R.color.name_my_account));
 			totalUsedSpace.setTypeface(normalTypeface);
 		}
 		else{
@@ -225,11 +222,11 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		if(myAccountInfo.getAccountType()==0){
 			transferQuotaUsedText.setText(context.getString(R.string.not_available));
-			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.black_85_alpha));
+			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
 			transferQuotaUsedText.setTypeface(normalTypeface);
 		} else if(myAccountInfo.getUsedTransferFormatted().trim().length()<=0){
 			transferQuotaUsedText.setText(getString(R.string.recovering_info));
-			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.black_85_alpha));
+			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.name_my_account));
 			transferQuotaUsedText.setTypeface(normalTypeface);
 		} else{
 			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.accentColor));

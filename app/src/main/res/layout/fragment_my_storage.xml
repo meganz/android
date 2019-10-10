@@ -17,7 +17,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/overall_usage_label"
-			android:textColor="@color/black_85_alpha"
+			android:textColor="@color/name_my_account"
 			android:layout_marginTop="9dp"
 			android:textSize="14sp"/>
 
@@ -32,7 +32,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="14sp"
-				android:textColor="@color/black_55_alpha"
+				android:textColor="@color/mail_my_account"
 				android:text="@string/general_storage"
 				android:layout_marginTop="14dp"/>
 
@@ -96,7 +96,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:text="@string/usage_storage_details_label"
-				android:textColor="@color/black_85_alpha"
+				android:textColor="@color/name_my_account"
 				android:textSize="14sp"/>
 
 			<!--cloud drive-->
@@ -113,7 +113,7 @@
 					android:layout_alignParentLeft="true"
 					android:text="@string/section_cloud_drive"
 					android:textSize="14sp"
-					android:textColor="@color/black_55_alpha"/>
+					android:textColor="@color/mail_my_account"/>
 
 				<TextView
 					android:id="@+id/my_storage_account_cloud_storage_text"
@@ -121,7 +121,7 @@
 					android:layout_height="wrap_content"
 					android:layout_alignParentRight="true"
 					android:textSize="14sp"
-					android:textColor="@color/black_85_alpha"/>
+					android:textColor="@color/name_my_account"/>
 
 				<LinearLayout
 					android:id="@+id/cloud_drive_separator"
@@ -148,7 +148,7 @@
 					android:layout_alignParentLeft="true"
 					android:text="@string/section_inbox"
 					android:textSize="14sp"
-					android:textColor="@color/black_55_alpha"/>
+					android:textColor="@color/mail_my_account"/>
 
 				<TextView
 					android:id="@+id/my_storage_account_inbox_storage_text"
@@ -156,7 +156,7 @@
 					android:layout_height="wrap_content"
 					android:layout_alignParentRight="true"
 					android:textSize="14sp"
-					android:textColor="@color/black_85_alpha"/>
+					android:textColor="@color/name_my_account"/>
 
 				<LinearLayout
 					android:id="@+id/inbox_separator"
@@ -182,7 +182,7 @@
 					android:layout_alignParentLeft="true"
 					android:text="@string/title_incoming_shares_explorer"
 					android:textSize="14sp"
-					android:textColor="@color/black_55_alpha"/>
+					android:textColor="@color/mail_my_account"/>
 
 				<TextView
 					android:id="@+id/my_storage_account_incoming_storage_text"
@@ -190,7 +190,7 @@
 					android:layout_height="wrap_content"
 					android:layout_alignParentRight="true"
 					android:textSize="14sp"
-					android:textColor="@color/black_85_alpha"/>
+					android:textColor="@color/name_my_account"/>
 
 				<LinearLayout
 					android:id="@+id/incoming_separator"
@@ -216,7 +216,7 @@
 					android:layout_alignParentLeft="true"
 					android:text="@string/section_rubbish_bin"
 					android:textSize="14sp"
-					android:textColor="@color/black_55_alpha"/>
+					android:textColor="@color/mail_my_account"/>
 
 				<TextView
 					android:id="@+id/my_storage_account_rubbish_storage_text"
@@ -224,7 +224,7 @@
 					android:layout_height="wrap_content"
 					android:layout_alignParentRight="true"
 					android:textSize="14sp"
-					android:textColor="@color/black_85_alpha"/>
+					android:textColor="@color/name_my_account"/>
 
 				<LinearLayout
 					android:id="@+id/rubbish_separator"
@@ -251,7 +251,7 @@
 					android:layout_alignParentLeft="true"
 					android:text="Previous versions"
 					android:textSize="14sp"
-					android:textColor="@color/black_55_alpha"/>
+					android:textColor="@color/mail_my_account"/>
 
 				<TextView
 					android:id="@+id/my_storage_account_previous_versions_text"
@@ -259,7 +259,7 @@
 					android:layout_height="wrap_content"
 					android:layout_alignParentRight="true"
 					android:textSize="14sp"
-					android:textColor="@color/black_85_alpha"/>
+					android:textColor="@color/name_my_account"/>
 
 			</RelativeLayout>
 

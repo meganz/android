@@ -2324,6 +2324,7 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s / [A]month[/A] *</string>
+    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user / [A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Recurring subscription can be cancelled any time before the renewal date.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Call Started</string>
 
@@ -2557,4 +2558,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view your Camera Uploads in your user account</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Something went wrong</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contact your business account administrator to resolve the issue and activate your account.</string>
+    <string name="business_account_clarification" context="">** For genuine business purposes.</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep the placeholder is to indicate if the space is refered to storage or transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]%1$s[/A] **</string>
 </resources>
