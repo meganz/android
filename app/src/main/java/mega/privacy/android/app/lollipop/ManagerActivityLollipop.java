@@ -234,6 +234,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -248,6 +249,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
+
+	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
 	final int CLOUD_DRIVE_BNV = 0;
 	final int CAMERA_UPLOADS_BNV = 1;
@@ -281,7 +284,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	MegaNode inboxNode = null;
 
-	boolean mkLayoutVisible = false;
+	private boolean mkLayoutVisible = false;
 
 	MegaNode rootNode = null;
 
@@ -587,7 +590,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem changePass;
 	private MenuItem exportMK;
-	private MenuItem removeMK;
 	private MenuItem takePicture;
 	private MenuItem searchByDate;
 	private MenuItem cancelSubscription;
@@ -1771,6 +1773,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				outState.putInt("selectedPaymentMethod", selectedPaymentMethod);
 			}
 		}
+		outState.putBoolean(MK_LAYOUT_VISIBLE, mkLayoutVisible);
 
 		if(searchQuery!=null){
 			outState.putInt("levelsSearch", levelsSearch);
@@ -1863,6 +1866,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
 			logDebug("savedInstanceState -> pathNavigationOffline: " + pathNavigationOffline);
 			accountFragment = savedInstanceState.getInt("accountFragment", -1);
+			mkLayoutVisible = savedInstanceState.getBoolean(MK_LAYOUT_VISIBLE, false);
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
@@ -2376,13 +2380,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
         }
 
-		///Check the MK file
+		///Check the MK or RK file
 		int versionApp = getVersion(this);
 		logInfo("Version app: " + versionApp);
 		final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
+		final File fRKOld = buildExternalStorageFile(OLD_RK_FILE);
 		if (isFileAvailable(fMKOld)) {
 			logDebug("Old MK file need to be renamed!");
-			aC.renameMK();
+			aC.renameRK(fMKOld);
+		} else if (isFileAvailable(fRKOld)) {
+			logDebug("Old RK file need to be renamed!");
+			aC.renameRK(fRKOld);
 		}
 
 		rootNode = megaApi.getRootNode();
@@ -2820,6 +2828,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_MY_ACCOUNT)){
 						logDebug("Intent from chat - show my account");
+
 						drawerItem=DrawerItem.ACCOUNT;
 						accountFragment=MY_ACCOUNT_FRAGMENT;
 						selectDrawerItemLollipop(drawerItem);
@@ -3021,6 +3030,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						switch (accountType){
 							case FREE:{
 								logDebug("Intent firstTimeAfterInstallation==true");
+
 								firstLogin = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 								displayedAccountType = -1;
@@ -3121,6 +3131,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (openLinkDialogIsErrorShown) {
 				openLink(text);
 			}
+		}
+
+		if (mkLayoutVisible) {
+			showMKLayout();
 		}
 
 		logDebug("END onCreate");
@@ -3448,6 +3462,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					logDebug("Not credentials -> INTENT");
     				if (intent.getAction() != null){
 						logDebug("Intent with ACTION: " + intent.getAction());
+
     					if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
     						Intent exportIntent = new Intent(managerActivity, LoginActivityLollipop.class);
 							intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
@@ -3467,6 +3482,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     		// Open folder from the intent
 			if (intent.hasExtra(EXTRA_OPEN_FOLDER)) {
 				logDebug("INTENT: EXTRA_OPEN_FOLDER");
+
 				parentHandleBrowser = intent.getLongExtra(EXTRA_OPEN_FOLDER, -1);
 				intent.removeExtra(EXTRA_OPEN_FOLDER);
 				setIntent(null);
@@ -3477,6 +3493,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     			if(getIntent().getAction().equals(ACTION_EXPLORE_ZIP)){
 					logDebug("Open zip browser");
+
     				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);
 
     				Intent intentZip = new Intent(managerActivity, ZipBrowserActivityLollipop.class);
@@ -3498,6 +3515,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 //    			}
     			if (getIntent().getAction().equals(ACTION_IMPORT_LINK_FETCH_NODES)){
 					logDebug("ACTION_IMPORT_LINK_FETCH_NODES");
+
 					Intent loginIntent = new Intent(managerActivity, LoginActivityLollipop.class);
 					intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -3509,6 +3527,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 				else if (getIntent().getAction().equals(ACTION_OPEN_MEGA_LINK)){
 					logDebug("ACTION_OPEN_MEGA_LINK");
+
 					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivityLollipop.class);
 					fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					fileLinkIntent.setAction(ACTION_IMPORT_LINK_FETCH_NODES);
@@ -3525,6 +3544,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
     			else if (intent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
 					logDebug("ACTION_OPEN_MEGA_FOLDER_LINK");
+
     				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivityLollipop.class);
     				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     				intentFolderLink.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
@@ -3558,6 +3578,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 	    		else if(intent.getAction().equals(ACTION_OVERQUOTA_TRANSFER)){
 					logWarning("Show overquota transfer alert!!");
+
 					if(alertDialogTransferOverquota==null){
 						showTransferOverquotaDialog();
 					}
@@ -3569,10 +3590,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 				else if (intent.getAction().equals(ACTION_CHANGE_AVATAR)){
 					logDebug("Intent CHANGE AVATAR");
+
 					String path = intent.getStringExtra("IMAGE_PATH");
 					megaApi.setAvatar(path, this);
 				} else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
 					logDebug("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+
                     String text = getString(R.string.cam_sync_cancel_sync);
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -3601,6 +3624,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
     			else if (intent.getAction().equals(ACTION_SHOW_TRANSFERS)){
 					logDebug("Intent show transfers");
+
     				drawerItem = DrawerItem.TRANSFERS;
     				selectDrawerItemLollipop(drawerItem);
     			}
@@ -3659,9 +3683,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				else if (getIntent().getAction().equals(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT)){
 					String parentPath = intent.getStringExtra("parentPath");
 					if (parentPath != null){
-						boolean fromOffline = getIntent().getBooleanExtra("fromOffline", false);
 						AccountController ac = new AccountController(this);
-						ac.exportMK(parentPath, fromOffline);
+						ac.exportMK(parentPath);
 					}
 				}
 				else  if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
@@ -4068,7 +4091,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_text_error_email.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         params_text_error_email.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error_email.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error_email.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
+		params_text_error_email.setMargins(scaleWidthPx(3, outMetrics), 0,scaleWidthPx(20, outMetrics),0);
 		textError_email.setLayoutParams(params_text_error_email);
 
 		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
@@ -4323,6 +4346,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				String valueLastName = inputLastName.getText().toString().trim();
 				String value = inputMail.getText().toString().trim();
 				String emailError = getEmailError(value, managerActivity);
+				if (emailError == null) {
+					emailError = comparedToCurrentEmail(value, managerActivity);
+				}
 				if (emailError != null) {
 //					inputMail.setError(emailError);
 					inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
@@ -5288,6 +5314,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		switch(accountFragment){
 			case UPGRADE_ACCOUNT_FRAGMENT:{
 				logDebug("Show upgrade FRAGMENT");
+
 				fragmentContainer.setVisibility(View.VISIBLE);
 				tabLayoutMyAccount.setVisibility(View.GONE);
 				viewPagerMyAccount.setVisibility(View.GONE);
@@ -5296,6 +5323,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			case MONTHLY_YEARLY_FRAGMENT:{
 				logDebug("Show monthly yearly FRAGMENT");
+
 				fragmentContainer.setVisibility(View.VISIBLE);
 				tabLayoutMyAccount.setVisibility(View.GONE);
 				viewPagerMyAccount.setVisibility(View.GONE);
@@ -6423,8 +6451,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		exportMK = menu.findItem(R.id.action_menu_export_MK);
 		exportMK.setVisible(false);
-		removeMK = menu.findItem(R.id.action_menu_remove_MK);
-		removeMK.setVisible(false);
 
 		killAllSessions = menu.findItem(R.id.action_menu_kill_all_sessions);
 		killAllSessions.setVisible(false);
@@ -6579,7 +6605,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 
 				oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-				if(oFLol != null && oFLol.getItemCountWithoutRK()>0){
+				if(oFLol != null && oFLol.getItemCount()>0){
 					sortByMenuItem.setVisible(true);
 					selectMenuItem.setVisible(true);
 				}
@@ -7195,17 +7221,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 					int index = viewPagerMyAccount.getCurrentItem();
 					if(index==0){
-						if(isFileAvailable(buildExternalStorageFile(RK_FILE))){
-							removeMK.setVisible(true);
-							exportMK.setVisible(false);
-						}
-						else{
-							removeMK.setVisible(false);
-							exportMK.setVisible(true);
-						}
+						exportMK.setVisible(true);
 					}
 					else{
-						removeMK.setVisible(false);
 						exportMK.setVisible(false);
 					}
 
@@ -7225,7 +7243,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					forgotPassMenuItem.setVisible(false);
 
 					cancelSubscription.setVisible(false);
-					removeMK.setVisible(false);
 					exportMK.setVisible(false);
 				}
 			}
@@ -7729,6 +7746,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						switch(accountFragment){
 							case UPGRADE_ACCOUNT_FRAGMENT:{
 								logDebug("Back to MyAccountFragment~ -> drawerItemPreUpgradeAccount");
+
 								setFirstNavigationLevel(true);
 								displayedAccountType=-1;
 								if (drawerItemPreUpgradeAccount != null) {
@@ -8287,11 +8305,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				startActivity(intent);
 				return true;
 	        }
-	        case R.id.action_menu_remove_MK:{
-				logDebug("Remove MK option selected");
-				showConfirmationRemoveMK();
-				return true;
-	        }
 	        case R.id.action_menu_export_MK:{
 				logDebug("Export MK option selected");
 
@@ -8421,12 +8434,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		viewPagerTransfers.setVisibility(View.GONE);
 		abL.setVisibility(View.GONE);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-		}
+		Window window = this.getWindow();
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
 
 		fragmentContainer.setVisibility(View.VISIBLE);
 		drawerLayout.closeDrawer(Gravity.LEFT);
@@ -8434,6 +8445,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		supportInvalidateOptionsMenu();
 		hideFabButton();
 	}
+
 
 	public void refreshAfterMovingToRubbish(){
 		logDebug("refreshAfterMovingToRubbish");
@@ -12258,71 +12270,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 				break;
 			}
-//			case R.id.top_control_bar:{
-//				if (nDALol != null){
-//					nDALol.setPositionClicked(-1);
-//				}
-//				drawerItem = DrawerItem.ACCOUNT;
-//				titleAB = drawerItem.getTitle(this);
-//
-//				selectDrawerItemLollipop(drawerItem);
-//
-//				break;
-//			}
-//			case R.id.bottom_control_bar:{
-//				if (nDALol != null){
-//					nDALol.setPositionClicked(-1);
-//				}
-//				drawerItem = DrawerItem.ACCOUNT;
-//				titleAB = drawerItem.getTitle(this);
-//
-//				selectDrawerItemLollipop(drawerItem);
-//
-//				break;
-//			}
 		}
-	}
-
-	void showBottomSheetRecoveryKey(){
-		RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
-		recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
 	}
 
 	void exportRecoveryKey (){
 		AccountController aC = new AccountController(this);
-		aC.exportMK(null, false);
-	}
-
-	public void showConfirmationRemoveMK(){
-		logDebug("showConfirmationRemoveMK");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
-		}
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						AccountController aC = new AccountController(managerActivity);
-						aC.removeMK();
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-		builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+		aC.saveRkToFileSystem();
 	}
 
 	public void showConfirmationCloseAllSessions(){
@@ -12368,11 +12321,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE: {
-						String pathNavigation = getPathNavigationOffline();
 						MegaOffline mOff = getSelectedOfflineNode();
 
 						NodeController nC = new NodeController(managerActivity);
-						nC.deleteOffline(mOff, pathNavigation);
+						nC.deleteOffline(mOff);
 
 						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
                         if(fbFLol != null){
@@ -12423,7 +12375,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						String pathNavigation = getPathNavigationOffline();
 						NodeController nC = new NodeController(managerActivity);
 						for (int i=0;i<documents.size();i++){
-							nC.deleteOffline(documents.get(i), pathNavigation);
+							nC.deleteOffline(documents.get(i));
 						}
 						updateOfflineView(documents.get(0));
 						sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
@@ -12730,6 +12682,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			logDebug("requestCode == REQUEST_CODE_SELECT_FILE");
+
 			if (intent == null) {
 				logWarning("Intent NULL");
 				return;
@@ -13008,6 +12961,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		else if (requestCode ==  REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
 			logDebug("REQUEST_CODE_SELECT_COPY_FOLDER");
+
 			if (intent == null) {
 				logWarning("Intent NULL");
 				return;
@@ -13019,6 +12973,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_LOCAL_FOLDER");
+
 			if (intent == null) {
 				logWarning("Intent NULL");
 				return;
@@ -13113,6 +13068,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		else if (requestCode == TAKE_PHOTO_CODE){
 			logDebug("TAKE_PHOTO_CODE");
+
 			if(resultCode == Activity.RESULT_OK){
 				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
 				if (!isFileAvailable(imgFile)) {
@@ -13133,6 +13089,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	    }
 		else if (requestCode == TAKE_PICTURE_PROFILE_CODE){
 			logDebug("TAKE_PICTURE_PROFILE_CODE");
+
 			if(resultCode == Activity.RESULT_OK){
 
 				String myEmail =  megaApi.getMyUser().getEmail();
@@ -13284,21 +13241,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
-				String[] split = RK_FILE.split(File.separator);
-				String path = parentPath+"/"+split[split.length-1];
-				logDebug("REQUEST_DOWNLOAD_FOLDER");
+				String path = parentPath + File.separator + getRecoveryKeyFileName();
+
+				logDebug("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
-				ac.exportMK(path, false);
-			}
-		}
-		else if (requestCode == REQUEST_SAVE_MK_FROM_OFFLINE && resultCode == RESULT_OK){
-			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			if (parentPath != null){
-				String[] split = RK_FILE.split(File.separator);
-				String path = parentPath+"/"+split[split.length-1];
-				logDebug("REQUEST_SAVE_MK_FROM_OFFLINE");
-				AccountController ac = new AccountController(this);
-				ac.exportMK(path, true);
+				ac.exportMK(path);
 			}
 		}
 		else if(requestCode == REQUEST_CODE_FILE_INFO && resultCode == RESULT_OK){
@@ -13403,8 +13350,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		if (chatHandles.length == 1) {
 			showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatHandles[0]);
-		}
-		else{
+		} else{
 			String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, userHandles.length);
 			showSnackbar(MESSAGE_SNACKBAR_TYPE, message, -1);
 		}
@@ -13820,6 +13766,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         switch (newStorageState) {
             case MegaApiJava.STORAGE_STATE_GREEN:
 				logDebug("STORAGE STATE GREEN");
+
                 intent.setAction(ACTION_STORAGE_STATE_CHANGED);
 
                 // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
@@ -13845,6 +13792,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
 				logWarning("STORAGE STATE ORANGE");
+
                 intent.setAction(ACTION_STORAGE_STATE_CHANGED);
 
 				// TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
@@ -14472,8 +14420,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK) {
 				logDebug("Status changed to: " + request.getNumber());
-			}
-			else if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
+			} else if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
 				logWarning("Status not changed, the chosen one is the same");
 			} else {
 				logError("ERROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
@@ -14734,7 +14681,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						showSnackbar(SNACKBAR_TYPE, getString(R.string.success_changing_user_avatar), -1);
 					}
 					else{
-
 						logDebug("User avatar deleted!");
 						showSnackbar(SNACKBAR_TYPE, getString(R.string.success_deleting_user_avatar), -1);
 					}
@@ -14746,7 +14692,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 				}
 				else{
-
 					if(request.getFile()!=null) {
 						logError("Some error ocurred when changing avatar: " + e.getErrorString() + " " + e.getErrorCode());
 						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_changing_user_avatar), -1);
@@ -15026,13 +14971,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 				showAlert(this, getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
 			}
-			else if(e.getErrorCode() == MegaError.API_EEXIST){
+			else if(e.getErrorCode() == MegaError.API_EACCESS){
 				logWarning("The new mail already exists");
 				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
 				showAlert(this, getString(R.string.mail_already_used), getString(R.string.email_verification_title));
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXIST){
+				logWarning("Email change already requested (confirmation link already sent).");
+				hideKeyboard(managerActivity, 0);
+				if (verify2FADialog != null && verify2FADialog.isShowing()) {
+					verify2FADialog.dismiss();
+				}
+				showAlert(this, getString(R.string.mail_changed_confirm_requested), getString(R.string.email_verification_title));
 			}
 			else if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED){
 				if (is2FAEnabled()){
@@ -15549,6 +15502,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_emptied), -1);
 				resetAccountDetailsTimeStamp(getApplicationContext());
+				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
+				if (sttFLol != null) {
+					sttFLol.resetRubbishInfo();
+				}
 			}
 			else{
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_no_emptied), -1);
@@ -17223,14 +17180,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			cFLol.contactLastGreenUpdate(userhandle, lastGreen);
 		}
     }
-
-    public boolean isMkLayoutVisible() {
-		return mkLayoutVisible;
-	}
-
-	public void setMkLayoutVisible(boolean mkLayoutVisible) {
-		this.mkLayoutVisible = mkLayoutVisible;
-	}
 
 	public void copyError(){
 		try {

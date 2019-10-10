@@ -364,7 +364,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     if (msgId != -1 && chatId != -1) {
                         msgChat = megaChatApi.getMessage(chatId, msgId);
                         if(msgChat==null){
-                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, chatId);
+                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                         }
                         if (msgChat != null) {
                             nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
@@ -786,7 +786,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         if (msgId != -1 && chatId != -1){
                             msgChat = megaChatApi.getMessage(chatId, msgId);
                             if(msgChat==null){
-                                msgChat = megaChatApi.getMessageFromNodeHistory(chatId, chatId);
+                                msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                             }
                             if (msgChat != null){
                                 nodeChat = msgChat.getMegaNodeList().get(0);

@@ -133,8 +133,8 @@ public class Constants {
 
     public static final int REQUEST_DOWNLOAD_FOLDER = 7;
 
-    public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
     public static final int REQUEST_READ_WRITE_STORAGE = 9;
+
     public static final int REQUEST_CAMERA_UPLOAD = 10;
     public static final int REQUEST_CAMERA_ON_OFF = 11;
     public static final int REQUEST_CAMERA_ON_OFF_FIRST_TIME = 12;
@@ -146,6 +146,7 @@ public class Constants {
     public static final int REQUEST_WRITE_STORAGE_TAKE_PICTURE = 14;
 
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
+    public static final int REQUEST_WRITE_STORAGE_OFFLINE = 16;
 
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
@@ -381,6 +382,9 @@ public class Constants {
     public static final String CHAT_ID_IN_PROGRESS = "chatHandleInProgress";
     public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
     public static final String SECOND_CALL = "SECOND_CALL";
+    public static final String PEER_ID = "peerId";
+    public static final String CLIENT_ID = "clientId";
+
 
 	public static final String[] FILE_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#!.+$",

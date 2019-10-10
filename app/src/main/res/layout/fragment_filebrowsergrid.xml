@@ -6,6 +6,13 @@
     android:background="@color/white"
     tools:context=".FileBrowserGridFragment" >
 	<include layout="@layout/item_transfers_overview"/>
+
+    <include layout="@layout/item_call_in_progress_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentTop="true" />
+
     <RelativeLayout
         android:id="@+id/content_grid_text_layout"
         android:layout_width="fill_parent"
@@ -63,6 +70,7 @@
 	    android:id="@+id/linear_layout_recycler"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_below="@id/call_in_progress_layout"
         android:orientation="vertical">
 
         <RelativeLayout
