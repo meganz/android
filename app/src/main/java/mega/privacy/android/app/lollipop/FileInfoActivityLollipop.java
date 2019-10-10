@@ -791,6 +791,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     return;
                 }
 
+                if (node.isFolder()) {
+                    modifiedLayout.setVisibility(View.GONE);
+                } else {
+                    modifiedLayout.setVisibility(View.VISIBLE);
+                }
+
                 String name = node.getName();
 
                 collapsingToolbar.setTitle(name.toUpperCase());
