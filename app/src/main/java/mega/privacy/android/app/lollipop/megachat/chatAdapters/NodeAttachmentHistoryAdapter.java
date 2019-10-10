@@ -624,7 +624,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 if (holder.fullNameTitle.trim().length() <= 0) {
 
                     logWarning("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    holder.fullNameTitle = "Unknown name";
+                    holder.fullNameTitle = context.getString(R.string.unknown_name_label);
                     if (!(holder.nameRequestedAction)) {
                         logDebug("Call for nonContactName: " + m.getUserHandle());
                         holder.nameRequestedAction = true;

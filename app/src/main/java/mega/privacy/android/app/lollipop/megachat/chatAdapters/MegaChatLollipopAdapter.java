@@ -8986,7 +8986,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (name.trim().length() <= 0) {
             logWarning("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-            name = "Unknown name";
+            name = context.getString(R.string.unknown_name_label);
             if (!holder.nameRequestedAction) {
                 logDebug("Call for nonContactName: " + handle);
                 holder.nameRequestedAction = true;
