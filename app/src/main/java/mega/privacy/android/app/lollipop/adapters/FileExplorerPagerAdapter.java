@@ -16,10 +16,10 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
 
-    private final int PAGE_COUNT = 3;
+    private static final int PAGE_COUNT = 3;
     private Context context;
-    private boolean chatFirst = false;
-    private boolean tabRemoved = false;
+    private boolean chatFirst;
+    private boolean tabRemoved;
 
     public FileExplorerPagerAdapter(FragmentManager fm, Context context, boolean chatFirst) {
         super(fm);
@@ -71,6 +71,7 @@ public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
         if (ceF != null) {
             return ceF;
         }
+
         return ChatExplorerFragment.newInstance();
     }
 

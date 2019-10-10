@@ -2163,7 +2163,9 @@ public class ChatController {
     }
 
     public void checkIfNodesAreMineAndAttachNodes(long handles[], long idChat) {
-        logDebug("checkIfNodesAreMineAndSelectChatsToSendNodes");
+        if (handles == null) {
+            return;
+        }
 
         MegaNode currentNode;
         ArrayList<MegaNode> nodes = new ArrayList<>();
@@ -2171,9 +2173,6 @@ public class ChatController {
         ArrayList<MegaNode> notOwnerNodes = new ArrayList<>();
         NodeController nC = new NodeController(context);
 
-        if (handles == null) {
-            return;
-        }
 
         for (int i=0; i<handles.length; i++) {
             currentNode = megaApi.getNodeByHandle(handles[i]);

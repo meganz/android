@@ -92,7 +92,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
             counter --;
             if (e.getErrorCode() == MegaError.API_OK){
                 nodesCopied.add(megaApi.getNodeByHandle(request.getNodeHandle()));
-                if (counter == 0 && nodesCopied != null) {
+                if (counter == 0) {
                     if (idChat == -1) {
                         NodeController nC = new NodeController(context);
                         nC.selectChatsToSendNodes(nodesCopied);

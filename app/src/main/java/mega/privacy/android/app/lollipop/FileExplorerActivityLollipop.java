@@ -140,9 +140,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private static final int INCOMING_TAB = 1;
 	private static final int CHAT_TAB = 2;
 	private static final int SHOW_TABS = 3;
-	private boolean isChatFirst = false;
+	private boolean isChatFirst;
 
-	private DatabaseHandler dbH = null;
+	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
 
 	private AppBarLayout abL;
@@ -183,15 +183,14 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private MegaChatApiAndroid megaChatApi;
 
 	private int mode;
-	private boolean multiselect = false;
-	private boolean selectFile = false;
+	private boolean multiselect;
+	private boolean selectFile;
 	
 	private long[] moveFromHandles;
 	private long[] copyFromHandles;
 	private long[] importChatHandles;
 	private ArrayList<String> selectedContacts;
-	private String imagePath;
-	private boolean folderSelected = false;
+	private boolean folderSelected;
 	
 	private Handler handler;
 
@@ -223,30 +222,30 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private long parentHandleIncoming;
 	private long parentHandleCloud;
-	private int deepBrowserTree = 0;
+	private int deepBrowserTree;
 
-	private Intent intent = null;
-	private boolean importFileF = false;
+	private Intent intent;
+	private boolean importFileF;
 	private int importFragmentSelected = -1;
-	private String action = null;
+	private String action;
     private android.support.v7.app.AlertDialog renameDialog;
 	private HashMap<String, String> nameFiles = new HashMap<>();
 
 	private MegaNode myChatFilesNode;
 	private ArrayList<MegaNode> attachNodes = new ArrayList<>();
 	private ArrayList<ShareInfo> uploadInfos = new ArrayList<>();
-	private int filesChecked = 0;
+	private int filesChecked;
 
 	private SearchView searchView;
 
 	private FileExplorerActivityLollipop fileExplorerActivityLollipop;
 
 	private String querySearch = "";
-	private boolean isSearchExpanded = false;
-	private boolean pendingToOpenSearchView = false;
-	private int pendingToAttach = 0;
-	private int totalAttached = 0;
-	private int totalErrors = 0;
+	private boolean isSearchExpanded;
+	private boolean pendingToOpenSearchView;
+	private int pendingToAttach;
+	private int totalAttached;
+	private int totalErrors;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -568,7 +567,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				mode = SELECT;
 				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
-				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase().toUpperCase());
+				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(CLOUD_TAB, false, -1);
 				tabShown = NO_TABS;
 
@@ -1482,21 +1481,15 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	private boolean isCloudVisible() {
-		if (cDriveExplorer != null && cDriveExplorer.isVisible()
+		return cDriveExplorer != null && cDriveExplorer.isVisible()
 				&& ((tabShown == CLOUD_TAB || tabShown == NO_TABS) && !importFileF)
-				|| (importFileF && importFragmentSelected == CLOUD_FRAGMENT)) {
-			return true;
-		}
-		return false;
+				|| (importFileF && importFragmentSelected == CLOUD_FRAGMENT);
 	}
 
 	private boolean isIncomingVisible() {
-		if (iSharesExplorer != null && iSharesExplorer.isVisible()
+		return iSharesExplorer != null && iSharesExplorer.isVisible()
 				&& ((tabShown == INCOMING_TAB && !importFileF)
-				|| (importFileF && importFragmentSelected == INCOMING_FRAGMENT))) {
-			return true;
-		}
-		return false;
+				|| (importFileF && importFragmentSelected == INCOMING_FRAGMENT));
 	}
 
 	private long createPendingMessageDBH (long idChat, long timestamp, String fingerprint, ShareInfo info) {
@@ -2377,7 +2370,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				break;
 			}
 			case R.id.cab_menu_sort:{
-				showShortOptions(fileExplorerActivityLollipop, outMetrics);
+				showSortOptions(fileExplorerActivityLollipop, outMetrics);
 				break;
 			}
 		}

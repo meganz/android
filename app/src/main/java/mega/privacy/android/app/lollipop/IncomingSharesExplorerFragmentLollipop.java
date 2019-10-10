@@ -163,29 +163,17 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 
 			if (selected.size() != 0) {
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-				MegaNode nodeS = megaApi.getNodeByHandle(parentHandle);
+				MegaNode node = megaApi.getNodeByHandle(parentHandle);
 
-				if(selected.size() == megaApi.getNumChildFiles(nodeS)){
+				if(selected.size() == megaApi.getNumChildFiles(node)){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
 
 				}else{
-					if(isMultiselect()){
-						MegaNode node = megaApi.getNodeByHandle(parentHandle);
-						if(selected.size() == megaApi.getNumChildFiles(node)){
-							menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-						}else{
-							menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-						}
-					}else{
-						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					}
-
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
-
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				}
+
+				unselect.setTitle(getString(R.string.action_unselect_all));
+				unselect.setVisible(true);
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
@@ -1060,14 +1048,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 			title = Integer.toString(sum);
 		}
 		actionMode.setTitle(title);
-
-
-		try {
-			actionMode.invalidate();
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-			logError("oninvalidate error", e);
-		}
+		actionMode.invalidate();
 	}
 
 	/*
@@ -1102,19 +1083,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 
 	public boolean isFolder(int position){
 		MegaNode node = nodes.get(position);
-		if(node == null || node.isFolder()){
-			return true;
-		}
-		else{
-			return false;
-		}
+
+		return node == null || node.isFolder();
 	}
 
 	boolean isMultiselect() {
-		if (modeCloud==FileExplorerActivityLollipop.SELECT && selectFile && ((FileExplorerActivityLollipop) context).isMultiselect()) {
-			return true;
-		}
-		return false;
+		return modeCloud == FileExplorerActivityLollipop.SELECT && selectFile && ((FileExplorerActivityLollipop) context).isMultiselect();
 	}
 
 	public void search (String s) {

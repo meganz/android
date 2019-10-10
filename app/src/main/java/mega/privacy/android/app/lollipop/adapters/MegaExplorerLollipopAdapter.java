@@ -81,6 +81,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 	private int placeholderCount;
 
+	private DisplayMetrics outMetrics;
+
     /*public static view holder class*/
     public class ViewHolderExplorerLollipop extends RecyclerView.ViewHolder{
 		public RelativeLayout itemLayout;
@@ -144,6 +146,10 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 		dbH = DatabaseHandler.getDbHandler(context);
 
+        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
 	}
 	
 	@Override
@@ -166,12 +172,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	
 	@Override
 	public ViewHolderExplorerLollipop onCreateViewHolder(ViewGroup parent, int viewType) {
+	    View v;
 
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-
-		View v;
 	    if (((FileExplorerActivityLollipop) context).isList()) {
 	        logDebug("onCreateViewHolder list");
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
@@ -233,17 +235,13 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
     }
 
     private void onBindViewHolderList(ViewHolderListExplorerLollipop holder, int position) {
-	    logDebug("onBindViewHolderList");
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
-
-        holder.currentPosition = position;
-
         MegaNode node = (MegaNode) getItem(position);
         if (node == null) {
             return;
         }
+
+        holder.currentPosition = position;
+
         holder.document = node.getHandle();
 
         holder.textViewFileName.setText(node.getName());
@@ -501,11 +499,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         }
     }
 
-    private void toggleAllSelection(int pos) {
-        logDebug("toggleAllSelection: " + pos);
-        startAnimation(pos, putOrDeletePostion(pos));
-    }
-
     public void toggleSelection(int pos) {
         logDebug("toggleSelection: " + pos);
         startAnimation(pos, putOrDeletePostion(pos));
@@ -613,12 +606,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			if(!isItemChecked(i)){
 				if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
 					if(!((CloudDriveExplorerFragmentLollipop) fragment).isFolder(i)){
-						toggleAllSelection(i);
+						toggleSelection(i);
 					}
 				}
 				else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
 					if(!((IncomingSharesExplorerFragmentLollipop) fragment).isFolder(i)){
-						toggleAllSelection(i);
+						toggleSelection(i);
 					}
 				}
 			}
@@ -629,7 +622,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		logDebug("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(isItemChecked(i)){
-				toggleAllSelection(i);
+				toggleSelection(i);
 			}
 		}
 	}

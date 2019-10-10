@@ -55,6 +55,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatExplorerFragment extends Fragment {
 
+    private static final int RECENTS_MAX_SIZE = 6;
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
     private ChatExplorerFragment chatExplorerFragment;
@@ -396,7 +397,7 @@ public class ChatExplorerFragment extends Fragment {
             if (context instanceof ChatExplorerActivity) {
                 ((ChatExplorerActivity) context).collapseSearchView();
             }
-            else {
+            else if (context instanceof FileExplorerActivityLollipop){
                 ((FileExplorerActivityLollipop) context).collapseSearchView();
             }
             if (!adapterList.getItems().equals(items)) {
@@ -668,7 +669,7 @@ public class ChatExplorerFragment extends Fragment {
                         item.setRecent(true);
                         recents.add(item);
                         removeChats.add(chat);
-                        if (recents.size() == 6) {
+                        if (recents.size() == RECENTS_MAX_SIZE) {
                             break;
                         }
                     }

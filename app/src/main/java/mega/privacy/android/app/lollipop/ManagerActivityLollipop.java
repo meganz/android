@@ -196,7 +196,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -8255,7 +8254,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        	return true;
 	        }
 	        case R.id.action_menu_sort_by:{
-				showShortOptions(managerActivity, outMetrics);
+				showSortOptions(managerActivity, outMetrics);
 	        	return true;
 	        }
 			case R.id.action_search_by_date:{

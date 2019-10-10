@@ -59,7 +59,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	private Context context;
 	private MegaApiAndroid megaApi;
 	private ArrayList<MegaNode> nodes;
-	private ArrayList<MegaNode> searchNodes = null;
+	private ArrayList<MegaNode> searchNodes;
 	private DisplayMetrics metrics;
 
 	private long parentHandle = -1;
@@ -319,7 +319,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			order = megaApi.ORDER_DEFAULT_ASC;
 		}
 
-		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
 		getNodes();
 		setParentHandle(parentHandle);
 
@@ -327,34 +326,26 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
 
 			MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
-			if(parent != null){
-				if(parent.getHandle() == chosenNode.getHandle()) {
-					activateButton(false);
-				}else{
-					activateButton(true);
-				}
-			}else{
+
+			if (parent != null && parent.getHandle() == parentHandle) {
+				activateButton(false);
+			} else {
 				activateButton(true);
 			}
 
 			nodeHandleMoveCopy = ((FileExplorerActivityLollipop)context).getNodeHandleMoveCopy();
 			setDisableNodes(nodeHandleMoveCopy);
-
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.COPY){
 			optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
 
 			MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
-			if(parent != null){
-				if(parent.getHandle() == chosenNode.getHandle()) {
-					activateButton(false);
-				}else{
-					activateButton(true);
-				}
-			}else{
+
+			if (parent != null && parent.getHandle() == parentHandle) {
+				activateButton(false);
+			} else {
 				activateButton(true);
 			}
-
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
@@ -942,12 +933,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 	public boolean isFolder(int position){
 		MegaNode node = nodes.get(position);
-		if(node == null || node.isFolder()){
-			return true;
-		}
-		else{
-			return false;
-		}
+
+		return node == null || node.isFolder();
 	}
 
 	/*
@@ -1049,10 +1036,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	}
 
 	private boolean isMultiselect() {
-		if (modeCloud==FileExplorerActivityLollipop.SELECT && selectFile && ((FileExplorerActivityLollipop) context).isMultiselect()) {
-			return true;
-		}
-		return false;
+		return modeCloud == FileExplorerActivityLollipop.SELECT && selectFile && ((FileExplorerActivityLollipop) context).isMultiselect();
 	}
 
 	public void search (String s) {
@@ -1063,9 +1047,12 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			setParentHandle(megaApi.getRootNode().getHandle());
 		}
 		MegaNode parent = megaApi.getNodeByHandle(getParentHandle());
+
 		if (parent == null) {
+			logWarning("Parent null when search");
 			return;
 		}
+
 		searchNodes = megaApi.search(parent, s, true, order);
 		if (searchNodes != null && adapter != null) {
 			addSectionTitle(searchNodes, ((FileExplorerActivityLollipop) context).getItemType());

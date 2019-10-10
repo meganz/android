@@ -20,18 +20,15 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class SorterContentActivity extends BaseActivity {
 
-    public void showShortOptions(final Context context, DisplayMetrics outMetrics) {
+    public void showSortOptions(final Context context, DisplayMetrics outMetrics) {
 
         ManagerActivityLollipop.DrawerItem drawerItem = null;
 
         AlertDialog sortByDialog;
-        LayoutInflater inflater = null;
+        LayoutInflater inflater = getLayoutInflater();
+
         if (context instanceof ManagerActivityLollipop) {
-            inflater = ((ManagerActivityLollipop) context).getLayoutInflater();
             drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-        }
-        else if (context instanceof FileExplorerActivityLollipop) {
-            inflater = ((FileExplorerActivityLollipop) context).getLayoutInflater();
         }
 
         View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
