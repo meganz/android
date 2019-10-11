@@ -63,6 +63,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -1493,7 +1494,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	private void refreshOrder() {
 		switch (orderGetChildren) {
-			case ORDER_DEFAULT_ASC: {
+			case MegaApiJava.ORDER_DEFAULT_ASC: {
 				sortByNameAscending();
 				break;
 			}

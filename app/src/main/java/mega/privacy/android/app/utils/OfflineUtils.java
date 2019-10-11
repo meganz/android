@@ -33,12 +33,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.getNodePath;
 import static mega.privacy.android.app.utils.Util.getSizeString;
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC;
-import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
-import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
-import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC;
-import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC;
+import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class OfflineUtils {
@@ -676,7 +671,7 @@ public class OfflineUtils {
         }
 
         for (MegaOffline node : mOffList) {
-            if (node.getType().equals("1")) {
+            if (node.getType().equals(MegaOffline.FOLDER)) {
                 foldersOrder.add(node);
             } else {
                 filesOrder.add(node);

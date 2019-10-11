@@ -55,8 +55,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -87,10 +85,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.MegaPreferences.*;
+import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.MegaPreferences.*;
-import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -2658,19 +2656,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 			}
 		}
-        Collections.sort(nodesResult, new Comparator<MegaNode>() {
-            @Override
-            public int compare(MegaNode o1, MegaNode o2) {
-                long m1 = o1.getModificationTime();
-                long m2 = o2.getModificationTime();
-                if (orderBy == MegaApiJava.ORDER_MODIFICATION_ASC) {
-                    return (int) (m1 - m2);
-                } else {
-                    return (int) (m2 - m1);
-                }
-            }
-        });
-        return nodesResult;
+		return nodesResult;
 		//setNodes(nodesResult);
 	}
 

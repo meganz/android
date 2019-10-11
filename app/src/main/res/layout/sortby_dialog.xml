@@ -26,7 +26,7 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"
+			android:textColor="@color/name_my_account"
 			android:theme="@style/ColorControlStyle"/>
 	    
 	    <CheckedTextView
@@ -38,7 +38,7 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"
+			android:textColor="@color/name_my_account"
 			android:theme="@style/ColorControlStyle"/>
 	    
 	    
@@ -59,7 +59,7 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"
+			android:textColor="@color/name_my_account"
 			android:theme="@style/ColorControlStyle"/>
 	    
 	    <CheckedTextView
@@ -71,7 +71,7 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"
+			android:textColor="@color/name_my_account"
 			android:theme="@style/ColorControlStyle"/>
 
 		<TextView 
@@ -91,7 +91,7 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"
+			android:textColor="@color/name_my_account"
 			android:theme="@style/ColorControlStyle"/>
 	    
 	    <CheckedTextView
@@ -103,7 +103,7 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"
+			android:textColor="@color/name_my_account"
 			android:layout_marginBottom="22dp"
 			android:theme="@style/ColorControlStyle"/>
 
@@ -124,7 +124,7 @@
             android:gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:fontFamily="sans-serif"
-            android:textColor="#de000000"
+            android:textColor="@color/name_my_account"
             android:theme="@style/ColorControlStyle"/>
 
         <CheckedTextView
@@ -136,7 +136,7 @@
             android:gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:fontFamily="sans-serif"
-            android:textColor="#de000000"
+            android:textColor="@color/name_my_account"
             android:layout_marginBottom="22dp"
             android:theme="@style/ColorControlStyle"/>
 
