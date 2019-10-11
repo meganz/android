@@ -684,6 +684,13 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
             emptyTextView = v.findViewById(R.id.file_grid_empty_text);
             emptyTextViewFirst = v.findViewById(R.id.file_grid_empty_text_first);
 
+			callInProgressLayout = v.findViewById(R.id.call_in_progress_layout);
+			callInProgressLayout.setOnClickListener(this);
+			callInProgressChrono = v.findViewById(R.id.call_in_progress_chrono);
+			callInProgressLayout.setVisibility(View.GONE);
+			callInProgressChrono.setVisibility(View.GONE);
+
+
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context,this,nodes,((ManagerActivityLollipop)context).parentHandleBrowser,recyclerView,aB,FILE_BROWSER_ADAPTER,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
             } else {
@@ -707,8 +714,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
-            
-            return v;
+
+			showCallLayout();
+
+			return v;
         }
     }
     

@@ -1297,7 +1297,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            chatC.prepareForDownload(intent, parentPath);
+			chatC.prepareForDownload(intent, parentPath);
 		}
 	}
 

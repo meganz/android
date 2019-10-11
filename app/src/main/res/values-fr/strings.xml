@@ -46,7 +46,7 @@
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importer</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Espace de stockage</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Quota de transfert</string>
-    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">S\'abonner</string>
+    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">M\'abonner</string>
     <!--
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>
     -->
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activation du compte</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Préparation de la liste des fichiers</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Veuillez vous connecter pour partager avec MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Votre lien de confirmation n\'est plus valide. Votre compte est peut-être déjà activé ou vous avez peut-être annulé votre inscription.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">L\'aperçu n\'a pas encore été téléchargé. Veuillez patienter</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Veuillez vous déconnecter avant de créer le compte</string>
 
@@ -635,7 +637,7 @@
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">Valider</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Ignorer</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Arrêter</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Le téléversement de l\'appareil photo est en cours</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Les téléversements de l\'appareil photo sont en cours</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Voulez-vous arrêter les téléversements de l\'appareil photo ?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -677,8 +679,8 @@
     </string-array>
 
     <string name="settings_camera_upload_on" context="settings option">Activer les téléversements de l\'appareil photo</string>
-    <string name="settings_camera_upload_turn_on" context="settings option">Activer le téléversement de l\'appareil photo</string>
-    <string name="settings_camera_upload_off" context="settings option">Désactiver les téléversements de l\'appareil photo</string>
+    <string name="settings_camera_upload_turn_on" context="settings option">Activer Téléversements de l\'appareil photo</string>
+    <string name="settings_camera_upload_off" context="settings option">Désactiver Téléversements de l\'appareil photo</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Comment téléverser</string>
 
     <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Activer le téléversement des médias secondaires</string>
@@ -704,7 +706,7 @@
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Conserver les noms de fichier comme sur l\'appareil</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Dossier local de l\'appareil photo</string>
-    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">Dossier MEGA de téléversement de l\'appareil photo</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">Dossier MEGA pour Téléversements de l\'appareil photo</string>
 
     <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">Dossier secondaire local</string>
     <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">Dossier MEGA secondaire</string>
@@ -745,7 +747,7 @@
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Conditions générales d\'utilisation</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Règlement sur la protection des données</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">Version de l\'appli</string>
-    <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Version de la trousse SDK MEGA</string>
+    <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Version de la trousse SDK de MEGA</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Version de la trousse SDK de MEGAchat</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">Voir le code source</string>
 
@@ -815,7 +817,7 @@
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">Pays</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Code postal</string>
 
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Saisir vos données de paiement :</string>
+    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Saisissez vos données de paiement :</string>
     <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Prénom</string>
     <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Nom de famille</string>
     <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Numéro de carte de crédit</string>
@@ -1114,7 +1116,7 @@
     <string name="clear_history_error" context="Message show when the history of a chat hasn't been successfully deleted">Erreur. L\'historique de la conversation n\'a pas été effacé correctement</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Ajouter des participants</string>
-    <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Supprimer un participant</string>
+    <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Supprimer le participant</string>
 
     <string name="mega_info_empty_screen" context="Message about MEGA when there are no message in the chat screen">Protège votre conversation avec un chiffrement de bout en bout (contrôlé par l\'utilisateur), fournissant des garanties de sécurité essentielles :</string>
     <string name="mega_authenticity_empty_screen" context="Message about MEGA when there are no message in the chat screen">Le système garantit que les données reçues proviennent vraiment de l\'expéditeur indiqué et que le contenu n\'a pas été manipulé pendant le transit.</string>
@@ -1146,7 +1148,7 @@
     -->
 
     <string name="group_chat_label" context="Label for the sliding panel of a group chat">Conversation de groupe</string>
-    <string name="group_chat_info_label" context="Label for the option of the sliding panel to show the info of a chat group">Renseignements sur le fichier</string>
+    <string name="group_chat_info_label" context="Label for the option of the sliding panel to show the info of a chat group">Renseignements sur le groupe</string>
     <string name="group_chat_start_conversation_label" context="Label for the option of the sliding panel to start a one to one chat">Lancer une conversation</string>
     <string name="group_chat_edit_profile_label" context="Label for the option of the sliding panel to edit the profile">Modifier le profil</string>
     <string name="title_properties_chat_leave_chat" context="Title of the section to leave a group content in the Contact Properties screen">Quitter le groupe</string>
@@ -1295,7 +1297,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]de %2$s[/A]</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Supprimer du mode hors ligne ?</string>
+    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Supprimer d\'Enregistrer Hors Ligne ?</string>
 
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Le dialogue en ligne est désactivé et ne peut pas être activé sans connexion.</string>
 
@@ -1598,7 +1600,7 @@
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">L\'adresse courriel est mal formée</string>
 
     <string name="paragraph_info_achievement_install_desktop" context="info paragraph about the achievement install megasync">En installant MEGAsync, vous obtenez %1$s d\'espace de stockage gratuit et %2$s de quota de transfert, tous deux valides pendant 180 jours. L\'appli MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
-    <string name="paragraph_info_achievement_install_mobile_app" context="info paragraph about the achievement install mobile app">En installant notre appli MEGA mobile vous obtenez %1$s d\'espace de stockage gratuit et %2$s de quota de transfert, tous deux valides pendant 180 jours. Nos applis mobiles sont proposées pour iOS, Android et Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app" context="info paragraph about the achievement install mobile app">En installant notre appli MEGA mobile, vous obtenez %1$s d\'espace de stockage gratuit et %2$s de quota de transfert, tous deux valides pendant 180 jours. Nos applis mobiles sont proposées pour iOS, Android et Windows Phone.</string>
 
     <string name="result_paragraph_info_achievement_install_desktop" context="info paragraph about the completed achievement install megasync">Vous avez obtenu %1$s d\'espace de stockage et %2$s de quota de transfert pour avoir installé notre appli MEGA pour ordinateur.</string>
     <string name="result_paragraph_info_achievement_install_mobile_app" context="info paragraph about the completed achievement install mobile app">Vous avez reçu %1$s d\'espace de stockage et %2$s de quota de transfert pour avoir installé notre appli mobile.</string>
@@ -1746,8 +1748,8 @@
 
     <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">Votre mot de passe est facile à deviner. Essayez de le rallonger. Combinez majuscules et minuscules. Ajoutez des caractères spéciaux. N\'utilisez pas de noms ou de mots du dictionnaire.</string>
     <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">Votre mot de passe est assez bon pour continuer, mais il est recommandé de le renforcer.</string>
-    <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">Ce mot de passe résistera à la plupart des attaques par force brute typiques. Veuillez vous assurer de vous en souvenir.</string>
-    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">Ce mot de passe résistera à la plupart des attaques par force brute typiques. Veuillez vous assurer de vous en souvenir.</string>
+    <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">Ce mot de passe résistera à la plupart des attaques en force typiques. Veuillez vous assurer de vous en souvenir.</string>
+    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">Ce mot de passe résistera à la plupart des attaques en force sophistiquées. Veuillez vous assurer de vous en souvenir.</string>
     <string name="pass_very_weak" context="Password very weak">Très vulnérable</string>
     <string name="pass_weak" context="Password weak">Faible</string>
     <string name="pass_medium" context="Password medium">Moyenne</string>
@@ -1796,7 +1798,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Téléversement vers la conversation</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualité des médias des conversations</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualité des vidéos des conversations</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Qualité des vidéos</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Les téléversements de l\'appareil photo doivent accéder à vos photos et autres médias sur votre appareil. Veuillez vous rendre dans les paramètres et accorder l\'autorisation.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -1858,7 +1860,7 @@
     <string name="proceed_to_logout" context="Option that permits user logout">Poursuivre la déconnexion</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Clé de récupération</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Enregistrer dans le système de fichiers</string>
-    <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Copié dans le presse-papier</string>
+    <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Copié dans le presse-papiers</string>
 
     <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">Sauter au plus récent</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">Nouveaux messages</string>
@@ -1953,13 +1955,13 @@
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">La prochaine fois que vous vous connecterez à votre compte, un code à 6 chiffres fourni par votre appli d\'authentification vous sera demandé.</string>
     <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Sauvegarder votre clé de récupération</b></string>
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Code invalide</string>
-    <string name="lost_your_authenticator_device" context="When a user tries to login with Two-Factor Authentication and lost his device, button that permits get information about how login">Avez-vous perdu votre appareil d\'authentification ?</string>
+    <string name="lost_your_authenticator_device" context="When a user tries to login with Two-Factor Authentication and lost his device, button that permits get information about how login">Appareil d\'authentification perdu ?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Vérification de la connexion</string>
     <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">Authentification à deux facteurs\nChanger le mot de passe</string>
     <string name="cancel_account_verification" context="Title of screen Cancel account verification with Two-Factor Authentication">Authentification à deux facteurs\nAnnuler le compte</string>
     <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">Authentification à deux facteurs\nChanger l\'adresse courriel</string>
     <string name="disable_2fa_verification" context="Title of screen Disable Two-Factor Authentication">Désactiver l\'authentification à deux facteurs</string>
-    <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Avez-vous perdu votre appareil d\'authentification ?</string>
+    <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Appareil d\'authentification perdu ?</string>
     <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">Une erreur est survenue en tentant de désactiver l\'authentification à deux facteurs. Veuillez ressayer.</string>
     <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">Une erreur est survenue en tentant d\'activer l\'authentification à deux facteurs. Veuillez ressayer.</string>
     <string name="title_enable_2fa" context="Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication">Activer l\'authentification à deux facteurs</string>
@@ -1979,7 +1981,7 @@
     <string name="number_no_imported_from_chat" context="error message when importing multiple files from chat">%d fichiers n\'ont pas été partagés</string>
     <string name="preview_content" context="button's text to open a full screen image">Aperçu du contenu</string>
 
-    <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">La diffusion en continu ne peut pas avoir lieu et le fichier n\'a pas été téléchargé</string>
+    <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">La lecture en continu ne peut pas avoir lieu et le fichier n\'a pas été téléchargé</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">Le fichier existe déjà dans Enregistré Hors ligne</string>
 
     <plurals name="error_forwarding_messages" context="Error message if forwarding a message failed">
@@ -2320,7 +2322,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Un appel a commencé</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Erreur de clé SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA n\'arrive pas à se connecter de façon sécurisée par SSL. Vous êtes peut-être sur un réseau Wi-Fi public qui a des exigences supplémentaires.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA n\'arrive pas à se connecter de façon sécurisée par SSL. Vous êtes peut-être sur un réseau Wi-Fi public avec des exigences supplémentaires.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Il n\'y a aucune [/B][A]notification[/A][B].[/B]</string>
 
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Chargement</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Veuillez patienter&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>
