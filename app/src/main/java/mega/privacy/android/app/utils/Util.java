@@ -1676,6 +1676,14 @@ public class Util {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
+
+	public static boolean isScreenInPortrait(Context context) {
+		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	/**
 	 * This method detects whether the android device is tablet
 	 *

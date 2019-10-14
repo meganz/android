@@ -5,8 +5,6 @@
     android:background="@color/white"
     tools:context=".FileBrowserListFragment">
 
-	<include layout="@layout/item_transfers_overview"/>
-
 	<include layout="@layout/item_call_in_progress_layout"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
