@@ -59,6 +59,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -749,7 +750,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 							}
 
-							mediaIntent.putExtra("isPlayList", false);
+							mediaIntent.putExtra(IS_PLAYLIST, false);
 							mediaIntent.putExtra("HANDLE", handle);
 							mediaIntent.putExtra("fromDownloadService", true);
                             mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());

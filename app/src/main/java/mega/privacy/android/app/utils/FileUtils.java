@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,6 +11,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -29,6 +32,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -50,6 +56,161 @@ public class FileUtils {
         return MegaApplication.getInstance().getApplicationContext().getString(R.string.general_rk) + ".txt";
     }
 
+    public static boolean isAudioOrVideo(MegaNode node) {
+        if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio())
+            return true;
+
+        return false;
+    }
+
+    public static boolean isInternalIntent(MegaNode node) {
+        if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported() || MimeTypeList.typeForName(node.getName()).isAudioNotSupported())
+            return false;
+
+        return true;
+    }
+
+    public static boolean isOpusFile(MegaNode node) {
+        String[] s = node.getName().split("\\.");
+        if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) return true;
+
+        return false;
+    }
+
+    public static boolean isOnMegaDownloads(Context context, MegaNode node) {
+        File f = new File(getDownloadLocation(context), node.getName());
+
+        if (isFileAvailable(f) && f.length() == node.getSize()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isLocalFile(Context context, MegaNode node, MegaApiAndroid megaApi, String localPath) {
+        if (localPath != null && (isOnMegaDownloads(context, node) || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath)))))
+            return true;
+
+        return false;
+    }
+
+    public static boolean setLocalIntentParams(Context context, MegaNode node, Intent intent, String localPath, boolean isText) {
+        File mediaFile = new File(localPath);
+
+        Uri mediaFileUri;
+        try {
+            mediaFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+        } catch (IllegalArgumentException e) {
+            mediaFileUri = Uri.fromFile(mediaFile);
+        }
+
+        if (mediaFileUri != null) {
+            if (isText) {
+                intent.setDataAndType(mediaFileUri, "text/plain");
+            } else {
+                intent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            return true;
+        }
+
+        ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        return false;
+    }
+
+    public static boolean setStreamingIntentParams(Context context, MegaNode node, MegaApiJava megaApi, Intent intent) {
+        if (megaApi.httpServerIsRunning() == 0) {
+            megaApi.httpServerStart();
+        }
+
+        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.getMemoryInfo(mi);
+
+        if (mi.totalMem > Constants.BUFFER_COMP) {
+            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+        } else {
+            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+        }
+
+        String url = megaApi.httpServerGetLocalLink(node);
+        if (url != null) {
+            Uri uri = Uri.parse(url);
+            if (uri != null) {
+                intent.setDataAndType(uri, MimeTypeList.typeForName(node.getName()).getType());
+                return true;
+            }
+        }
+
+        ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        return false;
+    }
+
+    public static boolean setURLIntentParams(Context context, MegaNode node, Intent intent, String localPath) {
+        File mediaFile = new File(localPath);
+        InputStream instream = null;
+        boolean paramsSetSuccessfully = false;
+
+        try {
+            // open the file for reading
+            instream = new FileInputStream(mediaFile.getAbsolutePath());
+            // if file the available for reading
+            if (instream != null) {
+                // prepare the file for reading
+                InputStreamReader inputreader = new InputStreamReader(instream);
+                BufferedReader buffreader = new BufferedReader(inputreader);
+
+                String line1 = buffreader.readLine();
+                if (line1 != null) {
+                    String line2 = buffreader.readLine();
+                    String url = line2.replace("URL=", "");
+                    intent.setData(Uri.parse(url));
+                    paramsSetSuccessfully = true;
+                }
+            }
+        } catch (Exception ex) {
+            logError("EXCEPTION reading file", ex);
+        } finally {
+            // close the file.
+            try {
+                instream.close();
+            } catch (IOException e) {
+                logError("EXCEPTION closing InputStream", e);
+            }
+        }
+        if (paramsSetSuccessfully) {
+            return true;
+        }
+        logError("Not expected format: Exception on processing url file");
+        return setLocalIntentParams(context, node, intent, localPath, true);
+    }
+
+    public static MegaNode getOutgoingOrIncomingParent(MegaApiAndroid megaApi, MegaNode node) {
+        if (isOutgoingOrIncomingFolder(node)) {
+            return node;
+        }
+
+        MegaNode parentNode = node;
+
+        while (megaApi.getParentNode(parentNode) != null) {
+            parentNode = megaApi.getParentNode(parentNode);
+
+            if (isOutgoingOrIncomingFolder(parentNode)) {
+                return parentNode;
+            }
+        }
+
+        return null;
+    }
+
+    private static boolean isOutgoingOrIncomingFolder(MegaNode node) {
+        if (node.isOutShare() || node.isInShare()) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
 
         if (f == null) return;
@@ -68,9 +229,9 @@ public class FileUtils {
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                 File fileToDelete = new File(f.getAbsolutePath());
                 Uri contentUri;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                try {
                     contentUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", fileToDelete);
-                } else {
+                } catch (IllegalArgumentException e) {
                     contentUri = Uri.fromFile(fileToDelete);
                 }
                 mediaScanIntent.setData(contentUri);
@@ -468,3 +629,4 @@ public class FileUtils {
         return result;
     }
 }
+

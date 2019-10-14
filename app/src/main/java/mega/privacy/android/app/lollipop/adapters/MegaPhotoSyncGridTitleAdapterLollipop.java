@@ -66,6 +66,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle> implements SectionTitleProvider {
@@ -784,21 +785,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 logDebug(n.getHandle() + " DURATION: " + n.getDuration());
                 int duration = n.getDuration();
                 if(duration>0){
-                    int hours = duration / 3600;
-                    int minutes = (duration % 3600) / 60;
-                    int seconds = duration % 60;
-
-                    String timeString;
-                    if(hours>0){
-                        timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
-                    }
-                    else{
-                        timeString = String.format("%d:%02d", minutes, seconds);
-                    }
-
-                    logDebug("The duration is: " + hours + " " + minutes + " " + seconds);
-
-                    videoDuration.setText(timeString);
+                    videoDuration.setText(getVideoDuration(duration));
                 }
                 else{
                     videoDuration.setVisibility(View.GONE);

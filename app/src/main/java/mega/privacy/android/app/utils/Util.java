@@ -1680,23 +1680,12 @@ public class Util {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
-	public static String getVideoDuration (int duration) {
-		if (duration > 0) {
-			int hours = duration / 3600;
-			int minutes = (duration % 3600) / 60;
-			int seconds = duration % 60;
-
-			String timeString;
-			if (hours > 0) {
-				timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
-			} else {
-				timeString = String.format("%d:%02d", minutes, seconds);
-			}
-
-			logDebug("The duration is: " + hours + " " + minutes + " " + seconds);
-			return timeString;
+	public static boolean isScreenInPortrait(Context context) {
+		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			return true;
+		} else {
+			return false;
 		}
-		return null;
 	}
 
 	/**

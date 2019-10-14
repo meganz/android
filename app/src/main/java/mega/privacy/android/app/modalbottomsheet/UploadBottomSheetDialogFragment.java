@@ -48,6 +48,8 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
     public LinearLayout optionTakePicture;
     public LinearLayout optionCreateFolder;
 
+    private LinearLayout createFolderSeparator;
+
     DisplayMetrics outMetrics;
     private int heightDisplay;
 
@@ -81,6 +83,16 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         optionScanDocument = (LinearLayout) contentView.findViewById(R.id.scan_document_layout);
         optionTakePicture = (LinearLayout) contentView.findViewById(R.id.take_picture_layout);
         optionCreateFolder = (LinearLayout) contentView.findViewById(R.id.new_folder_layout);
+        createFolderSeparator = (LinearLayout) contentView.findViewById(R.id.create_folder_separator);
+
+        if (((ManagerActivityLollipop)context).isOnRecents()) {
+            optionCreateFolder.setVisibility(View.GONE);
+            createFolderSeparator.setVisibility(View.GONE);
+        }
+        else {
+            optionCreateFolder.setVisibility(View.VISIBLE);
+            createFolderSeparator.setVisibility(View.VISIBLE);
+        }
 
         title = (TextView) contentView.findViewById(R.id.contact_list_contact_name_text);
 

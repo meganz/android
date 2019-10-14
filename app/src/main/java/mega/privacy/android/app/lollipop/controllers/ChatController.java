@@ -60,6 +60,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -467,7 +468,7 @@ public class ChatController {
                         if (nonContact != null) {
                             fullNameTitle = nonContact.getFullName();
                         } else {
-                            fullNameTitle = "Unknown name";
+                            fullNameTitle = context.getString(R.string.unknown_name_label);
 //                            log("3-Call for nonContactName: "+ message.getUserHandle());
 //                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
 //                        megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
@@ -496,7 +497,7 @@ public class ChatController {
                                 if (nonContact != null) {
                                     fullNameAction = nonContact.getFullName();
                                 } else {
-                                    fullNameAction = "Unknown name";
+                                    fullNameAction = context.getString(R.string.unknown_name_label);
                                     logDebug("2-Call for nonContactName: " + message.getUserHandle());
 //                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                    megaChatApi.getUserFirstname(message.getUserHandle(), listener);
@@ -531,7 +532,7 @@ public class ChatController {
                                     if (nonContact != null) {
                                         fullNameAction = nonContact.getFullName();
                                     } else {
-                                        fullNameAction = "Unknown name";
+                                        fullNameAction = context.getString(R.string.unknown_name_label);
                                         logDebug("4-Call for nonContactName: " + message.getUserHandle());
 //                                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
@@ -588,7 +589,7 @@ public class ChatController {
                             if (nonContact != null) {
                                 fullNameAction = nonContact.getFullName();
                             } else {
-                                fullNameAction = "Unknown name";
+                                fullNameAction = context.getString(R.string.unknown_name_label);
                                 logDebug("5-Call for nonContactName: " + message.getUserHandle());
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
@@ -615,7 +616,7 @@ public class ChatController {
                         if (nonContact != null) {
                             fullNameTitle = nonContact.getFullName();
                         } else {
-                            fullNameTitle = "Unknown name";
+                            fullNameTitle = context.getString(R.string.unknown_name_label);
                             logDebug("6-Call for nonContactName: " + message.getUserHandle());
 //                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
 //                            megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
@@ -655,7 +656,7 @@ public class ChatController {
                             if (nonContact != null) {
                                 fullNameAction = nonContact.getFullName();
                             } else {
-                                fullNameAction = "Unknown name";
+                                fullNameAction = context.getString(R.string.unknown_name_label);
                                 logDebug("8-Call for nonContactName: " + message.getUserHandle());
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
@@ -861,7 +862,7 @@ public class ChatController {
                         if (nonContact != null) {
                             fullNameTitle = nonContact.getFullName();
                         } else {
-                            fullNameTitle = "Unknown name";
+                            fullNameTitle = context.getString(R.string.unknown_name_label);
 //
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
@@ -1830,7 +1831,7 @@ public class ChatController {
                                     internalIntent = true;
                                     mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                                 }
-                                mediaIntent.putExtra("isPlayList", false);
+                                mediaIntent.putExtra(IS_PLAYLIST, false);
                                 mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                                 mediaIntent.putExtra("adapterType", FROM_CHAT);
                                 mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());

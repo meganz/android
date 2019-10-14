@@ -85,6 +85,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -553,7 +554,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 							}
 
 							mediaIntent.putExtra("adapterType", FROM_CHAT);
-							mediaIntent.putExtra("isPlayList", false);
+							mediaIntent.putExtra(IS_PLAYLIST, false);
 							mediaIntent.putExtra("msgId", m.getMsgId());
 							mediaIntent.putExtra("chatId", chatId);
 
