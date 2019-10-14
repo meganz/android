@@ -1161,6 +1161,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo().getFormattedUsedRubbish()));
 	}
 
+	public void resetRubbishInfo() {
+		logInfo("Updating size after clean the Rubbish Bin");
+		String emptyString = "0 " + getString(R.string.label_file_size_byte);
+		rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, emptyString));
+		MegaApplication.getInstance().getMyAccountInfo().setFormattedUsedRubbish(emptyString);
+	}
+
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);

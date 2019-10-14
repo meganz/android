@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Mengaktifkan akun</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Mempersiapkan daftar file</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Silakan log in untuk berbagi dengan MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Tautan konfirmasi Anda tidak lagi valid. Akun Anda mungkin sudah diaktifkan atau Anda mungkin telah membatalkan pendaftaran Anda.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -538,7 +539,7 @@
     <string name="upload_prepare" context="Status text at the beginning of an upload">Sedang memproses file</string>
     <plurals name="upload_prepare" context="Status text at the beginning of an upload">
         <item context="Status text at the beginning of an upload for 1 file" quantity="one">Sedang memproses file</item>
-        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Memproses file</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">Sumber sementara tidak tersedia, harap coba kembali nanti</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Tidak dapat membuka file terpilih</string>
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Pratinjau belum didownload. Mohon tunggu</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Tolong, log out sebelum membuat akun</string>
 
@@ -650,7 +652,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Gudang</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Kompresi video menghabiskan banyak daya; MEGA akan meminta Anda untuk mengisi daya perangkat Anda secara aktif jika video yang dikompres lebih besar dari %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Lanjutan</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Hapus Cache</string>
@@ -730,7 +732,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">File lokal Anda akan dihapus dan Anda akan keluar setelah 10 kali gagal</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Kode salah</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Kode PIN salah, silakan coba lagi. Anda memiliki 1 upaya lagi</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Kode PIN salah, silahkan coba lagi. Anda memiliki %2d upaya yang tersisa</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Code tidak cocok</string>
@@ -1079,7 +1081,7 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d kontak akan dihapus dari folder bersama.</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d kontak berhasil dihapus dari folder bersama</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160; dan %d kontak tidak berhasil dihapus</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d kontak tidak berhasil dihapus</string>
 
 	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Successfully updated permissions for %d contacts</string>
 	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Failed to update permissions for %d contacts</string>
@@ -2479,13 +2481,13 @@
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Masukkan tautan obrolan</string>
 
-    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
-    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
-    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
-    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Tempel tautan</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Tautan file atau folder tidak valid</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Silakan masukkan tautan file atau folder yang valid</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Silakan masukkan tautan obrolan yang valid</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">Anda telah menempelkan tautan obrolan.</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">Anda telah menempelkan tautan kontak.</string>
+    <string name="action_open_contact_link" context="Menu item">Buka tautan kontak</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">Orang-orang dapat bergabung dengan grup Anda dengan menggunakan tautan ini.</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Tautan obrolan baru</string>
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Memuat</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Mohon tunggu&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>
