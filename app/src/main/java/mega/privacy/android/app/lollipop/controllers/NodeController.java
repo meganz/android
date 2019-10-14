@@ -59,51 +59,13 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
-import static mega.privacy.android.app.utils.Constants.CHAT_LINK;
-import static mega.privacy.android.app.utils.Constants.CONTACT_LINK;
-import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
-import static mega.privacy.android.app.utils.Constants.ERROR_LINK;
-import static mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING;
-import static mega.privacy.android.app.utils.Constants.FILE_LINK;
-import static mega.privacy.android.app.utils.Constants.FOLDER_LINK;
-import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_CONTACTS_SHARE;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_COPY;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_FILE_SHARE;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_LEAVE_SHARE;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_MOVE;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_REMOVE_SHARING_CONTACTS;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_SEND_RUBBISH;
-import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CONTACT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_COPY_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_MOVE_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
-import static mega.privacy.android.app.utils.FileUtils.buildExternalStorageFile;
-import static mega.privacy.android.app.utils.FileUtils.copyFile;
-import static mega.privacy.android.app.utils.FileUtils.deleteFolderAndSubfolders;
-import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
-import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
-import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
-import static mega.privacy.android.app.utils.MegaApiUtils.getFolderSize;
-import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.createThumbnailVideo;
-import static mega.privacy.android.app.utils.Util.askMe;
-import static mega.privacy.android.app.utils.Util.getSizeString;
-import static mega.privacy.android.app.utils.Util.isOnline;
-import static mega.privacy.android.app.utils.Util.showSnackBar;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class NodeController {
 
@@ -113,7 +75,6 @@ public class NodeController {
     MegaPreferences prefs = null;
 
     boolean isFolderLink = false;
-//    private SDCardOperator sdCardOperator;
 
     public NodeController(Context context){
         logDebug("NodeController created");
@@ -459,7 +420,7 @@ public class NodeController {
             logDebug("NOT askMe");
             File defaultPathF = new File(downloadLocationDefaultPath);
             defaultPathF.mkdirs();
-            checkSizeBeforeDownload(downloadLocationDefaultPath, null, null, size, hashes, highPriority);
+            checkSizeBeforeDownload(downloadLocationDefaultPath, null, size, hashes, highPriority);
         }
     }
 
@@ -486,7 +447,7 @@ public class NodeController {
     }
 
     //Old downloadTo
-    public void checkSizeBeforeDownload(String parentPath, String uriString, String url, long size, long [] hashes, boolean highPriority){
+    public void checkSizeBeforeDownload(String parentPath, String url, long size, long [] hashes, boolean highPriority){
         //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
         logDebug("parentPath: " + parentPath + ", url: " + url + ", size: " + size);
         logDebug("Files to download: " + hashes.length);
@@ -541,7 +502,7 @@ public class NodeController {
 
         if(ask.equals("false")){
             logDebug("SIZE: Do not ask before downloading");
-            checkInstalledAppBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+            checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
         }
         else{
             logDebug("SIZE: Ask before downloading");
@@ -553,28 +514,28 @@ public class NodeController {
                 logDebug("Show size confirmacion: " + sizeC);
                 //Show alert
                 if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC,urlC, sizeC, hashesC, highPriority);
                 } else if (context instanceof FullScreenImageViewerLollipop) {
-                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                 } else if (context instanceof FileInfoActivityLollipop) {
-                    ((FileInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                    ((FileInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                 } else if (context instanceof ContactFileListActivityLollipop) {
-                    ((ContactFileListActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                    ((ContactFileListActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                 } else if (context instanceof PdfViewerActivityLollipop) {
-                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                 } else if (context instanceof AudioVideoPlayerLollipop) {
-                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                 } else if (context instanceof ContactInfoActivityLollipop) {
-                    ((ContactInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                    ((ContactInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                 }
             } else {
-                checkInstalledAppBeforeDownload(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
             }
         }
     }
 
     //Old proceedToDownload
-    public void checkInstalledAppBeforeDownload(String parentPath, String uriString, String url, long size, long [] hashes, boolean highPriority){
+    public void checkInstalledAppBeforeDownload(String parentPath, String url, long size, long [] hashes, boolean highPriority){
         logDebug("checkInstalledAppBeforeDownload");
         boolean confirmationToDownload = false;
         final String parentPathC = parentPath;
@@ -596,7 +557,7 @@ public class NodeController {
 
         if(ask.equals("false")){
             logDebug("INSTALLED APP: Do not ask before downloading");
-            download(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+            download(parentPathC, urlC, sizeC, hashesC, highPriority);
         }
         else{
             logDebug("INSTALLED APP: Ask before downloading");
@@ -636,29 +597,29 @@ public class NodeController {
             if(confirmationToDownload){
                 //Show message
                 if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((ManagerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof FullScreenImageViewerLollipop){
-                    ((FullScreenImageViewerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((FullScreenImageViewerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof FileInfoActivityLollipop){
-                    ((FileInfoActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((FileInfoActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
-                    ((ContactFileListActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((ContactFileListActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof PdfViewerActivityLollipop){
-                    ((PdfViewerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((PdfViewerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof AudioVideoPlayerLollipop){
-                    ((AudioVideoPlayerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((AudioVideoPlayerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
                 else if(context instanceof ContactInfoActivityLollipop){
-                    ((ContactInfoActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, uriString,urlC, sizeC, hashesC, nodeToDownload, highPriority);
+                    ((ContactInfoActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC,urlC, sizeC, hashesC, nodeToDownload, highPriority);
                 }
             }
             else{
-                download(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                download(parentPathC, urlC, sizeC, hashesC, highPriority);
             }
         }
     }
@@ -726,7 +687,7 @@ public class NodeController {
         }
     }
 
-    public void download(String parentPath, String uriString, String url, long size, long [] hashes, boolean highPriority){
+    public void download(String parentPath, String url, long size, long [] hashes, boolean highPriority){
         logDebug("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
         logDebug("files to download: "+hashes.length);
         boolean downloadToSDCard = false;
@@ -1044,7 +1005,7 @@ public class NodeController {
                                 service.putExtra(DownloadService.EXTRA_PATH, path);
                                 service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
                                 service.putExtra(DownloadService.EXTRA_TARGET_PATH, targetPath);
-                                service.putExtra(DownloadService.EXTRA_TARGET_URI, uriString);
+                                service.putExtra(DownloadService.EXTRA_TARGET_URI, dbH.getSDCardUri());
                             } else {
                                 service.putExtra(DownloadService.EXTRA_PATH, path);
                             }
@@ -1982,7 +1943,7 @@ public class NodeController {
                 intentPickFolder(document, url, null);
             }
         } else {
-            downloadTo(document, downloadLocationDefaultPath, null, url);
+            downloadTo(document, downloadLocationDefaultPath, url);
         }
     }
 
@@ -2009,7 +1970,7 @@ public class NodeController {
         }
     }
 
-    public void downloadTo(final MegaNode currentDocument, final String parentPath, String uriString, final String url){
+    public void downloadTo(final MegaNode currentDocument, final String parentPath, final String url){
         logDebug("downloadTo");
         boolean downloadToSDCard = false;
         String downloadRoot = null;
@@ -2106,7 +2067,7 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_PATH, downloadRoot);
                             service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
                             service.putExtra(DownloadService.EXTRA_TARGET_PATH, path);
-                            service.putExtra(DownloadService.EXTRA_TARGET_URI, uriString);
+                            service.putExtra(DownloadService.EXTRA_TARGET_URI, dbH.getSDCardUri());
                         } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                         }

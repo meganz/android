@@ -2257,6 +2257,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                         } else {
                             String path = FileUtil.getFullPathFromTreeUri(treeUri, context);
                             dbH.setStorageDownloadLocation(path);
+                            downloadLocationPath = path;
                             if (downloadLocation != null){
                                 downloadLocation.setSummary(path);
                             }
@@ -2279,6 +2280,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK && intent != null) {
 			String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			dbH.setStorageDownloadLocation(path);
+            downloadLocationPath = path;
 			if (downloadLocation != null){
 				downloadLocation.setSummary(path);
 			}

@@ -51,7 +51,7 @@ public class DownloadableActivity extends PinActivityLollipop {
         if (treeUri != null) {
             String uriString = treeUri.toString();
             DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
-            if (pickedDir.canWrite()) {
+            if (pickedDir != null && pickedDir.canWrite()) {
                 logDebug("sd card root uri is " + treeUri);
                 //save the sd card root uri string
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(this);
@@ -64,7 +64,7 @@ public class DownloadableActivity extends PinActivityLollipop {
                         } else {
                             String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
                             dbH.setStorageDownloadLocation(path);
-                            nC.checkSizeBeforeDownload(path, uriString, null, downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
+                            nC.checkSizeBeforeDownload(path, null, downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
                         }
                     } else if (linkInfo != null) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -72,7 +72,7 @@ public class DownloadableActivity extends PinActivityLollipop {
                         } else {
                             String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
                             dbH.setStorageDownloadLocation(path);
-                            nC.downloadTo(linkInfo.getNode(), path, uriString, linkInfo.getUrl());
+                            nC.downloadTo(linkInfo.getNode(), path, linkInfo.getUrl());
                         }
                     }
                 } catch (SDCardOperator.SDCardException e) {
@@ -90,7 +90,7 @@ public class DownloadableActivity extends PinActivityLollipop {
         if (treeUri != null) {
             String uriString = treeUri.toString();
             DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
-            if (pickedDir.canWrite()) {
+            if (pickedDir != null && pickedDir.canWrite()) {
                 logDebug("sd card root uri is " + treeUri);
                 //save the sd card root uri string
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(this);
@@ -106,7 +106,7 @@ public class DownloadableActivity extends PinActivityLollipop {
                             controller.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
                         } else {
                             dbH.setStorageDownloadLocation(path);
-                            controller.downloadTo(linkInfo.getNode(), path, uriString, linkInfo.getUrl());
+                            controller.downloadTo(linkInfo.getNode(), path, linkInfo.getUrl());
                         }
                     } else {
                         //folder link

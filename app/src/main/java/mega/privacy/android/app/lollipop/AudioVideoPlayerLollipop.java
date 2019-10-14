@@ -3311,7 +3311,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 if (nC == null) {
                     nC = new NodeController(this);
                 }
-                nC.downloadTo(currentDocument, parentPath, null, uri.toString());
+                nC.downloadTo(currentDocument, parentPath, uri.toString());
             }
             else if (adapterType == FROM_CHAT) {
                 chatC.prepareForDownload(intent, parentPath);
@@ -3325,7 +3325,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 if(nC==null){
                     nC = new NodeController(this, isFolderLink);
                 }
-                nC.checkSizeBeforeDownload(parentPath,  null,url, size, hashes, false);
+                nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
@@ -3957,7 +3957,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
     }
 
-    public void askSizeConfirmationBeforeDownload(String parentPath, final String uriString, String url, long size, long [] hashes, final boolean highPriority){
+    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
         logDebug("askSizeConfirmationBeforeDownload");
 
         final String parentPathC = parentPath;
@@ -3991,7 +3991,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                         if(nC==null){
                             nC = new NodeController(audioVideoPlayerLollipop, isFolderLink);
                         }
-                        nC.checkInstalledAppBeforeDownload(parentPathC,  uriString, urlC, sizeC, hashesC, highPriority);
+                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -4006,7 +4006,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         downloadConfirmationDialog.show();
     }
 
-    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, final String uriString,String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
+    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath,String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
         logDebug("askConfirmationNoAppInstaledBeforeDownload");
 
         final String parentPathC = parentPath;
@@ -4039,7 +4039,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                         if(nC==null){
                             nC = new NodeController(audioVideoPlayerLollipop, isFolderLink);
                         }
-                        nC.download(parentPathC, uriString, urlC, sizeC, hashesC, highPriority);
+                        nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
