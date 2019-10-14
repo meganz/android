@@ -35,9 +35,9 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="25dp"
-                android:gravity="start"
+                android:gravity="center"
                 android:lineSpacingMultiplier="1.27"
-                android:textAlignment="textStart"/>
+                android:textAlignment="center"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

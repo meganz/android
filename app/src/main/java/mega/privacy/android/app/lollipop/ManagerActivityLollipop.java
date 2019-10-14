@@ -358,6 +358,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private LinearLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
 
+    private int newStorageState = -1;
+
     float elevation = 0;
 
     public enum FragmentTag {
@@ -687,7 +689,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (intent.getAction() == ACTION_STORAGE_STATE_CHANGED) {
 					int newStorageState =
 							intent.getIntExtra("state", MegaApiJava.STORAGE_STATE_GREEN);
-					checkStorageStatus(newStorageState, false);
+					// don't interrupt the onboarding process, will check it when onboarding finished.
+					if(!firstTimeAfterInstallation) {
+                        checkStorageStatus(newStorageState, false);
+                    } else {
+					    ManagerActivityLollipop.this.newStorageState = newStorageState;
+                    }
 					updateAccountDetailsVisibleInfo();
 					return;
 				}
@@ -3275,6 +3282,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
 		selectDrawerItemLollipop(drawerItem);
+
+		// onboarding process finishes, check storage state.
+        firstTimeAfterInstallation = false;
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+        intent.setAction(ACTION_STORAGE_STATE_CHANGED);
+        intent.putExtra("state", newStorageState);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
 	void setContactStatus() {
