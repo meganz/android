@@ -80,32 +80,14 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.MegaPreferences.MEDIUM;
-import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
-import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED;
-import static mega.privacy.android.app.utils.Constants.DISABLE_2FA;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
-import static mega.privacy.android.app.utils.Constants.SET_PIN;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
-import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
-import static mega.privacy.android.app.utils.FileUtils.buildDefaultDownloadDir;
-import static mega.privacy.android.app.utils.FileUtils.purgeDirectory;
-import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
-import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
-import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.Util.getExternalCardPath;
-import static mega.privacy.android.app.utils.Util.hasPermissions;
-import static mega.privacy.android.app.utils.Util.isChatEnabled;
-import static mega.privacy.android.app.utils.Util.isOnline;
-import static mega.privacy.android.app.utils.Util.px2dp;
-import static mega.privacy.android.app.utils.Util.setFileLoggerKarere;
-import static mega.privacy.android.app.utils.Util.setFileLoggerSDK;
-import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
+import static mega.privacy.android.app.MegaPreferences.*;
+import static mega.privacy.android.app.jobservices.SyncRecord.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.DBUtil.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -1184,6 +1166,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	public void setRubbishInfo(){
 		logDebug("setRubbishInfo");
 		rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo().getFormattedUsedRubbish()));
+	}
+
+	public void resetRubbishInfo() {
+		logInfo("Updating size after clean the Rubbish Bin");
+		String emptyString = "0 " + getString(R.string.label_file_size_byte);
+		rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, emptyString));
+		MegaApplication.getInstance().getMyAccountInfo().setFormattedUsedRubbish(emptyString);
 	}
 
 	@Override

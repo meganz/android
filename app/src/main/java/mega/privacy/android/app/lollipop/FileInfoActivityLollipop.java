@@ -790,6 +790,12 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                     return;
                 }
 
+                if (node.isFolder()) {
+                    modifiedLayout.setVisibility(View.GONE);
+                } else {
+                    modifiedLayout.setVisibility(View.VISIBLE);
+                }
+
                 String name = node.getName();
 
                 collapsingToolbar.setTitle(name.toUpperCase());
@@ -820,20 +826,18 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                     if (megaApi.getParentNode(node) == null){ // It is because of the parent node is Incoming Shares
                         locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer));
                     }
-                    else {
-                        if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
-                                parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
-                                parent.getHandle() == megaApi.getInboxNode().getHandle()){
-                            if (megaApi.getParentNode(node).getHandle() == parent.getHandle()){
-                                locationTextView.setText(getTranslatedNameForParentNodes(parent.getHandle()));
-                            }
-                            else {
-                                locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getTranslatedNameForParentNodes(parent.getHandle()) +")");
-                            }
+                    else if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
+                            parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
+                            parent.getHandle() == megaApi.getInboxNode().getHandle()){
+                        if (megaApi.getParentNode(node).getHandle() == parent.getHandle()){
+                            locationTextView.setText(getTranslatedNameForParentNodes(parent.getHandle()));
                         }
                         else {
-                            locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                            locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getTranslatedNameForParentNodes(parent.getHandle()) +")");
                         }
+                    }
+                    else {
+                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
                     }
                 }
 

@@ -295,16 +295,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
 
-//        if (!renamed){
-//            uri = intent.getData();
-//            log("URI pdf: "+uri);
-//            if (uri == null){
-//                log("uri null");
-//                finish();
-//                return;
-//            }
-//        }
-
         if (type == OFFLINE_ADAPTER){
             isOffLine = true;
             pathNavigation = intent.getStringExtra("pathNavigation");
@@ -364,7 +354,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     if (msgId != -1 && chatId != -1) {
                         msgChat = megaChatApi.getMessage(chatId, msgId);
                         if(msgChat==null){
-                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, chatId);
+                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                         }
                         if (msgChat != null) {
                             nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
@@ -478,32 +468,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             }
         }
 
-//        if(megaApi==null||megaApi.getRootNode()==null){
-//            log("Refresh session - sdk");
-//            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-//            intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
-//            intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(intentLogin);
-//            finish();
-//            return;
-//        }
-//
-//        if(isChatEnabled()){
-//            if (megaChatApi == null){
-//                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-//            }
-//
-//            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-//                log("Refresh session - karere");
-//                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-//                intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
-//                intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                startActivity(intentLogin);
-//                finish();
-//                return;
-//            }
-//        }
-
         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
         if(tB==null){
             logWarning("Tb is Null");
@@ -517,16 +481,10 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-        }
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 
         bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
         fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
@@ -786,7 +744,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                         if (msgId != -1 && chatId != -1){
                             msgChat = megaChatApi.getMessage(chatId, msgId);
                             if(msgChat==null){
-                                msgChat = megaChatApi.getMessageFromNodeHistory(chatId, chatId);
+                                msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                             }
                             if (msgChat != null){
                                 nodeChat = msgChat.getMegaNodeList().get(0);
@@ -1491,6 +1449,40 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     }
                 }
             }
+            else if (type == RECENTS_ADAPTER) {
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                chatRemoveMenuItem.setVisible(false);
+                removeMenuItem.setVisible(false);
+                getlinkMenuItem.setVisible(false);
+                if (!isUrl) {
+                    shareMenuItem.setVisible(true);
+                }
+                else {
+                    shareMenuItem.setVisible(false);
+                }
+                removelinkMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+
+                int accessLevel = megaApi.getAccess(node);
+                switch (accessLevel) {
+                    case MegaShare.ACCESS_READWRITE:
+                    case MegaShare.ACCESS_READ:
+                    case MegaShare.ACCESS_UNKNOWN: {
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
+                        break;
+                    }
+                    case MegaShare.ACCESS_FULL:
+                    case MegaShare.ACCESS_OWNER: {
+                        renameMenuItem.setVisible(true);
+                        moveMenuItem.setVisible(true);
+                        moveToTrashMenuItem.setVisible(true);
+                        break;
+                    }
+                }
+            }
             else {
                 shareMenuItem.setVisible(true);
                 boolean shareVisible = true;
@@ -2156,7 +2148,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 nC = new NodeController(this);
             }
             boolean fromIncoming = false;
-            if (type == SEARCH_ADAPTER) {
+
+            if (type == SEARCH_ADAPTER || type == RECENTS_ADAPTER) {
                 fromIncoming = nC.nodeComesFromIncoming(node);
             }
             if (type == INCOMING_SHARES_ADAPTER || fromIncoming) {

@@ -244,12 +244,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public int onStartCommand(Intent intent,int flags,int startId) {
-        logDebug("onStartCommand");
-        initService();
+        logDebug("Starting CU service (flags: " + flags + ", startId: " + startId + ")");
         isServiceRunning = true;
-        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
-        startForeground(notificationId,mNotification);
-        
+        mContext = getApplicationContext();
+        mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        Notification notification = createNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
+        startForeground(notificationId,notification);
+        initService();
+
         if (megaApi == null) {
             logError("megaApi is null");
             finish();
@@ -1185,8 +1187,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } catch (Exception ex) {
             finish();
         }
-        
-        mContext = getApplicationContext();
+
         int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
         WifiManager wifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createWifiLock(wifiLockMode,"MegaDownloadServiceWifiLock");
@@ -1226,7 +1227,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         
         initDbH();
-        mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
         String previousIP = app.getLocalIpAddress();
         // the new logic implemented in NetworkStateReceiver
         String currentIP = getLocalIpAddress(getApplicationContext());
@@ -1854,16 +1855,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
         showProgressNotification(progressPercent,pendingIntent,message,info,getString(R.string.settings_camera_notif_title));
     }
-    
-    private void showNotification(String title,String content,PendingIntent intent,boolean isAutoCancel) {
-        logDebug("showNotification");
+
+    private Notification createNotification(String title,String content,PendingIntent intent,boolean isAutoCancel){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(false);
             channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
         }
-        
+
         mBuilder = new NotificationCompat.Builder(mContext,notificationChannelId);
         mBuilder.setSmallIcon(R.drawable.ic_stat_camera_sync)
                 .setOngoing(false)
@@ -1872,12 +1872,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 .setContentText(content)
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(isAutoCancel);
-        
+
         if (intent != null) {
             mBuilder.setContentIntent(intent);
         }
-        mNotification = mBuilder.build();
-        
+        return mBuilder.build();
+    }
+    
+    private void showNotification(String title,String content,PendingIntent intent,boolean isAutoCancel) {
+        mNotification = createNotification(title, content, intent, isAutoCancel);
         mNotificationManager.notify(notificationId,mNotification);
     }
 

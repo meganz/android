@@ -63,6 +63,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -705,6 +706,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 							pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+								pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							}
 							pdfIntent.putExtra("fromDownloadService", true);
 							pdfIntent.putExtra("inside", true);
 							pdfIntent.putExtra("isUrl", false);
@@ -760,7 +764,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 							}
 
-							mediaIntent.putExtra("isPlayList", false);
+							mediaIntent.putExtra(IS_PLAYLIST, false);
 							mediaIntent.putExtra("HANDLE", handle);
 							mediaIntent.putExtra("fromDownloadService", true);
                             mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());
@@ -774,6 +778,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 							mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+								mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							}
 
 							if (internalIntent) {
 								startActivity(mediaIntent);
@@ -838,6 +845,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+							viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						}
 
 						if (isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
@@ -957,6 +967,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 										intent.setDataAndType(Uri.fromFile(currentFile), "text/plain");
 									}
 									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+										intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+									}
 
 									if (isIntentAvailable(this, intent)){
 										startActivity(intent);
@@ -1008,6 +1021,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								intent.setDataAndType(Uri.fromFile(currentFile), "text/plain");
 							}
 							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+								intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							}
 
 							if (isIntentAvailable(this, intent)){
 								startActivity(intent);
@@ -1063,6 +1079,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+							intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						}
 
 						if (isIntentAvailable(this, intent))
 							startActivity(intent);
@@ -1081,6 +1100,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 									intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 								}
 								intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+									intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								}
 								startActivity(intent);
 							}
 						}
@@ -1606,6 +1628,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 						mediaScanIntent.setData(finishedContentUri);
 						mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+							mediaScanIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						}
 						this.sendBroadcast(mediaScanIntent);
 					}
 					catch (Exception e){}

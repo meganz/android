@@ -112,7 +112,9 @@ public class ChatUtil {
 
     /*Method to show or hide the "return the call" layout*/
     public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono) {
-        if (megaChatApi == null) return;
+        if (megaChatApi == null || callInProgressLayout == null) return;
+        logDebug("showCallLayout");
+
         if (!Util.isChatEnabled() || !(context instanceof ManagerActivityLollipop) || !participatingInACall(megaChatApi)) {
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
@@ -412,6 +414,43 @@ public class ChatUtil {
             brandAlertDialog(dialog);
         }catch(Exception ex){
             Util.showToast(activity, message);
+        }
+    }
+
+    public static String callStatusToString(int status){
+        switch (status) {
+            case MegaChatCall.CALL_STATUS_INITIAL: {
+                return "CALL_STATUS_INITIAL";
+            }
+            case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM: {
+                return "CALL_STATUS_HAS_LOCAL_STREAM";
+            }
+            case MegaChatCall.CALL_STATUS_REQUEST_SENT: {
+                return "CALL_STATUS_REQUEST_SENT";
+            }
+            case MegaChatCall.CALL_STATUS_RING_IN: {
+                return "CALL_STATUS_RING_IN";
+            }
+            case MegaChatCall.CALL_STATUS_JOINING: {
+                return "CALL_STATUS_JOINING";
+            }
+            case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
+                return "CALL_STATUS_IN_PROGRESS";
+            }
+            case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
+                return "CALL_STATUS_TERMINATING_USER_PARTICIPATION";
+            }
+            case MegaChatCall.CALL_STATUS_DESTROYED: {
+                return "CALL_STATUS_DESTROYED";
+            }
+            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+                return "CALL_STATUS_USER_NO_PRESENT";
+            }
+            case MegaChatCall.CALL_STATUS_RECONNECTING: {
+                return "CALL_STATUS_RECONNECTING";
+            }
+            default:
+                return  String.valueOf(status);
         }
     }
 }
