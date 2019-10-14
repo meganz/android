@@ -1738,6 +1738,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	protected void onDestroy() {
 		super.onDestroy();
 
+		if(drawableArrow == null) return;
+
 		drawableArrow.setColorFilter(null);
 		drawableDots.setColorFilter(null);
 		drawableSend.setColorFilter(null);

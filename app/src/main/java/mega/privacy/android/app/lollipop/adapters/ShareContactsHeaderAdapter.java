@@ -51,9 +51,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop> implements View.OnClickListener, SectionTitleProvider {
 
-    public static final int ITEM_VIEW_TYPE_NODE= 0;
-    public static final int ITEM_VIEW_TYPE_HEADER = 1;
-
     DatabaseHandler dbH = null;
     public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
     public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
@@ -117,10 +114,10 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     public int getItemViewType(int position) {
         ShareContactInfo contact = getItem(position);
         if (contact.isHeader()){
-            return ITEM_VIEW_TYPE_HEADER;
+            return HEADER_VIEW_TYPE;
         }
         else{
-            return ITEM_VIEW_TYPE_NODE;
+            return ITEM_VIEW_TYPE;
         }
     }
 

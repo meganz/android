@@ -1233,14 +1233,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
-
-			if(isChatEnabled() && chat != null && chat.isCallInProgress() && (megaChatApi != null) && (megaChatApi.getNumCalls() != 0)){
-				MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
-				if(call!=null){
-					return;
-				}
-			}
-
 			int messageType = chat.getLastMessageType();
 			MegaChatMessage lastMessage = megaChatApi.getMessage(chat.getChatId(), chat.getLastMessageId());
 			logDebug("MessageType: " + messageType);
@@ -1286,7 +1278,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						if(fullNameAction.isEmpty()){
 							if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 								logDebug("Call for nonContactHandle: "+ chat.getLastMessageSender());
-								fullNameAction = "Unknown name";
+								fullNameAction = context.getString(R.string.unknown_name_label);
 								((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 								((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -1394,7 +1386,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					if(fullNameTitle.trim().length()<=0){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 							logDebug("Call for nonContactHandle: " + chat.getLastMessageHandle());
-							fullNameTitle = "Unknown name";
+							fullNameTitle = context.getString(R.string.unknown_name_label);
 							((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 							((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageHandle();
 
@@ -1456,7 +1448,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								if(fullNameAction.isEmpty()){
 									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 										logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-										fullNameAction = "Unknown name";
+										fullNameAction = context.getString(R.string.unknown_name_label);
 										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 										((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -1543,7 +1535,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 									if(fullNameAction.isEmpty()){
 										if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 											logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-											fullNameAction = "Unknown name";
+											fullNameAction = context.getString(R.string.unknown_name_label);
 											((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 											((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -1653,7 +1645,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(fullNameAction.isEmpty()){
 								if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 									logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-									fullNameAction = "Unknown name";
+									fullNameAction = context.getString(R.string.unknown_name_label);
 									((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 									((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -1707,7 +1699,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					if(fullNameTitle.trim().length()<=0){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 							logDebug("Call for nonContactHandle: " + chat.getLastMessageHandle());
-							fullNameTitle = "Unknown name";
+							fullNameTitle = context.getString(R.string.unknown_name_label);
 							((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 							((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageHandle();
 
@@ -1764,7 +1756,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(fullNameAction.isEmpty()){
 								if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 									logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-									fullNameAction = "Unknown name";
+									fullNameAction = context.getString(R.string.unknown_name_label);
 									((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 									((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -1840,7 +1832,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						if(fullNameAction.isEmpty()){
 							if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 								logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-								fullNameAction = "Unknown name";
+								fullNameAction = context.getString(R.string.unknown_name_label);
 								((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 								((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -2183,7 +2175,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								if(fullNameAction.isEmpty()){
 									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 										logDebug("Call for nonContactName: " + lastMsgSender);
-										fullNameAction = "Unknown name";
+										fullNameAction = context.getString(R.string.unknown_name_label);
 										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
@@ -2274,7 +2266,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								if(fullNameAction.isEmpty()){
 									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 										logDebug("Call for nonContactName: " + lastMsgSender);
-										fullNameAction = "Unknown name";
+										fullNameAction = context.getString(R.string.unknown_name_label);
 										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
@@ -2366,7 +2358,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								if(fullNameAction.isEmpty()){
 									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 										logDebug("Call for nonContactName: " + lastMsgSender);
-										fullNameAction = "Unknown name";
+										fullNameAction = context.getString(R.string.unknown_name_label);
 										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
@@ -2445,7 +2437,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					}
 
 					if (fullNameAction.trim().length() <= 0 && fullNameAction.isEmpty() && !(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
-						fullNameAction = "Unknown name";
+						fullNameAction = context.getString(R.string.unknown_name_label);
 						((ViewHolderNormalChatList) holder).nameRequestedAction = true;
 						((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
 
@@ -2540,7 +2532,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(fullNameAction.isEmpty()){
 								if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 									logDebug("Call for nonContactHandle: " + lastMsgSender);
-									fullNameAction = "Unknown name";
+									fullNameAction = context.getString(R.string.unknown_name_label);
 									((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 									((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
@@ -2564,6 +2556,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							CharSequence indexedText = TextUtils.concat(name, myMessage);
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, true);
 						}
@@ -2572,6 +2565,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							CharSequence indexedText = TextUtils.concat(name, myMessage);
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, false);
 						}
@@ -2639,7 +2633,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(fullNameAction.isEmpty()){
 					if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 						logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-						fullNameAction = "Unknown name";
+						fullNameAction = context.getString(R.string.unknown_name_label);
 						((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 						((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 						ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
