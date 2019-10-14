@@ -121,6 +121,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -151,16 +152,16 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
-
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<ArrayList<AndroidMegaChatMessage>> {
 
@@ -2349,81 +2350,81 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
 
+    private boolean checkPermissions(String permission, int requestCode) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+
+        boolean hasPermission = (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED);
+
+        if (!hasPermission) {
+            ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+            return false;
+        }
+
+        return true;
+    }
+
     private boolean checkPermissionsVoiceClip() {
         logDebug("checkPermissionsVoiceClip()");
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
-
-        boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
-        if (!hasRecordAudioPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_VOICE_CLIP);
-            return false;
-        }
-
-        return true;
+        return checkPermissions(Manifest.permission.RECORD_AUDIO, RECORD_VOICE_CLIP);
     }
 
-    private boolean checkPermissionsCall(){
+    private boolean checkPermissionsCall() {
         logDebug("checkPermissionsCall");
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)  return true;
-
-        boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-        if (!hasCameraPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
-            return false;
-        }
-
-        boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
-        if (!hasRecordAudioPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
-            return false;
-        }
-
-        return true;
+        return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA)
+                && checkPermissions(Manifest.permission.RECORD_AUDIO, RECORD_AUDIO);
     }
 
-    public boolean checkPermissionsTakePicture(){
+    private boolean checkPermissionsTakePicture() {
         logDebug("checkPermissionsTakePicture");
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)  return true;
-
-        boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-        if (!hasCameraPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_TAKE_PICTURE);
-            return false;
-        }
-
-        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-        if (!hasStoragePermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE_TAKE_PICTURE);
-            return false;
-        }
-
-        return true;
+        return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA_TAKE_PICTURE)
+                && checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_STORAGE_TAKE_PICTURE);
     }
 
     private boolean checkPermissionsReadStorage() {
         logDebug("checkPermissionsReadStorage");
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
+        return checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_READ_STORAGE);
+    }
 
-        boolean hasReadStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-        if (!hasReadStoragePermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_STORAGE);
-            return false;
-        }
-
-        return true;
-
+    private boolean checkPermissionWriteStorage(int code) {
+        logDebug("checkPermissionsWriteStorage :" + code);
+        return checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, code);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         logDebug("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) return;
         switch (requestCode) {
+            case REQUEST_WRITE_STORAGE: {
+                logDebug("REQUEST_WRITE_STORAGE");
+                //After storage authorization, resume unfinished download
+                if (checkPermissionWriteStorage(REQUEST_WRITE_STORAGE)) {
+                    ArrayList<MegaNodeList> list = new ArrayList<>();
+                    for (int i = 0; i < preservedMessagesSelected.size(); i++) {
+                        MegaNodeList megaNodeList = preservedMessagesSelected.get(i).getMessage().getMegaNodeList();
+                        list.add(megaNodeList);
+                    }
+                    chatC.prepareForChatDownload(list);
+                    preservedMessagesSelected = null;
+                }
+                break;
+            }
+            case REQUEST_WRITE_STORAGE_OFFLINE: {
+                logDebug("REQUEST_WRITE_STORAGE");
+                //After storage authorization, resume unfinished offline download
+                if (checkPermissionWriteStorage(REQUEST_WRITE_STORAGE_OFFLINE)) {
+                    chatC.saveForOfflineWithAndroidMessages(preservedMessagesSelected, chatRoom);
+                    preservedMessagesSelected = null;
+                }
+                break;
+            }
             case REQUEST_CAMERA:
             case RECORD_AUDIO:{
                 logDebug("REQUEST_CAMERA || RECORD_AUDIO");
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsCall()) {
+                if (checkPermissionsCall()) {
                     startCall();
                 }
                 break;
@@ -2431,7 +2432,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case REQUEST_CAMERA_TAKE_PICTURE:
             case REQUEST_WRITE_STORAGE_TAKE_PICTURE:{
                 logDebug("REQUEST_CAMERA_TAKE_PICTURE || REQUEST_WRITE_STORAGE_TAKE_PICTURE");
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsTakePicture()) {
+                if (checkPermissionsTakePicture()) {
                     takePicture();
                 }
                 break;
@@ -2439,21 +2440,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case RECORD_VOICE_CLIP:
             case REQUEST_STORAGE_VOICE_CLIP:{
                 logDebug("RECORD_VOICE_CLIP || REQUEST_STORAGE_VOICE_CLIP");
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsVoiceClip()) {
+                if (checkPermissionsVoiceClip()) {
                    cancelRecording();
                 }
                 break;
             }
             case REQUEST_READ_STORAGE:{
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsReadStorage()) {
+                if (checkPermissionsReadStorage()) {
                     this.attachFromFileStorage();
                 }
                 break;
             }
             case LOCATION_PERMISSION_REQUEST_CODE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                    Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                     intent.putExtra(EDITING_MESSAGE, editingMessage);
                     if (messageToEdit != null) {
                         intent.putExtra(MSG_ID, messageToEdit.getMsgId());
@@ -3595,12 +3595,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     showConfirmationDeleteMessages(messagesSelected, chatRoom);
                     break;
                 }
-                case R.id.chat_cab_menu_download:{
+                case R.id.chat_cab_menu_download: {
                     logDebug("chat_cab_menu_download ");
                     clearSelections();
                     hideMultipleSelect();
+                    if (!checkPermissionWriteStorage(REQUEST_WRITE_STORAGE)) {
+                        preservedMessagesSelected = messagesSelected;
+                        return false;
+                    }
                     ArrayList<MegaNodeList> list = new ArrayList<>();
-                    for(int i = 0; i<messagesSelected.size();i++){
+                    for (int i = 0; i < messagesSelected.size(); i++) {
                         MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
                         list.add(megaNodeList);
                     }
@@ -3616,6 +3620,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 case R.id.chat_cab_menu_offline:{
                     clearSelections();
                     hideMultipleSelect();
+                    if (!checkPermissionWriteStorage(REQUEST_WRITE_STORAGE_OFFLINE)) {
+                        preservedMessagesSelected = messagesSelected;
+                        return false;
+                    }
                     chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom);
                     break;
                 }
@@ -4006,7 +4014,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void updateActionModeTitle() {
         try {
-            actionMode.setTitle(adapter.getSelectedMessages().size()+"");
+            actionMode.setTitle(adapter.getSelectedItemCount()+"");
             actionMode.invalidate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -4137,7 +4145,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                                         mediaIntent.putExtra("screenPosition", screenPosition);
                                         mediaIntent.putExtra("adapterType", FROM_CHAT);
-                                        mediaIntent.putExtra("isPlayList", false);
+                                        mediaIntent.putExtra(IS_PLAYLIST, false);
                                         mediaIntent.putExtra("msgId", m.getMessage().getMsgId());
                                         mediaIntent.putExtra("chatId", idChat);
                                         mediaIntent.putExtra("FILENAME", node.getName());
@@ -4956,6 +4964,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
         logDebug("onMessageLoaded");
+
         if(msg!=null){
             logDebug("STATUS: " + msg.getStatus());
             logDebug("TEMP ID: " + msg.getTempId());
@@ -5361,6 +5370,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         logDebug("msgID "+ msg.getMsgId());
+
         int resultModify = -1;
         if(msg.isDeleted()){
             if(adapter!=null){
@@ -5566,7 +5576,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
 
-        if (indexToChange != -1) {
+        if(indexToChange!=-1) {
             messages.remove(indexToChange);
             logDebug("Removed index: " + indexToChange + " positionNewMessagesLayout: " + positionNewMessagesLayout + " messages size: " + messages.size());
             if (positionNewMessagesLayout <= indexToChange) {
@@ -5581,17 +5591,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 adapter.notifyItemChanged(positionNewMessagesLayout);
             }
 
-            if (!messages.isEmpty()) {
+            if(!messages.isEmpty()){
                 //Update infoToShow of the next message also
                 if (indexToChange == 0) {
                     messages.get(indexToChange).setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
                     //Check if there is more messages and update the following one
-                    if (messages.size() > 1) {
-                        adjustInfoToShow(indexToChange + 1);
-                        setShowAvatar(indexToChange + 1);
+                    if(messages.size()>1){
+                        adjustInfoToShow(indexToChange+1);
+                        setShowAvatar(indexToChange+1);
                     }
-                } else {
-
+                }
+                else{
                     //Not first element
                     if (indexToChange == messages.size()) {
                         logDebug("The last message removed, do not check more messages");
@@ -5601,9 +5611,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         setShowAvatar(indexToChange);
                         setShowAvatar(indexToChange - 1);
                     }
+
+                    adjustInfoToShow(indexToChange);
+                    setShowAvatar(indexToChange);
+                    setShowAvatar(indexToChange-1);
                 }
             }
-
 
             adapter.removeMessage(indexToChange + 1, messages);
             disableMultiselection();
@@ -6522,28 +6535,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 logDebug("previousUserHandleToCompare: " + previousUserHandleToCompare);
 
-//                if(previousMessage.getInfoToShow()!=AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING){
-//                    msg.setShowAvatar(true);
-//                }
-//                else{
-                    if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CALL_ENDED) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CALL_STARTED) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CHAT_TITLE)) {
+                if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CALL_ENDED) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CALL_STARTED) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CHAT_TITLE)) {
+                    msg.setShowAvatar(true);
+                    logDebug("Set: " + true);
+                } else {
+                    if (previousUserHandleToCompare == userHandleToCompare) {
+                        msg.setShowAvatar(false);
+                        logDebug("Set: " + false);
+                    }else{
                         msg.setShowAvatar(true);
                         logDebug("Set: " + true);
-                    } else {
-                        if (previousUserHandleToCompare == userHandleToCompare) {
-                            msg.setShowAvatar(false);
-                            logDebug("Set: " + false);
-                        }else{
-                            msg.setShowAvatar(true);
-                            logDebug("Set: " + true);
-                        }
                     }
+                }
             }
             else{
                 logWarning("No previous message");
                 msg.setShowAvatar(true);
-                adapter.notifyDataSetChanged();
-
             }
         }
     }
@@ -7442,7 +7449,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(text!=null){
                 showSnackbar(SNACKBAR_TYPE, text, -1);
             }
-        }else{
+        }
+        else{
             if(chatHandle!=-1){
                 logDebug("Open chat to forward messages");
 
@@ -7886,8 +7894,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void showCallInProgressLayout(String text, boolean chrono, MegaChatCall call) {
         logDebug("showCallInProgressLayout");
-        callInProgressText.setText(text);
-        activateChrono(chrono, callInProgressChrono, call);
+        if (callInProgressText != null) {
+            callInProgressText.setText(text);
+        }
+        ChatUtil.activateChrono(chrono, callInProgressChrono, call);
 
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
             callInProgressLayout.setVisibility(View.VISIBLE);
@@ -8279,6 +8289,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
     }
+
+
+    public void hideFileStorageSection(){
+        logDebug("hideFileStorageSEctocioon");
+        if (fileStorageF != null) {
+            fileStorageF.clearSelections();
+            fileStorageF.hideMultipleSelect();
+        }
+        fileStorageLayout.setVisibility(View.GONE);
+        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
+    }
+
+
 
     public void setShareLinkDialogDismissed (boolean dismissed) {
         isShareLinkDialogDismissed = dismissed;

@@ -169,10 +169,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/create_folder_separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/divider_upgrade_account"
+                android:orientation="vertical"/>
 
             <LinearLayout
                 android:id="@+id/new_folder_layout"

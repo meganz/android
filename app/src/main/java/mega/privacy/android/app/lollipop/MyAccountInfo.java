@@ -169,7 +169,7 @@ public class MyAccountInfo {
 
         if (transfer) {
             totalTransferFormatted = getSizeString(accountInfo.getTransferMax());
-            usedTransferFormatted = getSizeString(accountInfo.getTransferOwnUsed());
+            usedTransferFormatted = getSizeString(accountInfo.getTransferUsed());
         }
 
         if (pro) {

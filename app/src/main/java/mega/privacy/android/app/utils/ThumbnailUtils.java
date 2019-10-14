@@ -61,15 +61,13 @@ public class ThumbnailUtils {
 		if(node!=null){
 			File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
 			Bitmap bitmap = null;
-			if (thumb.exists()){
-				if (thumb.length() > 0){
-					bitmap = getBitmapForCache(thumb, context);
-					if (bitmap == null) {
-						thumb.delete();
-					}
-					else{
-						thumbnailCache.put(node.getHandle(), bitmap);
-					}
+			if (thumb.exists() && thumb.length() > 0){
+				bitmap = getBitmapForCache(thumb, context);
+				if (bitmap == null) {
+					thumb.delete();
+				}
+				else{
+					thumbnailCache.put(node.getHandle(), bitmap);
 				}
 			}
 			return thumbnailCache.get(node.getHandle());
