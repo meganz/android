@@ -79,27 +79,11 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.ChatUtil.getFirstLetter;
-import static mega.privacy.android.app.utils.ChatUtil.getMaxAllowed;
-import static mega.privacy.android.app.utils.ChatUtil.showShareChatLinkDialog;
-import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES;
-import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
-import static mega.privacy.android.app.utils.Constants.DEFAULT_AVATAR_WIDTH_HEIGHT;
-import static mega.privacy.android.app.utils.Constants.EMOJI_AVATAR_SIZE;
-import static mega.privacy.android.app.utils.Constants.EMOJI_SIZE;
-import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.TimeUtils.lastGreenDate;
-import static mega.privacy.android.app.utils.Util.getScaleH;
-import static mega.privacy.android.app.utils.Util.getScaleW;
-import static mega.privacy.android.app.utils.Util.hideKeyboard;
-import static mega.privacy.android.app.utils.Util.px2dp;
-import static mega.privacy.android.app.utils.Util.scaleHeightPx;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
-import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
+import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
@@ -263,7 +247,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 String firstLetter = getFirstLetter(chat.getTitle());
                 initialLetter.setText(firstLetter);
             }
-            initialLetter.setEmojiSize(px2dp(EMOJI_AVATAR_SIZE, outMetrics));
+            initialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
             createGroupChatAvatar();
 
             infoLayout = findViewById(R.id.chat_group_contact_properties_info_layout);
@@ -296,6 +280,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             notificationsSwitch.setOnClickListener(this);
 
             dividerNotifications = findViewById(R.id.divider_notifications_layout);
+
+            infoNumParticipantsText = findViewById(R.id.chat_group_contact_properties_info_participants);
 
             //Chat links
             chatLinkLayout = findViewById(R.id.chat_group_contact_properties_chat_link_layout);

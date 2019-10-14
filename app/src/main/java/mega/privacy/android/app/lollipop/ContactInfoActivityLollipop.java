@@ -440,7 +440,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						nameText.setText(userEmailExtra);
 					}
 				}
-				String fullname = (String)firstLineTextToolbar.getText();
+				String fullname = firstLineTextToolbar.getText().toString();
 				setDefaultAvatar(fullname);
 			}
 			else{
