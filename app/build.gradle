@@ -88,6 +88,7 @@ dependencies {
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'net.opacapp:multiline-collapsingtoolbar:27.1.1'
+    implementation 'com.android.billingclient:billing:2.0.3'
 }
 
 apply plugin: 'com.google.gms.google-services'

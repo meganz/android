@@ -417,6 +417,11 @@ public class IabHelper {
         try {
             logDebug("Constructing buy intent for " + sku + ", item type: " + itemType);
             Bundle buyIntentBundle = mService.getBuyIntent(3, mContext.getPackageName(), sku, itemType, extraData);
+
+
+            Bundle buyIntentBundle2 = mService.getBuyIntentToReplaceSkus(3, mContext.getPackageName(), null, sku, itemType, extraData);
+
+
             int response = getResponseCodeFromBundle(buyIntentBundle);
             if (response != BILLING_RESPONSE_RESULT_OK) {
                 logError("Unable to buy item, Error response: " + getResponseDesc(response));
