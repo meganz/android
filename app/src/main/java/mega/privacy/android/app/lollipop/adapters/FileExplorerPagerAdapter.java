@@ -70,26 +70,26 @@ public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
         if(chatFirst){
             switch (position){
                 case 0:{
-                    return context.getString(R.string.section_chat).toLowerCase();
+                    return context.getString(R.string.section_chat);
                 }
                 case 1: {
-                    return context.getString(R.string.section_cloud_drive).toLowerCase();
+                    return context.getString(R.string.section_cloud_drive);
                 }
                 case 2:{
-                    return context.getString(R.string.tab_incoming_shares).toLowerCase();
+                    return context.getString(R.string.tab_incoming_shares);
                 }
             }
         }
         else{
             switch (position){
                 case 0: {
-                    return context.getString(R.string.section_cloud_drive).toLowerCase();
+                    return context.getString(R.string.section_cloud_drive);
                 }
                 case 1:{
-                    return context.getString(R.string.tab_incoming_shares).toLowerCase();
+                    return context.getString(R.string.tab_incoming_shares);
                 }
                 case 2:{
-                    return context.getString(R.string.section_chat).toLowerCase();
+                    return context.getString(R.string.section_chat);
                 }
             }
         }
