@@ -46,6 +46,7 @@ import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -57,6 +58,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
@@ -735,20 +737,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 logDebug(node.getHandle() + " DURATION: " + node.getDuration());
                 int duration = node.getDuration();
                 if (duration > 0) {
-                    int hours = duration / 3600;
-                    int minutes = (duration % 3600) / 60;
-                    int seconds = duration % 60;
-
-                    String timeString;
-                    if (hours > 0) {
-                        timeString = String.format("%d:%d:%02d",hours,minutes,seconds);
-                    } else {
-                        timeString = String.format("%d:%02d",minutes,seconds);
-                    }
-
-                    logDebug("The duration is: " + hours + " " + minutes + " " + seconds);
-
-                    holder.videoDuration.setText(timeString);
+                    holder.videoDuration.setText(getVideoDuration(duration));
                     holder.videoDuration.setVisibility(View.VISIBLE);
                 }
             }
@@ -1448,6 +1437,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
         if (this.multipleSelect) {
             selectedItems = new SparseBooleanArray();
+        } else if (selectedItems != null) {
+            selectedItems.clear();
         }
     }
 

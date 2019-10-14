@@ -499,20 +499,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             logDebug(node.getName() + " DURATION: " + node.getDuration());
             int duration = node.getDuration();
             if (duration > 0) {
-                int hours = duration / 3600;
-                int minutes = (duration % 3600) / 60;
-                int seconds = duration % 60;
-
-                String timeString;
-                if (hours > 0) {
-                    timeString = String.format("%d:%d:%02d",hours,minutes,seconds);
-                } else {
-                    timeString = String.format("%d:%02d",minutes,seconds);
-                }
-
-                logDebug("The duration is: " + hours + " " + minutes + " " + seconds);
-
-                holder.videoDuration.setText(timeString);
+                holder.videoDuration.setText(getVideoDuration(duration));
                 holder.videoDuration.setVisibility(View.VISIBLE);
             }
         }
@@ -624,7 +611,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 if (holder.fullNameTitle.trim().length() <= 0) {
 
                     logWarning("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    holder.fullNameTitle = "Unknown name";
+                    holder.fullNameTitle = context.getString(R.string.unknown_name_label);
                     if (!(holder.nameRequestedAction)) {
                         logDebug("Call for nonContactName: " + m.getUserHandle());
                         holder.nameRequestedAction = true;
