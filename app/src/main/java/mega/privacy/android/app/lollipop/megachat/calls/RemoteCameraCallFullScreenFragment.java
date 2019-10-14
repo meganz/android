@@ -20,12 +20,13 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 public class RemoteCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface, View.OnClickListener {
 
-    private SurfaceView remoteFullScreenSurfaceView;
+    private SurfaceView remoteFullScreenSurfaceView = null;
     private int width = 0;
     private int height = 0;
     private Bitmap bitmap;
@@ -41,25 +42,23 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
 
         RemoteCameraCallFullScreenFragment f = new RemoteCameraCallFullScreenFragment();
         Bundle args = new Bundle();
-        args.putLong("chatId", chatId);
-        args.putLong("peerid", peerid);
-        args.putLong("clientid", clientid);
+        args.putLong(CHAT_ID, chatId);
+        args.putLong(PEER_ID, peerid);
+        args.putLong(CLIENT_ID, clientid);
         f.setArguments(args);
         return f;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
         if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
         Bundle args = getArguments();
-        this.chatId = args.getLong("chatId", -1);
-        this.peerid = args.getLong("peerid", -1);
-        this.clientid = args.getLong("clientid", -1);
-
+        this.chatId = args.getLong(CHAT_ID, -1);
+        this.peerid = args.getLong(PEER_ID, -1);
+        this.clientid = args.getLong(CLIENT_ID, -1);
         logDebug("Chat ID: " + chatId);
         super.onCreate(savedInstanceState);
     }
@@ -79,7 +78,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         SurfaceHolder remoteSurfaceHolder = remoteFullScreenSurfaceView.getHolder();
         remoteSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         remoteRenderer = new MegaSurfaceRenderer(remoteFullScreenSurfaceView);
-        logDebug("addChatRemoteVideoListener Chat ID: " + chatId);
+        logDebug("Adding remote video listener");
         megaChatApi.addChatRemoteVideoListener(chatId, peerid, clientid, this);
 
         return v;
@@ -95,7 +94,6 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
-
             SurfaceHolder holder = remoteFullScreenSurfaceView.getHolder();
             if (holder != null) {
                 int viewWidth = remoteFullScreenSurfaceView.getWidth();
@@ -114,6 +112,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
                     this.height = -1;
                 }
             }
+
         }
         if (bitmap == null) return;
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
@@ -123,36 +122,31 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
 
     @Override
     public void onAttach(Context context) {
-        logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
     }
 
     @Override
     public void onDestroy() {
-        logDebug("onDestroy");
-        removeSurfaceView();
+        this.removeSurfaceView();
         super.onDestroy();
     }
 
     @Override
     public void onResume() {
-        logDebug("onResume");
         this.width = 0;
         this.height = 0;
         remoteFullScreenSurfaceView.setVisibility(View.VISIBLE);
-
         super.onResume();
     }
 
     public void removeSurfaceView() {
-        logDebug("removeSurfaceView()");
         if (remoteFullScreenSurfaceView.getParent() != null && remoteFullScreenSurfaceView.getParent().getParent() != null) {
-            logDebug("removeView Chat ID: " + chatId);
+            logDebug("Removing suface view");
             ((ViewGroup) remoteFullScreenSurfaceView.getParent()).removeView(remoteFullScreenSurfaceView);
         }
         remoteFullScreenSurfaceView.setVisibility(View.GONE);
-        logDebug("removeChatVideoListener (REMOTE) Chat ID: " + chatId);
+        logDebug("Removing remote video listener");
         megaChatApi.removeChatVideoListener(chatId, peerid, clientid, this);
     }
 

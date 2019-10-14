@@ -248,8 +248,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         isServiceRunning = true;
         mContext = getApplicationContext();
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
-        startForeground(notificationId,mNotification);
+        Notification notification = createNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
+        startForeground(notificationId,notification);
         initService();
 
         if (megaApi == null) {
@@ -1855,16 +1855,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
         showProgressNotification(progressPercent,pendingIntent,message,info,getString(R.string.settings_camera_notif_title));
     }
-    
-    private void showNotification(String title,String content,PendingIntent intent,boolean isAutoCancel) {
-        logDebug("showNotification");
+
+    private Notification createNotification(String title,String content,PendingIntent intent,boolean isAutoCancel){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(false);
             channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
         }
-        
+
         mBuilder = new NotificationCompat.Builder(mContext,notificationChannelId);
         mBuilder.setSmallIcon(R.drawable.ic_stat_camera_sync)
                 .setOngoing(false)
@@ -1873,12 +1872,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 .setContentText(content)
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(isAutoCancel);
-        
+
         if (intent != null) {
             mBuilder.setContentIntent(intent);
         }
-        mNotification = mBuilder.build();
-        
+        return mBuilder.build();
+    }
+    
+    private void showNotification(String title,String content,PendingIntent intent,boolean isAutoCancel) {
+        mNotification = createNotification(title, content, intent, isAutoCancel);
         mNotificationManager.notify(notificationId,mNotification);
     }
 

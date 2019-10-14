@@ -95,6 +95,7 @@ public class Constants {
     public static final int FORTUMO_FRAGMENT = 5005;
     public static final int MONTHLY_YEARLY_FRAGMENT = 5006;
     public static final int CENTILI_FRAGMENT = 5007;
+    public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5008;
 
     public static final int PAYMENT_CC_MONTH = 111;
     public static final int PAYMENT_CC_YEAR = 112;
@@ -145,17 +146,17 @@ public class Constants {
     public static final int REQUEST_CAMERA_TAKE_PICTURE = 13;
     public static final int REQUEST_WRITE_STORAGE_TAKE_PICTURE = 14;
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
+    public static final int REQUEST_WRITE_STORAGE_OFFLINE = 16;
 
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
     public static final int TYPE_ERROR_RECORD = 3;
-
-    public static final int PRO_LITE = 4;
-
+    
     public static final int FREE = 0;
     public static final int PRO_I = 1;
     public static final int PRO_II = 2;
     public static final int PRO_III = 3;
+    public static final int PRO_LITE = 4;
 
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
@@ -256,6 +257,7 @@ public class Constants {
     public static final int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
     public static final int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
     public static final int GENERAL_OTHERS_ADAPTER = 2023;
+    public static final int RECENTS_ADAPTER = 2024;
 
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -366,6 +368,9 @@ public class Constants {
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
 
+    public static final int HEADER_VIEW_TYPE = 0;
+    public static final int ITEM_VIEW_TYPE = 1;
+
     public static final int FILE_LINK = 200;
     public static final int FOLDER_LINK = 201;
     public static final int CHAT_LINK = 202;
@@ -378,6 +383,12 @@ public class Constants {
     public static final String CHAT_ID_IN_PROGRESS = "chatHandleInProgress";
     public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
     public static final String SECOND_CALL = "SECOND_CALL";
+    public static final String PEER_ID = "peerId";
+    public static final String CLIENT_ID = "clientId";
+
+
+    public static final String NODE_HANDLES = "NODE_HANDLES";
+    public static final String HANDLE = "handle";
 
 	public static final String[] FILE_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#!.+$",

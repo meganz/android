@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">激活账户</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">正在准备文件列表</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">请先登录MEGA进行共享</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">您的确认链接已失效。您的帐户可能已被激活或者您可能已取消注册。</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">预览尚未载入，请稍等</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">请在创建帐户之前注销</string>
 
@@ -1459,7 +1461,7 @@
     <string name="confirm_email_misspelled_resend" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">重新发送</string>
     <string name="confirm_email_misspelled_email_sent" context="Text shown after the confirmation email has been sent to the new email address">邮件已发送</string>
 
-    <string name="copyright_alert_title" context="text_copyright_alert_title">致所有使用者的著作权警告</string>
+    <string name="copyright_alert_title" context="text_copyright_alert_title">致所有使用者的版权提醒</string>
     <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGA尊重他人之著作权，且要求MEGA的云端服务使用者遵守著作权法。</string>
     <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">严禁使用MEGA云端服务侵犯知识产权。您不得上传、下载、储存、分享、显示、串流、分发、寄送电子邮件、提供链接、传输或以其他方式提供任何侵犯任何个人或单位的知识产权或其他产权的文件、资料或内容。</string>
     <string name="copyright_alert_agree_button" context="text of the Agree button">同意</string>
@@ -2447,7 +2449,7 @@
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">您输入的密码错误，请再试一次。</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">您输入的密码无效。</string>
 
-    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">无法打开该文件。未知文件类型或文件无法被解压缩。</string>
+    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">无法打开该文件。未知文件格式或文件无法被解压缩。</string>
 
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">无法在通话进行时播放媒体文件。</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">正在进行通话</string>
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">读取中</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">请等待&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>

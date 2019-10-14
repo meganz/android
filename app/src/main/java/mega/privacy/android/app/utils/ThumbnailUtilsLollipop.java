@@ -40,6 +40,7 @@ import java.util.HashMap;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
+import mega.privacy.android.app.lollipop.adapters.MediaRecentsAdapter;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter.ViewHolderFileStorage;
@@ -53,6 +54,8 @@ import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollip
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter.ViewHolderTransfer;
+import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter;
+import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.lollipop.providers.MegaProviderLollipopAdapter;
@@ -381,47 +384,65 @@ public class ThumbnailUtilsLollipop {
 				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 
-				if (holder != null){
-					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, base64+".jpg");
+				if (holder == null) return;
 
-					if (thumb.exists()) {
-						if (thumb.length() > 0) {
-							final Bitmap bitmap = getBitmapForCacheForList(thumb, context);
-							if (bitmap != null) {
-								thumbnailCache.put(handle, bitmap);
-								if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
-									if ((((MegaNodeAdapter.ViewHolderBrowserList)holder).document == handle)){
-										((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
-										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-										((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
-										adapter.notifyDataSetChanged();
-										logDebug("Thumbnail update");
-									}
-								}
-								else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
-									if ((((VersionsFileAdapter.ViewHolderVersion)holder).document == handle)){
-										((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setImageBitmap(bitmap);
-										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-										((VersionsFileAdapter.ViewHolderVersion)holder).imageView.startAnimation(fadeInAnimation);
-										adapter.notifyDataSetChanged();
-										logDebug("Thumbnail update");
-									}
-								}
-								else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserList){
-									if ((((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).document == handle)){
-										((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
-										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-										((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
-										int position = holder.getAdapterPosition();
-										adapter.notifyItemChanged(position);
-										logDebug("Thumbnail update");
-									}
-								}
-							}
+				File thumbDir = getThumbFolder(context);
+				File thumb = new File(thumbDir, base64+".jpg");
+
+				if (!thumb.exists() || thumb.length() <= 0) return;
+
+				final Bitmap bitmap = getBitmapForCache(thumb, context);
+				if (bitmap == null) return;
+
+				thumbnailCache.put(handle, bitmap);
+
+				Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+
+				if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
+					if ((((MegaNodeAdapter.ViewHolderBrowserList)holder).document == handle)){
+						((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
+						((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
+					}
+				}
+				else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
+					if ((((VersionsFileAdapter.ViewHolderVersion)holder).document == handle)){
+						((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setImageBitmap(bitmap);
+						((VersionsFileAdapter.ViewHolderVersion)holder).imageView.startAnimation(fadeInAnimation);
+					}
+				}
+				else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserList){
+					if ((((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).document == handle)){
+						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
+						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
+					}
+				}
+				else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
+					RecentsAdapter.ViewHolderBucket viewHolderBucket = (RecentsAdapter.ViewHolderBucket) holder;
+					if (viewHolderBucket.getDocument() == handle) {
+						viewHolderBucket.setImageThumbnail(bitmap);
+						viewHolderBucket.getImageThumbnail().startAnimation(fadeInAnimation);
+					}
+				}
+				else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
+					MediaRecentsAdapter.ViewHolderMediaBucket viewHolderMediaBucket = (MediaRecentsAdapter.ViewHolderMediaBucket) holder;
+					if (viewHolderMediaBucket.getDocument() == handle) {
+						viewHolderMediaBucket.setImage(bitmap);
+						viewHolderMediaBucket.getThumbnail().startAnimation(fadeInAnimation);
+					}
+				}
+				else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
+					MultipleBucketAdapter.ViewHolderMultipleBucket viewHolderMultipleBucket = (MultipleBucketAdapter.ViewHolderMultipleBucket) holder;
+					if (viewHolderMultipleBucket.getDocument() == handle) {
+						viewHolderMultipleBucket.setImageThumbnail(bitmap);
+						if (((MultipleBucketAdapter) adapter).isMedia()) {
+							viewHolderMultipleBucket.getThumbnailMedia().startAnimation(fadeInAnimation);
+						} else {
+							viewHolderMultipleBucket.getThumbnailList().startAnimation(fadeInAnimation);
 						}
 					}
 				}
+
+				adapter.notifyItemChanged(holder.getAdapterPosition());
 			}
 			else{
 				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
@@ -1210,27 +1231,34 @@ public class ThumbnailUtilsLollipop {
 		@Override
 		protected void onPostExecute(Boolean shouldContinueObject) {
 
-			if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
-				if (shouldContinueObject){
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) ((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(18, 0, 12, 0);
-					((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.setLayoutParams(params1);
+			if (!shouldContinueObject) return;
 
-					onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
-				}
+			if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
+				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) ((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.getLayoutParams();
+				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.setMargins(18, 0, 12, 0);
+				((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.setLayoutParams(params1);
+
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
 			}
 			else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
-				if (shouldContinueObject){
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) ((VersionsFileAdapter.ViewHolderVersion)holder).imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(18, 0, 12, 0);
-					((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setLayoutParams(params1);
+				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) ((VersionsFileAdapter.ViewHolderVersion)holder).imageView.getLayoutParams();
+				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.setMargins(18, 0, 12, 0);
+				((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setLayoutParams(params1);
 
-					onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
-				}
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
+			}
+			else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
+			}
+			else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
+			}
+			else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
 			}
 		}
 	}
@@ -1288,40 +1316,44 @@ public class ThumbnailUtilsLollipop {
 		else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
 			((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setImageBitmap(bitmap);
 		}
+		else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
+			((RecentsAdapter.ViewHolderBucket) holder).setImageThumbnail(bitmap);
+		}
+		else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
+			((MediaRecentsAdapter.ViewHolderMediaBucket) holder).setImage(bitmap);
+		}
+		else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
+			((MultipleBucketAdapter.ViewHolderMultipleBucket) holder).setImageThumbnail(bitmap);
+		}
 
 		thumbnailCache.put(document.getHandle(), bitmap);
-		adapter.notifyDataSetChanged();
 
+		adapter.notifyItemChanged(holder.getAdapterPosition());
 		logDebug("AttachThumbnailTask end");
 	}
 
 	private static void onThumbnailGeneratedGrid(Context context, File thumbFile, MegaNode document, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter){
 		logDebug("onThumbnailGeneratedGrid");
 
-		if(holder instanceof MegaNodeAdapter.ViewHolderBrowserGrid){
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-			Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
+		if(holder instanceof MegaNodeAdapter.ViewHolderBrowserGrid){
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-			thumbnailCache.put(document.getHandle(), bitmap);
-			adapter.notifyDataSetChanged();
 		}
 		else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid){
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-			Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-			thumbnailCache.put(document.getHandle(), bitmap);
-			adapter.notifyDataSetChanged();
 		}
 
+		thumbnailCache.put(document.getHandle(), bitmap);
+		adapter.notifyItemChanged(holder.getAdapterPosition());
 		logDebug("AttachThumbnailTask end");
 	}
 	
