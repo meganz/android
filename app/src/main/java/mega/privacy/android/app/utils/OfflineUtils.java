@@ -28,6 +28,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -201,11 +202,8 @@ public class OfflineUtils {
             MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
             if (offlineNode != null) {
                 File offlineFile = getOfflineFile(context, offlineNode);
-                logDebug("YES FOUND: " + node.getName());
-
                 if (isFileAvailable(offlineFile)) return true;
             }
-
         }
 
         logDebug("Not found offline file");
@@ -294,11 +292,11 @@ public class OfflineUtils {
         String path = context.getFilesDir().getAbsolutePath() + File.separator;
 
         switch (from) {
-            case Constants.FROM_INCOMING_SHARES: {
+            case FROM_INCOMING_SHARES: {
                 path = path + OFFLINE_DIR + File.separator + OfflineUtils.findIncomingParentHandle(node, megaApi);
                 break;
             }
-            case Constants.FROM_INBOX: {
+            case FROM_INBOX: {
                 path = path + OFFLINE_INBOX_DIR;
                 break;
             }

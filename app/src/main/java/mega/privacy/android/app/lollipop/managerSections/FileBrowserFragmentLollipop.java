@@ -74,7 +74,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -99,8 +98,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 
     MegaNodeAdapter adapter;
 
-	ProgressBar progressBar;
-
 	public int pendingTransfers = 0;
 	public int totalTransfers = 0;
 	public long totalSizePendingTransfer=0;
@@ -110,13 +107,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
-
-	RelativeLayout transfersOverViewLayout;
-	TextView transfersTitleText;
-	TextView transfersNumberText;
-	ImageView playButton;
-	RelativeLayout actionLayout;
-	RelativeLayout dotsOptionsTransfersLayout;
 
 	public NewHeaderItemDecoration headerItemDecoration;
 
@@ -637,21 +627,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 			callInProgressLayout.setVisibility(View.GONE);
 			callInProgressChrono.setVisibility(View.GONE);
 
-
-			transfersOverViewLayout = v.findViewById(R.id.transfers_overview_item_layout);
-			transfersTitleText = v.findViewById(R.id.transfers_overview_title);
-			transfersNumberText = v.findViewById(R.id.transfers_overview_number);
-			playButton = v.findViewById(R.id.transfers_overview_button);
-			actionLayout = v.findViewById(R.id.transfers_overview_action_layout);
-			dotsOptionsTransfersLayout = v.findViewById(R.id.transfers_overview_three_dots_layout);
-			progressBar = v.findViewById(R.id.transfers_overview_progress_bar);
-
-			transfersOverViewLayout.setOnClickListener(this);
-
-			if (adapter == null) {
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleBrowser, recyclerView, aB, FILE_BROWSER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-			} else {
-				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleBrowser);
+			if (adapter == null){
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleBrowser, recyclerView, aB, FILE_BROWSER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+			}
+			else{
+				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
             }
@@ -675,16 +655,15 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
                 emptyTextView.setVisibility(View.GONE);
             }
 
-            setOverviewLayout();
 			showCallLayout();
 			return v;
 
         } else {
 			logDebug("Grid View");
             View v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);
-			linearLayoutRecycler = (LinearLayout) v.findViewById(R.id.linear_layout_recycler);
+			linearLayoutRecycler = v.findViewById(R.id.linear_layout_recycler);
             recyclerView = (NewGridRecyclerView)v.findViewById(R.id.file_grid_view_browser);
-            fastScroller = (FastScroller)v.findViewById(R.id.fastscroll);
+            fastScroller = v.findViewById(R.id.fastscroll);
             
             recyclerView.setPadding(0,0,0,scaleHeightPx(80,outMetrics));
             
@@ -700,21 +679,17 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 					checkScroll();
 				}
 			});
-			progressBar = v.findViewById(R.id.file_grid_download_progress_bar);
+            
+            emptyImageView = v.findViewById(R.id.file_grid_empty_image);
+            emptyTextView = v.findViewById(R.id.file_grid_empty_text);
+            emptyTextViewFirst = v.findViewById(R.id.file_grid_empty_text_first);
 
-			emptyImageView = v.findViewById(R.id.file_grid_empty_image);
-			emptyTextView = v.findViewById(R.id.file_grid_empty_text);
-			emptyTextViewFirst = v.findViewById(R.id.file_grid_empty_text_first);
+			callInProgressLayout = v.findViewById(R.id.call_in_progress_layout);
+			callInProgressLayout.setOnClickListener(this);
+			callInProgressChrono = v.findViewById(R.id.call_in_progress_chrono);
+			callInProgressLayout.setVisibility(View.GONE);
+			callInProgressChrono.setVisibility(View.GONE);
 
-			transfersOverViewLayout = v.findViewById(R.id.transfers_overview_item_layout);
-			transfersTitleText = v.findViewById(R.id.transfers_overview_title);
-			transfersNumberText = v.findViewById(R.id.transfers_overview_number);
-			playButton = v.findViewById(R.id.transfers_overview_button);
-			actionLayout = v.findViewById(R.id.transfers_overview_action_layout);
-			dotsOptionsTransfersLayout = v.findViewById(R.id.transfers_overview_three_dots_layout);
-			progressBar = v.findViewById(R.id.transfers_overview_progress_bar);
-
-			transfersOverViewLayout.setOnClickListener(this);
 
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context,this,nodes,((ManagerActivityLollipop)context).parentHandleBrowser,recyclerView,aB,FILE_BROWSER_ADAPTER,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
@@ -739,68 +714,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
-            
-            setOverviewLayout();
-            
-            return v;
+
+			showCallLayout();
+
+			return v;
         }
     }
-
-	public void setOverviewLayout() {
-		logDebug("setOverviewLayout");
-
-		//Check transfers in progress
-		pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-		totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
-		
-		totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
-		totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
-
-		if (pendingTransfers > 0) {
-			logDebug("Transfers in progress");
-			transfersOverViewLayout.setVisibility(View.VISIBLE);
-			dotsOptionsTransfersLayout.setOnClickListener(this);
-			actionLayout.setOnClickListener(this);
-			
-			updateTransferButton();
-            long delay = megaApi.getBandwidthOverquotaDelay();
-
-            if (delay == 0) {
-			} else {
-				logDebug("Overquota delay activated until: " + delay);
-                transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
-            }
-
-            //this number could be negative - totalTransfers has been reset to 0, however pendingTransfers has not been reset yet due to the wait time of async response
-            int progressPercent = (int)Math.round((double)totalSizeTransfered / totalSizePendingTransfer * 100);
-            int inProgress = totalTransfers - pendingTransfers + 1;
-            String progressText;
-            if(inProgress > 0){
-                progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
-            }else{
-                progressText = getString(R.string.label_process_finishing);
-                progressPercent = 100;
-            }
-            progressBar.setProgress(progressPercent);
-			logDebug("Progress Percent: " + progressPercent);
-
-            transfersNumberText.setText(progressText);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
-			params.addRule(RelativeLayout.BELOW,transfersOverViewLayout.getId());
-			linearLayoutRecycler.setLayoutParams(params);
-		} else {
-			logDebug("NO TRANSFERS in progress");
-
-			if (transfersOverViewLayout != null) {
-				transfersOverViewLayout.setVisibility(View.GONE);
-			}
-
-			dotsOptionsTransfersLayout.setOnClickListener(null);
-			actionLayout.setOnClickListener(null);
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
-			linearLayoutRecycler.setLayoutParams(params);
-		}
-	}
     
     @Override
     public void onAttach(Activity activity) {
@@ -823,25 +742,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
     public void onClick(View v) {
 		logDebug("onClick");
         switch (v.getId()) {
-            
-            case R.id.transfers_overview_three_dots_layout: {
-				logDebug("Click show options");
-                ((ManagerActivityLollipop)getActivity()).showTransfersPanel();
-                break;
-            }
-            case R.id.transfers_overview_action_layout: {
-				logDebug("Click play/pause");
-                
-                ((ManagerActivityLollipop)getActivity()).changeTransfersStatus();
-                break;
-            }
-            case R.id.transfers_overview_item_layout: {
-				logDebug("Click transfers layout");
-                
-                ((ManagerActivityLollipop)getActivity()).selectDrawerItemTransfers();
-                ((ManagerActivityLollipop)getActivity()).invalidateOptionsMenu();
-                break;
-            }
 			case R.id.call_in_progress_layout:{
 				logDebug("Call_in_progress_layout");
 				if(checkPermissionsCall()){
@@ -849,24 +749,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 				}
 				break;
 			}
-        }
-    }
-    
-    public void updateTransferButton() {
-		logDebug("updateTransferButton");
-        
-        if (transfersOverViewLayout.getVisibility() == View.VISIBLE) {
-            if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-				logDebug("Show PLAY button");
-                playButton.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_play));
-                transfersTitleText.setText(getString(R.string.paused_transfers_title));
-            } else {
-				logDebug("Show PAUSE button");
-                playButton.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_pause));
-                transfersTitleText.setText(getString(R.string.section_transfers));
-            }
-        } else {
-			logDebug("Transfer panel not visible");
         }
     }
 
@@ -1355,7 +1237,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
             emptyTextView.setVisibility(View.GONE);
         }
         checkScroll();
-        setOverviewLayout();
     }
     
     public boolean showSelectMenuItem() {
@@ -1479,8 +1360,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 					adapter.setNodes(nodes);
 
 					visibilityFastScroller();
-
-					setOverviewLayout();
 
 					int lastVisiblePosition = 0;
 					if (!lastPositionStack.empty()) {
@@ -1652,8 +1531,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 		} else {
 			logWarning("Adapter is NULL");
 		}
-        
-        setOverviewLayout();
     }
 
     public boolean isMultipleselect() {

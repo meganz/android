@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">啟用帳號</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">正在準備檔案列表</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">請先登入，以便使用MEGA分享功能</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">您的確認連結已無效。您的帳戶可能已啟用，或您可能已取消註冊</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">此預覽尚未下載完全，請稍候。</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">請創建新帳戶之前先登出</string>
 
@@ -630,12 +632,12 @@
 
     <string name="menu_take_picture" context="menu item">拍照</string>
 
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">只在Wi-Fi 下</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或數據傳輸方案</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">只在WiFi連線</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或行動網路</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">跳過</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">停止</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">相機上傳正在進行</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">相機上傳正在進行中</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">您想停用相機上傳功能嗎？</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -687,8 +689,8 @@
     <string name="settings_empty_folder" context="settings option">選擇資料夾</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或數據傳輸方案</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">只在Wi-Fi 下</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或行動網路</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">只在WiFi連線</item>
     </string-array>
 
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">檔案上傳</string>
@@ -1796,7 +1798,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">上傳檔案至聊天</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">聊天媒體品質</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">聊天室影片上傳品質</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">影片品質</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">相機上傳需存取您裝置裡的相片與其他媒體內容，請到設定頁面並且允許其權限。</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -2320,7 +2322,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">通話開始</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL金鑰錯誤</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA無法安全地透過SSL金鑰連線。您使用的公共WiFi可能有附加條件。</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA無法安全的透過SSL連線。您可能使用有額外環境需求的公共WiFi連線。</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]沒有[/B][A]通知[/A][B]。[/B]</string>
 
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">讀取中</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">請等待&#8230;&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>

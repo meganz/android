@@ -90,7 +90,8 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	boolean allFiles = true;
 
 	MegaNodeAdapter adapter;
-	RelativeLayout transfersOverViewLayout;
+
+	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -586,8 +587,6 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
-			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
-			transfersOverViewLayout.setVisibility(View.GONE);
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			if (adapter == null){
 				logDebug("Creating the adapter: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
@@ -1633,9 +1632,6 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		}
 		else{
 			logDebug("Back to Cloud");
-			recyclerView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyLinearLayout.setVisibility(View.GONE);
 			((ManagerActivityLollipop) context).deepBrowserTreeOutgoing=0;
 			return 0;
 		}

@@ -95,9 +95,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	private TextView emptyTextViewFirst;
 
 	private MegaNodeAdapter adapter;
-	private ProgressBar progressBar;
 	private MegaApiAndroid megaApi;
-	private RelativeLayout transfersOverViewLayout;
 
 	private Stack<Integer> lastPositionStack;
 
@@ -600,15 +598,9 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				}
 			});
 
-			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
-			progressBar.setVisibility(View.GONE);
-
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
-
-			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
-			transfersOverViewLayout.setVisibility(View.GONE);
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
@@ -638,8 +630,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					checkScroll();
 				}
 			});
-			
-			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);

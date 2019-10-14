@@ -169,7 +169,7 @@
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Você tem certeza de que quer cancelar o login?</string>
 
     <string name="login_text" context="Login button">Entrar</string>
-    <string name="email_text" context="email label">E-mail</string>
+    <string name="email_text" context="email label">Email</string>
     <string name="password_text" context="password label">Senha</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Confirme a sua senha</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
@@ -178,8 +178,8 @@
     -->
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Novo no MEGA?</string>
     <string name="create_account" context="label and text button when creating the account">Criar conta</string>
-    <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Por favor, digite seu e-mail</string>
-    <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Endereço de e-mail inválido</string>
+    <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Por favor, digite seu email</string>
+    <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Endereço de email inválido</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Por favor digite sua senha</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Não há conexão de rede</string>
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">Você foi desconectado deste aparelho a partir de outra localização</string>
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Ativando conta</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparando lista de arquivos</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Faça login para compartilhar com o MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">O seu link de confirmação já não é válido. A sua conta pode já estar ativa, ou você pode ter cancelado o seu registro.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -376,7 +377,7 @@
     <string name="context_move_to_trash" context="menu item">Mover para a lixeira</string>
     <string name="context_delete_from_mega" context="menu item">Remover do MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Nome da Pasta</string>
-    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">E-mail do contato</string>
+    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Email do contato</string>
     <string name="context_creating_folder" context="status dialog when performing the action">Criando pasta</string>
     <!--
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Adding contact</string>
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">A prévia ainda não foi baixada. Aguarde.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Por favor, faça logout antes de criar a conta</string>
 
@@ -630,12 +632,12 @@
 
     <string name="menu_take_picture" context="menu item">Tirar foto</string>
 
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Somente WiFi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi ou dados móveis</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Somente Wi-Fi</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi ou dados móveis</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Pular</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Parar</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Envio da câmera em progresso</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Uploads da câmera em andamento</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Você quer parar os Uploads da câmera?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -650,7 +652,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Armazenamento</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Bloqueio com PIN</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">A compressão de vídeos consome muita bateria. Por isso, o MEGA mostrará um lembrete para que você coloque o seu dispositivo para carregar se o tamanho dos vídeos a serem comprimidos for superior a %s.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">A compressão de vídeos consome muita bateria. Por isso, o MEGA solicitará que você coloque o seu dispositivo para carregar se o tamanho dos vídeos a serem comprimidos for superior a %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avançado</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Deletar cache</string>
@@ -672,7 +674,7 @@
     </string-array>
 
     <string-array name="add_contact_array" context="choose the way the new user's email is inserted">
-        <item context="write option">Escreva e-mail do usuário</item>
+        <item context="write option">Digite o email do usuário</item>
         <item context="import from phone option">Importar do dispositivo</item>
     </string-array>
 
@@ -687,8 +689,8 @@
     <string name="settings_empty_folder" context="settings option">Escolher pasta</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi ou dados móveis</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">Somente WiFi</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi ou dados móveis</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Somente Wi-Fi</item>
     </string-array>
 
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Upload de arquivo</string>
@@ -878,7 +880,7 @@
     <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">Você tem um backup da sua chave de recuperação?</string>
 
     <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">Ótimo!</string>
-    <string name="edit_text_insert_mail" context="Hint of the text where the user can write his e-mail">emails vai aqui</string>
+    <string name="edit_text_insert_mail" context="Hint of the text where the user can write his e-mail">digite o email aqui</string>
     <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Por favor, digite o seu endereço de email abaixo. Você receberá um link de recuperação para informar a chave de recuperação, e resetar a sua senha.</string>
 
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Coloque aqui a sua chave de recuperação</string>
@@ -887,14 +889,14 @@
     <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">Este é o último passo para cancelar a sua conta. Você vai perder permanentemente todos os dados armazenados na nuvem. Por favor digite sua senha abaixo.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Comprovação de email</string>
-    <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Por favor, verifique seu e-mail para prosseguir.</string>
+    <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Por favor, verifique seu email para continuar.</string>
     <string name="general_text_error" context="Text to inform the user when an error occurs">Ocorreu um erro. Por favor, tente novamente.</string>
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Você precisa estar logado para realizar esta ação.</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">Incorreto</string>
 
-    <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Endereço de e-mail inválido</string>
+    <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Endereço de email inválido</string>
     <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Por favor, confirme o endereço de email e tente novamente.</string>
     <!--
     <string name="alert_not_logged_out" context="Alert to inform the user that have to be logged out to perform the action">You must be logged out to perform this action.</string>
@@ -929,7 +931,7 @@
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
     -->
 
-    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Erro. Este endereço de e-mail já está em uso.</string>
+    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Erro. Este endereço de email já está sendo usado.</string>
 
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Este é o último passo para alterar o seu email. Por favor, digite a sua senha abaixo.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Alterar email</string>
@@ -991,7 +993,7 @@
         <item context="Confirmation before removing the outgoing shares of a folder" quantity="other">Esta pasta está compartilhada com %1$d contatos. Você quer eliminar o compartilhamento?</item>
     </plurals>
 
-    <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">E-mail e/ou senha inválidos. Por favor, tente novamente</string>
+    <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Email e/ou senha inválidos. Por favor, tente novamente</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">A sua conta foi suspensa for infringir os Termos de serviço. Para mais informações, entre em contato com support&#64;mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Muitas tentativas de login incorretas. Por favor, aguarde uma hora.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Essa conta ainda não foi confirmada. Por favor, verifique o seu email.</string>
@@ -1470,7 +1472,7 @@
     <string name="context_link_removal_error" context="error message">Não foi possível remover o link. Por favor, tente novamente mais tarde.</string>
     <string name="context_link_action_error" context="error message">Não foi possível acessar o link. Por favor, tente novamente mais tarde.</string>
 
-    <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Escreva e-mail do usuário</string>
+    <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Digite o email do usuário</string>
 
     <string name="activity_title_files_attached" context="title of the screen to see the details of several node attachments">Arquivos anexos</string>
     <string name="activity_title_contacts_attached" context="title of the screen to see the details of several contact attachments">Contatos anexos</string>
@@ -1796,8 +1798,8 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Fazendo o upload ao chat</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualidade multimídia do chat</string>
-	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Qualidade do vídeo</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualidade dos vídeos no chat</string>
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Qualidade dos vídeos</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">A função Uploads da câmera precisa acessar as suas fotos e outras arquivos multimídia no seu dispositivo. Por favor, acesse as configurações do seu dispositivo e conceda permissão.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Qualidade original</item>
@@ -2320,7 +2322,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Chamada iniciada</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Erro na chave SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">O MEGA não consegue se conectar de forma segura por meio de SSL. Você pode estar usando uma rede WiFi pública com requisitos adicionais.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">O MEGA não consegue se conectar de forma segura por meio de SSL. Você pode estar usando uma rede Wi-Fi pública com requisitos adicionais.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Não há [/B][A]Notificações[/A][B].[/B]</string>
 
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Carregando</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Por favor, aguarde&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>
