@@ -77,7 +77,22 @@
                 android:background="@color/white"
                 android:gravity="left"
                 android:orientation="horizontal"
-                android:layout_below="@id/action_export_MK_layout">
+                android:layout_below="@id/action_export_MK_layout"
+                android:layout_margin="24dp">
+
+                <Button
+                    android:id="@+id/print_MK_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:textColor="@color/white"
+                    android:text="@string/context_option_print"
+                    android:background="@color/accentColor"
+                    android:elevation="@dimen/elevation_upgrade_low"
+                    android:stateListAnimator="@anim/button_upgrade_elevation"
+                    android:tint="@android:color/white"/>
 
                 <Button
                     android:id="@+id/copy_MK_button"
@@ -91,7 +106,8 @@
                     android:background="@color/accentColor"
                     android:elevation="@dimen/elevation_upgrade_low"
                     android:stateListAnimator="@anim/button_upgrade_elevation"
-                    android:tint="@android:color/white" />
+                    android:tint="@android:color/white"
+                    android:layout_marginLeft="8dp"/>
 
                 <Button
                     android:id="@+id/save_MK_button"
@@ -105,7 +121,8 @@
                     android:background="@color/accentColor"
                     android:elevation="@dimen/elevation_upgrade_low"
                     android:stateListAnimator="@anim/button_upgrade_elevation"
-                    android:tint="@android:color/white" />
+                    android:tint="@android:color/white"
+                    android:layout_marginLeft="8dp"/>
             </LinearLayout>
 
         </RelativeLayout>
