@@ -374,6 +374,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private int storageState = -1; //Default value (-1) indicates that is not initialized
 	private boolean isStorageStatusDialogShown = false;
 
+	private boolean userEmailChanged;
+
     int orientationSaved;
 
     float elevation = 0;
@@ -4089,6 +4091,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		error_layout_lastName.setVisibility(View.GONE);
 
+		userEmailChanged = false;
 		final EditText inputMail = new EditText(this);
 		inputMail.getBackground().mutate().clearColorFilter();
 		inputMail.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
@@ -4270,6 +4273,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		inputLastName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
 		inputMail.getBackground().mutate().clearColorFilter();
+		inputMail.setSingleLine();
+		inputMail.setText(megaApi.getMyUser().getEmail());
+		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+		inputMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		inputMail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 		inputMail.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -4283,6 +4292,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void afterTextChanged(Editable editable) {
+				userEmailChanged = true;
 				if(error_layout_email.getVisibility() == View.VISIBLE){
 					error_layout_email.setVisibility(View.GONE);
 					inputMail.getBackground().mutate().clearColorFilter();
@@ -4291,12 +4301,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		});
-		inputMail.setSingleLine();
-		inputMail.setText(megaApi.getMyUser().getEmail());
-		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
-		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-		inputMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		inputMail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 		inputMail.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
@@ -4370,7 +4374,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				String valueLastName = inputLastName.getText().toString().trim();
 				String value = inputMail.getText().toString().trim();
 				String emailError = getEmailError(value, managerActivity);
-				if (emailError == null) {
+				if (emailError == null && userEmailChanged) {
 					emailError = comparedToCurrentEmail(value, managerActivity);
 				}
 				if (emailError != null) {
