@@ -9,11 +9,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 
 import java.util.List;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.jobservices.CameraUploadStarterService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import nz.mega.sdk.MegaApiJava;
@@ -23,15 +26,16 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 @TargetApi(21)
 public class JobUtil {
 
-    public static final long SCHEDULER_INTERVAL = 60 * DateUtils.MINUTE_IN_MILLIS;
-    
-    public static final int CU_RESCHEDULE_INTERVAL = 5000;   //milliseconds
+    private static final long SCHEDULER_INTERVAL = 60 * DateUtils.MINUTE_IN_MILLIS;
 
-    public static final int START_JOB_FAILED = -1;
+    private static final int CU_RESCHEDULE_INTERVAL = 5000;   //milliseconds
 
-    public static final int PHOTOS_UPLOAD_JOB_ID = Constants.PHOTOS_UPLOAD_JOB_ID;
+    private static final int START_JOB_FAILED = -1;
+    private static final int START_JOB_FAILED_NOT_ENABLED = -2;
 
-    public static synchronized boolean isJobScheduled(Context context,int id) {
+    private static final int PHOTOS_UPLOAD_JOB_ID = Constants.PHOTOS_UPLOAD_JOB_ID;
+
+    private static synchronized boolean isJobScheduled(Context context,int id) {
         JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {
             List<JobInfo> jobs = js.getAllPendingJobs();
@@ -46,14 +50,13 @@ public class JobUtil {
         return false;
     }
 
-    public static int restart(Context context) {
-        stopRunningCameraUploadService(context);
-        return scheduleCameraUploadJob(context);
-    }
-
     public static synchronized int scheduleCameraUploadJob(Context context) {
-        logDebug("scheduleCameraUploadJob");
+        if(!isCameraUploadEnabled(context)){
+            logDebug("Schedule failed as CU not enabled");
+            return START_JOB_FAILED_NOT_ENABLED;
+        }
         if (isJobScheduled(context,PHOTOS_UPLOAD_JOB_ID)) {
+            logDebug("Schedule failed as already scheduled");
             return START_JOB_FAILED;
         }
         JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
@@ -73,12 +76,14 @@ public class JobUtil {
     public static synchronized void startCameraUploadService(Context context) {
         boolean isOverQuota = isOverquota(context);
         boolean hasReadPermission = Util.hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
-        logDebug("isOverQuota:" + isOverQuota + ", hasStoragePermission:" + hasReadPermission);
-        if (!CameraUploadsService.isServiceRunning && !isOverQuota && hasReadPermission) {
+        boolean isEnabled = isCameraUploadEnabled(context);
+        logDebug("isOverQuota:" + isOverQuota +
+                ", hasStoragePermission:" + hasReadPermission +
+                ", isCameraUploadEnabled:" + isEnabled +
+                ", isRunning:" + CameraUploadsService.isServiceRunning);
+        if (!CameraUploadsService.isServiceRunning && !isOverQuota && hasReadPermission && isEnabled) {
             Intent newIntent = new Intent(context,CameraUploadsService.class);
             postIntent(context, newIntent);
-        } else {
-            logDebug("Service not started because service is running");
         }
     }
 
@@ -122,5 +127,22 @@ public class JobUtil {
                 scheduleCameraUploadJob(context);
             }
         },CU_RESCHEDULE_INTERVAL);
+    }
+
+    private static boolean isCameraUploadEnabled(Context context) {
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+        MegaPreferences prefs = dbH.getPreferences();
+        if (prefs == null) {
+            logDebug("MegaPreferences not defined, so not enabled");
+            return false;
+        }
+
+        String cuEnabled = prefs.getCamSyncEnabled();
+        if (TextUtils.isEmpty(cuEnabled)) {
+            logDebug("CU not enabled");
+            return false;
+        }
+
+        return Boolean.parseBoolean(cuEnabled);
     }
 }

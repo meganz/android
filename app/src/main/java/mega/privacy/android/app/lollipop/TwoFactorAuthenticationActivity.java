@@ -114,6 +114,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private TextView pinError;
     private TextView suggestionRK;
     private LinearLayout saveRKButton;
+    private TextView fileNameRK;
 
     private String seed = null;
     private ArrayList<String> arraySeed;
@@ -595,6 +596,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         saveRKButton = (LinearLayout) findViewById(R.id.container_rk_2fa);
         saveRKButton.setOnClickListener(this);
 
+        fileNameRK = findViewById(R.id.fileNameRK);
+        fileNameRK.setText(getRecoveryKeyFileName());
 
         if (scanOrCopyIsShown || newAccount){
             showScanOrCopyLayout();
@@ -1245,11 +1248,11 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
                 logDebug("parentPath no NULL");
-                String[] split = RK_FILE.split(File.separator);
-                parentPath = parentPath+"/"+split[split.length-1];
+
+                parentPath = parentPath + File.separator + getRecoveryKeyFileName();
+
                 Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
                 newIntent.putExtra("parentPath", parentPath);
-                newIntent.putExtra("fromOffline", true);
                 newIntent.setAction(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);
                 intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG,newAccount );
                 startActivity(newIntent);
