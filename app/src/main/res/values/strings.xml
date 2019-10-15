@@ -2526,6 +2526,9 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Recents</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
     <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%s and %d more</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
