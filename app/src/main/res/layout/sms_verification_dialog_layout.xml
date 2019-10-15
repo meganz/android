@@ -19,6 +19,7 @@
                 android:layout_marginTop="25dp"
                 android:text="@string/sms_add_phone_number_dialog_title"
                 android:textColor="@color/name_my_account"
+                android:textStyle="bold"
                 android:textSize="18sp"/>
             <ImageView
                 android:id="@+id/image_storage_status"
@@ -26,6 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
                 android:src="@drawable/il_verify_phone_circle"/>
             <TextView
                 android:id="@+id/sv_dialog_msg"
@@ -35,9 +37,9 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="25dp"
-                android:gravity="center"
+                android:gravity="start"
                 android:lineSpacingMultiplier="1.27"
-                android:textAlignment="center"/>
+                android:textAlignment="textStart"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
