@@ -232,9 +232,10 @@ public class PlaylistFragment extends Fragment{
         if (player != null) {
             player.setPlayWhenReady(((AudioVideoPlayerLollipop) context).playWhenReady);
         }
-        if (!((AudioVideoPlayerLollipop) context).querySearch.equals("")){
-            aB.setTitle(getString(R.string.action_search)+": "+((AudioVideoPlayerLollipop) context).querySearch);
-            setNodesSearch(((AudioVideoPlayerLollipop) context).querySearch);
+        String querySearch = ((AudioVideoPlayerLollipop) context).getQuerySearch();
+        if (!querySearch.equals("")) {
+            aB.setTitle(getString(R.string.hint_action_search) + " " + querySearch);
+            setNodesSearch(querySearch);
         }
         return v;
     }
