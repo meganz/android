@@ -374,6 +374,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private int storageState = -1; //Default value (-1) indicates that is not initialized
 	private boolean isStorageStatusDialogShown = false;
 
+	private boolean userNameChanged;
 	private boolean userEmailChanged;
 
     int orientationSaved;
@@ -4008,7 +4009,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showDialogChangeUserAttribute(){
-		logDebug("showDialogChangeUserAttribute");
+		userNameChanged = false;
+		userEmailChanged = false;
 
 		megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
 
@@ -4091,7 +4093,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		error_layout_lastName.setVisibility(View.GONE);
 
-		userEmailChanged = false;
 		final EditText inputMail = new EditText(this);
 		inputMail.getBackground().mutate().clearColorFilter();
 		inputMail.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
@@ -4125,7 +4126,54 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		error_layout_email.setVisibility(View.GONE);
 
+		final OnEditorActionListener editorActionListener = new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String valueFirstName = inputFirstName.getText().toString().trim();
+					String valueLastName = inputLastName.getText().toString().trim();
+					String value = inputMail.getText().toString().trim();
+					String emailError = getEmailError(value, managerActivity);
+					if (emailError == null && userEmailChanged && !userNameChanged) {
+						emailError = comparedToCurrentEmail(value, managerActivity);
+					}
+					if (emailError != null) {
+//						inputMail.setError(emailError);
+						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_email.setText(emailError);
+						error_layout_email.setVisibility(View.VISIBLE);
+						inputMail.requestFocus();
+					} else if (valueFirstName.equals("") || valueFirstName.isEmpty()) {
+						logWarning("First name input is empty");
+//						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_firtName.setText(getString(R.string.invalid_string));
+						error_layout_firtName.setVisibility(View.VISIBLE);
+						inputFirstName.requestFocus();
+					} else if (valueLastName.equals("") || valueLastName.isEmpty()) {
+						logWarning("Last name input is empty");
+//						inputLastName.setError(getString(R.string.invalid_string));
+						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_lastName.setText(getString(R.string.invalid_string));
+						error_layout_lastName.setVisibility(View.VISIBLE);
+						inputLastName.requestFocus();
+					} else {
+						logDebug("Positive button pressed - change user attribute(s)");
+						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
+						changeUserAttributeDialog.dismiss();
+					}
+				} else {
+					logDebug("Other IME" + actionId);
+				}
+				return false;
+			}
+		};
 
+		inputFirstName.setSingleLine();
+		inputFirstName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText());
+		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputFirstName.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -4139,6 +4187,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void afterTextChanged(Editable editable) {
+				userNameChanged = true;
 				if(error_layout_firtName.getVisibility() == View.VISIBLE){
 					error_layout_firtName.setVisibility(View.GONE);
 					inputFirstName.getBackground().mutate().clearColorFilter();
@@ -4146,60 +4195,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		});
-		inputFirstName.setSingleLine();
-
-		inputFirstName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText());
-		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
-		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-		inputFirstName.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String valueFirstName = inputFirstName.getText().toString().trim();
-					String valueLastName = inputLastName.getText().toString().trim();
-					String value = inputMail.getText().toString().trim();
-					String emailError = getEmailError(value, managerActivity);
-					if (emailError != null) {
-//						inputMail.setError(emailError);
-						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_email.setText(emailError);
-						error_layout_email.setVisibility(View.VISIBLE);
-						inputMail.requestFocus();
-					}
-					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
-						logWarning("Input is empty");
-//						inputFirstName.setError(getString(R.string.invalid_string));
-						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_firtName.setText(getString(R.string.invalid_string));
-						error_layout_firtName.setVisibility(View.VISIBLE);
-						inputFirstName.requestFocus();
-					}
-					else if(valueLastName.equals("")||valueLastName.isEmpty()){
-						logWarning("Input is empty");
-//						inputLastName.setError(getString(R.string.invalid_string));
-						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_lastName.setText(getString(R.string.invalid_string));
-						error_layout_lastName.setVisibility(View.VISIBLE);
-						inputLastName.requestFocus();
-					}
-					else {
-						logDebug("Positive button pressed - change user attribute");
-						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
-						changeUserAttributeDialog.dismiss();
-					}
-				}
-				else{
-					logDebug("Other IME" + actionId);
-				}
-				return false;
-			}
-		});
-
-
+		inputFirstName.setOnEditorActionListener(editorActionListener);
 		inputFirstName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
+		inputLastName.setSingleLine();
+		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
+		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+		inputLastName.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputLastName.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -4213,6 +4216,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void afterTextChanged(Editable editable) {
+				userNameChanged = true;
 				if(error_layout_lastName.getVisibility() == View.VISIBLE){
 					error_layout_lastName.setVisibility(View.GONE);
 					inputLastName.getBackground().mutate().clearColorFilter();
@@ -4220,56 +4224,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		});
-		inputLastName.setSingleLine();
-		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
-		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
-		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-		inputLastName.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		inputLastName.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String valueFirstName = inputFirstName.getText().toString().trim();
-					String valueLastName = inputLastName.getText().toString().trim();
-					String value = inputMail.getText().toString().trim();
-					String emailError = getEmailError(value, managerActivity);
-					if (emailError != null) {
-//						inputMail.setError(emailError);
-						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_email.setText(emailError);
-						error_layout_email.setVisibility(View.VISIBLE);
-						inputMail.requestFocus();
-					}
-					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
-						logWarning("Input is empty");
-//						inputFirstName.setError(getString(R.string.invalid_string));
-						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_firtName.setText(getString(R.string.invalid_string));
-						error_layout_firtName.setVisibility(View.VISIBLE);
-						inputFirstName.requestFocus();
-					}
-					else if(valueLastName.equals("")||valueLastName.isEmpty()){
-						logWarning("Input is empty");
-//						inputLastName.setError(getString(R.string.invalid_string));
-						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_lastName.setText(getString(R.string.invalid_string));
-						error_layout_lastName.setVisibility(View.VISIBLE);
-						inputLastName.requestFocus();
-					}
-					else {
-						logDebug("Positive button pressed - change user attribute");
-						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
-						changeUserAttributeDialog.dismiss();
-					}
-				}
-				else{
-					logDebug("Other IME" + actionId);
-				}
-				return false;
-			}
-		});
-
+		inputLastName.setOnEditorActionListener(editorActionListener);
 		inputLastName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
 		inputMail.getBackground().mutate().clearColorFilter();
@@ -4301,49 +4256,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		});
-		inputMail.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String valueFirstName = inputFirstName.getText().toString().trim();
-					String valueLastName = inputLastName.getText().toString().trim();
-					String value = inputMail.getText().toString().trim();
-					String emailError = getEmailError(value, managerActivity);
-					if (emailError != null) {
-//						inputMail.setError(emailError);
-						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_email.setText(emailError);
-						error_layout_email.setVisibility(View.VISIBLE);
-						inputMail.requestFocus();
-					}
-					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
-						logDebug("Input is empty");
-//						inputFirstName.setError(getString(R.string.invalid_string));
-						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_firtName.setText(getString(R.string.invalid_string));
-						error_layout_firtName.setVisibility(View.VISIBLE);
-						inputFirstName.requestFocus();
-					}
-					else if(valueLastName.equals("")||valueLastName.isEmpty()){
-						logDebug("Input is empty");
-//						inputLastName.setError(getString(R.string.invalid_string));
-						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_lastName.setText(getString(R.string.invalid_string));
-						error_layout_lastName.setVisibility(View.VISIBLE);
-						inputLastName.requestFocus();
-					}
-					else {
-						logDebug("Positive button pressed - change user attribute");
-						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
-						changeUserAttributeDialog.dismiss();
-					}
-				}
-				else{
-					logDebug("Other IME" + actionId);
-				}
-				return false;
-			}
-		});
+		inputMail.setOnEditorActionListener(editorActionListener);
 		inputMail.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -4374,7 +4287,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				String valueLastName = inputLastName.getText().toString().trim();
 				String value = inputMail.getText().toString().trim();
 				String emailError = getEmailError(value, managerActivity);
-				if (emailError == null && userEmailChanged) {
+				if (emailError == null && userEmailChanged && !userNameChanged) {
 					emailError = comparedToCurrentEmail(value, managerActivity);
 				}
 				if (emailError != null) {
