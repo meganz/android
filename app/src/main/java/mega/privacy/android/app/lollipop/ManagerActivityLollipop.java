@@ -131,6 +131,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -200,7 +201,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -252,7 +252,7 @@ import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
 	private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
@@ -792,6 +792,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 	};
+
+	private BroadcastReceiver receiverUpdateOrder = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null) {
+				boolean cloudOrder = intent.getBooleanExtra("cloudOrder", true);
+				int order = intent.getIntExtra("order", MegaApiJava.ORDER_DEFAULT_ASC);
+				if (cloudOrder) {
+					refreshCloudOrder(order);
+				}
+				else {
+					refreshOthersOrder(order);
+				}
+			}
+		}
+	};
+
+    private BroadcastReceiver receiverUpdateView = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                updateView(intent.getBooleanExtra("isList", true));
+				supportInvalidateOptionsMenu();
+            }
+        }
+    };
 
 	private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
 		@Override
@@ -1947,6 +1973,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			localBroadcastManager.registerReceiver(networkReceiver,
 					new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+
+			localBroadcastManager.registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
+
+            localBroadcastManager.registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -4443,6 +4473,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateOrder);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateView);
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
     	super.onDestroy();
@@ -6428,13 +6460,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						sortByMenuItem.setVisible(false);
 					}
 
-					if (isList) {
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					} else {
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
+					setGridListIcon();
 				}
 				else if (getTabItemCloud() == RECENTS_TAB) {
 					createFolderMenuItem.setVisible(false);
@@ -6476,14 +6502,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
-				if (isList){
-					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-				}
+				setGridListIcon();
+
 				rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
 				if(rubbishBinFLol != null && rubbishBinFLol.getItemCount()>0){
 					sortByMenuItem.setVisible(true);
@@ -6542,14 +6562,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
-				if (isList){
-					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-				}
+				setGridListIcon();
+
 				gridSmallLargeMenuItem.setVisible(false);
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
@@ -6598,7 +6612,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				if (isListCameraUploads){
 					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					gridSmallLargeMenuItem.setVisible(false);
 
 					cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
@@ -6613,7 +6627,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					thumbViewMenuItem.setTitle(getString(R.string.action_list));
 					thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					}else{
 						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
@@ -6679,7 +6693,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				searchMenuItem.setVisible(true);
 				if (isListCameraUploads){
 					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					gridSmallLargeMenuItem.setVisible(false);
 
 					muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
@@ -6694,7 +6708,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					thumbViewMenuItem.setTitle(getString(R.string.action_list));
 					thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					}else{
 						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
@@ -6730,14 +6744,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sortByMenuItem.setVisible(false);
 				}
 
-				if (isList){
-					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-				}
+				setGridListIcon();
 
 				searchMenuItem.setVisible(true);
 				if(!firstLogin){
@@ -6843,15 +6850,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
-
-					if (isList) {
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					}
-					else {
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
 				}
 				else if (getTabItemShares() == OUTGOING_TAB) {
 					logDebug("onCreateOptionsMenuLollipop: in Outgoing");
@@ -6901,18 +6899,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
-
-					if (isList) {
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					}
-					else {
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
 				}
+
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
+				setGridListIcon();
 			}
 			else if (drawerItem == DrawerItem.CONTACTS){
 				logDebug("createOptions CONTACTS");
@@ -6966,14 +6957,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					killAllSessions.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 
-					if (isList){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
+					setGridListIcon();
 
 					gridSmallLargeMenuItem.setVisible(false);
 				}
@@ -7105,14 +7089,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							}else{
 								thumbViewMenuItem.setVisible(false);
 							}
-							if (isList){
-								thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-								thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-							}
-							else{
-								thumbViewMenuItem.setTitle(getString(R.string.action_list));
-								thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-							}
+
+							setGridListIcon();
 						}
 						else{
 							selectMenuItem.setVisible(false);
@@ -7533,6 +7511,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    return super.onCreateOptionsMenu(menu);
 	}
 
+	private void setGridListIcon() {
+		if (isList){
+			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_thumbnail_view));
+		}
+		else{
+			thumbViewMenuItem.setTitle(getString(R.string.action_list));
+			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_list_view));
+		}
+	}
+
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -7694,21 +7683,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								return true;
 							}
 						}
-
-//						if (tFLol != null){
-//							if (tFLol.onBackPressed() == 0){
-//								drawerItem = DrawerItem.CLOUD_DRIVE;
-//								if (nV != null){
-//									Menu nVMenu = nV.getMenu();
-//									MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-//									resetNavigationViewMenu(nVMenu);
-//									cloudDrive.setChecked(true);
-//									cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
-//								}
-//								selectDrawerItemLollipop(drawerItem);
-//								return true;
-//							}
-//						}
 					}
 				}
 		    	return true;
@@ -8095,7 +8069,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
 					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					}else{
 						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
@@ -8107,7 +8081,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
 					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					}else{
 						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
@@ -8164,53 +8138,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
         		}
 	        	else{
-		        	isList = !isList;
-	    			dbH.setPreferredViewList(isList);
-
-	    			if (isList){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-
-					//Refresh Cloud Fragment
-					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-
-					if (cloudPageAdapter != null) {
-						cloudPageAdapter.notifyDataSetChanged();
-					}
-
-					//Refresh Rubbish Fragment
-					refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
-
-
-					//Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
-					refreshFragment(FragmentTag.OFFLINE.getTag());
-
-					//Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
-					refreshFragment(FragmentTag.CONTACTS.getTag());
-
-					if (contactsPageAdapter != null) {
-	    				contactsPageAdapter.notifyDataSetChanged();
-					}
-
-					//Refresh shares section
-					refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-
-					//Refresh shares section
-					refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
-
-					if(sharesPageAdapter!=null){
-						sharesPageAdapter.notifyDataSetChanged();
-					}
-
-					//Refresh search section
-					refreshFragment(FragmentTag.SEARCH.getTag());
-
-					//Refresh inbox section
-					refreshFragment(FragmentTag.INBOX.getTag());
-
+	    			updateView(!isList);
 	        	}
 	        	supportInvalidateOptionsMenu();
 
@@ -8235,859 +8163,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	return true;
 	        }
 	        case R.id.action_menu_sort_by:{
-
-        		AlertDialog sortByDialog;
-        		LayoutInflater inflater = getLayoutInflater();
-        		View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
-
-        		TextView sortByNameTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_name_text);
-        		sortByNameTV.setText(getString(R.string.sortby_name));
-        		ViewGroup.MarginLayoutParams nameMLP = (ViewGroup.MarginLayoutParams) sortByNameTV.getLayoutParams();
-        		sortByNameTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		nameMLP.setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(15, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		TextView sortByDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_text);
-        		sortByDateTV.setText(getString(R.string.sortby_modification_date));
-        		ViewGroup.MarginLayoutParams dateMLP = (ViewGroup.MarginLayoutParams) sortByDateTV.getLayoutParams();
-        		sortByDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		dateMLP.setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(15, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		TextView sortBySizeTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_size_text);
-        		sortBySizeTV.setText(getString(R.string.sortby_size));
-        		ViewGroup.MarginLayoutParams sizeMLP = (ViewGroup.MarginLayoutParams) sortBySizeTV.getLayoutParams();
-        		sortBySizeTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		sizeMLP.setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(15, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView ascendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
-        		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
-        		ascendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		ascendingCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams ascendingMLP = (ViewGroup.MarginLayoutParams) ascendingCheck.getLayoutParams();
-        		ascendingMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView descendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_descending_check);
-        		descendingCheck.setText(getString(R.string.sortby_name_descending));
-        		descendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		descendingCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams descendingMLP = (ViewGroup.MarginLayoutParams) descendingCheck.getLayoutParams();
-        		descendingMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView newestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_check);
-        		newestCheck.setText(getString(R.string.sortby_date_newest));
-        		newestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		newestCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams newestMLP = (ViewGroup.MarginLayoutParams) newestCheck.getLayoutParams();
-        		newestMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView oldestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_check);
-        		oldestCheck.setText(getString(R.string.sortby_date_oldest));
-        		oldestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		oldestCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams oldestMLP = (ViewGroup.MarginLayoutParams) oldestCheck.getLayoutParams();
-        		oldestMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView largestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
-        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
-        		largestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		largestCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams largestMLP = (ViewGroup.MarginLayoutParams) largestCheck.getLayoutParams();
-        		largestMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView smallestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
-        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
-        		smallestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		smallestCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams smallestMLP = (ViewGroup.MarginLayoutParams) smallestCheck.getLayoutParams();
-        		smallestMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        		builder.setView(dialoglayout);
-				TextView textViewTitle = new TextView(ManagerActivityLollipop.this);
-				textViewTitle.setText(getString(R.string.action_sort_by));
-				textViewTitle.setTextSize(20);
-				textViewTitle.setTextColor(0xde000000);
-				textViewTitle.setPadding(scaleWidthPx(23, outMetrics), scaleHeightPx(20, outMetrics), 0, 0);
-        		builder.setCustomTitle(textViewTitle);
-
-        		sortByDialog = builder.create();
-        		sortByDialog.show();
-        		if(drawerItem==DrawerItem.CONTACTS){
-        			switch(orderContacts){
-		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-		        			ascendingCheck.setChecked(true);
-		        			descendingCheck.setChecked(false);
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(false);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(true);
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(false);
-		        			break;
-		        		}
-						case MegaApiJava.ORDER_CREATION_ASC:{
-							ascendingCheck.setChecked(false);
-							descendingCheck.setChecked(false);
-							newestCheck.setChecked(true);
-							oldestCheck.setChecked(false);
-							break;
-						}
-						case MegaApiJava.ORDER_CREATION_DESC:{
-							ascendingCheck.setChecked(false);
-							descendingCheck.setChecked(false);
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(true);
-							break;
-						}
-	        		}
-        		}
-        		else if(drawerItem==DrawerItem.SAVED_FOR_OFFLINE){
-					logDebug("orderOthers: " + orderOthers);
-        			switch(orderOthers){
-		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-							logDebug("ASCE");
-		        			ascendingCheck.setChecked(true);
-		        			descendingCheck.setChecked(false);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-							logDebug("DESC");
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(true);
-		        			break;
-		        		}
-        			}
-        		}
-        		else if(drawerItem==DrawerItem.SHARED_ITEMS){
-					if(viewPagerShares!=null){
-						int index = viewPagerShares.getCurrentItem();
-						if(index==1){
-							if (parentHandleOutgoing == -1){
-								switch(orderOthers){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
-										logDebug("ASCE");
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										logDebug("DESC");
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										break;
-									}
-								}
-							}
-							else{
-								switch(orderCloud){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(true);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(true);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(true);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(true);
-										smallestCheck.setChecked(false);
-										break;
-									}
-								}
-							}
-						}
-						else{
-							if (parentHandleIncoming == -1){
-								switch(orderOthers){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
-										logDebug("ASCE");
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										logDebug("DESC");
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										break;
-									}
-								}
-							}
-							else{
-								switch(orderCloud){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(true);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(true);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(true);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(true);
-										smallestCheck.setChecked(false);
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-				else if(drawerItem==DrawerItem.CAMERA_UPLOADS||drawerItem==DrawerItem.MEDIA_UPLOADS){
-					switch(orderCamera){
-						case MegaApiJava.ORDER_MODIFICATION_ASC:{
-							logDebug("ASCE");
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(true);
-							break;
-						}
-						case MegaApiJava.ORDER_MODIFICATION_DESC:{
-							logDebug("DESC");
-							newestCheck.setChecked(true);
-							oldestCheck.setChecked(false);
-							break;
-						}
-					}
-				}
-        		else{
-					logDebug("orderCloud: " + orderCloud);
-	        		switch(orderCloud){
-		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-		        			ascendingCheck.setChecked(true);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(true);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
-//		        		case MegaApiJava.ORDER_CREATION_DESC:{
-//		        			ascendingCheck.setChecked(false);
-//		        			descendingCheck.setChecked(false);
-//		        			newestCheck.setChecked(true);
-//		        			oldestCheck.setChecked(false);
-//		        			largestCheck.setChecked(false);
-//		        			smallestCheck.setChecked(false);
-//		        			break;
-//		        		}
-//		        		case MegaApiJava.ORDER_CREATION_ASC:{
-//		        			ascendingCheck.setChecked(false);
-//		        			descendingCheck.setChecked(false);
-//		        			newestCheck.setChecked(false);
-//		        			oldestCheck.setChecked(true);
-//		        			largestCheck.setChecked(false);
-//		        			smallestCheck.setChecked(false);
-//		        			break;
-//		        		}
-						case MegaApiJava.ORDER_MODIFICATION_ASC:{
-							ascendingCheck.setChecked(false);
-							descendingCheck.setChecked(false);
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(true);
-							largestCheck.setChecked(false);
-							smallestCheck.setChecked(false);
-							break;
-						}
-						case MegaApiJava.ORDER_MODIFICATION_DESC:{
-							ascendingCheck.setChecked(false);
-							descendingCheck.setChecked(false);
-							newestCheck.setChecked(true);
-							oldestCheck.setChecked(false);
-							largestCheck.setChecked(false);
-							smallestCheck.setChecked(false);
-							break;
-						}
-		        		case MegaApiJava.ORDER_SIZE_ASC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(true);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_SIZE_DESC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(true);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
-	        		}
-	        	}
-
-        		final AlertDialog dialog = sortByDialog;
-	        	switch(drawerItem){
-		        	case CONTACTS:{
-						sortByDateTV.setText(getString(R.string.sortby_date));
-						sortByDateTV.setVisibility(View.VISIBLE);
-		        		newestCheck.setVisibility(View.VISIBLE);
-		        		oldestCheck.setVisibility(View.VISIBLE);
-		        		sortBySizeTV.setVisibility(View.GONE);
-		        		largestCheck.setVisibility(View.GONE);
-		        		smallestCheck.setVisibility(View.GONE);
-
-		        		ascendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_ASC){
-									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_DEFAULT_ASC);
-								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		descendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_DESC) {
-									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_DEFAULT_DESC);
-								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-						newestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(true);
-								oldestCheck.setChecked(false);
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_CREATION_ASC){
-									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_CREATION_ASC);
-								}
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-
-						oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(true);
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_CREATION_DESC) {
-									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_CREATION_DESC);
-								}
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-
-		        		break;
-		        	}
-		        	case SAVED_FOR_OFFLINE: {
-
-		        		sortByDateTV.setVisibility(View.GONE);
-		        		newestCheck.setVisibility(View.GONE);
-		        		oldestCheck.setVisibility(View.GONE);
-		        		sortBySizeTV.setVisibility(View.GONE);
-		        		largestCheck.setVisibility(View.GONE);
-		        		smallestCheck.setVisibility(View.GONE);
-
-		        		ascendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_ASC) {
-									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_ASC);
-								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		descendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_DESC) {
-									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_DESC);
-								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		break;
-
-		        	}
-		        	case SHARED_ITEMS: {
-
-						if(firstNavigationLevel){
-
-							if (viewPagerShares.getCurrentItem()==0){
-								//Incoming Shares
-								sortByNameTV.setText(getString(R.string.sortby_owner_mail));
-							}
-							else{
-								sortByNameTV.setText(getString(R.string.sortby_name));
-							}
-
-							sortByDateTV.setVisibility(View.GONE);
-							newestCheck.setVisibility(View.GONE);
-							oldestCheck.setVisibility(View.GONE);
-							sortBySizeTV.setVisibility(View.GONE);
-							largestCheck.setVisibility(View.GONE);
-							smallestCheck.setVisibility(View.GONE);
-
-							ascendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(true);
-									descendingCheck.setChecked(false);
-									if(orderOthers!=MegaApiJava.ORDER_DEFAULT_ASC){
-										refreshOthersOrder(MegaApiJava.ORDER_DEFAULT_ASC);
-									}
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-							descendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(true);
-									if(orderOthers!=MegaApiJava.ORDER_DEFAULT_DESC){
-										refreshOthersOrder(MegaApiJava.ORDER_DEFAULT_DESC);
-									}
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-						}
-						else{
-							logDebug("No first level navigation on Incoming Shares");
-							sortByNameTV.setText(getString(R.string.sortby_name));
-
-							ascendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(true);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
-
-									refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_ASC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-							descendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(true);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
-
-									refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-							newestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(true);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
-
-									refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-							oldestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);;
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(true);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
-
-									refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-
-							largestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(true);
-									smallestCheck.setChecked(false);
-
-									refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-							smallestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(true);
-
-									refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-						}
-
-		        		break;
-
-		        	}
-					case MEDIA_UPLOADS:
-					case CAMERA_UPLOADS:{
-
-						sortByNameTV.setVisibility(View.GONE);
-						ascendingCheck.setVisibility(View.GONE);
-						descendingCheck.setVisibility(View.GONE);
-						sortBySizeTV.setVisibility(View.GONE);
-						largestCheck.setVisibility(View.GONE);
-						smallestCheck.setVisibility(View.GONE);
-
-						oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-								descendingCheck.setChecked(false);
-								if(orderCamera!=MegaApiJava.ORDER_MODIFICATION_ASC){
-									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_ASC);
-								}
-
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-
-						newestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(true);
-								if(orderCamera!=MegaApiJava.ORDER_MODIFICATION_DESC){
-									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_DESC);
-								}
-
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-						break;
-					}
-		        	case CLOUD_DRIVE:
-		        	case INBOX:
-                    case RUBBISH_BIN:{
-
-		        		ascendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-
-								refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_ASC);
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		descendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-
-								refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-
-						newestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(true);
-								oldestCheck.setChecked(false);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(false);
-
-								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
-
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-
-						oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);;
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(true);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(false);
-
-								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
-
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-
-
-		        		largestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(true);
-			        			smallestCheck.setChecked(false);
-
-								refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		smallestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(true);
-
-			        			refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		break;
-	        		}
-//		        	default:{
-//		        		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
-//			    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
-//			    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
-//			    		break;
-//		        	}
-	        	}
+				showSortOptions(managerActivity, outMetrics);
 	        	return true;
 	        }
 			case R.id.action_search_by_date:{
@@ -9168,6 +8244,46 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
 		}
 	}
+
+	private void updateView (boolean isList) {
+        if (this.isList != isList) {
+            this.isList = isList;
+            dbH.setPreferredViewList(isList);
+        }
+
+        //Refresh Cloud Fragment
+        refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+
+        //Refresh Rubbish Fragment
+        refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
+
+
+        //Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
+        refreshFragment(FragmentTag.OFFLINE.getTag());
+
+        //Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
+        refreshFragment(FragmentTag.CONTACTS.getTag());
+
+        if (contactsPageAdapter != null) {
+            contactsPageAdapter.notifyDataSetChanged();
+        }
+
+        //Refresh shares section
+        refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+
+        //Refresh shares section
+        refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+
+        if(sharesPageAdapter!=null){
+            sharesPageAdapter.notifyDataSetChanged();
+        }
+
+        //Refresh search section
+        refreshFragment(FragmentTag.SEARCH.getTag());
+
+        //Refresh inbox section
+        refreshFragment(FragmentTag.INBOX.getTag());
+    }
 
 	public void hideMKLayout(){
 		logDebug("hideMKLayout");
@@ -12669,6 +11785,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void selectSortByContacts(int _orderContacts){
 		logDebug("selectSortByContacts");
 
+		if (getOrderContacts() == _orderContacts) {
+			return;
+		}
+
 		this.setOrderContacts(_orderContacts);
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		if (cFLol != null){
@@ -12679,6 +11799,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void selectSortByOffline(int _orderOthers){
 		logDebug("selectSortByOffline");
+
+		if (orderOthers == orderOthers) {
+			return;
+		}
 
 		this.orderOthers = _orderOthers;
 		this.setOrderOthers(orderOthers);
@@ -12734,7 +11858,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void refreshOthersOrder(int newOrderOthers){
+		if (getOrderOthers() == newOrderOthers) {
+			return;
+		}
+
 		logDebug("New order: " + newOrderOthers);
+
 		this.setOrderOthers(newOrderOthers);
 
 		if(sharesPageAdapter!=null){
@@ -12744,6 +11873,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void selectSortUploads(int orderCamera){
 		logDebug("selectSortUploads");
+
+		if (this.orderCamera == orderCamera) {
+			return;
+		}
 
 		this.orderCamera = orderCamera;
 
@@ -13319,12 +12452,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			logDebug("Send to " + chatHandles.length + " chats");
-
 			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-
 			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
-
 			long[] userHandles = intent.getLongArrayExtra("USER_HANDLES");
 
 			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
