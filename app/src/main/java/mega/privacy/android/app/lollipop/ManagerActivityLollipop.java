@@ -203,6 +203,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -244,7 +245,6 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -2326,7 +2326,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         accountInfoFrame.setOnClickListener(this);
 
         nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
-		nVDisplayName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+		nVDisplayName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 
 		nVEmail = (TextView) findViewById(R.id.navigation_drawer_account_information_email);
         nVPictureProfile = (RoundedImageView) findViewById(R.id.navigation_drawer_user_account_picture_profile);
@@ -3972,7 +3972,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("setDefaultAvatar");
 
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		String firstLetter = ChatUtil.getFirstLetter(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+		String firstLetter = getFirstLetter(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
 			firstLetter = " ";
 		}
@@ -4057,7 +4057,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
 		final EmojiEditText inputFirstName = new EmojiEditText(this);
-		inputFirstName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+		inputFirstName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 
 		inputFirstName.getBackground().mutate().clearColorFilter();
 		inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
