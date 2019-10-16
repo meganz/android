@@ -396,7 +396,7 @@ public class Constants {
     public static final String[] FOLDER_DOWNLOAD_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#F!.+$",
             "^https://mega\\.nz/#F!.+$",
-            "^https://mega\\.co\\.nz/folder/.+#.*$",
+            "^https://mega\\.co\\.nz/folder/.+$",
             "^https://mega\\.nz/folder/.+#.*$"
     };
 
