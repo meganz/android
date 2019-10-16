@@ -200,6 +200,8 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.file_explorer_action, menu);
+        menu.findItem(R.id.cab_menu_sort).setVisible(false);
+        menu.findItem(R.id.cab_menu_grid_list).setVisible(false);
         searchMenuItem = menu.findItem(R.id.cab_menu_search);
         searchMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
         createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
@@ -258,7 +260,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     public void isPendingToOpenSearchView () {
-        if (pendingToOpenSearchView) {
+        if (pendingToOpenSearchView && searchMenuItem != null && searchView != null) {
             String query = querySearch;
             searchMenuItem.expandActionView();
             searchView.setQuery(query, false);
@@ -416,7 +418,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             intent.putExtra("SELECTED_CHATS", chatHandles);
         }
 
-        if (users != null && !chats.isEmpty()) {
+        if (users != null && !users.isEmpty()) {
             long[] userHandles = new long[users.size()];
             for (int i=0; i<users.size(); i++) {
                 userHandles[i] = users.get(i).getHandle();
@@ -440,9 +442,11 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     public void collapseSearchView () {
-        if (searchMenuItem != null) {
-            searchMenuItem.collapseActionView();
+        if (searchMenuItem == null) {
+            return;
         }
+
+        searchMenuItem.collapseActionView();
     }
 
     @Override

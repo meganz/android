@@ -5,10 +5,8 @@ import android.util.Log;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatLoggerInterface;
 
-
 public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInterface {
     public static final String LOG_FILE_NAME = "logKarere.txt";
-    private final String TAG = "AndroidChatLogger";
 
     public AndroidChatLogger(String fileName, boolean fileLogger) {
         super(fileName, fileLogger);
@@ -17,6 +15,7 @@ public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInter
     public void log(int logLevel, String message) {
         //display to console
         if (Util.DEBUG) {
+            String TAG = "AndroidLogger";
             Log.d(TAG, message);
         }
 
