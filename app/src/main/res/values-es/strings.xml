@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activando cuenta</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparando lista de archivos</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Inicia sesión para poder compartir en MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Tu enlace de confirmación ya no es válido. Es posible que tu cuenta ya esté activa o que hayas cancelado el registro.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">La vista previa todavía no se ha descargado, por favor espera</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Por favor, cierra sesión antes de crear la cuenta</string>
 
@@ -630,12 +632,12 @@
 
     <string name="menu_take_picture" context="menu item">Hacer foto</string>
 
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-fi</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-Fi</string>
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o plan de datos</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">Aceptar</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Saltar</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Detener</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Subidas de la Cámara en curso</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Subidas de la cámara en curso</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">¿Quieres detener las Subidas de la cámara?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -650,7 +652,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Almacenamiento</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Bloqueo con PIN</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compresión de vídeos consume mucha energía, por eso MEGA te recordará que enchufes tu dispositivo si los videos a comprimir son superiores a %s.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compresión de vídeos consume mucha energía, por eso MEGA te recordará que dejes tu dispositivo cargando si los videos a comprimir son superiores a %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avanzado</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Borrar caché</string>
@@ -688,10 +690,10 @@
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
         <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o plan de datos</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-fi</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-Fi</item>
     </string-array>
 
-    <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Subir archivo</string>
+    <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Subir archivos</string>
 
     <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
         <item context="the options of what to upload.">Solo fotos</item>
@@ -929,7 +931,7 @@
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
     -->
 
-    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. Este correo electrónico ya está asociado a una cuenta MEGA.</string>
+    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. Este correo electrónico ya está asociado a una cuenta de MEGA.</string>
 
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Este es el último paso para cambiar tu correo electrónico. Por favor, introduce tu contraseña.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Cambiar correo electrónico</string>
@@ -939,7 +941,7 @@
     -->
 
     <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">¡Te estás quedando sin espacio!</string>
-    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Sácale el máximo provecho a tu cuenta MEGA con una cuenta PRO.</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Sácale el máximo provecho a tu cuenta de MEGA con una cuenta PRO.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Editar imagen del perfil</string>
     <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Hacer foto</string>
@@ -1796,8 +1798,8 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Subiendo al chat</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calidad multimedia del chat</string>
-	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Calidad del vídeo</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calidad de video del chat</string>
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Calidad de vídeo</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Subidas de la cámara necesita acceder a tus fotos y otros archivos multimedia del dispositivo. Ve a los ajustes y permite el acceso.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Calidad original</item>
@@ -2273,7 +2275,7 @@
 	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">No hay suficiente espacio de almacenamiento</string>
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">No hay suficiente espacio de almacenamiento local para comprimir el vídeo.</string>
 	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">El tamaño es demasiado grande para efectuar la compresión.</string>
-	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">El tamaño total de los videos a comprimir excede de %s, por favor enchufa tu dispositivo para continuar.</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">El tamaño total de los videos a comprimir excede de %s, por favor deja tu dispositivo cargando para continuar.</string>
 	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Los cambios se aplicarán en el siguiente reinicio de las Subidas de la cámara</string>
 	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s comprimido</string>
 	<string name="title_compress_video" context="notification title when compressing video">Comprimiendo videos %1$d/%2$d</string>
@@ -2320,7 +2322,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Llamada iniciada</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Error clave SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA no se puede conectar de forma segura a través de SSL. Es posible que estés conectado a una WiFi pública con requisitos adicionales.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA no se puede conectar de forma segura a través de SSL. Es posible que estés conectado a una Wi-Fi pública con requisitos adicionales.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No hay [/B][A]notificaciones[/A][B].[/B]</string>
 
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Cargando</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Por favor espera&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>
