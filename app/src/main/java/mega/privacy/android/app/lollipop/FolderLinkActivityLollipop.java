@@ -654,7 +654,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						} else {
 							url = url + "!" + value;
 						}
-					} else if (url.contains(SEPERATOR + "folder" + SEPERATOR)) {
+					} else if (url.contains(SEPARATOR + "folder" + SEPARATOR)) {
 						// new folder link format
 						if (value.startsWith("#")) {
 							logDebug("Decryption key with hash!");
@@ -704,7 +704,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 								} else {
 									url = url + "!" + value;
 								}
-							} else if (url.contains(SEPERATOR + "folder" + SEPERATOR)) {
+							} else if (url.contains(SEPARATOR + "folder" + SEPARATOR)) {
 								// new folder link format
 								if (value.startsWith("#")) {
 									logDebug("Decryption key with hash!");

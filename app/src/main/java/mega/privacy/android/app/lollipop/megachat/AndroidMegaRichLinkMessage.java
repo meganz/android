@@ -14,7 +14,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.Constants.CHAT_LINK_REGEXS;
 import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_REGEXS;
 import static mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS;
-import static mega.privacy.android.app.utils.Constants.FOLDER_DOWNLOAD_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEXS;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -153,7 +153,7 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public static boolean isFolderLink(String url) {
-        return matchRegexs(url, FOLDER_DOWNLOAD_LINK_REGEXS);
+        return matchRegexs(url, FOLDER_LINK_REGEXS);
     }
 
     public static boolean isFileLink(String url) {

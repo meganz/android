@@ -119,7 +119,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Folder Download link
-        if (matchRegexs(url, FOLDER_DOWNLOAD_LINK_REGEXS)) {
+        if (matchRegexs(url, FOLDER_LINK_REGEXS)) {
 			logDebug("Folder link url");
 
 			Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);

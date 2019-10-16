@@ -311,7 +311,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						} else {
 							url = url + "!" + value;
 						}
-					} else if (url.contains(SEPERATOR + "file" + SEPERATOR)) {
+					} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
 						// new folder link format
 						if (value.startsWith("#")) {
 							logDebug("Decryption key with hash!");
@@ -361,7 +361,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 								} else {
 									url = url + "!" + value;
 								}
-							} else if (url.contains(SEPERATOR + "file" + SEPERATOR)) {
+							} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
 								// new folder link format
 								if (value.startsWith("#")) {
 									logDebug("Decryption key with hash!");
