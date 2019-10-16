@@ -157,7 +157,7 @@ public class Constants {
     public static final int PRO_II = 2;
     public static final int PRO_III = 3;
     public static final int PRO_LITE = 4;
-    public static final int BUSINESS = 5;
+    public static final int BUSINESS = 100;
 
 
     public static final int COLOR_STATUS_BAR_ACCENT = 1;

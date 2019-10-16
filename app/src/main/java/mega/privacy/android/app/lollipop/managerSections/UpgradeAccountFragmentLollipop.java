@@ -421,7 +421,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		if (s.length == 1) {
 			String[] s1 = priceString.split(",");
 			if (s1.length == 1) {
-				monthPrice = s1[0];
+				monthPrice = s1[0]+" €";
 			} else if (s1.length == 2) {
 				monthPrice = s1[0]+","+s1[1]+" €";
 			}

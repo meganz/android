@@ -8,17 +8,19 @@ public class Product implements Parcelable{
 	long handle;
 	int level;
 	int months;
-	long storage;
+	int storage;
 	int amount;
-	long transfer;
+	int transfer;
+	boolean isBusiness;
 
-	public Product (long _handle, int _level, int _months, long _storage, int _amount, long _transfer){
+	public Product (long _handle, int _level, int _months, int _storage, int _amount, int _transfer, boolean _isBusiness){
 		this.handle=_handle;
 		this.level = _level;
 		this.months = _months;
 		this.storage = _storage;
 		this.amount = _amount;
 		this.transfer = _transfer;
+		this.isBusiness = _isBusiness;
 	}
 
 	public long getHandle() {
@@ -45,11 +47,11 @@ public class Product implements Parcelable{
 		this.months = months;
 	}
 
-	public long getStorage() {
+	public int getStorage() {
 		return storage;
 	}
 
-	public void setStorage(long storage) {
+	public void setStorage(int storage) {
 		this.storage = storage;
 	}
 
@@ -61,12 +63,20 @@ public class Product implements Parcelable{
 		this.amount = amount;
 	}
 
-	public long getTransfer() {
+	public int getTransfer() {
 		return transfer;
 	}
 
-	public void setTransfer(long transfer) {
+	public void setTransfer(int transfer) {
 		this.transfer = transfer;
+	}
+
+	public boolean isBusiness() {
+		return isBusiness;
+	}
+
+	public void setBusiness(boolean isBusiness) {
+		this.isBusiness = isBusiness;
 	}
 
 	@Override
@@ -81,9 +91,10 @@ public class Product implements Parcelable{
 		out.writeLong(handle);
 		out.writeInt(level);
 		out.writeInt(months);
-		out.writeLong(storage);
+		out.writeInt(storage);
 		out.writeInt(amount);
-		out.writeLong(transfer);
+		out.writeInt(transfer);
+		out.writeInt(isBusiness ? 1 : 0);
 	}
 
 
