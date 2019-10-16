@@ -54,6 +54,7 @@ import mega.privacy.android.app.utils.CopyFileThread;
 import mega.privacy.android.app.utils.DownloadInfo;
 import mega.privacy.android.app.utils.DownloadLinkInfo;
 import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -1009,12 +1010,8 @@ public class NodeController {
     }
 
     private void showSelectDownloadLocationDialog(final MegaNode document, final String url) {
-        Dialog downloadLocationDialog;
-        String[] sdCardOptions = context.getResources().getStringArray(R.array.settings_storage_download_location_array);
-        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(context);
-
-        b.setTitle(context.getString(R.string.settings_storage_download_location));
-        b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context);
+        selector.initDialogBuilder(new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -1033,27 +1030,29 @@ public class NodeController {
                             //sd card is available, choose internal storage location
                             intentPickFolder(document, url, null);
                         }
-                        String sdCardRoot = sdCardOperator.getSDCardRoot();
-                        DownloadLinkInfo linkInfo = new DownloadLinkInfo(document, url);
-                        //don't use DocumentFile
-                        if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
-                            intentPickFolder(document, url, sdCardRoot);
-                        } else {
-                            if (context instanceof DownloadableActivity) {
-                                ((DownloadableActivity) context).setLinkInfo(linkInfo);
-                            }
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                try {
-                                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                                    intentPickFolder(document, url, sdCardRoot);
-                                } catch (SDCardOperator.SDCardException e) {
-                                    e.printStackTrace();
-                                    logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
-                                    //request sd card root request and write permission.
+                        if(sdCardOperator != null) {
+                            String sdCardRoot = sdCardOperator.getSDCardRoot();
+                            DownloadLinkInfo linkInfo = new DownloadLinkInfo(document, url);
+                            //don't use DocumentFile
+                            if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
+                                intentPickFolder(document, url, sdCardRoot);
+                            } else {
+                                if (context instanceof DownloadableActivity) {
+                                    ((DownloadableActivity) context).setLinkInfo(linkInfo);
+                                }
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    try {
+                                        sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                                        intentPickFolder(document, url, sdCardRoot);
+                                    } catch (SDCardOperator.SDCardException e) {
+                                        e.printStackTrace();
+                                        logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
+                                        //request sd card root request and write permission.
+                                        SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
+                                    }
+                                } else {
                                     SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
                                 }
-                            } else {
-                                SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
                             }
                         }
                         break;
@@ -1061,24 +1060,12 @@ public class NodeController {
                 }
             }
         });
-        b.setNegativeButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        downloadLocationDialog = b.create();
-        downloadLocationDialog.show();
+        selector.show();
     }
 
     private void showSelectDownloadLocationDialog(final DownloadInfo downloadInfo, final SDCardOperator sdCardOperator) {
-        Dialog downloadLocationDialog;
-        String[] sdCardOptions = context.getResources().getStringArray(R.array.settings_storage_download_location_array);
-        AlertDialog.Builder b = new AlertDialog.Builder(context);
-        b.setTitle(context.getResources().getString(R.string.settings_storage_download_location));
-
-        b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context);
+        selector.initDialogBuilder(new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -1115,16 +1102,7 @@ public class NodeController {
                 }
             }
         });
-        b.setNegativeButton(context.getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        downloadLocationDialog = b.create();
-        downloadLocationDialog.show();
-        logDebug("downloadLocationDialog shown");
+        selector.show();
     }
 
     /*

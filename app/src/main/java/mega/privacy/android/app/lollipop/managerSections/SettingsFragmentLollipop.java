@@ -70,6 +70,7 @@ import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -1478,51 +1479,44 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
     }
 
     private void showSelectDownloadLocationDialog() {
-        Dialog downloadLocationDialog;
-        String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-        AlertDialog.Builder b = new AlertDialog.Builder(context);
-
-        b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-        b.setItems(sdCardOptions, new OnClickListener() {
+        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context);
+        selector.setIsDefaultLocation(true);
+        selector.initDialogBuilder(new OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                logDebug("onClick");
                 switch (which) {
                     case 0: {
                         toSelectFolder();
                         break;
                     }
                     case 1: {
-                        logDebug("get External Files");
                         try {
                             sdCardOperator = new SDCardOperator(context);
                         } catch (SDCardOperator.SDCardException e) {
                             e.printStackTrace();
-                            logError(e.getMessage());
+                            logError("SDCardOperator initialize failed", e);
                         }
                         if (sdCardOperator != null) {
                             String sdCardRoot = sdCardOperator.getSDCardRoot();
                             //don't use DocumentFile
-                            if(sdCardOperator.canWriteWithFile(sdCardRoot)) {
-                                logDebug("can operate sd card with file.");
+                            if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
                                 toSelectFolder(sdCardRoot);
                             } else {
                                 String uri = dbH.getSDCardUri();
-                                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                     try {
                                         sdCardOperator.initDocumentFileRoot(uri);
-                                        logDebug("operate sd card with document file.");
                                         toSelectFolder(sdCardRoot);
                                     } catch (SDCardOperator.SDCardException e) {
                                         e.printStackTrace();
-                                        logError(e.getMessage());
+                                        logError("SDCardException initDocumentFileRoot failed", e);
                                         //request sd card root request and write permission.
-                                        SDCardOperator.requestSDCardPermission(sdCardRoot,context,SettingsFragmentLollipop.this);
+                                        SDCardOperator.requestSDCardPermission(sdCardRoot, context, SettingsFragmentLollipop.this);
                                     }
                                 } else {
                                     //open SAF to select target folder
-                                    SDCardOperator.requestSDCardPermission(sdCardRoot,context,SettingsFragmentLollipop.this);
+                                    SDCardOperator.requestSDCardPermission(sdCardRoot, context, SettingsFragmentLollipop.this);
                                 }
                             }
                         } else {
@@ -1533,17 +1527,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 }
             }
         });
-        b.setNegativeButton(getResources().getString(R.string.general_cancel), new OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                logDebug("Cancel dialog");
-                dialog.cancel();
-            }
-        });
-        downloadLocationDialog = b.create();
-        downloadLocationDialog.show();
-        logDebug("downloadLocationDialog shown");
+        selector.show();
     }
 
     @Override

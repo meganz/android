@@ -83,6 +83,7 @@ import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFrag
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DownloadInfo;
 import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -159,7 +160,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	MegaPreferences prefs = null;
 
 	boolean decryptionIntroduced=false;
-	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
+	public final static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	private ActionMode actionMode;
 	
 	boolean downloadCompleteFolder = false;
@@ -780,18 +781,14 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
     }
 
     private void showSelectDownloadLocationDialog(final long [] hashes, final long size) {
-        Dialog downloadLocationDialog;
-        String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-        android.support.v7.app.AlertDialog.Builder b = new android.support.v7.app.AlertDialog.Builder(this);
-        b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-
-        b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(this);
+        selector.initDialogBuilder(new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0: {
-                        toSelectFolder(hashes, size, null,null);
+                        toSelectFolder(hashes, size, null, null);
                         break;
                     }
                     case 1: {
@@ -818,10 +815,10 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                                         e.printStackTrace();
                                         logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
                                         //request sd card root request and write permission.
-                                        SDCardOperator.requestSDCardPermission(sdCardRoot, FolderLinkActivityLollipop.this, (FolderLinkActivityLollipop.this));
+                                        SDCardOperator.requestSDCardPermission(sdCardRoot, FolderLinkActivityLollipop.this, FolderLinkActivityLollipop.this);
                                     }
                                 } else {
-                                    SDCardOperator.requestSDCardPermission(sdCardRoot, FolderLinkActivityLollipop.this, (FolderLinkActivityLollipop.this));
+                                    SDCardOperator.requestSDCardPermission(sdCardRoot, FolderLinkActivityLollipop.this, FolderLinkActivityLollipop.this);
                                 }
                             }
                         }
@@ -830,16 +827,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                 }
             }
         });
-        b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        downloadLocationDialog = b.create();
-        downloadLocationDialog.show();
-        logDebug("downloadLocationDialog shown");
+        selector.show();
     }
 
 	@SuppressLint("NewApi")
