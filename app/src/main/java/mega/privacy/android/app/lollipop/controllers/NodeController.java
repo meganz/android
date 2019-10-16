@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.controllers;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,7 +14,6 @@ import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 
 import java.io.File;
 import java.net.URLDecoder;
@@ -447,7 +445,6 @@ public class NodeController {
     //Old downloadTo
     public void checkSizeBeforeDownload(String parentPath, String url, long size, long [] hashes, boolean highPriority){
         //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
-        logDebug("parentPath: " + parentPath + ", url: " + url + ", size: " + size);
         logDebug("Files to download: " + hashes.length);
         logDebug("SIZE to download before calculating: " + size);
 

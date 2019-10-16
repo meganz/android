@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -855,14 +854,10 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 
         if (askMe) {
             File[] fs = getExternalFilesDirs(null);
-            if (fs.length > 1) {
-                if (fs[1] == null) {
-                    toSelectFolder(hashes,size,null,null);
-                } else {
-                    showSelectDownloadLocationDialog(hashes, size);
-                }
+            if (fs.length <= 1 || fs[1] == null) {
+                toSelectFolder(hashes, size, null, null);
             } else {
-                toSelectFolder(hashes,size,null,null);
+                showSelectDownloadLocationDialog(hashes, size);
             }
         } else {
             downloadTo(downloadLocationDefaultPath, null, null, size, hashes);
