@@ -1081,7 +1081,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	
 			downloadTo (parentPath, null, url, size, hashes);
 		} else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode);
+            onRequestSDCardWritePermission(intent, resultCode, null);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 
