@@ -385,7 +385,7 @@ public class Constants {
             "^https://mega\\.co\\.nz/#!.+$",
             "^https://mega\\.nz/#!.+$",
             "^https://mega\\.co\\.nz/file/.+$",
-            "^https://mega\\.nz/file/.+#.*$",
+            "^https://mega\\.nz/file/.+$",
     };
 
     public static final String[] CONFIRMATION_LINK_REGEXS = {
