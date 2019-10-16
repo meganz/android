@@ -239,9 +239,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     Handler handlerKeyboard;
     Handler handlerEmojiKeyboard;
 
-    TextView emptyTextView;
-    ImageView emptyImageView;
-    LinearLayout emptyLayout;
+    private TextView emptyTextView;
+    private ImageView emptyImageView;
+    private RelativeLayout emptyLayout;
 
     boolean pendingMessagesLoaded = false;
 
@@ -584,9 +584,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         participantsLayout.setVisibility(View.GONE);
         iconStateToolbar.setVisibility(View.GONE);
         privateIconToolbar.setVisibility(View.GONE);
-
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         emptyLayout = findViewById(R.id.empty_messages_layout);
         emptyTextView = findViewById(R.id.empty_text_chat_recent);
@@ -875,7 +873,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         listView = findViewById(R.id.messages_chat_list_view);
         listView.setClipToPadding(false);
-        ;
+
         listView.setNestedScrollingEnabled(false);
         ((SimpleItemAnimator) listView.getItemAnimator()).setSupportsChangeAnimations(false);
 
@@ -1195,18 +1193,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 isOpeningChat = true;
 
-                LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams) emptyImageView.getLayoutParams();
-
-                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
-                    emptyTextViewParams1.setMargins(0, scaleHeightPx(40, outMetrics), 0, scaleHeightPx(24, outMetrics));
-                } else {
-                    emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
-                    emptyTextViewParams1.setMargins(0, scaleHeightPx(100, outMetrics), 0, scaleHeightPx(24, outMetrics));
-                }
-
-                emptyImageView.setLayoutParams(emptyTextViewParams1);
-
                 String textToShowB = String.format(getString(R.string.chat_loading_messages));
 
                 try {
@@ -1223,11 +1209,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     resultB = Html.fromHtml(textToShowB);
                 }
 
-                emptyTextView.setText(resultB);
-                emptyTextView.setVisibility(View.VISIBLE);
-                emptyLayout.setVisibility(View.VISIBLE);
-
-                chatRelativeLayout.setVisibility(View.GONE);
+                emptyScreen(resultB.toString());
 
                 if(textSnackbar!=null){
                     String chatLink = getIntent().getStringExtra("CHAT_LINK");
@@ -1251,6 +1233,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         logDebug("FINISH on Create");
+    }
+
+    private void emptyScreen(String text){
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
+        } else {
+            emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+        }
+
+        emptyTextView.setText(text);
+        emptyTextView.setVisibility(View.VISIBLE);
+        emptyLayout.setVisibility(View.VISIBLE);
+
+        chatRelativeLayout.setVisibility(View.GONE);
     }
 
     public void removeChatLink(){
@@ -6863,28 +6859,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             else {
+
+                String text;
                 if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
-                    emptyTextView.setText(getString(R.string.invalid_chat_link));
+                    text = getString(R.string.invalid_chat_link);
                 }
                 else{
                     showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
-                    emptyTextView.setText(getString(R.string.error_chat_link));
+                    text = getString(R.string.error_chat_link);
                 }
 
-                emptyTextView.setVisibility(View.VISIBLE);
-                emptyLayout.setVisibility(View.VISIBLE);
-                chatRelativeLayout.setVisibility(View.GONE);
-
-                LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyImageView.getLayoutParams();
-                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                    emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
-                    emptyTextViewParams1.setMargins(0, scaleHeightPx(40, outMetrics), 0, scaleHeightPx(24, outMetrics));
-                }else{
-                    emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
-                    emptyTextViewParams1.setMargins(0, scaleHeightPx(100, outMetrics), 0, scaleHeightPx(24, outMetrics));
-                }
-
-                emptyImageView.setLayoutParams(emptyTextViewParams1);
+                emptyScreen(text);
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
