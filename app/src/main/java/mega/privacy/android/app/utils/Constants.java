@@ -397,7 +397,7 @@ public class Constants {
             "^https://mega\\.co\\.nz/#F!.+$",
             "^https://mega\\.nz/#F!.+$",
             "^https://mega\\.co\\.nz/folder/.+$",
-            "^https://mega\\.nz/folder/.+#.*$"
+            "^https://mega\\.nz/folder/.+$"
     };
 
     public static final String[] CHAT_LINK_REGEXS = {
