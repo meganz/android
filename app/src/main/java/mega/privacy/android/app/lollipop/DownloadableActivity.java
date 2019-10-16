@@ -10,6 +10,7 @@ import android.support.v4.provider.DocumentFile;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DownloadInfo;
@@ -21,7 +22,7 @@ import mega.privacy.android.app.utils.Util;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
-public class DownloadableActivity extends PinActivityLollipop {
+public class DownloadableActivity extends SorterContentActivity {
 
     private DownloadInfo downloadInfo;
 
