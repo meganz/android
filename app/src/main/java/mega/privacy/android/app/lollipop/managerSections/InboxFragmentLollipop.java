@@ -491,7 +491,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 
-		if (((ManagerActivityLollipop) context).parentHandleInbox == -1||((ManagerActivityLollipop) context).parentHandleInbox==megaApi.getInboxNode().getHandle()) {
+		if (((ManagerActivityLollipop) context).getParentHandleInbox() == -1||((ManagerActivityLollipop) context).getParentHandleInbox()==megaApi.getInboxNode().getHandle()) {
 			logWarning("Parent Handle == -1");
 
 			if (megaApi.getInboxNode() != null){
@@ -501,8 +501,8 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			}
 		}
 		else{
-			logDebug("Parent Handle: " + ((ManagerActivityLollipop) context).parentHandleInbox);
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
+			logDebug("Parent Handle: " + ((ManagerActivityLollipop) context).getParentHandleInbox());
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
 
 			if(parentNode!=null){
 				logDebug("Parent Node Handle: " + parentNode.getHandle());
@@ -539,10 +539,10 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, null, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).getParentHandleInbox(), recyclerView, null, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
+				adapter.setParentHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
 //                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
                 adapter.setListFragment(recyclerView);
 //				adapter.setNodes(nodes);
@@ -583,10 +583,10 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, null, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).getParentHandleInbox(), recyclerView, null, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
+				adapter.setParentHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
 //                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 				adapter.setListFragment(recyclerView);
 //				adapter.setNodes(nodes);
@@ -605,11 +605,11 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	
 	public void refresh(){
 		logDebug("refresh");
-		if(inboxNode != null && (((ManagerActivityLollipop) context).parentHandleInbox==-1||((ManagerActivityLollipop) context).parentHandleInbox==inboxNode.getHandle())){
+		if(inboxNode != null && (((ManagerActivityLollipop) context).getParentHandleInbox()==-1||((ManagerActivityLollipop) context).getParentHandleInbox()==inboxNode.getHandle())){
 			nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
 		}
 		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
 			if(parentNode!=null){
 				logDebug("Parent Node Handle: " + parentNode.getHandle());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
@@ -913,7 +913,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
-				((ManagerActivityLollipop) context).parentHandleInbox = nodes.get(position).getHandle();
+				((ManagerActivityLollipop) context).setParentHandleInbox(nodes.get(position).getHandle());
 
 				((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop) context).setToolbarTitle();
@@ -1026,23 +1026,23 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			return 0;
 		}
 
-		if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).parentHandleInbox)) {
+		if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).getParentHandleInbox())) {
 			((ManagerActivityLollipop) context).comesFromNotifications = false;
 			((ManagerActivityLollipop) context).comesFromNotificationHandle = -1;
 			((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
-			((ManagerActivityLollipop)context).parentHandleInbox = ((ManagerActivityLollipop)context).comesFromNotificationHandleSaved;
+			((ManagerActivityLollipop)context).setParentHandleInbox(((ManagerActivityLollipop)context).comesFromNotificationHandleSaved);
 			((ManagerActivityLollipop)context).comesFromNotificationHandleSaved = -1;
 
 			return 2;
 		}
 		else {
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox));
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleInbox()));
 			if (parentNode != null) {
 				logDebug("Parent Node Handle: " + parentNode.getHandle());
 
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-				((ManagerActivityLollipop) context).parentHandleInbox = parentNode.getHandle();
+				((ManagerActivityLollipop) context).setParentHandleInbox(parentNode.getHandle());
 				((ManagerActivityLollipop) context).setToolbarTitle();
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
@@ -1077,7 +1077,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	}
 	
 	public long getParentHandle(){
-		return ((ManagerActivityLollipop) context).parentHandleInbox;
+		return ((ManagerActivityLollipop) context).getParentHandleInbox();
 	}
 
 	public RecyclerView getRecyclerView(){
@@ -1104,7 +1104,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			emptyTextView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.GONE);
 
-			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop)context).parentHandleInbox||((ManagerActivityLollipop)context).parentHandleInbox==-1) {
+			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleInbox()||((ManagerActivityLollipop)context).getParentHandleInbox()==-1) {
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 					emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
 				}else{
@@ -1159,11 +1159,11 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			emptyTextView.setVisibility(View.GONE);
 			contentTextLayout.setVisibility(View.GONE);
 
-			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).parentHandleInbox||((ManagerActivityLollipop) context).parentHandleInbox==-1) {
+			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).getParentHandleInbox()||((ManagerActivityLollipop) context).getParentHandleInbox()==-1) {
 
 				contentText.setText(getInfoFolder(inboxNode, context));
 			} else {
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
+				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
 
 				if(parentNode!=null){
 					contentText.setText(getInfoFolder(parentNode, context));

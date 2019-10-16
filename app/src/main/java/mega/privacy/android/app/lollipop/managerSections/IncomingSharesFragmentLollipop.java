@@ -484,7 +484,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		logDebug("Parent Handle: "+((ManagerActivityLollipop)context).parentHandleIncoming);
+		logDebug("Parent Handle: "+((ManagerActivityLollipop)context).getParentHandleIncoming());
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -525,21 +525,21 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleIncoming(), recyclerView, null, INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
-			if (((ManagerActivityLollipop)context).parentHandleIncoming == -1){
+			if (((ManagerActivityLollipop)context).getParentHandleIncoming() == -1){
 				logWarning("ParentHandle -1");
 				findNodes();
 				adapter.setParentHandle(-1);
 			}
 			else{
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
-				logDebug("ParentHandle to find children: "+((ManagerActivityLollipop)context).parentHandleIncoming);
+				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleIncoming());
+				logDebug("ParentHandle to find children: "+((ManagerActivityLollipop)context).getParentHandleIncoming());
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType());
@@ -559,7 +559,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleIncoming||((ManagerActivityLollipop)context).parentHandleIncoming==-1) {
+				if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleIncoming()||((ManagerActivityLollipop)context).getParentHandleIncoming()==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
 					}else{
@@ -640,21 +640,21 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleIncoming(), recyclerView, null, INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
+				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleIncoming());
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
-			if (((ManagerActivityLollipop)context).parentHandleIncoming == -1){
+			if (((ManagerActivityLollipop)context).getParentHandleIncoming() == -1){
 				logWarning("ParentHandle == -1");
 				findNodes();
 			}
 			else{
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
-				logDebug("ParentHandle: " + ((ManagerActivityLollipop)context).parentHandleIncoming);
+				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleIncoming());
+				logDebug("ParentHandle: " + ((ManagerActivityLollipop)context).getParentHandleIncoming());
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType());
@@ -674,7 +674,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleIncoming||((ManagerActivityLollipop)context).parentHandleIncoming==-1) {
+				if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleIncoming()||((ManagerActivityLollipop)context).getParentHandleIncoming()==-1) {
 
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
@@ -733,16 +733,16 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	public void refresh (){
 		logDebug("refresh");
 		MegaNode parentNode = null;
-		if (((ManagerActivityLollipop)context).parentHandleIncoming == -1){
+		if (((ManagerActivityLollipop)context).getParentHandleIncoming() == -1){
 			logWarning("ParentHandle is -1");
 			findNodes();
 		}
 		else{
-			if (megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming) == null){
+			if (megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleIncoming()) == null){
 				findNodes();
 			}
 			else {
-				parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
+				parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleIncoming());
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType());
@@ -761,7 +761,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
-			if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleIncoming||((ManagerActivityLollipop)context).parentHandleIncoming==-1) {
+			if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleIncoming()||((ManagerActivityLollipop)context).getParentHandleIncoming()==-1) {
 
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 					emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
@@ -833,7 +833,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
                 intent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
             }
 
-            if (((ManagerActivityLollipop) context).parentHandleIncoming == -1) {
+            if (((ManagerActivityLollipop) context).getParentHandleIncoming() == -1) {
                 intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderOthers);
             } else {
                 intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
@@ -870,7 +870,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
                 mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
             }
 
-            if (((ManagerActivityLollipop) context).parentHandleIncoming == -1) {
+            if (((ManagerActivityLollipop) context).getParentHandleIncoming() == -1) {
                 mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderOthers);
             } else {
                 mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
@@ -1123,11 +1123,11 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 
 				lastPositionStack.push(lastFirstVisiblePosition);
 
-				((ManagerActivityLollipop) context).parentHandleIncoming = n.getHandle();
+				((ManagerActivityLollipop) context).setParentHandleIncoming(n.getHandle());
 				((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop) context).setToolbarTitle();
 
-				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleIncoming);
+				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleIncoming());
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop) context).orderCloud);
 				addSectionTitle(nodes, adapter.getAdapterType());
 
@@ -1220,7 +1220,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
-			if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleIncoming||((ManagerActivityLollipop)context).parentHandleIncoming==-1) {
+			if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleIncoming()||((ManagerActivityLollipop)context).getParentHandleIncoming()==-1) {
 
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 					emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
@@ -1276,9 +1276,9 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public void setOrderNodes(){
-		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).parentHandleIncoming);
+		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleIncoming());
 
-		if(((ManagerActivityLollipop)context).parentHandleIncoming==-1){
+		if(((ManagerActivityLollipop)context).getParentHandleIncoming()==-1){
 			if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
 				sortByMailDescending(nodes);
 			}
@@ -1287,7 +1287,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			}
 		}
 		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleIncoming());
 			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 		}
 		addSectionTitle(nodes,adapter.getAdapterType() );
@@ -1405,7 +1405,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 				//In the beginning of the navigation
 
 				logDebug("deepBrowserTree==0");
-				((ManagerActivityLollipop) context).parentHandleIncoming = -1;
+				((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
 				((ManagerActivityLollipop) context).setToolbarTitle();
 				findNodes();
 				visibilityFastScroller();
@@ -1438,14 +1438,14 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			else if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming>0){
 				logDebug("deepTree>0");
 
-				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming));
+				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleIncoming()));
 
 				if (parentNode != null){
 					recyclerView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 
-					((ManagerActivityLollipop)context).parentHandleIncoming = parentNode.getHandle();
+					((ManagerActivityLollipop)context).setParentHandleIncoming(parentNode.getHandle());
 
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					((ManagerActivityLollipop)context).setToolbarTitle();

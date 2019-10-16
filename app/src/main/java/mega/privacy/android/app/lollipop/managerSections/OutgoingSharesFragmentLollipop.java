@@ -589,20 +589,20 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			if (adapter == null){
-				logDebug("Creating the adapter: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleOutgoing, recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				logDebug("Creating the adapter: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleOutgoing(), recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
-			if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
+			if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
 				logWarning("Parent Handle == -1");
 				findNodes();
 			}else{
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
-				logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
+				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
+				logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			}
 
@@ -625,7 +625,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyLinearLayout.setVisibility(View.VISIBLE);
 
-					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleOutgoing||((ManagerActivityLollipop)context).parentHandleOutgoing==-1) {
+					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleOutgoing()||((ManagerActivityLollipop)context).getParentHandleOutgoing()==-1) {
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
 						}else{
@@ -705,21 +705,21 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleOutgoing, recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleOutgoing(), recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
+				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
-			if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
+			if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
 				logWarning("Parent Handle == -1");
 				findNodes();
 			}
 			else{
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
-				logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
+				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
+				logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType());
@@ -739,7 +739,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyLinearLayout.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleOutgoing||((ManagerActivityLollipop)context).parentHandleOutgoing==-1) {
+				if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleOutgoing()||((ManagerActivityLollipop)context).getParentHandleOutgoing()==-1) {
 
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
@@ -796,9 +796,9 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public void refresh (){
-		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
+		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
 
-        if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
+        if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
             findNodes();
 
             ((ManagerActivityLollipop)context).setToolbarTitle();
@@ -814,7 +814,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
                     emptyImageView.setVisibility(View.VISIBLE);
                     emptyLinearLayout.setVisibility(View.VISIBLE);
 
-					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleOutgoing||((ManagerActivityLollipop)context).parentHandleOutgoing==-1) {
+					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleOutgoing()||((ManagerActivityLollipop)context).getParentHandleOutgoing()==-1) {
 
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
@@ -869,7 +869,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			}
         }
         else{
-            MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
+            MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
 
            	((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			((ManagerActivityLollipop)context).setToolbarTitle();
@@ -941,9 +941,9 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public void refreshContent (){
-		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
+		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
 
-		if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
+		if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
 			findNodes();
 			if(adapter != null){
 				logDebug("adapter != null");
@@ -966,7 +966,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			}
 		}
 		else{
-			MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
+			MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
 			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
 			addSectionTitle(nodes,adapter.getAdapterType());
 
@@ -1075,7 +1075,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 				intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 			}
 
-			if (((ManagerActivityLollipop) context).parentHandleOutgoing == -1) {
+			if (((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1) {
 				intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderOthers);
 			} else {
 				intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
@@ -1111,7 +1111,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 				mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 			}
 
-			if (((ManagerActivityLollipop) context).parentHandleOutgoing == -1) {
+			if (((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1) {
 				mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderOthers);
 			} else {
 				mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
@@ -1362,7 +1362,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 
 				lastPositionStack.push(lastFirstVisiblePosition);
 
-				((ManagerActivityLollipop) context).parentHandleOutgoing = n.getHandle();
+				((ManagerActivityLollipop) context).setParentHandleOutgoing(n.getHandle());
 
 				((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop) context).setToolbarTitle();
@@ -1557,7 +1557,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		if(((ManagerActivityLollipop) context).deepBrowserTreeOutgoing==0){
 			logDebug("deepBrowserTree==0");
 			//In the beginning of the navigation
-			((ManagerActivityLollipop)context).parentHandleOutgoing = -1;
+			((ManagerActivityLollipop)context).setParentHandleOutgoing(-1);
 
 			((ManagerActivityLollipop)context).setToolbarTitle();
 			findNodes();
@@ -1591,14 +1591,14 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		else if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing>0){
 			logDebug("Keep navigation");
 
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing));
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing()));
 
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyLinearLayout.setVisibility(View.GONE);
 
-				((ManagerActivityLollipop)context).parentHandleOutgoing=parentNode.getHandle();
+				((ManagerActivityLollipop)context).setParentHandleOutgoing(parentNode.getHandle());
 
 				((ManagerActivityLollipop)context).setToolbarTitle();
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();

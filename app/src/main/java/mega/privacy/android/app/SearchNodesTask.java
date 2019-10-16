@@ -20,7 +20,7 @@ import nz.mega.sdk.MegaShare;
 import static mega.privacy.android.app.utils.SortUtil.*;
 
 public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
-
+    private Context context;
     private ManagerActivityLollipop managerA;
     private FileExplorerActivityLollipop fileExplorerA;
     private IncomingSharesExplorerFragmentLollipop iSharesExplorerF;
@@ -37,7 +37,9 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
     private int orderCloud;
     private int orderOthers;
 
-    public SearchNodesTask(Context context, Fragment mFragment, String mQuery, long mParentHandleSearch, ArrayList<MegaNode> mNodes, int mOrderCloud, int mOrderOthers){
+    public SearchNodesTask(Context mContext, Fragment mFragment, String mQuery, long mParentHandleSearch, ArrayList<MegaNode> mNodes){
+
+        context = mContext;
 
         if (context instanceof ManagerActivityLollipop) {
             managerA = (ManagerActivityLollipop) context;
@@ -57,8 +59,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
         parentHandleSearch = mParentHandleSearch;
         nodes = mNodes;
 
-        orderCloud = mOrderCloud;
-        orderOthers = mOrderOthers;
+        getOrder();
 
         megaApi = MegaApplication.getInstance().getMegaApi();
     }
@@ -87,6 +88,22 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
         }
     }
 
+    private void getOrder() {
+        MegaPreferences prefs = DatabaseHandler.getDbHandler(context).getPreferences();
+
+        if (prefs != null && prefs.getPreferredSortCloud() !=  null) {
+            orderCloud = Integer.parseInt(prefs.getPreferredSortCloud());
+        } else {
+            orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
+        }
+
+        if (prefs != null && prefs.getPreferredSortOthers() != null) {
+            orderOthers = Integer.parseInt(prefs.getPreferredSortCloud());
+        } else {
+            orderOthers = MegaApiAndroid.ORDER_DEFAULT_ASC;
+        }
+    }
+
     private void getSearchNodes() {
         if (query == null) {
             nodes.clear();
@@ -103,23 +120,23 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
 
                 switch (drawerItem) {
                     case CLOUD_DRIVE: {
-                        parent = megaApi.getNodeByHandle(managerA.parentHandleBrowser);
+                        parent = megaApi.getNodeByHandle(managerA.getParentHandleBrowser());
                         break;
                     }
                     case SHARED_ITEMS: {
                         if (managerA.getTabItemShares() == 0) {
-                            if (managerA.parentHandleIncoming == -1) {
+                            if (managerA.getParentHandleIncoming() == -1) {
                                 nodes = filterInShares(query);
                                 return;
                             } else {
-                                parent = megaApi.getNodeByHandle(managerA.parentHandleIncoming);
+                                parent = megaApi.getNodeByHandle(managerA.getParentHandleIncoming());
                             }
                         } else if (managerA.getTabItemShares() == 1) {
-                            if (managerA.parentHandleOutgoing == -1) {
+                            if (managerA.getParentHandleOutgoing() == -1) {
                                 nodes = filterOutShares(query);
                                 return;
                             } else {
-                                parent = megaApi.getNodeByHandle(managerA.parentHandleOutgoing);
+                                parent = megaApi.getNodeByHandle(managerA.getParentHandleOutgoing());
                             }
                         }
                         break;
@@ -128,16 +145,16 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                         break;
                     }
                     case RUBBISH_BIN: {
-                        parentHandle = managerA.parentHandleRubbish;
+                        parentHandle = managerA.getParentHandleRubbish();
                         if (parentHandle == -1) {
                             parent = megaApi.getRubbishNode();
                         } else {
-                            parent = megaApi.getNodeByHandle(managerA.parentHandleRubbish);
+                            parent = megaApi.getNodeByHandle(managerA.getParentHandleRubbish());
                         }
                         break;
                     }
                     case INBOX: {
-                        parentHandle = managerA.parentHandleInbox;
+                        parentHandle = managerA.getParentHandleInbox();
                         if (parentHandle == -1) {
                             parent = megaApi.getInboxNode();
                         } else {
@@ -147,9 +164,14 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                     }
                 }
             } else if (isCDExplorerF()) {
-
+                parent = megaApi.getNodeByHandle(fileExplorerA.getParentHandleCloud());
             } else if (isISharesExplorerF()) {
-
+                if (fileExplorerA.getParentHandleIncoming() == -1) {
+                    nodes = filterInShares(query);
+                    return;
+                } else {
+                    parent = megaApi.getNodeByHandle(fileExplorerA.getParentHandleIncoming());
+                }
             }
         } else {
             parent = megaApi.getNodeByHandle(parentHandleSearch);

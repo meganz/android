@@ -124,8 +124,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	private RelativeLayout contentLayout;
 	private ProgressBar searchProgressBar;
 
-	private MegaCancelToken megaCancelToken;
-
 	@Override
 	protected RotatableAdapter getAdapter() {
 		return adapter;
@@ -604,7 +602,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleSearch(), recyclerView, null, SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setListFragment(recyclerView);
@@ -637,7 +635,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleSearch(), recyclerView, null, SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setListFragment(recyclerView);
@@ -672,10 +670,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		searchNodesTask = new SearchNodesTask(context,
 				this,
 				((ManagerActivityLollipop) context).getSearchQuery(),
-				((ManagerActivityLollipop) context).parentHandleSearch,
-				nodes,
-				((ManagerActivityLollipop) context).orderCloud,
-				((ManagerActivityLollipop) context).orderOthers);
+				((ManagerActivityLollipop) context).getParentHandleSearch(),
+				nodes);
 		searchNodesTask.execute();
 	}
 
@@ -765,7 +761,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					intent.putExtra("position", position);
 					intent.putExtra("searchQuery", ((ManagerActivityLollipop)context).getSearchQuery());
 					intent.putExtra("adapterType", SEARCH_ADAPTER);
-					if (((ManagerActivityLollipop)context).parentHandleSearch == -1){
+					if (((ManagerActivityLollipop)context).getParentHandleSearch() == -1){
 						intent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
@@ -803,7 +799,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					mediaIntent.putExtra("position", position);
 					mediaIntent.putExtra("searchQuery", ((ManagerActivityLollipop)context).getSearchQuery());
 					mediaIntent.putExtra("adapterType", SEARCH_ADAPTER);
-					if (((ManagerActivityLollipop)context).parentHandleSearch == -1){
+					if (((ManagerActivityLollipop)context).getParentHandleSearch() == -1){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
@@ -1129,7 +1125,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 		if (levelSearch >= 0) {
 			if (levelSearch > 0) {
-				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleSearch));
+				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleSearch()));
 				if (parentNode != null) {
 					((ManagerActivityLollipop) context).setParentHandleSearch(parentNode.getHandle());
 				}
@@ -1172,7 +1168,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	}
 	
 	public long getParentHandle(){
-		return ((ManagerActivityLollipop)context).parentHandleSearch;
+		return ((ManagerActivityLollipop)context).getParentHandleSearch();
 
 	}
 
@@ -1228,7 +1224,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
+				if(((ManagerActivityLollipop)context).getParentHandleSearch() == -1){
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 					}else{
@@ -1236,7 +1232,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 					emptyTextViewFirst.setText(R.string.no_results_found);
 				}
-				else if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleSearch) {
+				else if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleSearch()) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
 					}else{

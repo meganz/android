@@ -548,14 +548,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public boolean isList = true;
 
-	public long parentHandleBrowser;
-	public long parentHandleRubbish;
-	public long parentHandleIncoming;
-	public boolean isSearchEnabled;
-	public long parentHandleOutgoing;
-	public long parentHandleSearch;
-	public long parentHandleInbox;
-	public String pathNavigationOffline;
+	private long parentHandleBrowser;
+	private long parentHandleRubbish;
+	private long parentHandleIncoming;
+	private boolean isSearchEnabled;
+	private long parentHandleOutgoing;
+	private long parentHandleSearch;
+	private long parentHandleInbox;
+	private String pathNavigationOffline;
 	private int deepBrowserTreeRecents = 0;
 	private BucketSaved bucketSaved;
 	public int deepBrowserTreeIncoming = 0;
@@ -10878,7 +10878,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	private long getParentHandleBrowser() {
+	public long getParentHandleBrowser() {
 		if (parentHandleBrowser == -1) {
 			return megaApi.getRootNode().getHandle();
 		}
@@ -17962,5 +17962,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void setSearchQuery(String searchQuery) {
 		this.searchQuery = searchQuery;
+	}
+
+	public long getParentHandleIncoming() {
+		return parentHandleIncoming;
+	}
+
+	public long getParentHandleOutgoing() {
+		return parentHandleOutgoing;
+	}
+
+	public long getParentHandleRubbish() {
+		return parentHandleRubbish;
+	}
+
+	public long getParentHandleSearch() {
+		return parentHandleSearch;
 	}
 }
