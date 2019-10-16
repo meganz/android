@@ -384,7 +384,7 @@ public class Constants {
     public static final String[] FILE_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#!.+$",
             "^https://mega\\.nz/#!.+$",
-            "^https://mega\\.co\\.nz/file/.+#.*$",
+            "^https://mega\\.co\\.nz/file/.+$",
             "^https://mega\\.nz/file/.+#.*$",
     };
 
