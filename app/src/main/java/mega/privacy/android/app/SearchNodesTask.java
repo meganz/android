@@ -76,9 +76,11 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
             searchF.setProgressView(false);
             searchF.setNodes(nodes);
         } else if (isCDExplorerF()) {
-
+            cDExplorerF.setProgressView(false);
+            cDExplorerF.setSearchNodes(nodes);
         } else if (isISharesExplorerF()) {
-
+            iSharesExplorerF.setProgressView(false);
+            iSharesExplorerF.setSearchNodes(nodes);
         }
     }
 
@@ -98,7 +100,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
         }
 
         if (prefs != null && prefs.getPreferredSortOthers() != null) {
-            orderOthers = Integer.parseInt(prefs.getPreferredSortCloud());
+            orderOthers = Integer.parseInt(prefs.getPreferredSortOthers());
         } else {
             orderOthers = MegaApiAndroid.ORDER_DEFAULT_ASC;
         }
@@ -248,6 +250,6 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
     }
 
     private boolean isCDExplorerF() {
-        return isISharesExplorerF() && cDExplorerF != null;
+        return isFileExplorerA() && cDExplorerF != null;
     }
 }
