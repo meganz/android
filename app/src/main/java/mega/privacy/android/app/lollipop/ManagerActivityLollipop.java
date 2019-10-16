@@ -13722,9 +13722,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             dbH.setStorageDownloadLocation(parentPath);
-			logDebug("parentPath: "+parentPath);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-			logDebug("URL: " + url);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			logDebug("Size: " + size);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);

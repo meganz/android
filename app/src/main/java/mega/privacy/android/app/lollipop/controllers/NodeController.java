@@ -50,6 +50,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.CopyFileThread;
 import mega.privacy.android.app.utils.DownloadInfo;
 import mega.privacy.android.app.utils.DownloadLinkInfo;
 import mega.privacy.android.app.utils.SDCardOperator;
@@ -398,23 +399,19 @@ public class NodeController {
             logDebug("askMe");
             File[] fs = context.getExternalFilesDirs(null);
             final DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
-            if (fs.length > 1) {
-                if (fs[1] == null) {
-                    requestLocalFolder(downloadInfo, null, null);
-                } else {
-                    // has sd card
-                    try {
-                        SDCardOperator sdCardOperator = new SDCardOperator(context);
-                        showSelectDownloadLocationDialog(downloadInfo, sdCardOperator);
-                    } catch (SDCardOperator.SDCardException e) {
-                        e.printStackTrace();
-                        logError(e.getMessage());
-                        //sd card is unavailable
-                        requestLocalFolder(downloadInfo, null, null);
-                    }
-                }
-            } else {
+            if (fs.length <= 1 || fs[1] == null) {
                 requestLocalFolder(downloadInfo, null, null);
+            } else {
+                // has sd card
+                try {
+                    SDCardOperator sdCardOperator = new SDCardOperator(context);
+                    showSelectDownloadLocationDialog(downloadInfo, sdCardOperator);
+                } catch (SDCardOperator.SDCardException e) {
+                    e.printStackTrace();
+                    logError("Initialize SDCardOperator failed", e);
+                    //sd card is unavailable
+                    requestLocalFolder(downloadInfo, null, null);
+                }
             }
         } else {
             logDebug("NOT askMe");
@@ -651,44 +648,7 @@ public class NodeController {
         }
     }
 
-    private class CopyFileThread implements Runnable {
-
-        private boolean copyToSDCard;
-
-        private String path;
-
-        private String targetPath;
-
-        private String fileName;
-
-        private SDCardOperator operator;
-
-        public CopyFileThread(boolean copyToSDCard, String path, String targetPath, String fileName, SDCardOperator operator) {
-            this.copyToSDCard = copyToSDCard;
-            this.path = path;
-            this.targetPath = targetPath;
-            this.fileName = fileName;
-            this.operator = operator;
-        }
-
-        @Override
-        public void run() {
-            logDebug("Call to copyFile: localPath: " + path + " node name: " + fileName);
-            try{
-                if (copyToSDCard) {
-                    operator.moveFile(targetPath, new File(path));
-                } else {
-                    copyFile(new File(path), new File(targetPath, fileName));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                logError(e.getMessage());
-            }
-        }
-    }
-
     public void download(String parentPath, String url, long size, long [] hashes, boolean highPriority){
-        logDebug("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
         logDebug("files to download: "+hashes.length);
         boolean downloadToSDCard = false;
         String downloadRoot = null;
@@ -698,7 +658,7 @@ public class NodeController {
             sdCardOperator = new SDCardOperator(context);
         } catch (SDCardOperator.SDCardException e) {
             e.printStackTrace();
-            logError(e.getMessage());
+            logError("Initialize SDCardOperator failed", e);
             // user uninstall the sd card. but default download location is still on the sd card
             if (SDCardOperator.isSDCardPath(parentPath)) {
                 logDebug("select new path as download location.");
@@ -721,14 +681,13 @@ public class NodeController {
                 return;
             }
             if (!sdCardOperator.canWriteWithFile(parentPath)) {
-                logDebug("init sd card root with document file.");
                 downloadToSDCard = true;
                 downloadRoot = sdCardOperator.getDownloadRoot();
                 try {
                     sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                 } catch (SDCardOperator.SDCardException e) {
                     e.printStackTrace();
-                    logError(e.getMessage());
+                    logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
                     //don't have permission with sd card root. need to request.
                     String sdRoot = sdCardOperator.getSDCardRoot();
                     if(context instanceof DownloadableActivity) {
@@ -976,7 +935,6 @@ public class NodeController {
                     for (MegaNode document : dlFiles.keySet()) {
                         String path = dlFiles.get(document);
                         String targetPath = targets.get(document.getHandle());
-                        logDebug("path of the file: "+path);
                         numberOfNodesToDownload++;
 
                         File destDir = new File(path);
@@ -984,10 +942,8 @@ public class NodeController {
                         destDir.mkdirs();
                         if (destDir.isDirectory()){
                             destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
-                            logDebug("destDir is Directory. destFile: " + destFile.getAbsolutePath());
                         }
                         else{
-                            logDebug("destDir is File");
                             destFile = destDir;
                         }
 
@@ -1002,10 +958,7 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
                             service.putExtra(DownloadService.EXTRA_URL, url);
                             if(downloadToSDCard) {
-                                service.putExtra(DownloadService.EXTRA_PATH, path);
-                                service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
-                                service.putExtra(DownloadService.EXTRA_TARGET_PATH, targetPath);
-                                service.putExtra(DownloadService.EXTRA_TARGET_URI, dbH.getSDCardUri());
+                                service = getDownloadToSDCardIntent(service,path,targetPath,dbH.getSDCardUri());
                             } else {
                                 service.putExtra(DownloadService.EXTRA_PATH, path);
                             }
@@ -1076,7 +1029,7 @@ public class NodeController {
                             sdCardOperator = new SDCardOperator(context);
                         } catch (SDCardOperator.SDCardException e) {
                             e.printStackTrace();
-                            logError(e.getMessage());
+                            logError("Initialize SDCardOperator failed", e);
                             //sd card is available, choose internal storage location
                             intentPickFolder(document, url, null);
                         }
@@ -1084,7 +1037,6 @@ public class NodeController {
                         DownloadLinkInfo linkInfo = new DownloadLinkInfo(document, url);
                         //don't use DocumentFile
                         if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
-                            logDebug("can operate sd card with file.");
                             intentPickFolder(document, url, sdCardRoot);
                         } else {
                             if (context instanceof DownloadableActivity) {
@@ -1093,11 +1045,10 @@ public class NodeController {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 try {
                                     sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                                    logDebug("operate sd card with document file.");
                                     intentPickFolder(document, url, sdCardRoot);
                                 } catch (SDCardOperator.SDCardException e) {
                                     e.printStackTrace();
-                                    logError(e.getMessage());
+                                    logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
                                     //request sd card root request and write permission.
                                     SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
                                 }
@@ -1140,7 +1091,6 @@ public class NodeController {
                         String sdCardRoot = sdCardOperator.getSDCardRoot();
                         //don't use DocumentFile
                         if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
-                            logDebug("can operate sd card with file.");
                             requestLocalFolder(downloadInfo, sdCardRoot, null);
                         } else {
                             if (context instanceof DownloadableActivity) {
@@ -1149,11 +1099,10 @@ public class NodeController {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 try {
                                     sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                                    logDebug("operate sd card with document file.");
                                     requestLocalFolder(downloadInfo, sdCardRoot, null);
                                 } catch (SDCardOperator.SDCardException e) {
                                     e.printStackTrace();
-                                    logError(e.getMessage());
+                                    logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
                                     //request sd card root request and write permission.
                                     SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
                                 }
@@ -1860,35 +1809,25 @@ public class NodeController {
         }
 
         if (dbH.getCredentials() == null || dbH.getPreferences() == null) {
-            File[] fs = context.getExternalFilesDirs(null);
-            if (fs.length > 1) {
-                if (fs[1] == null) {
-                    intentPickFolder(document, url, null);
-                } else {
-                    showSelectDownloadLocationDialog(document, url);
-                }
-            } else {
-                intentPickFolder(document, url, null);
-            }
+            pickFolder(document, url);
             return;
         }
 
         boolean askMe = askMe(context);
-        String downloadLocationDefaultPath = getDownloadLocation(context);
-
         if (askMe) {
-            File[] fs = context.getExternalFilesDirs(null);
-            if (fs.length > 1) {
-                if (fs[1] == null) {
-                    intentPickFolder(document, url, null);
-                } else {
-                    showSelectDownloadLocationDialog(document, url);
-                }
-            } else {
-                intentPickFolder(document, url, null);
-            }
+            pickFolder(document, url);
         } else {
+            String downloadLocationDefaultPath = getDownloadLocation(context);
             downloadTo(document, downloadLocationDefaultPath, url);
+        }
+    }
+
+    private void pickFolder(MegaNode document, String url) {
+        File[] fs = context.getExternalFilesDirs(null);
+        if(fs.length <= 1 || fs[1] == null) {
+            intentPickFolder(document, url, null);
+        } else {
+            showSelectDownloadLocationDialog(document, url);
         }
     }
 
@@ -1924,7 +1863,7 @@ public class NodeController {
             sdCardOperator = new SDCardOperator(context);
         } catch (SDCardOperator.SDCardException e) {
             e.printStackTrace();
-            logError(e.getMessage());
+            logError("Initialize SDCardOperator failed", e);
             // user uninstall the sd card. but default download location is still on the sd card
             if (SDCardOperator.isSDCardPath(parentPath)) {
                 logDebug("select new path as download location.");
@@ -1946,14 +1885,13 @@ public class NodeController {
                 return;
             }
             if (!sdCardOperator.canWriteWithFile(parentPath)) {
-                logDebug("init sd card root with document file.");
                 downloadToSDCard = true;
                 downloadRoot = sdCardOperator.getDownloadRoot();
                 try {
                     sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                 } catch (SDCardOperator.SDCardException e) {
                     e.printStackTrace();
-                    logError(e.getMessage());
+                    logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
                     //don't have permission with sd card root. need to request.
                     String sdRoot = sdCardOperator.getSDCardRoot();
                     if(context instanceof DownloadableActivity) {
@@ -2009,10 +1947,7 @@ public class NodeController {
                         service.putExtra(EXTRA_SERIALIZE_STRING, currentDocument.serialize());
                         service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
                         if (downloadToSDCard) {
-                            service.putExtra(DownloadService.EXTRA_PATH, downloadRoot);
-                            service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
-                            service.putExtra(DownloadService.EXTRA_TARGET_PATH, path);
-                            service.putExtra(DownloadService.EXTRA_TARGET_URI, dbH.getSDCardUri());
+                            service = getDownloadToSDCardIntent(service, downloadRoot, path, dbH.getSDCardUri());
                         } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                         }
@@ -2043,5 +1978,13 @@ public class NodeController {
                 }
             }
         }
+    }
+
+    public static Intent getDownloadToSDCardIntent(Intent intent,String downloadRoot,String targetPath,String uri) {
+        intent.putExtra(DownloadService.EXTRA_PATH, downloadRoot);
+        intent.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
+        intent.putExtra(DownloadService.EXTRA_TARGET_PATH, targetPath);
+        intent.putExtra(DownloadService.EXTRA_TARGET_URI, uri);
+        return intent;
     }
 }

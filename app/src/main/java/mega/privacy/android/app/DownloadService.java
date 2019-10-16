@@ -46,6 +46,7 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -78,20 +79,20 @@ import static mega.privacy.android.app.utils.Util.*;
 public class DownloadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
 	// Action to stop download
-	public static String ACTION_CANCEL = "CANCEL_DOWNLOAD";
-	public static String EXTRA_SIZE = "DOCUMENT_SIZE";
-	public static String EXTRA_HASH = "DOCUMENT_HASH";
-	public static String EXTRA_URL = "DOCUMENT_URL";
-	public static String EXTRA_DOWNLOAD_TO_SDCARD = "download_to_sdcard";
-	public static String EXTRA_TARGET_PATH = "target_path";
-	public static String EXTRA_TARGET_URI = "target_uri";
-	public static String EXTRA_PATH = "SAVE_PATH";
-	public static String EXTRA_FOLDER_LINK = "FOLDER_LINK";
-	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
-	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
-	public static String EXTRA_OPEN_FILE = "OPEN_FILE";
-	public static String EXTRA_CONTENT_URI = "CONTENT_URI";
-	public static String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
+	public static final String ACTION_CANCEL = "CANCEL_DOWNLOAD";
+	public static final String EXTRA_SIZE = "DOCUMENT_SIZE";
+	public static final String EXTRA_HASH = "DOCUMENT_HASH";
+	public static final String EXTRA_URL = "DOCUMENT_URL";
+	public static final String EXTRA_DOWNLOAD_TO_SDCARD = "download_to_sdcard";
+	public static final String EXTRA_TARGET_PATH = "target_path";
+	public static final String EXTRA_TARGET_URI = "target_uri";
+	public static final String EXTRA_PATH = "SAVE_PATH";
+	public static final String EXTRA_FOLDER_LINK = "FOLDER_LINK";
+	public static final String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
+	public static final String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
+	public static final String EXTRA_OPEN_FILE = "OPEN_FILE";
+	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
+	public static final String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
 
 	private int errorCount = 0;
 	private int alreadyDownloaded = 0;
@@ -198,6 +199,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			megaChatApi.saveCurrentState();
 		}
 
+		// remove all the generated folders in cache folder on SD card.
+        File[] fs = getExternalCacheDirs();
+        if (fs.length > 1 && fs[1] != null) {
+            FileUtils.purgeDirectory(fs[1]);
+        }
 		super.onDestroy();
 	}
 
@@ -396,10 +402,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             currentDir = new File(intent.getStringExtra(EXTRA_PATH));
             currentDir.mkdirs();
 
-            if (currentDir.isDirectory()){
-				logDebug("To download(dir): " + currentDir.getAbsolutePath() + "/");
-            }
-            else{
+            if (!currentDir.isDirectory()){
 				logWarning("currentDir is not a directory");
             }
             storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
@@ -444,7 +447,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         else{
 			logDebug("contentUri NULL");
             if (currentDir.isDirectory()){
-				logDebug("To download(dir): " + currentDir.getAbsolutePath() + "/");
+				logDebug("To download(dir)");
 
                 if(currentFile.exists()){
 					logDebug("The file already exists!");
@@ -541,7 +544,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		} else {
 			destDir = new File(intent.getStringExtra(EXTRA_PATH));
 		}
-		logDebug("Save to: " + destDir.getAbsolutePath());
 		return destDir;
 	}
 
@@ -690,7 +692,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							startActivity(intentZip);
 						}
 
-						logDebug("Launch intent to manager.....");
+						logDebug("Launch intent to manager");
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						logDebug("Pdf file");
@@ -1560,7 +1562,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						resultTransfersVoiceClip(transfer.getNodeHandle(), SUCCESSFUL_VOICE_CLIP_TRANSFER);
 					}
 
-                    logDebug("DOWNLOADFILE: " + path);
                     String targetPath = targetPaths.get(path);
                     String uri = targetUris.get(path);
                     //need to move downloaded file to a location on sd card.
@@ -1576,14 +1577,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                             //new path, after moving to target location.
                             path = sdCardOperator.move(targetPath, source);
                             File newFile = new File(path);
-                            if (newFile.exists() && newFile.length() == source.length()) {
-                                logDebug("move to sd card successfully.");
+                            if(!newFile.exists() || newFile.length() != source.length()) {
+                                logError("Error moving file to the sd card path");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            logError(e.getMessage());
+                            logError("Error moving file to the sd card path with exception", e);
                         } finally {
-                            logDebug("delete downloaded file.");
                             source.delete();
                         }
                     }
@@ -1714,8 +1714,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	    	String sourceLocation = tempFolder.getAbsolutePath() + File.separator +fileName;
 
-			logDebug("Gonna copy: " + sourceLocation);
-
 	        ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(uri, "w");
 	        FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
 
@@ -1817,8 +1815,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("Fast login OK");
-				logDebug("Calling fetchNodes from CameraSyncService");
+				logDebug("Fast login OK, Calling fetchNodes from CameraSyncService");
 				megaApi.fetchNodes(this);
 			}
 			else{
@@ -1890,7 +1887,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					if(!wl.isHeld()) wl.acquire();
 					if(!lock.isHeld()) lock.acquire();
 					if (currentDir.isDirectory()){
-						logDebug("To downloadPublic(dir): " + currentDir.getAbsolutePath() + "/");
+						logDebug("To downloadPublic(dir)");
 						megaApi.startDownload(node, currentDir.getAbsolutePath() + "/", this);
 					}
 				}

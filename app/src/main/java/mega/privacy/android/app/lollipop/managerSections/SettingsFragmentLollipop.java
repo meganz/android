@@ -69,10 +69,7 @@ import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -84,6 +81,7 @@ import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
+import static mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -102,90 +100,90 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	private MegaChatApiAndroid megaChatApi;
 	Handler handler = new Handler();
 
-	private static int REQUEST_DOWNLOAD_FOLDER = 1000;
-	private static int REQUEST_CODE_TREE_LOCAL_CAMERA = 1050;
-	private static int REQUEST_CAMERA_FOLDER = 2000;
-	private static int REQUEST_MEGA_CAMERA_FOLDER = 3000;
-	private static int REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER = 4000;
-	private static int REQUEST_MEGA_SECONDARY_MEDIA_FOLDER = 5000;
-	private final String KEY_SET_QUEUE_DIALOG = "KEY_SET_QUEUE_DIALOG";
-    private final String KEY_SET_QUEUE_SIZE = "KEY_SET_QUEUE_SIZE";
+	private final static int REQUEST_DOWNLOAD_FOLDER = 1000;
+	private final static int REQUEST_CODE_TREE_LOCAL_CAMERA = 1050;
+	private final static int REQUEST_CAMERA_FOLDER = 2000;
+	private final static int REQUEST_MEGA_CAMERA_FOLDER = 3000;
+	private final static int REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER = 4000;
+	private final static int REQUEST_MEGA_SECONDARY_MEDIA_FOLDER = 5000;
+	private final static String KEY_SET_QUEUE_DIALOG = "KEY_SET_QUEUE_DIALOG";
+    private final static String KEY_SET_QUEUE_SIZE = "KEY_SET_QUEUE_SIZE";
 
 	public static final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
 
-	public static String CATEGORY_PIN_LOCK = "settings_pin_lock";
-	public static String CATEGORY_CHAT_ENABLED = "settings_chat";
-	public static String CATEGORY_CHAT_NOTIFICATIONS = "settings_notifications_chat";
-	public static String CATEGORY_STORAGE = "settings_storage";
-	public static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
-	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
-	public static String CATEGORY_QR_CODE = "settings_qrcode";
-	public static String CATEGORY_SECURITY = "settings_security";
-	public static String CATEGORY_2FA = "settings_2fa";
-	public static String CATEGORY_FILE_MANAGEMENT = "settings_file_management";
+	public final static String CATEGORY_PIN_LOCK = "settings_pin_lock";
+	public final static String CATEGORY_CHAT_ENABLED = "settings_chat";
+	public final static String CATEGORY_CHAT_NOTIFICATIONS = "settings_notifications_chat";
+	public final static String CATEGORY_STORAGE = "settings_storage";
+	public final static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
+	public final static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
+	public final static String CATEGORY_QR_CODE = "settings_qrcode";
+	public final static String CATEGORY_SECURITY = "settings_security";
+	public final static String CATEGORY_2FA = "settings_2fa";
+	public final static String CATEGORY_FILE_MANAGEMENT = "settings_file_management";
 
-	public static String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
-	public static String KEY_2FA = "settings_2fa_activated";
+	public final static String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
+	public final static String KEY_2FA = "settings_2fa_activated";
 
-	public static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
-	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
+	public final static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
+	public final static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
 
-	public static String KEY_CHAT_ENABLE = "settings_chat_enable";
+	public final static String KEY_CHAT_ENABLE = "settings_chat_enable";
 
-	public static String KEY_RICH_LINKS_ENABLE = "settings_rich_links_enable";
+	public final static String KEY_RICH_LINKS_ENABLE = "settings_rich_links_enable";
 
-	public static String CATEGORY_AUTOAWAY_CHAT = "settings_autoaway_chat";
-	public static String KEY_CHAT_AUTOAWAY = "settings_autoaway_chat_preference";
-	public static String KEY_AUTOAWAY_ENABLE = "settings_autoaway_chat_switch";
+	public final static String CATEGORY_AUTOAWAY_CHAT = "settings_autoaway_chat";
+	public final static String KEY_CHAT_AUTOAWAY = "settings_autoaway_chat_preference";
+	public final static String KEY_AUTOAWAY_ENABLE = "settings_autoaway_chat_switch";
 
-	public static String CATEGORY_PERSISTENCE_CHAT = "settings_persistence_chat";
-	public static String KEY_CHAT_PERSISTENCE = "settings_persistence_chat_checkpreference";
+	public final static String CATEGORY_PERSISTENCE_CHAT = "settings_persistence_chat";
+	public final static String KEY_CHAT_PERSISTENCE = "settings_persistence_chat_checkpreference";
 
-	public static String KEY_CHAT_NESTED_NOTIFICATIONS = "settings_nested_notifications_chat";
+	public final static String KEY_CHAT_NESTED_NOTIFICATIONS = "settings_nested_notifications_chat";
 
-	public static String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
-	public static String KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE = "settings_storage_download_location_sd_card_preference";
-	public static String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
-	public static String KEY_STORAGE_ADVANCED_DEVICES = "settings_storage_advanced_devices";
-	public static String KEY_CAMERA_UPLOAD_ON = "settings_camera_upload_on";
-	public static String KEY_CAMERA_UPLOAD_HOW_TO = "settings_camera_upload_how_to_upload";
-	public static String KEY_CAMERA_UPLOAD_CHARGING = "settings_camera_upload_charging";
-    public static String KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE = "video_compression_queue_size";
-	public static String KEY_KEEP_FILE_NAMES = "settings_keep_file_names";
-	public static String KEY_CAMERA_UPLOAD_WHAT_TO = "settings_camera_upload_what_to_upload";
-    public static String KEY_CAMERA_UPLOAD_VIDEO_QUALITY = "settings_video_upload_quality";
-	public static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER = "settings_local_camera_upload_folder";
-	public static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD = "settings_local_camera_upload_folder_sdcard";
-	public static String KEY_CAMERA_UPLOAD_MEGA_FOLDER = "settings_mega_camera_folder";
+	public final static String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
+	public final static String KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE = "settings_storage_download_location_sd_card_preference";
+	public final static String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
+	public final static String KEY_STORAGE_ADVANCED_DEVICES = "settings_storage_advanced_devices";
+	public final static String KEY_CAMERA_UPLOAD_ON = "settings_camera_upload_on";
+	public final static String KEY_CAMERA_UPLOAD_HOW_TO = "settings_camera_upload_how_to_upload";
+	public final static String KEY_CAMERA_UPLOAD_CHARGING = "settings_camera_upload_charging";
+    public final static String KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE = "video_compression_queue_size";
+	public final static String KEY_KEEP_FILE_NAMES = "settings_keep_file_names";
+	public final static String KEY_CAMERA_UPLOAD_WHAT_TO = "settings_camera_upload_what_to_upload";
+    public final static String KEY_CAMERA_UPLOAD_VIDEO_QUALITY = "settings_video_upload_quality";
+	public final static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER = "settings_local_camera_upload_folder";
+	public final static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD = "settings_local_camera_upload_folder_sdcard";
+	public final static String KEY_CAMERA_UPLOAD_MEGA_FOLDER = "settings_mega_camera_folder";
 
-	public static String KEY_SECONDARY_MEDIA_FOLDER_ON = "settings_secondary_media_folder_on";
-	public static String KEY_LOCAL_SECONDARY_MEDIA_FOLDER = "settings_local_secondary_media_folder";
-	public static String KEY_MEGA_SECONDARY_MEDIA_FOLDER = "settings_mega_secondary_media_folder";
+	public final static String KEY_SECONDARY_MEDIA_FOLDER_ON = "settings_secondary_media_folder_on";
+	public final static String KEY_LOCAL_SECONDARY_MEDIA_FOLDER = "settings_local_secondary_media_folder";
+	public final static String KEY_MEGA_SECONDARY_MEDIA_FOLDER = "settings_mega_secondary_media_folder";
 
-	public static String KEY_CACHE = "settings_advanced_features_cache";
-	public static String KEY_OFFLINE = "settings_file_management_offline";
-	public static String KEY_RUBBISH = "settings_file_management_rubbish";
-	public static String KEY_FILE_VERSIONS = "settings_file_management_file_version";
-	public static String KEY_CLEAR_VERSIONS = "settings_file_management_clear_version";
-	public static String KEY_ENABLE_VERSIONS = "settings_file_versioning_switch";
-	public static String KEY_ENABLE_RB_SCHEDULER = "settings_rb_scheduler_switch";
-	public static String KEY_DAYS_RB_SCHEDULER = "settings_days_rb_scheduler";
+	public final static String KEY_CACHE = "settings_advanced_features_cache";
+	public final static String KEY_OFFLINE = "settings_file_management_offline";
+	public final static String KEY_RUBBISH = "settings_file_management_rubbish";
+	public final static String KEY_FILE_VERSIONS = "settings_file_management_file_version";
+	public final static String KEY_CLEAR_VERSIONS = "settings_file_management_clear_version";
+	public final static String KEY_ENABLE_VERSIONS = "settings_file_versioning_switch";
+	public final static String KEY_ENABLE_RB_SCHEDULER = "settings_rb_scheduler_switch";
+	public final static String KEY_DAYS_RB_SCHEDULER = "settings_days_rb_scheduler";
 
-	public static String KEY_ENABLE_LAST_GREEN_CHAT = "settings_last_green_chat_switch";
+	public final static String KEY_ENABLE_LAST_GREEN_CHAT = "settings_last_green_chat_switch";
 
-	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
-	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
-	public static String KEY_ABOUT_GDPR = "settings_about_gdpr";
-	public static String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
-	public static String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
-	public static String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
-	public static String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
+	public final static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
+	public final static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
+	public final static String KEY_ABOUT_GDPR = "settings_about_gdpr";
+	public final static String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
+	public final static String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
+	public final static String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
+	public final static String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
 
-	public static String KEY_HELP_SEND_FEEDBACK= "settings_help_send_feedfack";
-    public static String KEY_AUTO_PLAY_SWITCH= "auto_play_switch";
+	public final static String KEY_HELP_SEND_FEEDBACK= "settings_help_send_feedfack";
+    public final static String KEY_AUTO_PLAY_SWITCH= "auto_play_switch";
 
-	public static String KEY_RECOVERY_KEY= "settings_recovery_key";
-	public static String KEY_CHANGE_PASSWORD= "settings_change_password";
+	public final static String KEY_RECOVERY_KEY= "settings_recovery_key";
+	public final static String KEY_CHANGE_PASSWORD= "settings_change_password";
 
 	public static final String CAMERA_UPLOADS_STATUS = "CAMERA_UPLOADS_STATUS";
 
@@ -1443,12 +1441,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 showSelectDownloadLocationDialog();
             }
         } else {
-            Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+            showSnackBar(context, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
         }
     }
 
     private void onCannotWriteOnSDCard() {
-        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
+        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -2222,12 +2220,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				logWarning("Set PIN ERROR");
 			}
 		}
-        else if (requestCode == Constants.REQUEST_CODE_TREE){
+        else if (requestCode == REQUEST_CODE_TREE){
             if (intent == null){
                 logDebug("intent NULL");
                 if(requestCode != Activity.RESULT_OK) {
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+                        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
                     }
                 } else {
                     onCannotWriteOnSDCard();
@@ -2244,7 +2242,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             toSelectFolder(sdCardOperator.getSDCardRoot());
                         } else {
-                            String path = FileUtil.getFullPathFromTreeUri(treeUri, context);
+                            String path = getFullPathFromTreeUri(treeUri, context);
                             dbH.setStorageDownloadLocation(path);
                             downloadLocationPath = path;
                             if (downloadLocation != null){

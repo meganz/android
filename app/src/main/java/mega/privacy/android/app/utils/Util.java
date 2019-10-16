@@ -141,20 +141,6 @@ public class Util {
         return false;
     }
 
-    public static String getSDCardRoot(String path) {
-        int i = 0,x = 0;
-        for(; x < path.toCharArray().length;x++) {
-            char c = path.toCharArray()[x];
-            if(c == '/') {
-                i++;
-            }
-            if(i == 3) {
-                break;
-            }
-        }
-        return path.substring(0,x);
-    }
-
 	/*
 	 * Build error dialog
 	 * @param message Message to display

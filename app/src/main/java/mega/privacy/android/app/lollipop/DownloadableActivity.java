@@ -35,7 +35,7 @@ public class DownloadableActivity extends PinActivityLollipop {
 
     private Uri extractUri(Intent intent, int resultCode) {
         if (intent == null) {
-            logDebug("intent NULL");
+            logWarning("extractUri: result intent is null");
             if (resultCode != Activity.RESULT_OK) {
                 Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
             } else {
@@ -52,7 +52,6 @@ public class DownloadableActivity extends PinActivityLollipop {
             String uriString = treeUri.toString();
             DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
             if (pickedDir != null && pickedDir.canWrite()) {
-                logDebug("sd card root uri is " + treeUri);
                 //save the sd card root uri string
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(this);
                 dbH.setSDCardUri(uriString);
@@ -77,11 +76,11 @@ public class DownloadableActivity extends PinActivityLollipop {
                     }
                 } catch (SDCardOperator.SDCardException e) {
                     e.printStackTrace();
-                    logError(e.getMessage());
+                    logError("Initialize SDCardOperator failed", e);
                 }
             }
         } else {
-            logDebug("tree uri is null!");
+            logWarning("tree uri is null!");
         }
     }
 
@@ -91,7 +90,6 @@ public class DownloadableActivity extends PinActivityLollipop {
             String uriString = treeUri.toString();
             DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
             if (pickedDir != null && pickedDir.canWrite()) {
-                logDebug("sd card root uri is " + treeUri);
                 //save the sd card root uri string
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(this);
                 dbH.setSDCardUri(uriString);
@@ -126,7 +124,7 @@ public class DownloadableActivity extends PinActivityLollipop {
                 }
             }
         } else {
-            logDebug("tree uri is null!");
+            logWarning("tree uri is null!");
         }
     }
 }

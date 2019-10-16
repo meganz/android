@@ -800,25 +800,23 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                             sdCardOperator = new SDCardOperator(FolderLinkActivityLollipop.this);
                         } catch (SDCardOperator.SDCardException e) {
                             e.printStackTrace();
-                            logError(e.getMessage());
-                            toSelectFolder(hashes, size, null,null);
+                            logError("Initialize SDCardOperator failed, toSelectFolder", e);
+                            toSelectFolder(hashes, size, null, null);
                         }
                         if(sdCardOperator != null) {
                             String sdCardRoot = sdCardOperator.getSDCardRoot();
                             //don't use DocumentFile
                             if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
-                                logDebug("can operate sd card with file.");
                                 toSelectFolder(hashes, size, sdCardRoot,null);
                             } else {
                                 setDownloadInfo(new DownloadInfo(false, size, hashes));
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                     try {
                                         sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                                        logDebug("operate sd card with document file.");
                                         toSelectFolder(hashes, size, sdCardRoot,null);
                                     } catch (SDCardOperator.SDCardException e) {
                                         e.printStackTrace();
-                                        logError(e.getMessage());
+                                        logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
                                         //request sd card root request and write permission.
                                         SDCardOperator.requestSDCardPermission(sdCardRoot, FolderLinkActivityLollipop.this, (FolderLinkActivityLollipop.this));
                                     }
@@ -855,14 +853,17 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                 size += n.getSize();
             }
         }
+        preDownload(size, hashes);
+    }
 
+    private void preDownload(long size, long[] hashes) {
         if (dbH == null) {
             dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         }
 
-		boolean askMe = Util.askMe(this);
-		prefs = dbH.getPreferences();
-		downloadLocationDefaultPath = getDownloadLocation(this);
+        boolean askMe = Util.askMe(this);
+        prefs = dbH.getPreferences();
+        downloadLocationDefaultPath = getDownloadLocation(this);
 
         if (askMe) {
             File[] fs = getExternalFilesDirs(null);
@@ -878,36 +879,13 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
         } else {
             downloadTo(downloadLocationDefaultPath, null, null, size, hashes);
         }
-	}
-	
-	@SuppressLint("NewApi")
+    }
+
+    @SuppressLint("NewApi")
     public void onFolderClick(long handle, final long size){
 		final long[] hashes = new long[1];
-		
 		hashes[0] = handle;
-		
-		if (dbH == null){
-			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		}
-
-		boolean askMe = askMe(this);
-		String downloadLocationDefaultPath = getDownloadLocation(this);
-
-        if (askMe) {
-            File[] fs = getExternalFilesDirs(null);
-            if (fs.length > 1) {
-                if (fs[1] == null) {
-                    toSelectFolder(hashes, size, null, null);
-                } else {
-                    showSelectDownloadLocationDialog(hashes, size);
-                }
-            } else {
-                toSelectFolder(hashes, size, null, null);
-            }
-        }
-		else{
-			downloadTo(downloadLocationDefaultPath, null, null, size, hashes);
-		}
+		preDownload(size, hashes);
 	}
 	
 	public void downloadTo(String parentPath, String uriString, String url, final long size, final long [] hashes){
@@ -927,7 +905,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
             sdCardOperator = new SDCardOperator(this);
         } catch (SDCardOperator.SDCardException e) {
             e.printStackTrace();
-            logError(e.getMessage());
+            logError("Initialize SDCardOperator failed, user has uninstalled the SD card", e);
             // user uninstall the sd card. but default download location is still on the sd card
             if (SDCardOperator.isSDCardPath(parentPath)) {
                 logDebug("select new path as download location.");
@@ -956,7 +934,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                     sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                 } catch (SDCardOperator.SDCardException e) {
                     e.printStackTrace();
-                    logError(e.getMessage());
+                    logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
                     //don't have permission with sd card root. need to request.
                     String sdRoot = sdCardOperator.getSDCardRoot();
                     setDownloadInfo(new DownloadInfo(false, size, hashes));
@@ -990,7 +968,6 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                         getDlList(dlFiles, node, new File(parentPath, node.getName()));
                     }
 				} else {
-                    logDebug("MegaNode.TYPE_FILE");
                     if (downloadToSDCard) {
                         targets.put(node.getHandle(), parentPath);
                         dlFiles.put(node, downloadRoot);
@@ -1033,10 +1010,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 						logDebug("EXTRA_HASH: " + document.getHandle());
 						Intent service = new Intent(this, DownloadService.class);
                         if(downloadToSDCard) {
-                            service.putExtra(DownloadService.EXTRA_PATH, path);
-                            service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
-                            service.putExtra(DownloadService.EXTRA_TARGET_PATH, targetPath);
-                            service.putExtra(DownloadService.EXTRA_TARGET_URI, uriString);
+                            service = NodeController.getDownloadToSDCardIntent(service,path, targetPath, uriString);
                         } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                         }

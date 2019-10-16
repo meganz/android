@@ -121,8 +121,8 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 
 	long parentHandle = -1;
 
-	DatabaseHandler dbH = null;
-	MegaPreferences prefs = null;
+	DatabaseHandler dbH;
+	MegaPreferences prefs;
 
 	MenuItem createFolderMenuItem;
 	MenuItem startConversation;
@@ -511,6 +511,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 
 		handler = new Handler();
+		dbH = DatabaseHandler.getDbHandler(this);
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1059,7 +1060,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			logDebug("Local folder selected");
 			String parentPath = intent
 					.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            DatabaseHandler.getDbHandler(this).setStorageDownloadLocation(parentPath);
+            dbH.setStorageDownloadLocation(parentPath);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);

@@ -64,7 +64,7 @@ public class SDCardOperator {
         } else {
             throw new SDCardException("No sd card installed!");
         }
-        sdCardRoot = Util.getSDCardRoot(downloadRoot);
+        sdCardRoot = FileUtils.getSDCardRoot(downloadRoot);
     }
 
     public void initDocumentFileRoot(String uriString) throws SDCardException {

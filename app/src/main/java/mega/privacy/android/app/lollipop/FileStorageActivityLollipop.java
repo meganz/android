@@ -1012,21 +1012,19 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
             sdCardOperator = new SDCardOperator(this);
         } catch (SDCardOperator.SDCardException e) {
             e.printStackTrace();
+            logError("Initialize SDCardOperator failed", e);
         }
-		if(sdCardOperator != null) {
-		    if(SDCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
-                try {
-                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                    sdCardOperator.createFolder(path.getAbsolutePath(),value);
-                } catch (SDCardOperator.SDCardException e) {
-                    e.printStackTrace();
-                    showErrorAlertDialog(getString(R.string.error_io_problem),true, this);
-                }
-            } else {
-                createFolderWithFile(value);
+        if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
+            try {
+                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                sdCardOperator.createFolder(path.getAbsolutePath(), value);
+            } catch (SDCardOperator.SDCardException e) {
+                e.printStackTrace();
+                logError("SDCardOperator initDocumentFileRoot failed", e);
+                showErrorAlertDialog(getString(R.string.error_io_problem), true, this);
             }
         } else {
-		    createFolderWithFile(value);
+            createFolderWithFile(value);
         }
         setFiles(path);
     }

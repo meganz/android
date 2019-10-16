@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -37,8 +36,9 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class FileUtils {
 
@@ -610,6 +610,20 @@ public class FileUtils {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static String getSDCardRoot(String path) {
+        int i = 0,x = 0;
+        for(; x < path.toCharArray().length;x++) {
+            char c = path.toCharArray()[x];
+            if(c == '/') {
+                i++;
+            }
+            if(i == 3) {
+                break;
+            }
+        }
+        return path.substring(0,x);
     }
 
     public static boolean appendStringToFile(final String appendContents, final File file) {
