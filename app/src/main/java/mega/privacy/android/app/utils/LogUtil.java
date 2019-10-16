@@ -97,6 +97,10 @@ public class LogUtil {
      * @param message  Message for the logging system.
      */
     private static void log(int logLevel, String message) {
+        if (!Util.DEBUG && !Util.getFileLoggerSDK()) {
+            return;
+        }
+
         final int STACK_TRACE_LEVELS_UP = 4;
         final StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP];
 
@@ -117,6 +121,10 @@ public class LogUtil {
      * @param printStackTrace Flag to print the stack trace of the exception.
      */
     private static void log(int logLevel, String message, Throwable exception, boolean printStackTrace) {
+        if (!Util.DEBUG && !Util.getFileLoggerSDK()) {
+            return;
+        }
+
         final int STACK_TRACE_LEVELS_UP = 4;
         final StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP];
 
