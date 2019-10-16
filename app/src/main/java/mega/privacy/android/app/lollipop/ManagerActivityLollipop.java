@@ -505,7 +505,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private ArrayList<String> offlineSearchPaths = new ArrayList<>();
 	SearchView searchView;
 	public boolean searchExpand = false;
-	public String searchQuery = "";
+	private String searchQuery = "";
 	public boolean textSubmitted = false;
 	public boolean textsearchQuery = false;
 	boolean isSearching = false;
@@ -17954,5 +17954,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		} else {
 			logDebug("Transfer panel not visible");
 		}
+	}
+
+	public String getSearchQuery() {
+		return searchQuery;
+	}
+
+	public void setSearchQuery(String searchQuery) {
+		this.searchQuery = searchQuery;
 	}
 }

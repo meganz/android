@@ -783,7 +783,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             intent.putExtra("CHAT_ID", adapterList.getChatAt(position).getChatId());
             this.startActivity(intent);
             if (context instanceof ManagerActivityLollipop) {
-                if (((ManagerActivityLollipop) context).searchQuery != null && !((ManagerActivityLollipop) context).searchQuery.isEmpty()) {
+                if (((ManagerActivityLollipop) context).getSearchQuery() != null && !((ManagerActivityLollipop) context).getSearchQuery().isEmpty()) {
                     closeSearch();
                     ((ManagerActivityLollipop) context).closeSearchView();
                 }
@@ -1462,7 +1462,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         if (context instanceof ManagerActivityLollipop) {
-            String searchQuery = ((ManagerActivityLollipop) context).searchQuery;
+            String searchQuery = ((ManagerActivityLollipop) context).getSearchQuery();
             if (searchQuery != null && ((ManagerActivityLollipop) context).searchExpand) {
                 filterChats(searchQuery);
             }
