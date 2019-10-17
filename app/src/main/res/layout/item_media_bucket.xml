@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/thumbnail_view"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp" />
+
+
+    <RelativeLayout
+        android:id="@+id/video_layout"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/thumbnail_view"
+        android:paddingBottom="2dp">
+
+        <RelativeLayout
+            android:layout_width="68dp"
+            android:layout_height="35dp"
+            android:background="@drawable/gradient_media_bucket"
+            android:id="@+id/cell_photosync_title_gradient_effect"
+            android:paddingBottom="4dp"
+            android:layout_marginLeft="2dp"
+            android:layout_alignParentBottom="true"/>
+
+        <ImageView
+            android:id="@+id/video_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/ic_play_white"/>
+
+        <TextView
+            android:id="@+id/duration_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:paddingRight="4dp"
+            android:paddingBottom="1dp"/>
+
+    </RelativeLayout>
+</RelativeLayout>

@@ -1544,6 +1544,10 @@ public class Util {
 		return defaultAvatar;
 	}
 
+	public static MegaPreferences getPreferences (Context context) {
+		return DatabaseHandler.getDbHandler(context).getPreferences();
+	}
+
     public static boolean askMe (Context context) {
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		MegaPreferences prefs = dbH.getPreferences();
@@ -1676,6 +1680,14 @@ public class Util {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
+	public static boolean isScreenInPortrait(Context context) {
+		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 * This method detects whether the android device is tablet
 	 *
@@ -1703,6 +1715,7 @@ public class Util {
 			}
 		}
 		return false;
+
 	}
 
     public static boolean hasPermissions(Context context, String... permissions) {
