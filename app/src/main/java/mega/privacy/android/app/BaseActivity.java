@@ -441,7 +441,7 @@ public class BaseActivity extends AppCompatActivity {
      *
      */
     private void showExpiredBusinessAlert(){
-        if (isPaused || isExpiredBusinessAlertShown) {
+        if (isPaused || (expiredBusinessAlert != null && expiredBusinessAlert.isShowing())) {
             return;
         }
 

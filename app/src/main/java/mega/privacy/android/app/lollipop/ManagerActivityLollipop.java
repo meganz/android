@@ -3214,7 +3214,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     private void showBusinessGraceAlert() {
     	logDebug("showBusinessGraceAlert");
-    	if (isBusinessGraceAlertShown) {
+    	if (businessGraceAlert != null && businessGraceAlert.isShowing()) {
     		return;
 		}
 

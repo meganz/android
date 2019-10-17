@@ -316,18 +316,21 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		return v;
 	}
-    
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (scrollView != null) {
-        	scrollView.post(new Runnable() {
+
+	private void scrollToTop() {
+		if (scrollView != null) {
+			scrollView.post(new Runnable() {
 				@Override
 				public void run() {
 					scrollView.fullScroll(View.FOCUS_UP);
 				}
 			});
 		}
+	}
+    
+    @Override
+    public void onResume() {
+        super.onResume();
 
         //Refresh
 		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
@@ -516,6 +519,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				businessAccountTypeText.setText(R.string.user_label);
 			}
 
+			scrollToTop();
 			return;
 		}
 
@@ -578,6 +582,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			expiryRenewLayout.setVisibility(View.GONE);
 			expiryRenewSeparator.setVisibility(View.GONE);
 		}
+
+		scrollToTop();
 	}
 
 	@Override
