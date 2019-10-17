@@ -5320,7 +5320,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							break;
 						}
 						default:{
-							indexAccount = STORAGE_TAB;
+							indexAccount = GENERAL_TAB;
 							viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
 							updateLogoutWarnings();
 						}
