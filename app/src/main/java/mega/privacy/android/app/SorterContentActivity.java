@@ -12,13 +12,14 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import nz.mega.sdk.MegaApiJava;
 
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class SorterContentActivity extends BaseActivity {
+public class SorterContentActivity extends PinActivityLollipop {
 
     public void showSortOptions(final Context context, DisplayMetrics outMetrics) {
 
