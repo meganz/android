@@ -8169,6 +8169,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         //Refresh Cloud Fragment
         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
 
+        if(cloudPageAdapter != null) {
+            cloudPageAdapter.notifyDataSetChanged();
+        }
+
         //Refresh Rubbish Fragment
         refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
 
