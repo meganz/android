@@ -8,8 +8,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.Constants.MEGA_BLOG_LINK_REGEXS;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
 
 
 public class WebViewActivityLollipop extends Activity {
@@ -24,8 +26,6 @@ public class WebViewActivityLollipop extends Activity {
         setContentView(R.layout.activity_fortumo_payment);
 
         activity = this;
-        progressDialog = ProgressDialog.show(activity, this.getString(R.string.embed_web_browser_loading_title), this.getString(R.string.embed_web_browser_loading_message), true);
-        progressDialog.setCancelable(false);
 
         myWebView = findViewById(R.id.webview);
 
@@ -45,7 +45,7 @@ public class WebViewActivityLollipop extends Activity {
             public void onPageFinished(WebView view, final String url) {
                 // Blog pages currently not support mobile website, which would trigger redirecting to mega.nz
                 // We could remove this condition after blog page support mobile web page
-                if (!Util.matchRegexs(url, Constants.MEGA_BLOG_LINK_REGEXS)) {
+                if (!matchRegexs(url, MEGA_BLOG_LINK_REGEXS)) {
                     progressDialog.dismiss();
                 }
             }
@@ -54,12 +54,10 @@ public class WebViewActivityLollipop extends Activity {
         Intent intent = getIntent();
         if (intent != null) {
             String url = intent.getDataString();
-            log("URL: " + url);
+            logDebug("URL: " + url);
             myWebView.loadUrl(url);
+            progressDialog = ProgressDialog.show(activity, this.getString(R.string.embed_web_browser_loading_title), this.getString(R.string.embed_web_browser_loading_message), true);
+            progressDialog.setCancelable(false);
         }
-    }
-
-    public static void log(String message) {
-        Util.log("WebViewActivityLollipop", message);
     }
 }

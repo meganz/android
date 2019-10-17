@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Aktywacja konta</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Przygotowywanie listy plików</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Zaloguj się aby móc udostępnić</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Twój link potwierdzający nie jest już ważny. Twoje konto może już być aktywne lub możesz anulować rejestrację.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Podgląd nie został jeszcze pobrany. Prosimy czekać</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Wyloguj się aby utworzyć nowe konto</string>
 
@@ -631,11 +633,11 @@
     <string name="menu_take_picture" context="menu item">Zrób zdjęcie</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Tylko Wi-Fi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi lub mobilna transmisja danych</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi lub komórkowa transmisja danych</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Pomiń</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Wstrzymaj</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Trwa wgrywanie zdjęć</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Przesyłanie z kamery w toku</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Czy chcesz zatrzymać wysyłanie z aparatu?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -687,7 +689,7 @@
     <string name="settings_empty_folder" context="settings option">Wybierz katalog</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi lub mobilna transmisja danych</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi lub komórkowa transmisja danych</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Tylko Wi-Fi</item>
     </string-array>
 
@@ -1796,7 +1798,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Wgrywanie pliku</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Jakość plików</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Jakość wideo na czacie</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Jakość wideo</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Przesyłanie z aparatu musi mieć dostęp do zdjęć i innych multimediów w urządzeniu. Przejdź do strony ustawień i udziel pozwolenia.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -2320,7 +2322,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Połączenie rozpoczęte</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Błąd klucza SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA nie może zweryfikować SSL. Możliwe, że korzystasz z publicznego WiFi.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA nie może połączyć się bezpiecznie przez SSL. Być może korzystasz z publicznej sieci Wi-Fi z dodatkowymi wymaganiami.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Brak [/B][A]powiadomień[/A][B].[/B]</string>
 
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Trwa ładowanie</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Proszę czekać&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>

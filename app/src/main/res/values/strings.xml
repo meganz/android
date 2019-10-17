@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activating account</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Please log in to share with MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Your confirmation link is no longer valid. Your account may already be activated or you may have cancelled your registration.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Please, log out before creating the account</string>
 
@@ -630,12 +632,12 @@
 
     <string name="menu_take_picture" context="menu item">Take picture</string>
 
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">WiFi only</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi or mobile data</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload in progress</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Uploads in progress</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to stop Camera Uploads?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -687,8 +689,8 @@
     <string name="settings_empty_folder" context="settings option">Choose folder</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi or mobile data</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">WiFi only</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</item>
     </string-array>
 
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">File Upload</string>
@@ -1796,7 +1798,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Chat uploading</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media quality</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat video quality</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Quality</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -2320,7 +2322,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Call Started</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL key error</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public WiFi with additional requirements.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public Wi-Fi with additional requirements.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
 
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Loading</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Please wait&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>

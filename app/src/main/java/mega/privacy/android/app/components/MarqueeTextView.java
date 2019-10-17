@@ -7,7 +7,8 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MarqueeTextView extends TextView {
 
@@ -57,7 +58,7 @@ public class MarqueeTextView extends TextView {
 
     private void scroll (TextPaint textPaint, int width) {
         if (textPaint.measureText(text.toString()) > width) {
-            log("Text more large than textview --> Animate");
+            logDebug("Text more large than textview --> Animate");
             mLastIndex = text.length()-1;
             while (textPaint.measureText(text.subSequence(0, mLastIndex-1).toString()) > width) {
                 mLastIndex--;
@@ -65,7 +66,7 @@ public class MarqueeTextView extends TextView {
             animateText();
         }
         else {
-            log("Text less large than textview --> Not animate");
+            logDebug("Text less large than textview --> Not animate");
             setText(text);
         }
     }
@@ -100,9 +101,5 @@ public class MarqueeTextView extends TextView {
         mFirstIndex = 0;
         mHandler.removeCallbacksAndMessages(characterAdder);
         mHandler.postDelayed(characterAdder, mDelay);
-    }
-
-    public static void log(String message) {
-        Util.log("MarqueeTextView", message);
     }
 }
