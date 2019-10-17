@@ -46,6 +46,7 @@ import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -55,8 +56,10 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
@@ -361,24 +364,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      */
     @Override
     public int getFolderCount() {
-        return getFolderCount(nodes);
-    }
-
-    /*
-     * The method to calculate how many nodes are folders in array list
-     */
-    public int getFolderCount(ArrayList<MegaNode> nodes) {
-        int folderCount = 0;
-        if (nodes == null) return folderCount;
-        for (MegaNode node : nodes) {
-            if (node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-        }
-        return folderCount;
+        return getNumberOfFolders(nodes);
     }
 
     /**
@@ -389,19 +375,31 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * @return Nodes list with placeholder.
      */
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
-        int folderCount = getFolderCount(nodes);
+        if (adapterType == ITEM_VIEW_TYPE_LIST) {
+            placeholderCount = 0;
+            return nodes;
+        }
+
+        int folderCount = getNumberOfFolders(nodes);
         int spanCount = 2;
+
         if (listFragment instanceof NewGridRecyclerView) {
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
         }
+
         placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
 
         if (folderCount > 0 && placeholderCount != 0 && adapterType == ITEM_VIEW_TYPE_GRID) {
             //Add placeholder at folders' end.
             for (int i = 0;i < placeholderCount;i++) {
-                nodes.add(folderCount + i,null);
+                try {
+                    nodes.add(folderCount + i,null);
+                } catch (IndexOutOfBoundsException e) {
+                    logError("Inserting placeholders [nodes.size]: " + nodes.size() + " [folderCount+i]: " + (folderCount + i), e);
+                }
             }
         }
+
         return nodes;
     }
 
@@ -472,7 +470,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     public void setNodes(ArrayList<MegaNode> nodes) {
         this.nodes = insertPlaceHolderNode(nodes);
         logDebug("setNodes size: " + this.nodes.size());
-//		contentTextFragment.setText(getInfoFolder(node));
         notifyDataSetChanged();
     }
 
@@ -732,23 +729,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             if (isVideoFile(node.getName())) {
                 holder.videoInfoLayout.setVisibility(View.VISIBLE);
                 holder.videoDuration.setVisibility(View.GONE);
-                logDebug(node.getHandle() + " DURATION: " + node.getDuration());
-                int duration = node.getDuration();
-                if (duration > 0) {
-                    int hours = duration / 3600;
-                    int minutes = (duration % 3600) / 60;
-                    int seconds = duration % 60;
 
-                    String timeString;
-                    if (hours > 0) {
-                        timeString = String.format("%d:%d:%02d",hours,minutes,seconds);
-                    } else {
-                        timeString = String.format("%d:%02d",minutes,seconds);
-                    }
-
-                    logDebug("The duration is: " + hours + " " + minutes + " " + seconds);
-
-                    holder.videoDuration.setText(timeString);
+                String duration = getVideoDuration(node.getDuration());
+                if (duration != null && !duration.isEmpty()) {
+                    holder.videoDuration.setText(duration);
                     holder.videoDuration.setVisibility(View.VISIBLE);
                 }
             }
@@ -1200,17 +1184,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
-//	public boolean isEnabled(int position) {
-//		// if (position == 0){
-//		// return false;
-//		// }
-//		// else{
-//		// return true;
-//		// }
-//		return super.isEnabled(position);
-//	}
-
-
     private String getItemNode(int position) {
         if (nodes.get(position) != null) {
             return nodes.get(position).getName();
@@ -1448,14 +1421,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
         if (this.multipleSelect) {
             selectedItems = new SparseBooleanArray();
+        } else if (selectedItems != null) {
+            selectedItems.clear();
         }
     }
 
     public void setListFragment (RecyclerView listFragment) {
         this.listFragment = listFragment;
-    }
-
-    public void allowMultiselect() {
-
     }
 }
