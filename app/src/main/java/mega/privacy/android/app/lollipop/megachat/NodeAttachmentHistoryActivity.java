@@ -85,6 +85,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -553,7 +554,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 							}
 
 							mediaIntent.putExtra("adapterType", FROM_CHAT);
-							mediaIntent.putExtra("isPlayList", false);
+							mediaIntent.putExtra(IS_PLAYLIST, false);
 							mediaIntent.putExtra("msgId", m.getMsgId());
 							mediaIntent.putExtra("chatId", chatId);
 
@@ -1247,11 +1248,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			showProgressForwarding();
 
 			long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
-			logDebug("Send " + idMessages.length + " messages");
-
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			logDebug("Send to " + chatHandles.length + " chats");
-
 			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
 
 			if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
@@ -1296,7 +1293,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            chatC.prepareForDownload(intent, parentPath);
+			chatC.prepareForDownload(intent, parentPath);
 		}
 	}
 
