@@ -5313,16 +5313,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 				}
 
-				if(indexAccount!=-1 && viewPagerMyAccount != null) {
+				if(viewPagerMyAccount != null) {
 					switch (indexAccount){
-						case GENERAL_TAB:{
-							viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
-							updateLogoutWarnings();
-							break;
-						}
 						case STORAGE_TAB:{
 							viewPagerMyAccount.setCurrentItem(STORAGE_TAB);
 							break;
+						}
+						default:{
+							indexAccount = STORAGE_TAB;
+							viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
+							updateLogoutWarnings();
 						}
 					}
 				}
@@ -16954,6 +16954,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		logDebug("onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getNodeHandle() + " - " + transfer.getTag());
+
+		if (!existOngoingTransfers(megaApi)) {
+			updateLogoutWarnings();
+		}
 
 		if(transfer.isStreamingTransfer()){
 			return;

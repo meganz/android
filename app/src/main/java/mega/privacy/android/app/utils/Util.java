@@ -1428,11 +1428,7 @@ public class Util {
 	 * @return true if exist ongoing transfers, false otherwise
 	 */
 	public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
-		if (megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0) {
-			return true;
-		}
-
-		return false;
+		return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
 	}
 
 	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
