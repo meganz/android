@@ -1040,7 +1040,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_business_layout:{
-				String url = "https://mega.nz/business";
+				String url = "https://mega.nz/registerb";
 				Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
 				openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				openTermsIntent.setData(Uri.parse(url));
