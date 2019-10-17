@@ -638,7 +638,7 @@
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
     <string name="cam_sync_syncing" context="The upload of the user\'s photos or videos from their specified album is in progress.">Camera Uploads in progress</string>
-    <string name="cam_sync_cancel_sync" context="confirmation question for disabling the camera uploads">Do you want to disabling Camera Uploads?</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for disabling the camera uploads">Do you want to disable Camera Uploads?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
