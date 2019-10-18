@@ -195,11 +195,11 @@ import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -241,14 +241,12 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -256,6 +254,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
     private static final String BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN";
+	private static final String BUSINESS_CU_ALERT_SHOWN = "BUSINESS_CU_ALERT_SHOWN";
+	private static final String BUSINESS_CU_FRAGMENT = "BUSINESS_CU_FRAGMENT";
+	public static final String BUSINESS_CU_FRAGMENT_SETTINGS = "BUSINESS_CU_FRAGMENT_SETTINGS";
+	public static final String BUSINESS_CU_FRAGMENT_CU = "BUSINESS_CU_FRAGMENT_CU";
+	private static final String BUSINESS_CU_FIRST_TIME = "BUSINESS_CU_FIRST_TIME";
 	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
 	private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
@@ -701,6 +704,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	private boolean isBusinessGraceAlertShown = false;
 	private AlertDialog businessGraceAlert;
+	private boolean isBusinessCUAlertShown;
+	private AlertDialog businessCUAlert;
+	private String businessCUF;
+	private boolean businessCUFirstTime;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -1663,10 +1670,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
             case REQUEST_CAMERA_UPLOAD:{
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-                    if(sttFLol != null){
-                        sttFLol.enableCameraUpload();
-                    }
+                    checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_SETTINGS, false);
                 } else {
                     showSnackBar(this, SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
                 }
@@ -1676,10 +1680,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
             case REQUEST_CAMERA_ON_OFF: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    cuFL = (CameraUploadFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-                    if (cuFL != null) {
-                        cuFL.cameraOnOff();
-                    }
+                    checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, false);
                 } else {
                     showSnackBar(this,SNACKBAR_TYPE,getString(R.string.on_refuse_storage_permission),-1);
                 }
@@ -1691,10 +1692,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     return;
                 }
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-                    if(cuFL != null){
-                        cuFL.cameraOnOffFirstTime();
-                    }
+                    checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, true);
                 } else {
                     if(!ActivityCompat.shouldShowRequestPermissionRationale(this,permissions[0])){
                         cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
@@ -1712,17 +1710,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case PermissionsFragment.PERMISSIONS_FRAGMENT: {
 				pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
 				if (pF != null) {
-//					if (pF.getCurrentPermission() == 2 && pF.askingForMicrophoneAndWriteCallsLog()) {
-//						if (grantResults.length == 1) {
-////							Do nothing, asking for microphone, still need to ask for write call logs
-//						}
-//						else {
-//							pF.setNextPermission();
-//						}
-//					}
-//					else {
-						pF.setNextPermission();
-//					}
+					pF.setNextPermission();
 				}
 			}
         }
@@ -1845,6 +1833,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		outState.putBoolean(BUSINESS_GRACE_ALERT_SHOWN, isBusinessGraceAlertShown);
+		if (isBusinessCUAlertShown) {
+			outState.putBoolean(BUSINESS_CU_ALERT_SHOWN, isBusinessCUAlertShown);
+			outState.putString(BUSINESS_CU_FRAGMENT, businessCUF);
+			outState.putBoolean(BUSINESS_CU_FIRST_TIME, businessCUFirstTime);
+		}
 	}
 
 	@Override
@@ -1926,6 +1919,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", -1);
 			openLinkDialogIsShown = savedInstanceState.getBoolean("openLinkDialogIsShown", false);
 			isBusinessGraceAlertShown = savedInstanceState.getBoolean(BUSINESS_GRACE_ALERT_SHOWN, false);
+			isBusinessCUAlertShown = savedInstanceState.getBoolean(BUSINESS_CU_ALERT_SHOWN, false);
+			if (isBusinessCUAlertShown) {
+				businessCUF = savedInstanceState.getString(BUSINESS_CU_FRAGMENT);
+				businessCUFirstTime = savedInstanceState.getBoolean(BUSINESS_CU_FIRST_TIME, false);
+			}
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -3198,6 +3196,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             return;
         }
 
+        if (isBusinessCUAlertShown) {
+        	showBusinessCUAlert();
+        	return;
+		}
+
         MyAccountInfo myAccountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
 
         if (myAccountInfo != null && myAccountInfo.shouldShowBusinessAlert()) {
@@ -3245,6 +3248,65 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         }
         isBusinessGraceAlertShown = true;
     }
+
+	public void checkIfShouldShowBusinessCUAlert(String f, boolean firstTime) {
+    	businessCUF = f;
+    	businessCUFirstTime = firstTime;
+		if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
+			showBusinessCUAlert();
+		} else {
+		    enableCU();
+		}
+	}
+
+    private void showBusinessCUAlert() {
+        if (businessCUAlert != null && businessCUAlert.isShowing()) {
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+        builder.setTitle(R.string.section_photo_sync)
+                .setMessage(R.string.camera_uploads_business_alert)
+                .setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        isBusinessCUAlertShown = false;
+                        dialog.dismiss();
+                    }
+                })
+                .setPositiveButton(R.string.general_enable, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        enableCU();
+                    }
+                });
+
+        builder.setCancelable(false);
+        businessCUAlert = builder.create();
+        businessCUAlert.show();
+        isBusinessCUAlertShown = true;
+    }
+
+    private void enableCU() {
+        if (businessCUF.equals(BUSINESS_CU_FRAGMENT_SETTINGS)) {
+            sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
+            if (sttFLol != null) {
+                sttFLol.enableCameraUpload();
+            }
+        } else if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
+            cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+            if (cuFL == null) {
+                return;
+            }
+
+            if (businessCUFirstTime) {
+                cuFL.cameraOnOffFirstTime();
+            } else {
+                cuFL.cameraOnOff();
+            }
+        }
+    }
+
 
 	private void openContactLink (long handle) {
     	if (handle == -1) {
@@ -18565,10 +18627,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		logDebug("Level: " + level);
         if(level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL){
 			logWarning("Low memory");
-            isDeviceMemoryLow = true;
+			ThumbnailUtilsLollipop.isDeviceMemoryLow = true;
         }else{
 			logDebug("Memory OK");
-			isDeviceMemoryLow = false;
+			ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
         }
     }
 
