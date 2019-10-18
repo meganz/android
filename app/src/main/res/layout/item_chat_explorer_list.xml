@@ -9,7 +9,6 @@
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
         android:layout_height="36dp">
-
         <TextView
             android:id="@+id/label_text"
             android:layout_width="wrap_content"
@@ -47,14 +46,13 @@
                 rounded:border_width="0dp"
                 rounded:corner_radius="30dp" />
 
-            <TextView
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/chat_explorer_list_initial_letter"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:textSize="22sp"
-                android:gravity="center_horizontal|center_vertical"
-                android:paddingBottom="3dp" />
+                android:gravity="center_horizontal|center_vertical" />
 
         </RelativeLayout>
 
@@ -68,14 +66,17 @@
                 android:id="@+id/chat_explorer_list_title_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:textSize="16sp"
+                android:layout_marginLeft="16dp"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:textColor="@color/file_list_first_row">
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/chat_explorer_list_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:layout_marginLeft="16dp"
                     android:singleLine="true"
                     android:textColor="@color/file_list_first_row" />
 
@@ -87,7 +88,6 @@
                     android:layout_marginLeft="6dp"
                     android:background="@null"
                     android:src="@drawable/circle_status_contact_offline" />
-
             </LinearLayout>
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView

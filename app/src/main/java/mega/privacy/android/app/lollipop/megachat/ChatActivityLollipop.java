@@ -89,6 +89,7 @@ import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
@@ -269,12 +270,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     ActionBar aB;
     Toolbar tB;
-    LinearLayout toolbarElements;
     RelativeLayout toolbarElementsInside;
 
-    TextView titleToolbar;
+    private EmojiTextView titleToolbar;
     MarqueeTextView individualSubtitleToobar;
-    TextView groupalSubtitleToolbar;
+    private EmojiTextView groupalSubtitleToolbar;
     LinearLayout subtitleCall;
     Chronometer subtitleChronoCall;
     LinearLayout participantsLayout;
@@ -302,13 +302,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     TextView userTypingText;
     boolean sendIsTyping=true;
     long userTypingTimeStamp = -1;
-    ImageButton keyboardTwemojiButton;
+    private ImageButton keyboardTwemojiButton;
     ImageButton mediaButton;
     ImageButton pickFileStorageButton;
     ImageButton pickAttachButton;
 
-    EmojiKeyboard emojiKeyboard;
-    RelativeLayout rLKeyboardTwemojiButton;
+    private EmojiKeyboard emojiKeyboard;
+    private RelativeLayout rLKeyboardTwemojiButton;
+
     RelativeLayout rLMediaButton;
     RelativeLayout rLPickFileStorageButton;
     RelativeLayout rLPickAttachButton;
@@ -319,7 +320,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean startVideo = false;
 
-    EmojiEditText textChat;
+    private EmojiEditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
 
@@ -555,6 +556,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         //Set toolbar
         tB = findViewById(R.id.toolbar_chat);
+
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         aB.setDisplayHomeAsUpEnabled(true);
@@ -562,22 +564,38 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         aB.setTitle(null);
         aB.setSubtitle(null);
         tB.setOnClickListener(this);
-        toolbarElements = tB.findViewById(R.id.toolbar_elements);
-        toolbarElementsInside = findViewById(R.id.toolbar_elements_inside);
+
+        toolbarElementsInside = tB.findViewById(R.id.toolbar_elements_inside);
         titleToolbar = tB.findViewById(R.id.title_toolbar);
+        iconStateToolbar = tB.findViewById(R.id.state_icon_toolbar);
+        privateIconToolbar = tB.findViewById(R.id.private_icon_toolbar);
+
         individualSubtitleToobar = tB.findViewById(R.id.individual_subtitle_toolbar);
         groupalSubtitleToolbar = tB.findViewById(R.id.groupal_subtitle_toolbar);
+
         subtitleCall = tB.findViewById(R.id.subtitle_call);
         subtitleChronoCall = tB.findViewById(R.id.chrono_call);
         participantsLayout = tB.findViewById(R.id.ll_participants);
         participantsText = tB.findViewById(R.id.participants_text);
-        iconStateToolbar = tB.findViewById(R.id.state_icon_toolbar);
-        privateIconToolbar = tB.findViewById(R.id.private_icon_toolbar);
+
+        textChat = findViewById(R.id.edit_text_chat);
+        textChat.setVisibility(View.VISIBLE);
+        textChat.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+        textChat.setEnabled(true);
+
+        emptyLayout = findViewById(R.id.empty_messages_layout);
+        emptyTextView = findViewById(R.id.empty_text_chat_recent);
+        emptyImageView = findViewById(R.id.empty_image_view_chat);
+
+        fragmentContainer = findViewById(R.id.fragment_container_chat);
+        writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
 
         titleToolbar.setText("");
+        titleToolbar.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
         individualSubtitleToobar.setText("");
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
+        groupalSubtitleToolbar.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
         groupalSubtitleToolbar.setVisibility(View.GONE);
         subtitleCall.setVisibility(View.GONE);
         subtitleChronoCall.setVisibility(View.GONE);
@@ -588,14 +606,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        emptyLayout = findViewById(R.id.empty_messages_layout);
-        emptyTextView = findViewById(R.id.empty_text_chat_recent);
-        emptyImageView = findViewById(R.id.empty_image_view_chat);
 
         updateNavigationToolbarIcon();
 
-        fragmentContainer = findViewById(R.id.fragment_container_chat);
-        writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
+
 
         joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
         joinButton = findViewById(R.id.join_button);
@@ -616,13 +630,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickFileStorageButton = findViewById(R.id.pick_file_storage_icon_chat);
         pickAttachButton = findViewById(R.id.pick_attach_chat);
 
-        textChat = findViewById(R.id.edit_text_chat);
-        textChat.setVisibility(View.VISIBLE);
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            textChat.setEmojiSize(scaleWidthPx(10, outMetrics));
-        } else {
-            textChat.setEmojiSize(scaleWidthPx(20, outMetrics));
-        }
 
         keyboardHeight = outMetrics.heightPixels / 2 - getActionBarHeight(this, getResources());
         marginBottomDeactivated = px2dp(MARGIN_BUTTON_DEACTIVATED, outMetrics);
@@ -634,10 +641,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
         callInProgressChrono.setVisibility(View.GONE);
 
-        enableButton(rLKeyboardTwemojiButton,keyboardTwemojiButton);
-        enableButton(rLMediaButton,mediaButton);
-        enableButton(rLPickAttachButton,pickAttachButton);
-        enableButton(rLPickFileStorageButton,pickFileStorageButton);
+        enableButton(rLKeyboardTwemojiButton, keyboardTwemojiButton);
+        enableButton(rLMediaButton, mediaButton);
+        enableButton(rLPickAttachButton, pickAttachButton);
+        enableButton(rLPickFileStorageButton, pickFileStorageButton);
 
         messageJumpLayout.setOnClickListener(this);
 
@@ -673,13 +680,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordButton.setRecordView(recordView);
         myAudioRecorder = new MediaRecorder();
 
-        emojiKeyboard = findViewById(R.id.emojiView);
-        emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
-
+        //Input text:
         handlerKeyboard = new Handler();
         handlerEmojiKeyboard = new Handler();
 
-        textChat.setEnabled(true);
+
+
+        emojiKeyboard = findViewById(R.id.emojiView);
+        emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
         emojiKeyboard.setListenerActivated(true);
 
         observersLayout = findViewById(R.id.observers_layout);
@@ -702,14 +710,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     currentRecordButtonState = 0;
                     recordLayout.setVisibility(View.GONE);
                     recordButtonLayout.setVisibility(View.GONE);
-                }else{
+                } else {
                     refreshTextInput();
                 }
 
                 if (getCurrentFocus() == textChat) {
                     // is only executed if the EditText was directly changed by the user
                     if (sendIsTyping) {
-
                         logDebug("textChat:TextChangedListener:onTextChanged:sendIsTyping:sendTypingNotification");
                         sendIsTyping = false;
                         megaChatApi.sendTypingNotification(chatRoom.getChatId());
@@ -961,13 +968,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return true;
     }
 
-    private void showLetterKB(){
-        if((emojiKeyboard == null) || (emojiKeyboard.getLetterKeyboardShown())) return;
+    private void showLetterKB() {
+        if (emojiKeyboard == null || emojiKeyboard.getLetterKeyboardShown()) return;
         emojiKeyboard.showLetterKeyboard();
     }
 
-    private void hideFileStorage(){
-        if((!fileStorageLayout.isShown())) return;
+    private void hideFileStorage() {
+        if ((!fileStorageLayout.isShown())) return;
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
         placeRecordButton(RECORD_BUTTON_DEACTIVATED);
@@ -1082,14 +1089,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    private void initializeInputText(){
+    private void initializeInputText() {
         hideKeyboard();
         setChatSubtitle();
 
         ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
-        if(prefs!=null){
+        if (prefs != null) {
             String written = prefs.getWrittenText();
-            if(!TextUtils.isEmpty(written)){
+            if (!TextUtils.isEmpty(written)) {
                 textChat.setText(written);
                 sendIcon.setVisibility(View.VISIBLE);
                 sendIcon.setEnabled(true);
@@ -1103,14 +1110,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 recordButtonLayout.setVisibility(View.GONE);
                 return;
             }
-        }else{
+        } else {
             prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "");
             dbH.setChatItemPreferences(prefs);
         }
         refreshTextInput();
     }
 
-    private void refreshTextInput(){
+    private void refreshTextInput() {
         recordButtonStates(RECORD_BUTTON_DEACTIVATED);
         sendIcon.setVisibility(View.GONE);
         sendIcon.setEnabled(false);
@@ -1182,7 +1189,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 setPreviewersView();
-
                 titleToolbar.setText(chatRoom.getTitle());
                 setChatSubtitle();
 
@@ -2102,14 +2108,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     /*
      *Hide chat options while recording
      */
+
     private void hideChatOptions(){
         logDebug("hideChatOptions");
         textChat.setVisibility(View.INVISIBLE);
         sendIcon.setVisibility(View.GONE);
-        disableButton(rLKeyboardTwemojiButton,keyboardTwemojiButton);
-        disableButton(rLMediaButton,mediaButton);
-        disableButton(rLPickAttachButton,pickAttachButton);
-        disableButton(rLPickFileStorageButton,pickFileStorageButton);
+        disableButton(rLKeyboardTwemojiButton, keyboardTwemojiButton);
+        disableButton(rLMediaButton, mediaButton);
+        disableButton(rLPickAttachButton, pickAttachButton);
+        disableButton(rLPickFileStorageButton, pickFileStorageButton);
     }
 
     private void disableButton(final  RelativeLayout layout, final  ImageButton button){
@@ -2125,10 +2132,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private void showChatOptions(){
         logDebug("showChatOptions");
         textChat.setVisibility(View.VISIBLE);
-        enableButton(rLKeyboardTwemojiButton,keyboardTwemojiButton);
-        enableButton(rLMediaButton,mediaButton);
-        enableButton(rLPickAttachButton,pickAttachButton);
-        enableButton(rLPickFileStorageButton,pickFileStorageButton);
+        enableButton(rLKeyboardTwemojiButton, keyboardTwemojiButton);
+        enableButton(rLMediaButton, mediaButton);
+        enableButton(rLPickAttachButton, pickAttachButton);
+        enableButton(rLPickFileStorageButton, pickFileStorageButton);
     }
 
     private void enableButton(RelativeLayout layout, ImageButton button){
@@ -3539,20 +3546,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             switch(item.getItemId()){
                 case R.id.chat_cab_menu_edit:{
                     logDebug("Edit text");
-                    MegaChatMessage msg = messagesSelected.get(0).getMessage();
-                    MegaChatContainsMeta meta = msg.getContainsMeta();
-                    editingMessage = true;
-                    messageToEdit = msg;
-
-                    if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-                        sendLocation();
-                        clearSelections();
-                        hideMultipleSelect();
-                        actionMode.invalidate();
-                    }
-                    else {
+                    if (!messagesSelected.isEmpty() && messagesSelected.get(0) != null) {
+                        editingMessage = true;
+                        MegaChatMessage msg = messagesSelected.get(0).getMessage();
+                        MegaChatContainsMeta meta = msg.getContainsMeta();
+                        messageToEdit = msg;
                         textChat.setText(messageToEdit.getContent());
                         textChat.setSelection(textChat.getText().length());
+                        if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+                            sendLocation();
+                            clearSelections();
+                            hideMultipleSelect();
+                            actionMode.invalidate();
+                        }
+                        else {
+                            textChat.setText(messageToEdit.getContent());
+                            textChat.setSelection(textChat.getText().length());
+                        }
                     }
                     break;
                 }
@@ -5321,7 +5331,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("Change of chat title");
             String newTitle = msg.getContent();
             if(newTitle!=null){
-
                 titleToolbar.setText(newTitle);
             }
         }
@@ -8194,10 +8203,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void hideKeyboard() {
         logDebug("hideKeyboard");
         hideFileStorage();
-
-        if(emojiKeyboard!=null) {
-            emojiKeyboard.hideBothKeyboard(this);
-        }
+        if (emojiKeyboard == null) return;
+        emojiKeyboard.hideBothKeyboard(this);
     }
 
     public void showConfirmationConnect(){
