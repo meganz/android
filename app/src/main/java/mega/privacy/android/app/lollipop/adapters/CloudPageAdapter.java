@@ -58,10 +58,10 @@ public class CloudPageAdapter extends FragmentStatePagerAdapter {
         // Generate title based on item position
         switch (position) {
             case CLOUD_TAB: {
-                return context.getString(R.string.section_cloud_drive).toLowerCase();
+                return context.getString(R.string.section_cloud_drive);
             }
             case RECENTS_TAB: {
-                return context.getString(R.string.section_recents).toLowerCase();
+                return context.getString(R.string.section_recents);
             }
         }
         return null;

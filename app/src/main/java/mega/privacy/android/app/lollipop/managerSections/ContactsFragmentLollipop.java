@@ -603,6 +603,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					if (users.size()>0){
 						ContactController cC = new ContactController(context);
 						cC.pickFileToSend(users);
+						clearSelections();
+						hideMultipleSelect();
 					}										
 					break;
 				}
