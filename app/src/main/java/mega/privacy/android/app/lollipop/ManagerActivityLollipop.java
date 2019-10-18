@@ -138,6 +138,8 @@ import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
@@ -200,6 +202,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -457,7 +460,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
 	FrameLayout accountInfoFrame;
-	TextView nVDisplayName;
+	private EmojiTextView nVDisplayName;
 	TextView nVEmail;
 	RoundedImageView nVPictureProfile;
 	TextView spaceTV;
@@ -2327,7 +2330,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		accountInfoFrame = (FrameLayout) findViewById(R.id.navigation_drawer_account_view);
         accountInfoFrame.setOnClickListener(this);
 
-        nVDisplayName = (TextView) findViewById(R.id.navigation_drawer_account_information_display_name);
+        nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
+		nVDisplayName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+
 		nVEmail = (TextView) findViewById(R.id.navigation_drawer_account_information_email);
         nVPictureProfile = (RoundedImageView) findViewById(R.id.navigation_drawer_user_account_picture_profile);
 
@@ -3972,13 +3977,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("setDefaultAvatar");
 
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		String firstLetter = " ";
-		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
-			firstLetter = ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter();
-		}
-		if (firstLetter == null) {
+		String firstLetter = getFirstLetter(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
 			firstLetter = " ";
 		}
+
 		nVPictureProfile.setImageBitmap(createDefaultAvatar(color, firstLetter));
 	}
 
@@ -4059,7 +4062,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
-		final EditText inputFirstName = new EditText(this);
+		final EmojiEditText inputFirstName = new EmojiEditText(this);
+		inputFirstName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+
 		inputFirstName.getBackground().mutate().clearColorFilter();
 		inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputFirstName, params);
@@ -4091,7 +4096,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		error_layout_firtName.setVisibility(View.GONE);
 
-		final EditText inputLastName = new EditText(this);
+		final EmojiEditText inputLastName = new EmojiEditText(this);
 		inputLastName.getBackground().mutate().clearColorFilter();
 		inputLastName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputLastName, params);

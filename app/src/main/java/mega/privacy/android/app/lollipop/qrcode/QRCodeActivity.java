@@ -279,6 +279,11 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         return super.onOptionsItemSelected(item);
     }
 
+    public String getName(){
+       return  ((MegaApplication) getApplication()).getMyAccountInfo().getFullName();
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);

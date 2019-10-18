@@ -44,6 +44,7 @@ import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
@@ -553,6 +554,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		LocalBroadcastManager.getInstance(this).registerReceiver(logoutReceiver, new IntentFilter(ACTION_LOG_OUT));
 		EmojiManager.install(new TwitterEmojiProvider());
 
+		EmojiManagerShortcodes.initEmojiData(getApplicationContext());
+		EmojiManager.install(new TwitterEmojiProvider());
 		final EmojiCompat.Config config;
 		if (USE_BUNDLED_EMOJI) {
 			logDebug("Use Bundle emoji");
@@ -570,11 +573,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					.setReplaceAll(false)
 					.registerInitCallback(new EmojiCompat.InitCallback() {
 						@Override
-						public  void onInitialized() {
+						public void onInitialized() {
 							logDebug("EmojiCompat initialized");
 						}
 						@Override
-						public  void onFailed(@Nullable Throwable throwable) {
+						public void onFailed(@Nullable Throwable throwable) {
 							logWarning("EmojiCompat initialization failed");
 						}
 					});
@@ -582,7 +585,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		EmojiCompat.init(config);
 		// clear the cache files stored in the external cache folder.
         clearPublicCache(this);
-
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();

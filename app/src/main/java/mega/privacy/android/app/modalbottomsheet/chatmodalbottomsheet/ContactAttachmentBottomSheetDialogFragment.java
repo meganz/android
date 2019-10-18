@@ -29,6 +29,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -38,6 +39,9 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -70,11 +74,11 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
-    public TextView titleNameContactChatPanel;
+    public EmojiTextView titleNameContactChatPanel;
     public ImageView stateIcon;
-    public TextView titleMailContactChatPanel;
+    public EmojiTextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
-    public TextView contactInitialLetter;
+    public EmojiTextView contactInitialLetter;
     LinearLayout optionView;
     LinearLayout optionInfo;
     LinearLayout optionStartConversation;
@@ -158,7 +162,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.contact_attachment_bottom_sheet);
         items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
-        titleNameContactChatPanel = (TextView) contentView.findViewById(R.id.contact_attachment_chat_name_text);
+        titleNameContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_name_text);
         stateIcon = (ImageView) contentView.findViewById(R.id.contact_attachment_state_circle);
 
         stateIcon.setVisibility(View.VISIBLE);
@@ -166,9 +170,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         stateIcon.setMaxWidth(scaleWidthPx(6,outMetrics));
         stateIcon.setMaxHeight(scaleHeightPx(6,outMetrics));
 
-        titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.contact_attachment_chat_mail_text);
+        titleMailContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_mail_text);
         contactImageView = (RoundedImageView) contentView.findViewById(R.id.contact_attachment_thumbnail);
-        contactInitialLetter = (TextView) contentView.findViewById(R.id.contact_attachment_initial_letter);
+        contactInitialLetter = contentView.findViewById(R.id.contact_attachment_initial_letter);
 
         optionView = (LinearLayout) contentView.findViewById(R.id.option_view_layout);
         optionInfo = (LinearLayout) contentView.findViewById(R.id.option_info_layout);
@@ -194,6 +198,11 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             titleNameContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
             titleMailContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
         }
+        titleNameContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+        contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+        titleMailContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+
+
 
         if (message != null) {
             long userCount  = message.getMessage().getUsersCount();
@@ -495,12 +504,15 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
             if(name!=null){
                 if(!(name.trim().isEmpty())){
-                    String firstLetter = name.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                    contactInitialLetter.setText(firstLetter);
-                    contactInitialLetter.setTextColor(Color.WHITE);
-                    contactInitialLetter.setVisibility(View.VISIBLE);
-                    contactInitialLetter.setTextSize(24);
+                    String firstLetter = ChatUtil.getFirstLetter(name);
+                    if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+                       contactInitialLetter.setVisibility(View.INVISIBLE);
+                    }else {
+                       contactInitialLetter.setText(firstLetter);
+                       contactInitialLetter.setTextColor(Color.WHITE);
+                       contactInitialLetter.setVisibility(View.VISIBLE);
+                       contactInitialLetter.setTextSize(24);
+                    }
                 }
                 else{
                     contactInitialLetter.setVisibility(View.GONE);
@@ -534,17 +546,20 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             display.getMetrics(outMetrics);
 
             if(name!=null){
-                contactInitialLetter.setText(name);
-                contactInitialLetter.setTextColor(Color.WHITE);
-                contactInitialLetter.setVisibility(View.VISIBLE);
-                contactInitialLetter.setTextSize(24);
+                String firstLetter = ChatUtil.getFirstLetter(name);
+                if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+                    contactInitialLetter.setVisibility(View.INVISIBLE);
+                }else {
+                    contactInitialLetter.setText(firstLetter);
+                    contactInitialLetter.setTextColor(Color.WHITE);
+                    contactInitialLetter.setVisibility(View.VISIBLE);
+                    contactInitialLetter.setTextSize(24);
+                }
             }
             else{
                 contactInitialLetter.setVisibility(View.GONE);
             }
         }
-
-        ////
     }
 
     @Override

@@ -28,11 +28,15 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -56,12 +60,12 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
-    public TextView titleNameContactChatPanel;
+    public EmojiTextView titleNameContactChatPanel;
     public ImageView stateIcon;
     public ImageView permissionsIcon;
     public TextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
-    public TextView contactInitialLetter;
+    public EmojiTextView contactInitialLetter;
     public LinearLayout contactLayout;
     public LinearLayout optionContactInfoChat;
     public LinearLayout optionStartConversationChat;
@@ -128,7 +132,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
         //Sliding CHAT panel
-        titleNameContactChatPanel = (TextView) contentView.findViewById(R.id.group_participants_chat_name_text);
+        titleNameContactChatPanel = contentView.findViewById(R.id.group_participants_chat_name_text);
         stateIcon = (ImageView) contentView.findViewById(R.id.group_participants_state_circle);
 
         stateIcon.setVisibility(View.VISIBLE);
@@ -141,7 +145,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.group_participants_chat_mail_text);
         contactLayout = (LinearLayout) contentView.findViewById(R.id.group_participants_chat);
         contactImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
-        contactInitialLetter = (TextView) contentView.findViewById(R.id.sliding_group_participants_chat_list_initial_letter);
+        contactInitialLetter = contentView.findViewById(R.id.sliding_group_participants_chat_list_initial_letter);
 
         optionContactInfoChat = (LinearLayout) contentView.findViewById(R.id.contact_info_group_participants_chat_layout);
         optionStartConversationChat = (LinearLayout) contentView.findViewById(R.id.start_chat_group_participants_chat_layout);
@@ -173,6 +177,10 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             titleNameContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
             titleMailContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
         }
+
+        titleNameContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+        contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+
 
         if(selectedChat==null){
             logWarning("Error. Selected chat is NULL");
@@ -428,11 +436,14 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         if(name!=null){
             if(!(name.trim().isEmpty())){
-                String firstLetter = name.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                contactInitialLetter.setText(firstLetter);
-                contactInitialLetter.setTextColor(Color.WHITE);
-                contactInitialLetter.setVisibility(View.VISIBLE);
+                String firstLetter = ChatUtil.getFirstLetter(name);
+                if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+                    contactInitialLetter.setVisibility(View.INVISIBLE);
+                }else {
+                    contactInitialLetter.setText(firstLetter);
+                    contactInitialLetter.setTextColor(Color.WHITE);
+                    contactInitialLetter.setVisibility(View.VISIBLE);
+                }
                 contactInitialLetter.setTextSize(24);
             }
             else{
