@@ -2967,6 +2967,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     void setNextLayout() {
+        inviteContactMenuItem.setVisible(false);
         if (visibleContactsMEGA != null && !visibleContactsMEGA.isEmpty()) {
             setSendInvitationVisibility();
             setTitleAB();
@@ -3091,6 +3092,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         aB.setSubtitle(null);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             inviteContactButton.setVisibility(View.VISIBLE);
+        } else {
+            inviteContactMenuItem.setVisible(true);
         }
         newGroupChatButton.setVisibility(View.VISIBLE);
         newChatLinkButton.setVisibility(View.VISIBLE);
