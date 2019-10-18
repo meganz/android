@@ -5612,15 +5612,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if (indexToChange == messages.size()) {
                         logDebug("The last message removed, do not check more messages");
                         setShowAvatar(indexToChange - 1);
-                    }else {
+                    } else {
                         adjustInfoToShow(indexToChange);
                         setShowAvatar(indexToChange);
                         setShowAvatar(indexToChange - 1);
                     }
-
-                    adjustInfoToShow(indexToChange);
-                    setShowAvatar(indexToChange);
-                    setShowAvatar(indexToChange-1);
                 }
             }
 
