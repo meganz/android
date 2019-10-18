@@ -1928,7 +1928,7 @@
     <string name="subtitle_mega_rich_link_no_key" context="Subtitle of a MEGA rich link without the decryption key">Tap to enter the Decryption Key</string>
 
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Please enter a stronger password</string>
-
+	<string name="error_password_too_weak" context="when the user tries to creates a password protected download link and the password strength is very weak">Please enter a stronger password</string>
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
     <string name="title_storage_usage" context="title of usage storage section in Storage">Storage Usage</string>
 
