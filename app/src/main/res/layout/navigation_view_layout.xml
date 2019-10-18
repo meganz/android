@@ -60,7 +60,7 @@
                 android:layout_marginBottom="20dp"
                 android:orientation="vertical">
 
-                <TextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/navigation_drawer_account_information_display_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

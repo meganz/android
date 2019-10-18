@@ -63,13 +63,13 @@ public class ContactsPageAdapter extends FragmentPagerAdapter {
         // Generate title based on item position
         switch (position){
             case 0: {
-                return context.getString(R.string.section_contacts).toLowerCase();
+                return context.getString(R.string.section_contacts);
             }
             case 1:{
-                return context.getString(R.string.tab_sent_requests).toLowerCase();
+                return context.getString(R.string.tab_sent_requests);
             }
             case 2:{
-                return context.getString(R.string.tab_received_requests).toLowerCase();
+                return context.getString(R.string.tab_received_requests);
             }
         }
         return null;

@@ -68,7 +68,7 @@
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content">
 
-							<TextView
+							<mega.privacy.android.app.components.twemoji.EmojiTextView
 								android:id="@+id/my_account_name"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"

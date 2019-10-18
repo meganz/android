@@ -50,6 +50,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -59,6 +60,9 @@ import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import nz.mega.sdk.MegaAccountDetails;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -81,6 +85,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
+
 	private final int WIDTH = 500;
 
 	private ScrollView scrollView;
@@ -90,7 +95,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	private RelativeLayout avatarLayout;
 	private RoundedImageView myAccountImage;
 
-	private TextView nameView;
+	private EmojiTextView nameView;
 
 	private TextView typeAccount;
 	private TextView infoEmail;
@@ -220,16 +225,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
 		}
 
-		nameView = (TextView) v.findViewById(R.id.my_account_name);
+		nameView = v.findViewById(R.id.my_account_name);
+		nameView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+		nameView.setOnClickListener(this);
 
-		editImageView = (ImageView) v.findViewById(R.id.my_account_edit_icon);
 
-		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
+		editImageView = v.findViewById(R.id.my_account_edit_icon);
+
+		infoEmail = v.findViewById(R.id.my_account_email);
 		infoEmail.setText(megaApi.getMyEmail());
 		
-		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
+		myAccountImage = v.findViewById(R.id.my_account_thumbnail);
 
-		mkButton = (Button) v.findViewById(R.id.MK_button);
+		mkButton = v.findViewById(R.id.MK_button);
 		mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
 		mkButton.setOnClickListener(this);
 
@@ -819,11 +827,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
-
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-
-		myAccountImage.setImageBitmap(createDefaultAvatar(color, myAccountInfo.getFirstLetter()));
-
+		String firstLetter = ChatUtil.getFirstLetter(myAccountInfo.getFullName());
+		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+			firstLetter = " ";
+		}
+		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, firstLetter));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){

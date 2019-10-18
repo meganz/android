@@ -2699,10 +2699,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
             long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-            logDebug("Send to " + (chatHandles.length+contactHandles.length) + " chats");
-
             long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
-            logDebug("Send " + nodeHandles.length + " nodes");
 
             if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
                 if (contactHandles != null && contactHandles.length > 0) {

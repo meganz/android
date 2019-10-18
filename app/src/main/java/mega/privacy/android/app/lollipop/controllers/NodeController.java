@@ -210,6 +210,20 @@ public class NodeController {
             return;
         }
 
+        checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
+
+        if (notOwnerNodes.size() == 0) {
+            selectChatsToSendNodes(ownerNodes);
+            return;
+        }
+
+        CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
+        copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
+    }
+
+    public void checkIfNodesAreMine(ArrayList<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {
+        MegaNode currentNode;
+
         for (int i=0; i<nodes.size(); i++) {
             currentNode = nodes.get(i);
             if (currentNode != null) {
@@ -236,14 +250,6 @@ public class NodeController {
                     }
                 }
             }
-        }
-
-        if (notOwnerNodes.size() == 0) {
-            selectChatsToSendNodes(ownerNodes);
-        }
-        else {
-            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
-            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
         }
     }
 

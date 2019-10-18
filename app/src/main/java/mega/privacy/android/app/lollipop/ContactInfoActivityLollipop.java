@@ -68,6 +68,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -141,7 +142,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	LinearLayout optionsLayout;
 
 	//Info of the user
-	TextView nameText;
+	EmojiTextView nameText;
 	TextView emailText;
 
 	LinearLayout chatOptionsLayout;
@@ -174,7 +175,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	//Toolbar elements
 	ImageView contactStateIcon;
-	TextView firstLineTextToolbar;
+	EmojiTextView firstLineTextToolbar;
 	TextView firstLineLengthToolbar;
 	MarqueeTextView secondLineTextToolbar;
 	TextView secondLineLengthToolbar;
@@ -294,14 +295,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
 			/*TITLE*/
-			firstLineTextToolbar = (TextView) findViewById(R.id.first_line_toolbar);
+			firstLineTextToolbar = (EmojiTextView) findViewById(R.id.first_line_toolbar);
 			firstLineLengthToolbar = (TextView) findViewById(R.id.first_line_length_toolbar);
 
 			/*SUBTITLE*/
 			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
-			nameText = (TextView) findViewById(R.id.chat_contact_properties_name_text);
+			nameText = (EmojiTextView) findViewById(R.id.chat_contact_properties_name_text);
+			nameText.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 			emailText =(TextView) findViewById(R.id.chat_contact_properties_email_text);
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -438,7 +440,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						nameText.setText(userEmailExtra);
 					}
 				}
-				String fullname = (String)firstLineTextToolbar.getText();
+				String fullname = firstLineTextToolbar.getText().toString();
 				setDefaultAvatar(fullname);
 			}
 			else{

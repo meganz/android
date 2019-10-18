@@ -131,12 +131,15 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
@@ -238,9 +241,9 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -250,7 +253,7 @@ import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
     private static final String BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN";
@@ -378,6 +381,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private int storageState = -1; //Default value (-1) indicates that is not initialized
 	private boolean isStorageStatusDialogShown = false;
 
+	private boolean userNameChanged;
+	private boolean userEmailChanged;
+
     int orientationSaved;
 
     float elevation = 0;
@@ -459,7 +465,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
 	FrameLayout accountInfoFrame;
-	TextView nVDisplayName;
+	private EmojiTextView nVDisplayName;
 	TextView nVEmail;
 	RoundedImageView nVPictureProfile;
 	TextView spaceTV;
@@ -805,6 +811,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 	};
+
+	private BroadcastReceiver receiverUpdateOrder = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null) {
+				boolean cloudOrder = intent.getBooleanExtra("cloudOrder", true);
+				int order = intent.getIntExtra("order", MegaApiJava.ORDER_DEFAULT_ASC);
+				if (cloudOrder) {
+					refreshCloudOrder(order);
+				}
+				else {
+					refreshOthersOrder(order);
+				}
+			}
+		}
+	};
+
+    private BroadcastReceiver receiverUpdateView = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                updateView(intent.getBooleanExtra("isList", true));
+				supportInvalidateOptionsMenu();
+            }
+        }
+    };
 
 	private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
 		@Override
@@ -1954,6 +1986,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			localBroadcastManager.registerReceiver(networkReceiver,
 					new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+
+			localBroadcastManager.registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
+
+            localBroadcastManager.registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -2295,7 +2331,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		accountInfoFrame = (FrameLayout) findViewById(R.id.navigation_drawer_account_view);
         accountInfoFrame.setOnClickListener(this);
 
-        nVDisplayName = (TextView) findViewById(R.id.navigation_drawer_account_information_display_name);
+        nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
+		nVDisplayName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+
 		nVEmail = (TextView) findViewById(R.id.navigation_drawer_account_information_email);
         nVPictureProfile = (RoundedImageView) findViewById(R.id.navigation_drawer_user_account_picture_profile);
 
@@ -4060,13 +4098,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		logDebug("setDefaultAvatar");
 
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		String firstLetter = " ";
-		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
-			firstLetter = ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter();
-		}
-		if (firstLetter == null) {
+		String firstLetter = getFirstLetter(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
 			firstLetter = " ";
 		}
+
 		nVPictureProfile.setImageBitmap(createDefaultAvatar(color, firstLetter));
 	}
 
@@ -4128,7 +4164,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showDialogChangeUserAttribute(){
-		logDebug("showDialogChangeUserAttribute");
+		userNameChanged = false;
+		userEmailChanged = false;
 
 		megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
 
@@ -4146,7 +4183,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
-		final EditText inputFirstName = new EditText(this);
+		final EmojiEditText inputFirstName = new EmojiEditText(this);
+		inputFirstName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+
 		inputFirstName.getBackground().mutate().clearColorFilter();
 		inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputFirstName, params);
@@ -4178,7 +4217,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		error_layout_firtName.setVisibility(View.GONE);
 
-		final EditText inputLastName = new EditText(this);
+		final EmojiEditText inputLastName = new EmojiEditText(this);
 		inputLastName.getBackground().mutate().clearColorFilter();
 		inputLastName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputLastName, params);
@@ -4244,7 +4283,54 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		error_layout_email.setVisibility(View.GONE);
 
+		final OnEditorActionListener editorActionListener = new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String valueFirstName = inputFirstName.getText().toString().trim();
+					String valueLastName = inputLastName.getText().toString().trim();
+					String value = inputMail.getText().toString().trim();
+					String emailError = getEmailError(value, managerActivity);
+					if (emailError == null && userEmailChanged && !userNameChanged) {
+						emailError = comparedToCurrentEmail(value, managerActivity);
+					}
+					if (emailError != null) {
+//						inputMail.setError(emailError);
+						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_email.setText(emailError);
+						error_layout_email.setVisibility(View.VISIBLE);
+						inputMail.requestFocus();
+					} else if (valueFirstName.equals("") || valueFirstName.isEmpty()) {
+						logWarning("First name input is empty");
+//						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_firtName.setText(getString(R.string.invalid_string));
+						error_layout_firtName.setVisibility(View.VISIBLE);
+						inputFirstName.requestFocus();
+					} else if (valueLastName.equals("") || valueLastName.isEmpty()) {
+						logWarning("Last name input is empty");
+//						inputLastName.setError(getString(R.string.invalid_string));
+						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_lastName.setText(getString(R.string.invalid_string));
+						error_layout_lastName.setVisibility(View.VISIBLE);
+						inputLastName.requestFocus();
+					} else {
+						logDebug("Positive button pressed - change user attribute(s)");
+						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
+						changeUserAttributeDialog.dismiss();
+					}
+				} else {
+					logDebug("Other IME" + actionId);
+				}
+				return false;
+			}
+		};
 
+		inputFirstName.setSingleLine();
+		inputFirstName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText());
+		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputFirstName.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -4258,6 +4344,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void afterTextChanged(Editable editable) {
+				userNameChanged = true;
 				if(error_layout_firtName.getVisibility() == View.VISIBLE){
 					error_layout_firtName.setVisibility(View.GONE);
 					inputFirstName.getBackground().mutate().clearColorFilter();
@@ -4265,60 +4352,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		});
-		inputFirstName.setSingleLine();
-
-		inputFirstName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText());
-		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
-		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-		inputFirstName.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String valueFirstName = inputFirstName.getText().toString().trim();
-					String valueLastName = inputLastName.getText().toString().trim();
-					String value = inputMail.getText().toString().trim();
-					String emailError = getEmailError(value, managerActivity);
-					if (emailError != null) {
-//						inputMail.setError(emailError);
-						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_email.setText(emailError);
-						error_layout_email.setVisibility(View.VISIBLE);
-						inputMail.requestFocus();
-					}
-					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
-						logWarning("Input is empty");
-//						inputFirstName.setError(getString(R.string.invalid_string));
-						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_firtName.setText(getString(R.string.invalid_string));
-						error_layout_firtName.setVisibility(View.VISIBLE);
-						inputFirstName.requestFocus();
-					}
-					else if(valueLastName.equals("")||valueLastName.isEmpty()){
-						logWarning("Input is empty");
-//						inputLastName.setError(getString(R.string.invalid_string));
-						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_lastName.setText(getString(R.string.invalid_string));
-						error_layout_lastName.setVisibility(View.VISIBLE);
-						inputLastName.requestFocus();
-					}
-					else {
-						logDebug("Positive button pressed - change user attribute");
-						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
-						changeUserAttributeDialog.dismiss();
-					}
-				}
-				else{
-					logDebug("Other IME" + actionId);
-				}
-				return false;
-			}
-		});
-
-
+		inputFirstName.setOnEditorActionListener(editorActionListener);
 		inputFirstName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
+		inputLastName.setSingleLine();
+		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
+		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+		inputLastName.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputLastName.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -4332,6 +4373,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void afterTextChanged(Editable editable) {
+				userNameChanged = true;
 				if(error_layout_lastName.getVisibility() == View.VISIBLE){
 					error_layout_lastName.setVisibility(View.GONE);
 					inputLastName.getBackground().mutate().clearColorFilter();
@@ -4339,59 +4381,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		});
-		inputLastName.setSingleLine();
-		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
-		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
-		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-		inputLastName.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		inputLastName.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String valueFirstName = inputFirstName.getText().toString().trim();
-					String valueLastName = inputLastName.getText().toString().trim();
-					String value = inputMail.getText().toString().trim();
-					String emailError = getEmailError(value, managerActivity);
-					if (emailError != null) {
-//						inputMail.setError(emailError);
-						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_email.setText(emailError);
-						error_layout_email.setVisibility(View.VISIBLE);
-						inputMail.requestFocus();
-					}
-					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
-						logWarning("Input is empty");
-//						inputFirstName.setError(getString(R.string.invalid_string));
-						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_firtName.setText(getString(R.string.invalid_string));
-						error_layout_firtName.setVisibility(View.VISIBLE);
-						inputFirstName.requestFocus();
-					}
-					else if(valueLastName.equals("")||valueLastName.isEmpty()){
-						logWarning("Input is empty");
-//						inputLastName.setError(getString(R.string.invalid_string));
-						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_lastName.setText(getString(R.string.invalid_string));
-						error_layout_lastName.setVisibility(View.VISIBLE);
-						inputLastName.requestFocus();
-					}
-					else {
-						logDebug("Positive button pressed - change user attribute");
-						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
-						changeUserAttributeDialog.dismiss();
-					}
-				}
-				else{
-					logDebug("Other IME" + actionId);
-				}
-				return false;
-			}
-		});
-
+		inputLastName.setOnEditorActionListener(editorActionListener);
 		inputLastName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
 		inputMail.getBackground().mutate().clearColorFilter();
+		inputMail.setSingleLine();
+		inputMail.setText(megaApi.getMyUser().getEmail());
+		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+		inputMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		inputMail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 		inputMail.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -4405,6 +4404,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void afterTextChanged(Editable editable) {
+				userEmailChanged = true;
 				if(error_layout_email.getVisibility() == View.VISIBLE){
 					error_layout_email.setVisibility(View.GONE);
 					inputMail.getBackground().mutate().clearColorFilter();
@@ -4413,55 +4413,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		});
-		inputMail.setSingleLine();
-		inputMail.setText(megaApi.getMyUser().getEmail());
-		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
-		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-		inputMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		inputMail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-		inputMail.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String valueFirstName = inputFirstName.getText().toString().trim();
-					String valueLastName = inputLastName.getText().toString().trim();
-					String value = inputMail.getText().toString().trim();
-					String emailError = getEmailError(value, managerActivity);
-					if (emailError != null) {
-//						inputMail.setError(emailError);
-						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_email.setText(emailError);
-						error_layout_email.setVisibility(View.VISIBLE);
-						inputMail.requestFocus();
-					}
-					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
-						logDebug("Input is empty");
-//						inputFirstName.setError(getString(R.string.invalid_string));
-						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_firtName.setText(getString(R.string.invalid_string));
-						error_layout_firtName.setVisibility(View.VISIBLE);
-						inputFirstName.requestFocus();
-					}
-					else if(valueLastName.equals("")||valueLastName.isEmpty()){
-						logDebug("Input is empty");
-//						inputLastName.setError(getString(R.string.invalid_string));
-						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_lastName.setText(getString(R.string.invalid_string));
-						error_layout_lastName.setVisibility(View.VISIBLE);
-						inputLastName.requestFocus();
-					}
-					else {
-						logDebug("Positive button pressed - change user attribute");
-						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
-						changeUserAttributeDialog.dismiss();
-					}
-				}
-				else{
-					logDebug("Other IME" + actionId);
-				}
-				return false;
-			}
-		});
+		inputMail.setOnEditorActionListener(editorActionListener);
 		inputMail.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -4492,7 +4444,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				String valueLastName = inputLastName.getText().toString().trim();
 				String value = inputMail.getText().toString().trim();
 				String emailError = getEmailError(value, managerActivity);
-				if (emailError == null) {
+				if (emailError == null && userEmailChanged && !userNameChanged) {
 					emailError = comparedToCurrentEmail(value, managerActivity);
 				}
 				if (emailError != null) {
@@ -4565,6 +4517,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateOrder);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateView);
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
     	super.onDestroy();
@@ -5629,23 +5583,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 		if (rChatFL == null){
-			logWarning("New REcentChatFragment");
 			rChatFL = RecentChatsFragmentLollipop.newInstance();
 			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
 		}
 		else{
-			logDebug("REcentChatFragment is not null");
+			refreshFragment(FragmentTag.RECENT_CHAT.getTag());
 			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
-//			rChatFL.setChats();
-			rChatFL.setStatus();
 		}
-		logDebug("Show chats");
-	}
 
-	public void setBottomNavigationCurrentItem (int item) {
-		if (bNV != null) {
-			bNV.setCurrentItem(item);
-		}
+		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
 	public void setBottomNavigationMenuItemChecked (int item) {
@@ -6550,13 +6496,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						sortByMenuItem.setVisible(false);
 					}
 
-					if (isList) {
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					} else {
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
+					setGridListIcon();
 				}
 				else if (getTabItemCloud() == RECENTS_TAB) {
 					createFolderMenuItem.setVisible(false);
@@ -6598,14 +6538,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
-				if (isList){
-					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-				}
+				setGridListIcon();
+
 				rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
 				if(rubbishBinFLol != null && rubbishBinFLol.getItemCount()>0){
 					sortByMenuItem.setVisible(true);
@@ -6664,14 +6598,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
-				if (isList){
-					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-				}
+				setGridListIcon();
+
 				gridSmallLargeMenuItem.setVisible(false);
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
@@ -6720,7 +6648,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				if (isListCameraUploads){
 					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					gridSmallLargeMenuItem.setVisible(false);
 
 					cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
@@ -6735,7 +6663,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					thumbViewMenuItem.setTitle(getString(R.string.action_list));
 					thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					}else{
 						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
@@ -6801,7 +6729,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				searchMenuItem.setVisible(true);
 				if (isListCameraUploads){
 					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					gridSmallLargeMenuItem.setVisible(false);
 
 					muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
@@ -6816,7 +6744,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					thumbViewMenuItem.setTitle(getString(R.string.action_list));
 					thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					}else{
 						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
@@ -6852,14 +6780,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sortByMenuItem.setVisible(false);
 				}
 
-				if (isList){
-					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-				}
+				setGridListIcon();
 
 				searchMenuItem.setVisible(true);
 				if(!firstLogin){
@@ -6965,15 +6886,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
-
-					if (isList) {
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					}
-					else {
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
 				}
 				else if (getTabItemShares() == OUTGOING_TAB) {
 					logDebug("onCreateOptionsMenuLollipop: in Outgoing");
@@ -7023,18 +6935,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
-
-					if (isList) {
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					}
-					else {
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
 				}
+
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
+				setGridListIcon();
 			}
 			else if (drawerItem == DrawerItem.CONTACTS){
 				logDebug("createOptions CONTACTS");
@@ -7088,14 +6993,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					killAllSessions.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 
-					if (isList){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
+					setGridListIcon();
 
 					gridSmallLargeMenuItem.setVisible(false);
 				}
@@ -7227,14 +7125,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							}else{
 								thumbViewMenuItem.setVisible(false);
 							}
-							if (isList){
-								thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-								thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-							}
-							else{
-								thumbViewMenuItem.setTitle(getString(R.string.action_list));
-								thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-							}
+
+							setGridListIcon();
 						}
 						else{
 							selectMenuItem.setVisible(false);
@@ -7659,6 +7551,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    return super.onCreateOptionsMenu(menu);
 	}
 
+	private void setGridListIcon() {
+		if (isList){
+			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_thumbnail_view));
+		}
+		else{
+			thumbViewMenuItem.setTitle(getString(R.string.action_list));
+			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_list_view));
+		}
+	}
+
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -7820,21 +7723,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								return true;
 							}
 						}
-
-//						if (tFLol != null){
-//							if (tFLol.onBackPressed() == 0){
-//								drawerItem = DrawerItem.CLOUD_DRIVE;
-//								if (nV != null){
-//									Menu nVMenu = nV.getMenu();
-//									MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-//									resetNavigationViewMenu(nVMenu);
-//									cloudDrive.setChecked(true);
-//									cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
-//								}
-//								selectDrawerItemLollipop(drawerItem);
-//								return true;
-//							}
-//						}
 					}
 				}
 		    	return true;
@@ -8221,7 +8109,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
 					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					}else{
 						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
@@ -8233,7 +8121,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
 					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 					}else{
 						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
@@ -8290,53 +8178,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
         		}
 	        	else{
-		        	isList = !isList;
-	    			dbH.setPreferredViewList(isList);
-
-	    			if (isList){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-
-					//Refresh Cloud Fragment
-					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-
-					if (cloudPageAdapter != null) {
-						cloudPageAdapter.notifyDataSetChanged();
-					}
-
-					//Refresh Rubbish Fragment
-					refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
-
-
-					//Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
-					refreshFragment(FragmentTag.OFFLINE.getTag());
-
-					//Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
-					refreshFragment(FragmentTag.CONTACTS.getTag());
-
-					if (contactsPageAdapter != null) {
-	    				contactsPageAdapter.notifyDataSetChanged();
-					}
-
-					//Refresh shares section
-					refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-
-					//Refresh shares section
-					refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
-
-					if(sharesPageAdapter!=null){
-						sharesPageAdapter.notifyDataSetChanged();
-					}
-
-					//Refresh search section
-					refreshFragment(FragmentTag.SEARCH.getTag());
-
-					//Refresh inbox section
-					refreshFragment(FragmentTag.INBOX.getTag());
-
+	    			updateView(!isList);
 	        	}
 	        	supportInvalidateOptionsMenu();
 
@@ -8361,859 +8203,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	return true;
 	        }
 	        case R.id.action_menu_sort_by:{
-
-        		AlertDialog sortByDialog;
-        		LayoutInflater inflater = getLayoutInflater();
-        		View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
-
-        		TextView sortByNameTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_name_text);
-        		sortByNameTV.setText(getString(R.string.sortby_name));
-        		ViewGroup.MarginLayoutParams nameMLP = (ViewGroup.MarginLayoutParams) sortByNameTV.getLayoutParams();
-        		sortByNameTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		nameMLP.setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(15, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		TextView sortByDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_text);
-        		sortByDateTV.setText(getString(R.string.sortby_modification_date));
-        		ViewGroup.MarginLayoutParams dateMLP = (ViewGroup.MarginLayoutParams) sortByDateTV.getLayoutParams();
-        		sortByDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		dateMLP.setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(15, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		TextView sortBySizeTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_size_text);
-        		sortBySizeTV.setText(getString(R.string.sortby_size));
-        		ViewGroup.MarginLayoutParams sizeMLP = (ViewGroup.MarginLayoutParams) sortBySizeTV.getLayoutParams();
-        		sortBySizeTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		sizeMLP.setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(15, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView ascendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
-        		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
-        		ascendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		ascendingCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams ascendingMLP = (ViewGroup.MarginLayoutParams) ascendingCheck.getLayoutParams();
-        		ascendingMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView descendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_descending_check);
-        		descendingCheck.setText(getString(R.string.sortby_name_descending));
-        		descendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		descendingCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams descendingMLP = (ViewGroup.MarginLayoutParams) descendingCheck.getLayoutParams();
-        		descendingMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView newestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_check);
-        		newestCheck.setText(getString(R.string.sortby_date_newest));
-        		newestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		newestCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams newestMLP = (ViewGroup.MarginLayoutParams) newestCheck.getLayoutParams();
-        		newestMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView oldestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_check);
-        		oldestCheck.setText(getString(R.string.sortby_date_oldest));
-        		oldestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		oldestCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams oldestMLP = (ViewGroup.MarginLayoutParams) oldestCheck.getLayoutParams();
-        		oldestMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView largestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
-        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
-        		largestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		largestCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams largestMLP = (ViewGroup.MarginLayoutParams) largestCheck.getLayoutParams();
-        		largestMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		final CheckedTextView smallestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
-        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
-        		smallestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		smallestCheck.setCompoundDrawablePadding(scaleWidthPx(34, outMetrics));
-        		ViewGroup.MarginLayoutParams smallestMLP = (ViewGroup.MarginLayoutParams) smallestCheck.getLayoutParams();
-        		smallestMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        		builder.setView(dialoglayout);
-				TextView textViewTitle = new TextView(ManagerActivityLollipop.this);
-				textViewTitle.setText(getString(R.string.action_sort_by));
-				textViewTitle.setTextSize(20);
-				textViewTitle.setTextColor(0xde000000);
-				textViewTitle.setPadding(scaleWidthPx(23, outMetrics), scaleHeightPx(20, outMetrics), 0, 0);
-        		builder.setCustomTitle(textViewTitle);
-
-        		sortByDialog = builder.create();
-        		sortByDialog.show();
-        		if(drawerItem==DrawerItem.CONTACTS){
-        			switch(orderContacts){
-		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-		        			ascendingCheck.setChecked(true);
-		        			descendingCheck.setChecked(false);
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(false);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(true);
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(false);
-		        			break;
-		        		}
-						case MegaApiJava.ORDER_CREATION_ASC:{
-							ascendingCheck.setChecked(false);
-							descendingCheck.setChecked(false);
-							newestCheck.setChecked(true);
-							oldestCheck.setChecked(false);
-							break;
-						}
-						case MegaApiJava.ORDER_CREATION_DESC:{
-							ascendingCheck.setChecked(false);
-							descendingCheck.setChecked(false);
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(true);
-							break;
-						}
-	        		}
-        		}
-        		else if(drawerItem==DrawerItem.SAVED_FOR_OFFLINE){
-					logDebug("orderOthers: " + orderOthers);
-        			switch(orderOthers){
-		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-							logDebug("ASCE");
-		        			ascendingCheck.setChecked(true);
-		        			descendingCheck.setChecked(false);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-							logDebug("DESC");
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(true);
-		        			break;
-		        		}
-        			}
-        		}
-        		else if(drawerItem==DrawerItem.SHARED_ITEMS){
-					if(viewPagerShares!=null){
-						int index = viewPagerShares.getCurrentItem();
-						if(index==1){
-							if (parentHandleOutgoing == -1){
-								switch(orderOthers){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
-										logDebug("ASCE");
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										logDebug("DESC");
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										break;
-									}
-								}
-							}
-							else{
-								switch(orderCloud){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(true);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(true);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(true);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(true);
-										smallestCheck.setChecked(false);
-										break;
-									}
-								}
-							}
-						}
-						else{
-							if (parentHandleIncoming == -1){
-								switch(orderOthers){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
-										logDebug("ASCE");
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										logDebug("DESC");
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										break;
-									}
-								}
-							}
-							else{
-								switch(orderCloud){
-									case MegaApiJava.ORDER_DEFAULT_ASC:{
-										ascendingCheck.setChecked(true);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_DEFAULT_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(true);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(true);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_MODIFICATION_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(true);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(false);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_ASC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(false);
-										smallestCheck.setChecked(true);
-										break;
-									}
-									case MegaApiJava.ORDER_SIZE_DESC:{
-										ascendingCheck.setChecked(false);
-										descendingCheck.setChecked(false);
-										newestCheck.setChecked(false);
-										oldestCheck.setChecked(false);
-										largestCheck.setChecked(true);
-										smallestCheck.setChecked(false);
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-				else if(drawerItem==DrawerItem.CAMERA_UPLOADS||drawerItem==DrawerItem.MEDIA_UPLOADS){
-					switch(orderCamera){
-						case MegaApiJava.ORDER_MODIFICATION_ASC:{
-							logDebug("ASCE");
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(true);
-							break;
-						}
-						case MegaApiJava.ORDER_MODIFICATION_DESC:{
-							logDebug("DESC");
-							newestCheck.setChecked(true);
-							oldestCheck.setChecked(false);
-							break;
-						}
-					}
-				}
-        		else{
-					logDebug("orderCloud: " + orderCloud);
-	        		switch(orderCloud){
-		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-		        			ascendingCheck.setChecked(true);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(true);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
-//		        		case MegaApiJava.ORDER_CREATION_DESC:{
-//		        			ascendingCheck.setChecked(false);
-//		        			descendingCheck.setChecked(false);
-//		        			newestCheck.setChecked(true);
-//		        			oldestCheck.setChecked(false);
-//		        			largestCheck.setChecked(false);
-//		        			smallestCheck.setChecked(false);
-//		        			break;
-//		        		}
-//		        		case MegaApiJava.ORDER_CREATION_ASC:{
-//		        			ascendingCheck.setChecked(false);
-//		        			descendingCheck.setChecked(false);
-//		        			newestCheck.setChecked(false);
-//		        			oldestCheck.setChecked(true);
-//		        			largestCheck.setChecked(false);
-//		        			smallestCheck.setChecked(false);
-//		        			break;
-//		        		}
-						case MegaApiJava.ORDER_MODIFICATION_ASC:{
-							ascendingCheck.setChecked(false);
-							descendingCheck.setChecked(false);
-							newestCheck.setChecked(false);
-							oldestCheck.setChecked(true);
-							largestCheck.setChecked(false);
-							smallestCheck.setChecked(false);
-							break;
-						}
-						case MegaApiJava.ORDER_MODIFICATION_DESC:{
-							ascendingCheck.setChecked(false);
-							descendingCheck.setChecked(false);
-							newestCheck.setChecked(true);
-							oldestCheck.setChecked(false);
-							largestCheck.setChecked(false);
-							smallestCheck.setChecked(false);
-							break;
-						}
-		        		case MegaApiJava.ORDER_SIZE_ASC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(true);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_SIZE_DESC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(true);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
-	        		}
-	        	}
-
-        		final AlertDialog dialog = sortByDialog;
-	        	switch(drawerItem){
-		        	case CONTACTS:{
-						sortByDateTV.setText(getString(R.string.sortby_date));
-						sortByDateTV.setVisibility(View.VISIBLE);
-		        		newestCheck.setVisibility(View.VISIBLE);
-		        		oldestCheck.setVisibility(View.VISIBLE);
-		        		sortBySizeTV.setVisibility(View.GONE);
-		        		largestCheck.setVisibility(View.GONE);
-		        		smallestCheck.setVisibility(View.GONE);
-
-		        		ascendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_ASC){
-									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_DEFAULT_ASC);
-								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		descendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_DESC) {
-									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_DEFAULT_DESC);
-								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-						newestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(true);
-								oldestCheck.setChecked(false);
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_CREATION_ASC){
-									logDebug("Call to selectSortByContacts ASC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_CREATION_ASC);
-								}
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-
-						oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(true);
-								logDebug("Order contacts value: " + orderContacts);
-								if(orderContacts!=MegaApiJava.ORDER_CREATION_DESC) {
-									logDebug("Call to selectSortByContacts DESC: " + orderContacts);
-									selectSortByContacts(MegaApiJava.ORDER_CREATION_DESC);
-								}
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-
-		        		break;
-		        	}
-		        	case SAVED_FOR_OFFLINE: {
-
-		        		sortByDateTV.setVisibility(View.GONE);
-		        		newestCheck.setVisibility(View.GONE);
-		        		oldestCheck.setVisibility(View.GONE);
-		        		sortBySizeTV.setVisibility(View.GONE);
-		        		largestCheck.setVisibility(View.GONE);
-		        		smallestCheck.setVisibility(View.GONE);
-
-		        		ascendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_ASC) {
-									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_ASC);
-								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		descendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_DESC) {
-									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_DESC);
-								}
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		break;
-
-		        	}
-		        	case SHARED_ITEMS: {
-
-						if(firstNavigationLevel){
-
-							if (viewPagerShares.getCurrentItem()==0){
-								//Incoming Shares
-								sortByNameTV.setText(getString(R.string.sortby_owner_mail));
-							}
-							else{
-								sortByNameTV.setText(getString(R.string.sortby_name));
-							}
-
-							sortByDateTV.setVisibility(View.GONE);
-							newestCheck.setVisibility(View.GONE);
-							oldestCheck.setVisibility(View.GONE);
-							sortBySizeTV.setVisibility(View.GONE);
-							largestCheck.setVisibility(View.GONE);
-							smallestCheck.setVisibility(View.GONE);
-
-							ascendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(true);
-									descendingCheck.setChecked(false);
-									if(orderOthers!=MegaApiJava.ORDER_DEFAULT_ASC){
-										refreshOthersOrder(MegaApiJava.ORDER_DEFAULT_ASC);
-									}
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-							descendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(true);
-									if(orderOthers!=MegaApiJava.ORDER_DEFAULT_DESC){
-										refreshOthersOrder(MegaApiJava.ORDER_DEFAULT_DESC);
-									}
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-						}
-						else{
-							logDebug("No first level navigation on Incoming Shares");
-							sortByNameTV.setText(getString(R.string.sortby_name));
-
-							ascendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(true);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
-
-									refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_ASC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-							descendingCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(true);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
-
-									refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-							newestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(true);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
-
-									refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-							oldestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);;
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(true);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(false);
-
-									refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-
-							largestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(true);
-									smallestCheck.setChecked(false);
-
-									refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-
-							smallestCheck.setOnClickListener(new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									ascendingCheck.setChecked(false);
-									descendingCheck.setChecked(false);
-									newestCheck.setChecked(false);
-									oldestCheck.setChecked(false);
-									largestCheck.setChecked(false);
-									smallestCheck.setChecked(true);
-
-									refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
-
-									if (dialog != null){
-										dialog.dismiss();
-									}
-								}
-							});
-						}
-
-		        		break;
-
-		        	}
-					case MEDIA_UPLOADS:
-					case CAMERA_UPLOADS:{
-
-						sortByNameTV.setVisibility(View.GONE);
-						ascendingCheck.setVisibility(View.GONE);
-						descendingCheck.setVisibility(View.GONE);
-						sortBySizeTV.setVisibility(View.GONE);
-						largestCheck.setVisibility(View.GONE);
-						smallestCheck.setVisibility(View.GONE);
-
-						oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-								descendingCheck.setChecked(false);
-								if(orderCamera!=MegaApiJava.ORDER_MODIFICATION_ASC){
-									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_ASC);
-								}
-
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-
-						newestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(true);
-								if(orderCamera!=MegaApiJava.ORDER_MODIFICATION_DESC){
-									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_DESC);
-								}
-
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-						break;
-					}
-		        	case CLOUD_DRIVE:
-		        	case INBOX:
-                    case RUBBISH_BIN:{
-
-		        		ascendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-
-								refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_ASC);
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		descendingCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-
-								refreshCloudOrder(MegaApiJava.ORDER_DEFAULT_DESC);
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-
-						newestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
-								newestCheck.setChecked(true);
-								oldestCheck.setChecked(false);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(false);
-
-								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_DESC);
-
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-
-						oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);;
-								newestCheck.setChecked(false);
-								oldestCheck.setChecked(true);
-								largestCheck.setChecked(false);
-								smallestCheck.setChecked(false);
-
-								refreshCloudOrder(MegaApiJava.ORDER_MODIFICATION_ASC);
-
-								if (dialog != null){
-									dialog.dismiss();
-								}
-							}
-						});
-
-
-		        		largestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(true);
-			        			smallestCheck.setChecked(false);
-
-								refreshCloudOrder(MegaApiJava.ORDER_SIZE_DESC);
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		smallestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(true);
-
-			        			refreshCloudOrder(MegaApiJava.ORDER_SIZE_ASC);
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		break;
-	        		}
-//		        	default:{
-//		        		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
-//			    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
-//			    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
-//			    		break;
-//		        	}
-	        	}
+				showSortOptions(managerActivity, outMetrics);
 	        	return true;
 	        }
 			case R.id.action_search_by_date:{
@@ -9294,6 +8284,50 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
 		}
 	}
+
+	private void updateView (boolean isList) {
+        if (this.isList != isList) {
+            this.isList = isList;
+            dbH.setPreferredViewList(isList);
+        }
+
+        //Refresh Cloud Fragment
+        refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+
+        if(cloudPageAdapter != null) {
+            cloudPageAdapter.notifyDataSetChanged();
+        }
+
+        //Refresh Rubbish Fragment
+        refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
+
+
+        //Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
+        refreshFragment(FragmentTag.OFFLINE.getTag());
+
+        //Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
+        refreshFragment(FragmentTag.CONTACTS.getTag());
+
+        if (contactsPageAdapter != null) {
+            contactsPageAdapter.notifyDataSetChanged();
+        }
+
+        //Refresh shares section
+        refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+
+        //Refresh shares section
+        refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+
+        if(sharesPageAdapter!=null){
+            sharesPageAdapter.notifyDataSetChanged();
+        }
+
+        //Refresh search section
+        refreshFragment(FragmentTag.SEARCH.getTag());
+
+        //Refresh inbox section
+        refreshFragment(FragmentTag.INBOX.getTag());
+    }
 
 	public void hideMKLayout(){
 		logDebug("hideMKLayout");
@@ -12814,6 +11848,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void selectSortByContacts(int _orderContacts){
 		logDebug("selectSortByContacts");
 
+		if (getOrderContacts() == _orderContacts) {
+			return;
+		}
+
 		this.setOrderContacts(_orderContacts);
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		if (cFLol != null){
@@ -12824,6 +11862,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void selectSortByOffline(int _orderOthers){
 		logDebug("selectSortByOffline");
+
+		if (orderOthers == orderOthers) {
+			return;
+		}
 
 		this.orderOthers = _orderOthers;
 		this.setOrderOthers(orderOthers);
@@ -12879,7 +11921,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void refreshOthersOrder(int newOrderOthers){
+		if (getOrderOthers() == newOrderOthers) {
+			return;
+		}
+
 		logDebug("New order: " + newOrderOthers);
+
 		this.setOrderOthers(newOrderOthers);
 
 		if(sharesPageAdapter!=null){
@@ -12889,6 +11936,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void selectSortUploads(int orderCamera){
 		logDebug("selectSortUploads");
+
+		if (this.orderCamera == orderCamera) {
+			return;
+		}
 
 		this.orderCamera = orderCamera;
 
@@ -13464,12 +12515,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			logDebug("Send to " + chatHandles.length + " chats");
-
 			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-
 			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
-
 			long[] userHandles = intent.getLongArrayExtra("USER_HANDLES");
 
 			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
