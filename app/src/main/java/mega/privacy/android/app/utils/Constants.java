@@ -145,6 +145,7 @@ public class Constants {
     public static final int REQUEST_STORAGE_VOICE_CLIP = 12;
     public static final int REQUEST_CAMERA_TAKE_PICTURE = 13;
     public static final int REQUEST_WRITE_STORAGE_TAKE_PICTURE = 14;
+
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
     public static final int REQUEST_WRITE_STORAGE_OFFLINE = 16;
 
@@ -232,6 +233,8 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
     public static final String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
     public static final String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
+    public static final String BROADCAST_ACTION_INTENT_UPDATE_ORDER = "INTENT_UPDATE_ORDER";
+    public static final String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
@@ -390,7 +393,17 @@ public class Constants {
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String HANDLE = "handle";
 
-	public static final String[] FILE_LINK_REGEXS = {
+    public static final int EMOJI_SIZE_EXTRA_SMALL = 10;
+    public static final int EMOJI_SIZE_SMALL = 15;
+    public static final int EMOJI_SIZE = 20;
+    public static final int EMOJI_SIZE_MEDIUM = 25;
+    public static final int EMOJI_AVATAR_SIZE = 30;
+    public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
+    public static final int EMOJI_AVATAR_CALL_SMALL = 40;
+    public static final int EMOJI_AVATAR_CALL_HIGH = 60;
+
+
+    public static final String[] FILE_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#!.+$",
 			"^https://mega\\.nz/#!.+$"
 	};

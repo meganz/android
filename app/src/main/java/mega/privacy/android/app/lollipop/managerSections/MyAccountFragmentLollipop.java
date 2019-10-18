@@ -50,6 +50,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -57,6 +58,9 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -86,7 +90,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	RelativeLayout avatarLayout;
 	RoundedImageView myAccountImage;
 
-	TextView nameView;
+	private EmojiTextView nameView;
 
 	TextView typeAccount;
 	TextView infoEmail;
@@ -214,8 +218,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
 		}
 
-		nameView = (TextView) v.findViewById(R.id.my_account_name);
+		nameView = v.findViewById(R.id.my_account_name);
+		nameView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
 		nameView.setOnClickListener(this);
+
 
 		editImageView = (ImageView) v.findViewById(R.id.my_account_edit_icon);
 		editImageView.setOnClickListener(this);
@@ -766,11 +772,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
-
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-
-		myAccountImage.setImageBitmap(createDefaultAvatar(color, myAccountInfo.getFirstLetter()));
-
+		String firstLetter = ChatUtil.getFirstLetter(myAccountInfo.getFullName());
+		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+			firstLetter = " ";
+		}
+		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, firstLetter));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){

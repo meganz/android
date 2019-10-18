@@ -97,11 +97,16 @@ public class LogUtil {
      * @param message  Message for the logging system.
      */
     private static void log(int logLevel, String message) {
-        final int STACK_TRACE_LEVELS_UP = 4;
+        if (!Util.DEBUG && !Util.getFileLoggerSDK()) {
+            return;
+        }
 
-        String fileName = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getFileName();
-        String methodName = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getMethodName();
-        int line = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getLineNumber();
+        final int STACK_TRACE_LEVELS_UP = 4;
+        final StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP];
+
+        String fileName = stackTrace.getFileName();
+        String methodName = stackTrace.getMethodName();
+        int line = stackTrace.getLineNumber();
 
         MegaApiAndroid.log(logLevel, "[clientApp]: " + message +
                 " (" + fileName + "::" + methodName + ":" + line + ")");
@@ -116,11 +121,16 @@ public class LogUtil {
      * @param printStackTrace Flag to print the stack trace of the exception.
      */
     private static void log(int logLevel, String message, Throwable exception, boolean printStackTrace) {
-        final int STACK_TRACE_LEVELS_UP = 4;
+        if (!Util.DEBUG && !Util.getFileLoggerSDK()) {
+            return;
+        }
 
-        String fileName = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getFileName();
-        String methodName = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getMethodName();
-        int line = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP].getLineNumber();
+        final int STACK_TRACE_LEVELS_UP = 4;
+        final StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[STACK_TRACE_LEVELS_UP];
+
+        String fileName = stackTrace.getFileName();
+        String methodName = stackTrace.getMethodName();
+        int line = stackTrace.getLineNumber();
 
         if (printStackTrace) {
             MegaApiAndroid.log(logLevel, "[clientApp]: " + message +
@@ -131,6 +141,5 @@ public class LogUtil {
                     " (" + fileName + "::" + methodName + ":" + line + ")" +
                     System.lineSeparator() + "[" + exception.toString() + "]");
         }
-
     }
 }

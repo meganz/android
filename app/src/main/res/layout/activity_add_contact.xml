@@ -376,7 +376,7 @@
 					android:layout_centerVertical="true"
 					android:src="@drawable/ic_w_take_photo"/>
 
-				<EditText
+				<mega.privacy.android.app.components.twemoji.EmojiEditText
 					android:id="@+id/name_group_edittext"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
