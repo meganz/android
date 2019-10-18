@@ -12,15 +12,23 @@ import mega.privacy.android.app.R;
 
 public class PositionDividerItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDivider;
-    DisplayMetrics outMetrics;
-    Context context;
+    private DisplayMetrics outMetrics;
+    private Context context;
+    private int position = -1;
 
     public PositionDividerItemDecoration(Context context, DisplayMetrics outMetrics) {
-
         mDivider = ContextCompat.getDrawable(context, R.drawable.line_divider);
 
         this.outMetrics = outMetrics;
         this.context = context;
+    }
+
+    public PositionDividerItemDecoration (Context context, DisplayMetrics outMetrics, int position) {
+        mDivider = ContextCompat.getDrawable(context, R.drawable.line_divider);
+
+        this.outMetrics = outMetrics;
+        this.context = context;
+        this.position = position;
     }
 
     @Override
@@ -32,9 +40,9 @@ public class PositionDividerItemDecoration extends RecyclerView.ItemDecoration {
         int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View child = parent.getChildAt(i);
-            int position = parent.getChildAdapterPosition(child);
+            int pos = parent.getChildAdapterPosition(child);
 
-            if (position != 0) {
+            if (draw(pos)) {
                 RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
 
                 int top = child.getBottom() + params.bottomMargin;
@@ -44,5 +52,12 @@ public class PositionDividerItemDecoration extends RecyclerView.ItemDecoration {
                 mDivider.draw(c);
             }
         }
+    }
+
+    private boolean draw(int pos) {
+        if (pos == 0 || (position != -1 && position-1 == pos) || (position != -1 && position == pos)) {
+            return false;
+        }
+        return true;
     }
 }

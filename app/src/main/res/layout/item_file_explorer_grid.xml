@@ -1,0 +1,149 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/file_explorer_grid_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="2dp"
+    android:background="@drawable/background_item_grid"
+    android:descendantFocusability="blocksDescendants"
+    android:padding="1dp">
+
+    <RelativeLayout
+        android:id="@+id/file_explorer_grid_folder_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_item_grid_new"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:id="@+id/file_explorer_grid_folder_thumbnail_layout"
+            android:layout_width="match_parent"
+            android:layout_height="56dp">
+
+            <ImageView
+                android:id="@+id/file_explorer_grid_folder_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@null"
+                android:scaleType="fitCenter"/>
+
+            <TextView
+                android:id="@+id/file_explorer_grid_folder_filename"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                android:layout_toRightOf="@+id/file_explorer_grid_folder_icon"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:textColor="#DE000000"
+                android:textSize="14sp"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/file_explorer_grid_file_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_item_grid_new"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:id="@+id/file_explorer_grid_file_thumbnail_layout"
+            android:layout_width="match_parent"
+            android:layout_height="172dp">
+
+            <ImageView
+                android:id="@+id/file_explorer_grid_file_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:scaleType="fitXY"
+                android:paddingTop="1dp"
+                android:paddingRight="1dp"
+                android:paddingLeft="1dp"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/file_explorer_grid_file_selected"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="7dp"
+                android:layout_marginTop="7dp"/>
+
+            <ImageView
+                android:id="@+id/file_explorer_grid_file_icon"
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:background="@null"
+                android:scaleType="fitCenter"/>
+
+            <RelativeLayout
+                android:id="@+id/file_explorer_grid_file_videoinfo_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/gradient_cam_uploads"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/file_explorer_grid_file_title_video_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="33dp"
+                    android:text="00:00"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:visibility="gone"/>
+
+                <ImageView
+                    android:id="@+id/file_explorer_grid_file_video_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:background="@null"
+                    android:src="@drawable/ic_play_arrow_white_24dp"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_upgrade_account"
+            android:layout_below="@+id/file_explorer_grid_file_thumbnail_layout"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="47dp"
+            android:layout_below="@+id/file_explorer_grid_file_thumbnail_layout">
+
+            <TextView
+                android:id="@+id/file_grid_filename_for_file"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:textColor="#DE000000"
+                android:textSize="14sp"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -44,10 +44,10 @@ public class QRCodePageAdapter extends FragmentPagerAdapter {
         // Generate title based on item position
         switch (position){
             case 0: {
-                return context.getString(R.string.section_my_code).toLowerCase();
+                return context.getString(R.string.section_my_code);
             }
             case 1:{
-                return context.getString(R.string.section_scan_code).toLowerCase();
+                return context.getString(R.string.section_scan_code);
             }
         }
         return null;
