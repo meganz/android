@@ -98,12 +98,15 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         }
 
         RelativeLayout itemLayout;
+        RelativeLayout itemContainer;
         RoundedImageView avatarImage;
         TextView initialLetter;
         EmojiTextView titleText;
         ImageView stateIcon;
         MarqueeTextView lastSeenStateText;
         EmojiTextView participantsText;
+        RelativeLayout headerLayout;
+        TextView headerText;
 
         String email;
 
@@ -129,13 +132,16 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_explorer_list, parent, false);
         holder = new ViewHolderChatExplorerList(v);
 
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.chat_explorer_list_item_layout);
-        holder.avatarImage = (RoundedImageView) v.findViewById(R.id.chat_explorer_list_avatar);
-        holder.initialLetter = (TextView) v.findViewById(R.id.chat_explorer_list_initial_letter);
-        holder.titleText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_title);
-        holder.stateIcon = (ImageView) v.findViewById(R.id.chat_explorer_list_contact_state);
-        holder.lastSeenStateText = (MarqueeTextView) v.findViewById(R.id.chat_explorer_list_last_seen_state);
-        holder.participantsText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_participants);
+        holder.headerLayout = v.findViewById(R.id.header_layout);
+        holder.headerText = v.findViewById(R.id.label_text);
+        holder.itemContainer = v.findViewById(R.id.item_container);
+        holder.itemLayout = v.findViewById(R.id.chat_explorer_list_item_layout);
+        holder.avatarImage = v.findViewById(R.id.chat_explorer_list_avatar);
+        holder.initialLetter = v.findViewById(R.id.chat_explorer_list_initial_letter);
+        holder.titleText = v.findViewById(R.id.chat_explorer_list_title);
+        holder.stateIcon = v.findViewById(R.id.chat_explorer_list_contact_state);
+        holder.lastSeenStateText = v.findViewById(R.id.chat_explorer_list_last_seen_state);
+        holder.participantsText = v.findViewById(R.id.chat_explorer_list_participants);
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             holder.titleText.setEmojiSize(scaleWidthPx(10, outMetrics));
@@ -157,6 +163,20 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         ChatExplorerListItem item = getItem(position);
         MegaChatListItem chat = item.getChat();
 
+        if (item.isHeader()) {
+            holder.itemContainer.setVisibility(View.GONE);
+            holder.headerLayout.setVisibility(View.VISIBLE);
+            if (item.isRecent()) {
+                holder.headerText.setText(R.string.recents_label);
+            }
+            else {
+                holder.headerText.setText(R.string.chats_label);
+            }
+            return;
+        }
+
+        holder.headerLayout.setVisibility(View.GONE);
+        holder.itemContainer.setVisibility(View.VISIBLE);
         holder.titleText.setText(item.getTitle());
 
         if (chat != null && chat.isGroup()) {
@@ -268,26 +288,13 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             }
         }
         
-        if (chat != null) {
-            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_RM || chat.getOwnPrivilege()==MegaChatRoom.PRIV_RO){
-                holder.avatarImage.setAlpha(.4f);
-                holder.itemLayout.setOnClickListener(null);
-                holder.itemLayout.setOnLongClickListener(null);
 
-                holder.titleText.setTextColor(context.getResources().getColor(R.color.text_secondary));
-                holder.lastSeenStateText.setTextColor(context.getResources().getColor(R.color.text_secondary));
-                holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-            }
-            else{
-                holder.avatarImage.setAlpha(1.0f);
-                holder.itemLayout.setOnClickListener(this);
-                holder.itemLayout.setOnLongClickListener(this);
+        holder.itemLayout.setOnClickListener(this);
+        holder.itemLayout.setOnLongClickListener(this);
 
-                holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
-                holder.lastSeenStateText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-                holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-            }
-        }
+        holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
+        holder.lastSeenStateText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+        holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
     }
 
     public void createGroupChatAvatar(ViewHolderChatExplorerList holder){
