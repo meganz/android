@@ -3173,6 +3173,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if (searchMenuItem != null) {
             searchMenuItem.setVisible(false);
         }
+        if (inviteContactMenuItem != null) {
+            inviteContactMenuItem.setVisible(false);
+        }
         addContactsLayout.setVisibility(View.GONE);
         newGroupLayout.setVisibility(View.VISIBLE);
         if (createNewChatLink) {
