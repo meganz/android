@@ -12,7 +12,9 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +32,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListenerShare;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -51,6 +57,8 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     private Context mContext;
     OnItemClickListener mItemClickListener;
     private List<ShareContactInfo> shareContacts;
+
+
 
 
     private MegaApiAndroid megaApi;
@@ -118,7 +126,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         RelativeLayout itemHeader;
         TextView textHeader;
         RelativeLayout itemLayout;
-        TextView contactNameTextView;
+        EmojiTextView contactNameTextView;
         TextView emailTextView;
         public String mail;
         public RoundedImageView avatar;
@@ -142,6 +150,10 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     @Override
     public ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
 
         View rowView = inflater.inflate(R.layout.item_contact_share, parent, false);
         ViewHolderShareContactsLollipop holder = new ViewHolderShareContactsLollipop(rowView);
@@ -150,7 +162,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         holder.textHeader = (TextView) rowView.findViewById(R.id.text_header);
 
         holder.itemLayout = (RelativeLayout) rowView.findViewById(R.id.item_content);
-        holder.contactNameTextView = (TextView) rowView.findViewById(R.id.contact_name);
+        holder.contactNameTextView = rowView.findViewById(R.id.contact_name);
 
         if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics());
@@ -160,6 +172,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics());
             holder.contactNameTextView.setMaxWidth((int) width);
         }
+        holder.contactNameTextView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 
         holder.emailTextView = (TextView) rowView.findViewById(R.id.contact_mail);
         holder.avatar = (RoundedImageView) rowView.findViewById(R.id.contact_avatar);
@@ -383,7 +396,10 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             //No name, ask for it and later refresh!!
             fullName = mail;
         }
-        String firstLetter = fullName.charAt(0) + "";
+        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            firstLetter = " ";
+        }
 
         logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
