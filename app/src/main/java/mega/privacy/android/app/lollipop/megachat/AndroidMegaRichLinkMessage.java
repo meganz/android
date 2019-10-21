@@ -11,13 +11,9 @@ import java.util.regex.Matcher;
 
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.Constants.CHAT_LINK_REGEXS;
-import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_REGEXS;
-import static mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS;
-import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEXS;
-import static mega.privacy.android.app.utils.Util.matchRegexs;
-
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class AndroidMegaRichLinkMessage {
 
@@ -111,28 +107,7 @@ public class AndroidMegaRichLinkMessage {
 
     public static String extractMegaLink(String urlIn) {
 
-        try {
-            urlIn = URLDecoder.decode(urlIn, "UTF-8");
-        }
-        catch (Exception e) {
-            logError("Error decoding URL: " + urlIn, e);
-        }
-
-        urlIn.replace(' ', '+');
-        if(urlIn.startsWith("mega://")){
-            urlIn = urlIn.replace("mega://", "https://mega.co.nz/");
-        }
-        else  if(urlIn.startsWith("mega.")){
-            urlIn = urlIn.replace("mega.", "https://mega.");
-        }
-
-        if (urlIn.startsWith("https://www.mega.co.nz")){
-            urlIn = urlIn.replace("https://www.mega.co.nz", "https://mega.co.nz");
-        }
-
-        if (urlIn.startsWith("https://www.mega.nz")){
-            urlIn = urlIn.replace("https://www.mega.nz", "https://mega.nz");
-        }
+        decodeURL(urlIn);
 
         Matcher m = Patterns.WEB_URL.matcher(urlIn);
         while (m.find()) {
