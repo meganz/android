@@ -10,6 +10,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
+        android:maxLength="4"
         android:hint="@string/hint_minutes"
         android:textColorHint="@color/text_secondary"
         android:inputType="number"
