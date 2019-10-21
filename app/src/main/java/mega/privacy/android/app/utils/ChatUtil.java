@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.SystemClock;
@@ -16,9 +17,13 @@ import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -38,6 +43,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatUtil {
+
+    private static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
 
     /*Method to know if i'm participating in any A/V call*/
     public static boolean participatingInACall(MegaChatApiAndroid megaChatApi) {
@@ -159,7 +166,31 @@ public class ChatUtil {
         return actionBarHeight;
     }
 
-    public static void showShareChatLinkDialog(final Context context, MegaChatRoom chat, final String chatLink) {
+    public static int getMaxAllowed(@Nullable final CharSequence text) {
+        int numEmojis = EmojiManager.getInstance().getNumEmojis(text);
+        if (numEmojis > 0) {
+            int realLenght = text.length() + (numEmojis * 2);
+            if (realLenght >= MAX_ALLOWED_CHARACTERS_AND_EMOJIS) return text.length();
+        }
+        return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
+    }
+
+    public static String getFirstLetter(String title) {
+        String resultTitle = EmojiUtilsShortcodes.emojify(title);
+        resultTitle = resultTitle.trim();
+        if (resultTitle.isEmpty()) return "";
+        if (resultTitle.length() == 1) return resultTitle;
+        String lastEmoji = resultTitle.substring(0, 2);
+        int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
+        if (numEmojis > 0) return lastEmoji;
+        String result = String.valueOf(resultTitle.charAt(0)).toUpperCase(Locale.getDefault());
+
+        return result;
+    }
+
+
+    public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         LayoutInflater inflater = null;
         if (context instanceof GroupChatInfoActivityLollipop) {

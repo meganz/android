@@ -1,6 +1,7 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -28,6 +29,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -35,6 +37,9 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -52,39 +57,42 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    Context context;
-    MegaChatListItem chat = null;
-    long chatId;
+    private Context context;
+    private MegaChatListItem chat = null;
+    private long chatId;
+
+    private final static int MAX_WIDTH = 200;
+    private final static int ICON_STATE_SIZE = 6;
 
     private BottomSheetBehavior mBehavior;
     private LinearLayout items_layout;
 
-    public LinearLayout mainLinearLayout;
-    public TextView titleNameContactChatPanel;
-    public ImageView iconStateChatPanel;
-    public TextView titleMailContactChatPanel;
-    public RoundedImageView chatImageView;
-    public TextView chatInitialLetter;
-    public TextView infoChatText;
-    public LinearLayout optionInfoChat;
-    public LinearLayout optionLeaveChat;
-    public TextView optionLeaveText;
-    public LinearLayout optionClearHistory;
-    public LinearLayout optionMuteChat;
-    public ImageView optionMuteChatIcon;
-    public TextView optionMuteChatText;
-    public LinearLayout optionArchiveChat;
-    public TextView archiveChatText;
-    public ImageView archiveChatIcon;
+    private LinearLayout mainLinearLayout;
+    private EmojiTextView titleNameContactChatPanel;
+    private ImageView iconStateChatPanel;
+    private TextView titleMailContactChatPanel;
+    private RoundedImageView chatImageView;
+    private EmojiTextView chatInitialLetter;
+    private TextView infoChatText;
+    private LinearLayout optionInfoChat;
+    private LinearLayout optionLeaveChat;
+    private TextView optionLeaveText;
+    private LinearLayout optionClearHistory;
+    private LinearLayout optionMuteChat;
+    private ImageView optionMuteChatIcon;
+    private TextView optionMuteChatText;
+    private LinearLayout optionArchiveChat;
+    private TextView archiveChatText;
+    private ImageView archiveChatIcon;
 
-    boolean notificationsEnabled;
-    ChatItemPreferences chatPrefs;
+    private boolean notificationsEnabled;
+    private ChatItemPreferences chatPrefs;
 
-    DisplayMetrics outMetrics;
+    private DisplayMetrics outMetrics;
 
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-    DatabaseHandler dbH;
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
+    private DatabaseHandler dbH;
 
     private int heightDisplay;
 
@@ -121,6 +129,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
     }
+    @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(final Dialog dialog, int style) {
 
@@ -133,32 +142,34 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         super.setupDialog(dialog, style);
         View contentView = View.inflate(getContext(), R.layout.chat_item_bottom_sheet, null);
 
-        mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.chat_item_bottom_sheet);
-        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
+        mainLinearLayout = contentView.findViewById(R.id.chat_item_bottom_sheet);
+        items_layout = contentView.findViewById(R.id.items_layout);
 
-        iconStateChatPanel = (ImageView) contentView.findViewById(R.id.chat_list_contact_state);
+        iconStateChatPanel = contentView.findViewById(R.id.chat_list_contact_state);
 
         iconStateChatPanel.setMaxWidth(scaleWidthPx(6,outMetrics));
         iconStateChatPanel.setMaxHeight(scaleHeightPx(6,outMetrics));
 
-        titleNameContactChatPanel = (TextView) contentView.findViewById(R.id.chat_list_chat_name_text);
-        titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.chat_list_chat_mail_text);
-        chatImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_chat_list_thumbnail);
-        chatInitialLetter = (TextView) contentView.findViewById(R.id.sliding_chat_list_initial_letter);
-        infoChatText = (TextView) contentView.findViewById(R.id.chat_list_info_chat_text);
-        optionInfoChat = (LinearLayout) contentView.findViewById(R.id.chat_list_info_chat_layout);
-        optionLeaveChat= (LinearLayout) contentView.findViewById(R.id.chat_list_leave_chat_layout);
-        optionLeaveText = (TextView) contentView.findViewById(R.id.chat_list_leave_chat_text);
-        optionClearHistory = (LinearLayout) contentView.findViewById(R.id.chat_list_clear_history_chat_layout);
-        optionMuteChat = (LinearLayout) contentView.findViewById(R.id.chat_list_mute_chat_layout);
-        optionMuteChatIcon = (ImageView) contentView.findViewById(R.id.chat_list_mute_chat_image);
-        optionMuteChatText = (TextView) contentView.findViewById(R.id.chat_list_mute_chat_text);
-        optionArchiveChat = (LinearLayout) contentView.findViewById(R.id.chat_list_archive_chat_layout);
-        archiveChatText = (TextView) contentView.findViewById(R.id.chat_list_archive_chat_text);
-        archiveChatIcon = (ImageView) contentView.findViewById(R.id.file_archive_chat_image);
+        titleNameContactChatPanel = contentView.findViewById(R.id.chat_list_chat_name_text);
+        titleMailContactChatPanel = contentView.findViewById(R.id.chat_list_chat_mail_text);
+        chatImageView = contentView.findViewById(R.id.sliding_chat_list_thumbnail);
+        chatInitialLetter = contentView.findViewById(R.id.sliding_chat_list_initial_letter);
+        chatInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
+        infoChatText = contentView.findViewById(R.id.chat_list_info_chat_text);
+        optionInfoChat = contentView.findViewById(R.id.chat_list_info_chat_layout);
+        optionLeaveChat = contentView.findViewById(R.id.chat_list_leave_chat_layout);
+        optionLeaveText = contentView.findViewById(R.id.chat_list_leave_chat_text);
+        optionClearHistory = contentView.findViewById(R.id.chat_list_clear_history_chat_layout);
+        optionMuteChat = contentView.findViewById(R.id.chat_list_mute_chat_layout);
+        optionMuteChatIcon = contentView.findViewById(R.id.chat_list_mute_chat_image);
+        optionMuteChatText = contentView.findViewById(R.id.chat_list_mute_chat_text);
+        optionArchiveChat = contentView.findViewById(R.id.chat_list_archive_chat_layout);
+        archiveChatText = contentView.findViewById(R.id.chat_list_archive_chat_text);
+        archiveChatIcon = contentView.findViewById(R.id.file_archive_chat_image);
 
-        titleNameContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
-        titleMailContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
+        titleNameContactChatPanel.setMaxWidth(Util.px2dp(MAX_WIDTH, outMetrics));
+        titleNameContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+        titleMailContactChatPanel.setMaxWidth(Util.px2dp(MAX_WIDTH, outMetrics));
 
         optionInfoChat.setOnClickListener(this);
         optionMuteChat.setOnClickListener(this);
@@ -166,7 +177,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         optionClearHistory.setOnClickListener(this);
         optionArchiveChat.setOnClickListener(this);
 
-        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+        LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
 
         titleNameContactChatPanel.setText(chat.getTitle());
 
@@ -401,14 +412,11 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        float density = getResources().getDisplayMetrics().density;
-
         boolean setInitialByMail = false;
 
         if (chat.getTitle() != null) {
             if (chat.getTitle().trim().length() > 0) {
-                String firstLetter = chat.getTitle().charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
                 chatInitialLetter.setText(firstLetter);
                 chatInitialLetter.setTextColor(Color.WHITE);
                 chatInitialLetter.setVisibility(View.VISIBLE);
@@ -430,7 +438,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             }
         }
         chatInitialLetter.setTextSize(22);
-        ////
+
     }
 
     @Override

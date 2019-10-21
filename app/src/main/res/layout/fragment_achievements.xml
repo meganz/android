@@ -559,26 +559,28 @@
                                         android:layout_column="0"/>
 
                                 </RelativeLayout>
-
-
                             </LinearLayout>
 
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:id="@+id/days_left_text_install_app"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentRight="true"
+                                    android:layout_marginRight="12dp"
+                                    android:layout_marginTop="5dp"
+                                    android:singleLine="true"
+                                    android:ellipsize="end"
+                                    android:textSize="14dp"
+                                    android:gravity="right"
+                                    android:textColor="@color/mail_my_account"
+                                    android:layout_column="0"/>
+                            </RelativeLayout>
+
                         </RelativeLayout>
 
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:id="@+id/days_left_text_install_app"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_marginRight="12dp"
-                                android:textSize="14dp"
-                                android:gravity="right"
-                                android:textColor="@color/mail_my_account"
-                                android:layout_column="0"/>
-                        </RelativeLayout>
 
                     </LinearLayout>
 
@@ -695,25 +697,28 @@
 
                                 </RelativeLayout>
 
-
                             </LinearLayout>
-
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:id="@+id/days_left_text_registration"
+                            <RelativeLayout
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_marginRight="12dp"
-                                android:textSize="14dp"
-                                android:gravity="right"
-                                android:textColor="@color/mail_my_account"
-                                android:layout_column="0"/>
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:id="@+id/days_left_text_registration"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentRight="true"
+                                    android:layout_marginRight="12dp"
+                                    android:layout_marginTop="5dp"
+                                    android:singleLine="true"
+                                    android:ellipsize="end"
+                                    android:textSize="14dp"
+                                    android:gravity="right"
+                                    android:textColor="@color/mail_my_account"
+                                    android:layout_column="0"/>
+                            </RelativeLayout>
+
                         </RelativeLayout>
+
+
 
                     </LinearLayout>
 
@@ -838,24 +843,25 @@
 
                                 </RelativeLayout>
 
-
                             </LinearLayout>
-
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:id="@+id/days_left_text_install_desktop"
+                            <RelativeLayout
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_marginRight="12dp"
-                                android:textSize="14dp"
-                                android:gravity="right"
-                                android:textColor="@color/mail_my_account"
-                                android:layout_column="0"/>
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:id="@+id/days_left_text_install_desktop"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentRight="true"
+                                    android:layout_marginRight="12dp"
+                                    android:layout_marginTop="5dp"
+                                    android:singleLine="true"
+                                    android:ellipsize="end"
+                                    android:textSize="14dp"
+                                    android:gravity="right"
+                                    android:textColor="@color/mail_my_account"
+                                    android:layout_column="0"/>
+                            </RelativeLayout>
+
                         </RelativeLayout>
 
                     </LinearLayout>

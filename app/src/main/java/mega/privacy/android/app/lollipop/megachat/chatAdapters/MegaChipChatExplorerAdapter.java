@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,9 +26,13 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
@@ -67,7 +70,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             super(itemView);
         }
 
-        TextView textViewName;
+        EmojiTextView textViewName;
         ImageView deleteIcon;
         RoundedImageView avatar;
         RelativeLayout itemLayout;
@@ -97,14 +100,12 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chip_avatar, parent, false);
 
         holder = new ViewHolderChips(v);
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
-
-        holder.textViewName = (TextView) v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(px2dp(60, outMetrics));
-
-        holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
-
-        holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
+        holder.itemLayout = v.findViewById(R.id.item_layout_chip);
+        holder.textViewName = v.findViewById(R.id.name_chip);
+        holder.textViewName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
+        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
+        holder.avatar = v.findViewById(R.id.rounded_avatar);
+        holder.deleteIcon = v.findViewById(R.id.delete_icon_chip);
         holder.deleteIcon.setOnClickListener(this);
 
         holder.deleteIcon.setTag(holder);
@@ -304,7 +305,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-        String firstLetter = item.getTitle().charAt(0) + "";
+        String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
 
         logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
@@ -312,7 +313,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
         int xPos = (c.getWidth()/2);
         int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-        c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
+        c.drawText(firstLetter, xPos, yPos, paintText);
 
         holder.avatar.setImageBitmap(defaultAvatar);;
     }
@@ -356,10 +357,10 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             radius = defaultAvatar.getHeight()/2;
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-
-        String firstLetter = item.getTitle().charAt(0) + "";
-
-        logDebug("Draw letter: " + firstLetter);
+        String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
+        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            firstLetter = " ";
+        }
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
