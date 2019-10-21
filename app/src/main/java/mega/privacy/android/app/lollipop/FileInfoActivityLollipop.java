@@ -105,6 +105,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -115,7 +116,6 @@ import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-
 
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
@@ -318,6 +318,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     int errorVersionRemove = 0;
 
     private FileContactMultipleRequestListener.RequestCompletedCallback requestCompletedCallback;
+
+    private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
 
     public void activateActionMode(){
         logDebug("activateActionMode");
@@ -3280,11 +3282,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
     public void showOptionsPanel(MegaShare sShare){
         logDebug("showNodeOptionsPanel");
-        if(node!=null){
-            this.selectedShare = sShare;
-            FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-        }
+
+        if (node == null ||sShare == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedShare = sShare;
+        bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
 
