@@ -2548,7 +2548,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             }
             nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
         } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, nC);
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 

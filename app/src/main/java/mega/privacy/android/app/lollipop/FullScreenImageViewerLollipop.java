@@ -2521,7 +2521,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
 			}
         } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, nC);
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 

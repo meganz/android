@@ -1396,9 +1396,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
 				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
 			}
-        }
-		else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode,nC);
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			logDebug("requestCode == REQUEST_CODE_SELECT_FILE");

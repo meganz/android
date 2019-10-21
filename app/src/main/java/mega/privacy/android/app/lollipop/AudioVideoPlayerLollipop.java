@@ -3317,7 +3317,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 }
             }
         } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, nC);
+            onRequestSDCardWritePermission(intent, resultCode, (adapterType == FROM_CHAT), nC);
         }
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");

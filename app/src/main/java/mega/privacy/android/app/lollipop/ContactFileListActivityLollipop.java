@@ -1073,7 +1073,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			}
 			nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
         } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, nC);
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
 			if (!isOnline(this)) {

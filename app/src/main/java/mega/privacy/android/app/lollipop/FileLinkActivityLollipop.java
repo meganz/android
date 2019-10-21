@@ -858,7 +858,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 			NodeController nC = new NodeController(this);
 			nC.downloadTo(document, parentPath, url);
         } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, null);
+            onRequestSDCardWritePermission(intent, resultCode, false, null);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!isOnline(this)) {

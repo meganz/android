@@ -52,11 +52,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
@@ -86,13 +86,35 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.MULTIPLE_CHAT_IMPORT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
+import static mega.privacy.android.app.utils.Util.px2dp;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
-public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
+public class NodeAttachmentHistoryActivity extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
 
 	public static int NUMBER_MESSAGES_TO_LOAD = 20;
 	public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -1295,6 +1317,9 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			chatC.prepareForDownload(intent, parentPath);
 		}
+        if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, true, null);
+        }
 	}
 
 	public void showProgressForwarding(){

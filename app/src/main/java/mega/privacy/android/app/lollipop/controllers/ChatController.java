@@ -1610,65 +1610,68 @@ public class ChatController {
 
         boolean askMe = askMe(context);
         if (askMe){
-            logDebug("askMe");
-            File[] fs = context.getExternalFilesDirs(null);
-            final ArrayList<String> serializedNodes = serializeNodes(nodeList);
-            if (fs.length <= 1 || fs[1] == null) {
-                requestLocalFolder(size, serializedNodes, null);
-            } else {
-                SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context);
-                final long sizeFinal = size;
-                selector.initDialogBuilder(new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0: {
-                                requestLocalFolder(sizeFinal, serializedNodes, null);
-                                break;
-                            }
-                            case 1: {
-                                try {
-                                    SDCardOperator sdCardOperator = new SDCardOperator(context);
-                                    String sdCardRoot = sdCardOperator.getSDCardRoot();
-                                    //don't use DocumentFile
-                                    if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
-                                        requestLocalFolder(sizeFinal, serializedNodes, sdCardRoot);
-                                    } else {
-                                        if (context instanceof DownloadableActivity) {
-                                            ((DownloadableActivity) context).setChatDownloadInfo(new ChatDownloadInfo(sizeFinal, serializedNodes,nodeList));
-                                        }
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                            try {
-                                                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                                                requestLocalFolder(sizeFinal, serializedNodes, sdCardRoot);
-                                            } catch (SDCardOperator.SDCardException e) {
-                                                e.printStackTrace();
-                                                logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
-                                                //request sd card root request and write permission.
-                                                SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
-                                            }
-                                        } else {
-                                            SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
-                                        }
-                                    }
-                                } catch (SDCardOperator.SDCardException e) {
-                                    e.printStackTrace();
-                                    logError("Initialize SDCardOperator failed", e);
-                                    // SD card is unavailable, choose internal folder
-                                    requestLocalFolder(sizeFinal, serializedNodes, null);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                });
-                selector.show();
-            }
+            showDownloadLocationSelector(nodeList, size);
         }
         else{
             logDebug("NOT askMe");
             filePathDefault(downloadLocationDefaultPath,nodeList);
+        }
+    }
+
+    private void showDownloadLocationSelector(final ArrayList<MegaNode> nodeList, final long size) {
+        logDebug("askMe");
+        File[] fs = context.getExternalFilesDirs(null);
+        final ArrayList<String> serializedNodes = serializeNodes(nodeList);
+        if (fs.length <= 1 || fs[1] == null) {
+            requestLocalFolder(size, serializedNodes, null);
+        } else {
+            SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context);
+            selector.initDialogBuilder(new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case 0: {
+                            requestLocalFolder(size, serializedNodes, null);
+                            break;
+                        }
+                        case 1: {
+                            try {
+                                SDCardOperator sdCardOperator = new SDCardOperator(context);
+                                String sdCardRoot = sdCardOperator.getSDCardRoot();
+                                //don't use DocumentFile
+                                if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
+                                    requestLocalFolder(size, serializedNodes, sdCardRoot);
+                                } else {
+                                    if (context instanceof DownloadableActivity) {
+                                        ((DownloadableActivity) context).setChatDownloadInfo(new ChatDownloadInfo(size, serializedNodes,nodeList));
+                                    }
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        try {
+                                            sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                                            requestLocalFolder(size, serializedNodes, sdCardRoot);
+                                        } catch (SDCardOperator.SDCardException e) {
+                                            e.printStackTrace();
+                                            logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
+                                            //request sd card root request and write permission.
+                                            SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
+                                        }
+                                    } else {
+                                        SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
+                                    }
+                                }
+                            } catch (SDCardOperator.SDCardException e) {
+                                e.printStackTrace();
+                                logError("Initialize SDCardOperator failed", e);
+                                // SD card is unavailable, choose internal folder
+                                requestLocalFolder(size, serializedNodes, null);
+                            }
+                            break;
+                        }
+                    }
+                }
+            });
+            selector.show();
         }
     }
 
@@ -1752,7 +1755,7 @@ public class ChatController {
         }
     }
 
-    public void download(String parentPath, ArrayList<MegaNode> nodeList){
+    public void download(String parentPath, final ArrayList<MegaNode> nodeList){
         logDebug("download()");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -2005,7 +2008,7 @@ public class ChatController {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            requestLocalFolder(sizeFinal, serializedNodes, sdCardRoot);
+                            showDownloadLocationSelector(nodeList, sizeFinal);
                         }
                     }, 1500);
                     showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.old_sdcard_unavailable));

@@ -99,13 +99,13 @@ import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
@@ -163,7 +163,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<ArrayList<AndroidMegaChatMessage>> {
+public class ChatActivityLollipop extends DownloadableActivity implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<ArrayList<AndroidMegaChatMessage>> {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -2709,8 +2709,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 logError("TAKE_PHOTO_CODE--->ERROR!");
             }
 
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, true, null);
         }
-        else  if (requestCode == REQUEST_CODE_SEND_LOCATION && resultCode == RESULT_OK) {
+        else if (requestCode == REQUEST_CODE_SEND_LOCATION && resultCode == RESULT_OK) {
             if (intent == null) {
                 return;
             }
@@ -2751,6 +2753,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         } else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            dbH.setStorageDownloadLocation(parentPath);
             chatC.prepareForDownload(intent, parentPath);
         }
         else{

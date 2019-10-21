@@ -839,9 +839,8 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             dbH.setStorageDownloadLocation(parentPath);
 			chatC.prepareForDownload(intent, parentPath);
-		}
-        else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermissionFromChat(intent,resultCode);
+		} else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, true, null);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
@@ -849,7 +848,7 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 			if(!isOnline(this)||megaApi==null) {
 				try{
 					statusDialog.dismiss();
-				} catch(Exception ex) {};
+				} catch(Exception ex) {}
 
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;

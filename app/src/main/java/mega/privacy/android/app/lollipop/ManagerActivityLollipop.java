@@ -12459,7 +12459,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				startService(service);
 			}
         } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, nC);
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			logDebug("requestCode == REQUEST_CODE_SELECT_FILE");
