@@ -188,7 +188,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
                 break;
             }
             case R.id.take_picture_layout:{
-                ((ManagerActivityLollipop) context).fromTakePicture = TAKE_PICTURE_OPTION;
+                ((ManagerActivityLollipop) context).typesCameraPermission = TAKE_PICTURE_OPTION;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
                     if (!hasStoragePermission) {

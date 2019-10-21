@@ -5,12 +5,6 @@
     android:background="@color/white"
     tools:context=".FileBrowserListFragment">
 
-	<include layout="@layout/item_call_in_progress_layout"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:visibility="gone"
-		android:layout_alignParentTop="true" />
-
 	<RelativeLayout
 		android:id="@+id/relative_layout_file_list_browser_camera_upload_on_off"
 		android:layout_width="match_parent"
