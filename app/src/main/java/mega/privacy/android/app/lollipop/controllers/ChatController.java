@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.controllers;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,11 +9,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StatFs;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.Spanned;
 
@@ -27,11 +27,11 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -48,6 +48,10 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
+import mega.privacy.android.app.utils.download.ChatDownloadInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -61,15 +65,40 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
+import static mega.privacy.android.app.utils.ChatUtil.getMegaChatMessage;
+import static mega.privacy.android.app.utils.ChatUtil.isVoiceClip;
+import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.EXTRA_TRANSFER_TYPE;
+import static mega.privacy.android.app.utils.Constants.EXTRA_VOICE_CLIP;
+import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
+import static mega.privacy.android.app.utils.Constants.FROM_OTHERS;
+import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
+import static mega.privacy.android.app.utils.Constants.MULTIPLE_FORWARD_MESSAGES;
+import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FILE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.FileUtils.copyFile;
+import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineParentFile;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.createThumbnailVideo;
+import static mega.privacy.android.app.utils.Util.askMe;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
+import static mega.privacy.android.app.utils.Util.showSnackBar;
+import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatController {
 
@@ -1473,13 +1502,16 @@ public class ChatController {
         }
     }
 
-    void requestLocalFolder (long size, ArrayList<String> serializedNodes) {
+    public void requestLocalFolder (long size, ArrayList<String> serializedNodes,@Nullable String sdRoot) {
         Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
         intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
         intent.setClass(context, FileStorageActivityLollipop.class);
         intent.putStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES, serializedNodes);
+        if (sdRoot != null) {
+            intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT, sdRoot);
+        }
 
         if(context instanceof ChatActivityLollipop){
             ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
@@ -1581,54 +1613,57 @@ public class ChatController {
             logDebug("askMe");
             File[] fs = context.getExternalFilesDirs(null);
             final ArrayList<String> serializedNodes = serializeNodes(nodeList);
-            if (fs.length > 1){
-                if (fs[1] == null){
-                    requestLocalFolder(size, serializedNodes);
-                }
-                else{
-                    Dialog downloadLocationDialog;
-                    String[] sdCardOptions = context.getResources().getStringArray(R.array.settings_storage_download_location_array);
-                    AlertDialog.Builder b=new AlertDialog.Builder(context);
+            if (fs.length <= 1 || fs[1] == null) {
+                requestLocalFolder(size, serializedNodes, null);
+            } else {
+                SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context);
+                final long sizeFinal = size;
+                selector.initDialogBuilder(new DialogInterface.OnClickListener() {
 
-                    b.setTitle(context.getResources().getString(R.string.settings_storage_download_location));
-                    final long sizeFinal = size;
-
-                    b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch(which){
-                                case 0:{
-                                    requestLocalFolder(sizeFinal, serializedNodes);
-                                    break;
-                                }
-                                case 1:{
-                                    File[] fs = context.getExternalFilesDirs(null);
-                                    if (fs.length > 1){
-                                        String path = fs[1].getAbsolutePath();
-                                        File defaultPathF = new File(path);
-                                        defaultPathF.mkdirs();
-                                        showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
-                                        checkSizeBeforeDownload(path, nodeList);
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0: {
+                                requestLocalFolder(sizeFinal, serializedNodes, null);
+                                break;
+                            }
+                            case 1: {
+                                try {
+                                    SDCardOperator sdCardOperator = new SDCardOperator(context);
+                                    String sdCardRoot = sdCardOperator.getSDCardRoot();
+                                    //don't use DocumentFile
+                                    if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
+                                        requestLocalFolder(sizeFinal, serializedNodes, sdCardRoot);
+                                    } else {
+                                        if (context instanceof DownloadableActivity) {
+                                            ((DownloadableActivity) context).setChatDownloadInfo(new ChatDownloadInfo(sizeFinal, serializedNodes,nodeList));
+                                        }
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                            try {
+                                                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                                                requestLocalFolder(sizeFinal, serializedNodes, sdCardRoot);
+                                            } catch (SDCardOperator.SDCardException e) {
+                                                e.printStackTrace();
+                                                logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
+                                                //request sd card root request and write permission.
+                                                SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
+                                            }
+                                        } else {
+                                            SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
+                                        }
                                     }
-                                    break;
+                                } catch (SDCardOperator.SDCardException e) {
+                                    e.printStackTrace();
+                                    logError("Initialize SDCardOperator failed", e);
+                                    // SD card is unavailable, choose internal folder
+                                    requestLocalFolder(sizeFinal, serializedNodes, null);
                                 }
+                                break;
                             }
                         }
-                    });
-                    b.setNegativeButton(context.getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-                    downloadLocationDialog = b.create();
-                    downloadLocationDialog.show();
-                }
-            }
-            else{
-                requestLocalFolder(size, serializedNodes);
+                    }
+                });
+                selector.show();
             }
         }
         else{
@@ -1746,6 +1781,7 @@ public class ChatController {
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             REQUEST_WRITE_STORAGE);
                 }
+                return;
             }
         }
 
@@ -1940,15 +1976,77 @@ public class ChatController {
                 }
             }
 
+            boolean downloadToSDCard = false;
+            String downloadRoot = null;
+            SDCardOperator sdCardOperator = null;
+            long size = 0;
+            for (int i = 0; i < nodeList.size(); i++) {
+                size += nodeList.get(i).getSize();
+            }
+            final long sizeFinal = size;
+            final ArrayList<String> serializedNodes = serializeNodes(nodeList);
+            try {
+                sdCardOperator = new SDCardOperator(context);
+            } catch (SDCardOperator.SDCardException e) {
+                e.printStackTrace();
+                logError("Initialize SDCardOperator failed", e);
+                // user uninstall the sd card. but default download location is still on the sd card
+                if (SDCardOperator.isSDCardPath(parentPath)) {
+                    logDebug("select new path as download location.");
+                    requestLocalFolder(sizeFinal,serializedNodes,null);
+                    return;
+                }
+            }
+            if (sdCardOperator != null && SDCardOperator.isSDCardPath(parentPath)) {
+                final String sdCardRoot = sdCardOperator.getSDCardRoot();
+                //user has installed another sd card.
+                if (sdCardOperator.isNewSDCardPath(parentPath)) {
+                    logDebug("new sd card, check permission.");
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            requestLocalFolder(sizeFinal, serializedNodes, sdCardRoot);
+                        }
+                    }, 1500);
+                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.old_sdcard_unavailable));
+                    return;
+                }
+                if (!sdCardOperator.canWriteWithFile(parentPath)) {
+                    downloadToSDCard = true;
+                    downloadRoot = sdCardOperator.getDownloadRoot();
+                    try {
+                        sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                    } catch (SDCardOperator.SDCardException e) {
+                        e.printStackTrace();
+                        logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
+                        //request SD card write permission.
+                        if (context instanceof DownloadableActivity) {
+                            ((DownloadableActivity) context).setChatDownloadInfo(new ChatDownloadInfo(sizeFinal, serializedNodes,nodeList));
+                        }
+                        SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
+                        return;
+                    }
+                }
+            }
+
             for (int i=0; i<nodeList.size();i++) {
                 MegaNode nodeToDownload = nodeList.get(i);
                 if(nodeToDownload != null){
                     logDebug("Node NOT null is going to donwload");
-                    Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-                    dlFiles.put(nodeToDownload, parentPath);
+                    Map<MegaNode, String> dlFiles = new HashMap<>();
+                    Map<Long, String> targets = new HashMap();
+
+                    if (downloadToSDCard) {
+                        targets.put(nodeToDownload.getHandle(), parentPath);
+                        dlFiles.put(nodeToDownload, downloadRoot);
+                    } else {
+                        dlFiles.put(nodeToDownload, parentPath);
+                    }
 
                     for (MegaNode document : dlFiles.keySet()) {
                         String path = dlFiles.get(document);
+                        String targetPath = targets.get(document.getHandle());
+
                         Intent service = new Intent(context, DownloadService.class);
                         if (context instanceof ChatActivityLollipop) {
                             nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((ChatActivityLollipop) context).getChatRoom());
@@ -1964,14 +2062,15 @@ public class ChatController {
                         }else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                             service.putExtra("fromMV", true);
                         }
-
+                        if (downloadToSDCard) {
+                            service = NodeController.getDownloadToSDCardIntent(service, path, targetPath, dbH.getSDCardUri());
+                        } else {
+                            service.putExtra(DownloadService.EXTRA_PATH, path);
+                        }
                         logDebug("serializeString: " + serializeString);
                         service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
-                        service.putExtra(DownloadService.EXTRA_PATH, path);
                         service.putExtra(HIGH_PRIORITY_TRANSFER, true);
                         context.startService(service);
-
-
                     }
                 }
                 else {

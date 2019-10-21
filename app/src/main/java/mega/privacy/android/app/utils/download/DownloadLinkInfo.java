@@ -1,4 +1,4 @@
-package mega.privacy.android.app.utils;
+package mega.privacy.android.app.utils.download;
 
 import nz.mega.sdk.MegaNode;
 

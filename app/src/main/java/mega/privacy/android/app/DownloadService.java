@@ -1605,17 +1605,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						logDebug("NOT video!");
 					}
 
-					File resultFile = new File(path);
-					File treeParent = resultFile.getParentFile();
-					while(treeParent != null)
-					{
-						treeParent.setReadable(true, false);
-						treeParent.setExecutable(true, false);
-						treeParent = treeParent.getParentFile();
-					}
-					resultFile.setReadable(true, false);
-					resultFile.setExecutable(true, false);
-
 					String filePath = path;
 					File f = new File(filePath);
 					try {
