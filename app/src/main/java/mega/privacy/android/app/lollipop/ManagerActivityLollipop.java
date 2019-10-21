@@ -3665,7 +3665,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage(text);
 
-                    builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                    builder.setPositiveButton(getString(R.string.general_yes),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
@@ -3678,7 +3678,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 									}
                                 }
                             });
-                    builder.setNegativeButton(getString(R.string.general_cancel), null);
+                    builder.setNegativeButton(getString(R.string.general_no), null);
                     final AlertDialog dialog = builder.create();
                     try {
                         dialog.show();

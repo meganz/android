@@ -1513,37 +1513,37 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
 			AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-								
-			
-			builder.setTitle(getString(R.string.section_photo_sync));
-			builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					logDebug("AlertDialog");
-					resetCUTimeStampsAndCache();
+
+
+            builder.setTitle(getString(R.string.section_photo_sync));
+            builder.setSingleChoiceItems(adapter, -1, new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    logDebug("AlertDialog");
+                    resetCUTimeStampsAndCache();
                     dbH.setCamSyncEnabled(true);
-					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+                    dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
                     File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-					String localPath = localFile.getAbsolutePath();
-					dbH.setCamSyncLocalPath(localPath);
-					dbH.setCameraFolderExternalSDCard(false);
+                    String localPath = localFile.getAbsolutePath();
+                    dbH.setCamSyncLocalPath(localPath);
+                    dbH.setCameraFolderExternalSDCard(false);
                     startCU();
-				
-					((ManagerActivityLollipop)context).refreshCameraUpload();
-					switch (which){
-					case 0:{
-						dbH.setCamSyncWifi(true);
-						break;
-					}
-					case 1:{
-						dbH.setCamSyncWifi(false);
-						break;
-					}
-				}
-					dialog.dismiss();
-				}
-			});
+
+                    ((ManagerActivityLollipop) context).refreshCameraUpload();
+                    switch (which) {
+                        case 0: {
+                            dbH.setCamSyncWifi(true);
+                            break;
+                        }
+                        case 1: {
+                            dbH.setCamSyncWifi(false);
+                            break;
+                        }
+                    }
+                    dialog.dismiss();
+                }
+            });
 			
 			builder.setPositiveButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
 				
