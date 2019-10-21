@@ -2944,6 +2944,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     inviteContacts(addedContactsPhone);
                 }
                 else if (contactType == CONTACT_TYPE_MEGA){
+                    if (onlyCreateGroup && addedContactsMEGA.isEmpty()) {
+                        showSnackbar(getString(R.string.error_creating_group_and_attaching_file));
+                        break;
+                    }
+
                     setResultContacts(addedContactsMEGA, true);
                 }
                 else {
