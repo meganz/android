@@ -17,7 +17,6 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -108,85 +107,81 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface {
 
-    public static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
-    private static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
-    public static final String BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT = "INTENT_FILTER_INVITE_CONTACT";
+    private static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
+    public static final String EXTRA_MEGA_CONTACTS = "mega_contacts";
+    public static final String EXTRA_CONTACTS = "extra_contacts";
+    public static final String EXTRA_NODE_HANDLE = "node_handle";
+    public static final String EXTRA_CHAT_TITLE = "chatTitle";
+    public static final String EXTRA_GROUP_CHAT = "groupChat";
+    public static final String EXTRA_EKR = "EKR";
+    public static final String EXTRA_CHAT_LINK = "chatLink";
 
-    DisplayMetrics outMetrics;
-    MegaApplication app;
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-    DatabaseHandler dbH = null;
-    public int contactType = 0;
-    int multipleSelectIntent;
-    long nodeHandle = -1;
-    long[] nodeHandles;
-    Handler handler;
-    long chatId = -1;
+    private DisplayMetrics outMetrics;
+    private MegaApplication app;
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
+    private DatabaseHandler dbH = null;
+    private int contactType = 0;
+    private int multipleSelectIntent;
+    private long nodeHandle = -1;
+    private long[] nodeHandles;
+    private long chatId = -1;
 
-    AddContactActivityLollipop addContactActivityLollipop;
+    private AddContactActivityLollipop addContactActivityLollipop;
 
-    Toolbar tB;
-    ActionBar aB;
+    private Toolbar tB;
+    private ActionBar aB;
 
-    RelativeLayout containerContacts;
-    RecyclerView recyclerViewList;
-    LinearLayoutManager linearLayoutManager;
-    StickyLayoutManager stickyLayoutManager;
-    ImageView emptyImageView;
-    TextView emptyTextView;
-    TextView emptySubTextView;
-    Button emptyInviteButton;
-    ProgressBar progressBar;
-    RecyclerView addedContactsRecyclerView;
-    RelativeLayout containerAddedContactsRecyclerView;
-    LinearLayoutManager mLayoutManager;
-    String inputString  = "";
-    String savedInputString = "";
+    private RelativeLayout containerContacts;
+    private RecyclerView recyclerViewList;
+    private LinearLayoutManager linearLayoutManager;
+    private StickyLayoutManager stickyLayoutManager;
+    private ImageView emptyImageView;
+    private TextView emptyTextView;
+    private TextView emptySubTextView;
+    private Button emptyInviteButton;
+    private ProgressBar progressBar;
+    private RecyclerView addedContactsRecyclerView;
+    private RelativeLayout containerAddedContactsRecyclerView;
+    private LinearLayoutManager mLayoutManager;
+    private String inputString  = "";
+    private String savedInputString = "";
 
 //    Adapter list MEGA contacts
-    MegaContactsLollipopAdapter adapterMEGA;
+    private MegaContactsLollipopAdapter adapterMEGA;
 //    Adapter list chips MEGA contacts
-    MegaAddContactsLollipopAdapter adapterMEGAContacts;
+    private MegaAddContactsLollipopAdapter adapterMEGAContacts;
 
-    ArrayList<MegaUser> contactsMEGA;
-    ArrayList<MegaContactAdapter> visibleContactsMEGA = new ArrayList<>();
-    ArrayList<MegaContactAdapter> filteredContactMEGA = new ArrayList<>();
-    ArrayList<MegaContactAdapter> addedContactsMEGA = new ArrayList<>();
-    ArrayList<MegaContactAdapter> queryContactMEGA = new ArrayList<>();
+    private ArrayList<MegaUser> contactsMEGA;
+    private ArrayList<MegaContactAdapter> visibleContactsMEGA = new ArrayList<>();
+    private ArrayList<MegaContactAdapter> filteredContactMEGA = new ArrayList<>();
+    private ArrayList<MegaContactAdapter> addedContactsMEGA = new ArrayList<>();
+    private ArrayList<MegaContactAdapter> queryContactMEGA = new ArrayList<>();
 
 
 //    Adapter list Phone contacts
-    PhoneContactsLollipopAdapter adapterPhone;
+    private PhoneContactsLollipopAdapter adapterPhone;
 //    Adapter list chips Phone contacts
-    AddContactsLollipopAdapter adapterContacts;
+    private AddContactsLollipopAdapter adapterContacts;
 
-    ArrayList<PhoneContactInfo> phoneContacts = new ArrayList<>();
-    ArrayList<PhoneContactInfo> addedContactsPhone = new ArrayList<>();
-    ArrayList<PhoneContactInfo> filteredContactsPhone = new ArrayList<>();
-    ArrayList<PhoneContactInfo> queryContactsPhone = new ArrayList<>();
+    private ArrayList<PhoneContactInfo> phoneContacts = new ArrayList<>();
+    private ArrayList<PhoneContactInfo> addedContactsPhone = new ArrayList<>();
+    private ArrayList<PhoneContactInfo> filteredContactsPhone = new ArrayList<>();
+    private ArrayList<PhoneContactInfo> queryContactsPhone = new ArrayList<>();
 
 //    Adapter list Share contacts
-    ShareContactsHeaderAdapter adapterShareHeader;
+    private ShareContactsHeaderAdapter adapterShareHeader;
 //    Adapter list chips MEGA/Phone contacts
-    ShareContactsAdapter adapterShare;
+    private ShareContactsAdapter adapterShare;
 
-    ArrayList<ShareContactInfo> addedContactsShare = new ArrayList<>();
-    ArrayList<ShareContactInfo> shareContacts = new ArrayList<>();
-    ArrayList<ShareContactInfo> filteredContactsShare = new ArrayList<>();
-    ArrayList<ShareContactInfo> queryContactsShare = new ArrayList<>();
+    private ArrayList<ShareContactInfo> addedContactsShare = new ArrayList<>();
+    private ArrayList<ShareContactInfo> shareContacts = new ArrayList<>();
+    private ArrayList<ShareContactInfo> filteredContactsShare = new ArrayList<>();
+    private ArrayList<ShareContactInfo> queryContactsShare = new ArrayList<>();
 
-    RelativeLayout relativeLayout;
+    private RelativeLayout relativeLayout;
 
-    ArrayList<String> savedaddedContacts = new ArrayList<>();
-
-    public static String EXTRA_MEGA_CONTACTS = "mega_contacts";
-    public static String EXTRA_CONTACTS = "extra_contacts";
-    public static String EXTRA_NODE_HANDLE = "node_handle";
-    public static String EXTRA_CHAT_TITLE = "chatTitle";
-    public static String EXTRA_GROUP_CHAT = "groupChat";
-    public static String EXTRA_EKR = "EKR";
-    public static String EXTRA_CHAT_LINK = "chatLink";
+    private ArrayList<String> savedaddedContacts = new ArrayList<>();
 
     private MenuItem sendInvitationMenuItem;
     private MenuItem scanQrMenuItem;
@@ -240,7 +235,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private boolean isEKREnabled = false;
     private RelativeLayout getChatLinkLayout;
     private CheckBox getChatLinkBox;
-    LinearLayoutManager newGrouplinearLayoutManager;
+    private LinearLayoutManager newGrouplinearLayoutManager;
     private RecyclerView newGroupRecyclerView;
     private TextView newGroupHeaderList;
     private boolean newGroup = false;
@@ -886,7 +881,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    void setAddedAdapterContacts () {
+    private void setAddedAdapterContacts () {
         if (contactType == CONTACT_TYPE_MEGA) {
             if (adapterMEGAContacts == null){
                 adapterMEGAContacts = new MegaAddContactsLollipopAdapter(addContactActivityLollipop, addedContactsMEGA);
@@ -942,7 +937,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         setSendInvitationVisibility();
     }
 
-    void setPhoneAdapterContacts (ArrayList<PhoneContactInfo> contacts) {
+    private void setPhoneAdapterContacts (ArrayList<PhoneContactInfo> contacts) {
         if(queryPermissions && filteredContactsPhone!=null){
             if (filteredContactsPhone.size() == 0){
                 headerContacts.setVisibility(View.GONE);
@@ -1018,7 +1013,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    void setMegaAdapterContacts (ArrayList<MegaContactAdapter> contacts, int adapter) {
+    private void setMegaAdapterContacts (ArrayList<MegaContactAdapter> contacts, int adapter) {
         if (onNewGroup){
             adapterMEGA = new MegaContactsLollipopAdapter(addContactActivityLollipop, null, contacts, newGroupRecyclerView, adapter);
 
@@ -1064,7 +1059,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    void setShareAdapterContacts (ArrayList<ShareContactInfo> contacts) {
+    private void setShareAdapterContacts (ArrayList<ShareContactInfo> contacts) {
         if (adapterShareHeader == null){
             adapterShareHeader = new ShareContactsHeaderAdapter(addContactActivityLollipop, contacts);
             recyclerViewList.setAdapter(adapterShareHeader);
@@ -1102,7 +1097,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    public final static boolean isValidEmail(CharSequence target) {
+    private final static boolean isValidEmail(CharSequence target) {
         if (target == null) {
             return false;
         } else {
@@ -1111,20 +1106,20 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    public void setSendInvitationVisibility() {
+    private void setSendInvitationVisibility() {
         if (fabButton != null) {
             if (contactType == CONTACT_TYPE_MEGA && !onNewGroup && (createNewGroup || createNewChatLink
                     || (comesFromChat && adapterMEGAContacts != null && adapterMEGAContacts.getItemCount() > 0))){
-                fabButton.setVisibility(View.VISIBLE);
+                fabButton.show();
             }
             else if (contactType == CONTACT_TYPE_DEVICE && adapterContacts != null && adapterContacts.getItemCount() > 0) {
-                fabButton.setVisibility(View.VISIBLE);
+                fabButton.show();
             }
             else if (contactType == CONTACT_TYPE_BOTH && adapterShare != null && adapterShare.getItemCount() > 0){
-                fabButton.setVisibility(View.VISIBLE);
+                fabButton.show();
             }
             else {
-                fabButton.setVisibility(View.GONE);
+                fabButton.hide();
             }
         }
         if (sendInvitationMenuItem != null) {
@@ -1265,7 +1260,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         return super.onCreateOptionsMenu(menu);
     }
 
-    void setSearchVisibility() {
+    private void setSearchVisibility() {
         if (searchMenuItem == null) {
             return;
         }
@@ -1321,7 +1316,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         return super.onOptionsItemSelected(item);
     }
 
-    public void refreshKeyboard() {
+    private void refreshKeyboard() {
 
         String s = typeContactEditText.getText().toString();
         int imeOptions = typeContactEditText.getImeOptions();
@@ -1385,7 +1380,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         saveContactsAdded(outState);
     }
 
-    void saveContactsAdded (Bundle outState) {
+    private void saveContactsAdded (Bundle outState) {
 
         boolean finished = true;
 
@@ -1534,7 +1529,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         dbH = DatabaseHandler.getDbHandler(this);
-        handler = new Handler();
         setContentView(R.layout.activity_add_contact);
 
         tB = (Toolbar) findViewById(R.id.add_contact_toolbar);
@@ -1815,7 +1809,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         setGetChatLinkVisibility();
     }
 
-    void setEmptyStateVisibility (boolean visible) {
+    private void setEmptyStateVisibility (boolean visible) {
         if (visible) {
             emptyImageView.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.VISIBLE);
@@ -1836,7 +1830,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    void setGetChatLinkVisibility () {
+    private void setGetChatLinkVisibility () {
         if (isEKREnabled) {
             getChatLinkLayout.setVisibility(View.GONE);
         } else {
@@ -1844,7 +1838,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    void queryIfHasReadContactsPermissions() {
+    private void queryIfHasReadContactsPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
             if (!hasReadContactsPermission) {
@@ -1943,7 +1937,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         typeContactEditText.setBackground(editTextBackground);
     }
 
-    public void addShareContact (ShareContactInfo contact) {
+    private void addShareContact (ShareContactInfo contact) {
         logDebug("addShareContact");
 
         if (searchExpand && searchMenuItem != null) {
@@ -2005,7 +1999,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         refreshKeyboard();
     }
 
-    public void addContactMEGA (MegaContactAdapter contact) {
+    private void addContactMEGA (MegaContactAdapter contact) {
         logDebug("Contact: " + contact.getFullName());
 
         if (searchExpand && searchMenuItem != null) {
@@ -2052,7 +2046,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         refreshKeyboard();
     }
 
-    public void addContact (PhoneContactInfo contact){
+    private void addContact (PhoneContactInfo contact){
         logDebug("Contact: " + contact.getName()+", Mail: " + contact.getEmail());
 
         if (searchExpand && searchMenuItem != null) {
@@ -2744,7 +2738,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         setSearchVisibility();
     }
 
-    void showConfirmationDeleteFromChat (final MegaContactAdapter contact) {
+    private void showConfirmationDeleteFromChat (final MegaContactAdapter contact) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
 
@@ -2784,7 +2778,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         isConfirmDeleteShown = true;
     }
 
-    public void itemClick(View view, int position) {
+    private void itemClick(View view, int position) {
         logDebug("on item click");
         if (searchExpand) {
             if (searchAutoComplete !=  null) {
@@ -2881,7 +2875,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         return mail;
     }
 
-    public String getMegaContactMail (MegaContactAdapter contact) {
+    private String getMegaContactMail (MegaContactAdapter contact) {
         String mail = null;
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getEmail() != null) {
@@ -2894,7 +2888,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         return mail;
     }
 
-    public long getMegaContactHandle (MegaContactAdapter contact) {
+    private long getMegaContactHandle (MegaContactAdapter contact) {
         long handle = -1;
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
@@ -2960,7 +2954,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    void setNextLayout() {
+    private void setNextLayout() {
         if (visibleContactsMEGA != null && !visibleContactsMEGA.isEmpty()) {
             setSendInvitationVisibility();
             setTitleAB();
@@ -2973,7 +2967,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    void initScanQR() {
+    private void initScanQR() {
         Intent intent = new Intent(this, QRCodeActivity.class);
         intent.putExtra("inviteContacts", true);
         startActivityForResult(intent, SCAN_QR_FOR_ADD_CONTACTS);
@@ -3019,14 +3013,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             returnToAddContacts();
             createMyContact();
-        }
-        else if (createNewGroup && newGroup) {
+        } else if (createNewGroup && (newGroup || onlyCreateGroup)) {
             finish();
-        }
-        else if ((createNewGroup || createNewChatLink) && (!newGroup || !onlyCreateGroup)) {
+        } else if ((createNewGroup || createNewChatLink) && (!newGroup || !onlyCreateGroup)) {
             returnToStartConversation();
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
     }
@@ -3070,7 +3061,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         hideKeyboard(addContactActivityLollipop, 0);
     }
 
-    void addParticipants(ArrayList<String> contacts) {
+    private void addParticipants(ArrayList<String> contacts) {
         Intent intent = new Intent();
         intent.putStringArrayListExtra(EXTRA_CONTACTS, contacts);
 
@@ -3079,7 +3070,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         finish();
     }
 
-    void returnToStartConversation() {
+    private void returnToStartConversation() {
         createNewGroup = false;
         createNewChatLink = false;
         aB.setSubtitle(null);
@@ -3118,7 +3109,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    void createMyContact () {
+    private void createMyContact () {
         if (myContact == null) {
             MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(megaApi.getMyUserHandle() + ""));
             String myFullName =  megaChatApi.getMyFullname();
@@ -3319,7 +3310,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    public void setRecyclersVisibility () {
+    private void setRecyclersVisibility () {
         if (contactType == CONTACT_TYPE_MEGA) {
             if (filteredContactMEGA.size() > 0){
                 containerContacts.setVisibility(View.VISIBLE);
@@ -3351,7 +3342,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    public void visibilityFastScroller(){
+    private void visibilityFastScroller(){
         fastScroller.setRecyclerView(recyclerViewList);
         if (contactType == CONTACT_TYPE_MEGA) {
             if(adapterMEGA == null){
