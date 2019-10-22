@@ -2550,6 +2550,11 @@
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 
+    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">When you logout, files from your Offline section will be deleted from your device.</string>
+    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">When you logout, ongoing transfers will be cancelled.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">When you logout, files from your Offline section will be deleted from your device and ongoing transfers will be cancelled.</string>
+
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
 </resources>

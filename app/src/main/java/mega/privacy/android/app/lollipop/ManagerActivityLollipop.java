@@ -5241,7 +5241,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void selectDrawerItemAccount(){
-		logDebug("selectDrawerItemAccount");
 
 		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
 			megaApi.getFolderInfo(megaApi.getRootNode(), this);
@@ -5249,75 +5248,36 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		switch(accountFragment){
 			case UPGRADE_ACCOUNT_FRAGMENT:{
-				logDebug("Show upgrade FRAGMENT");
 				showUpAF();
 				break;
 			}
 			case MONTHLY_YEARLY_FRAGMENT:{
-				logDebug("Show monthly yearly FRAGMENT");
 				showmyF(selectedPaymentMethod, selectedAccountType);
 				showFabButton();
 				break;
 			}
 			default:{
-				logDebug("Show myAccount Fragment");
 				accountFragment=MY_ACCOUNT_FRAGMENT;
 
 				if (mTabsAdapterMyAccount == null){
-					logWarning("mTabsAdapterMyAccount == null");
-
-					mTabsAdapterMyAccount = new MyAccountPageAdapter(getSupportFragmentManager(),this);
+					mTabsAdapterMyAccount = new MyAccountPageAdapter(getSupportFragmentManager(), this);
 					viewPagerMyAccount.setAdapter(mTabsAdapterMyAccount);
 					tabLayoutMyAccount.setupWithViewPager(viewPagerMyAccount);
-
-					logDebug("The index of the TAB ACCOUNT is: " + indexAccount);
-					if(indexAccount!=-1) {
-						if (viewPagerMyAccount != null) {
-							switch (indexAccount){
-								case GENERAL_TAB:{
-									viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
-									logDebug("General TAB");
-									break;
-								}
-								case STORAGE_TAB:{
-									viewPagerMyAccount.setCurrentItem(STORAGE_TAB);
-									logDebug("Storage TAB");
-									break;
-								}
-								default:{
-									viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
-									logDebug("Default general TAB");
-									break;
-								}
-							}
-						}
-					}
-					else{
-						//No bundle, no change of orientation
-						logDebug("indexAccount is NOT -1");
-					}
-				}
-				else{
-					logDebug("mTabsAdapterMyAccount NOT null");
+				} else{
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-
 					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
+				}
 
-					if(indexAccount!=-1) {
-						logDebug("The index of the TAB MyAccount is: " + indexAccount);
-						if (viewPagerMyAccount != null) {
-							switch (indexAccount) {
-								case STORAGE_TAB: {
-									viewPagerMyAccount.setCurrentItem(STORAGE_TAB);
-									logDebug("Select Storage TAB");
-									break;
-								}
-								default: {
-									viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
-									logDebug("Select General TAB");
-									break;
-								}
-							}
+				if(viewPagerMyAccount != null) {
+					switch (indexAccount){
+						case STORAGE_TAB:{
+							viewPagerMyAccount.setCurrentItem(STORAGE_TAB);
+							break;
+						}
+						default:{
+							indexAccount = GENERAL_TAB;
+							viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
+							updateLogoutWarnings();
 						}
 					}
 				}
@@ -16047,6 +16007,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		logDebug("onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getNodeHandle() + " - " + transfer.getTag());
 
+		if (!existOngoingTransfers(megaApi)) {
+			updateLogoutWarnings();
+		}
+
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
@@ -16164,6 +16128,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setTransfersWidget();
 				}
 			}
+		}
+
+		if (!existOngoingTransfers(megaApi)) {
+			updateLogoutWarnings();
+		}
+	}
+
+	private void updateLogoutWarnings() {
+		if (getMyAccountFragment() != null) {
+			maFLol.checkLogoutWarnings();
 		}
 	}
 
