@@ -231,9 +231,9 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     else {
 //                        Send files
                         if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop) context).sendFilesToChats(chats, null, handles);
+                            ((ManagerActivityLollipop) context).checkIfNodesAreMineBeforeAttach(chats, null, handles);
                         } else if (context instanceof ContactInfoActivityLollipop) {
-                            ((ContactInfoActivityLollipop) context).sendFilesToChat(chats.get(0).getChatId(), handles);
+                            ((ContactInfoActivityLollipop) context).checkIfNodesAreMineBeforeAttach(handles, chats.get(0).getChatId());
                         }
                     }
                 }

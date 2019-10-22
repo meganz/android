@@ -1415,7 +1415,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			MegaChatRoom chatRoomToSend = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chatRoomToSend!=null){
-				sendFilesToChat(chatRoomToSend.getChatId(), fileHandles);
+				checkIfNodesAreMineBeforeAttach(fileHandles, chatRoomToSend.getChatId());
 			}
 			else{
 				//Create first the chat
@@ -1496,8 +1496,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		super.onActivityResult(requestCode, resultCode, intent);
 	}
 
-	public void sendFilesToChat(long chatId, long[] fileHandles) {
-		MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatId, true, fileHandles.length);
+	public void checkIfNodesAreMineBeforeAttach(long[] fileHandles, long chatId) {
+		new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, chatId);
+	}
+
+	public void sendFilesToChat(long[] fileHandles, long chatId) {
+		MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatId, fileHandles.length);
 		for (long fileHandle : fileHandles) {
 			megaChatApi.attachNode(chatId, fileHandle, listener);
 		}
