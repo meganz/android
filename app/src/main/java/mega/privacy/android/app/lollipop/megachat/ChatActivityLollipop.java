@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -156,6 +157,8 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -389,6 +392,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
+
+    private BottomSheetDialogFragment bottomSheetDialogFragment;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -3526,7 +3531,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void showUploadPanel(){
-        AttachmentUploadBottomSheetDialogFragment bottomSheetDialogFragment = new AttachmentUploadBottomSheetDialogFragment();
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        bottomSheetDialogFragment = new AttachmentUploadBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
@@ -6557,56 +6564,58 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void showMsgNotSentPanel(AndroidMegaChatMessage message, int position){
         logDebug("Position: " + position);
 
-        this.selectedPosition = position;
-        this.selectedMessageId = message.getMessage().getRowId();
-        logDebug("Temporal id of MS message: " + message.getMessage().getTempId());
+        selectedPosition = position;
 
-        if(message!=null){
-            MessageNotSentBottomSheetDialogFragment bottomSheetDialogFragment = new MessageNotSentBottomSheetDialogFragment();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-        }
+        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedMessageId = message.getMessage().getRowId();
+        logDebug("Temporal id of MS message: "+message.getMessage().getTempId());
+        bottomSheetDialogFragment = new MessageNotSentBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     public void showNodeAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
-        logDebug("Position: " + position);
-        this.selectedPosition = position;
+        logDebug("showNodeAttachmentBottomSheet: "+position);
+        selectedPosition = position;
 
-        if(message!=null){
-            this.selectedMessageId = message.getMessage().getMsgId();
-//            this.selectedChatItem = chat;
-            NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-        }
+        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedMessageId = message.getMessage().getMsgId();
+
+        bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     public void showSendAttachmentBottomSheet(){
         logDebug("showSendAttachmentBottomSheet");
 
-        SendAttachmentChatBottomSheetDialogFragment bottomSheetDialogFragment = new SendAttachmentChatBottomSheetDialogFragment();
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        bottomSheetDialogFragment = new SendAttachmentChatBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     public void showUploadingAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
-        logDebug("Position: " + position);
-        this.selectedPosition = position;
-        if(message!=null){
-            this.selectedMessageId = message.getPendingMessage().getId();
+        logDebug("showUploadingAttachmentBottomSheet: "+position);
+        selectedPosition = position;
 
-            PendingMessageBottomSheetDialogFragment pendingMsgSheetDialogFragment = new PendingMessageBottomSheetDialogFragment();
-            pendingMsgSheetDialogFragment.show(getSupportFragmentManager(), pendingMsgSheetDialogFragment.getTag());
-        }
+        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedMessageId = message.getPendingMessage().getId();
+
+        bottomSheetDialogFragment = new PendingMessageBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     public void showContactAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
-        logDebug("Position: " + position);
-        this.selectedPosition = position;
+        logDebug("showContactAttachmentBottomSheet: "+position);
+        selectedPosition = position;
 
-        if(message!=null){
-            this.selectedMessageId = message.getMessage().getMsgId();
-//            this.selectedChatItem = chat;
-            ContactAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-        }
+        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedMessageId = message.getMessage().getMsgId();
+        bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     public void removeMsgNotSent(){

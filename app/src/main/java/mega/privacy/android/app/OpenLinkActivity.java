@@ -70,7 +70,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		// File link
 		if (matchRegexs(url, FILE_LINK_REGEXS)) {
-			logDebug("open link url");
+			logDebug("Open link url");
 
 			Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
 			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
