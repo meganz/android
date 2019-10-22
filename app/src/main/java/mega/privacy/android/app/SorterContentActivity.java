@@ -112,14 +112,6 @@ public class SorterContentActivity extends PinActivityLollipop {
                 }
                 case SAVED_FOR_OFFLINE: {
                     order = ((ManagerActivityLollipop) context).getOrderOthers();
-
-                    sortByDateTV.setVisibility(View.GONE);
-                    newestCheck.setVisibility(View.GONE);
-                    oldestCheck.setVisibility(View.GONE);
-                    sortBySizeTV.setVisibility(View.GONE);
-                    largestCheck.setVisibility(View.GONE);
-                    smallestCheck.setVisibility(View.GONE);
-
                     break;
                 }
                 case SHARED_ITEMS: {
