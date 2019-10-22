@@ -1406,19 +1406,23 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
-			long fileHandle = intent.getLongExtra("SELECT", 0);
+			long fileHandles[] = intent.getLongArrayExtra(NODE_HANDLES);
+
+			if (fileHandles == null) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error), -1);
+				return;
+			}
 
 			MegaChatRoom chatRoomToSend = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chatRoomToSend!=null){
-				MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatRoomToSend.getChatId(), false, 1);
-				megaChatApi.attachNode(chatRoomToSend.getChatId(), fileHandle, listener);
+				sendFilesToChat(chatRoomToSend.getChatId(), fileHandles);
 			}
 			else{
 				//Create first the chat
 				ArrayList<MegaChatRoom> chats = new ArrayList<>();
 				ArrayList<MegaUser> usersNoChat = new ArrayList<>();
 				usersNoChat.add(user);
-				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandle, this, CreateChatToPerformActionListener.SEND_FILE);
+				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandles, this, CreateChatToPerformActionListener.SEND_FILES, -1);
 				MegaChatPeerList peers = MegaChatPeerList.createInstance();
 				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 				megaChatApi.createChat(false, peers, listener);
@@ -1490,6 +1494,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         }
 
 		super.onActivityResult(requestCode, resultCode, intent);
+	}
+
+	public void sendFilesToChat(long chatId, long[] fileHandles) {
+		MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatId, true, fileHandles.length);
+		for (long fileHandle : fileHandles) {
+			megaChatApi.attachNode(chatId, fileHandle, listener);
+		}
 	}
 
 	/*

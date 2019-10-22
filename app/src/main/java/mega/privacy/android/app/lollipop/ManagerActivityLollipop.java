@@ -12369,7 +12369,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
 			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+			long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 			long[] userHandles = intent.getLongArrayExtra("USER_HANDLES");
 
 			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
@@ -12483,7 +12483,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
-			long fileHandle = intent.getLongExtra("SELECT", 0);
+			long fileHandles[] = intent.getLongArrayExtra(NODE_HANDLES);
 
 			//Send file to contacts
 			//Check if all contacts have a chat created
@@ -12512,12 +12512,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			if(usersNoChat==null || usersNoChat.isEmpty()){
-				sendFileToChatsFromContacts(this, chats, fileHandle);
-
+				sendFilesToChats(chats, null, fileHandles);
 			}
 			else{
 				//Create first the chats
-				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandle, this, CreateChatToPerformActionListener.SEND_FILE);
+				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandles, this, CreateChatToPerformActionListener.SEND_FILES, -1);
 
 				for(int i=0; i<usersNoChat.size(); i++){
 					MegaChatPeerList peers = MegaChatPeerList.createInstance();

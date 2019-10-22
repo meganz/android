@@ -108,7 +108,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
-
 	public final static int CLOUD_FRAGMENT = 0;
 	public final static int INCOMING_FRAGMENT = 1;
 	public final static int CHAT_FRAGMENT = 3;
@@ -1716,7 +1715,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		logDebug("handles: " + handles.length);
 
         Intent intent = new Intent();
-        intent.putExtra("NODE_HANDLES", handles);
+        intent.putExtra(NODE_HANDLES, handles);
         intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
         setResult(RESULT_OK, intent);
 		finishActivity();

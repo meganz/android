@@ -2625,7 +2625,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 return;
             }
 
-            long handles[] = intent.getLongArrayExtra("NODE_HANDLES");
+            long handles[] = intent.getLongArrayExtra(NODE_HANDLES);
             logDebug("Number of files to send: " + handles.length);
 
             chatC.checkIfNodesAreMineAndAttachNodes(handles, idChat);
