@@ -541,7 +541,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
         if (folderCount > 0 && placeholderCount != 0 && isGrid) {
             //Add placeholder at folders' end.
             for (int i = 0;i < placeholderCount;i++) {
-                safeList.add(folderCount + i,null);
+				try {
+					safeList.add(folderCount + i,null);
+				} catch (IndexOutOfBoundsException e) {
+					logError("Inserting placeholders [nodes.size]: " + safeList.size() + " [folderCount+i]: " + (folderCount + i), e);
+				}
             }
 		}
 		return new ArrayList<>(safeList);

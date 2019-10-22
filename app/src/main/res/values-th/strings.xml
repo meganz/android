@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">เปิดใช้งานบัญชี</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">กำลังเตรียมการรายการไฟล์</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">กรุณาลงชื่อเข้าใช้เพื่อแชร์กับ MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">ลิงก์ยืนยันของคุณใช้ไม่ได้อีกต่อไป บัญชีของคุณอาจถูกเปิดใช้งานหรือคุณอาจยกเลิกการลงทะเบียนแล้ว</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -611,6 +612,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">ยังไม่ได้ดาวน์โหลดตัวอย่าง กรุณารอสักครู่</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">กรุณาออกจากระบบก่อนที่จะสร้างบัญชี</string>
 
@@ -631,7 +633,7 @@
     <string name="menu_take_picture" context="menu item">ถ่ายภาพ</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi เท่านั้น</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลเครือข่ายโทรศัพท์</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลมือถือ</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">ตกลง</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">ข้าม</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">หยุด</string>
@@ -687,7 +689,7 @@
     <string name="settings_empty_folder" context="settings option">เลือกโฟลเดอร์</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลเครือข่ายโทรศัพท์</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลมือถือ</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi เท่านั้น</item>
     </string-array>
 
@@ -2524,4 +2526,6 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">กำลังโหลด</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">กรุณารอสักครู่&#8230;</string>
+
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 </resources>

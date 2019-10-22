@@ -452,7 +452,7 @@ public class AccountController implements View.OnClickListener{
         logDebug("logout");
 
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = MegaApplication.getInstance().getMegaApi();
         }
 
         if (context instanceof ManagerActivityLollipop){
@@ -480,6 +480,9 @@ public class AccountController implements View.OnClickListener{
         logDebug("logoutConfirmed");
 
         localLogoutApp(context);
+
+        //Clear num verions after logout
+        MegaApplication.getInstance().getMyAccountInfo().setNumVersions(-1);
 
         PackageManager m = context.getPackageManager();
         String s = context.getPackageName();

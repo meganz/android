@@ -32,13 +32,12 @@
                 rounded:border_width="0dp"
                 rounded:corner_radius="20dp" />
 
-            <TextView
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/sliding_chat_list_initial_letter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:gravity="center_horizontal|center_vertical"
-                android:paddingBottom="3dp" />
+                android:gravity="center_horizontal|center_vertical" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -47,7 +46,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="16dp">
 
-            <TextView
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/chat_list_chat_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

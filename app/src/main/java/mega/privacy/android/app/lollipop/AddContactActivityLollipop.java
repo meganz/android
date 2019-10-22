@@ -34,6 +34,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
+import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -54,6 +55,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.brandongogetap.stickyheaders.StickyLayoutManager;
@@ -74,6 +76,7 @@ import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.lollipop.adapters.AddContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaAddContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
@@ -107,6 +110,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface {
 
     public static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
+    private static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
     public static final String BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT = "INTENT_FILTER_INVITE_CONTACT";
 
     DisplayMetrics outMetrics;
@@ -210,7 +214,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     private FloatingActionButton fabImageGroup;
     private FloatingActionButton fabButton;
-    private EditText nameGroup;
+    private EmojiEditText nameGroup;
     private boolean onNewGroup = false;
     private boolean isConfirmDeleteShown = false;
     private String confirmDeleteMail;
@@ -1314,6 +1318,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 hideKeyboard(addContactActivityLollipop, 0);
                 break;
             }
+            case R.id.action_invite_contact: {
+                toInviteContact();
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -1603,7 +1611,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         containerAddedContactsRecyclerView = (RelativeLayout) findViewById(R.id.contacts_adds_container);
         containerAddedContactsRecyclerView.setVisibility(View.GONE);
         fabImageGroup = (FloatingActionButton) findViewById(R.id.image_group_floating_button);
-        nameGroup = (EditText) findViewById(R.id.name_group_edittext);
+        nameGroup = findViewById(R.id.name_group_edittext);
+        nameGroup.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+        nameGroup.setFilters(new InputFilter[]{new InputFilter.LengthFilter(MAX_ALLOWED_CHARACTERS_AND_EMOJIS)});
 
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         addedContactsRecyclerView.setLayoutManager(mLayoutManager);
@@ -1664,6 +1674,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
         }
         else {
+            // auto scroll to the bottom to show the invite button
+            final ScrollView scrollView = findViewById(R.id.scroller);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scrollView.fullScroll(View.FOCUS_DOWN);
+                }
+            }, 100);
             emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
         }
         emptyTextView.setText(R.string.contacts_list_empty_text_loading_share);
@@ -2902,6 +2920,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         return handle;
     }
 
+    private void toInviteContact() {
+        Intent in = new Intent(this, AddContactActivityLollipop.class);
+        in.putExtra("contactType", CONTACT_TYPE_DEVICE);
+        startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -2912,10 +2936,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             case R.id.add_contact_list_empty_invite_button:
             case R.id.layout_invite_contact: {
-                logDebug("Invite contact pressed");
-                Intent in = new Intent(this, AddContactActivityLollipop.class);
-                in.putExtra("contactType", CONTACT_TYPE_DEVICE);
-                startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
+                toInviteContact();
                 break;
             }
             case R.id.layout_group_chat: {
@@ -2951,6 +2972,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     void setNextLayout() {
+        inviteContactMenuItem.setVisible(false);
         if (visibleContactsMEGA != null && !visibleContactsMEGA.isEmpty()) {
             setSendInvitationVisibility();
             setTitleAB();
@@ -3046,11 +3068,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         else if (onNewGroup) {
             String chatTitle = "";
-            if(nameGroup!=null && (nameGroup.getText()).length()>0){
+            if (nameGroup != null && nameGroup.getText().length() > 0) {
                 chatTitle = nameGroup.getText().toString();
                 startConversation(contactsSelected, megaContacts, chatTitle);
             }
-            else{
+            else {
                 startConversation(contactsSelected, megaContacts, null);
             }
         }
@@ -3073,7 +3095,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         createNewGroup = false;
         createNewChatLink = false;
         aB.setSubtitle(null);
-        inviteContactButton.setVisibility(View.VISIBLE);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            inviteContactButton.setVisibility(View.VISIBLE);
+        } else {
+            inviteContactMenuItem.setVisible(true);
+        }
         newGroupChatButton.setVisibility(View.VISIBLE);
         newChatLinkButton.setVisibility(View.VISIBLE);
         filteredContactMEGA.clear();
@@ -3151,6 +3177,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if (searchMenuItem != null) {
             searchMenuItem.setVisible(false);
+        }
+        if (inviteContactMenuItem != null) {
+            inviteContactMenuItem.setVisible(false);
         }
         addContactsLayout.setVisibility(View.GONE);
         newGroupLayout.setVisibility(View.VISIBLE);
