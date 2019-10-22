@@ -463,24 +463,18 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 break;
             }
             case R.id.new_group_button: {
-                if(megaApi!=null && megaApi.getRootNode()!=null){
+                if (megaApi != null && megaApi.getRootNode() != null) {
                     ArrayList<MegaUser> contacts = megaApi.getContacts();
-                    if(contacts==null){
+                    if (contacts == null || contacts.isEmpty()) {
                         showSnackbar(getString(R.string.no_contacts_invite));
+                        break;
                     }
-                    else {
-                        if(contacts.isEmpty()){
-                            showSnackbar(getString(R.string.no_contacts_invite));
-                        }
-                        else{
-                            Intent intent = new Intent(this, AddContactActivityLollipop.class);
-                            intent.putExtra("contactType", CONTACT_TYPE_MEGA);
-                            intent.putExtra("onlyCreateGroup", true);
-                            startActivityForResult(intent, REQUEST_CREATE_CHAT);
-                        }
-                    }
-                }
-                else{
+
+                    Intent intent = new Intent(this, AddContactActivityLollipop.class);
+                    intent.putExtra("contactType", CONTACT_TYPE_MEGA);
+                    intent.putExtra("onlyCreateGroup", true);
+                    startActivityForResult(intent, REQUEST_CREATE_CHAT);
+                } else {
                     logWarning("Online but not megaApi");
                     showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 }

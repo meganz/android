@@ -241,6 +241,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -701,6 +702,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private RelativeLayout openLinkError;
 	private TextView openLinkErrorText;
 	private Button openLinkOpenButton;
+
+	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -3665,7 +3668,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage(text);
 
-                    builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                    builder.setPositiveButton(getString(R.string.general_yes),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
@@ -3678,7 +3681,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 									}
                                 }
                             });
-                    builder.setNegativeButton(getString(R.string.general_cancel), null);
+                    builder.setNegativeButton(getString(R.string.general_no), null);
                     final AlertDialog dialog = builder.create();
                     try {
                         dialog.show();
@@ -11468,21 +11471,22 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void showNodeOptionsPanel(MegaNode node){
 		logDebug("showNodeOptionsPanel");
-		this.selectedNode=node;
-		if(node!=null){
-			this.selectedNode = node;
-			NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedNode = node;
+		bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showOptionsPanel(MegaOffline sNode){
 		logDebug("showNodeOptionsPanel-Offline");
-		if(sNode!=null){
-			this.selectedOfflineNode = sNode;
-			OfflineOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new OfflineOptionsBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (sNode == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedOfflineNode = sNode;
+		bottomSheetDialogFragment = new OfflineOptionsBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showContactOptionsPanel(MegaContactAdapter user){
@@ -11493,55 +11497,58 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		if(user!=null){
-			this.selectedUser = user;
-			ContactsBottomSheetDialogFragment bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+		if (user == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedUser = user;
+		bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showSentRequestOptionsPanel(MegaContactRequest request){
 		logDebug("showSentRequestOptionsPanel");
-		if(request!=null){
-			this.selectedRequest = request;
-			SentRequestBottomSheetDialogFragment bottomSheetDialogFragment = new SentRequestBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+		if (request == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedRequest = request;
+		bottomSheetDialogFragment = new SentRequestBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showReceivedRequestOptionsPanel(MegaContactRequest request){
 		logDebug("showReceivedRequestOptionsPanel");
-		if(request!=null){
-			this.selectedRequest = request;
-			ReceivedRequestBottomSheetDialogFragment bottomSheetDialogFragment = new ReceivedRequestBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (request == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedRequest = request;
+		bottomSheetDialogFragment = new ReceivedRequestBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showMyAccountOptionsPanel() {
 		logDebug("showMyAccountOptionsPanel");
-		MyAccountBottomSheetDialogFragment bottomSheetDialogFragment = new MyAccountBottomSheetDialogFragment();
+
+		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		bottomSheetDialogFragment = new MyAccountBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showUploadPanel(){
 		logDebug("showUploadPanel");
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-						REQUEST_READ_WRITE_STORAGE);
-			}else{
-				onGetReadWritePermission();
-			}
-		}else{
-			onGetReadWritePermission();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			ActivityCompat.requestPermissions(this,
+					new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+					REQUEST_READ_WRITE_STORAGE);
+			return;
 		}
+
+		onGetReadWritePermission();
 	}
 
 	private void onGetReadWritePermission(){
-		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
+		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
@@ -16344,11 +16351,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showChatPanel(MegaChatListItem chat){
 		logDebug("showChatPanel");
 
-		if(chat!=null){
-			this.selectedChatItemId = chat.getChatId();
-			ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+		if (chat == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedChatItemId = chat.getChatId();
+		bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	private void showTransfersPanel(){
@@ -16356,7 +16363,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		int pendingTransfers = megaApi.getNumPendingUploads()+megaApi.getNumPendingDownloads();
 
-		if(pendingTransfers>0){
+		if(pendingTransfers>0 && !isBottomSheetDialogShown(transfersBottomSheet)){
 			transfersBottomSheet = new TransfersBottomSheetDialogFragment();
 			transfersBottomSheet.show(getSupportFragmentManager(), transfersBottomSheet.getTag());
 		}
