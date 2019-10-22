@@ -60,7 +60,7 @@ public class ContactController {
         for (int i=0; i<users.size(); i++){
             longArray.add(users.get(i).getEmail());
         }
-        intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
+        intent.putStringArrayListExtra(SELECTED_CONTACTS, longArray);
         ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
     }
 
@@ -73,7 +73,7 @@ public class ContactController {
         for (int i=0; i<users.size(); i++){
             longArray.add(users.get(i).getEmail());
         }
-        intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
+        intent.putStringArrayListExtra(SELECTED_CONTACTS, longArray);
 
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);

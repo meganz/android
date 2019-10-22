@@ -6,6 +6,7 @@ import android.view.View;
 
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
@@ -149,6 +150,14 @@ public class SnackbarNavigateOption implements View.OnClickListener{
             settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             ((ChatFullScreenImageViewer)context).startActivity(settingIntent);
             ((ChatFullScreenImageViewer)context).finish();
+        } else if (context instanceof ContactInfoActivityLollipop) {
+            Intent intent = new Intent(context, ManagerActivityLollipop.class);
+            intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("CHAT_ID", idChat);
+            intent.putExtra("moveToChatSection", true);
+            ((ContactInfoActivityLollipop)context).startActivity(intent);
+            ((ContactInfoActivityLollipop)context).finish();
         }
     }
 }

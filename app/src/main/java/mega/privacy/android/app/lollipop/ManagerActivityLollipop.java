@@ -12482,7 +12482,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				cFLol.clearSelectionsNoAnimations();
 			}
 
-			ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			long fileHandles[] = intent.getLongArrayExtra(NODE_HANDLES);
 
 			//Send file to contacts
@@ -12578,7 +12578,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				return;
 			}
 
-			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
 			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);

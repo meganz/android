@@ -1014,7 +1014,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER_TO_SHARE);
 			ArrayList<String> contacts = new ArrayList<String>();
 			contacts.add(email);
-			intent.putExtra("SELECTED_CONTACTS", contacts);
+			intent.putExtra(SELECTED_CONTACTS, contacts);
 			startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
 		}
 		else{
@@ -1338,7 +1338,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
-			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);

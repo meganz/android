@@ -559,12 +559,12 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		aB.setDisplayShowHomeEnabled(true);
 
 		if ((intent != null) && (intent.getAction() != null)){
+            selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			logDebug("intent OK: " + intent.getAction());
 			if (intent.getAction().equals(ACTION_SELECT_FOLDER_TO_SHARE)){
 				logDebug("action = ACTION_SELECT_FOLDER_TO_SHARE");
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 				mode = SELECT;
-				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(CLOUD_TAB, false, -1);
@@ -576,7 +576,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 				mode = SELECT;
 				selectFile = true;
-				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 1).toUpperCase());
 				setView(CLOUD_TAB, false, -1);
@@ -653,7 +652,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			else if ((intent.getAction().equals(ACTION_SELECT_FOLDER))){
 				logDebug("action = ACTION_SELECT_FOLDER");
 				mode = SELECT;
-				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(SHOW_TABS, false, CHAT_TAB);
@@ -1716,7 +1714,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
         Intent intent = new Intent();
         intent.putExtra(NODE_HANDLES, handles);
-        intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
+        intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
         setResult(RESULT_OK, intent);
 		finishActivity();
     }
@@ -1875,7 +1873,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			{
 				Intent intent = new Intent();
 				intent.putExtra("SELECT", handle);
-				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
+				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
 			}
@@ -1888,7 +1886,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 				Intent intent = new Intent();
 				intent.putExtra("SELECT", parentNode.getHandle());
-				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
+				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
 			}
