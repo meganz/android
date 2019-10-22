@@ -56,6 +56,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -104,6 +105,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	int totalRemoveSelected = 0;
 	int errorRemove = 0;
 	int completedRemove = 0;
+
+	private VersionBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	private class GetVersionsSizeTask extends AsyncTask<String, Void, String> {
 
@@ -419,12 +422,12 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	
 	public void showOptionsPanel(MegaNode sNode, int sPosition){
 		logDebug("showOptionsPanel");
-		if(node!=null){
-			this.selectedNode = sNode;
-			this.selectedPosition = sPosition;
-			VersionBottomSheetDialogFragment bottomSheetDialogFragment = new VersionBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedNode = sNode;
+		selectedPosition = sPosition;
+		bottomSheetDialogFragment = new VersionBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	@Override

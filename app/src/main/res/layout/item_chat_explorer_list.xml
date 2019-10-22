@@ -2,93 +2,118 @@
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chat_explorer_list_item_layout"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:paddingRight="12dp"
+    android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants" >
 
     <RelativeLayout
-        android:id="@+id/chat_explorer_list_relative_layout_avatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginLeft="16dp"
-        android:layout_centerVertical="true">
-
-        <mega.privacy.android.app.components.RoundedImageView
-            android:id="@+id/chat_explorer_list_avatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:scaleType="fitCenter"
-            rounded:border_color="@color/border_file_properties"
-            rounded:border_width="0dp"
-            rounded:corner_radius="30dp" />
-
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="36dp">
         <TextView
-            android:id="@+id/chat_explorer_list_initial_letter"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:textSize="22sp"
-            android:gravity="center_horizontal|center_vertical"
-            android:paddingBottom="3dp" />
+            android:id="@+id/label_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/name_my_account"
+            android:layout_centerVertical="true"
+            android:fontFamily="sans-serif-light"
+            android:textStyle="bold"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"/>
 
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/chat_explorer_list_relative_layout_avatar"
-        android:layout_centerVertical="true">
+        android:id="@+id/item_container"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:paddingRight="12dp">
 
-        <LinearLayout
-            android:id="@+id/chat_explorer_list_title_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+        <RelativeLayout
+            android:id="@+id/chat_explorer_list_relative_layout_avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="16dp"
+            android:layout_centerVertical="true">
+
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/chat_explorer_list_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:scaleType="fitCenter"
+                rounded:border_color="@color/border_file_properties"
+                rounded:border_width="0dp"
+                rounded:corner_radius="30dp" />
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView
-                android:id="@+id/chat_explorer_list_title"
+                android:id="@+id/chat_explorer_list_initial_letter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:textSize="22sp"
+                android:gravity="center_horizontal|center_vertical" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/chat_explorer_list_relative_layout_avatar"
+            android:layout_centerVertical="true">
+
+            <LinearLayout
+                android:id="@+id/chat_explorer_list_title_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:layout_marginLeft="16dp"
                 android:singleLine="true"
-                android:textColor="@color/file_list_first_row" />
+                android:maxLines="1"
+                android:textColor="@color/file_list_first_row">
 
-            <ImageView
-                android:id="@+id/chat_explorer_list_contact_state"
-                android:layout_width="6dp"
-                android:layout_height="6dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="6dp"
-                android:background="@null"
-                android:src="@drawable/circle_status_contact_offline" />
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
+                    android:id="@+id/chat_explorer_list_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:singleLine="true"
+                    android:textColor="@color/file_list_first_row" />
 
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/chat_explorer_list_contact_state"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="6dp"
+                    android:background="@null"
+                    android:src="@drawable/circle_status_contact_offline" />
+            </LinearLayout>
 
-        <mega.privacy.android.app.components.twemoji.EmojiTextView
-            android:id="@+id/chat_explorer_list_participants"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/chat_explorer_list_title_layout"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="2dp"
-            android:textSize="14sp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textColor="@color/file_list_second_row" />
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
+                android:id="@+id/chat_explorer_list_participants"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/chat_explorer_list_title_layout"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="2dp"
+                android:textSize="14sp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/file_list_second_row" />
 
-        <mega.privacy.android.app.components.MarqueeTextView
-            android:id="@+id/chat_explorer_list_last_seen_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/chat_explorer_list_title_layout"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="2dp"
-            android:textSize="14sp"
-            android:singleLine="true"
-            android:textColor="@color/file_list_second_row" />
+            <mega.privacy.android.app.components.MarqueeTextView
+                android:id="@+id/chat_explorer_list_last_seen_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/chat_explorer_list_title_layout"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="2dp"
+                android:textSize="14sp"
+                android:singleLine="true"
+                android:textColor="@color/file_list_second_row" />
 
+        </RelativeLayout>
     </RelativeLayout>
 
 </RelativeLayout>

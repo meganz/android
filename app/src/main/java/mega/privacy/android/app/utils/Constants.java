@@ -95,6 +95,7 @@ public class Constants {
     public static final int FORTUMO_FRAGMENT = 5005;
     public static final int MONTHLY_YEARLY_FRAGMENT = 5006;
     public static final int CENTILI_FRAGMENT = 5007;
+    public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5008;
 
     public static final int PAYMENT_CC_MONTH = 111;
     public static final int PAYMENT_CC_YEAR = 112;
@@ -133,8 +134,8 @@ public class Constants {
 
     public static final int REQUEST_DOWNLOAD_FOLDER = 7;
 
-    public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
     public static final int REQUEST_READ_WRITE_STORAGE = 9;
+
     public static final int REQUEST_CAMERA_UPLOAD = 10;
     public static final int REQUEST_CAMERA_ON_OFF = 11;
     public static final int REQUEST_CAMERA_ON_OFF_FIRST_TIME = 12;
@@ -144,18 +145,19 @@ public class Constants {
     public static final int REQUEST_STORAGE_VOICE_CLIP = 12;
     public static final int REQUEST_CAMERA_TAKE_PICTURE = 13;
     public static final int REQUEST_WRITE_STORAGE_TAKE_PICTURE = 14;
+
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
+    public static final int REQUEST_WRITE_STORAGE_OFFLINE = 16;
 
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
     public static final int TYPE_ERROR_RECORD = 3;
-
-    public static final int PRO_LITE = 4;
-
+    
     public static final int FREE = 0;
     public static final int PRO_I = 1;
     public static final int PRO_II = 2;
     public static final int PRO_III = 3;
+    public static final int PRO_LITE = 4;
 
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
@@ -231,6 +233,8 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
     public static final String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
     public static final String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
+    public static final String BROADCAST_ACTION_INTENT_UPDATE_ORDER = "INTENT_UPDATE_ORDER";
+    public static final String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
@@ -256,6 +260,7 @@ public class Constants {
     public static final int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
     public static final int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
     public static final int GENERAL_OTHERS_ADAPTER = 2023;
+    public static final int RECENTS_ADAPTER = 2024;
 
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -366,6 +371,9 @@ public class Constants {
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
 
+    public static final int HEADER_VIEW_TYPE = 0;
+    public static final int ITEM_VIEW_TYPE = 1;
+
     public static final int FILE_LINK = 200;
     public static final int FOLDER_LINK = 201;
     public static final int CHAT_LINK = 202;
@@ -378,8 +386,25 @@ public class Constants {
     public static final String CHAT_ID_IN_PROGRESS = "chatHandleInProgress";
     public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
     public static final String SECOND_CALL = "SECOND_CALL";
+    public static final String PEER_ID = "peerId";
+    public static final String CLIENT_ID = "clientId";
 
-	public static final String[] FILE_LINK_REGEXS = {
+
+    public static final String NODE_HANDLES = "NODE_HANDLES";
+    public static final String HANDLE = "handle";
+
+    public static final int EMOJI_SIZE_EXTRA_SMALL = 10;
+    public static final int EMOJI_SIZE_SMALL = 15;
+    public static final int EMOJI_SIZE = 20;
+    public static final int EMOJI_SIZE_MEDIUM = 25;
+    public static final int EMOJI_AVATAR_SIZE = 30;
+    public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
+    public static final int EMOJI_AVATAR_CALL_SMALL = 40;
+    public static final int EMOJI_AVATAR_CALL_HIGH = 60;
+    public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
+
+
+    public static final String[] FILE_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#!.+$",
 			"^https://mega\\.nz/#!.+$"
 	};

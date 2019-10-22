@@ -49,48 +49,6 @@
 			</LinearLayout>
 		</RelativeLayout>
 	</RelativeLayout>
-
-
-
-	<!--
-          <Button
-               android:id="@+id/file_list_browser_camera_upload_on_off"
-               android:layout_gravity="center"
-               android:layout_height="48dp"
-               android:layout_width="fill_parent"
-               android:layout_alignParentBottom="true"
-               android:background="@drawable/btn_default_holo_light_without_corners"
-               android:textColor="@color/white"
-               android:text="@string/settings_camera_upload_on"
-               android:visibility="gone"
-               android:layout_below="@id/buttons_layout">
-        </Button>
-
-         <Button
-               android:id="@+id/file_explorer_button"
-               android:layout_gravity="center"
-               android:layout_height="55dp"
-               android:layout_width="fill_parent"
-               android:layout_alignParentBottom="true"
-               android:background="@drawable/btn_default_holo_light_without_corners"
-               android:textColor="@color/white"
-               android:visibility="gone"
-               android:layout_below="@id/buttons_layout">
-        </Button>
-
-          <Button
-             android:id="@+id/file_explorer_button"
-            android:layout_width="@dimen/fab_button_diameter"
-            android:layout_height="@dimen/fab_button_diameter"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/fab_button_margin_bottom"
-            android:layout_marginRight="@dimen/fab_button_margin_right"
-            android:background="@drawable/ripple"
-            android:text="+"
-            android:tint="@android:color/white"
-            android:elevation="@dimen/elevation_low"
-            android:stateListAnimator="@anim/button_elevation"/>-->
       
     <LinearLayout
         android:id="@+id/options_explorer_layout"
@@ -128,14 +86,38 @@
 	 android:layout_height="1dip"
 	 android:layout_above="@id/options_explorer_layout"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/file_list_view_browser"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" 
-        android:clipToPadding="false"
-        android:choiceMode="multipleChoice"
-        android:layout_below="@id/content_text"
-        android:layout_above="@id/separator" />
-    
-    
+	<RelativeLayout
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_below="@id/content_text"
+		android:layout_above="@id/separator">
+
+		<android.support.v7.widget.RecyclerView
+			android:id="@+id/file_list_view_browser"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:clipToPadding="false"
+			android:choiceMode="multipleChoice" />
+
+		<mega.privacy.android.app.components.NewGridRecyclerView
+			android:id="@+id/file_grid_view_browser"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_centerHorizontal="true"
+			android:layout_centerInParent="true"
+			android:choiceMode="multipleChoice"
+			android:columnWidth ="172dp"
+			android:paddingRight="4dp"
+			android:paddingLeft="4dp"/>
+
+		<mega.privacy.android.app.components.scrollBar.FastScroller
+			android:id="@+id/fastscroll"
+			android:orientation="vertical"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_alignParentRight="true"
+			android:gravity="right"/>
+
+	</RelativeLayout>
+
 </RelativeLayout>

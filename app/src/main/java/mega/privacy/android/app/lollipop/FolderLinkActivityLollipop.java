@@ -89,6 +89,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -166,6 +167,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 	String downloadLocationDefaultPath;
 	public static final int FOLDER_LINK = 2;
+
+	private FolderLinkBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	public void activateActionMode(){
 		logDebug("activateActionMode");
@@ -2184,11 +2187,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 	public void showOptionsPanel(MegaNode sNode){
 		logDebug("showNodeOptionsPanel-Offline");
-		if(sNode!=null){
-			this.selectedNode = sNode;
-			FolderLinkBottomSheetDialogFragment bottomSheetDialogFragment = new FolderLinkBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (sNode == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedNode = sNode;
+		bottomSheetDialogFragment = new FolderLinkBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showSnackbar(int type, String s){

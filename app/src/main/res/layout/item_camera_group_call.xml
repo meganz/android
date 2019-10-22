@@ -1,6 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/tools"
     android:id="@+id/general"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -84,7 +83,7 @@
                 rounded:border_width="3dp"
                 rounded:corner_radius="60dp" />
 
-            <TextView
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/avatar_initial_letter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
