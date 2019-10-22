@@ -144,7 +144,9 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:fontFamily="sans-serif"
-            android:textStyle="normal"/>
+            android:textStyle="normal"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="15dp"/>
 
         <CheckedTextView
             android:id="@+id/sortby_dialog_photo_check"
@@ -157,6 +159,7 @@
             android:fontFamily="sans-serif"
             android:textColor="@color/name_my_account"
             android:theme="@style/ColorControlStyle"
+            android:textSize="16sp"
             android:drawablePadding="34dp"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="10dp"/>
@@ -173,6 +176,7 @@
             android:textColor="@color/name_my_account"
             android:layout_marginBottom="22dp"
             android:theme="@style/ColorControlStyle"
+            android:textSize="16sp"
             android:drawablePadding="34dp"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="10dp"/>
