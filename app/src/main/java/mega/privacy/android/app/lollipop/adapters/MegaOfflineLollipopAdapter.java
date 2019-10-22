@@ -52,8 +52,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener, RotatableAdapter {
 
-	private final int LARGE_IMAGE_WIDTH = 48;
-	private final int SHORT_IMAGE_WIDTH = 36;
+	private static final int LARGE_IMAGE_WIDTH = 48;
+	private static final int SHORT_IMAGE_WIDTH = 36;
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	
@@ -721,9 +721,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
 	private void checkThumbnail(MegaOffline currentNode, File currentFile, ViewHolderOffline holder) {
+		MimeTypeList fileType = MimeTypeList.typeForName(currentNode.getName());
+
 		if (!currentFile.exists()
-				|| (!MimeTypeList.typeForName(currentNode.getName()).isImage() && !MimeTypeList.typeForName(currentNode.getName()).isPdf()
-				&& !MimeTypeList.typeForName(currentNode.getName()).isVideo() && !MimeTypeList.typeForName(currentNode.getName()).isAudio())) {
+				|| (!fileType.isImage() && !fileType.isPdf()
+				&& !fileType.isVideo() && !fileType.isAudio())) {
 			return;
 		}
 
