@@ -693,13 +693,35 @@ public class OfflineUtils {
         Comparator<MegaOffline> nameComparator = new Comparator<MegaOffline>() {
             @Override
             public int compare(MegaOffline o1, MegaOffline o2) {
-                String name1 = o1.getName();
-                String name2 = o2.getName();
-                if (name1.length() > name2.length()) {
-                    return 1;
-                } else if (name1.length() < name2.length()) {
-                    return -1;
-                } else return name1.compareTo(name2);
+                String name1 = o1.getNameWithoutExtension();
+                String name2 = o2.getNameWithoutExtension();
+                try {
+                    int pureInteger1 = Integer.parseInt(name1);
+                    int pureInteger2 = Integer.parseInt(name2);
+                    return pureInteger1 - pureInteger2;
+                } catch (Exception ex) {
+                    logError("Exception happens" + ex.toString());
+                }
+                int n1 = name1.length(), n2 = name2.length();
+                int n = n1 < n2 ? n1 : n2;
+                for (int i = 0;
+                     i < n;
+                     i++) {
+                    char c1 = name1.charAt(i);
+                    char c2 = name2.charAt(i);
+                    if (c1 != c2) {
+                        if (c1 >= 'A' && c1 <= 'Z') { //Fast lower case
+                            c1 = (char) (c1 | 0x20);
+                        }
+                        if (c2 >= 'A' && c2 <= 'Z') {
+                            c2 = (char) (c2 | 0x20);
+                        }
+                        if (c1 != c2) {
+                            return c1 - c2;
+                        }
+                    }
+                }
+                return n1 - n2;
             }
         };
 
@@ -725,7 +747,7 @@ public class OfflineUtils {
             }
         }
 
-        Collections.sort(foldersOrder, comparator);
+        Collections.sort(foldersOrder, nameComparator);
 
         Collections.sort(filesOrder, comparator);
 
@@ -744,7 +766,9 @@ public class OfflineUtils {
 
 
         if (isDescending) {
-            Collections.reverse(foldersOrder);
+            if (order == ORDER_DEFAULT_DESC) {
+                Collections.reverse(foldersOrder);
+            }
             Collections.reverse(filesOrder);
         }
 

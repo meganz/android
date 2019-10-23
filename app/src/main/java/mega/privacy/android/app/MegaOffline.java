@@ -68,6 +68,15 @@ public class MegaOffline {
 		return name;
 	}
 
+	public String getNameWithoutExtension() {
+		int index = name.lastIndexOf(".");
+		if ((index != -1) && ((index + 1) < name.length())) {
+			return name.substring(0, name.indexOf("."));
+		} else {
+			return "";
+		}
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
