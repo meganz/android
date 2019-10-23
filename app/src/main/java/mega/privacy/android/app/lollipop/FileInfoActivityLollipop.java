@@ -1454,8 +1454,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			sharedLayout.setVisibility(View.GONE);
 			dividerSharedLayout.setVisibility(View.GONE);
 			sizeTitleTextView.setText(getString(R.string.file_properties_info_size_file));
-
-			sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
+			sizeTextView.setText(getSizeString(node.getSize()));
 
 			contentLayout.setVisibility(View.GONE);
 
@@ -1537,7 +1536,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			contentTextView.setText(getInfoFolder(node, this));
 
 			long sizeFile=megaApi.getSize(node);
-			sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));
+			sizeTextView.setText(getSizeString(sizeFile));
 
 			iconToolbarView.setImageResource(imageId);
 
@@ -2410,8 +2409,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     }
                     else {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.version_history_deleted_erroneously)
-                                + getResources().getQuantityString(R.plurals.versions_deleted_succesfully, versionsRemoved)
-                                + getResources().getQuantityString(R.plurals.versions_not_deleted, errorVersionRemove), -1);
+                                + "\n" + getResources().getQuantityString(R.plurals.versions_deleted_succesfully, versionsRemoved, versionsRemoved)
+                                + "\n" + getResources().getQuantityString(R.plurals.versions_not_deleted, errorVersionRemove, errorVersionRemove), -1);
                     }
                     versionsToRemove = 0;
                     versionsRemoved = 0;
@@ -2946,7 +2945,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		if (node.isFolder()){
 			long sizeFile=megaApi.getSize(node);
-			sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));
+			sizeTextView.setText(getSizeString(sizeFile));
 
 			contentTextView.setText(getInfoFolder(node, this));
 
@@ -3006,7 +3005,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		}
 		else{
 
-			sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
+			sizeTextView.setText(getSizeString(node.getSize()));
 		}
 
 		if (node.getCreationTime() != 0){
@@ -3054,15 +3053,15 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     		megaApi.removeRequestListener(this);
     	}
 
-        upArrow.setColorFilter(null);
-        drawableRemoveLink.setColorFilter(null);
-        drawableLink.setColorFilter(null);
-        drawableShare.setColorFilter(null);
-        drawableDots.setColorFilter(null);
-        drawableDownload.setColorFilter(null);
-        drawableLeave.setColorFilter(null);
-        drawableCopy.setColorFilter(null);
-        drawableChat.setColorFilter(null);
+    	if (upArrow != null) upArrow.setColorFilter(null);
+    	if (drawableRemoveLink != null) drawableRemoveLink.setColorFilter(null);
+        if (drawableLink != null) drawableLink.setColorFilter(null);
+        if (drawableShare != null) drawableShare.setColorFilter(null);
+        if (drawableDots != null) drawableDots.setColorFilter(null);
+        if (drawableDownload != null) drawableDownload.setColorFilter(null);
+        if (drawableLeave != null) drawableLeave.setColorFilter(null);
+        if (drawableCopy != null) drawableCopy.setColorFilter(null);
+        if (drawableChat != null) drawableChat.setColorFilter(null);
     }
 
 	@Override

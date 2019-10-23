@@ -40,6 +40,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.VersionBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -100,6 +101,10 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	Handler handler;
 	DisplayMetrics outMetrics;
+
+	int totalRemoveSelected = 0;
+	int errorRemove = 0;
+	int completedRemove = 0;
 
 	private VersionBottomSheetDialogFragment bottomSheetDialogFragment;
 
@@ -171,11 +176,28 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 					break;
 				}
 				case R.id.action_download_versions:{
-
+					if (nodes.size() == 1) {
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(0).getHandle());
+						NodeController nC = new NodeController(versionsFileActivity);
+						nC.prepareForDownload(handleList, false);
+						showSnackbar(getString(R.string.download_began));
+						clearSelections();
+						actionMode.invalidate();
+					}
 					break;
 				}
 				case R.id.action_delete_versions:{
 					showConfirmationRemoveVersions(nodes);
+					break;
+				}
+				case R.id.action_revert_version:{
+					if (nodes.size() == 1) {
+						selectedNode = nodes.get(0);
+						revertVersion();
+						clearSelections();
+						actionMode.invalidate();
+					}
 					break;
 				}
 			}
@@ -207,8 +229,9 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			logDebug("onPrepareActionMode");
 			List<MegaNode> selected = adapter.getSelectedNodes();
 
-			if (selected.size() != 0) {
+			menu.findItem(R.id.action_revert_version).setIcon(mutateIconSecondary(versionsFileActivity, R.drawable.ic_restore_black_24dp, R.color.white));
 
+			if (selected.size() != 0) {
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -220,7 +243,16 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 				}
-				menu.findItem(R.id.action_download_versions).setVisible(false);
+
+				if (selected.size() == 1) {
+					menu.findItem(R.id.action_revert_version).setVisible(true);
+					menu.findItem(R.id.action_download_versions).setVisible(true);
+				}
+				else {
+					menu.findItem(R.id.action_revert_version).setVisible(false);
+					menu.findItem(R.id.action_download_versions).setVisible(false);
+				}
+
 				menu.findItem(R.id.action_delete_versions).setVisible(true);
 			}
 			else{
@@ -228,6 +260,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 				menu.findItem(R.id.action_download_versions).setVisible(false);
 				menu.findItem(R.id.action_delete_versions).setVisible(false);
+				menu.findItem(R.id.action_revert_version).setVisible(false);
 			}
 			
 			return false;
@@ -527,21 +560,44 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		logDebug("onRequestFinish: " + request.getType());
 		logDebug("onRequestFinish: " + request.getRequestString());
-		if(adapter!=null){
-			if(adapter.isMultipleSelect()){
-				adapter.clearSelections();
-				hideMultipleSelect();
-			}
+		if(adapter!=null && adapter.isMultipleSelect()){
+			adapter.clearSelections();
+			hideMultipleSelect();
 		}
 
-//		if (request.getType() == MegaRequest.TYPE_REMOVE) {
-//			log(" MegaRequest.TYPE_REMOVE");
-//			adapter.notifyDataSetChanged();
-//		}
-//		else if(request.getType() == MegaRequest.TYPE_RESTORE){
-//			log(" MegaRequest.TYPE_RESTORE");
-//			adapter.notifyDataSetChanged();
-//		}
+		if (request.getType() == MegaRequest.TYPE_REMOVE) {
+			logDebug("MegaRequest.TYPE_REMOVE");
+			totalRemoveSelected --;
+			if (e.getErrorCode() == MegaError.API_OK) {
+				completedRemove++;
+				checkScroll();
+			}
+			else {
+				errorRemove++;
+			}
+
+			if (totalRemoveSelected == 0) {
+				if (completedRemove > 0 && errorRemove == 0) {
+					showSnackbar(getResources().getQuantityString(R.plurals.versions_deleted_succesfully, completedRemove, completedRemove));
+				}
+				else if (completedRemove > 0 && errorRemove > 0) {
+					showSnackbar(getResources().getQuantityString(R.plurals.versions_deleted_succesfully, completedRemove, completedRemove) +"\n"
+							+ getResources().getQuantityString(R.plurals.versions_not_deleted, errorRemove, errorRemove));
+				}
+				else {
+					showSnackbar(getResources().getQuantityString(R.plurals.versions_not_deleted, errorRemove, errorRemove));
+				}
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_RESTORE){
+			logDebug("MegaRequest.TYPE_RESTORE");
+			if (e.getErrorCode() == MegaError.API_OK) {
+				showSnackbar(getString(R.string.version_restored));
+			}
+			else {
+				showSnackbar(getString(R.string.general_text_error));
+			}
+		}
 	}
 
 
@@ -856,6 +912,10 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	public void removeVersions(List<MegaNode> removeNodes){
 		logDebug("removeVersion");
+		totalRemoveSelected = removeNodes.size();
+		errorRemove = 0;
+		completedRemove = 0;
+
 		for(int i=0; i<removeNodes.size();i++){
 			megaApi.removeVersion(removeNodes.get(i), this);
 		}
