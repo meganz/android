@@ -584,7 +584,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                     String title = getString(R.string.cam_sync_syncing);
                     String text = getString(R.string.cam_sync_cancel_sync);
                     AlertDialog.Builder builder = getCustomAlertBuilder(this, title, text, null);
-                    builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                    builder.setPositiveButton(getString(R.string.general_yes),
                             new DialogInterface.OnClickListener() {
 
                                 @Override
@@ -593,7 +593,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                                     dbH.setCamSyncEnabled(false);
                                 }
                             });
-                    builder.setNegativeButton(getString(R.string.general_cancel), null);
+                    builder.setNegativeButton(getString(R.string.general_no), null);
                     final AlertDialog dialog = builder.create();
                     try {
                         dialog.show();

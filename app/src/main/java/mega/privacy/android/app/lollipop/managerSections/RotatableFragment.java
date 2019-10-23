@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 
@@ -38,7 +39,7 @@ public abstract class RotatableFragment extends Fragment {
             if (selectedItems != null && selectedItems.size() > 0) {
                 activateActionMode();
                 for (int selectedItem : selectedItems) {
-                    if (((ManagerActivityLollipop) getActivity()).isList) {
+                    if (isList()) {
                         logDebug("selectedItem:" + selectedItem);
                         multipleItemClick(selectedItem);
                     } else {
@@ -54,6 +55,16 @@ public abstract class RotatableFragment extends Fragment {
             }
             updateActionModeTitle();
         }
+    }
+
+    private boolean isList() {
+        if (getActivity() instanceof ManagerActivityLollipop) {
+            return ((ManagerActivityLollipop) getActivity()).isList();
+        } else if (getActivity() instanceof FileExplorerActivityLollipop) {
+            return ((FileExplorerActivityLollipop) getActivity()).isList();
+        }
+
+        return false;
     }
 
     @Override

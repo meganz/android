@@ -32,7 +32,6 @@
                 tools:context=".lollipop.megachat.ChatActivityLollipop">
 
                 <LinearLayout
-                    android:id="@+id/toolbar_elements"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|left"
@@ -42,37 +41,37 @@
                         android:id="@+id/toolbar_elements_inside"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical|left"
-                        android:gravity="center_vertical|left">
+                        android:gravity="center_vertical|left"
+                        android:layout_gravity="center_vertical|left">
 
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/title_toolbar"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="left"
-                            android:layout_toLeftOf="@+id/icons_layout"
-                            android:ellipsize="end"
                             android:fontFamily="sans-serif-light"
                             android:gravity="center_vertical|left"
-                            android:maxLines="1"
-                            android:textColor="@color/white"
                             android:textSize="20sp"
-                            android:textStyle="bold" />
-
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:singleLine="true"
+                            android:maxLines="1"
+                            android:layout_alignParentLeft="true"
+                            android:ellipsize="end"/>
                         <LinearLayout
                             android:id="@+id/icons_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentRight="true"
-                            android:orientation="horizontal">
-
+                            android:layout_toRightOf="@+id/title_toolbar"
+                            android:orientation="horizontal"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center_vertical">
                             <ImageView
                                 android:id="@+id/state_icon_toolbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="3dp"
-                                android:layout_marginTop="7dp"
+                                android:layout_marginTop="2dp"
                                 android:layout_marginRight="1.5dp"
                                 android:background="@null"
                                 android:visibility="gone" />
@@ -103,7 +102,7 @@
                         android:textSize="12sp"
                         android:visibility="gone" />
 
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/groupal_subtitle_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -159,9 +158,7 @@
 
             </android.support.v7.widget.Toolbar>
 
-            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
+            <RelativeLayout
                 android:id="@+id/writing_container_layout_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -225,6 +222,7 @@
                                 android:maxLines="1"
                                 android:textColor="@color/black"
                                 android:textSize="14sp" />
+
                         </RelativeLayout>
                     </RelativeLayout>
 
@@ -323,7 +321,7 @@
                 </LinearLayout>
             </RelativeLayout>
 
-            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <RelativeLayout
                 android:id="@+id/join_chat_layout_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="96dp"
@@ -361,35 +359,38 @@
                 android:id="@+id/message_container_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_above="@id/writing_container_layout_chat_layout"
                 android:layout_below="@id/toolbar_chat"
+                android:layout_above="@id/writing_container_layout_chat_layout"
                 android:background="@color/background_chat"
                 android:orientation="vertical">
 
                 <!--Empty messages -->
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/empty_messages_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/background_chat"
-                    android:orientation="vertical">
+                    android:background="@color/background_chat">
 
                     <ImageView
                         android:id="@+id/empty_image_view_chat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:background="@null"
                         android:layout_gravity="center_horizontal" />
 
                     <TextView
                         android:id="@+id/empty_text_chat_recent"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:layout_below="@id/empty_image_view_chat"
+                        android:layout_centerInParent="true"
                         android:layout_gravity="center_horizontal"
-                        android:gravity="center"
                         android:text="@string/chat_loading_messages"
                         android:textColor="@color/adapters_background"
                         android:textSize="18sp" />
-                </LinearLayout>
+                </RelativeLayout>
 
                 <!-- Layout with chat content -->
                 <RelativeLayout
@@ -509,12 +510,11 @@
             <include
                 layout="@layout/item_call_in_progress_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/toolbar_chat" />
+                android:layout_height="48dp"
+                android:layout_below="@id/toolbar_chat"/>
 
-            <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
+
+            <FrameLayout
                 android:id="@+id/fragment_voice_clip"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
