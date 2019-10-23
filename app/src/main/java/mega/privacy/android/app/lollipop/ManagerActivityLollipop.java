@@ -649,8 +649,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private MenuItem scanQRcodeMenuItem;
 	private MenuItem rubbishBinMenuItem;
 
-
-	public int typesCameraPermission = -1;
+	private int typesCameraPermission = -1;
 	AlertDialog enable2FADialog;
 	boolean isEnable2FADialogShown = false;
 	Button enable2FAButton;
@@ -1561,9 +1560,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		logDebug("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
+		logDebug("request Code "+requestCode);
+
+		switch(requestCode){
 			case REQUEST_READ_CONTACTS:{
-				logDebug("REQUEST_READ_CONTACTS");
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 					if (checkPermission(Manifest.permission.READ_CONTACTS)){
 						Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
@@ -1577,8 +1577,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 	        case REQUEST_CAMERA:{
-				logDebug("REQUEST_CAMERA PERMISSIONS");
-
 				if (typesCameraPermission == TAKE_PICTURE_OPTION) {
 					logDebug("TAKE_PICTURE_OPTION");
 		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -1616,14 +1614,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        	break;
 	        }
 			case REQUEST_READ_WRITE_STORAGE:{
-				logDebug("REQUEST_READ_WRITE_STORAGE");
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 					onGetReadWritePermission();
 				}
 				break;
 			}
 	        case REQUEST_WRITE_STORAGE:{
-				logDebug("REQUEST_WRITE_STORAGE PERMISSIONS");
 	        	if (firstLogin){
 					logDebug("The first time");
 	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -1654,9 +1650,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 								typesCameraPermission = -1;
 							}
 						}
-						else{
-							logWarning("No option typesCameraPermission: " + typesCameraPermission);
-						}
 		        	}
 	        	}
 	        	else{
@@ -1685,7 +1678,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						}
 					}
 					else{
-						logWarning("No option typesCameraPermission: " + typesCameraPermission);
 						oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 						if(oFLol != null){
 							oFLol.notifyDataSetChanged();
@@ -1762,7 +1754,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			case RECORD_AUDIO: {
-				logDebug("RECORD_AUDIO");
 				if(typesCameraPermission == START_CALL_PERMISSIONS){
 					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 						if(checkPermissionsCall()){
@@ -1777,6 +1768,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
         }
     }
+
+	public void setTypesCameraPermission(int typesCameraPermission) {
+		this.typesCameraPermission = typesCameraPermission;
+	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -12096,7 +12091,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			case R.id.call_in_progress_layout:{
-				logDebug("Call_in_progress_layout");
 				if(checkPermissionsCall()){
 					returnCall(context, megaChatApi);
 				}
@@ -17708,11 +17702,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
 			if (!hasRecordAudioPermission) {
 				typesCameraPermission = START_CALL_PERMISSIONS;
-
 				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
 				return false;
 			}
-			return true;
 		}
 		return true;
 	}
