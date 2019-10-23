@@ -362,7 +362,6 @@
                 android:layout_below="@id/toolbar_chat"
                 android:layout_above="@id/writing_container_layout_chat_layout"
                 android:background="@color/background_chat"
-                android:layout_above="@id/writing_container_layout_chat_layout"
                 android:orientation="vertical">
 
                 <!--Empty messages -->
