@@ -11741,7 +11741,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void selectSortByOffline(int _orderOthers){
 		logDebug("selectSortByOffline");
 
-		if (orderOthers == orderOthers) {
+		if (_orderOthers == orderOthers) {
 			return;
 		}
 
