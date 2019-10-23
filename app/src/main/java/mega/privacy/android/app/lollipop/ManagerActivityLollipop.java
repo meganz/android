@@ -195,7 +195,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -11136,7 +11135,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         } catch (IOException e) {}
 
         //This method is in the v4 support library, so can be applied to all devices
-		Uri outputFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING, newFile);
+		Uri outputFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, newFile);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
