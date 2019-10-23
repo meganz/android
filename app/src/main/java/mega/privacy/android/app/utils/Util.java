@@ -1706,17 +1706,17 @@ public class Util {
 		url.replace(' ', '+');
 
 		if (url.startsWith("mega://")) {
-			url = url.replace("mega://", "https://mega.nz/");
+			url = url.replaceFirst("mega://", "https://mega.nz/");
 		} else if (url.startsWith("mega.")) {
-			url = url.replace("mega.", "https://mega.");
+			url = url.replaceFirst("mega.", "https://mega.");
 		}
 
 		if (url.startsWith("https://www.mega.co.nz")) {
-			url = url.replace("https://www.mega.co.nz", "https://mega.co.nz");
+			url = url.replaceFirst("https://www.mega.co.nz", "https://mega.co.nz");
 		}
 
 		if (url.startsWith("https://www.mega.nz")) {
-			url = url.replace("https://www.mega.nz", "https://mega.nz");
+			url = url.replaceFirst("https://www.mega.nz", "https://mega.nz");
 		}
 
 		if (url.endsWith("/")) {
