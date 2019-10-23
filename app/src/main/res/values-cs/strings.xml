@@ -303,8 +303,7 @@
 	<!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Obsah</string>
     -->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Sdílené složky s:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Přidat nové kontakty pomocí níže uvedeného tlačítka.</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Přidat nové kontakty pomocí níže uvedeného tlačítka.</string>
 	<!--
     <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">V účtu nejsou žádné kontakty. Přidejte je na obrazovce Kontakty.</string>
     -->

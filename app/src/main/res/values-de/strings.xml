@@ -296,8 +296,7 @@
 	<!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Inhalt</string>
     -->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Ordnerfreigaben an:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Klicken Sie auf den untenstehenden Button, um neue Kontakte hinzu zu fügen.</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Klicken Sie auf den untenstehenden Button, um neue Kontakte hinzu zu fügen.</string>
 	<!--
     <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are no contacts in the account. Please add them on the Contacts screen.</string>
     -->

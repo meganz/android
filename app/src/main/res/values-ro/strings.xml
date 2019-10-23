@@ -241,8 +241,7 @@
 	<string name="contact_accept" context="option to accept a contact invitation">Acceptă</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">Informaţii de contact</string>	
 	<!--<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Conţinut</string>	-->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Foldere partajate cu:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Adaugă contacte noi folosind butonul de mai jos.</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Adaugă contacte noi folosind butonul de mai jos.</string>
 	<!--<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are no contacts in the account. Please add them on the Contacts screen.</string>-->
 	
 	<string name="error_not_enough_free_space" context="Error message">Spaţiu liber insuficient</string>

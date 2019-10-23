@@ -307,8 +307,7 @@
 	<!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Partages entrants avec</string>
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Ajoutez de nouveaux contacts en utilisant le bouton ci-dessous</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Ajoutez de nouveaux contacts en utilisant le bouton ci-dessous</string>
 	<!--
     <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
 	-->
@@ -1242,8 +1241,6 @@
     </plurals>
 
     <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">Erreur de partage du dossier. Veuillez ressayer.</string>
-
-    <string name="incoming_shares_label" context="title of the section that shows all the incoming shared items">Partages entrants</string>
 
     <plurals name="confirmation_remove_contact" context="confirmation message before removing a contact">
         <item context="Singular" quantity="one">Toutes les données relatives au contact sélectionné seront perdues irrémédiablement.</item>

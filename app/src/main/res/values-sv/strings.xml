@@ -234,8 +234,7 @@
 	<string name="contact_accept" context="option to accept a contact invitation">Tillåt</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">Information om kontakt</string>	
 	<!--<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Innehåll</string>	-->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Delade mappar med:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Lägg till nya kontakter genom knappen nedanför.</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Lägg till nya kontakter genom knappen nedanför.</string>
 	<!--<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">Det är inga kontakter i kontot, lägg till kontakter först.</string>-->
 	
 	<string name="error_not_enough_free_space" context="Error message">Otillräckligt lagringsutrymme</string>

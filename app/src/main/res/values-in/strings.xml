@@ -234,8 +234,7 @@
 	<string name="contact_accept" context="option to accept a contact invitation">Terima</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">Kontak info</string>	
 	<!--<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Isi</string>	-->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Bagikan folder dengan:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Tambah kontak anda dengan tombol dibawah.</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Tambah kontak anda dengan tombol dibawah.</string>
 	<!--<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">Tidak ada kontak ditemukan pada akun ini. Harap tambahkan mereka pada halaman Kontak.</string>-->
 	
 	<string name="error_not_enough_free_space" context="Error message">Tidak ada ruang tersedia</string>

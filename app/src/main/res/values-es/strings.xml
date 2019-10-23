@@ -251,8 +251,7 @@
 	<string name="contact_accept" context="option to accept a contact invitation">Aceptar</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">Info</string>	
 	<!-- <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Contenido</string> -->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Carpetas entrantes con</string>
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Añadir nuevos contactos usando el botón inferior.</string>		
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Añadir nuevos contactos usando el botón inferior.</string>
 	<!-- <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">No hay contactos en la cuenta. Añádelos en la pantalla de Contactos</string> -->
 	<string name="error_not_enough_free_space" context="Error message">No hay suficiente espacio</string>
 	<!-- <string name="session_problem" context="if a link to a folder cannot be fetched">Existe un problema con la sesión de usuario</string> -->
@@ -1018,8 +1017,6 @@
     </plurals>
 
     <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">Error al compartir la carpeta. Por favor, inténtalo otra vez.</string>
-
-    <string name="incoming_shares_label" context="title of the section that shows all the incoming shared items">Compartido contigo</string>
 
     <plurals name="confirmation_remove_contact" context="confirmation message before removing a contact">
         <item context="Singular" quantity="one">Todos los datos asociados al contacto seleccionado se eliminarán.</item>

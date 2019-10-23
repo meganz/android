@@ -234,8 +234,7 @@
 	<string name="contact_accept" context="option to accept a contact invitation">Accepteren</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>	
 	<!--<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Inhoud</string>	-->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Gedeelde Mappen met:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Voeg nieuwe contacten toe met de onderstaande knop.</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Voeg nieuwe contacten toe met de onderstaande knop.</string>
 	<!--<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">Er zijn geen contacten in het account. Voeg ze alstublieft toe in het scherm Contacten.</string>-->
 	
 	<string name="error_not_enough_free_space" context="Error message">Niet genoeg schijfruimte vrij</string>

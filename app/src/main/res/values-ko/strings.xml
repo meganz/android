@@ -234,8 +234,7 @@
 	<string name="contact_accept" context="option to accept a contact invitation">수락</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">연락처 정보</string>	
 	<!--<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">내용</string>	-->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">다음과 폴더 공유:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">아래의 버튼을 눌러 새 연락처를 추가하세요.</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">아래의 버튼을 눌러 새 연락처를 추가하세요.</string>
 	<!--<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">계정에 연락처가 없습니다. 연락처 화면에서 추가하세요.</string>-->
 	
 	<string name="error_not_enough_free_space" context="Error message">여유 공간이 부족합니다.</string>

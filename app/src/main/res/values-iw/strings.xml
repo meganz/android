@@ -248,8 +248,7 @@
 	<string name="contact_accept" context="option to accept a contact invitation">אשר</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">מידע הודות איש קשר</string>	
 	<!--<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">תוכן</string>	-->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">תיקיות משותפות עם:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">הוסף אנשי קשר חדשים בעזרת הכפתור שלמטה</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">הוסף אנשי קשר חדשים בעזרת הכפתור שלמטה</string>
 	<!--<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">אין אנשי קשר בחשבון. אנא הוסף אותם במסך אנשי קשר.</string>-->
 	
 	<string name="error_not_enough_free_space" context="Error message">אין מספיק מקום פנוי</string>
