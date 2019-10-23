@@ -17486,6 +17486,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     }
 
+	public boolean isSearchOpen() {
+		return searchQuery != null && searchExpand;
+	}
+
     public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
 		this.accountFragmentPreUpgradeAccount = accountFragment;
 	}
