@@ -18713,7 +18713,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     }
 
 	public boolean isSearchOpen() {
-		return true ? searchQuery != null && searchExpand : false;
+		return searchQuery != null && searchExpand;
 	}
 
     public void setAccountFragmentPreUpgradeAccount (int accountFragment) {

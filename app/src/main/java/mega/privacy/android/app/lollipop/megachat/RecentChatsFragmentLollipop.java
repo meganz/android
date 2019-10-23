@@ -1801,7 +1801,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 }
             }
 
-            if (chatsToSearch != null && !chatsToSearch.isEmpty()) {
+            if (!chatsToSearch.isEmpty()) {
                 if (filteredChats == null) {
                     filteredChats = new ArrayList<>();
                 } else {
