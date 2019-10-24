@@ -704,15 +704,18 @@ public class OfflineUtils {
         Comparator<MegaOffline> nameComparator = new Comparator<MegaOffline>() {
             @Override
             public int compare(MegaOffline o1, MegaOffline o2) {
-                String name1 = o1.getNameWithoutExtension();
-                String name2 = o2.getNameWithoutExtension();
-                try {
-                    int pureInteger1 = Integer.parseInt(name1);
-                    int pureInteger2 = Integer.parseInt(name2);
-                    return pureInteger1 - pureInteger2;
-                } catch (Exception ex) {
-                    logError("Exception happens" + ex.toString());
+                String name1 = o1.getName();
+                String name2 = o2.getName();
+                if (isFileNameNumeric(name1) && isFileNameNumeric(name2)) {
+                    try {
+                        int pureInteger1 = Integer.parseInt(getFileNameWithoutExtension(name1));
+                        int pureInteger2 = Integer.parseInt(getFileNameWithoutExtension(name2));
+                        return pureInteger1 - pureInteger2;
+                    } catch (Exception ex) {
+                        logError("Exception happens" + ex.toString());
+                    }
                 }
+
                 int n1 = name1.length(), n2 = name2.length();
                 int n = n1 < n2 ? n1 : n2;
                 for (int i = 0;
