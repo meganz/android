@@ -202,7 +202,6 @@ public class NodeController {
     public void checkIfNodesAreMineAndSelectChatsToSendNodes(ArrayList<MegaNode> nodes) {
         logDebug("checkIfNodesAreMineAndSelectChatsToSendNodes");
 
-        MegaNode currentNode;
         ArrayList<MegaNode> ownerNodes = new ArrayList<>();
         ArrayList<MegaNode> notOwnerNodes = new ArrayList<>();
 

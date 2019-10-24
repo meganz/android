@@ -81,6 +81,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -111,13 +112,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	boolean moveToRubbish=false;
 
-	public static int REQUEST_CODE_GET = 1000;
-	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
-	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
-	public static int REQUEST_CODE_GET_LOCAL = 1003;
-	public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
-	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
-
 	static ContactFileListActivityLollipop contactPropertiesMainActivity;
 
 	long parentHandle = -1;
@@ -143,6 +137,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	Toolbar tB;
 	ActionBar aB;
+
+	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -587,7 +583,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 		}
 
-		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
+		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
@@ -1575,11 +1573,12 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	public void showOptionsPanel(MegaNode node){
 		logDebug("showOptionsPanel");
-		if(node!=null){
-			this.selectedNode = node;
-			ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedNode = node;
+        bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showSnackbar(int type, String s){

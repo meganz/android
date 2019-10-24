@@ -196,6 +196,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		final int itemType = getItemViewType(position);
 		logDebug("position: " + position + ", itemType: " + itemType);
 
+		holder.itemView.setVisibility(View.VISIBLE);
+
 		if(itemType == ITEM_VIEW_TYPE_NORMAL) {
 			((ViewHolderNormalChatList)holder).imageView.setImageBitmap(null);
 			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(SPACE);
@@ -391,6 +393,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
 		}
 		else if(itemType == ITEM_VIEW_TYPE_ARCHIVED_CHATS) {
+			if (context instanceof ManagerActivityLollipop && ((ManagerActivityLollipop) context).isSearchOpen()) {
+				holder.itemView.setVisibility(View.GONE);
+				return;
+			}
+
 			((ViewHolderArchivedChatList)holder).textViewArchived.setOnClickListener(this);
 			((ViewHolderArchivedChatList)holder).textViewArchived.setTag(holder);
 
@@ -2480,9 +2487,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					long idLastMessage = chat.getLastMessageId();
 					long idChat = chat.getChatId();
 					MegaChatMessage m = megaChatApi.getMessage(idChat, idLastMessage);
-					if (m == null || m.getMegaNodeList() == null || m.getMegaNodeList().size() < 1 || !isVoiceClip(m.getMegaNodeList().get(0).getName()))return;
-					long duration = getVoiceClipDuration(m.getMegaNodeList().get(0));
-					((ViewHolderNormalChatList) holder).voiceClipOrLocationText.setText(milliSecondsToTimer(duration));
+					if (m == null || m.getMegaNodeList() == null || m.getMegaNodeList().size() < 1 || !isVoiceClip(m.getMegaNodeList().get(0).getName())) {
+						((ViewHolderNormalChatList) holder).voiceClipOrLocationText.setText("--:--");
+					} else {
+						long duration = getVoiceClipDuration(m.getMegaNodeList().get(0));
+						((ViewHolderNormalChatList) holder).voiceClipOrLocationText.setText(milliSecondsToTimer(duration));
+					}
 
 				}
 
