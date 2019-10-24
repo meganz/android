@@ -56,6 +56,12 @@ public class FileUtils {
         return MegaApplication.getInstance().getApplicationContext().getString(R.string.general_rk) + ".txt";
     }
 
+    public static boolean isGIF (String name) {
+        String s[] = name.split("\\.");
+
+        return s != null && s[s.length-1].equals("gif");
+    }
+
     public static boolean isAudioOrVideo(MegaNode node) {
         if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio())
             return true;
