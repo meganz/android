@@ -6863,6 +6863,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 idChat = request.getChatHandle();
                 MegaApplication.setOpenChatId(idChat);
                 showChat(null);
+
+                supportInvalidateOptionsMenu();
                 if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
                     if (megaChatApi.getChatRoom(idChat).isActive()) {
                         logWarning("ERROR: You are already a participant of the chat link or are trying to open it again");
@@ -7489,7 +7491,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             MegaApplication.setShowPinScreen(true);
             MegaApplication.setOpenChatId(idChat);
-
             supportInvalidateOptionsMenu();
 
             int chatConnection = megaChatApi.getChatConnectionState(idChat);
@@ -7721,7 +7722,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
         logDebug("Chat ID: "+ chatid + ". New State: " + newState);
-
         supportInvalidateOptionsMenu();
 
         if (idChat == chatid) {
