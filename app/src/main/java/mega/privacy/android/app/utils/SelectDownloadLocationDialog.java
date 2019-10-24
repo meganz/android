@@ -15,7 +15,9 @@ import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
+import mega.privacy.android.app.utils.download.ChatDownloadInfo;
 import mega.privacy.android.app.utils.download.DownloadInfo;
+import mega.privacy.android.app.utils.download.DownloadLinkInfo;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.LogUtil.logError;
@@ -38,9 +40,11 @@ public class SelectDownloadLocationDialog {
 
     private String url;
 
-    private ArrayList<String> nodeList;
+    private ArrayList<String> serializedNodes;
 
-    private long [] hashes;
+    private ArrayList<MegaNode> nodeList;
+
+    private long[] hashes;
 
     private long size;
 
@@ -90,8 +94,12 @@ public class SelectDownloadLocationDialog {
         this.size = size;
     }
 
-    public void setNodeList(ArrayList<String> nodeList) {
+    public void setNodeList(ArrayList<MegaNode> nodeList) {
         this.nodeList = nodeList;
+    }
+
+    public void setSerializedNodes(ArrayList<String> serializedNodes) {
+        this.serializedNodes = serializedNodes;
     }
 
     public void setHashes(long[] hashes) {
@@ -127,13 +135,13 @@ public class SelectDownloadLocationDialog {
                 settingsFragment.toSelectFolder(sdRoot);
                 break;
             case FILE_LINK:
-                nodeController.intentPickFolder(document, url,sdRoot);
+                nodeController.intentPickFolder(document, url, sdRoot);
                 break;
             case FOLDER_LINK:
-                folderLinkActivity.toSelectFolder(hashes,size,sdRoot,null);
+                folderLinkActivity.toSelectFolder(hashes, size, sdRoot, null);
                 break;
             case CHAT:
-                chatController.requestLocalFolder(size, nodeList, sdRoot);
+                chatController.requestLocalFolder(size, serializedNodes, sdRoot);
                 break;
         }
     }
@@ -171,9 +179,29 @@ public class SelectDownloadLocationDialog {
                         if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
                             selectLocalFolder(sdCardRoot);
                         } else {
-                            if (context instanceof DownloadableActivity) {
-                                ((DownloadableActivity) context).setDownloadInfo(downloadInfo);
+                            switch (from) {
+                                case NORMAL:
+                                    if (context instanceof DownloadableActivity) {
+                                        ((DownloadableActivity) context).setDownloadInfo(downloadInfo);
+                                    }
+                                    break;
+                                case FILE_LINK:
+                                    if (context instanceof DownloadableActivity) {
+                                        ((DownloadableActivity) context).setLinkInfo(new DownloadLinkInfo(document, url));
+                                    }
+                                    break;
+                                case FOLDER_LINK:
+                                    if (context instanceof DownloadableActivity) {
+                                        ((DownloadableActivity) context).setDownloadInfo(new DownloadInfo(false, size, hashes));
+                                    }
+                                    break;
+                                case CHAT:
+                                    if (context instanceof DownloadableActivity) {
+                                        ((DownloadableActivity) context).setChatDownloadInfo(new ChatDownloadInfo(size, serializedNodes, nodeList));
+                                    }
+                                    break;
                             }
+
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 try {
                                     sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());

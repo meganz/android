@@ -1627,7 +1627,8 @@ public class ChatController {
             SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context,SelectDownloadLocationDialog.From.CHAT);
             selector.setChatController(this);
             selector.setSize(size);
-            selector.setNodeList(serializedNodes);
+            selector.setNodeList(nodeList);
+            selector.setSerializedNodes(serializedNodes);
             selector.show();
         }
     }

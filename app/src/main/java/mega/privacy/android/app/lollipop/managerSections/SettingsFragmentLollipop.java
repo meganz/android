@@ -1476,6 +1476,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
     private void showSelectDownloadLocationDialog() {
         SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context, SelectDownloadLocationDialog.From.SETTINGS);
         selector.setIsDefaultLocation(true);
+        selector.setSettingsFragment(this);
         selector.show();
     }
 
