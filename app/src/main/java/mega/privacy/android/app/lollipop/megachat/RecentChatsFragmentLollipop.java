@@ -195,7 +195,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         } else {
             logWarning("Chat not enabled!");
         }
-        grantedContactPermission = Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, context);
+
+        grantedContactPermission = hasPermissions(context, Manifest.permission.READ_CONTACTS);
         contactGetter = new MegaContactGetter(context);
         contactGetter.setMegaContactUpdater(this);
     }
@@ -1703,7 +1704,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void refreshMegaContactsList() {
-        grantedContactPermission = Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, context);
+        grantedContactPermission = hasPermissions(context, Manifest.permission.READ_CONTACTS);
         if (grantedContactPermission) {
             showPermissionGrantedView();
         } else {

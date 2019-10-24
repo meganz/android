@@ -124,11 +124,11 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         if (savedInstanceState == null) {
             numItems = 0;
             permissionsPosition = 0;
-            readGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-            writeGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            cameraGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA);
-            microphoneGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.RECORD_AUDIO);
-            contactsGranted = checkPermissionGranted(Manifest.permission.READ_CONTACTS, this.getActivity());
+            readGranted = hasPermissions(this.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+            writeGranted = hasPermissions(this.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            cameraGranted = hasPermissions(this.getActivity(), Manifest.permission.CAMERA);
+            microphoneGranted = hasPermissions(this.getActivity(), Manifest.permission.RECORD_AUDIO);
+            contactsGranted = hasPermissions(this.getActivity(), Manifest.permission.READ_CONTACTS);
 
             if (!readGranted || !writeGranted) {
                 items[numItems] = READ_WRITE;

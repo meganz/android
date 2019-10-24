@@ -1700,15 +1700,6 @@ public class Util {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
-	public static boolean checkPermissionGranted(String permission, Context context) {
-        try {
-            return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
-        } catch (IllegalArgumentException ex) {
-            logFatal("IllegalArgument Exception is thrown", ex);
-            return false;
-        }
-    }
-
 	/**
 	 * This method detects whether the android device is tablet
 	 *

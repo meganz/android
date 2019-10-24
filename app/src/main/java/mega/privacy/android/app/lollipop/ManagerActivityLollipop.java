@@ -1928,7 +1928,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		transfersInProgress = new ArrayList<Integer>();
 
 		//sync local contacts to see who's on mega.
-		if (checkPermissionGranted(Manifest.permission.READ_CONTACTS, this)) {
+		if (hasPermissions(this, Manifest.permission.READ_CONTACTS)) {
 		    logDebug("sync mega contacts");
 			MegaContactGetter getter = new MegaContactGetter(this);
 			getter.getMegaContacts(megaApi, MegaContactGetter.WEEK);
