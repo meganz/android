@@ -1916,6 +1916,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				storageAdvancedDevices.setEnabled(true);
 			}
 			else{
+			    downloadLocationPath = dbH.getPreferences().getStorageDownloadLocation();
 				logDebug("storageAskMeAlways NOT checked!");
 				if (downloadLocation != null){
 					downloadLocation.setEnabled(true);

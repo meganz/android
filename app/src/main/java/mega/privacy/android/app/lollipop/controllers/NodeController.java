@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.CopyFileThread;
+import mega.privacy.android.app.utils.DownloadChecker;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
 import mega.privacy.android.app.utils.download.DownloadInfo;
@@ -647,49 +648,17 @@ public class NodeController {
         boolean downloadToSDCard = false;
         String downloadRoot = null;
         SDCardOperator sdCardOperator = null;
-        final DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
-        try {
-            sdCardOperator = new SDCardOperator(context);
-        } catch (SDCardOperator.SDCardException e) {
-            e.printStackTrace();
-            logError("Initialize SDCardOperator failed", e);
-            // user uninstall the sd card. but default download location is still on the sd card
-            if (SDCardOperator.isSDCardPath(parentPath)) {
-                logDebug("select new path as download location.");
-                requestLocalFolder(downloadInfo, null,context.getString(R.string.no_external_SD_card_detected));
-                return;
-            }
-        }
-        if(sdCardOperator != null && SDCardOperator.isSDCardPath(parentPath)) {
-            //user has installed another sd card.
-            if(sdCardOperator.isNewSDCardPath(parentPath)) {
-                logDebug("new sd card, check permission.");
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showSelectDownloadLocationDialog(downloadInfo);
-                    }
-                }, 1500);
-                showSnackbar(Constants.SNACKBAR_TYPE,context.getString(R.string.old_sdcard_unavailable));
-                return;
-            }
-            if (!sdCardOperator.canWriteWithFile(parentPath)) {
+        if(SDCardOperator.isSDCardPath(parentPath)) {
+            DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
+            DownloadChecker checker = new DownloadChecker(context, parentPath, SelectDownloadLocationDialog.From.NORMAL);
+            checker.setNodeController(this);
+            checker.setDownloadInfo(downloadInfo);
+            if (checker.check()) {
                 downloadToSDCard = true;
-                downloadRoot = sdCardOperator.getDownloadRoot();
-                try {
-                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                } catch (SDCardOperator.SDCardException e) {
-                    e.printStackTrace();
-                    logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
-                    //don't have permission with sd card root. need to request.
-                    String sdRoot = sdCardOperator.getSDCardRoot();
-                    if(context instanceof DownloadableActivity) {
-                        ((DownloadableActivity) context).setDownloadInfo(new DownloadInfo(highPriority, size, hashes));
-                    }
-                    //request SD card write permission.
-                    SDCardOperator.requestSDCardPermission(sdRoot, context, (Activity) context);
-                    return;
-                }
+                downloadRoot = checker.getDownloadRoot();
+                sdCardOperator = checker.getSdCardOperator();
+            } else {
+                return;
             }
         }
 
@@ -905,8 +874,8 @@ public class NodeController {
                 MegaNode node = megaApi.getNodeByHandle(hash);
                 if(node != null){
                     logDebug("node NOT null");
-                    Map<MegaNode, String> dlFiles = new HashMap();
-                    Map<Long, String> targets = new HashMap();
+                    Map<MegaNode, String> dlFiles = new HashMap<>();
+                    Map<Long, String> targets = new HashMap<>();
                     if (node.getType() == MegaNode.TYPE_FOLDER) {
                         logDebug("MegaNode.TYPE_FOLDER");
                         if (downloadToSDCard) {
@@ -951,7 +920,7 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
                             service.putExtra(DownloadService.EXTRA_URL, url);
                             if(downloadToSDCard) {
-                                service = getDownloadToSDCardIntent(service,path,targetPath,dbH.getSDCardUri());
+                                service = getDownloadToSDCardIntent(service, path, targetPath, dbH.getSDCardUri());
                             } else {
                                 service.putExtra(DownloadService.EXTRA_PATH, path);
                             }
@@ -1001,7 +970,7 @@ public class NodeController {
         }
     }
 
-    private void showSelectDownloadLocationDialog(MegaNode document, String url) {
+    public void showSelectDownloadLocationDialog(MegaNode document, String url) {
         SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context, SelectDownloadLocationDialog.From.FILE_LINK);
         selector.setDocument(document);
         selector.setUrl(url);
@@ -1009,7 +978,7 @@ public class NodeController {
         selector.show();
     }
 
-    private void showSelectDownloadLocationDialog(DownloadInfo downloadInfo) {
+    public void showSelectDownloadLocationDialog(DownloadInfo downloadInfo) {
         SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context,SelectDownloadLocationDialog.From.NORMAL);
         selector.setDownloadInfo(downloadInfo);
         selector.setNodeController(this);

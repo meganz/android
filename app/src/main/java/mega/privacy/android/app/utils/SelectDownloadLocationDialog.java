@@ -169,6 +169,7 @@ public class SelectDownloadLocationDialog {
                             logError("Initialize SDCardOperator failed", e);
                             //sd card is available, choose internal storage location
                             selectLocalFolder(null);
+                            return;
                         }
                         String sdCardRoot = sdCardOperator.getSDCardRoot();
                         //don't use DocumentFile
@@ -219,13 +220,11 @@ public class SelectDownloadLocationDialog {
     }
 
     private void requestSDCardWritePermission(String sdCardRoot) {
-        if (context instanceof Activity) {
-            SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
+        if(settingsFragment != null) {
+            // from settings
+            SDCardOperator.requestSDCardPermission(sdCardRoot, context, settingsFragment);
         } else {
-            // request from fragment
-            if (settingsFragment != null) {
-                SDCardOperator.requestSDCardPermission(sdCardRoot, context, settingsFragment);
-            }
+            SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
         }
     }
 
