@@ -7,7 +7,8 @@
 
     <uses-sdk
         android:minSdkVersion="11"
-        android:targetSdkVersion="25" />
+        android:maxSdkVersion="27"
+        android:targetSdkVersion="26" />
 
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
