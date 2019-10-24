@@ -32,6 +32,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -649,6 +650,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private MenuItem clearCompletedTransfers;
 	private MenuItem scanQRcodeMenuItem;
 	private MenuItem rubbishBinMenuItem;
+	private MenuItem returnCallMenuItem;
+
+	private Chronometer chronometerMenuItem;
 
 	private int typesCameraPermission = -1;
 	AlertDialog enable2FADialog;
@@ -1609,7 +1613,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}else if(typesCameraPermission == START_CALL_PERMISSIONS){
 					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 						if(checkPermissionsCall()){
-							returnCall(context, megaChatApi);
+							returnCall(this, megaChatApi);
 						}
 						typesCameraPermission = -1;
 					}
@@ -1760,7 +1764,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(typesCameraPermission == START_CALL_PERMISSIONS){
 					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 						if(checkPermissionsCall()){
-							returnCall(context, megaChatApi);
+							returnCall(this, megaChatApi);
 						}
 						typesCameraPermission = -1;
 					}
@@ -6259,6 +6263,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
 		scanQRcodeMenuItem.setVisible(false);
 
+		returnCallMenuItem = menu.findItem(R.id.action_return_call);
+		returnCallMenuItem.setVisible(false);
+
+		LinearLayout rootView = (LinearLayout) returnCallMenuItem.getActionView();
+		chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
+
+		rootView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onOptionsItemSelected(returnCallMenuItem);
+			}
+		});
+
 		changePass = menu.findItem(R.id.action_menu_change_pass);
 
 		takePicture = menu.findItem(R.id.action_take_picture);
@@ -6343,6 +6360,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     takePicture.setVisible(false);
                 }
 
+				if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1 && megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+					returnCallMenuItem.setVisible(true);
+					chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
+					chronometerMenuItem.start();
+					chronometerMenuItem.setFormat(" %s");
+
+				}else {
+					chronometerMenuItem.stop();
+					returnCallMenuItem.setVisible(false);
+				}
+
 				if(getTabItemCloud() == CLOUD_TAB) {
 					//Show
 					logDebug("createFolderMenuItem.setVisible_14");
@@ -6404,7 +6432,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				helpMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
-
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);
 				setGridListIcon();
 
 				rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
@@ -6464,6 +6493,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				helpMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 
 				setGridListIcon();
 
@@ -6512,6 +6543,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				helpMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 
 				if (isListCameraUploads){
 					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -6592,6 +6625,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				helpMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 
 				searchMenuItem.setVisible(true);
 				if (isListCameraUploads){
@@ -6678,6 +6713,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				forgotPassMenuItem.setVisible(false);
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 			}
 			else if (drawerItem == DrawerItem.SHARED_ITEMS){
 				//Lollipop
@@ -6804,6 +6841,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					forgotPassMenuItem.setVisible(false);
 				}
 
+				if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1 && megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+					returnCallMenuItem.setVisible(true);
+					chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
+					chronometerMenuItem.start();
+					chronometerMenuItem.setFormat(" %s");
+
+				}else {
+					chronometerMenuItem.stop();
+					returnCallMenuItem.setVisible(false);
+				}
+
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
 				setGridListIcon();
@@ -6813,6 +6861,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				int index = getTabItemContacts();
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 				if (index == CONTACTS_TAB){
 					logDebug("createOptions TAB CONTACTS");
 					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
@@ -6972,6 +7022,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				forgotPassMenuItem.setVisible(false);
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 
 				if (searchExpand) {
 					openSearchView();
@@ -7030,6 +7082,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 
 				if(accountFragment==MY_ACCOUNT_FRAGMENT){
 					//Show
@@ -7072,6 +7126,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				//Hide
 				searchByDate.setVisible(false);
 				searchMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
 				addMenuItem.setVisible(false);
@@ -7137,6 +7193,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				//Hide
 				searchByDate.setVisible(false);
 				searchMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
 				addMenuItem.setVisible(false);
@@ -7206,6 +7264,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
 					importLinkMenuItem.setVisible(true);
 
+					if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1 && megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+						returnCallMenuItem.setVisible(true);
+						chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
+						chronometerMenuItem.start();
+						chronometerMenuItem.setFormat(" %s");
+
+					}else {
+						chronometerMenuItem.stop();
+						returnCallMenuItem.setVisible(false);
+					}
+
 					//Hide
 					searchByDate.setVisible(false);
 					createFolderMenuItem.setVisible(false);
@@ -7239,6 +7308,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					addContactMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
+					chronometerMenuItem.stop();
+					returnCallMenuItem.setVisible(false);;
 					createFolderMenuItem.setVisible(false);
 					addMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
@@ -7273,6 +7344,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				searchByDate.setVisible(false);
 				addContactMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 				createFolderMenuItem.setVisible(false);
 				addMenuItem.setVisible(false);
 				sortByMenuItem.setVisible(false);
@@ -7320,6 +7393,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					searchByDate.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
+					if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1 && megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+						returnCallMenuItem.setVisible(true);
+						chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
+						chronometerMenuItem.start();
+						chronometerMenuItem.setFormat(" %s");
+
+					}else {
+						chronometerMenuItem.stop();
+						returnCallMenuItem.setVisible(false);
+					}
 					createFolderMenuItem.setVisible(false);
 					addMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
@@ -7351,6 +7434,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setStatusMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
+					chronometerMenuItem.stop();
+					returnCallMenuItem.setVisible(false);;
 					searchMenuItem.setVisible(false);
 					createFolderMenuItem.setVisible(false);
 					addMenuItem.setVisible(false);
@@ -7385,6 +7470,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				addContactMenuItem.setVisible(false);
 				selectMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
+				chronometerMenuItem.stop();
+				returnCallMenuItem.setVisible(false);;
 				createFolderMenuItem.setVisible(false);
 				addMenuItem.setVisible(false);
 				sortByMenuItem.setVisible(false);
@@ -8139,6 +8226,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						intent.putExtra("contacts", true);
 						startActivity(intent);
 					}
+				}
+				return true;
+			}
+			case R.id.action_return_call:{
+				logDebug("Action menu return to call in progress pressed");
+				if(checkPermissionsCall()){
+					returnCall(this, megaChatApi);
 				}
 				return true;
 			}
@@ -17059,7 +17153,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if ((rChatFL != null) && (rChatFL.isVisible())) {
 					rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
 				}
-				setCallWidget();
+				if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+					setCallWidget();
+				}else{
+					supportInvalidateOptionsMenu();
+				}
 				break;
 			}
 			default:
@@ -17638,13 +17736,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 */
 	public void setCallWidget() {
 		setCallBadge();
-		if(drawerItem != DrawerItem.CLOUD_DRIVE && drawerItem != DrawerItem.SHARED_ITEMS && drawerItem != DrawerItem.CHAT){
+
+		if(drawerItem != DrawerItem.CLOUD_DRIVE && drawerItem != DrawerItem.SHARED_ITEMS && drawerItem != DrawerItem.CHAT  || this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_PORTRAIT){
+
 			callInProgressLayout.setVisibility(View.GONE);
 			if (callInProgressChrono != null) {
 				activateChrono(false, callInProgressChrono, null);
 			}
 			return;
 		}
+
 
 		if (!isOnline(this)) return;
 

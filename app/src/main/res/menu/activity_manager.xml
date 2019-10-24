@@ -1,6 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
+
+	<item
+		android:id="@+id/action_return_call"
+		android:orderInCategory="80"
+		android:title="@string/call_in_progress_layout"
+		android:icon="@drawable/ic_call_menu"
+		MEGA:showAsAction="always"
+		MEGA:actionLayout="@layout/layout_menu_return_call" />
+
 	<item
 		android:id="@+id/action_search"
 		android:orderInCategory="85"

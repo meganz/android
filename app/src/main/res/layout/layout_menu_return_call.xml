@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="22dp"
+    android:orientation="horizontal"
+    android:background="@drawable/dark_rounded_chat_own_message"
+    android:gravity="center_horizontal|center_vertical">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="3dp"
+        android:src="@drawable/ic_call_menu"
+        android:contentDescription="@string/call_in_progress_layout"/>
+
+    <Chronometer
+        android:id="@+id/chrono_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:textColor="@color/white"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginRight="8dp"
+        android:textSize="12sp"
+        android:text="00:00"/>
+</LinearLayout>
