@@ -1609,7 +1609,7 @@ public class ChatController {
 
         boolean askMe = askMe(context);
         if (askMe){
-            showDownloadLocationSelector(nodeList, size);
+            showSelectDownloadLocationDialog(nodeList, size);
         }
         else{
             logDebug("NOT askMe");
@@ -1617,7 +1617,7 @@ public class ChatController {
         }
     }
 
-    private void showDownloadLocationSelector(final ArrayList<MegaNode> nodeList, final long size) {
+    public void showSelectDownloadLocationDialog(ArrayList<MegaNode> nodeList, long size) {
         logDebug("askMe");
         File[] fs = context.getExternalFilesDirs(null);
         final ArrayList<String> serializedNodes = serializeNodes(nodeList);
@@ -1966,7 +1966,7 @@ public class ChatController {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            showDownloadLocationSelector(nodeList, sizeFinal);
+                            showSelectDownloadLocationDialog(nodeList, sizeFinal);
                         }
                     }, 1500);
                     showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.old_sdcard_unavailable));

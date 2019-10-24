@@ -24,7 +24,7 @@ import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class SelectDownloadLocationDialog {
 
-    private Context context;
+    protected Context context;
 
     private String[] sdCardOptions;
 
@@ -34,35 +34,35 @@ public class SelectDownloadLocationDialog {
 
     private boolean isDefaultLocation;
 
-    private DownloadInfo downloadInfo;
+    protected DownloadInfo downloadInfo;
 
-    private MegaNode document;
+    protected MegaNode document;
 
-    private String url;
+    protected String url;
 
-    private ArrayList<String> serializedNodes;
+    protected ArrayList<String> serializedNodes;
 
-    private ArrayList<MegaNode> nodeList;
+    protected ArrayList<MegaNode> nodeList;
 
-    private long[] hashes;
+    protected long[] hashes;
 
-    private long size;
+    protected long size;
 
-    private From from;
+    protected From from;
 
-    private DatabaseHandler dbH;
+    protected DatabaseHandler dbH;
 
     public enum From {
         NORMAL, SETTINGS, FILE_LINK, FOLDER_LINK, CHAT
     }
 
-    private NodeController nodeController;
+    protected NodeController nodeController;
 
-    private SettingsFragmentLollipop settingsFragment;
+    protected SettingsFragmentLollipop settingsFragment;
 
-    private ChatController chatController;
+    protected ChatController chatController;
 
-    private FolderLinkActivityLollipop folderLinkActivity;
+    protected FolderLinkActivityLollipop folderLinkActivity;
 
     public SelectDownloadLocationDialog(Context context, From from) {
         this.context = context;
@@ -123,10 +123,6 @@ public class SelectDownloadLocationDialog {
     }
 
     private void selectLocalFolder(String sdRoot) {
-        if (from == null) {
-            logError("Must set field `from` first.");
-            return;
-        }
         switch (from) {
             case NORMAL:
                 nodeController.requestLocalFolder(downloadInfo, sdRoot, null);

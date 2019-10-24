@@ -779,7 +779,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
         startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
     }
 
-    private void showSelectDownloadLocationDialog(long[] hashes, long size) {
+    public void showSelectDownloadLocationDialog(long[] hashes, long size) {
         SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(this, SelectDownloadLocationDialog.From.FOLDER_LINK);
         selector.setFolderLinkActivity(this);
         selector.setSize(size);
