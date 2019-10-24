@@ -1,10 +1,24 @@
 package mega.privacy.android.app.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
 
+import java.util.ArrayList;
+
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.DownloadableActivity;
+import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
+import mega.privacy.android.app.utils.download.DownloadInfo;
+import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class SelectDownloadLocationDialog {
 
@@ -18,19 +32,113 @@ public class SelectDownloadLocationDialog {
 
     private boolean isDefaultLocation;
 
-    public SelectDownloadLocationDialog(Context context) {
+    private DownloadInfo downloadInfo;
+
+    private MegaNode document;
+
+    private String url;
+
+    private ArrayList<String> nodeList;
+
+    private long [] hashes;
+
+    private long size;
+
+    private From from;
+
+    private DatabaseHandler dbH;
+
+    public enum From {
+        NORMAL, SETTINGS, FILE_LINK, FOLDER_LINK, CHAT
+    }
+
+    private NodeController nodeController;
+
+    private SettingsFragmentLollipop settingsFragment;
+
+    private ChatController chatController;
+
+    private FolderLinkActivityLollipop folderLinkActivity;
+
+    public SelectDownloadLocationDialog(Context context, From from) {
         this.context = context;
         sdCardOptions = context.getResources().getStringArray(R.array.settings_storage_download_location_array);
         titleDefaultDownloadLocation = context.getResources().getString(R.string.settings_storage_download_location);
         titleDownloadLocation = context.getResources().getString(R.string.title_select_download_location);
         dialogBuilder = new AlertDialog.Builder(context);
+        this.from = from;
+        dbH = DatabaseHandler.getDbHandler(context);
     }
 
     public void setIsDefaultLocation(boolean isDefaultLocation) {
         this.isDefaultLocation = isDefaultLocation;
     }
 
-    public void initDialogBuilder(DialogInterface.OnClickListener listener) {
+    public void setDownloadInfo(DownloadInfo downloadInfo) {
+        this.downloadInfo = downloadInfo;
+    }
+
+    public void setDocument(MegaNode document) {
+        this.document = document;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public void setNodeList(ArrayList<String> nodeList) {
+        this.nodeList = nodeList;
+    }
+
+    public void setHashes(long[] hashes) {
+        this.hashes = hashes;
+    }
+
+    public void setFolderLinkActivity(FolderLinkActivityLollipop folderLinkActivity) {
+        this.folderLinkActivity = folderLinkActivity;
+    }
+
+    public void setNodeController(NodeController nodeController) {
+        this.nodeController = nodeController;
+    }
+
+    public void setChatController(ChatController chatController) {
+        this.chatController = chatController;
+    }
+
+    public void setSettingsFragment(SettingsFragmentLollipop settingsFragment) {
+        this.settingsFragment = settingsFragment;
+    }
+
+    private void selectLocalFolder(String sdRoot) {
+        if (from == null) {
+            logError("Must set field `from` first.");
+            return;
+        }
+        switch (from) {
+            case NORMAL:
+                nodeController.requestLocalFolder(downloadInfo, sdRoot, null);
+                break;
+            case SETTINGS:
+                settingsFragment.toSelectFolder(sdRoot);
+                break;
+            case FILE_LINK:
+                nodeController.intentPickFolder(document, url,sdRoot);
+                break;
+            case FOLDER_LINK:
+                folderLinkActivity.toSelectFolder(hashes,size,sdRoot,null);
+                break;
+            case CHAT:
+                chatController.requestLocalFolder(size, nodeList, sdRoot);
+                break;
+        }
+    }
+
+    private void initDialogBuilder() {
         setTitle();
         dialogBuilder.setNegativeButton(context.getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
 
@@ -39,7 +147,62 @@ public class SelectDownloadLocationDialog {
                 dialog.cancel();
             }
         });
-        dialogBuilder.setItems(sdCardOptions, listener);
+        dialogBuilder.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0: {
+                        selectLocalFolder(null);
+                        break;
+                    }
+                    case 1: {
+                        SDCardOperator sdCardOperator = null;
+                        try {
+                            sdCardOperator = new SDCardOperator(context);
+                        } catch (SDCardOperator.SDCardException e) {
+                            e.printStackTrace();
+                            logError("Initialize SDCardOperator failed", e);
+                            //sd card is available, choose internal storage location
+                            selectLocalFolder(null);
+                        }
+                        String sdCardRoot = sdCardOperator.getSDCardRoot();
+                        //don't use DocumentFile
+                        if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
+                            selectLocalFolder(sdCardRoot);
+                        } else {
+                            if (context instanceof DownloadableActivity) {
+                                ((DownloadableActivity) context).setDownloadInfo(downloadInfo);
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                try {
+                                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                                    selectLocalFolder(sdCardRoot);
+                                } catch (SDCardOperator.SDCardException e) {
+                                    e.printStackTrace();
+                                    logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
+                                    requestSDCardWritePermission(sdCardRoot);
+                                }
+                            } else {
+                                requestSDCardWritePermission(sdCardRoot);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    private void requestSDCardWritePermission(String sdCardRoot) {
+        if (context instanceof Activity) {
+            SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
+        } else {
+            // request from fragment
+            if (settingsFragment != null) {
+                SDCardOperator.requestSDCardPermission(sdCardRoot, context, settingsFragment);
+            }
+        }
     }
 
     private void setTitle() {
@@ -51,6 +214,7 @@ public class SelectDownloadLocationDialog {
     }
 
     public void show() {
+        initDialogBuilder();
         dialogBuilder.create().show();
     }
 }

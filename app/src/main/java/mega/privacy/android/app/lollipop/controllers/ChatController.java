@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.controllers;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -1625,52 +1624,10 @@ public class ChatController {
         if (fs.length <= 1 || fs[1] == null) {
             requestLocalFolder(size, serializedNodes, null);
         } else {
-            SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context);
-            selector.initDialogBuilder(new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which) {
-                        case 0: {
-                            requestLocalFolder(size, serializedNodes, null);
-                            break;
-                        }
-                        case 1: {
-                            try {
-                                SDCardOperator sdCardOperator = new SDCardOperator(context);
-                                String sdCardRoot = sdCardOperator.getSDCardRoot();
-                                //don't use DocumentFile
-                                if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
-                                    requestLocalFolder(size, serializedNodes, sdCardRoot);
-                                } else {
-                                    if (context instanceof DownloadableActivity) {
-                                        ((DownloadableActivity) context).setChatDownloadInfo(new ChatDownloadInfo(size, serializedNodes,nodeList));
-                                    }
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        try {
-                                            sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                                            requestLocalFolder(size, serializedNodes, sdCardRoot);
-                                        } catch (SDCardOperator.SDCardException e) {
-                                            e.printStackTrace();
-                                            logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
-                                            //request sd card root request and write permission.
-                                            SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
-                                        }
-                                    } else {
-                                        SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
-                                    }
-                                }
-                            } catch (SDCardOperator.SDCardException e) {
-                                e.printStackTrace();
-                                logError("Initialize SDCardOperator failed", e);
-                                // SD card is unavailable, choose internal folder
-                                requestLocalFolder(size, serializedNodes, null);
-                            }
-                            break;
-                        }
-                    }
-                }
-            });
+            SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context,SelectDownloadLocationDialog.From.CHAT);
+            selector.setChatController(this);
+            selector.setSize(size);
+            selector.setNodeList(serializedNodes);
             selector.show();
         }
     }

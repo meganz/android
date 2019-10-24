@@ -779,53 +779,11 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
         startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
     }
 
-    private void showSelectDownloadLocationDialog(final long [] hashes, final long size) {
-        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(this);
-        selector.initDialogBuilder(new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0: {
-                        toSelectFolder(hashes, size, null, null);
-                        break;
-                    }
-                    case 1: {
-                        SDCardOperator sdCardOperator = null;
-                        try {
-                            sdCardOperator = new SDCardOperator(FolderLinkActivityLollipop.this);
-                        } catch (SDCardOperator.SDCardException e) {
-                            e.printStackTrace();
-                            logError("Initialize SDCardOperator failed, toSelectFolder", e);
-                            toSelectFolder(hashes, size, null, null);
-                        }
-                        if(sdCardOperator != null) {
-                            String sdCardRoot = sdCardOperator.getSDCardRoot();
-                            //don't use DocumentFile
-                            if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
-                                toSelectFolder(hashes, size, sdCardRoot,null);
-                            } else {
-                                setDownloadInfo(new DownloadInfo(false, size, hashes));
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    try {
-                                        sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                                        toSelectFolder(hashes, size, sdCardRoot,null);
-                                    } catch (SDCardOperator.SDCardException e) {
-                                        e.printStackTrace();
-                                        logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
-                                        //request sd card root request and write permission.
-                                        SDCardOperator.requestSDCardPermission(sdCardRoot, FolderLinkActivityLollipop.this, FolderLinkActivityLollipop.this);
-                                    }
-                                } else {
-                                    SDCardOperator.requestSDCardPermission(sdCardRoot, FolderLinkActivityLollipop.this, FolderLinkActivityLollipop.this);
-                                }
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-        });
+    private void showSelectDownloadLocationDialog(long[] hashes, long size) {
+        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(this, SelectDownloadLocationDialog.From.FOLDER_LINK);
+        selector.setFolderLinkActivity(this);
+        selector.setSize(size);
+        selector.setHashes(hashes);
         selector.show();
     }
 
