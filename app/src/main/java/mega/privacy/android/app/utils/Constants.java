@@ -329,6 +329,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
     public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
     public static final String CHAT_FOLDER = "My chat files";
+    public static final String AUTHORITY_STRING_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider";
 
     public static final int RICH_WARNING_TRUE = 1;
     public static final int RICH_WARNING_FALSE = 0;

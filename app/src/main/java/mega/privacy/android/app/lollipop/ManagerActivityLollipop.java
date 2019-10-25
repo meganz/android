@@ -202,7 +202,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -10002,13 +10001,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         	newFile.createNewFile();
         } catch (IOException e) {}
 
-		Uri outputFileUri;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
-		}
-		else{
-			outputFileUri = Uri.fromFile(newFile);
-		}
+        //This method is in the v4 support library, so can be applied to all devices
+		Uri outputFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, newFile);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
