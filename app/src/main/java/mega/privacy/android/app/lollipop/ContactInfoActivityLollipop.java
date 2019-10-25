@@ -68,6 +68,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -105,8 +106,8 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_COPY_FOLDER;
-import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_MOVE_FOLDER;
+import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.*;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -141,7 +142,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	LinearLayout optionsLayout;
 
 	//Info of the user
-	TextView nameText;
+	EmojiTextView nameText;
 	TextView emailText;
 
 	LinearLayout chatOptionsLayout;
@@ -174,7 +175,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	//Toolbar elements
 	ImageView contactStateIcon;
-	TextView firstLineTextToolbar;
+	EmojiTextView firstLineTextToolbar;
 	TextView firstLineLengthToolbar;
 	MarqueeTextView secondLineTextToolbar;
 	TextView secondLineLengthToolbar;
@@ -220,6 +221,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     NodeController nC;
     boolean moveToRubbish;
     long parentHandle;
+
+    private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
@@ -294,14 +297,15 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
 			/*TITLE*/
-			firstLineTextToolbar = (TextView) findViewById(R.id.first_line_toolbar);
+			firstLineTextToolbar = (EmojiTextView) findViewById(R.id.first_line_toolbar);
 			firstLineLengthToolbar = (TextView) findViewById(R.id.first_line_length_toolbar);
 
 			/*SUBTITLE*/
 			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
-			nameText = (TextView) findViewById(R.id.chat_contact_properties_name_text);
+			nameText = (EmojiTextView) findViewById(R.id.chat_contact_properties_name_text);
+			nameText.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 			emailText =(TextView) findViewById(R.id.chat_contact_properties_email_text);
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -438,7 +442,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 						nameText.setText(userEmailExtra);
 					}
 				}
-				String fullname = (String)firstLineTextToolbar.getText();
+				String fullname = firstLineTextToolbar.getText().toString();
 				setDefaultAvatar(fullname);
 			}
 			else{
@@ -678,7 +682,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 				logDebug("This user is offline");
 				contactStateIcon.setVisibility(View.VISIBLE);
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_offline));
+				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.offline_status));
 				secondLineLengthToolbar.setText(getString(R.string.offline_status));
@@ -1940,12 +1944,13 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
     
     public void showOptionsPanel(MegaNode node){
-		logDebug("Node handle: " + node.getHandle());
-        if(node!=null){
-            this.selectedNode = node;
-            ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-        }
+		logDebug("showOptionsPanel");
+
+        if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedNode = node;
+		bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
     
     public MegaNode getSelectedNode() {

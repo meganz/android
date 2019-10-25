@@ -80,32 +80,14 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
-import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.FileUtils.copyFile;
-import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.Util.getScaleH;
-import static mega.privacy.android.app.utils.Util.getScaleW;
-import static mega.privacy.android.app.utils.Util.getSizeString;
-import static mega.privacy.android.app.utils.Util.isChatEnabled;
-import static mega.privacy.android.app.utils.Util.isOnline;
-import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
-import static mega.privacy.android.app.utils.Util.scaleHeightPx;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatFullScreenImageViewer extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
-
+	private static final long ANIMATION_DURATION = 400L;
 	boolean fromChatSavedInstance = false;
 	int[] screenPosition;
 	int mLeftDelta;
@@ -571,7 +553,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 
 	public void runEnterAnimation() {
 		logDebug("runEnterAnimation");
-		final long duration = 600;
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
 				tB.animate().translationY(-220).setDuration(0)
@@ -607,7 +588,7 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 
 		ivShadow.setAlpha(0);
 
-		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
+		viewPager.animate().setDuration(ANIMATION_DURATION).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
 			@Override
 			public void run() {
 				showActionBar();
@@ -617,7 +598,7 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 			}
 		});
 
-		ivShadow.animate().setDuration(duration).alpha(1);
+		ivShadow.animate().setDuration(ANIMATION_DURATION).alpha(1);
 	}
 
 	@Override
@@ -1041,14 +1022,15 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 	protected void hideActionBar(){
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
-				tB.animate().translationY(-220).setDuration(400L)
+				tB.animate().translationY(-220).setDuration(ANIMATION_DURATION)
 						.withEndAction(new Runnable() {
 							@Override
 							public void run() {
 								aB.hide();
 							}
 						}).start();
-				bottomLayout.animate().translationY(220).setDuration(400L).start();
+				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -1058,8 +1040,9 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 		if (aB != null && !aB.isShowing()) {
 			aB.show();
 			if(tB != null) {
-				tB.animate().translationY(0).setDuration(400L).start();
-				bottomLayout.animate().translationY(0).setDuration(400L).start();
+				tB.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+				bottomLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 
 		}

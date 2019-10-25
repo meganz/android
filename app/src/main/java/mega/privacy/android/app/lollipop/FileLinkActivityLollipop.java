@@ -462,7 +462,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 //				nameView.setText(document.getName());
 				collapsingToolbar.setTitle(document.getName());
 
-				sizeTextView.setText(Formatter.formatFileSize(this, document.getSize()));
+				sizeTextView.setText(getSizeString(document.getSize()));
 
 				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 				iconViewLayout.setVisibility(View.VISIBLE);

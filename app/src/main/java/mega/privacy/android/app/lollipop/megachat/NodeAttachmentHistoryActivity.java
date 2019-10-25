@@ -86,33 +86,12 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
-import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
-import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
-import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_CHAT_IMPORT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
-import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
-import static mega.privacy.android.app.utils.Util.getSizeString;
-import static mega.privacy.android.app.utils.Util.isOnline;
-import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
-import static mega.privacy.android.app.utils.Util.px2dp;
-import static mega.privacy.android.app.utils.Util.scaleHeightPx;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class NodeAttachmentHistoryActivity extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
 
@@ -170,6 +149,8 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 	public long selectedMessageId = -1;
 
 	ChatController chatC;
+
+	private NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -381,16 +362,6 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 			else{
 				logError("ERROR: node is NULL");
 			}
-		}
-	}
-	
-	public void showOptionsPanel(MegaChatMessage sMessage, int sPosition){
-		logDebug("showOptionsPanel");
-		if(sMessage!=null){
-			this.selectedMessage = sMessage;
-			this.selectedPosition = sPosition;
-			//VersionBottomSheetDialogFragment bottomSheetDialogFragment = new VersionBottomSheetDialogFragment();
-			//bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
 
@@ -1711,14 +1682,13 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 	}
 
 	public void showNodeAttachmentBottomSheet(MegaChatMessage message, int position){
-		logDebug("Position: " + position);
-		//this.selectedPosition = position;
-		if(message!=null){
-			this.selectedMessageId = message.getMsgId();
+		logDebug("showNodeAttachmentBottomSheet: "+position);
 
-			NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+		if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedMessageId = message.getMsgId();
+		bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showSnackbar(int type, String s){

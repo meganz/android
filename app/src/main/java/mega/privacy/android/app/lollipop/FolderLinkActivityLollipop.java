@@ -34,7 +34,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -91,12 +90,46 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
+import static mega.privacy.android.app.utils.Constants.SCROLL_TO_POSITION;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.UPDATE_IMAGE_DRAG;
+import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.PreviewUtils.getBitmapForCache;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromCache;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromFolder;
+import static mega.privacy.android.app.utils.PreviewUtils.previewCache;
+import static mega.privacy.android.app.utils.Util.askMe;
+import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
+import static mega.privacy.android.app.utils.Util.getScaleH;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isChatEnabled;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
 public class FolderLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener{
 
@@ -168,6 +201,8 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 
 	String downloadLocationDefaultPath;
 	public static final int FOLDER_LINK = 2;
+
+	private FolderLinkBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	public void activateActionMode(){
 		logDebug("activateActionMode");
@@ -1277,7 +1312,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 									fileLinkFragmentContainer.setVisibility(View.VISIBLE);
 
 									fileLinkNameView.setText(pN.getName());
-									fileLinkSizeTextView.setText(Formatter.formatFileSize(this, pN.getSize()));
+									fileLinkSizeTextView.setText(getSizeString(pN.getSize()));
 
 									fileLinkIconView.setImageResource(MimeTypeList.typeForName(pN.getName()).getIconResourceId());
 
@@ -1467,12 +1502,21 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		adapterList.setMultipleSelect(false);
+		if (adapterList != null) {
+			adapterList.setMultipleSelect(false);
+		}
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
-		optionsBar.setVisibility(View.VISIBLE);
-		separator.setVisibility(View.VISIBLE);
+
+		if (optionsBar != null) {
+			optionsBar.setVisibility(View.VISIBLE);
+		}
+
+		if (separator != null) {
+			separator.setVisibility(View.VISIBLE);
+		}
 	}
 	
 	public void selectAll(){
@@ -2076,11 +2120,12 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 
 	public void showOptionsPanel(MegaNode sNode){
 		logDebug("showNodeOptionsPanel-Offline");
-		if(sNode!=null){
-			this.selectedNode = sNode;
-			FolderLinkBottomSheetDialogFragment bottomSheetDialogFragment = new FolderLinkBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (sNode == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedNode = sNode;
+		bottomSheetDialogFragment = new FolderLinkBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showSnackbar(int type, String s){

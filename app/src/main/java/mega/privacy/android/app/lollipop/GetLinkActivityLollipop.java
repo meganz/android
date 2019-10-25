@@ -2,9 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,21 +11,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -246,191 +236,26 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 
 	public void showSetPasswordDialog(final String password, final String link){
-		logDebug("showSetPasswordDialog");
-
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.overquota_alert_title));
-		LayoutInflater inflater = getLayoutInflater();
-		View dialoglayout = inflater.inflate(R.layout.dialog_set_password_link, null);
-		builder.setTitle(getString(R.string.set_password_protection_dialog));
-
-		final EditText input1 = (EditText) dialoglayout.findViewById(R.id.first_edit_text);
-		final EditText input2 = (EditText) dialoglayout.findViewById(R.id.second_edit_text);
-
-		if(password!=null){
-			input1.setText(password);
-		}
-
-		input1.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        logDebug("showSetPasswordDialog");
+		SetPasswordDialog.SetPasswordCallback callback = new SetPasswordDialog.SetPasswordCallback() {
 			@Override
-			public void onFocusChange(final View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
+			public void onConfirmed(String password) {
+				if(getLinkFragment != null){
+					getLinkFragment.processingPass();
 				}
+				megaApi.encryptLinkWithPassword(link, password, GetLinkActivityLollipop.this);
 			}
-		});
 
-		final RelativeLayout errorLayout1 = (RelativeLayout) dialoglayout.findViewById(R.id.error_first_edit_layout);
-		final RelativeLayout errorLayout2 = (RelativeLayout) dialoglayout.findViewById(R.id.error_second_edit_layout);
-
-		final TextView textError1 = (TextView) dialoglayout.findViewById(R.id.error_first_edit_text);
-		final TextView textError2 = (TextView) dialoglayout.findViewById(R.id.error_second_edit_text);
-
-		builder.setView(dialoglayout);
-
-
-		builder.setPositiveButton(getString(R.string.button_set), new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-
-			}
-		});
-
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input1.getBackground().clearColorFilter();
-				if(getLinkFragment!=null){
+			public void onCanceled() {
+				if (getLinkFragment != null) {
 					getLinkFragment.enablePassProtection(false);
 				}
 			}
-		});
+		};
 
-		input1.getBackground().mutate().clearColorFilter();
-		input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input1.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(errorLayout1.getVisibility() == View.VISIBLE){
-					errorLayout1.setVisibility(View.GONE);
-					input1.getBackground().mutate().clearColorFilter();
-					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getLinkActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input2.getBackground().mutate().clearColorFilter();
-		input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input2.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(errorLayout2.getVisibility() == View.VISIBLE){
-					errorLayout2.setVisibility(View.GONE);
-					input2.getBackground().mutate().clearColorFilter();
-					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-										  KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_NEXT) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						errorLayout1.setVisibility(View.VISIBLE);
-						input1.requestFocus();
-						return true;
-					}
-					else{
-						input2.requestFocus();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-		passwordDialog = builder.create();
-		passwordDialog.show();
-		passwordDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				boolean proceedInput1 = false;
-				boolean proceedInput2 = false;
-				String value1 = input1.getText().toString();
-				if (value1.trim().length() != 0) {
-					proceedInput1 = true;
-				}
-
-				String value2 = input2.getText().toString();
-				if (value2.trim().length() != 0) {
-					proceedInput2 = true;
-				}
-
-				if(proceedInput1&&proceedInput2){
-					logDebug("Check are equal");
-					if(value1.equals(value2)){
-						logDebug("Proceed to set pass");
-						getLinkFragment.processingPass();
-						megaApi.encryptLinkWithPassword(link, value2, getLinkActivity);
-						passwordDialog.dismiss();
-					}
-					else{
-						input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						errorLayout2.setVisibility(View.VISIBLE);
-						textError2.setText(getString(R.string.error_passwords_dont_match));
-						input2.requestFocus();
-					}
-				}
-				else if(!proceedInput1&&proceedInput2){
-					logWarning("Error on pass1");
-					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					errorLayout1.setVisibility(View.VISIBLE);
-					input1.requestFocus();
-				}
-				else if(!proceedInput2&&proceedInput1){
-					logWarning("Error on pass2");
-					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					errorLayout2.setVisibility(View.VISIBLE);
-					input2.requestFocus();
-				}
-				else{
-					logWarning("Error on both");
-					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					errorLayout1.setVisibility(View.VISIBLE);
-					input1.requestFocus();
-
-					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					errorLayout2.setVisibility(View.VISIBLE);
-				}
-			}
-		});
-	}
-
-	private void showKeyboardDelayed(final View view) {
-		logDebug("showKeyboardDelayed");
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
+		SetPasswordDialog dialog = new SetPasswordDialog(this, callback, megaApi);
+		dialog.show();
 	}
 
 	public void showFragment(int visibleFragment){
