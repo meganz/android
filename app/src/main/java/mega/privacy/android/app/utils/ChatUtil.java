@@ -100,7 +100,6 @@ public class ChatUtil {
 
     /*Method to return to the call which I am participating*/
     public static void returnCall(Context context, MegaChatApiAndroid megaChatApi) {
-        logDebug("returnCall()");
         if ((megaChatApi == null) || (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)) == null))
             return;
         long chatId = getChatCallInProgress(megaChatApi);

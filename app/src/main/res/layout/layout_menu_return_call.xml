@@ -2,7 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="22dp"
+    android:layout_height="24dp"
     android:orientation="horizontal"
     android:background="@drawable/dark_rounded_chat_own_message"
     android:gravity="center_horizontal|center_vertical">
@@ -10,8 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="3dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
         android:src="@drawable/ic_call_menu"
         android:contentDescription="@string/call_in_progress_layout"/>
 
@@ -19,11 +19,10 @@
         android:id="@+id/chrono_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
         android:textColor="@color/white"
         android:gravity="center_vertical|center_horizontal"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_marginRight="8dp"
-        android:textSize="12sp"
-        android:text="00:00"/>
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="4dp"
+        android:textSize="12sp"/>
 </LinearLayout>

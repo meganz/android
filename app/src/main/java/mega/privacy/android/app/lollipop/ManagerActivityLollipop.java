@@ -6268,6 +6268,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		LinearLayout rootView = (LinearLayout) returnCallMenuItem.getActionView();
 		chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
+		chronometerMenuItem.setVisibility(View.GONE);
 
 		rootView.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -6360,11 +6361,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     takePicture.setVisible(false);
                 }
 
-				if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1 && megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+				if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1) {
 					returnCallMenuItem.setVisible(true);
-					chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
-					chronometerMenuItem.start();
-					chronometerMenuItem.setFormat(" %s");
+
+					if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+						chronometerMenuItem.setVisibility(View.VISIBLE);
+						chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
+						chronometerMenuItem.start();
+						chronometerMenuItem.setFormat(" %s");
+					}else if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+						chronometerMenuItem.setVisibility(View.GONE);
+					}
+
 
 				}else {
 					chronometerMenuItem.stop();
@@ -6841,11 +6849,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					forgotPassMenuItem.setVisible(false);
 				}
 
-				if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1 && megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+				if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1) {
 					returnCallMenuItem.setVisible(true);
-					chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
-					chronometerMenuItem.start();
-					chronometerMenuItem.setFormat(" %s");
+
+					if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+						chronometerMenuItem.setVisibility(View.VISIBLE);
+						chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
+						chronometerMenuItem.start();
+						chronometerMenuItem.setFormat(" %s");
+					}else if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+						chronometerMenuItem.setVisibility(View.GONE);
+					}
 
 				}else {
 					chronometerMenuItem.stop();
@@ -7264,11 +7278,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
 					importLinkMenuItem.setVisible(true);
 
-					if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1 && megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+					if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1) {
 						returnCallMenuItem.setVisible(true);
-						chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
-						chronometerMenuItem.start();
-						chronometerMenuItem.setFormat(" %s");
+						if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+							chronometerMenuItem.setVisibility(View.VISIBLE);
+							chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
+							chronometerMenuItem.start();
+							chronometerMenuItem.setFormat(" %s");
+						}else if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+							chronometerMenuItem.setVisibility(View.GONE);
+						}
 
 					}else {
 						chronometerMenuItem.stop();
@@ -7393,11 +7412,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					searchByDate.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
-					if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1 && megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+					if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Util.isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1) {
 						returnCallMenuItem.setVisible(true);
-						chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
-						chronometerMenuItem.start();
-						chronometerMenuItem.setFormat(" %s");
+						if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+							chronometerMenuItem.setVisibility(View.VISIBLE);
+							chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
+							chronometerMenuItem.start();
+							chronometerMenuItem.setFormat(" %s");
+						}else if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+							chronometerMenuItem.setVisibility(View.GONE);
+						}
 
 					}else {
 						chronometerMenuItem.stop();
