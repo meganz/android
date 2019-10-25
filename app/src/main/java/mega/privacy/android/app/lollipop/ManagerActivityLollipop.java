@@ -494,6 +494,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private ViewPager viewPagerTransfers;
 
 	private RelativeLayout transfersOverViewLayout;
+	private LinearLayout transfersTextLayout;
 	private TextView transfersTitleText;
 	private TextView transfersNumberText;
 	private ImageView playButton;
@@ -2479,22 +2480,25 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
         }
 
-		transfersOverViewLayout = (RelativeLayout) findViewById(R.id.transfers_overview_item_layout);
+		transfersOverViewLayout = findViewById(R.id.transfers_overview_item_layout);
 		transfersOverViewLayout.setOnClickListener(this);
-		transfersTitleText = (TextView) findViewById(R.id.transfers_overview_title);
-		transfersNumberText = (TextView) findViewById(R.id.transfers_overview_number);
-		playButton = (ImageView) findViewById(R.id.transfers_overview_button);
-		actionLayout = (RelativeLayout) findViewById(R.id.transfers_overview_action_layout);
+		transfersTextLayout = findViewById(R.id.transfers_text_layout);
+		transfersTitleText = findViewById(R.id.transfers_overview_title);
+		transfersNumberText = findViewById(R.id.transfers_overview_number);
+
+		playButton = findViewById(R.id.transfers_overview_button);
+		actionLayout = findViewById(R.id.transfers_overview_action_layout);
 		actionLayout.setOnClickListener(this);
-		dotsOptionsTransfersLayout = (RelativeLayout) findViewById(R.id.transfers_overview_three_dots_layout);
+		dotsOptionsTransfersLayout = findViewById(R.id.transfers_overview_three_dots_layout);
 		dotsOptionsTransfersLayout.setOnClickListener(this);
-		progressBarTransfers = (ProgressBar) findViewById(R.id.transfers_overview_progress_bar);
+		progressBarTransfers = findViewById(R.id.transfers_overview_progress_bar);
+
+		putTransfersWidget();
 
 		callInProgressLayout = findViewById(R.id.call_in_progress_layout);
 		callInProgressLayout.setOnClickListener(this);
 		callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
 		callInProgressLayout.setVisibility(View.GONE);
-		callInProgressChrono.setVisibility(View.GONE);
 
 		///Check the MK or RK file
 		int versionApp = getVersion(this);
@@ -17752,6 +17756,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			dotsOptionsTransfersLayout.setOnClickListener(null);
 			actionLayout.setOnClickListener(null);
 		}
+	}
+
+	private void putTransfersWidget(){
+		if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			transfersOverViewLayout.getLayoutParams().height = px2dp(72, outMetrics);
+			transfersTextLayout.setOrientation(LinearLayout.VERTICAL);
+		}else{
+			transfersOverViewLayout.getLayoutParams().height = px2dp(50, outMetrics);
+			transfersTextLayout.setOrientation(LinearLayout.HORIZONTAL);
+		}
+		transfersOverViewLayout.requestLayout();
 	}
 
 	/**
