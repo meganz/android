@@ -5,6 +5,7 @@
     android:background="@drawable/statelist_item_layout"
     android:id="@+id/transfers_overview_item_layout"
 	android:paddingBottom="3dp"
+	android:paddingLeft="16dp"
 	android:visibility="gone">
 
 	<LinearLayout
@@ -13,7 +14,6 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentTop="true"
-		android:layout_marginLeft="16dp"
 		android:layout_marginTop="14dp">
 		<TextView
 			android:id="@+id/transfers_overview_title"
@@ -80,6 +80,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
+		android:layout_marginRight="16dp"
 		style="@style/TransferProgressBar" />
 
 </RelativeLayout>
