@@ -75,7 +75,7 @@ public class SDCardOperator {
                 Uri tragetUri = Uri.parse(uriString);
                 targetRoot = FileUtil.getFullPathFromTreeUri(tragetUri, context);
                 sdCardRootDocument = DocumentFile.fromTreeUri(context, tragetUri);
-                if (!sdCardRootDocument.canWrite()) {
+                if (sdCardRootDocument == null || !sdCardRootDocument.canWrite()) {
                     throw new SDCardException("Permission required!");
                 }
             } catch (Exception e) {

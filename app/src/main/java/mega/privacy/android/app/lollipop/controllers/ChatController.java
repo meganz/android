@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.StatFs;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -30,7 +29,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -47,10 +45,9 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
-import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DownloadChecker;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
-import mega.privacy.android.app.utils.download.ChatDownloadInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1713,7 +1710,7 @@ public class ChatController {
         }
     }
 
-    public void download(String parentPath, final ArrayList<MegaNode> nodeList){
+    public void download(String parentPath, ArrayList<MegaNode> nodeList){
         logDebug("download()");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -1937,56 +1934,24 @@ public class ChatController {
                 }
             }
 
-            boolean downloadToSDCard = false;
-            String downloadRoot = null;
-            SDCardOperator sdCardOperator = null;
             long size = 0;
             for (int i = 0; i < nodeList.size(); i++) {
                 size += nodeList.get(i).getSize();
             }
-            final long sizeFinal = size;
-            final ArrayList<String> serializedNodes = serializeNodes(nodeList);
-            try {
-                sdCardOperator = new SDCardOperator(context);
-            } catch (SDCardOperator.SDCardException e) {
-                e.printStackTrace();
-                logError("Initialize SDCardOperator failed", e);
-                // user uninstall the sd card. but default download location is still on the sd card
-                if (SDCardOperator.isSDCardPath(parentPath)) {
-                    logDebug("select new path as download location.");
-                    requestLocalFolder(sizeFinal,serializedNodes,null);
-                    return;
-                }
-            }
-            if (sdCardOperator != null && SDCardOperator.isSDCardPath(parentPath)) {
-                final String sdCardRoot = sdCardOperator.getSDCardRoot();
-                //user has installed another sd card.
-                if (sdCardOperator.isNewSDCardPath(parentPath)) {
-                    logDebug("new sd card, check permission.");
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            showSelectDownloadLocationDialog(nodeList, sizeFinal);
-                        }
-                    }, 1500);
-                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.old_sdcard_unavailable));
-                    return;
-                }
-                if (!sdCardOperator.canWriteWithFile(parentPath)) {
+            ArrayList<String> serializedNodes = serializeNodes(nodeList);
+            boolean downloadToSDCard = false;
+            String downloadRoot = null;
+            if(SDCardOperator.isSDCardPath(parentPath)) {
+                DownloadChecker checker = new DownloadChecker(context, parentPath, SelectDownloadLocationDialog.From.CHAT);
+                checker.setChatController(this);
+                checker.setSize(size);
+                checker.setNodeList(nodeList);
+                checker.setSerializedNodes(serializedNodes);
+                if (checker.check()) {
                     downloadToSDCard = true;
-                    downloadRoot = sdCardOperator.getDownloadRoot();
-                    try {
-                        sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                    } catch (SDCardOperator.SDCardException e) {
-                        e.printStackTrace();
-                        logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
-                        //request SD card write permission.
-                        if (context instanceof DownloadableActivity) {
-                            ((DownloadableActivity) context).setChatDownloadInfo(new ChatDownloadInfo(sizeFinal, serializedNodes,nodeList));
-                        }
-                        SDCardOperator.requestSDCardPermission(sdCardRoot, context, (Activity) context);
-                        return;
-                    }
+                    downloadRoot = checker.getDownloadRoot();
+                } else {
+                    return;
                 }
             }
 
@@ -1995,7 +1960,7 @@ public class ChatController {
                 if(nodeToDownload != null){
                     logDebug("Node NOT null is going to donwload");
                     Map<MegaNode, String> dlFiles = new HashMap<>();
-                    Map<Long, String> targets = new HashMap();
+                    Map<Long, String> targets = new HashMap<>();
 
                     if (downloadToSDCard) {
                         targets.put(nodeToDownload.getHandle(), parentPath);

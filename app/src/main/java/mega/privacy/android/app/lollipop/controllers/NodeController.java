@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -31,7 +30,6 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
@@ -52,7 +50,6 @@ import mega.privacy.android.app.utils.DownloadChecker;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
 import mega.privacy.android.app.utils.download.DownloadInfo;
-import mega.privacy.android.app.utils.download.DownloadLinkInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -979,7 +976,7 @@ public class NodeController {
     }
 
     public void showSelectDownloadLocationDialog(DownloadInfo downloadInfo) {
-        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context,SelectDownloadLocationDialog.From.NORMAL);
+        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context, SelectDownloadLocationDialog.From.NORMAL);
         selector.setDownloadInfo(downloadInfo);
         selector.setNodeController(this);
         selector.show();
@@ -1712,53 +1709,22 @@ public class NodeController {
         }
     }
 
-    public void downloadTo(final MegaNode currentDocument, final String parentPath, final String url){
+    public void downloadTo(MegaNode currentDocument, String parentPath, String url){
         logDebug("downloadTo");
         boolean downloadToSDCard = false;
         String downloadRoot = null;
         SDCardOperator sdCardOperator = null;
-        try {
-            sdCardOperator = new SDCardOperator(context);
-        } catch (SDCardOperator.SDCardException e) {
-            e.printStackTrace();
-            logError("Initialize SDCardOperator failed", e);
-            // user uninstall the sd card. but default download location is still on the sd card
-            if (SDCardOperator.isSDCardPath(parentPath)) {
-                logDebug("select new path as download location.");
-                intentPickFolder(currentDocument, url,null);
-                return;
-            }
-        }
-        if(sdCardOperator != null && SDCardOperator.isSDCardPath(parentPath)) {
-            //user has installed another sd card.
-            if(sdCardOperator.isNewSDCardPath(parentPath)) {
-                logDebug("new sd card, check permission.");
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showSelectDownloadLocationDialog(currentDocument, url);
-                    }
-                }, 1500);
-                showSnackbar(Constants.SNACKBAR_TYPE,context.getString(R.string.old_sdcard_unavailable));
-                return;
-            }
-            if (!sdCardOperator.canWriteWithFile(parentPath)) {
+        if(SDCardOperator.isSDCardPath(parentPath)) {
+            DownloadChecker checker = new DownloadChecker(context, parentPath, SelectDownloadLocationDialog.From.FILE_LINK);
+            checker.setNodeController(this);
+            checker.setDocument(currentDocument);
+            checker.setUrl(url);
+            if (checker.check()) {
                 downloadToSDCard = true;
-                downloadRoot = sdCardOperator.getDownloadRoot();
-                try {
-                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                } catch (SDCardOperator.SDCardException e) {
-                    e.printStackTrace();
-                    logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
-                    //don't have permission with sd card root. need to request.
-                    String sdRoot = sdCardOperator.getSDCardRoot();
-                    if(context instanceof DownloadableActivity) {
-                        ((DownloadableActivity) context).setLinkInfo(new DownloadLinkInfo(currentDocument,url));
-                    }
-                    //request SD card write permission.
-                    SDCardOperator.requestSDCardPermission(sdRoot, context, (Activity) context);
-                    return;
-                }
+                downloadRoot = checker.getDownloadRoot();
+                sdCardOperator = checker.getSdCardOperator();
+            } else {
+                return;
             }
         }
 
@@ -1781,7 +1747,6 @@ public class NodeController {
                     //copy file.
                     new Thread(new CopyFileThread(downloadToSDCard,localPath,parentPath,tempNode.getName(),sdCardOperator)).start();
                 }
-
             }
             else{
                 logDebug("LocalPath is NULL");

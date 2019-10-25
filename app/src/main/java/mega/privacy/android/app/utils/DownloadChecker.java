@@ -15,8 +15,6 @@ import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class DownloadChecker extends SelectDownloadLocationDialog {
 
-    private boolean downloadToSDCard;
-
     private String downloadRoot;
 
     private SDCardOperator sdCardOperator;
@@ -36,10 +34,6 @@ public class DownloadChecker extends SelectDownloadLocationDialog {
         isSDCardPath = SDCardOperator.isSDCardPath(downloadPath);
     }
 
-    public boolean isDownloadToSDCard() {
-        return downloadToSDCard;
-    }
-
     public String getDownloadRoot() {
         return downloadRoot;
     }
@@ -48,19 +42,19 @@ public class DownloadChecker extends SelectDownloadLocationDialog {
         return sdCardOperator;
     }
 
-    private void requestLocalFolder(String sdRoot, String prompt) {
+    private void requestInternalFolder(String prompt) {
         switch (from) {
             case NORMAL:
-                nodeController.requestLocalFolder(downloadInfo, sdRoot, prompt);
+                nodeController.requestLocalFolder(downloadInfo, null, prompt);
                 break;
             case FILE_LINK:
-                nodeController.intentPickFolder(document, url, sdRoot);
+                nodeController.intentPickFolder(document, url, null);
                 break;
             case FOLDER_LINK:
-                folderLinkActivity.toSelectFolder(hashes, size, sdRoot, null);
+                folderLinkActivity.toSelectFolder(hashes, size, null, null);
                 break;
             case CHAT:
-                chatController.requestLocalFolder(size, serializedNodes, sdRoot);
+                chatController.requestLocalFolder(size, serializedNodes, null);
                 break;
         }
     }
@@ -91,7 +85,7 @@ public class DownloadChecker extends SelectDownloadLocationDialog {
             // user uninstall the sd card. but default download location is still on the sd card
             if (isSDCardPath) {
                 logDebug("select new path as download location.");
-                requestLocalFolder(null, context.getString(R.string.no_external_SD_card_detected));
+                requestInternalFolder(context.getString(R.string.no_external_SD_card_detected));
                 return false;
             }
         }
@@ -109,7 +103,6 @@ public class DownloadChecker extends SelectDownloadLocationDialog {
                 return false;
             }
             if (!sdCardOperator.canWriteWithFile(downloadPath)) {
-                downloadToSDCard = true;
                 downloadRoot = sdCardOperator.getDownloadRoot();
                 try {
                     sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());

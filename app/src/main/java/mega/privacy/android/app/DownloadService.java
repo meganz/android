@@ -46,7 +46,6 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -202,7 +201,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		// remove all the generated folders in cache folder on SD card.
         File[] fs = getExternalCacheDirs();
         if (fs.length > 1 && fs[1] != null) {
-            FileUtils.purgeDirectory(fs[1]);
+            purgeDirectory(fs[1]);
         }
 		super.onDestroy();
 	}

@@ -117,7 +117,7 @@ public class DownloadableActivity extends SorterContentActivity {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                         activity.toSelectFolder(downloadInfo.getHashes(), downloadInfo.getSize(), sdCardOperator.getSDCardRoot(), null);
                                     } else {
-                                        activity.downloadTo(extractRealPath(treeUri), uriString, null, downloadInfo.getSize(), downloadInfo.getHashes());
+                                        activity.downloadTo(extractRealPath(treeUri), null, downloadInfo.getSize(), downloadInfo.getHashes());
                                     }
                                 }
                             }

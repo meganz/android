@@ -161,7 +161,7 @@ public class SelectDownloadLocationDialog {
                         break;
                     }
                     case 1: {
-                        SDCardOperator sdCardOperator = null;
+                        SDCardOperator sdCardOperator;
                         try {
                             sdCardOperator = new SDCardOperator(context);
                         } catch (SDCardOperator.SDCardException e) {
