@@ -19,35 +19,6 @@
         android:textColor="@color/name_my_account"
         android:theme="@style/ColorControlStyle"/>
 
-    <RelativeLayout
-        android:id="@+id/autoaway_error"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_below="@id/autoaway_edittext"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/login_newPassword1_text_error_icon"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="2dp"
-            android:src="@drawable/ic_input_warning"
-            android:tint="@color/login_warning"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="3dp"
-            android:id="@+id/login_newPassword1_text_error_text"
-            android:textColor="@color/login_warning"
-            android:layout_toLeftOf="@+id/login_newPassword1_text_error_icon"
-            android:layout_alignParentLeft="true"
-            android:text="@string/error_autoaway"/>
-    </RelativeLayout>
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -190,12 +190,10 @@ import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -237,7 +235,6 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -11740,7 +11737,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         View v = inflater.inflate(R.layout.dialog_autoaway, null);
         builder.setView(v);
 
-        final RelativeLayout error = v.findViewById(R.id.autoaway_error);
         final EditText input = v.findViewById(R.id.autoaway_edittext);
         input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -11750,9 +11746,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (error.getVisibility() == View.VISIBLE) {
-                    error.setVisibility(View.GONE);
-                }
+
             }
 
             @Override
@@ -11764,14 +11758,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (validAutoaway(value)) {
+					String value = validateAutoAway(v.getText());
+					if (value != null) {
 						setAutoAwayValue(value, false);
-						newFolderDialog.dismiss();
 					}
-					else {
-						error.setVisibility(View.VISIBLE);
-					}
+					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
@@ -11790,16 +11781,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
 		set.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
-                String value = input.getText().toString().trim();
-                if (validAutoaway(value)) {
-                    setAutoAwayValue(value, false);
-					newFolderDialog.dismiss();
-                }
-                else {
-                    error.setVisibility(View.VISIBLE);
-                }
-            }
+			public void onClick(View v) {
+				String value = validateAutoAway(input.getText());
+				if (value != null) {
+					setAutoAwayValue(value, false);
+				}
+				newFolderDialog.dismiss();
+			}
         });
 		Button cancel = (Button) v.findViewById(R.id.autoaway_cancel_button);
 	    cancel.setOnClickListener(new OnClickListener() {
@@ -11814,10 +11802,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		newFolderDialog.show();
 	}
 
-	boolean validAutoaway(String value) {
-		int timeout = Integer.parseInt(value);
-		return timeout > 0 && timeout <= MAX_AUTOAWAY_TIMEOUT;
-    }
+	private String validateAutoAway(CharSequence value) {
+		int timeout;
+		try {
+			timeout = Integer.parseInt(value.toString().trim());
+			if (timeout <= 0) {
+				timeout = 1;
+			} else if (timeout > MAX_AUTOAWAY_TIMEOUT) {
+				timeout = MAX_AUTOAWAY_TIMEOUT;
+			}
+			return String.valueOf(timeout);
+		} catch (Exception e) {
+			logWarning("Unable to parse user input, user entered: '" + value + "'");
+			return null;
+		}
+	}
 
 	public void setAutoAwayValue(String value, boolean cancelled){
 		logDebug("Value: " + value);
