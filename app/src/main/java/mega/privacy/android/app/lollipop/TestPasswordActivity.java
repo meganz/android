@@ -40,11 +40,11 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
 
 public class TestPasswordActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
 
@@ -85,6 +85,8 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     boolean testingPassword = false;
     boolean dismissPasswordReminder = false;
     int numRequests = 0;
+
+    private RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -341,10 +343,9 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
                 logDebug("parentPath no NULL");
-                String[] split = RK_FILE.split(File.separator);
-                parentPath = parentPath+"/"+split[split.length-1];
+                parentPath = parentPath + File.separator + getRecoveryKeyFileName();
                 AccountController ac = new AccountController(this);
-                ac.exportMK(parentPath, false);
+                ac.exportMK(parentPath);
             }
         }
     }
@@ -389,7 +390,9 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             }
             case R.id.password_reminder_recoverykey_button:
             case R.id.test_password_backup_button: {
-                RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
+                if (isBottomSheetDialogShown(recoveryKeyBottomSheetDialogFragment)) break;
+
+                recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
                 recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
                 break;
             }

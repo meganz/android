@@ -603,11 +603,12 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					if (users.size()>0){
 						ContactController cC = new ContactController(context);
 						cC.pickFileToSend(users);
+						clearSelections();
+						hideMultipleSelect();
 					}										
 					break;
 				}
 				case R.id.cab_menu_start_conversation:{
-					ArrayList<Long> contactHandles = new ArrayList<>();
 
 					if(users.get(0)==null){
 						logWarning("Selected contact NULL");

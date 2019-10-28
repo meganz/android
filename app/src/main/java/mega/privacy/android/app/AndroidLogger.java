@@ -1,27 +1,18 @@
 package mega.privacy.android.app;
 
-import android.util.Log;
-
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaLoggerInterface;
 
-
 public class AndroidLogger extends MegaLogger implements MegaLoggerInterface {
 
     public static final String LOG_FILE_NAME = "logSDK.txt";
-    private final String TAG = "AndroidLogger";
 
     public AndroidLogger(String fileName, boolean fileLogger) {
         super(fileName, fileLogger);
     }
 
     public void log(String time, int logLevel, String source, String message) {
-        //display to console
-        if (Util.DEBUG) {
-            Log.d(TAG, createMessage(time, logLevel, source, message));
-        }
-
         //save to log file
         if (isReadyToWriteToFile(Util.getFileLoggerSDK())) {
             fileLogQueue.add(createMessage(time, logLevel, source, message));
@@ -59,12 +50,10 @@ public class AndroidLogger extends MegaLogger implements MegaLoggerInterface {
         String sourceMessage = "";
         if (source != null) {
             String[] s = source.split("jni/mega");
-            if (s != null) {
-                if (s.length > 1) {
-                    sourceMessage = s[1];
-                } else {
-                    sourceMessage = source;
-                }
+            if (s.length > 1) {
+                sourceMessage = s[1];
+            } else {
+                sourceMessage = source;
             }
         }
 

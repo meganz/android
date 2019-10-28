@@ -29,75 +29,95 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
+import mega.privacy.android.app.components.NewGridRecyclerView;
+import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
+import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnClickListener{
+public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements OnClickListener{
 
-	Context context;
-	MegaApiAndroid megaApi;
-	ArrayList<MegaNode> nodes;
+	private Context context;
+	private MegaApiAndroid megaApi;
+	private ArrayList<MegaNode> nodes;
+	private ArrayList<MegaNode> searchNodes;
+	private DisplayMetrics metrics;
 
-	public long parentHandle = -1;
-	
-	MegaExplorerLollipopAdapter adapter;
-	
-	int modeCloud;
-	boolean selectFile=false;
-	MegaPreferences prefs;
-	DatabaseHandler dbH;
-	public ActionMode actionMode;
-	
-//	public String name;
-	
-//	boolean first = false;
-//	private boolean folderSelected = false;
-	LinearLayout optionsBar;
-	RecyclerView listView;
-	LinearLayoutManager mLayoutManager;
+	private long parentHandle = -1;
 
-	ImageView emptyImageView;
-	LinearLayout emptyTextView;
-	TextView emptyTextViewFirst;
+	private MegaExplorerLollipopAdapter adapter;
+    private FastScroller fastScroller;
 
-	TextView contentText;
-	Button optionButton;
-	Button cancelButton;
-	View separator;
+	private int modeCloud;
+	private boolean selectFile=false;
+	private MegaPreferences prefs;
+	private DatabaseHandler dbH;
+	private  ActionMode actionMode;
 
-	ArrayList<Long> nodeHandleMoveCopy;
+	private LinearLayout optionsBar;
+	private RecyclerView recyclerView;
+	private LinearLayoutManager mLayoutManager;
+	private CustomizedGridLayoutManager gridLayoutManager;
 
-	Stack<Integer> lastPositionStack;
+	private ImageView emptyImageView;
+	private LinearLayout emptyTextView;
+	private TextView emptyTextViewFirst;
 
-	Handler handler;
+	private TextView contentText;
+	private Button optionButton;
+	private Button cancelButton;
+	private View separator;
+
+	private ArrayList<Long> nodeHandleMoveCopy;
+
+	private Stack<Integer> lastPositionStack;
+
+	private Handler handler;
+
+	private int order;
+
+	private NewHeaderItemDecoration headerItemDecoration;
+
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
+	}
 
 	public void activateActionMode(){
 		logDebug("activateActionMode");
+
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 
-			if(modeCloud==FileExplorerActivityLollipop.SELECT){
-				if(selectFile) {
-					if (((FileExplorerActivityLollipop) context).multiselect) {
-						activateButton(true);
-					}
-				}
+			if(isMultiselect()) {
+				activateButton(true);
 			}
 		}
+	}
+
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -156,7 +176,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}else{
 					if(modeCloud==FileExplorerActivityLollipop.SELECT){
 						if(selectFile){
-							if(((FileExplorerActivityLollipop)context).multiselect){
+							if(((FileExplorerActivityLollipop)context).isMultiselect()){
 								MegaNode node = megaApi.getNodeByHandle(parentHandle);
 								if(selected.size() == megaApi.getNumChildFiles(node)){
 									menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -218,6 +238,18 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		handler.removeCallbacksAndMessages(null);
 	}
 
+	public void checkScroll () {
+		if (recyclerView == null) {
+			return;
+		}
+		if (recyclerView.canScrollVertically(-1)){
+			((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+		}
+		else {
+			((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+		}
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		logDebug("onCreateView");
@@ -225,160 +257,95 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		
-		DisplayMetrics metrics = new DisplayMetrics();
+		metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
-		
-		float density  = getResources().getDisplayMetrics().density;
-		
-	    float scaleW = getScaleW(metrics, density);
-	    float scaleH = getScaleH(metrics, density);
 
-		separator = (View) v.findViewById(R.id.separator);
+		separator = v.findViewById(R.id.separator);
 		
-		optionsBar = (LinearLayout) v.findViewById(R.id.options_explorer_layout);
-		optionButton = (Button) v.findViewById(R.id.action_text);
+		optionsBar = v.findViewById(R.id.options_explorer_layout);
+		optionButton = v.findViewById(R.id.action_text);
 		optionButton.setOnClickListener(this);
 
-		cancelButton = (Button) v.findViewById(R.id.cancel_text);
+		cancelButton = v.findViewById(R.id.cancel_text);
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
-		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+        fastScroller = v.findViewById(R.id.fastscroll);
+		if (((FileExplorerActivityLollipop) context).isList()) {
+			recyclerView = v.findViewById(R.id.file_list_view_browser);
+			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
+			mLayoutManager = new LinearLayoutManager(context);
+			recyclerView.setLayoutManager(mLayoutManager);
+		}
+		else {
+			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			v.findViewById(R.id.file_list_view_browser).setVisibility(View.GONE);
+			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+		}
 
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
-		mLayoutManager = new LinearLayoutManager(context);
-		listView.setLayoutManager(mLayoutManager);
-		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 				super.onScrolled(recyclerView, dx, dy);
-				if (listView.canScrollVertically(-1)){
-					((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
-				}
-				else {
-					((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
-				}
+				checkScroll();
 			}
 		});
 		
-		contentText = (TextView) v.findViewById(R.id.content_text);
+		contentText = v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
 
-		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-		emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
-		emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
+		emptyImageView = v.findViewById(R.id.file_list_empty_image);
+		emptyTextView = v.findViewById(R.id.file_list_empty_text);
+		emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
 
-		parentHandle = ((FileExplorerActivityLollipop)context).parentHandleCloud;
+		parentHandle = ((FileExplorerActivityLollipop)context).getParentHandleCloud();
 		
 		if(modeCloud==FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
-			parentHandle = -1;
+			setParentHandle(-1);
+		}
+		else if (parentHandle == -1) {
+			setParentHandle(megaApi.getRootNode().getHandle());
+		}
+
+		MegaPreferences prefs = getPreferences(context);
+		if(prefs.getPreferredSortCloud()!=null){
+			order = Integer.parseInt(prefs.getPreferredSortCloud());
 		}
 		else{
-			if (parentHandle == -1)
-			{
-				//QA Report #6608 - do not remember last folder
-				//Find in the database the last parentHandle
-//				if (dbH == null){
-//					dbH = DatabaseHandler.getDbHandler(context);
-//				}
-//				if (dbH != null){
-//					prefs = dbH.getPreferences();
-//					if (prefs != null) {
-//
-//						String lastFolder = prefs.getLastFolderCloud();
-//						if(lastFolder != null) {
-//							if (lastFolder.compareTo("") != 0){
-//								parentHandle = Long.parseLong(lastFolder);
-//							}
-//						}
-//					}
-//				}
-				parentHandle = megaApi.getRootNode().getHandle();
-			}
-		}		
-		
-		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
-		if(chosenNode == null) {
-			logWarning("chosenNode is NULL");
-		
-			if(megaApi.getRootNode()!=null){
-				parentHandle = megaApi.getRootNode().getHandle();
-				nodes = megaApi.getChildren(megaApi.getRootNode());
-			}
-
-		}else if(chosenNode.getType() == MegaNode.TYPE_ROOT) {
-			logDebug("chosenNode is ROOT");
-			parentHandle = megaApi.getRootNode().getHandle();
-			nodes = megaApi.getChildren(chosenNode);
-
-		}else {
-			logDebug("ChosenNode not null and not ROOT");
-			
-			MegaNode parentNode = megaApi.getParentNode(chosenNode);
-			if(parentNode!=null){
-				logDebug("ParentNode NOT NULL");
-				MegaNode grandParentNode = megaApi.getParentNode(parentNode);
-				while(grandParentNode!=null){
-					parentNode=grandParentNode;
-					grandParentNode = megaApi.getParentNode(parentNode);
-				}
-				if(parentNode.getType() == MegaNode.TYPE_ROOT){
-					nodes = megaApi.getChildren(chosenNode);
-					logDebug("chosenNode is: " + chosenNode.getName());
-				}
-				else{
-					logDebug("Parent node exists but is not Cloud!");
-					parentHandle = megaApi.getRootNode().getHandle();
-					nodes = megaApi.getChildren(megaApi.getRootNode());
-				}
-				
-			}
-			else{
-				logWarning("parentNode is NULL");
-				parentHandle = megaApi.getRootNode().getHandle();
-				nodes = megaApi.getChildren(megaApi.getRootNode());
-			}		
-			
+			order = megaApi.ORDER_DEFAULT_ASC;
 		}
-		
-		((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
 
+		getNodes();
+		setParentHandle(parentHandle);
 
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
 			optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
 
 			MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
-			if(parent != null){
-				if(parent.getHandle() == chosenNode.getHandle()) {
-					activateButton(false);
-				}else{
-					activateButton(true);
-				}
-			}else{
+
+			if (parent != null && parent.getHandle() == parentHandle) {
+				activateButton(false);
+			} else {
 				activateButton(true);
 			}
 
 			nodeHandleMoveCopy = ((FileExplorerActivityLollipop)context).getNodeHandleMoveCopy();
 			setDisableNodes(nodeHandleMoveCopy);
-
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.COPY){
 			optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
 
 			MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
-			if(parent != null){
-				if(parent.getHandle() == chosenNode.getHandle()) {
-					activateButton(false);
-				}else{
-					activateButton(true);
-				}
-			}else{
+
+			if (parent != null && parent.getHandle() == parentHandle) {
+				activateButton(false);
+			} else {
 				activateButton(true);
 			}
-
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
@@ -396,7 +363,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if(modeCloud==FileExplorerActivityLollipop.SELECT){
 			if(selectFile)
 			{
-				if(((FileExplorerActivityLollipop)context).multiselect){
+				if(((FileExplorerActivityLollipop)context).isMultiselect()){
 					separator.setVisibility(View.VISIBLE);
 					optionsBar.setVisibility(View.VISIBLE);
 					optionButton.setText(getString(R.string.context_send));
@@ -418,58 +385,44 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 			}
 		}
-//		else{
-//			if(selectFile)
-//			{
-//				separator.setVisibility(View.GONE);
-//				optionsBar.setVisibility(View.GONE);
-//			}
-//		}
 
 		if (adapter == null){
-			if(selectFile){
-				logDebug("Mode SELECT FILE ON");
-			}
-
-//			if(((FileExplorerActivityLollipop)context).multiselect){
-				adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
-			logDebug("SetOnItemClickListener");
-				adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
-
-					@Override
-					public void onItemClick(View view, int position) {
-						logDebug("Item click listener trigger!!");
-						itemClick(view, position);
-					}
-				});
-//			}
-//			else{
-//
-//				adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
-//				log("SetOnItemClickListener");
-//				adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
-//
-//					@Override
-//					public void onItemClick(View view, int position) {
-//						log("item click listener trigger!!");
-//						itemClick(view, position);
-//					}
-//				});
-//			}
+			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, recyclerView, selectFile);
 		}
 		else{
+			adapter.setListFragment(recyclerView);
 			adapter.setParentHandle(parentHandle);
-			adapter.setNodes(nodes);
 			adapter.setSelectFile(selectFile);
 		}
 
-		adapter.setPositionClicked(-1);		
-		
-		listView.setAdapter(adapter);
+		recyclerView.setAdapter(adapter);
+		fastScroller.setRecyclerView(recyclerView);
+        setNodes(nodes);
+		return v;
+	}
 
-		//If folder has no files
+	private void getNodes() {
+		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
+
+		if (chosenNode != null && chosenNode.getType() != MegaNode.TYPE_ROOT) {
+			nodes = megaApi.getChildren(chosenNode, order);
+			logDebug("chosenNode is: " + chosenNode.getName());
+			return;
+		}
+
+		MegaNode rootNode = megaApi.getRootNode();
+		if (rootNode != null) {
+			setParentHandle(rootNode.getHandle());
+			nodes = megaApi.getChildren(rootNode, order);
+		}
+	}
+
+	private void showEmptyScreen() {
+		if (adapter == null) {
+			return;
+		}
 		if (adapter.getItemCount() == 0){
-			listView.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			if (megaApi.getRootNode().getHandle()==parentHandle) {
@@ -522,34 +475,18 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		}
 		else{
-			listView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-
-
-
 		}
-
-		return v;
 	}
-	
-//	public void setMode(int mode){
-//		log("setMode: "+mode);
-//		modeCloud=mode;
-//		log("setMode: "+modeCloud);
-//	}	
 
-
-//	public void setBackVisibility(boolean backVisibility){
-//		((LauncherFileExplorerActivity) context).setBackVisibility(backVisibility);
-//	}
-	
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
     }
-	
+
 	@Override
 	public void onClick(View v) {
 		logDebug("onClick");
@@ -557,7 +494,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		switch(v.getId()){
 			case R.id.action_text:{
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
-				if(((FileExplorerActivityLollipop)context).multiselect){
+
+				if(((FileExplorerActivityLollipop)context).isMultiselect()){
 					logDebug("Send several files to chat");
 					if(adapter.getSelectedItemCount()>0){
 						long handles[] = adapter.getSelectedHandles();
@@ -584,23 +522,24 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		logDebug("Handle: " + handle);
 
 		int lastFirstVisiblePosition = 0;
-		lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+		if (((FileExplorerActivityLollipop) context).isList()) {
+			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+		}
+		else {
+			lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+		}
 
 		logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 		lastPositionStack.push(lastFirstVisiblePosition);
 
-		parentHandle = handle;
-
-		adapter.setParentHandle(parentHandle);
+		setParentHandle(handle);
 		nodes.clear();
 		adapter.setNodes(nodes);
-		listView.scrollToPosition(0);
-
-		((FileExplorerActivityLollipop) context).changeTitle();
+		recyclerView.scrollToPosition(0);
 
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
-			listView.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 //			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
@@ -627,7 +566,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			emptyTextViewFirst.setText(result);
 		}
 		else{
-			listView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.GONE);
 		}
 
@@ -639,27 +578,33 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
     public void itemClick(View view, int position) {
 		logDebug("Position: " + position);
 
-		if (nodes.get(position).isFolder()){
-			if(selectFile) {
-				if(((FileExplorerActivityLollipop)context).multiselect){
-					if(adapter.isMultipleSelect()){
-						hideMultipleSelect();
-					}
-				}
+		ArrayList<MegaNode> clickNodes;
+
+		if (((FileExplorerActivityLollipop) context).isSearchExpanded() && searchNodes != null) {
+			clickNodes = searchNodes;
+			((FileExplorerActivityLollipop) context).collapseSearchView();
+		}
+		else {
+			clickNodes = nodes;
+		}
+
+		if (clickNodes.get(position).isFolder()){
+			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
+					hideMultipleSelect();
 			}
 
-			MegaNode n = nodes.get(position);
+			MegaNode n = clickNodes.get(position);
 
 			int lastFirstVisiblePosition = 0;
-			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+			if (((FileExplorerActivityLollipop)context).isList()) {
+				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+			}
+			else {
+				lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+			}
 
 			logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 			lastPositionStack.push(lastFirstVisiblePosition);
-			
-//			String path=n.getName();
-//			String[] temp;
-//			temp = path.split("/");
-//			name = temp[temp.length-1];
 
 			if(n.getType() != MegaNode.TYPE_ROOT)
 			{
@@ -672,7 +617,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					}
 					else
 					{
-						if(((FileExplorerActivityLollipop)context).multiselect){
+						if(((FileExplorerActivityLollipop)context).isMultiselect()){
 							separator.setVisibility(View.VISIBLE);
 							optionsBar.setVisibility(View.VISIBLE);
 							optionButton.setText(getString(R.string.context_send));
@@ -692,21 +637,17 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					optionsBar.setVisibility(View.GONE);
 				}
 			}
-			
-			parentHandle = nodes.get(position).getHandle();
 
-			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
+			setParentHandle(clickNodes.get(position).getHandle());
 
-			adapter.setParentHandle(parentHandle);
-			nodes = megaApi.getChildren(nodes.get(position));
+			nodes = megaApi.getChildren(clickNodes.get(position), order);
+			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(nodes);
-			listView.scrollToPosition(0);
-
-			((FileExplorerActivityLollipop) context).changeTitle();
+			recyclerView.scrollToPosition(0);
 			
 			//If folder has no files
 			if (adapter.getItemCount() == 0){
-				listView.setVisibility(View.GONE);
+				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
@@ -762,7 +703,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 			}
 			else{
-				listView.setVisibility(View.VISIBLE);
+				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
@@ -786,18 +727,29 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			//Is file
 			if(selectFile)
 			{
-				if(((FileExplorerActivityLollipop)context).multiselect){
-					logDebug("Select file and allow multiselection");
+				MegaNode n = clickNodes.get(position);
+				if(((FileExplorerActivityLollipop)context).isMultiselect()){
+					logDebug("select file and allow multiselection");
+					int togglePosition = position;
+					if (!clickNodes.equals(nodes)) {
+						MegaNode node;
+						for (int i=0; i<nodes.size(); i++) {
+							node = nodes.get(i);
+							if (node != null && node.getHandle() == n.getHandle()) {
+								togglePosition = i;
+							}
+						}
+					}
 
 					if (adapter.getSelectedItemCount() == 0) {
 						logDebug("Activate the actionMode");
 						activateActionMode();
-						adapter.toggleSelection(position);
+						adapter.toggleSelection(togglePosition);
 						updateActionModeTitle();
 					}
 					else {
-						logDebug("Add to selectedNodes");
-						adapter.toggleSelection(position);
+						logDebug("add to selectedNodes");
+						adapter.toggleSelection(togglePosition);
 
 						List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 						if (selectedNodes.size() > 0){
@@ -808,12 +760,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 				else{
 					//Send file
-					MegaNode n = nodes.get(position);
-					logDebug("Selected node to send: " + n.getName());
-					if(nodes.get(position).isFile()){
-						MegaNode nFile = nodes.get(position);
-						((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
-					}
+					((FileExplorerActivityLollipop) context).buttonClick(n.getHandle());
 				}
 
 			}
@@ -829,14 +776,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public int onBackPressed(){
 		logDebug("onBackPressed");
 		if(selectFile) {
-			if(((FileExplorerActivityLollipop)context).multiselect){
+			if(((FileExplorerActivityLollipop)context).isMultiselect()){
 				if(adapter.isMultipleSelect()){
 					hideMultipleSelect();
 				}
 			}
 		}
-		
-		parentHandle = adapter.getParentHandle();
 
 		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 
@@ -853,7 +798,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					}
 					else
 					{
-						if(((FileExplorerActivityLollipop)context).multiselect){
+						if(((FileExplorerActivityLollipop)context).isMultiselect()){
 							separator.setVisibility(View.VISIBLE);
 							optionsBar.setVisibility(View.VISIBLE);
 							optionButton.setText(getString(R.string.context_send));
@@ -868,10 +813,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				((FileExplorerActivityLollipop) context).changeTitle();
 			}
 			else{
-//				String path=parentNode.getName();
-//				String[] temp;
-//				temp = path.split("/");
-//				name = temp[temp.length-1];
 
 				if(modeCloud==FileExplorerActivityLollipop.SELECT){
 					if(!selectFile)
@@ -881,7 +822,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					}
 					else
 					{
-						if(((FileExplorerActivityLollipop)context).multiselect){
+						if(((FileExplorerActivityLollipop)context).isMultiselect()){
 							separator.setVisibility(View.VISIBLE);
 							optionsBar.setVisibility(View.VISIBLE);
 							optionButton.setText(getString(R.string.context_send));
@@ -893,8 +834,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 					}
 				}
-				parentHandle = parentNode.getHandle();
-				((FileExplorerActivityLollipop) context).changeTitle();
+				setParentHandle(parentNode.getHandle());
 			}
 
 			if((modeCloud == FileExplorerActivityLollipop.MOVE) || (modeCloud == FileExplorerActivityLollipop.COPY)){
@@ -911,11 +851,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 			}
 
-			listView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 
-			nodes = megaApi.getChildren(parentNode);
+			nodes = megaApi.getChildren(parentNode, order);
+			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(nodes);
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
@@ -925,10 +866,15 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			logDebug("Scroll to " + lastVisiblePosition + " position");
 
 			if(lastVisiblePosition>=0){
-				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				if (((FileExplorerActivityLollipop) context).isList()) {
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+				else {
+					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
 			}
 			adapter.setParentHandle(parentHandle);
-			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
+			((FileExplorerActivityLollipop)context).setParentHandleCloud(parentHandle);
 
 
 			return 2;
@@ -945,28 +891,14 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		logDebug("Disabled nodes: " + disabledNodes.size());
 		if (adapter == null){
 			logWarning("Adapter is NULL");
-			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
-
-			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
-
-				@Override
-				public void onItemClick(View view, int position) {
-					itemClick(view, position);
-				}
-			});
+			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, recyclerView, selectFile);
 		}
-//		else{
-//			adapter.setParentHandle(parentHandle);
-//			adapter.setNodes(nodes);
-//			adapter.setSelectFile(selectFile);
-//		}
 		adapter.setDisableNodes(disabledNodes);
 		adapter.setSelectFile(selectFile);
 	}
 
-	public long getParentHandle(){
-		logDebug("getParentHandle");
-		return adapter.getParentHandle();
+	public long getParentHandle() {
+		return parentHandle;
 	}
 	
 	public void setParentHandle(long parentHandle){
@@ -975,74 +907,23 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (adapter != null){
 			adapter.setParentHandle(parentHandle);
 		}
-		((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
+		((FileExplorerActivityLollipop)context).setParentHandleCloud(parentHandle);
+		((FileExplorerActivityLollipop) context).changeTitle();
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		logDebug("Nodes: " + nodes.size());
 		this.nodes = nodes;
 		if (adapter != null){
+			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(nodes);
-			if (adapter.getItemCount() == 0){
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				if (megaApi.getRootNode().getHandle()==parentHandle) {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					}
-					String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				} else {
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-					}else{
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-					}
-					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				}
-			}
-			else{
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}
+			showEmptyScreen();
 		}
 	}
 
-	public void selectAll(){
+	private void selectAll(){
 		logDebug("selectAll");
+
 		if (adapter != null){
 			adapter.selectAll();
 
@@ -1052,12 +933,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 	public boolean isFolder(int position){
 		MegaNode node = nodes.get(position);
-		if(node.isFolder()){
-			return true;
-		}
-		else{
-			return false;
-		}
+
+		return node == null || node.isFolder();
 	}
 
 	/*
@@ -1069,10 +946,16 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 	}
 
-	private void updateActionModeTitle() {
-		logDebug("updateActionModeTitle");
+	@Override
+	protected void updateActionModeTitle() {
+		if (actionMode == null || getActivity() == null) {
+			return;
+		}
 
 		List<MegaNode> documents = adapter.getSelectedNodes();
+
+		if (documents == null) return;
+
 		int files = 0;
 		int folders = 0;
 		for (MegaNode document : documents) {
@@ -1115,26 +998,22 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public void hideMultipleSelect() {
 		logDebug("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
-		adapter.clearSelectedItems();
+		adapter.clearSelections();
 		if (actionMode != null) {
 			actionMode.finish();
 		}
 
-		if(modeCloud==FileExplorerActivityLollipop.SELECT){
-			if(selectFile) {
-				if (((FileExplorerActivityLollipop) context).multiselect) {
-					activateButton(false);
-				}
-			}
+		if(isMultiselect()){
+			activateButton(false);
 		}
 
 	}
 
-	public RecyclerView getListView(){
-		return listView;
+	public RecyclerView getRecyclerView(){
+		return recyclerView;
 	}
 
-	public void activateButton(boolean show){
+	private void activateButton(boolean show){
 		optionButton.setEnabled(show);
 		if(show){
 			optionButton.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
@@ -1143,4 +1022,117 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 	}
 
+	public void orderNodes (int order) {
+		this.order = order;
+		if (parentHandle == -1) {
+			nodes = megaApi.getChildren(megaApi.getRootNode(), order);
+		}
+		else {
+			nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), order);
+		}
+
+		addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
+		adapter.setNodes(nodes);
+	}
+
+	private boolean isMultiselect() {
+		return modeCloud == FileExplorerActivityLollipop.SELECT && selectFile && ((FileExplorerActivityLollipop) context).isMultiselect();
+	}
+
+	public void search (String s) {
+		if (megaApi == null || s == null) {
+			return;
+		}
+		if (getParentHandle() == -1) {
+			setParentHandle(megaApi.getRootNode().getHandle());
+		}
+		MegaNode parent = megaApi.getNodeByHandle(getParentHandle());
+
+		if (parent == null) {
+			logWarning("Parent null when search");
+			return;
+		}
+
+		searchNodes = megaApi.search(parent, s, true, order);
+		if (searchNodes != null && adapter != null) {
+			addSectionTitle(searchNodes, ((FileExplorerActivityLollipop) context).getItemType());
+			adapter.setNodes(searchNodes);
+		}
+		showEmptyScreen();
+	}
+
+	public void closeSearch() {
+		searchNodes = null;
+		if (adapter == null) {
+			return;
+		}
+		getNodes();
+		addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
+		adapter.setNodes(nodes);
+		showEmptyScreen();
+	}
+
+	private void addSectionTitle(List<MegaNode> nodes,int type) {
+		Map<Integer, String> sections = new HashMap<>();
+		int placeholderCount;
+		int folderCount = 0;
+		int fileCount = 0;
+		for (MegaNode node : nodes) {
+			if(node == null) {
+				continue;
+			}
+			if (node.isFolder()) {
+				folderCount++;
+			}
+			if (node.isFile()) {
+				fileCount++;
+			}
+		}
+
+		if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
+			int spanCount = 2;
+			if (recyclerView instanceof NewGridRecyclerView) {
+				spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
+			}
+			if(folderCount > 0) {
+				for (int i = 0;i < spanCount;i++) {
+					sections.put(i,getString(R.string.general_folders));
+				}
+			}
+
+			if(fileCount > 0 ) {
+				placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+				if (placeholderCount == 0) {
+					for (int i = 0;i < spanCount;i++) {
+						sections.put(folderCount + i,getString(R.string.general_files));
+					}
+				} else {
+					for (int i = 0;i < spanCount;i++) {
+						sections.put(folderCount + placeholderCount + i,getString(R.string.general_files));
+					}
+				}
+			}
+		} else {
+			sections.put(0,getString(R.string.general_folders));
+			sections.put(folderCount,getString(R.string.general_files));
+		}
+
+		if (headerItemDecoration == null) {
+			headerItemDecoration = new NewHeaderItemDecoration(context);
+		} else {
+			recyclerView.removeItemDecoration(headerItemDecoration);
+		}
+
+		headerItemDecoration.setType(type);
+		headerItemDecoration.setKeys(sections);
+		recyclerView.addItemDecoration(headerItemDecoration);
+	}
+
+	public FastScroller getFastScroller() {
+	    return fastScroller;
+    }
+
+    public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
+		this.headerItemDecoration = headerItemDecoration;
+	}
 }

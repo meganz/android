@@ -525,7 +525,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 size = getResources().getQuantityString(R.plurals.upload_service_failed,errorCount,errorCount);
             } else {
                 long transferredBytes = getTransferredByte(mapProgressFileTransfers);
-                String totalBytes = Formatter.formatFileSize(UploadService.this,transferredBytes);
+                String totalBytes = getSizeString(transferredBytes);
                 size = getString(R.string.general_total_size,totalBytes);
             }
 
@@ -549,7 +549,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 notificationSubTitle = getResources().getQuantityString(R.plurals.upload_service_failed,childUploadFailed,childUploadFailed);
             }else{
                 long transferredBytes = getTransferredByte(mapProgressFolderTransfers);
-                String totalBytes = Formatter.formatFileSize(UploadService.this,transferredBytes);
+                String totalBytes = getSizeString(transferredBytes);
                 notificationSubTitle = getString(R.string.general_total_size,totalBytes);
             }
 

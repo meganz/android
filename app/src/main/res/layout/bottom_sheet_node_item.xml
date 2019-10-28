@@ -123,40 +123,46 @@
 
             <!-- Options -->
             <LinearLayout
-                android:id="@+id/option_properties_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/option_properties_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/option_properties_layout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
-                    android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/info_ic"
-                    android:visibility="visible" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
 
-                <TextView
-                    android:id="@+id/option_properties_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    <ImageView
+                        android:id="@+id/option_properties_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:layout_marginLeft="5dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/info_ic"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/option_properties_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="18dp"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="72dp"
+                    android:background="@color/divider_upgrade_account"/>
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:background="@color/divider_upgrade_account"/>
 
             <LinearLayout
                 android:id="@+id/option_download_layout"
