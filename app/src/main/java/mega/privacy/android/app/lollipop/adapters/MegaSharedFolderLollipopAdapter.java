@@ -446,8 +446,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	}
 	
 	public void createDefaultAvatar(ViewHolderShareList holder, MegaUser contact){
-		logDebug("Contact Handle: " + contact.getHandle());
-		
+
 		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
