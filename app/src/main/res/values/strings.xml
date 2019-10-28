@@ -2266,9 +2266,6 @@
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">file name</string>
-
-    <string name="error_autoaway" context="Label shown when user types a wrong value setting the auto-away">Please choose from 1 to 1457 minutes.</string>
-
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show Last seen&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow your contacts to see the last time you were active on MEGA.</string>
 
