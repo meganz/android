@@ -1,0 +1,39 @@
+package mega.privacy.android.app.listeners;
+
+import android.content.Context;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.WeakAccountProtectionAlertActivity;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+
+public class WhyAmIBlockedListener implements MegaRequestListenerInterface {
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        if (request.getType() != MegaRequest.TYPE_WHY_AM_I_BLOCKED) return;
+
+        Context context = MegaApplication.getInstance().getApplicationContext();
+
+        if (context instanceof WeakAccountProtectionAlertActivity && e.getErrorCode() == MegaError.API_OK) {
+            String result = String.valueOf(request.getNumber());
+            ((WeakAccountProtectionAlertActivity) context).whyAmIBlockedResult(result);
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
+    }
+}

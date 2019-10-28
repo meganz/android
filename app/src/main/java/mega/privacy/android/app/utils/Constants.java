@@ -222,10 +222,13 @@ public class Constants {
 
     public static final String ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE = "ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE";
 
+    public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
+
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN = "INTENT_FILTER_UPDATE_FULL_SCREEN";
 
+    public static final String BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE = "INTENT_ON_ACCOUNT_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS = "INTENT_UPDATE_2FA_SETTINGS";
     public static final String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE = "INTENT_CONNECTIVITY_CHANGE";
@@ -494,4 +497,13 @@ public class Constants {
 			"^https://mega\\.nz/#pwr.+$",
 			"^https://mega\\.nz/pwr.+$"
 	};
+
+	//Types of blocked accounts
+    public static final String ACCOUNT_NOT_BLOCKED = "0";
+    public static final String COPYRIGHT_ACCOUNT_BLOCK = "200";
+    public static final String MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK = "300";
+    public static final String DISABLED_ACCOUNT_BLOCK = "400";
+    public static final String REMOVED_ACCOUNT_BLOCK = "401";
+    public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
+    public static final String WEAK_PROTECTION_ACCOUNT_BLOCK = "700";
 }

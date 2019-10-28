@@ -49,6 +49,7 @@ import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
+import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -95,10 +96,9 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
+public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	final private static int INITIAL_SOUND_LEVEL = 10;
 	static final public String USER_AGENT = "MEGAAndroid/3.7.1_260";
 
 	DatabaseHandler dbH;
@@ -841,7 +841,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			logDebug("ADD REQUESTLISTENER");
 			megaApi.addRequestListener(requestListener);
 
-			megaApi.addGlobalListener(this);
+			megaApi.addGlobalListener(new GlobalListener());
 
 //			DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 //			if (dbH.getCredentials() != null){
@@ -986,37 +986,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	
 	public void setLocalIpAddress(String ip){
 		localIpAddress = ip;
-	}
-
-	@Override
-	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		logDebug("onUsersUpdate");
-	}
-
-	@Override
-	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-		logDebug("onUserAlertsUpdate");
-		updateAppBadge();
-	}
-
-	@Override
-	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-		logDebug("onNodesUpdate");
-		if (updatedNodes != null) {
-			logDebug("updatedNodes: " + updatedNodes.size());
-
-			for (int i = 0; i < updatedNodes.size(); i++) {
-				MegaNode n = updatedNodes.get(i);
-				if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
-					logDebug("updatedNodes name: " + n.getName() + " isInshared: " + n.isInShare() + " getchanges: " + n.getChanges() + " haschanged(TYPE_INSHARE): " + n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE));
-
-					showSharedFolderNotification(n);
-				}
-			}
-		}
-		else{
-			logWarning("Updated nodes is NULL");
-		}
 	}
 
 	public void showSharedFolderNotification(MegaNode n) {
@@ -1185,16 +1154,23 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 //        }
 	}
 
-
-	@Override
-	public void onReloadNeeded(MegaApiJava api) {
-		// TODO Auto-generated method stub
+	public void onUserAlertsUpdate(ArrayList<MegaUserAlert> userAlerts) {
+		updateAppBadge();
 	}
 
+	public void onNodesUpdate(ArrayList<MegaNode> nodeList) {
+		for (int i = 0; i < nodeList.size(); i++) {
+			MegaNode n = nodeList.get(i);
+			if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
+				MegaApplication.getInstance().showSharedFolderNotification(n);
+			}
+		}
+	}
 
-	@Override
-	public void onAccountUpdate(MegaApiJava api) {
-		logDebug("onAccountUpdate");
+	public void onAccountUpdate() {
+		Intent intent = new Intent(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
+		intent.setAction(ACTION_ON_ACCOUNT_UPDATE);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
 		megaApi.getPaymentMethods(null);
 		megaApi.getAccountDetails(null);
@@ -1203,35 +1179,36 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		dbH.resetExtendedAccountDetailsTimestamp();
 	}
 
-	@Override
-	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
-		logDebug("onContactRequestUpdate");
-
+	public void onContactRequestsUpdate(ArrayList<MegaContactRequest> requests) {
 		updateAppBadge();
 
-		if(requests!=null){
-			for (int i = 0; i < requests.size(); i++) {
-				MegaContactRequest cr = requests.get(i);
-				if (cr != null) {
-					if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
+		if (requests == null) return;
 
-						ContactsAdvancedNotificationBuilder notificationBuilder;
-						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
+		createNewContactRequestsNotifications(requests);
+	}
 
-						notificationBuilder.removeAllIncomingContactNotifications();
-						notificationBuilder.showIncomingContactRequestNotification();
+	private void createNewContactRequestsNotifications(ArrayList<MegaContactRequest> requests) {
+		for (int i = 0; i < requests.size(); i++) {
+			MegaContactRequest cr = requests.get(i);
+			if (cr != null) {
+				if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
 
-						logDebug("IPC: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
-					}
-					else if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
+					ContactsAdvancedNotificationBuilder notificationBuilder;
+					notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
 
-						ContactsAdvancedNotificationBuilder notificationBuilder;
-						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
+					notificationBuilder.removeAllIncomingContactNotifications();
+					notificationBuilder.showIncomingContactRequestNotification();
 
-						notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
+					logDebug("IPC: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+				}
+				else if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
 
-						logDebug("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
-					}
+					ContactsAdvancedNotificationBuilder notificationBuilder;
+					notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
+
+					notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
+
+					logDebug("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
 				}
 			}
 		}
@@ -1363,24 +1340,12 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		logWarning("onRequestTemporaryError (CHAT): "+e.getErrorString());
 	}
 
-	@Override
-	public void onEvent(MegaApiJava api, MegaEvent event) {
-		logDebug("onEvent: " + event.getText());
-
-		if (event.getType() == MegaEvent.EVENT_STORAGE) {
-			logDebug("Storage status changed");
-			int state = (int) event.getNumber();
-			if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
-				api.getAccountDetails(null);
-			}
-			else {
-				storageState = state;
-				Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-				intent.setAction(ACTION_STORAGE_STATE_CHANGED);
-				intent.putExtra("state", state);
-				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-			}
-		}
+	public void updateAccountDetails(int state) {
+		storageState = state;
+		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+		intent.setAction(ACTION_STORAGE_STATE_CHANGED);
+		intent.putExtra("state", state);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
 
@@ -1419,7 +1384,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	}
 
 
-	public void updateAppBadge(){
+	private void updateAppBadge(){
 		logDebug("updateAppBadge");
 
 		int totalHistoric = 0;

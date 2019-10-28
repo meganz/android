@@ -396,4 +396,29 @@ public class BaseActivity extends AppCompatActivity {
             ((MegaApplication) getApplication()).askForAccountDetails();
         }
     }
+
+    public void checkWhyAmIBlocked(long eventNumber, String stringError) {
+        switch (Long.toString(eventNumber)) {
+            case ACCOUNT_NOT_BLOCKED:
+//                I am not blocked
+                break;
+            case COPYRIGHT_ACCOUNT_BLOCK:
+                showErrorAlertDialog(getString(R.string.account_suspended_breache_ToS), false, this);
+                break;
+            case MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK:
+                showErrorAlertDialog(getString(R.string.account_suspended_multiple_breaches_ToS), false, this);
+                break;
+            case SMS_VERIFICATION_ACCOUNT_BLOCK:
+//                Pending to merge: #752
+                break;
+            case WEAK_PROTECTION_ACCOUNT_BLOCK:
+                Intent intent = new Intent(this, WeakAccountProtectionAlertActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+
+                break;
+            default:
+                showErrorAlertDialog(stringError, false, this);
+        }
+    }
 }

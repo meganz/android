@@ -194,4 +194,7 @@
     <color name="statusbar_tour_4">#FF00948C</color>
 
     <color name="black_40_alpha">#66000000</color>
+
+    <color name="red_alert">#FF6464</color>
+    <color name="status_bar_red_alert">#CF4949</color>
 </resources>

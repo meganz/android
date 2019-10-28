@@ -32,8 +32,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
@@ -42,23 +40,17 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaEvent;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaUser;
-import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class LoginActivityLollipop extends BaseActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
+public class LoginActivityLollipop extends BaseActivity implements MegaRequestListenerInterface {
 
     float scaleH, scaleW;
     float density;
@@ -127,12 +119,26 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
     };
 
+    private BroadcastReceiver onAccountUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null) return;
+
+            if (intent.getAction() == ACTION_ON_ACCOUNT_UPDATE && waitingForConfirmAccount) {
+                waitingForConfirmAccount = false;
+                visibleFragment = LOGIN_FRAGMENT;
+                showFragment(visibleFragment);
+            }
+        }
+    };
+
     @Override
     protected void onDestroy() {
         logDebug("onDestroy");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onAccountUpdateReceiver);
+
         if (megaApi != null) {
-            megaApi.removeGlobalListener(this);
             megaApi.removeRequestListener(this);
         }
         super.onDestroy();
@@ -143,7 +149,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
         super.onCreate(savedInstanceState);
-        
+
         loginActivity = this;
 
         display = getWindowManager().getDefaultDisplay();
@@ -166,7 +172,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
             megaApiFolder = ((MegaApplication) getApplication()).getMegaApiFolder();
         }
 
-        megaApi.addGlobalListener(this);
         megaApi.addRequestListener(this);
 
         setContentView(R.layout.activity_login);
@@ -201,6 +206,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
+        LocalBroadcastManager.getInstance(this).registerReceiver(onAccountUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE));
         isBackFromLoginPage = false;
         showFragment(visibleFragment);
     }
@@ -798,62 +804,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
     public String getEmailTemp() {
         return this.emailTemp;
-    }
-
-
-//	public void onNewIntent(Intent intent){
-//		if (intent != null && ACTION_CONFIRM.equals(intent.getAction())) {
-//			loginFragment.handleConfirmationIntent(intent);
-//		}
-//	}
-
-    @Override
-    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-
-    }
-
-    @Override
-    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        logDebug("onUserAlertsUpdate");
-    }
-
-    @Override
-    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
-
-    }
-
-    @Override
-    public void onReloadNeeded(MegaApiJava api) {
-    }
-
-    @Override
-    public void onAccountUpdate(MegaApiJava api) {
-        logDebug("onAccountUpdate");
-
-        if (waitingForConfirmAccount) {
-            waitingForConfirmAccount = false;
-            visibleFragment = LOGIN_FRAGMENT;
-            showFragment(visibleFragment);
-        }
-    }
-
-    @Override
-    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
-    }
-
-
-    @Override
-    public void onEvent(MegaApiJava api, MegaEvent event) {
-        logDebug("onEvent");
-        if(event.getType()==MegaEvent.EVENT_ACCOUNT_BLOCKED){
-            logDebug("Event received: " + event.getText() + "_" + event.getNumber());
-            if(event.getNumber()==200){
-                accountBlocked = getString(R.string.account_suspended_multiple_breaches_ToS);
-            }
-            else if(event.getNumber()==300){
-                accountBlocked = getString(R.string.account_suspended_breache_ToS);
-            }
-        }
     }
 
     @Override

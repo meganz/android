@@ -427,6 +427,13 @@
             android:launchMode="singleTop">
         </activity>
 
+        <activity
+            android:name="mega.privacy.android.app.WeakAccountProtectionAlertActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Megaactionbar"
+            android:launchMode="singleTop">
+        </activity>
+
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
             android:exported="false" >
