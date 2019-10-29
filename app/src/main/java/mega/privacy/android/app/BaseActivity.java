@@ -33,6 +33,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -60,6 +61,10 @@ public class BaseActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(signalPresenceReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
+
+        IntentFilter filter =  new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
+        filter.addAction(ACTION_EVENT_ACCOUNT_BLOCKED);
+        LocalBroadcastManager.getInstance(this).registerReceiver(accountBlockedReceiver, filter);
     }
 
     @Override
@@ -88,6 +93,7 @@ public class BaseActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
 
         super.onDestroy();
     }
@@ -113,6 +119,18 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
     }
+
+    /**
+     * Broadcast receiver to manage the errors shown and actions when an account is blocked.
+     */
+    private BroadcastReceiver accountBlockedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_EVENT_ACCOUNT_BLOCKED)) return;
+
+            checkWhyAmIBlocked(intent.getLongExtra(EVENT_NUMBER, -1), intent.getStringExtra(EVENT_TEXT));
+        }
+    };
 
     /**
      * Broadcast receiver to manage a possible SSL verification error.

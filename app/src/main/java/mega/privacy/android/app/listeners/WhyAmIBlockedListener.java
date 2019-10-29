@@ -10,6 +10,13 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class WhyAmIBlockedListener implements MegaRequestListenerInterface {
+
+    private Context context;
+
+    public WhyAmIBlockedListener(Context context) {
+        this.context = context;
+    }
+
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
@@ -22,11 +29,9 @@ public class WhyAmIBlockedListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        if (request.getType() != MegaRequest.TYPE_WHY_AM_I_BLOCKED) return;
+        if (request.getType() != MegaRequest.TYPE_WHY_AM_I_BLOCKED || e.getErrorCode() != MegaError.API_OK) return;
 
-        Context context = MegaApplication.getInstance().getApplicationContext();
-
-        if (context instanceof WeakAccountProtectionAlertActivity && e.getErrorCode() == MegaError.API_OK) {
+        if (context instanceof WeakAccountProtectionAlertActivity) {
             String result = String.valueOf(request.getNumber());
             ((WeakAccountProtectionAlertActivity) context).whyAmIBlockedResult(result);
         }

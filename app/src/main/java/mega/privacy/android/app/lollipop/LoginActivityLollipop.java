@@ -45,6 +45,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -124,7 +125,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null) return;
 
-            if (intent.getAction() == ACTION_ON_ACCOUNT_UPDATE && waitingForConfirmAccount) {
+            if (intent.getAction().equals(ACTION_ON_ACCOUNT_UPDATE) && waitingForConfirmAccount) {
                 waitingForConfirmAccount = false;
                 visibleFragment = LOGIN_FRAGMENT;
                 showFragment(visibleFragment);
@@ -201,7 +202,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
-        LocalBroadcastManager.getInstance(this).registerReceiver(onAccountUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE));
+
+        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
+        filter.addAction(ACTION_ON_ACCOUNT_UPDATE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onAccountUpdateReceiver, filter);
+
         isBackFromLoginPage = false;
         showFragment(visibleFragment);
     }

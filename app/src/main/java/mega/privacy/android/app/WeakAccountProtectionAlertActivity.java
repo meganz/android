@@ -86,12 +86,12 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
     protected void onResume() {
         super.onResume();
 
-        megaApi.whyAmIBlocked(new WhyAmIBlockedListener());
+        megaApi.whyAmIBlocked(new WhyAmIBlockedListener(this));
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+//        Do nothing: do not permit to skip the warning, account blocked
     }
 
     @Override
@@ -106,7 +106,7 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
                 showInfoDialog();
                 break;
             case R.id.resend_email_button:
-                megaApi.resendVerificationEmail(new ResendVerificationEmailListener());
+                megaApi.resendVerificationEmail(new ResendVerificationEmailListener(this));
                 break;
             case R.id.ok_button:
                 isInfoDialogShown = false;
@@ -124,7 +124,7 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         LayoutInflater inflater = getLayoutInflater();
-        View v = inflater.inflate(R.layout.dialog_enable_2fa_create_account, null);
+        View v = inflater.inflate(R.layout.dialog_locked_accounts, null);
         builder.setView(v);
 
         Button okButton = v.findViewById(R.id.ok_button);

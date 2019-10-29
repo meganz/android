@@ -1154,66 +1154,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 //        }
 	}
 
-	public void onUserAlertsUpdate(ArrayList<MegaUserAlert> userAlerts) {
-		updateAppBadge();
-	}
-
-	public void onNodesUpdate(ArrayList<MegaNode> nodeList) {
-		for (int i = 0; i < nodeList.size(); i++) {
-			MegaNode n = nodeList.get(i);
-			if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
-				MegaApplication.getInstance().showSharedFolderNotification(n);
-			}
-		}
-	}
-
-	public void onAccountUpdate() {
-		Intent intent = new Intent(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
-		intent.setAction(ACTION_ON_ACCOUNT_UPDATE);
-		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-
-		megaApi.getPaymentMethods(null);
-		megaApi.getAccountDetails(null);
-		megaApi.getPricing(null);
-		megaApi.creditCardQuerySubscriptions(null);
-		dbH.resetExtendedAccountDetailsTimestamp();
-	}
-
-	public void onContactRequestsUpdate(ArrayList<MegaContactRequest> requests) {
-		updateAppBadge();
-
-		if (requests == null) return;
-
-		createNewContactRequestsNotifications(requests);
-	}
-
-	private void createNewContactRequestsNotifications(ArrayList<MegaContactRequest> requests) {
-		for (int i = 0; i < requests.size(); i++) {
-			MegaContactRequest cr = requests.get(i);
-			if (cr != null) {
-				if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
-
-					ContactsAdvancedNotificationBuilder notificationBuilder;
-					notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
-
-					notificationBuilder.removeAllIncomingContactNotifications();
-					notificationBuilder.showIncomingContactRequestNotification();
-
-					logDebug("IPC: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
-				}
-				else if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
-
-					ContactsAdvancedNotificationBuilder notificationBuilder;
-					notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
-
-					notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
-
-					logDebug("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
-				}
-			}
-		}
-	}
-
 	public void sendSignalPresenceActivity(){
 		logDebug("sendSignalPresenceActivity");
 		if(isChatEnabled()){
@@ -1340,15 +1280,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		logWarning("onRequestTemporaryError (CHAT): "+e.getErrorString());
 	}
 
-	public void updateAccountDetails(int state) {
-		storageState = state;
-		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-		intent.setAction(ACTION_STORAGE_STATE_CHANGED);
-		intent.putExtra("state", state);
-		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-	}
-
-
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 
@@ -1384,7 +1315,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	}
 
 
-	private void updateAppBadge(){
+	public void updateAppBadge(){
 		logDebug("updateAppBadge");
 
 		int totalHistoric = 0;
