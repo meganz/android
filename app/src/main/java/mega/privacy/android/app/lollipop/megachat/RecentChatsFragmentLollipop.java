@@ -430,6 +430,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         } else {
             bannerContainer.setVisibility(View.GONE);
         }
+
+        setCustomisedActionBar();
         return v;
     }
 
@@ -1698,7 +1700,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }
         refreshMegaContactsList();
-        setCustomisedActionBar();
         setStatus();
         super.onResume();
     }
