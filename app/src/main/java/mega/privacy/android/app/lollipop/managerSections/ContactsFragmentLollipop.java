@@ -609,7 +609,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					break;
 				}
 				case R.id.cab_menu_start_conversation:{
-					ArrayList<Long> contactHandles = new ArrayList<>();
 
 					if(users.get(0)==null){
 						logWarning("Selected contact NULL");

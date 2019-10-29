@@ -40,6 +40,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -70,6 +71,8 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     String querySearch = "";
     boolean isSearchExpanded = false;
     boolean pendingToOpenSearchView = false;
+
+    private ChatBottomSheetDialogFragment bottomSheetDialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,11 +198,11 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     public void showChatPanel(MegaChatListItem chat){
         logDebug("showChatPanel");
 
-        if(chat!=null){
-            this.selectedChatItemId = chat.getChatId();
-            ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-        }
+        if (chat == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedChatItemId = chat.getChatId();
+        bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     @Override

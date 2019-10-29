@@ -86,6 +86,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -148,6 +149,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	public long selectedMessageId = -1;
 
 	ChatController chatC;
+
+	private NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -359,16 +362,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			else{
 				logError("ERROR: node is NULL");
 			}
-		}
-	}
-	
-	public void showOptionsPanel(MegaChatMessage sMessage, int sPosition){
-		logDebug("showOptionsPanel");
-		if(sMessage!=null){
-			this.selectedMessage = sMessage;
-			this.selectedPosition = sPosition;
-			//VersionBottomSheetDialogFragment bottomSheetDialogFragment = new VersionBottomSheetDialogFragment();
-			//bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
 
@@ -1686,14 +1679,13 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void showNodeAttachmentBottomSheet(MegaChatMessage message, int position){
-		logDebug("Position: " + position);
-		//this.selectedPosition = position;
-		if(message!=null){
-			this.selectedMessageId = message.getMsgId();
+		logDebug("showNodeAttachmentBottomSheet: "+position);
 
-			NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+		if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedMessageId = message.getMsgId();
+		bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showSnackbar(int type, String s){

@@ -106,8 +106,8 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_COPY_FOLDER;
-import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_MOVE_FOLDER;
+import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.*;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -221,6 +221,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     NodeController nC;
     boolean moveToRubbish;
     long parentHandle;
+
+    private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
@@ -680,7 +682,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 				logDebug("This user is offline");
 				contactStateIcon.setVisibility(View.VISIBLE);
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_offline));
+				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.offline_status));
 				secondLineLengthToolbar.setText(getString(R.string.offline_status));
@@ -1913,12 +1915,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
     
     public void showOptionsPanel(MegaNode node){
-		logDebug("Node handle: " + node.getHandle());
-        if(node!=null){
-            this.selectedNode = node;
-            ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-        }
+		logDebug("showOptionsPanel");
+
+        if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedNode = node;
+		bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
     
     public MegaNode getSelectedNode() {

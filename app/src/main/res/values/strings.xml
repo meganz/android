@@ -637,9 +637,8 @@
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Uploads in progress</string>
-    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to stop Camera Uploads?</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos or videos from their specified album is in progress.">Camera Uploads in progress</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for disabling the camera uploads">Do you want to disable Camera Uploads?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
@@ -2270,9 +2269,6 @@
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">file name</string>
-
-    <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Invalid value for auto-away, it should be greater than 0.</string>
-
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show Last seen&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow your contacts to see the last time you were active on MEGA.</string>
 
@@ -2428,13 +2424,13 @@
     <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Previous versions not deleted.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
-        <item context="version item" quantity="one">%d version deleted successfully</item>
-        <item context="version items" quantity="other">%d versions deleted successfully</item>
+        <item context="version item" quantity="one">%1$d version deleted successfully</item>
+        <item context="version items" quantity="other">%1$d versions deleted successfully</item>
     </plurals>
 
     <plurals name="versions_not_deleted" formatted="false" context="Alert shown when some versions are not deleted successfully">
-        <item context="version item" quantity="one">%d version not deleted</item>
-        <item context="version items" quantity="other">%d versions not deleted</item>
+        <item context="version item" quantity="one">%1$d version not deleted</item>
+        <item context="version items" quantity="other">%1$d versions not deleted</item>
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
@@ -2509,6 +2505,8 @@
     <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
 
+    <string name="version_restored" context="Message shown when it restored successfully a file version">Version restored successfully.</string>
+
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
@@ -2546,6 +2544,13 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Loading</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Please wait&#8230;</string>
 
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+
+    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">When you logout, files from your Offline section will be deleted from your device.</string>
+    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">When you logout, ongoing transfers will be cancelled.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">When you logout, files from your Offline section will be deleted from your device and ongoing transfers will be cancelled.</string>
+
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
-    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %s Contacts.</string>
+
+    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
 </resources>
