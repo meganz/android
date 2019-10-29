@@ -38,7 +38,7 @@
             android:paddingTop="24dp"
             android:src="@drawable/ic_add_avatar"/>
     </RelativeLayout>
-    <TextView
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/name_chip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

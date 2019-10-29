@@ -31,9 +31,7 @@ import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
-
 import android.support.v4.app.ActivityCompat;
-
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
@@ -41,7 +39,6 @@ import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.format.Formatter;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -96,7 +93,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 
 public class Util {
@@ -1487,6 +1486,20 @@ public class Util {
 			}
 		}
 	}
+
+    public static Bitmap createAvatarBackground(String colorString) {
+        Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(circle);
+        Paint paintCircle = new Paint();
+        paintCircle.setAntiAlias(true);
+        int color = (colorString == null) ?
+                ContextCompat.getColor(context, R.color.lollipop_primary_color) :
+                Color.parseColor(colorString);
+        paintCircle.setColor(color);
+        int radius = circle.getWidth() / 2;
+        c.drawCircle(radius, radius, radius, paintCircle);
+        return circle;
+    }
 
 	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
 		logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
