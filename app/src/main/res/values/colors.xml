@@ -195,4 +195,5 @@
     <color name="statusbar_tour_3">#FFCC7300</color>
     <color name="statusbar_tour_4">#FF00948C</color>
 
+    <color name="black_40_alpha">#66000000</color>
 </resources>

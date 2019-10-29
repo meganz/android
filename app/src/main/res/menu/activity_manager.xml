@@ -13,7 +13,7 @@
 		android:id="@+id/action_grid_view_large_small"
 		android:orderInCategory="90"
 		android:title="@string/action_grid"
-		android:icon="@drawable/ic_menu_gridview"
+		android:icon="@drawable/ic_thumbnail_view"
 		MEGA:showAsAction="ifRoom"
 		android:visible="false"/>
 
@@ -58,13 +58,6 @@
 		android:id="@+id/action_menu_export_MK"
 		android:orderInCategory="95"
 		android:title="@string/action_export_master_key"
-		android:icon="@drawable/ic_action_bar_null"
-		MEGA:showAsAction="never" />
-
-	<item
-		android:id="@+id/action_menu_remove_MK"
-		android:orderInCategory="95"
-		android:title="@string/action_remove_master_key"
 		android:icon="@drawable/ic_action_bar_null"
 		MEGA:showAsAction="never" />
 

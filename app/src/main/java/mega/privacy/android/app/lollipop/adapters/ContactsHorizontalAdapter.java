@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +27,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.CacheFolderManager;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.Util;
@@ -66,6 +68,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         ContactViewHolder holder = new ContactViewHolder(v);
         holder.itemLayout = v.findViewById(R.id.chip_layout);
         holder.contactInitialLetter = v.findViewById(R.id.contact_list_initial_letter);
+        holder.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
         holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
         holder.avatar = v.findViewById(R.id.add_rounded_avatar);
@@ -130,21 +133,15 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         setDefaultAvatar(megaContact, holder);
         File avatar = CacheFolderManager.buildAvatarFile(context, email + ".jpg");
         Bitmap bitmap;
-        if (FileUtils.isFileAvailable(avatar)) {
-            if (avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    if (avatar.delete()) {
-                        logDebug("delete avatar successfully.");
-                    }
-                    megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
-                } else {
-                    holder.contactInitialLetter.setVisibility(View.GONE);
-                    holder.avatar.setImageBitmap(bitmap);
-                }
-            } else {
+        if (FileUtils.isFileAvailable(avatar) && avatar.length() > 0) {
+            BitmapFactory.Options bOpts = new BitmapFactory.Options();
+            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+            if (bitmap == null) {
+                avatar.delete();
                 megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
+            } else {
+                holder.contactInitialLetter.setVisibility(View.GONE);
+                holder.avatar.setImageBitmap(bitmap);
             }
         } else {
             megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
@@ -153,8 +150,18 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     public void setDefaultAvatar(MegaContactGetter.MegaContact contact, ContactViewHolder holder) {
         String color = megaApi.getUserAvatarColor(contact.getId());
-        Bitmap defaultAvatar = Util.createDefaultAvatar(color, getFirstLetter(holder));
-        holder.avatar.setImageBitmap(defaultAvatar);
+        Bitmap background = Util.createAvatarBackground(color);
+        holder.avatar.setImageBitmap(background);
+
+        String firstLetter = ChatUtil.getFirstLetter(contact.getLocalName());
+        if (firstLetter.trim().isEmpty() || firstLetter.equals("(")) {
+            holder.contactInitialLetter.setVisibility(View.INVISIBLE);
+        } else {
+            holder.contactInitialLetter.setText(firstLetter);
+            holder.contactInitialLetter.setTextColor(Color.WHITE);
+            holder.contactInitialLetter.setVisibility(View.VISIBLE);
+            holder.contactInitialLetter.setTextSize(24);
+        }
     }
 
     @Override

@@ -173,7 +173,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         holder.thumbLayout.setVisibility(View.VISIBLE);
         holder.photo.setVisibility(View.VISIBLE);
 
-        Picasso.with(holder.photo.getContext())
+        Picasso.get()
                 .load(uriImages.get(position))
                 .fit()
                 .centerCrop()

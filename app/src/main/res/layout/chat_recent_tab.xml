@@ -168,8 +168,7 @@
             <RelativeLayout
                 android:id="@+id/linear_empty_layout_chat_recent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/empty_image_view_recent"

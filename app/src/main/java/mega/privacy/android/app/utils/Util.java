@@ -31,9 +31,7 @@ import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
-
 import android.support.v4.app.ActivityCompat;
-
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
@@ -41,7 +39,6 @@ import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.format.Formatter;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -84,7 +81,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -97,7 +93,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 
 public class Util {
@@ -582,8 +580,8 @@ public class Util {
 	public static String getProgressSize(Context context, long progress,
 			long size) {
 		return String.format("%s/%s",
-				Formatter.formatFileSize(context, progress),
-				Formatter.formatFileSize(context, size));
+				getSizeString(progress),
+				getSizeString(size));
 	}
 	
 	/*
@@ -1206,6 +1204,16 @@ public class Util {
 		return null;
 	}
 
+	/*
+	 * compare the current mail to newly changed email
+	 */
+	public static String comparedToCurrentEmail(String value, Context context) {
+		if (value.equals(dbH.getCredentials().getEmail())) {
+			return context.getString(R.string.mail_same_as_old);
+		}
+		return null;
+	}
+
 	public static int getAvatarTextSize (float density){
 		float textSize = 0.0f;
 
@@ -1434,42 +1442,14 @@ public class Util {
 		return icon;
 	}
 
-	//Notice user that any transfer prior to login will be destroyed
-	public static void checkPendingTransfer(MegaApiAndroid megaApi, Context context, final AbortPendingTransferCallback callback){
-		if(megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0){
-			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-			if(context instanceof ManagerActivityLollipop){
-				logDebug("Show dialog to cancel transfers before logging OUT");
-				builder.setMessage(R.string.logout_warning_abort_transfers);
-				builder.setPositiveButton(R.string.action_logout, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						callback.onAbortConfirm();
-					}
-				});
-			}
-			else{
-				logDebug("Show dialog to cancel transfers before logging IN");
-				builder.setMessage(R.string.login_warning_abort_transfers);
-				builder.setPositiveButton(R.string.login_text, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						callback.onAbortConfirm();
-					}
-				});
-			}
-
-			builder.setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					callback.onAbortCancel();
-				}
-			});
-			builder.show();
-		}else{
-			callback.onAbortConfirm();
-		}
+	/**
+	 *Check if exist ongoing transfers
+	 *
+	 * @param megaApi
+	 * @return true if exist ongoing transfers, false otherwise
+	 */
+	public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
+		return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
 	}
 
 	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
@@ -1506,6 +1486,20 @@ public class Util {
 			}
 		}
 	}
+
+    public static Bitmap createAvatarBackground(String colorString) {
+        Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(circle);
+        Paint paintCircle = new Paint();
+        paintCircle.setAntiAlias(true);
+        int color = (colorString == null) ?
+                ContextCompat.getColor(context, R.color.lollipop_primary_color) :
+                Color.parseColor(colorString);
+        paintCircle.setColor(color);
+        int radius = circle.getWidth() / 2;
+        c.drawCircle(radius, radius, radius, paintCircle);
+        return circle;
+    }
 
 	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
 		logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
@@ -1554,6 +1548,10 @@ public class Util {
 		c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
 
 		return defaultAvatar;
+	}
+
+	public static MegaPreferences getPreferences (Context context) {
+		return DatabaseHandler.getDbHandler(context).getPreferences();
 	}
 
     public static boolean askMe (Context context) {
@@ -1700,6 +1698,14 @@ public class Util {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
+	public static boolean isScreenInPortrait(Context context) {
+		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 * This method detects whether the android device is tablet
 	 *
@@ -1727,6 +1733,7 @@ public class Util {
 			}
 		}
 		return false;
+
 	}
 
     public static boolean hasPermissions(Context context, String... permissions) {
