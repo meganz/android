@@ -254,8 +254,8 @@
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
-    <string name="tab_incoming_shares" context="Incoming shared folders. The title of a tab">Incoming</string>
-    <string name="tab_outgoing_shares" context="Outgoing shared folders. The title of a tab">Outgoing</string>
+    <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
+    <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
 
     <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Incoming shares with</string>
@@ -613,7 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait</string>
-    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">The preview is not able to load due to insufficient memory available. Please try again later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Please, log out before creating the account</string>
 
@@ -938,9 +938,6 @@
     <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">You have already requested a confirmation link for that email address.</string>
 
     <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">The new and the old email must not match</string>
-
-
-
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">This is the last step to change your email. Please enter your password below.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Change email</string>
 
@@ -1692,8 +1689,8 @@
     <string name="action_delete_qr" context="Option in menu of section  My QR code to delete the QR code">Delete QR code</string>
     <string name="save_cloud_drive" context="Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive">To Cloud Drive</string>
     <string name="save_file_system" context="Option shown in QR code bottom sheet dialog to save QR code in File System">To File System</string>
-    <string name="section_my_code" context="Title of QR code section">My code</string>
-    <string name="section_scan_code" context="Title of QR code scan section">Scan code</string>
+    <string name="section_my_code" context="Title of QR code section">MY CODE</string>
+    <string name="section_scan_code" context="Title of QR code scan section">SCAN CODE</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">Auto-Accept</string>
     <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR Code will be automatically added to your contact list.</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Previous QR code will no longer be valid</string>
@@ -1929,7 +1926,7 @@
     <string name="subtitle_mega_rich_link_no_key" context="Subtitle of a MEGA rich link without the decryption key">Tap to enter the Decryption Key</string>
 
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Please enter a stronger password</string>
-	<string name="error_password_too_weak" context="when the user tries to creates a password protected download link and the password strength is very weak">Please enter a stronger password</string>
+
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
     <string name="title_storage_usage" context="title of usage storage section in Storage">Storage Usage</string>
 
@@ -2530,16 +2527,16 @@
     <string name="chats_label" context="Label to reference a chats section">Chats</string>
 
     <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
-    <string name="title_bucket" cotext="Title of a recents bucket">%s and %d more</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
-    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%d Images and %d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
     <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
     <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
     <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 Image and 1 Video</string>
     <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
-    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">me</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Me</string>
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
@@ -2549,7 +2546,7 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Loading</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Please wait&#8230;</string>
 
-    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %s Contacts.</string>
 
     <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">When you logout, files from your Offline section will be deleted from your device.</string>
     <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">When you logout, ongoing transfers will be cancelled.</string>

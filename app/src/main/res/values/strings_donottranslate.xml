@@ -2,9 +2,9 @@
 <resources>
     <string name="app_name" context="Name of the app" translatable="false">MEGA</string>
     <string name="pdf_app_name" context="PDF viewer app name" translatable="false">MEGA PDF Viewer</string>
-    <string name="app_version" context="Version number of the app" translatable="false">3.7.1 (265)</string>
-    <string name="sdk_version" context="SDK version" translatable="false">49df2e3</string>
-    <string name="karere_version" context="MEGAchat SDK version" translatable="false">f9301e7</string>
+    <string name="app_version" context="Version number of the app" translatable="false">3.7.2 (266)</string>
+    <string name="sdk_version" context="SDK version" translatable="false">eea7e93</string>
+    <string name="karere_version" context="MEGAchat SDK version" translatable="false">3e16257</string>
     <string name="prolite_account" context="PRO Lite account" translatable="false">Lite</string>
     <string name="pro1_account" context="PRO I account" translatable="false">PRO I</string>
     <string name="pro2_account" context="PRO II account" translatable="false">PRO II</string>
