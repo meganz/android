@@ -138,9 +138,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onAccountUpdateReceiver);
 
-        if (megaApi != null) {
-            megaApi.removeRequestListener(this);
-        }
         super.onDestroy();
     }
 
@@ -171,8 +168,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         if (megaApiFolder == null) {
             megaApiFolder = ((MegaApplication) getApplication()).getMegaApiFolder();
         }
-
-        megaApi.addRequestListener(this);
 
         setContentView(R.layout.activity_login);
         relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);

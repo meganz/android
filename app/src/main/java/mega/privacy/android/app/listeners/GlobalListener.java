@@ -39,7 +39,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
     @Override
     public void onAccountUpdate(MegaApiJava api) {
-        logDebug("onAccountUpdate: "+MegaApplication.getInstance().getApplicationContext().toString());
+        logDebug("onAccountUpdate");
 
         MegaApplication.getInstance().onAccountUpdate();
     }

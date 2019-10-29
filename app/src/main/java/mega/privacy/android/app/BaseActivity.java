@@ -397,6 +397,13 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Method to show an alert or error when the account has been suspended
+     * for any reason
+     *
+     * @param eventNumber long that determines the event for which the account has been suspended
+     * @param stringError string shown as an alert in case there is not any specific action for the event
+     */
     public void checkWhyAmIBlocked(long eventNumber, String stringError) {
         switch (Long.toString(eventNumber)) {
             case ACCOUNT_NOT_BLOCKED:
