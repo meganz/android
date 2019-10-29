@@ -26,16 +26,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="13dp"
-        android:layout_marginRight="13dp"
+        android:layout_marginRight="12dp"
         android:layout_toRightOf="@id/file_explorer_thumbnail"
         android:scrollbars="none">
         <TextView
             android:id="@+id/file_explorer_filename"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scrollHorizontally="true"
             android:layout_marginTop="16dp"
             android:textColor="@color/file_list_first_row"
+            android:ellipsize="middle"
             android:singleLine="true"
             android:textSize="16sp"/>
     </HorizontalScrollView>

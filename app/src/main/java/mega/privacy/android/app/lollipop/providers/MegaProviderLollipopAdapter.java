@@ -142,10 +142,8 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
 
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			holder.textViewFileName.setMaxWidth(scaleWidthPx(260, outMetrics));
 			holder.textViewFileSize.setMaxWidth(scaleWidthPx(260, outMetrics));
 		}else{
-			holder.textViewFileName.setMaxWidth(scaleWidthPx(200, outMetrics));
 			holder.textViewFileSize.setMaxWidth(scaleWidthPx(200, outMetrics));
 		}
 			

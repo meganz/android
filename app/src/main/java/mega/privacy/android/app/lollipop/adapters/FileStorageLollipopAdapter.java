@@ -99,8 +99,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		holder.itemLayout.setOnClickListener(this);
 		holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
 		holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
-		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = px2dp((260*scaleW), outMetrics);
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
 
 		v.setTag(holder);
