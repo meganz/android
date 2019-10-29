@@ -8,8 +8,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 260
-        versionName "3.7.1 (260)"
+        versionCode 265
+        versionName "3.7.1 (265)"
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
     }
