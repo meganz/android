@@ -35,7 +35,7 @@
 
     <string name="general_export" context="button">Exporter</string>
 
-    <string name="general_retry" context="Button to try retry some action">Ressayer</string>
+    <string name="general_retry" context="Button to try retry some action">Réessayer</string>
     <string name="general_open_browser" context="Button to open the default web browser">Ouvrir le navigateur</string>
     <!--
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
@@ -54,7 +54,7 @@
     <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Pas encore implémenté</string>
     <string name="error_no_selection" context="when any file or folder is selected">Aucun fichier ou dossier n\'a été sélectionné</string>
     <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Déjà téléchargé</string>
-    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">déjà téléversé</string>
+    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">Déjà téléversé</string>
     <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">Renseignements sur le fichier</string>
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Renseignements sur le dossier</string>
     <!--
@@ -62,7 +62,7 @@
     -->
     <string name="general_show_info" context="Label of a button/notification to show info about something">Afficher les renseignements</string>
 
-    <string name="error_general_nodes" context="Error getting the root node">Erreur. Veuillez ressayer.</string>
+    <string name="error_general_nodes" context="Error getting the root node">Erreur. Veuillez réessayer.</string>
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">Le dossier des médias secondaires n\'existe pas, veuillez choisir un nouveau dossier</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Aucune mémoire externe n\'a été détectée</string>
@@ -494,7 +494,7 @@
     <!--
     <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancel Subscription</string>
     -->
-    <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Nous vous remercions de votre rétroaction ! Voulez-vous vraiment annuler votre abonnement MEGA ?</string>
+    <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Nous vous remercions de votre avis ! Voulez-vous vraiment annuler votre abonnement MEGA ?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Votre abonnement n\'a pas été annulé. Veuillez fournir le motif de votre annulation.</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">Le dossier est désormais privé</string>
@@ -541,7 +541,7 @@
         <item context="Status text at the beginning of an upload for 1 file" quantity="one">Traitement du fichier</item>
         <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
     </plurals>
-    <string name="error_temporary_unavaible" context="error message when downloading a file">La ressource n\'est temporairement pas disponible, veuillez ressayer ultérieurement.</string>
+    <string name="error_temporary_unavaible" context="error message when downloading a file">La ressource n\'est temporairement pas disponible, veuillez réessayer ultérieurement.</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Impossible d\'ouvrir le fichier sélectionné</string>
     <string name="upload_began" context="when an upload starts, a message is shown to the user">Le téléversement a démarré</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Décompression du fichier</string>
@@ -648,7 +648,7 @@
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Les téléversements de l\'appareil photo sont terminés</string>
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Espace de stockage</string>
-    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">NIP de verrouillage</string>
+    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN de verrouillage</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Paramètres avancés</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Vider le cache</string>
@@ -720,21 +720,21 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Non défini</string>
-    <string name="settings_reset_lock_code" context="settings of the pin lock">Réinitialiser le NIP</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">NIP de verrouillage</string>
+    <string name="settings_reset_lock_code" context="settings of the pin lock">Réinitialiser le PIN</string>
+    <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN de verrouillage</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Valider</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Vos fichiers locaux seront supprimés et vous serez déconnecté après dix tentatives infructueuses.</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Code erroné</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Le NIP est erroné, veuillez ressayer. Il vous reste %2d tentatives</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Le PIN est erroné, veuillez réessayer. Il vous reste %2d tentatives</item>
+        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Le PIN est erroné, veuillez réessayer. Il vous reste %2d tentatives</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Les NIP ne correspondent pas</string>
-    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Saisir votre NIP</string>
-    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Saisir votre NIP de nouveau</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Saisir votre nouveau NIP</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Saisir votre nouveau NIP de nouveau</string>
+    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Les PIN ne correspondent pas</string>
+    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Saisir votre PIN</string>
+    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Saisir votre PIN de nouveau</string>
+    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Saisir votre nouveau PIN</string>
+    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Saisir votre nouveau PIN de nouveau</string>
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">Toutes vos données locales seront supprimées et vous serez déconnecté dans %1d secondes</string>
 
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">À propos</string>
@@ -829,10 +829,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="title to choose the type of PIN code">Type de NIP</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">NIP à 4 chiffres</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">NIP à 6 chiffres</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">NIP alphanumérique</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">Type de PIN</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">PIN à 4 chiffres</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">PIN à 6 chiffres</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">PIN alphanumérique</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">La journalisation est maintenant activée</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">La journalisation est maintenant désactivée</string>
@@ -885,14 +885,14 @@
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Vérification de l\'adresse courriel</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Veuillez vérifier vos courriels afin de continuer.</string>
-    <string name="general_text_error" context="Text to inform the user when an error occurs">Une erreur est survenue, veuillez ressayer.</string>
+    <string name="general_text_error" context="Text to inform the user when an error occurs">Une erreur est survenue, veuillez réessayer.</string>
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Vous devez être connecté pour effectuer cette action.</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">Erroné</string>
 
     <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Adresse courriel invalide</string>
-    <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Veuillez vérifier l\'adresse courriel et ressayer.</string>
+    <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Veuillez vérifier l\'adresse courriel et réessayer.</string>
     <!--
     <string name="alert_not_logged_out" context="Alert to inform the user that have to be logged out to perform the action">You must be logged out to perform this action.</string>
     -->
@@ -912,7 +912,7 @@
     <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">Cette étape est la dernière pour remiser votre compte. Veuillez saisir votre nouveau mot de passe. Vos données seront conservées pendant au moins 60 jours. Si vous vous souvenez du mot de passe de votre compte remisé, veuillez contacter support&#64;mega.nz</string>
 
     <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">Saisir le nouveau mot de passe</string>
-    <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">Le lien de récupération a expiré. Veuillez ressayer.</string>
+    <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">Le lien de récupération a expiré. Veuillez réessayer.</string>
 
     <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Votre clé de récupération sera utilisée pour réinitialiser votre mot de passe. Veuillez saisir votre nouveau mot de passe.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Vous recevrez un lien de récupération qui vous permettra de réinitialiser votre mot de passe.</string>
@@ -943,7 +943,7 @@
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Choisir une photo</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Supprimer la photo</string>
 
-    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">La clé que vous avez fournie ne correspond pas à ce compte. Veuillez vous assurez d\'utiliser la bonne clé et ressayer.</string>
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">La clé que vous avez fournie ne correspond pas à ce compte. Veuillez vous assurez d\'utiliser la bonne clé et réessayer.</string>
     <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">La clé de récupération est invalide</string>
 
     <string name="option_full_link" context="Alert Dialog to get link">Lien avec clé</string>
@@ -988,7 +988,7 @@
         <item context="Confirmation before removing the outgoing shares of a folder" quantity="other">Le dossier est partagé avec %1$d contacts. Supprimer tous les partages ?</item>
     </plurals>
 
-    <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">L\'adresse courriel ou le mot de passe sont erronés. Veuillez ressayer.</string>
+    <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">L\'adresse courriel ou le mot de passe sont erronés. Veuillez réessayer.</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Votre compte a été désactivé en raison du non-respect de nos conditions générales d\'utilisation. Veuillez contacter support&#64;mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Trop de tentatives infructueuses de connexion, veuillez patienter pendant une heure.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Ce compte n\'a pas encore été validé. Veuillez vérifier vos courriels.</string>
@@ -1117,7 +1117,7 @@
     <string name="title_mega_confidentiality_empty_screen" context="Message about MEGA when there are no message in the chat screen">Confidentialité</string>
 
     <string name="error_not_logged_with_correct_account" context="Error message shown when opening a cancel link with an account that not corresponds to the link">Ce lien n\'est pas associé à ce compte. Veuillez vous connecter avec le bon compte.</string>
-    <string name="cancel_link_expired" context="Message when the user tries to open a cancel link and it has expired">Ce lien d\'annulation est expiré, veuillez ressayer.</string>
+    <string name="cancel_link_expired" context="Message when the user tries to open a cancel link and it has expired">Ce lien d\'annulation est expiré, veuillez réessayer.</string>
 
     <string name="no_results_found" context="Text shown after searching and no results found">Aucun résultat n\'a été trouvé</string>
 
@@ -1239,7 +1239,7 @@
         <item context="Title of the contact list" quantity="other">%1$d contacts</item>
     </plurals>
 
-    <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">Erreur de partage du dossier. Veuillez ressayer.</string>
+    <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">Erreur de partage du dossier. Veuillez réessayer.</string>
 
     <plurals name="confirmation_remove_contact" context="confirmation message before removing a contact">
         <item context="Singular" quantity="one">Toutes les données relatives au contact sélectionné seront perdues irrémédiablement.</item>
@@ -1255,7 +1255,7 @@
     <string name="chat_connection_error" context="error shown when the connection to the chat fails">Chat connection error</string>
     -->
 
-    <string name="message_option_retry" context="option shown when a message could not be sent">Ressayer</string>
+    <string name="message_option_retry" context="option shown when a message could not be sent">réessayer</string>
 
     <string name="title_message_not_sent_options" context="title of the menu for a non sent message">Message non envoyé</string>
     <string name="title_message_uploading_options" context="title of the menu for an uploading message with attachment">Téléverser un fichier joint</string>
@@ -1459,7 +1459,7 @@
     <string name="download_show_info" context="Hint how to cancel the download">Afficher les renseignements</string>
 
     <string name="context_link_removal_error" context="error message">Échec de suppression du lien. Veuillez essayer ultérieurement.</string>
-    <string name="context_link_action_error" context="error message">Échec d\'action du lien. Veuillez ressayer ultérieurement.</string>
+    <string name="context_link_action_error" context="error message">Échec d\'action du lien. Veuillez réessayer ultérieurement.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Saisir l\'adresse courriel de l\'utilisateur</string>
 
@@ -1605,8 +1605,8 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Aucun dossier n\'est partagé</string>
 
     <string name="settings_help" context="Settings category title for Help">Aide</string>
-    <string name="settings_help_preference" context="Settings preference title for send feedback">Envoyer une rétroaction</string>
-    <string name="setting_feedback_subject" context="mail subject">Rétroaction Android</string>
+    <string name="settings_help_preference" context="Settings preference title for send feedback">Envoyer un avis</string>
+    <string name="setting_feedback_subject" context="mail subject">Avis Android</string>
     <string name="setting_feedback_body" context="mail body">Veuillez rédiger votre commentaire ici :</string>
     <string name="settings_feedback_body_device_model" context="mail body">Modèle de l\'appareil</string>
     <string name="settings_feedback_body_android_version" context="mail body">Version d\'Android</string>
@@ -1661,7 +1661,7 @@
 
     <string name="title_evaluate_the_app_panel" context="Title of dialog to evaluate the app">Cette appli vous satisfait-elle ?</string>
     <string name="rate_the_app_panel" context="Label to show rate the app">Oui, évaluer l\'appli</string>
-    <string name="send_feedback_panel" context="Label to show send feedback">Non, envoyer une rétroaction</string>
+    <string name="send_feedback_panel" context="Label to show send feedback">Non, envoyer un avis</string>
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Options avancées</string>
 
@@ -1681,13 +1681,13 @@
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Le lien a été copié dans le presse-papiers</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">Le code QR a été réinitialisé avec succès</string>
     <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">Le code QR a été supprimé avec succès</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">Le code QR n\'a pas été réinitialisé en raison d\'une erreur. Veuillez ressayer.</string>
-    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">Le code QR n\'a pas été supprimé en raison d\'une erreur. Veuillez ressayer.</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">Le code QR n\'a pas été réinitialisé en raison d\'une erreur. Veuillez réessayer.</string>
+    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">Le code QR n\'a pas été supprimé en raison d\'une erreur. Veuillez réessayer.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">L\'invitation a été envoyée</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">L\'utilisateur %s a été invité et apparaîtra dans votre liste de contacts une fois qu\'il aura accepté.</string>
-    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">Une erreur est survenue en tentant de partager le fichier QR. Le fichier n\'existe peut-être pas. Veuillez ressayer ultérieurement.</string>
-    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">Une erreur est survenue en tentant de téléverser le fichier QR. Le fichier n\'existe peut-être pas. Veuillez ressayer ultérieurement.</string>
-    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Une erreur est survenue en tentant de télécharger le fichier QR. Le fichier n\'existe peut-être pas. Veuillez ressayer ultérieurement.</string>
+    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">Une erreur est survenue en tentant de partager le fichier QR. Le fichier n\'existe peut-être pas. Veuillez réessayer ultérieurement.</string>
+    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">Une erreur est survenue en tentant de téléverser le fichier QR. Le fichier n\'existe peut-être pas. Veuillez réessayer ultérieurement.</string>
+    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Une erreur est survenue en tentant de télécharger le fichier QR. Le fichier n\'existe peut-être pas. Veuillez réessayer ultérieurement.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">Le code QR a été téléchargé avec succès sur %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">L\'invitation n\'a pas été envoyée</string>
     <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">Le code QR ou le lien de contact est invalide. Veuillez essayer de balayer un code valide ou d\'ouvrir un lien valide.</string>
@@ -1877,7 +1877,7 @@
     <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Clé de récupération</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">En exportant et en conservant la clé de récupération en lieu sûr, vous pourrez définir un nouveau mot de passe sans risquer de perdre des données.</string>
 
-    <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">Impossible d\'atteindre MEGA. Veuillez vérifier votre connectivité ou ressayer ultérieurement.</string>
+    <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">Impossible d\'atteindre MEGA. Veuillez vérifier votre connectivité ou réessayer ultérieurement.</string>
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Les serveurs sont trop occupés. Veuillez patienter.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Ce processus prend plus de temps que prévu. Veuillez patienter.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit ">Trop de requêtes. Veuillez patienter.</string>
@@ -1938,7 +1938,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Veuillez saisir le code à 6 chiffres généré par votre appli d\'authentification.</string>
     <string name="general_verify" context="Text button">Vérifier</string>
     <string name="general_next" context="Text button">Suivant</string>
-    <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Une erreur est survenue lors de la génération de la graine ou du code QR, veuillez ressayer.</string>
+    <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Une erreur est survenue lors de la génération de la graine ou du code QR, veuillez réessayer.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">L\'authentification à deux facteurs est activée</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">La prochaine fois que vous vous connecterez à votre compte, un code à 6 chiffres fourni par votre appli d\'authentification vous sera demandé.</string>
     <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Sauvegarder votre clé de récupération</b></string>
@@ -1950,8 +1950,8 @@
     <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">Authentification à deux facteurs\nChanger l\'adresse courriel</string>
     <string name="disable_2fa_verification" context="Title of screen Disable Two-Factor Authentication">Désactiver l\'authentification à deux facteurs</string>
     <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Avez-vous perdu votre appareil d\'authentification ?</string>
-    <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">Une erreur est survenue en tentant de désactiver l\'authentification à deux facteurs. Veuillez ressayer.</string>
-    <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">Une erreur est survenue en tentant d\'activer l\'authentification à deux facteurs. Veuillez ressayer.</string>
+    <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">Une erreur est survenue en tentant de désactiver l\'authentification à deux facteurs. Veuillez réessayer.</string>
+    <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">Une erreur est survenue en tentant d\'activer l\'authentification à deux facteurs. Veuillez réessayer.</string>
     <string name="title_enable_2fa" context="Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication">Activer l\'authentification à deux facteurs</string>
     <string name="label_2fa_disabled" context="Label shown when it disables the Two-Factor Authentication">L\'authentification à deux facteurs est désactivée</string>
     <string name="open_app_button" context="Text of the button which action is to show the authentication apps">Ouvrir avec</string>
@@ -2055,7 +2055,7 @@
     <string name="text_confirmation_dialog_delete_versions" context="Text of the dialog to delete all the file versions of the account">Vous êtes sur le point de supprimer les historiques de version de tous les fichiers. Tout fichier partagé avec vous par un contact devra être supprimé par ce contact.\n\nVeuillez noter que les fichiers actuels ne seront pas supprimés.</string>
 
     <string name="success_delete_versions" context="success message when deleting all the versions of the account">Les versions de fichiers ont été supprimées avec succès</string>
-    <string name="error_delete_versions" context="error message when deleting all the versions of the account">Une erreur est survenue en essayant de supprimer toutes les versions précédentes de vos fichiers, veuillez ressayer ultérieurement.</string>
+    <string name="error_delete_versions" context="error message when deleting all the versions of the account">Une erreur est survenue en essayant de supprimer toutes les versions précédentes de vos fichiers, veuillez réessayer ultérieurement.</string>
 
     <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">Versionnage des fichiers</string>
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Activer ou désactiver le versionnage des fichiers pour votre compte entier.\nVous pourriez encore recevoir des versions de fichiers provenant de dossiers partagés si vos contacts ont activé cette option.</string>
@@ -2422,7 +2422,7 @@
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Saisir votre mot de passe</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s est un document PDF protégé par mot de passe. Veuillez saisir le mot de passe pour ouvrir le PDF.</string>
-    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Le mot de passe que vous avez saisi est erroné, veuillez ressayer.</string>
+    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Le mot de passe que vous avez saisi est erroné, veuillez réessayer.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">Le mot de passe que vous avez saisi est invalide.</string>
 
     <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">Le fichier ne peut pas être ouvert. Son type est inconnu ou il n\'a pas été possible de le décompresser avec succès.</string>
