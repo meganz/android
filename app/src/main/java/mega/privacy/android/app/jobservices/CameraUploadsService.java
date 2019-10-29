@@ -922,7 +922,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
                     if(prefs.getRemoveGPS() != null) {
                         removeGPS = Boolean.parseBoolean(prefs.getRemoveGPS());
-                        logDebug("shoulde remove GPS: " + removeGPS);
+                        logDebug("Should remove GPS: " + removeGPS);
                     }
                     
                     boolean isWifi = isOnWifi(this);
@@ -1042,7 +1042,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         if(prefs.getRemoveGPS() != null) {
             removeGPS = Boolean.parseBoolean(prefs.getRemoveGPS());
-            logDebug("shoulde remove GPS: " + removeGPS);
+            logDebug("Should remove GPS: " + removeGPS);
         }
         
         if (prefs.getSecondaryMediaFolderEnabled() == null) {

@@ -1042,8 +1042,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			cameraUploadCategory.removePreference(localCameraUploadFolder);
 			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
 			hideVideoQualitySettingsSection();
-			cameraUploadRemoveGPS.setSummary("");
-			cameraUploadCategory.removePreference(cameraUploadRemoveGPS);
+            removeRemoveGPS();
 			cameraUploadCategory.removePreference(keepFileNames);
 			cameraUploadCategory.removePreference(megaCameraFolder);
 			cameraUploadCategory.removePreference(cameraUploadHow);
@@ -2645,7 +2644,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
     }
 
     private void removeRemoveGPS() {
-	    cameraUploadRemoveGPS.setSummary("");
+        cameraUploadRemoveGPS.setSummary("");
         cameraUploadCategory.removePreference(cameraUploadRemoveGPS);
     }
 
