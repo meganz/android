@@ -58,10 +58,10 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
         // Generate title based on item position
         switch (position){
             case 0: {
-                return context.getString(R.string.tab_incoming_shares).toLowerCase();
+                return context.getString(R.string.tab_incoming_shares);
             }
             case 1:{
-                return context.getString(R.string.tab_outgoing_shares).toLowerCase();
+                return context.getString(R.string.tab_outgoing_shares);
             }
         }
         return null;

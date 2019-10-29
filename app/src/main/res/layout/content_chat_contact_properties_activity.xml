@@ -25,7 +25,7 @@
             android:background="@color/white"
             android:orientation="vertical" >
 
-            <TextView
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/chat_contact_properties_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

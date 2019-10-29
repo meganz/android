@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">Erreur. Veuillez ressayer.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-CLÉdeRÉCUPÉRATION</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">Le dossier des médias secondaires n\'existe pas, veuillez choisir un nouveau dossier</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Aucune mémoire externe n\'a été détectée</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Ce dossier est en lecture seulement. Vous n\'avez pas le droit de téléverser</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Vue en imagettes</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Vue en liste</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Sauvegarder la clé de récupération</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Supprimer la clé de récupération</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Annuler l\'abonnement</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">La clé de récupération a été supprimée</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">L\'abonnement a été annulé</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Il nous a été impossible d\'annuler votre abonnement. Veuillez contacter support&#64;mega.nz pour obtenir de l\'assistance</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Fermer les autres sessions</string>
@@ -232,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">Supprimer tous les transferts ?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disque nuagique</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Récents</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Téléversement des médias</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Boîte de réception</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Enregistré Hors ligne</string>
@@ -612,7 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">L\'aperçu n\'a pas encore été téléchargé. Veuillez patienter</string>
-    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Une mémoire insuffisante empêche de charger l\'aperçu. Veuillez ressayer ultérieurement.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Veuillez vous déconnecter avant de créer le compte</string>
 
@@ -911,7 +912,7 @@
     <string name="park_account_button" context="Button to park an account">Remiser</string>
     <string name="park_account_title" context="Title of the screen to park an account">Oups !</string>
     <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">En raison de notre modèle de chiffrement de bout en bout, vous ne pourrez pas accéder à vos données sans votre mot de passe ou une sauvegarde de votre clé de récupération.</string>
-    <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">Vous pouvez remiser votre compte existant et en commencer un nouveau avec la même adresse courriel. Vos données seront conservées pendant au moins 60 jours. Dans le cas où vous vous souviendriez du mot de passe de votre compte remisé, veuillez contacter support&#64;mega.nz</string>
+    <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">Vous pouvez remiser votre compte existant et en commencer un nouveau avec la même adresse courriel. Vos données seront conservées pendant au moins 60 jours. Au cas où vous vous souviendriez du mot de passe de votre compte remisé, veuillez contacter support&#64;mega.nz</string>
 
     <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">Veuillez saisir votre adresse courriel ci-dessous. Vous recevrez un lien de récupération qui vous permettra de remiser votre compte.</string>
     <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">Cette étape est la dernière pour remiser votre compte. Veuillez saisir votre nouveau mot de passe. Vos données seront conservées pendant au moins 60 jours. Si vous vous souvenez du mot de passe de votre compte remisé, veuillez contacter support&#64;mega.nz</string>
@@ -933,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Erreur. Cette adresse courriel est déjà utilisée.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">Vous avez déjà demandé un lien de confirmation pour cette adresse courriel.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">La nouvelle adresse courriel et l\'ancienne ne doivent pas correspondre</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Ceci est la dernière étape pour changer votre adresse courriel. Veuillez saisir votre mot de passe ci-dessous.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Changer l\'adresse courriel</string>
 
@@ -1580,7 +1584,7 @@
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Prime d\'inscription</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Installer l\'appli MEGA pour ordinateur</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Quota de base du compte</string>
-    <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">Il n\'y a aucun fichier dans les téléversements de l\'appareil photo</string>
+    <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">Il n\'y a aucun fichier dans Téléversements de l\'appareil photo</string>
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">%1$d j restants</string>
     <string name="expired_achievement" context="state to indicate the achievement has expired">Expiré</string>
 
@@ -1724,7 +1728,7 @@
     <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invitez vos amis à [/B][A]dialoguer en ligne[/A][B] et profitez de notre plateforme chiffrée assurant confidentialité et sécurité.[/B]</string>
     <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[C]Activez[/C] le [B]dialogue en ligne[/B][A][C] et profitez de notre plateforme chiffrée, en toute confidentialité et sécurité.[/C]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Il n\'y a aucun fichier de média dans les [/B][A]téléversements de l\'appareil photo[/A][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Il n\'y a aucun média dans [/B][A]Téléversements de l\'appareil photo[/A][B].[/B]</string>
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Corbeille [/A][B]vide[/B][B].[/B]</string>
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Il n\'y a aucun fichier dans votre [/B][A]boîte de réception[/A][B].[/B]</string>
@@ -2322,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Un appel a commencé</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Erreur de clé SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA n\'arrive pas à se connecter de façon sécurisée par SSL. Vous êtes peut-être sur un réseau Wi-Fi public avec des exigences supplémentaires.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA n\'arrive pas à se connecter de façon sécurisée par SSL. Vous vous trouvez peut-être sur un réseau Wi-Fi public avec des exigences supplémentaires.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Il n\'y a aucune [/B][A]notification[/A][B].[/B]</string>
 
@@ -2436,13 +2440,13 @@
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Vous n\'avez aucun contact MEGA. Veuillez inviter des amis dans la section Contacts.</string>
 
     <string name="title_tour_one" context="Title of first tour screen">Vous détenez les clés</string>
-    <string name="content_tour_one" cotext="Content of first tour screen">La sécurité est notre raison d\'être. Avec nous, vos fichiers sont en sécurité à l\'abri d\'un système de chiffrement efficace dans lequel vous seul avez accès à vos fichiers.</string>
+    <string name="content_tour_one" cotext="Content of first tour screen">La sécurité est notre raison d\'être. Avec nous, vos fichiers sont en sécurité, protégés par un système de chiffrement efficace dans lequel vous seul avez accès à vos fichiers.</string>
     <string name="title_tour_two" cotext="Title of second tour screen">Dialogue en ligne chiffré</string>
-    <string name="content_tour_two" cotext="Content of second tour screen">Le dialogue en ligne est entièrement chiffré, offrant des appels voix, des appels vidéo, une messagerie de groupe et le partage de fichiers intégré à votre disque nuagique.</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">Le dialogue en ligne est entièrement chiffré et offre des appels voix, des appels vidéo, une messagerie de groupe et le partage de fichiers tous intégrés à votre disque nuagique.</string>
     <string name="title_tour_three" cotext="Title of third tour screen">Créer votre réseau</string>
     <string name="content_tour_three" cotext="Content of third tour screen">Ajoutez des contacts, créez un réseau, collaborez et faites des appels voix ou vidéo sans jamais quitter MEGA</string>
     <string name="title_tour_four" cotext="Title of fourth tour screen">Vos photos dans le nuage</string>
-    <string name="content_tour_four" cotext="Content of fourth tour screen">Les téléversements de l\'appareil photo sont une fonction essentielle de tout appareil mobile, et nous nous en occupons pour vous. Créez votre compte maintenant.</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">Téléversements de l\'appareil photo est une fonction essentielle de tout appareil mobile et nous nous en occupons pour vous. Créez votre compte maintenant.</string>
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Saisir votre mot de passe</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s est un document PDF protégé par mot de passe. Veuillez saisir le mot de passe pour ouvrir le PDF.</string>
@@ -2519,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d fichiers en attente.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Récents</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 image et 1 vidéo</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Moi</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Il est impossible d\'enregistrer des messages vocaux pendant un appel.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Une erreur est survenue lors de la tentative de téléversement du message vocal.</string>
 
@@ -2527,5 +2546,6 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Chargement</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Veuillez patienter&#8230;</string>
 
-    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s contacts envoyés.</string>
 </resources>

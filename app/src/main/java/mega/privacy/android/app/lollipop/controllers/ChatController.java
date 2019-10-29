@@ -38,6 +38,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatImportToForwardListener;
+import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -59,6 +60,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -1349,11 +1351,6 @@ public class ChatController {
         logDebug("pickFileToSend");
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_MULTISELECT_FILE);
-//        ArrayList<String> longArray = new ArrayList<String>();
-//        for (int i=0; i<users.size(); i++){
-//            longArray.add(users.get(i).getEmail());
-//        }
-//        intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
         ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
     }
 
@@ -1834,7 +1831,7 @@ public class ChatController {
                                     internalIntent = true;
                                     mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                                 }
-                                mediaIntent.putExtra("isPlayList", false);
+                                mediaIntent.putExtra(IS_PLAYLIST, false);
                                 mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                                 mediaIntent.putExtra("adapterType", FROM_CHAT);
                                 mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());
@@ -2163,5 +2160,39 @@ public class ChatController {
         }
 
         return false;
+    }
+
+    public void checkIfNodesAreMineAndAttachNodes(long handles[], long idChat) {
+        if (handles == null) {
+            return;
+        }
+
+        MegaNode currentNode;
+        ArrayList<MegaNode> nodes = new ArrayList<>();
+        ArrayList<MegaNode> ownerNodes = new ArrayList<>();
+        ArrayList<MegaNode> notOwnerNodes = new ArrayList<>();
+        NodeController nC = new NodeController(context);
+
+
+        for (int i=0; i<handles.length; i++) {
+            currentNode = megaApi.getNodeByHandle(handles[i]);
+            if (currentNode != null) {
+                nodes.add(currentNode);
+            }
+        }
+
+        nC.checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
+
+        if (notOwnerNodes.size() == 0) {
+            for(MegaNode node : ownerNodes) {
+                if (context instanceof ChatActivityLollipop) {
+                    megaChatApi.attachNode(idChat, node.getHandle(), (ChatActivityLollipop)context);
+                }
+            }
+            return;
+        }
+
+        CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChat);
+        copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
     }
 }

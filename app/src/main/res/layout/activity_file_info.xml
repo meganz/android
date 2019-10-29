@@ -32,7 +32,7 @@
                 app:expandedTitleMarginTop="65dp"
                 app:expandedTitleMarginStart="72dp"
                 app:expandedTitleMarginBottom="14dp"
-                app:maxLines="2"
+                app:maxLines="3"
                 app:lineSpacingMultiplier="1.2">
 
                 <RelativeLayout
