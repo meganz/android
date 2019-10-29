@@ -126,7 +126,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
         int icon = MimeTypeThumbnail.typeForName(imageFile.getName()).getIconResourceId();
 
-        if (isGIF(imageFile.getName())) {
+        if (MimeTypeThumbnail.typeForName(imageFile.getName()).isGIF()) {
             holder.imgDisplay.setVisibility(View.GONE);
             holder.gifImgDisplay.setVisibility(View.VISIBLE);
             setGlideParams(imageFile, icon, holder.gifImgDisplay, pb);
@@ -179,7 +179,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	}
 
 	private void setGlideParams(File imgFile, int icon, ImageView imageView, final ProgressBar pb) {
-    	if (isGIF(imgFile.getName())) {
+    	if (MimeTypeThumbnail.typeForName(imgFile.getName()).isGIF()) {
     		RequestListener<GifDrawable> gifListener = new RequestListener<GifDrawable>() {
 				@Override
 				public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
