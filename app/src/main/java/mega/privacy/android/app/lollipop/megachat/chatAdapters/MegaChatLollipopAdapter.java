@@ -3624,7 +3624,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                         }
                     }
-                    ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(Formatter.formatFileSize(context, node.getSize()));
+                    ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(getSizeString(node.getSize()));
                 } else {
                     if (node.isInShare()) {
                         ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageResource(R.drawable.ic_folder_incoming_list);
@@ -3879,7 +3879,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         }
                     }
-                    ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(Formatter.formatFileSize(context, node.getSize()));
+                    ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(getSizeString(node.getSize()));
                 } else {
                     if (node.isInShare()) {
                         ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(R.drawable.ic_folder_incoming_list);

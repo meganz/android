@@ -2856,38 +2856,38 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		logDebug("onNodesUpdate");
 
-		boolean thisNode = false;
-		if(nodes==null){
-			return;
-		}
+		if ((adapterType != OFFLINE_ADAPTER) && adapterType != FILE_LINK_ADAPTER && adapterType != ZIP_ADAPTER) {
+			boolean thisNode = false;
+			if(nodes==null){
+				return;
+			}
 
-		Iterator<MegaNode> it = nodes.iterator();
-		while (it.hasNext()){
-			MegaNode n = it.next();
-			if (n != null){
-				if (positionG < imageHandles.size() && n.getHandle() == imageHandles.get(positionG)){
-					thisNode = true;
+
+			Iterator<MegaNode> it = nodes.iterator();
+			while (it.hasNext()){
+				MegaNode n = it.next();
+				if (n != null && positionG < imageHandles.size() && n.getHandle() == imageHandles.get(positionG)){
+						thisNode = true;
 				}
 			}
+
+			if (!thisNode){
+				logWarning("Not related to this node");
+				return;
+			}
+
+			if (positionG < imageHandles.size() && imageHandles.get(positionG) != -1){
+				logDebug("Node updated");
+				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			}
+
+			if (node == null){
+				return;
+			}
+
+			fileNameTextView.setText(node.getName());
+			supportInvalidateOptionsMenu();
 		}
-
-		if (!thisNode){
-			logWarning("Not related to this node");
-			return;
-		}
-
-		if (positionG < imageHandles.size() && imageHandles.get(positionG) != -1){
-			logDebug("Node updated");
-			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-		}
-
-		if (node == null){
-			return;
-		}
-
-		fileNameTextView.setText(node.getName());
-		supportInvalidateOptionsMenu();
-
 	}
 
 	@Override

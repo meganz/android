@@ -202,7 +202,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -241,6 +240,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -701,6 +701,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private RelativeLayout openLinkError;
 	private TextView openLinkErrorText;
 	private Button openLinkOpenButton;
+
+	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -3665,7 +3667,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage(text);
 
-                    builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                    builder.setPositiveButton(getString(R.string.general_yes),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
@@ -3678,7 +3680,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 									}
                                 }
                             });
-                    builder.setNegativeButton(getString(R.string.general_cancel), null);
+                    builder.setNegativeButton(getString(R.string.general_no), null);
                     final AlertDialog dialog = builder.create();
                     try {
                         dialog.show();
@@ -5238,7 +5240,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void selectDrawerItemAccount(){
-		logDebug("selectDrawerItemAccount");
 
 		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
 			megaApi.getFolderInfo(megaApi.getRootNode(), this);
@@ -5246,75 +5247,36 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		switch(accountFragment){
 			case UPGRADE_ACCOUNT_FRAGMENT:{
-				logDebug("Show upgrade FRAGMENT");
 				showUpAF();
 				break;
 			}
 			case MONTHLY_YEARLY_FRAGMENT:{
-				logDebug("Show monthly yearly FRAGMENT");
 				showmyF(selectedPaymentMethod, selectedAccountType);
 				showFabButton();
 				break;
 			}
 			default:{
-				logDebug("Show myAccount Fragment");
 				accountFragment=MY_ACCOUNT_FRAGMENT;
 
 				if (mTabsAdapterMyAccount == null){
-					logWarning("mTabsAdapterMyAccount == null");
-
-					mTabsAdapterMyAccount = new MyAccountPageAdapter(getSupportFragmentManager(),this);
+					mTabsAdapterMyAccount = new MyAccountPageAdapter(getSupportFragmentManager(), this);
 					viewPagerMyAccount.setAdapter(mTabsAdapterMyAccount);
 					tabLayoutMyAccount.setupWithViewPager(viewPagerMyAccount);
-
-					logDebug("The index of the TAB ACCOUNT is: " + indexAccount);
-					if(indexAccount!=-1) {
-						if (viewPagerMyAccount != null) {
-							switch (indexAccount){
-								case GENERAL_TAB:{
-									viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
-									logDebug("General TAB");
-									break;
-								}
-								case STORAGE_TAB:{
-									viewPagerMyAccount.setCurrentItem(STORAGE_TAB);
-									logDebug("Storage TAB");
-									break;
-								}
-								default:{
-									viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
-									logDebug("Default general TAB");
-									break;
-								}
-							}
-						}
-					}
-					else{
-						//No bundle, no change of orientation
-						logDebug("indexAccount is NOT -1");
-					}
-				}
-				else{
-					logDebug("mTabsAdapterMyAccount NOT null");
+				} else{
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-
 					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
+				}
 
-					if(indexAccount!=-1) {
-						logDebug("The index of the TAB MyAccount is: " + indexAccount);
-						if (viewPagerMyAccount != null) {
-							switch (indexAccount) {
-								case STORAGE_TAB: {
-									viewPagerMyAccount.setCurrentItem(STORAGE_TAB);
-									logDebug("Select Storage TAB");
-									break;
-								}
-								default: {
-									viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
-									logDebug("Select General TAB");
-									break;
-								}
-							}
+				if(viewPagerMyAccount != null) {
+					switch (indexAccount){
+						case STORAGE_TAB:{
+							viewPagerMyAccount.setCurrentItem(STORAGE_TAB);
+							break;
+						}
+						default:{
+							indexAccount = GENERAL_TAB;
+							viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
+							updateLogoutWarnings();
 						}
 					}
 				}
@@ -10039,13 +10001,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         	newFile.createNewFile();
         } catch (IOException e) {}
 
-		Uri outputFileUri;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
-		}
-		else{
-			outputFileUri = Uri.fromFile(newFile);
-		}
+        //This method is in the v4 support library, so can be applied to all devices
+		Uri outputFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, newFile);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
@@ -10636,7 +10593,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         View v = inflater.inflate(R.layout.dialog_autoaway, null);
         builder.setView(v);
 
-        final RelativeLayout error = (RelativeLayout) v.findViewById(R.id.autoaway_error);
         final EditText input = v.findViewById(R.id.autoaway_edittext);
         input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -10646,9 +10602,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (error.getVisibility() == View.VISIBLE) {
-                    error.setVisibility(View.GONE);
-                }
+
             }
 
             @Override
@@ -10660,14 +10614,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (validAutoaway(value)) {
+					String value = validateAutoAway(v.getText());
+					if (value != null) {
 						setAutoAwayValue(value, false);
-						newFolderDialog.dismiss();
 					}
-					else {
-						error.setVisibility(View.VISIBLE);
-					}
+					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
@@ -10686,16 +10637,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
 		set.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
-                String value = input.getText().toString().trim();
-                if (validAutoaway(value)) {
-                    setAutoAwayValue(value, false);
-					newFolderDialog.dismiss();
-                }
-                else {
-                    error.setVisibility(View.VISIBLE);
-                }
-            }
+			public void onClick(View v) {
+				String value = validateAutoAway(input.getText());
+				if (value != null) {
+					setAutoAwayValue(value, false);
+				}
+				newFolderDialog.dismiss();
+			}
         });
 		Button cancel = (Button) v.findViewById(R.id.autoaway_cancel_button);
 	    cancel.setOnClickListener(new OnClickListener() {
@@ -10710,12 +10658,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		newFolderDialog.show();
 	}
 
-	boolean validAutoaway(String value) {
-		if (Integer.parseInt(value) > 0) {
-			return true;
+	private String validateAutoAway(CharSequence value) {
+		int timeout;
+		try {
+			timeout = Integer.parseInt(value.toString().trim());
+			if (timeout <= 0) {
+				timeout = 1;
+			} else if (timeout > MAX_AUTOAWAY_TIMEOUT) {
+				timeout = MAX_AUTOAWAY_TIMEOUT;
+			}
+			return String.valueOf(timeout);
+		} catch (Exception e) {
+			logWarning("Unable to parse user input, user entered: '" + value + "'");
+			return null;
 		}
-	    return false;
-    }
+	}
 
 	public void setAutoAwayValue(String value, boolean cancelled){
 		logDebug("Value: " + value);
@@ -11508,21 +11465,22 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void showNodeOptionsPanel(MegaNode node){
 		logDebug("showNodeOptionsPanel");
-		this.selectedNode=node;
-		if(node!=null){
-			this.selectedNode = node;
-			NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedNode = node;
+		bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showOptionsPanel(MegaOffline sNode){
 		logDebug("showNodeOptionsPanel-Offline");
-		if(sNode!=null){
-			this.selectedOfflineNode = sNode;
-			OfflineOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new OfflineOptionsBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (sNode == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedOfflineNode = sNode;
+		bottomSheetDialogFragment = new OfflineOptionsBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showContactOptionsPanel(MegaContactAdapter user){
@@ -11533,55 +11491,58 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		if(user!=null){
-			this.selectedUser = user;
-			ContactsBottomSheetDialogFragment bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+		if (user == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedUser = user;
+		bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showSentRequestOptionsPanel(MegaContactRequest request){
 		logDebug("showSentRequestOptionsPanel");
-		if(request!=null){
-			this.selectedRequest = request;
-			SentRequestBottomSheetDialogFragment bottomSheetDialogFragment = new SentRequestBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+		if (request == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedRequest = request;
+		bottomSheetDialogFragment = new SentRequestBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showReceivedRequestOptionsPanel(MegaContactRequest request){
 		logDebug("showReceivedRequestOptionsPanel");
-		if(request!=null){
-			this.selectedRequest = request;
-			ReceivedRequestBottomSheetDialogFragment bottomSheetDialogFragment = new ReceivedRequestBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+
+		if (request == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedRequest = request;
+		bottomSheetDialogFragment = new ReceivedRequestBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showMyAccountOptionsPanel() {
 		logDebug("showMyAccountOptionsPanel");
-		MyAccountBottomSheetDialogFragment bottomSheetDialogFragment = new MyAccountBottomSheetDialogFragment();
+
+		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		bottomSheetDialogFragment = new MyAccountBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showUploadPanel(){
 		logDebug("showUploadPanel");
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-						REQUEST_READ_WRITE_STORAGE);
-			}else{
-				onGetReadWritePermission();
-			}
-		}else{
-			onGetReadWritePermission();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			ActivityCompat.requestPermissions(this,
+					new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+					REQUEST_READ_WRITE_STORAGE);
+			return;
 		}
+
+		onGetReadWritePermission();
 	}
 
 	private void onGetReadWritePermission(){
-		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
+		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
@@ -16040,6 +16001,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		logDebug("onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getNodeHandle() + " - " + transfer.getTag());
 
+		if (!existOngoingTransfers(megaApi)) {
+			updateLogoutWarnings();
+		}
+
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
@@ -16157,6 +16122,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setTransfersWidget();
 				}
 			}
+		}
+
+		if (!existOngoingTransfers(megaApi)) {
+			updateLogoutWarnings();
+		}
+	}
+
+	private void updateLogoutWarnings() {
+		if (getMyAccountFragment() != null) {
+			maFLol.checkLogoutWarnings();
 		}
 	}
 
@@ -16370,11 +16345,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showChatPanel(MegaChatListItem chat){
 		logDebug("showChatPanel");
 
-		if(chat!=null){
-			this.selectedChatItemId = chat.getChatId();
-			ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+		if (chat == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedChatItemId = chat.getChatId();
+		bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	private void showTransfersPanel(){
@@ -16382,7 +16357,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		int pendingTransfers = megaApi.getNumPendingUploads()+megaApi.getNumPendingDownloads();
 
-		if(pendingTransfers>0){
+		if(pendingTransfers>0 && !isBottomSheetDialogShown(transfersBottomSheet)){
 			transfersBottomSheet = new TransfersBottomSheetDialogFragment();
 			transfersBottomSheet.show(getSupportFragmentManager(), transfersBottomSheet.getTag());
 		}
@@ -17504,6 +17479,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        searchView.setQuery(searchQuery, true);
         }
     }
+
+	public boolean isSearchOpen() {
+		return searchQuery != null && searchExpand;
+	}
 
     public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
 		this.accountFragmentPreUpgradeAccount = accountFragment;
