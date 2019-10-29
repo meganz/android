@@ -19,13 +19,12 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-/**
- * Created by mega on 12/01/18.
- */
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -47,22 +46,21 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log("onCreate");
-
+        logDebug("onCreate");
     }
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        logDebug("onClick");
         switch(v.getId()){
 
             case R.id.qr_code_saveTo_cloud_layout:{
-                log("option save to Cloud Drive");
+                logDebug("Option save to Cloud Drive");
                 saveToCloudDrive();
                 break;
             }
             case R.id.qr_code_saveTo_fileSystem_layout:{
-                log("option save to File System");
+                logDebug("Option save to File System");
                 saveToFileSystem();
                 break;
             }
@@ -78,17 +76,9 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
         }
         MegaNode parentNode = megaApi.getRootNode();
         String myEmail = megaApi.getMyUser().getEmail();
-        File qrFile = null;
-        if (getActivity().getExternalCacheDir() != null){
-            File qrDir = new File (getActivity().getExternalCacheDir(), "qrMEGA");
-            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-        }
-        else{
-            File qrDir = getActivity().getDir("qrMEGA", 0);
-            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-        }
+        File qrFile = buildQrFile(getActivity(),myEmail + "QRcode.jpg");
 
-        if (qrFile != null && qrFile.exists()){
+        if (isFileAvailable(qrFile)){
             ShareInfo info = ShareInfo.infoFromFile(qrFile);
             Intent intent = new Intent(getActivity().getApplicationContext(), UploadService.class);
             intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -148,9 +138,5 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
 
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, getContext(), 48));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-    }
-
-    public static void log(String message) {
-        Util.log("QRCodeSaveBottomSheetDialogFragment", message);
     }
 }

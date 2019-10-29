@@ -1448,8 +1448,4 @@ public class PDFView extends RelativeLayout {
             });
         }
     }
-
-    public static void log(String log) {
-        mega.privacy.android.app.utils.Util.log("PdfView", log);
-    }
 }

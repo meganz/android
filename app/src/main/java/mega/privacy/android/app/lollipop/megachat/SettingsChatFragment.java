@@ -15,9 +15,10 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SettingsChatFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
     Context context;
@@ -71,7 +72,7 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
 
 
         if(chatSettings==null){
-            log("Chat settings is NULL");
+            logDebug("Chat settings is NULL");
             dbH.setNotificationEnabledChat(true+"");
             dbH.setVibrationEnabledChat(true+"");
             dbH.setNotificationSoundChat("");
@@ -86,7 +87,7 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
             chatSoundPreference.setSummary(defaultSound.getTitle(context));
         }
         else{
-            log("There is chat settings");
+            logDebug("There is chat settings");
             if (chatSettings.getNotificationsEnabled() == null){
                 dbH.setNotificationEnabledChat(true+"");
                 chatNotifications = true;
@@ -113,7 +114,7 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
 //            log("---Notification sound: "+defaultSound2.getTitle(context));
 
             if (chatSettings.getNotificationsSound() == null){
-                log("Notification sound is NULL");
+                logDebug("Notification sound is NULL");
                 Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                 Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
                 chatSoundPreference.setSummary(defaultSound.getTitle(context));
@@ -123,34 +124,41 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
             }
             else{
                 if(chatSettings.getNotificationsSound().equals("")){
-                    log("Notification sound is EMPTY");
+                    logDebug("Notification sound is EMPTY");
                     Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                     Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
-                    chatSoundPreference.setSummary(defaultSound.getTitle(context));
+                    if (defaultSound == null) {
+//                        None Mode could not be fetched as default sound in some devices such as Huawei's devices, set Silent as title
+                        logWarning("defaultSound == null");
+                        chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
+                    }
+                    else {
+                        chatSoundPreference.setSummary(defaultSound.getTitle(context));
+                    }
                 }
                 else{
                     String soundString = chatSettings.getNotificationsSound();
-                    log("Sound stored in DB: "+soundString);
+                    logDebug("Sound stored in DB: " + soundString);
                     Uri uri = Uri.parse(soundString);
-                    log("Uri: "+uri);
+                    logDebug("Uri: " + uri);
 
                     if(soundString.equals("true")){
 
                         Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                         Ringtone defaultSound2 = RingtoneManager.getRingtone(context, defaultSoundUri2);
                         chatSoundPreference.setSummary(defaultSound2.getTitle(context));
-                        log("---Notification sound: "+defaultSound2.getTitle(context));
+                        logDebug("Notification sound: " + defaultSound2.getTitle(context));
                         dbH.setNotificationSoundChat(defaultSoundUri2.toString());
                     }
                     else{
                         Ringtone sound = RingtoneManager.getRingtone(context, Uri.parse(soundString));
                         if(sound==null){
-                            log("Sound is null");
+                            logWarning("Sound is null");
                             chatSoundPreference.setSummary("None");
                         }
                         else{
                             String titleSound = sound.getTitle(context);
-                            log("Notification sound: "+titleSound);
+                            logDebug("Notification sound: " + titleSound);
                             chatSoundPreference.setSummary(titleSound);
                         }
                     }
@@ -174,12 +182,12 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
         }
 
         if (preference.getKey().compareTo(KEY_CHAT_NOTIFICATIONS) == 0){
-            log("KEY_CHAT_NOTIFICATIONS");
+            logDebug("KEY_CHAT_NOTIFICATIONS");
             chatNotifications = !chatNotifications;
             setChatPreferences();
         }
         else if (preference.getKey().compareTo(KEY_CHAT_VIBRATE) == 0){
-            log("KEY_CHAT_VIBRATE");
+            logDebug("KEY_CHAT_VIBRATE");
             chatVibration = !chatVibration;
             if (chatVibration){
                 dbH.setVibrationEnabledChat(true+"");
@@ -189,7 +197,7 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
             }
         }
         else if (preference.getKey().compareTo(KEY_CHAT_SOUND) == 0){
-            log("KEY_CHAT_SOUND");
+            logDebug("KEY_CHAT_SOUND");
 
             ((ChatPreferencesActivity) context).changeSound(chatSettings.getNotificationsSound());
         }
@@ -220,7 +228,7 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
             String title = sound.getTitle(context);
 
             if(title!=null){
-                log("Title sound notification: "+title);
+                logDebug("Title sound notification: " + title);
                 chatSoundPreference.setSummary(title);
             }
 
@@ -252,9 +260,5 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-    }
-
-    private static void log(String log) {
-        Util.log("SettingsChatFragment", log);
     }
 }

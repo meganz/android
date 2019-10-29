@@ -4,15 +4,20 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
+
 import java.io.File;
+
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
@@ -26,12 +31,12 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart()");
+        logDebug("onRequestStart()");
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish(): "+e.getErrorCode());
+        logDebug("Error code: " + e.getErrorCode());
 
         if (e.getErrorCode() == MegaError.API_OK){
             Bitmap bitmap;
@@ -48,7 +53,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                     }
                 }
                 else{
-                    log("Adapter cannot be updated - null");
+                    logWarning("Adapter cannot be updated - null");
                 }
             }
             else if (holder instanceof MegaListChatExplorerAdapter.ViewHolderChatExplorerList) {
@@ -63,7 +68,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                     }
                 }
                 else{
-                    log("Adapter cannot be updated - null");
+                    logWarning("Adapter cannot be updated - null");
                 }
             }
             else if (holder instanceof MegaChipChatExplorerAdapter.ViewHolderChips) {
@@ -78,7 +83,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                     }
                 }
                 else{
-                    log("Adapter cannot be updated - null");
+                    logWarning("Adapter cannot be updated - null");
                 }
             }
         }
@@ -86,7 +91,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
-        log("onRequestTemporaryError");
+        logWarning("onRequestTemporaryError");
     }
 
     @Override
@@ -95,16 +100,9 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
     }
 
     private Bitmap getBitmap(String email) {
-        File avatar;
+        File avatar = buildAvatarFile(context, email + ".jpg");
         Bitmap bitmap;
-
-        if (context.getExternalCacheDir() != null){
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-        }
-        else{
-            avatar = new File(context.getCacheDir().getAbsolutePath(), email + ".jpg");
-        }
-        if (avatar.exists()){
+        if (isFileAvailable(avatar)){
             if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
@@ -121,9 +119,4 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
         return null;
     }
-
-    private static void log(String log) {
-        Util.log("ChatUserAvatarListener", log);
-    }
-
 }

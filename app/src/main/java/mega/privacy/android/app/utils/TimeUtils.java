@@ -12,6 +12,9 @@ import java.util.TimeZone;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatMessage;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
+
 public class TimeUtils implements Comparator<Calendar> {
 
     public static int TIME=0;
@@ -70,7 +73,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
     public static String formatTime(MegaChatMessage lastMessage){
         java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
-        Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getTimestamp());
+        Calendar cal = calculateDateFromTimestamp(lastMessage.getTimestamp());
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
         Date date = cal.getTime();
@@ -88,7 +91,7 @@ public class TimeUtils implements Comparator<Calendar> {
             df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
         }
 
-        Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getTimestamp());
+        Calendar cal = calculateDateFromTimestamp(lastMessage.getTimestamp());
 
         //Compare to yesterday
         Calendar calToday = Calendar.getInstance();
@@ -137,7 +140,7 @@ public class TimeUtils implements Comparator<Calendar> {
             //df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
         }
 
-        Calendar cal = Util.calculateDateFromTimestamp(timestamp);
+        Calendar cal = calculateDateFromTimestamp(timestamp);
 
         //Compare to yesterday
         Calendar calToday = Calendar.getInstance();
@@ -172,7 +175,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
         df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT, Locale.getDefault());
 
-        Calendar cal = Util.calculateDateFromTimestamp(timestamp);
+        Calendar cal = calculateDateFromTimestamp(timestamp);
         Date date = cal.getTime();
         String formattedDate = df.format(date);
         return formattedDate;
@@ -182,7 +185,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
         java.text.DateFormat df = new SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault());
 
-        Calendar cal = Util.calculateDateFromTimestamp(timestamp);
+        Calendar cal = calculateDateFromTimestamp(timestamp);
         Date date = cal.getTime();
         String formattedDate = df.format(date);
         return formattedDate;
@@ -190,7 +193,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
     public static String formatTime(long ts){
         java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
-        Calendar cal = Util.calculateDateFromTimestamp(ts);
+        Calendar cal = calculateDateFromTimestamp(ts);
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
         Date date = cal.getTime();
@@ -208,7 +211,7 @@ public class TimeUtils implements Comparator<Calendar> {
         calYesterday.add(Calendar.DATE, -1);
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         long ts = calGreen.getTimeInMillis();
-        log("Ts last green: "+ts);
+        logDebug("Ts last green: " + ts);
         if(minutesAgo>=65535){
             String formattedDate = context.getString(R.string.last_seen_long_time_ago);
             return formattedDate;
@@ -265,7 +268,7 @@ public class TimeUtils implements Comparator<Calendar> {
             df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
         }
 
-        Calendar cal = Util.calculateDateFromTimestamp(ts);
+        Calendar cal = calculateDateFromTimestamp(ts);
 
         //Compare to yesterday
         Calendar calToday = Calendar.getInstance();
@@ -300,7 +303,37 @@ public class TimeUtils implements Comparator<Calendar> {
         }
     }
 
-    private static void log(String message) {
-        Util.log("TimeUtils", message);
+    public static String formatBucketDate(Context context, long ts) {
+        Calendar cal = Util.calculateDateFromTimestamp(ts);
+        Calendar calToday = Calendar.getInstance();
+        Calendar calYesterday = Calendar.getInstance();
+        calYesterday.add(Calendar.DATE, -1);
+        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
+
+        if (tc.compare(cal, calToday) == 0) {
+            return context.getString(R.string.label_today);
+        } else if (tc.compare(cal, calYesterday) == 0) {
+            return context.getString(R.string.label_yesterday);
+        } else {
+            Date date = cal.getTime();
+            return new SimpleDateFormat("EEEE, d MMM yyyy").format(date);
+        }
     }
+
+    public static String getVideoDuration(int duration) {
+        if (duration > 0) {
+            int hours = duration / 3600;
+            int minutes = (duration % 3600) / 60;
+            int seconds = duration % 60;
+
+            if (hours > 0) {
+                return String.format("%d:%d:%02d", hours, minutes, seconds);
+            } else {
+                return String.format("%d:%02d", minutes, seconds);
+            }
+        }
+
+        return null;
+    }
+
 }

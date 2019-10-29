@@ -27,12 +27,14 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.utils.DBUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.DBUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MyStorageFragmentLollipop extends Fragment {
@@ -75,12 +77,19 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-		log("onCreate");
+		logDebug("onCreate");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public void onResume () {
+		super.onResume();
+
+		refreshAccountInfo();
 	}
 
 	public void checkScroll () {
@@ -96,7 +105,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		logDebug("onCreateView");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -160,43 +169,41 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 //		storageAvailableText = (TextView) v.findViewById(R.id.my_storage_account_space_text);
 //		RelativeLayout.LayoutParams bottomParams = (RelativeLayout.LayoutParams)progressBar.getLayoutParams();
-//		bottomParams.setMargins(0, 0, 0, Util.scaleHeightPx(32, outMetrics));
+//		bottomParams.setMargins(0, 0, 0, scaleHeightPx(32, outMetrics));
 //		progressBar.setLayoutParams(bottomParams);
 
 		if(myAccountInfo==null){
-			log("MyAccountInfo is NULL");
+			logWarning("MyAccountInfo is NULL");
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
 		setAccountDetails();
-//
-		refreshAccountInfo();
 
 		return v;
 	}
 
 	public static MyStorageFragmentLollipop newInstance() {
-		log("newInstance");
+		logDebug("newInstance");
 		MyStorageFragmentLollipop fragment = new MyStorageFragmentLollipop();
 		return fragment;
 	}
 
 	public void refreshAccountInfo(){
-		log("refreshAccountInfo");
+		logDebug("refreshAccountInfo");
 
 		//Check if the call is recently
-		log("Check the last call to getAccountDetails");
-		if(DBUtil.callToAccountDetails(context)){
-			log("megaApi.getAccountDetails SEND");
+		logDebug("Check the last call to getAccountDetails");
+		if(callToAccountDetails(context)){
+			logDebug("megaApi.getAccountDetails SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
 		}
 	}
 
 	public void setAccountDetails(){
-		log("setAccountDetails");
+		logDebug("setAccountDetails");
 
 		if((getActivity() == null) || (!isAdded())){
-			log("Fragment MyAccount NOT Attached!");
+			logWarning("Fragment MyAccount NOT Attached!");
 			return;
 		}
 		//Set account details
@@ -209,9 +216,9 @@ public class MyStorageFragmentLollipop extends Fragment {
 		else{
 //			storageAvailableText.setText(myAccountInfo.getTotalFormatted());
 
-			log("ExpirationTime: "+Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
-			log("Subscription cycle: "+myAccountInfo.getAccountInfo().getSubscriptionCycle());
-			log("Renews on: "+Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+			logDebug("ExpirationTime: " + getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+			logDebug("Subscription cycle: " + myAccountInfo.getAccountInfo().getSubscriptionCycle());
+			logDebug("Renews on: " + getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
 
 			switch(myAccountInfo.getAccountType()){
 
@@ -249,13 +256,13 @@ public class MyStorageFragmentLollipop extends Fragment {
 //					now.setToNow();
 //					if (myAccountInfo.getAccountType() != 0){
 //						if (now.toMillis(false) >= (myAccountInfo.getAccountInfo().getProExpiration()*1000)){
-//							if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+//							if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
 //								upgradeButton.setVisibility(View.VISIBLE);
 //							}
 //						}
 //					}
 //					else{
-//						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+//						if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
 //							upgradeButton.setVisibility(View.VISIBLE);
 //						}
 //					}
@@ -285,7 +292,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 		}
 
 		if(myAccountInfo.getAccountInfo()==null){
-			log("Account info NULL");
+			logWarning("Account info NULL");
 			return;
 		}
 
@@ -317,14 +324,11 @@ public class MyStorageFragmentLollipop extends Fragment {
 			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
 		}
 		else{
-			if(myAccountInfo.getAccountInfo().getTransferOwnUsed()<0){
+			if(myAccountInfo.getUsedTransferFormatted().trim().length()<=0){
 				transferQuotaUsedText.setText(getString(R.string.recovering_info));
 			}
 			else{
-				long transferQuotaUsed = myAccountInfo.getAccountInfo().getTransferOwnUsed();
-				long transferQuotaMax = myAccountInfo.getAccountInfo().getTransferMax();
-
-				String textToShow = String.format(context.getString(R.string.my_account_of_string), Util.getSizeString(transferQuotaUsed), Util.getSizeString(transferQuotaMax));
+				String textToShow = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedTransferFormatted(), myAccountInfo.getTotalTansferFormatted());
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#777777\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -362,17 +366,17 @@ public class MyStorageFragmentLollipop extends Fragment {
 		typeAccountIcon.setVisibility(View.VISIBLE);
 		typeAccountIcon.setBackground(drawable);
 
-		if(myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
-				&& myAccountInfo.getAccountInfo().getSubscriptionRenewTime() > 0){
+		if(myAccountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
+				&& myAccountInfo.getSubscriptionRenewTime() > 0){
 			expirationAccountTitle.setText(getString(R.string.renews_on));
-			expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+			expirationAccountText.setText(getDateString(myAccountInfo.getSubscriptionRenewTime()));
 		}
-		else if (myAccountInfo.getAccountInfo().getProExpiration() > 0){
+		else if (myAccountInfo.getProExpirationTime() > 0){
 			expirationAccountTitle.setText(getString(R.string.expires_on));
-			expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+			expirationAccountText.setText(getDateString(myAccountInfo.getProExpirationTime()));
 		}
 		else {
-			log("Error. Renew date and expiration date invalids");
+			logError("Error. Renew date and expiration date invalids");
 			expirationAccountLayout.setVisibility(View.GONE);
 		}
 	}
@@ -394,20 +398,20 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 	@Override
 	public void onAttach(Activity activity) {
-		log("onAttach");
+		logDebug("onAttach");
 		super.onAttach(activity);
 		context = activity;
 	}
 
 	@Override
 	public void onAttach(Context context) {
-		log("onAttach context");
+		logDebug("onAttach context");
 		super.onAttach(context);
 		this.context = context;
 	}
 
 	public int onBackPressed(){
-		log("onBackPressed");
+		logDebug("onBackPressed");
 
 //		if(exportMKLayout.getVisibility()==View.VISIBLE){
 //			log("Master Key layout is VISIBLE");
@@ -450,9 +454,4 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		return info;
 	}
-
-	public static void log(String log) {
-		Util.log("MyStorageFragmentLollipop", log);
-	}
-
 }

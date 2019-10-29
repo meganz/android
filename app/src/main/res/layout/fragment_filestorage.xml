@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/relative_layout_frag"
-        android:background="@color/grid_item_separator">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relative_layout_frag"
+    android:background="@color/grid_item_separator">
 
         <TextView
             android:id="@+id/empty_textview"
@@ -27,6 +28,25 @@
             android:background="@color/grid_item_separator"
             android:clipToPadding="false"
             android:scrollbars="horizontal"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/send_file_icon_chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="16dp"
+            android:scaleType="center"
+            android:visibility="gone"
+            android:tint="@color/accentColor"
+            android:src="@drawable/ic_send_black"
+            app:backgroundTint="@color/white"
+            app:borderWidth="0dp"
+            app:elevation="6dp"
+            app:fabSize="normal"
+            app:pressedTranslationZ="12dp" />
 
 </RelativeLayout>
 

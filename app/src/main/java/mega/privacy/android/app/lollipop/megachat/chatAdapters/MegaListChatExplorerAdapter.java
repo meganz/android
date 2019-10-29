@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -38,13 +37,19 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
+
 
 public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListChatExplorerAdapter.ViewHolderChatExplorerList> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider {
 
@@ -68,7 +73,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     SparseBooleanArray searchSelectedItems;
 
     public MegaListChatExplorerAdapter(Context _context, Object _fragment, ArrayList<ChatExplorerListItem> _items, RecyclerView _listView) {
-        log("new adapter");
+        logDebug("New adapter");
         this.context = _context;
         this.items = _items;
         this.fragment = _fragment;
@@ -93,12 +98,15 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         }
 
         RelativeLayout itemLayout;
+        RelativeLayout itemContainer;
         RoundedImageView avatarImage;
-        TextView initialLetter;
+        EmojiTextView initialLetter;
         EmojiTextView titleText;
         ImageView stateIcon;
         MarqueeTextView lastSeenStateText;
         EmojiTextView participantsText;
+        RelativeLayout headerLayout;
+        TextView headerText;
 
         String email;
 
@@ -124,25 +132,20 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_explorer_list, parent, false);
         holder = new ViewHolderChatExplorerList(v);
 
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.chat_explorer_list_item_layout);
-        holder.avatarImage = (RoundedImageView) v.findViewById(R.id.chat_explorer_list_avatar);
-        holder.initialLetter = (TextView) v.findViewById(R.id.chat_explorer_list_initial_letter);
-        holder.titleText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_title);
-        holder.stateIcon = (ImageView) v.findViewById(R.id.chat_explorer_list_contact_state);
-        holder.lastSeenStateText = (MarqueeTextView) v.findViewById(R.id.chat_explorer_list_last_seen_state);
-        holder.participantsText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_participants);
-
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            holder.titleText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-            holder.participantsText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-        }
-        else{
-            holder.titleText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-            holder.participantsText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-        }
+        holder.headerLayout = v.findViewById(R.id.header_layout);
+        holder.headerText = v.findViewById(R.id.label_text);
+        holder.itemContainer = v.findViewById(R.id.item_container);
+        holder.itemLayout = v.findViewById(R.id.chat_explorer_list_item_layout);
+        holder.avatarImage = v.findViewById(R.id.chat_explorer_list_avatar);
+        holder.initialLetter = v.findViewById(R.id.chat_explorer_list_initial_letter);
+        holder.titleText = v.findViewById(R.id.chat_explorer_list_title);
+        holder.stateIcon = v.findViewById(R.id.chat_explorer_list_contact_state);
+        holder.lastSeenStateText = v.findViewById(R.id.chat_explorer_list_last_seen_state);
+        holder.participantsText = v.findViewById(R.id.chat_explorer_list_participants);
+        holder.titleText.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+        holder.initialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
         v.setTag(holder);
-
         return holder;
     }
 
@@ -152,13 +155,25 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         ChatExplorerListItem item = getItem(position);
         MegaChatListItem chat = item.getChat();
 
+        if (item.isHeader()) {
+            holder.itemContainer.setVisibility(View.GONE);
+            holder.headerLayout.setVisibility(View.VISIBLE);
+            if (item.isRecent()) {
+                holder.headerText.setText(R.string.recents_label);
+            }
+            else {
+                holder.headerText.setText(R.string.chats_label);
+            }
+            return;
+        }
+
+        holder.headerLayout.setVisibility(View.GONE);
+        holder.itemContainer.setVisibility(View.VISIBLE);
         holder.titleText.setText(item.getTitle());
 
         if (chat != null && chat.isGroup()) {
             if (item.getTitle().length() > 0){
-                String chatTitle = item.getTitle().trim();
-                String firstLetter = chatTitle.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                String firstLetter = getFirstLetter(item.getTitle());
                 holder.initialLetter.setText(firstLetter);
             }
             if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
@@ -186,7 +201,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
             if (chat != null) {
                 holder.email = megaChatApi.getContactEmail(chat.getPeerHandle());
-                log("email: "+holder.email);
+                logDebug("Email: " + holder.email);
             }
             else if (contact != null && contact.getMegaUser() != null) {
                 holder.email = contact.getMegaUser().getEmail();
@@ -208,44 +223,44 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 setUserAvatar(holder, userHandleEncoded);
             }
             
-            if(Util.isChatEnabled()){
+            if(isChatEnabled()){
                 if (megaChatApi != null){
                     int userStatus = megaChatApi.getUserOnlineStatus(handle);
                     if(userStatus == MegaChatApi.STATUS_ONLINE){
-                        log("This user is connected");
+                        logDebug("This user is connected");
                         holder.stateIcon.setVisibility(View.VISIBLE);
                         holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
                         holder.lastSeenStateText.setText(context.getString(R.string.online_status));
                         holder.lastSeenStateText.setVisibility(View.VISIBLE);
                     }
                     else if(userStatus == MegaChatApi.STATUS_AWAY){
-                        log("This user is away");
+                        logDebug("This user is away");
                         holder.stateIcon.setVisibility(View.VISIBLE);
                         holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
                         holder.lastSeenStateText.setText(context.getString(R.string.away_status));
                         holder.lastSeenStateText.setVisibility(View.VISIBLE);
                     }
                     else if(userStatus == MegaChatApi.STATUS_BUSY){
-                        log("This user is busy");
+                        logDebug("This user is busy");
                         holder.stateIcon.setVisibility(View.VISIBLE);
                         holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
                         holder.lastSeenStateText.setText(context.getString(R.string.busy_status));
                         holder.lastSeenStateText.setVisibility(View.VISIBLE);
                     }
                     else if(userStatus == MegaChatApi.STATUS_OFFLINE){
-                        log("This user is offline");
+                        logDebug("This user is offline");
                         holder.stateIcon.setVisibility(View.VISIBLE);
                         holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
                         holder.lastSeenStateText.setText(context.getString(R.string.offline_status));
                         holder.lastSeenStateText.setVisibility(View.VISIBLE);
                     }
                     else if(userStatus == MegaChatApi.STATUS_INVALID){
-                        log("INVALID status: "+userStatus);
+                        logWarning("INVALID status: " + userStatus);
                         holder.stateIcon.setVisibility(View.GONE);
                         holder.lastSeenStateText.setVisibility(View.GONE);
                     }
                     else{
-                        log("This user status is: "+userStatus);
+                        logDebug("This user status is: " + userStatus);
                         holder.stateIcon.setVisibility(View.GONE);
                         holder.lastSeenStateText.setVisibility(View.GONE);
                     }
@@ -263,32 +278,19 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             }
         }
         
-        if (chat != null) {
-            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_RM || chat.getOwnPrivilege()==MegaChatRoom.PRIV_RO){
-                holder.avatarImage.setAlpha(.4f);
-                holder.itemLayout.setOnClickListener(null);
-                holder.itemLayout.setOnLongClickListener(null);
 
-                holder.titleText.setTextColor(context.getResources().getColor(R.color.text_secondary));
-                holder.lastSeenStateText.setTextColor(context.getResources().getColor(R.color.text_secondary));
-                holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-            }
-            else{
-                holder.avatarImage.setAlpha(1.0f);
-                holder.itemLayout.setOnClickListener(this);
-                holder.itemLayout.setOnLongClickListener(this);
+        holder.itemLayout.setOnClickListener(this);
+        holder.itemLayout.setOnLongClickListener(this);
 
-                holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
-                holder.lastSeenStateText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-                holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-            }
-        }
+        holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
+        holder.lastSeenStateText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+        holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
     }
 
     public void createGroupChatAvatar(ViewHolderChatExplorerList holder){
-        log("createGroupChatAvatar()");
+        logDebug("createGroupChatAvatar()");
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
@@ -313,7 +315,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             holder.initialLetter.setVisibility(View.INVISIBLE);
         }
         else{
-            log("Group chat initial letter is: "+firstLetter);
+            logDebug("Group chat initial letter is: " + firstLetter);
             if(firstLetter.equals("(")){
                 holder.initialLetter.setVisibility(View.INVISIBLE);
             }
@@ -327,29 +329,16 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public void setUserAvatar(ViewHolderChatExplorerList holder, String userHandle){
-		log("setUserAvatar ");
+        logDebug("setUserAvatar ");
 		createDefaultAvatar(holder, userHandle);
 
 		ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
-		File avatar = null;
-
-		if(holder.email == null){
-			if (context.getExternalCacheDir() != null) {
-				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), userHandle + ".jpg");
-			}else {
-				avatar = new File(context.getCacheDir().getAbsolutePath(), userHandle + ".jpg");
-			}
-		}
-		else{
-			if (context.getExternalCacheDir() != null){
-				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.email + ".jpg");
-			}else{
-				avatar = new File(context.getCacheDir().getAbsolutePath(), holder.email + ".jpg");
-			}
-		}
+        File avatar = (holder.email == null) ?
+                buildAvatarFile(context,userHandle + ".jpg") :
+                buildAvatarFile(context,holder.email + ".jpg");
 
 		Bitmap bitmap = null;
-		if (avatar.exists()){
+		if (isFileAvailable(avatar)){
 			if (avatar.length() > 0){
 				BitmapFactory.Options bOpts = new BitmapFactory.Options();
 				bOpts.inPurgeable = true;
@@ -359,64 +348,50 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 					avatar.delete();
 
 					if(megaApi==null){
-						log("setUserAvatar: megaApi is Null in Offline mode");
+                        logWarning("megaApi is Null in Offline mode");
 						return;
 					}
 
-					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(holder.email, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-					}
-					else{
-						megaApi.getUserAvatar(holder.email, context.getCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-					}
-				}else{
+                    megaApi.getUserAvatar(holder.email,buildAvatarFile(context,holder.email + ".jpg").getAbsolutePath(),listener);
+                }else{
 					holder.initialLetter.setVisibility(View.GONE);
 					holder.avatarImage.setImageBitmap(bitmap);
 				}
 			}else{
 
 				if(megaApi==null){
-					log("setUserAvatar: megaApi is Null in Offline mode");
+                    logWarning("megaApi is Null in Offline mode");
 					return;
 				}
 
-				if (context.getExternalCacheDir() != null){
-					megaApi.getUserAvatar(holder.email, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-				}else{
-					megaApi.getUserAvatar(holder.email, context.getCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-				}
+                megaApi.getUserAvatar(holder.email,buildAvatarFile(context,holder.email + ".jpg").getAbsolutePath(),listener);
 			}
 		}else{
 
 			if(megaApi==null){
-				log("setUserAvatar: megaApi is Null in Offline mode");
+                logWarning("megaApi is Null in Offline mode");
 				return;
 			}
 
-			if (context.getExternalCacheDir() != null){
-				megaApi.getUserAvatar(holder.email, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-			}
-			else{
-				megaApi.getUserAvatar(holder.email, context.getCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-			}
+            megaApi.getUserAvatar(holder.email,buildAvatarFile(context,holder.email + ".jpg").getAbsolutePath(),listener);
 		}
 	}
 
     public void createDefaultAvatar(ViewHolderChatExplorerList holder, String userHandle){
-        log("createDefaultAvatar()");
+        logDebug("createDefaultAvatar()");
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
 
         String color = megaApi.getUserAvatarColor(userHandle);
         if(color!=null){
-            log("The color to set the avatar is "+color);
+            logDebug("The color to set the avatar is " + color);
             p.setColor(Color.parseColor(color));
         }
         else{
-            log("Default color to the avatar");
+            logDebug("Default color to the avatar");
             p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
@@ -439,8 +414,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         if (fullName != null){
             if (fullName.trim().length() > 0){
-                String firstLetter = fullName.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                String firstLetter = getFirstLetter(fullName);
+
                 holder.initialLetter.setText(firstLetter);
                 holder.initialLetter.setTextColor(Color.WHITE);
                 holder.initialLetter.setVisibility(View.VISIBLE);
@@ -454,8 +429,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         if(setInitialByMail){
             if (holder.email != null){
                 if (holder.email.length() > 0){
-                    log("email TEXT: " + holder.email);
-                    log("email TEXT AT 0: " + holder.email.charAt(0));
+                    logDebug("Email TEXT: " + holder.email);
+                    logDebug("Email TEXT AT 0: " + holder.email.charAt(0));
                     String firstLetter = holder.email.charAt(0) + "";
                     firstLetter = firstLetter.toUpperCase(Locale.getDefault());
                     holder.initialLetter.setText(firstLetter);
@@ -484,7 +459,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public int getPosition (ChatExplorerListItem item) {
-        log("getPosition");
+        logDebug("getPosition");
         return items.indexOf(item);
     }
 
@@ -527,7 +502,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public void updateItemContactStatus(int position){
-        log("updateContactStatus: "+position);
+        logDebug("position: " + position);
 
         notifyItemChanged(position);
     }
@@ -541,21 +516,21 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public void toggleSelection(int pos) {
-        log("toggleSelection");
+        logDebug("position: " + pos);
 
         if (selectedItems.get(pos, false)) {
-            log("delete pos: "+pos);
+            logDebug("Delete pos: " + pos);
             selectedItems.delete(pos);
         }
         else {
-            log("PUT pos: "+pos);
+            logDebug("PUT pos: " + pos);
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
 
         MegaListChatExplorerAdapter.ViewHolderChatExplorerList view = (MegaListChatExplorerAdapter.ViewHolderChatExplorerList) listView.findViewHolderForLayoutPosition(pos);
         if(view!=null){
-            log("Start animation: "+pos);
+            logDebug("Start animation: " + pos);
             Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
             flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
@@ -590,9 +565,5 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
     public void setSearchSelectedItems (SparseBooleanArray searchSelectedItems) {
         this.searchSelectedItems = searchSelectedItems;
-    }
-
-    private static void log(String log) {
-        Util.log("MegaListChatExplorerAdapter", log);
     }
 }

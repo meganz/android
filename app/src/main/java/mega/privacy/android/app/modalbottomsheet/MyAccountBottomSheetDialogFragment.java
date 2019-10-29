@@ -15,17 +15,16 @@ import android.widget.LinearLayout;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -122,31 +121,31 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
         switch(v.getId()){
 
             case R.id.my_account_choose_photo_layout:{
-                log("option choose photo avatar");
+                logDebug("Option choose photo avatar");
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setType("image/*");
-                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.CHOOSE_PICTURE_PROFILE_CODE);
+                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), CHOOSE_PICTURE_PROFILE_CODE);
 
                 dismissAllowingStateLoss();
                 break;
             }
             case R.id.my_account_take_photo_layout:{
-                log("option take photo avatar");
+                logDebug("Option take photo avatar");
 
                 ((ManagerActivityLollipop)context).checkPermissions();
                 dismissAllowingStateLoss();
                 break;
             }
             case R.id.my_account_delete_layout:{
-                log("option delete avatar");
+                logDebug("Option delete avatar");
                 ((ManagerActivityLollipop) context).showConfirmationDeleteAvatar();
                 break;
             }
             case R.id.my_account_my_QR_code: {
-                log("option QR code");
+                logDebug("Option QR code");
                 //Check if there is a in progress call:
                 boolean activeCall = false;
                 if(megaChatApi!=null){
@@ -194,9 +193,5 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-    }
-
-    private static void log(String log) {
-        Util.log("MyAccountBottomSheetDialogFragment", log);
     }
 }

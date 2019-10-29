@@ -35,7 +35,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckedTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -43,7 +42,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -51,6 +49,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
@@ -60,10 +60,6 @@ import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -83,97 +79,87 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
 
-    GroupChatInfoActivityLollipop groupChatInfoActivity;
 
+    private final static int MAX_LENGTH_CHAT_TITLE = 60;
     public long chatHandle;
-    MegaChatRoom chat;
-
     public long selectedHandleParticipant;
-
+    private GroupChatInfoActivityLollipop groupChatInfoActivity;
+    private MegaChatRoom chat;
     AlertDialog permissionsDialog;
     AlertDialog changeTitleDialog;
     AlertDialog chatLinkDialog;
 
     MenuItem addParticipantItem;
     MenuItem changeTitleItem;
-
-    private MegaApiAndroid megaApi = null;
     MegaChatApiAndroid megaChatApi = null;
-
     Display display;
     DisplayMetrics outMetrics;
     float density;
     float scaleW;
     float scaleH;
     float scaleText;
-
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
     ChatSettings chatSettings = null;
     boolean generalChatNotifications = true;
-
     CoordinatorLayout fragmentContainer;
-    TextView initialLetter;
-    RoundedImageView avatarImageView;
-
     android.support.v4.widget.NestedScrollView scrollView;
-
     LinearLayout infoLayout;
     RelativeLayout avatarLayout;
-    TextView infoTitleChatText;
     TextView infoNumParticipantsText;
     RelativeLayout infoTextContainerLayout;
     ImageView editImageView;
-
     LinearLayout notificationsLayout;
     SwitchCompat notificationsSwitch;
     TextView notificationsTitle;
-    TextView notificationSelectedText;
     View dividerNotifications;
-
     LinearLayout chatLinkLayout;
     TextView chatLinkTitleText;
     View chatLinkSeparator;
     String chatLink;
-
     LinearLayout privateLayout;
     View privateSeparator;
-
     RelativeLayout sharedFilesLayout;
     View dividerSharedFilesLayout;
-
     RelativeLayout clearChatLayout;
     View dividerClearLayout;
     RelativeLayout leaveChatLayout;
     View dividerLeaveLayout;
-
     RelativeLayout archiveChatLayout;
     TextView archiveChatTitle;
     ImageView archiveChatIcon;
     View archiveChatSeparator;
-
     RelativeLayout observersLayout;
     TextView observersNumberText;
     View observersSeparator;
-
     TextView participantsTitle;
     long participantsCount;
-
     RecyclerView recyclerView;
     MegaParticipantsChatLollipopAdapter adapter;
     ArrayList<MegaChatParticipant> participants;
-
     Toolbar toolbar;
     ActionBar aB;
+    private EmojiTextView initialLetter;
+    private RoundedImageView avatarImageView;
+    private EmojiTextView infoTitleChatText;
+    private MegaApiAndroid megaApi = null;
+
+    private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        log("onCreate");
+        logDebug("onCreate");
         groupChatInfoActivity = this;
         if (megaApi == null) {
             MegaApplication app = (MegaApplication) getApplication();
@@ -186,16 +172,16 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-            log("Refresh session - karere");
+            logDebug("Refresh session - karere");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
             return;
         }
 
-        log("addChatListener");
+        logDebug("addChatListener");
         megaChatApi.addChatListener(this);
 
         display = getWindowManager().getDefaultDisplay();
@@ -203,13 +189,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         display.getMetrics(outMetrics);
         density = getResources().getDisplayMetrics().density;
 
-        scaleW = Util.getScaleW(outMetrics, density);
-        scaleH = Util.getScaleH(outMetrics, density);
+        scaleW = getScaleW(outMetrics, density);
+        scaleH = getScaleH(outMetrics, density);
 
-        if (scaleH < scaleW){
+        if (scaleH < scaleW) {
             scaleText = scaleH;
-        }
-        else{
+        } else {
             scaleText = scaleW;
         }
 
@@ -222,9 +207,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
 
             chat = megaChatApi.getChatRoom(chatHandle);
-
             if(chat==null){
-                log("Chatroom NULL cannot be recovered");
+                logError("Chatroom NULL cannot be recovered");
                 finish();
                 return;
             }
@@ -236,8 +220,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
-            fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_group_chat);
-            toolbar = (Toolbar) findViewById(R.id.toolbar_group_chat_properties);
+            fragmentContainer = findViewById(R.id.fragment_container_group_chat);
+            toolbar = findViewById(R.id.toolbar_group_chat_properties);
             setSupportActionBar(toolbar);
             aB = getSupportActionBar();
 
@@ -246,117 +230,105 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             aB.setTitle(getString(R.string.group_chat_info_label).toUpperCase());
 
-            scrollView = (android.support.v4.widget.NestedScrollView) findViewById(R.id.scroll_view_group_chat_properties);
+            scrollView = findViewById(R.id.scroll_view_group_chat_properties);
             new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
                 @Override
                 public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                    if (scrollView.canScrollVertically(-1)){
+                    if (scrollView.canScrollVertically(-1)) {
                         changeActionBarElevation(true);
-                    }
-                    else {
+                    } else {
                         changeActionBarElevation(false);
                     }
                 }
             });
 
             //Info Layout
-            avatarImageView = (RoundedImageView) findViewById(R.id.chat_group_properties_thumbnail);
-            initialLetter = (TextView) findViewById(R.id.chat_group_properties_initial_letter);
-
-            if (chat.getTitle().length() > 0){
-                String chatTitle = chat.getTitle().trim();
-
-                String firstLetter = "";
-                if(!chatTitle.isEmpty()){
-                    firstLetter = chatTitle.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                }
-
+            avatarImageView = findViewById(R.id.chat_group_properties_thumbnail);
+            initialLetter = findViewById(R.id.chat_group_properties_initial_letter);
+            if (chat.getTitle().length() > 0) {
+                String firstLetter = getFirstLetter(chat.getTitle());
                 initialLetter.setText(firstLetter);
             }
-
+            initialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
             createGroupChatAvatar();
 
-            infoLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_info_layout);
+            infoLayout = findViewById(R.id.chat_group_contact_properties_info_layout);
             infoLayout.setVisibility(View.VISIBLE);
-            avatarLayout = (RelativeLayout) findViewById(R.id.chat_group_properties_avatar_layout);
+            avatarLayout = findViewById(R.id.chat_group_properties_avatar_layout);
 
-            infoTextContainerLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_info_text_container);
+            infoTextContainerLayout = findViewById(R.id.chat_group_contact_properties_info_text_container);
             LinearLayout.LayoutParams paramsInfoText = (LinearLayout.LayoutParams) infoTextContainerLayout.getLayoutParams();
-            paramsInfoText.leftMargin = Util.scaleWidthPx(16, outMetrics);
+            paramsInfoText.leftMargin = scaleWidthPx(16, outMetrics);
             infoTextContainerLayout.setLayoutParams(paramsInfoText);
 
-            infoTitleChatText = (TextView) findViewById(R.id.chat_group_contact_properties_info_title);
-            log("The full title of chat: "+chat.getTitle());
+            infoTitleChatText = findViewById(R.id.chat_group_contact_properties_info_title);
             infoTitleChatText.setText(chat.getTitle());
-            infoNumParticipantsText = (TextView) findViewById(R.id.chat_group_contact_properties_info_participants);
+            infoTitleChatText.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
 
-            infoTitleChatText.setMaxWidth(Util.scaleWidthPx(240, outMetrics));
+            infoTitleChatText.setMaxWidth(scaleWidthPx(240, outMetrics));
 
             editImageView = (ImageView) findViewById(R.id.chat_group_contact_properties_edit_icon);
             RelativeLayout.LayoutParams paramsEditIcon = (RelativeLayout.LayoutParams) editImageView.getLayoutParams();
-            paramsEditIcon.leftMargin = Util.scaleWidthPx(8, outMetrics);
+            paramsEditIcon.leftMargin = scaleWidthPx(8, outMetrics);
             editImageView.setLayoutParams(paramsEditIcon);
             editImageView.setOnClickListener(this);
 
             //Notifications Layout
-
-            notificationsLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_notifications_layout);
+            notificationsLayout = findViewById(R.id.chat_group_contact_properties_notifications_layout);
             notificationsLayout.setVisibility(View.VISIBLE);
 
-            notificationsTitle = (TextView) findViewById(R.id.chat_group_contact_properties_notifications_title);
-//            notificationSelectedText = (TextView) findViewById(R.id.chat_group_contact_properties_notifications_option);
-
-            notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_group_contact_properties_switch);
+            notificationsTitle = findViewById(R.id.chat_group_contact_properties_notifications_title);
+            notificationsSwitch = findViewById(R.id.chat_group_contact_properties_switch);
             notificationsSwitch.setOnClickListener(this);
 
-            dividerNotifications = (View) findViewById(R.id.divider_notifications_layout);
+            dividerNotifications = findViewById(R.id.divider_notifications_layout);
+
+            infoNumParticipantsText = findViewById(R.id.chat_group_contact_properties_info_participants);
 
             //Chat links
-            chatLinkLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_chat_link_layout);
-            chatLinkTitleText = (TextView) findViewById(R.id.chat_group_contact_properties_chat_link);
-            chatLinkSeparator = (View) findViewById(R.id.divider_chat_link_layout);
+            chatLinkLayout = findViewById(R.id.chat_group_contact_properties_chat_link_layout);
+            chatLinkTitleText = findViewById(R.id.chat_group_contact_properties_chat_link);
+            chatLinkSeparator = findViewById(R.id.divider_chat_link_layout);
 
             //Private chat
-            privateLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_private_layout);
-            privateSeparator = (View) findViewById(R.id.divider_private_layout);
+            privateLayout = findViewById(R.id.chat_group_contact_properties_private_layout);
+            privateSeparator = findViewById(R.id.divider_private_layout);
 
             //Chat Shared Files Layout
 
-            sharedFilesLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_chat_files_shared_layout);
+            sharedFilesLayout = findViewById(R.id.chat_group_contact_properties_chat_files_shared_layout);
             sharedFilesLayout.setOnClickListener(this);
 
-            dividerSharedFilesLayout = (View) findViewById(R.id.divider_chat_files_shared_layout);
+            dividerSharedFilesLayout = findViewById(R.id.divider_chat_files_shared_layout);
 
             //Clear chat Layout
-            clearChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_clear_layout);
+            clearChatLayout = findViewById(R.id.chat_group_contact_properties_clear_layout);
             clearChatLayout.setOnClickListener(this);
 
-            dividerClearLayout = (View) findViewById(R.id.divider_clear_layout);
+            dividerClearLayout = findViewById(R.id.divider_clear_layout);
 
             //Archive chat Layout
-            archiveChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_archive_layout);
+            archiveChatLayout = findViewById(R.id.chat_group_contact_properties_archive_layout);
             archiveChatLayout.setOnClickListener(this);
 
-            archiveChatSeparator = (View) findViewById(R.id.divider_archive_layout);
+            archiveChatSeparator = findViewById(R.id.divider_archive_layout);
 
-            archiveChatTitle = (TextView) findViewById(R.id.chat_group_contact_properties_archive);
-            archiveChatIcon = (ImageView) findViewById(R.id.chat_group_contact_properties_archive_icon);
+            archiveChatTitle = findViewById(R.id.chat_group_contact_properties_archive);
+            archiveChatIcon = findViewById(R.id.chat_group_contact_properties_archive_icon);
 
             //Leave chat Layout
-            leaveChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_leave_layout);
+            leaveChatLayout = findViewById(R.id.chat_group_contact_properties_leave_layout);
             leaveChatLayout.setOnClickListener(this);
-            dividerLeaveLayout = (View) findViewById(R.id.divider_leave_layout);
+            dividerLeaveLayout = findViewById(R.id.divider_leave_layout);
 
             //Observers layout
-            observersLayout = (RelativeLayout) findViewById(R.id.chat_group_observers_layout);
-            observersNumberText = (TextView) findViewById(R.id.chat_group_observers_number_text);
-            observersSeparator = (View) findViewById(R.id.divider_observers_layout);
+            observersLayout = findViewById(R.id.chat_group_observers_layout);
+            observersNumberText = findViewById(R.id.chat_group_observers_number_text);
+            observersSeparator = findViewById(R.id.divider_observers_layout);
 
-            participantsTitle = (TextView) findViewById(R.id.chat_group_contact_properties_title_text);
+            participantsTitle = findViewById(R.id.chat_group_contact_properties_title_text);
 
-            recyclerView = (RecyclerView) findViewById(R.id.chat_group_contact_properties_list);
-//            recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+            recyclerView = findViewById(R.id.chat_group_contact_properties_list);
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
             recyclerView.setHasFixedSize(true);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -365,7 +337,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setNestedScrollingEnabled(false);
 
-            if(chat.isPreview()){
+            if (chat.isPreview()) {
                 notificationsLayout.setVisibility(View.GONE);
                 dividerNotifications.setVisibility(View.GONE);
                 chatLinkLayout.setVisibility(View.GONE);
@@ -379,26 +351,25 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 leaveChatLayout.setVisibility(View.GONE);
                 dividerLeaveLayout.setVisibility(View.GONE);
                 editImageView.setVisibility(View.GONE);
-            }
-            else{
+            } else {
                 setChatPermissions();
 
-                if(chat.isArchived()){
+                if (chat.isArchived()) {
                     archiveChatTitle.setText(getString(R.string.general_unarchive));
                     archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_unarchive));
-                }
-                else{
+                } else {
                     archiveChatTitle.setText(getString(R.string.general_archive));
                     archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_archive));
                 }
 
                 chatSettings = dbH.getChatSettings();
+
                 if(chatSettings==null){
-                    log("Chat settings null - notifications ON");
+                    logDebug("Chat settings null - notifications ON");
                     setUpIndividualChatNotifications();
                 }
                 else {
-                    log("There is chat settings");
+                    logDebug("There is chat settings");
                     if (chatSettings.getNotificationsEnabled() == null) {
                         generalChatNotifications = true;
 
@@ -410,13 +381,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     if (generalChatNotifications) {
                         setUpIndividualChatNotifications();
                     } else {
-                        log("General notifications OFF");
+                        logDebug("General notifications OFF");
                         notificationsSwitch.setChecked(false);
                     }
                 }
             }
 
-            if(megaChatApi.isSignalActivityRequired()){
+            if (megaChatApi.isSignalActivityRequired()) {
                 megaChatApi.signalPresenceActivity();
             }
 
@@ -429,24 +400,23 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public void updatePreviewers(){
-        log("updatePreviewers");
 
-        if(chat.getNumPreviewers()<1){
+    public void updatePreviewers(){
+        logDebug("updatePreviewers");
+        if (chat.getNumPreviewers() < 1) {
             observersSeparator.setVisibility(View.GONE);
             observersLayout.setVisibility(View.GONE);
-        }
-        else{
+        } else {
             observersSeparator.setVisibility(View.VISIBLE);
             observersLayout.setVisibility(View.VISIBLE);
-            observersNumberText.setText(chat.getNumPreviewers()+"");
+            observersNumberText.setText(chat.getNumPreviewers() + "");
         }
     }
 
-    public void changeActionBarElevation(boolean whitElevation){
+    public void changeActionBarElevation(boolean whitElevation) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (whitElevation) {
-                aB.setElevation(Util.px2dp(4, outMetrics));
+                aB.setElevation(px2dp(4, outMetrics));
             }
             else {
                 aB.setElevation(0);
@@ -454,52 +424,50 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
+
     public void setUpIndividualChatNotifications(){
-        log("setUpIndividualChatNotifications");
+        logDebug("setUpIndividualChatNotifications");
         //SET Preferences (if exist)
         if(chatPrefs!=null){
-            log("There is individual chat preferences");
+            logDebug("There is individual chat preferences");
             boolean notificationsEnabled = true;
-            if (chatPrefs.getNotificationsEnabled() != null){
+            if (chatPrefs.getNotificationsEnabled() != null) {
                 notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
             }
             notificationsSwitch.setChecked(notificationsEnabled);
-
         }
         else{
-            log("NO individual chat preferences");
+            logDebug("NO individual chat preferences");
             notificationsSwitch.setChecked(true);
         }
     }
 
     public void setChatPermissions(){
-        log("setChatPermissions");
-
-        if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+        logDebug("setChatPermissions");
+        if (chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
             editImageView.setVisibility(View.VISIBLE);
             dividerClearLayout.setVisibility(View.VISIBLE);
             clearChatLayout.setVisibility(View.VISIBLE);
             dividerLeaveLayout.setVisibility(View.VISIBLE);
 
-            if(chat.isPublic()){
+            if (chat.isPublic()) {
                 privateLayout.setVisibility(View.VISIBLE);
                 privateLayout.setOnClickListener(this);
                 privateSeparator.setVisibility(View.VISIBLE);
             }
             else{
-                log("Private chat");
+                logDebug("Private chat");
                 privateLayout.setVisibility(View.GONE);
                 privateSeparator.setVisibility(View.GONE);
             }
-        }
-        else{
+        } else {
             editImageView.setVisibility(View.GONE);
             dividerClearLayout.setVisibility(View.GONE);
             clearChatLayout.setVisibility(View.GONE);
             privateLayout.setVisibility(View.GONE);
             privateSeparator.setVisibility(View.GONE);
 
-            if(chat.getOwnPrivilege()<MegaChatRoom.PRIV_RO){
+            if (chat.getOwnPrivilege() < MegaChatRoom.PRIV_RO) {
                 leaveChatLayout.setVisibility(View.GONE);
                 dividerLeaveLayout.setVisibility(View.GONE);
             }
@@ -509,8 +477,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             chatLinkLayout.setVisibility(View.VISIBLE);
             chatLinkLayout.setOnClickListener(this);
             chatLinkSeparator.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             chatLinkLayout.setVisibility(View.GONE);
             chatLinkSeparator.setVisibility(View.GONE);
             chatLink = null;
@@ -519,8 +486,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     protected void onDestroy(){
-        log("onDestroy()");
-
+        logDebug("onDestroy()");
         if (megaChatApi != null) {
             megaChatApi.removeChatListener(this);
         }
@@ -529,22 +495,21 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void setParticipants(){
-        log("setParticipants: "+participants.size());
+        logDebug("Participants size: " + participants.size());
         //Set the first element = me
         participantsCount = chat.getPeerCount();
-        log("Participants count: "+participantsCount);
+        logDebug("Participants count: " + participantsCount);
         if (chat.isPreview()) {
             infoNumParticipantsText.setText(getString(R.string.number_of_participants, participantsCount));
-        }
-        else {
-            long participantsLabel = participantsCount+1; //Add one to include me
+        } else {
+            long participantsLabel = participantsCount + 1; //Add one to include me
             infoNumParticipantsText.setText(getString(R.string.number_of_participants, participantsLabel));
         }
 
-        for(int i=0;i<participantsCount;i++){
+        for (int i = 0; i < participantsCount; i++) {
             int peerPrivilege = chat.getPeerPrivilege(i);
             if(peerPrivilege==MegaChatRoom.PRIV_RM){
-                log("Continue");
+                logDebug("Continue");
                 continue;
             }
 
@@ -553,29 +518,27 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             String fullName = getParticipantFullName(i);
             String participantEmail = chat.getPeerEmail(i);
 
-            log(i+"FullName of the peer: "+fullName + "email " + chat.getPeerEmail(i) + " privilege: "+peerPrivilege);
-
+            logDebug(i + " - Handle of the peer: "+ peerHandle + ", Pprivilege: " + peerPrivilege);
             MegaChatParticipant participant = new MegaChatParticipant(peerHandle, "", "", fullName, participantEmail, peerPrivilege);
 
             participants.add(participant);
 
             int userStatus = megaChatApi.getUserOnlineStatus(participant.getHandle());
             if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-                log("Request last green for user");
+                logDebug("Request last green for user");
                 megaChatApi.requestLastGreen(participant.getHandle(), null);
             }
         }
 
         if(!chat.isPreview()){
-            log("Is not preview - add me as participant");
+            logDebug("Is not preview - add me as participant");
             String myFullName =  megaChatApi.getMyFullname();
             if(myFullName!=null){
                 if(myFullName.trim().isEmpty()){
                     myFullName =  megaChatApi.getMyEmail();
                 }
-            }
-            else{
-                myFullName =  megaChatApi.getMyEmail();
+            } else {
+                myFullName = megaChatApi.getMyEmail();
             }
 
             MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege());
@@ -583,47 +546,43 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             participants.add(me);
         }
 
-        log("number of participants with me: "+participants.size());
+        logDebug("Number of participants with me: " + participants.size());
         if (adapter == null){
             if(chat.isPreview()){
                 adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView, true);
-            }
-            else{
+            } else {
                 adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView, false);
             }
 
             adapter.setHasStableIds(true);
             adapter.setPositionClicked(-1);
             recyclerView.setAdapter(adapter);
-        }
-        else{
+        } else {
             adapter.setParticipants(participants);
         }
     }
 
-    public String getParticipantFullName(long i){
+    public String getParticipantFullName(long i) {
 
         String fullName = chat.getPeerFullname(i);
-
         if(fullName!=null){
             if(fullName.isEmpty()){
-                log("1-Put email as fullname");
+                logDebug("Put email as fullname");
                 fullName = chat.getPeerEmail(i);
                 return fullName;
             }
             else{
                 if (fullName.trim().length() <= 0){
-                    log("2-Put email as fullname");
+                    logDebug("Put email as fullname");
                     fullName = chat.getPeerEmail(i);
                     return fullName;
-                }
-                else{
+                } else {
                     return fullName;
                 }
             }
         }
         else{
-            log("3-Put email as fullname");
+            logDebug("Put email as fullname");
             fullName = chat.getPeerEmail(i);
             return fullName;
         }
@@ -631,34 +590,31 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        log("onCreateOptionsMenuLollipop");
+        logDebug("onCreateOptionsMenuLollipop");
 
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_group_chat_info, menu);
 
         addParticipantItem = menu.findItem(R.id.action_add_participants);
-        changeTitleItem =menu.findItem(R.id.action_rename);
+        changeTitleItem = menu.findItem(R.id.action_rename);
 
         int permission = chat.getOwnPrivilege();
-        log("Permision: "+permission);
-
-        if(permission==MegaChatRoom.PRIV_MODERATOR) {
+        logDebug("Permision: " + permission);
+        if (permission == MegaChatRoom.PRIV_MODERATOR) {
             addParticipantItem.setVisible(true);
             changeTitleItem.setVisible(true);
-        }
-        else {
+        } else {
             addParticipantItem.setVisible(false);
             changeTitleItem.setVisible(false);
         }
 
-        log("Call to super onCreateOptionsMenu");
+        logDebug("Call to super onCreateOptionsMenu");
         return super.onCreateOptionsMenu(menu);
     }
 
-
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(megaChatApi.isSignalActivityRequired()){
+        if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
 
@@ -668,12 +624,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 finish();
                 break;
             }
-            case R.id.action_add_participants:{
+            case R.id.action_add_participants: {
                 //
                 chooseAddParticipantDialog();
                 break;
             }
-            case R.id.action_rename:{
+            case R.id.action_rename: {
                 showRenameGroupDialog(false);
                 break;
             }
@@ -681,50 +637,49 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         return super.onOptionsItemSelected(item);
     }
 
-    public void chooseAddParticipantDialog(){
-        log("chooseAddContactDialog");
 
-        if(megaChatApi.isSignalActivityRequired()){
+    public void chooseAddParticipantDialog(){
+        logDebug("chooseAddContactDialog");
+
+        if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
 
-        if(megaApi!=null && megaApi.getRootNode()!=null){
+        if (megaApi != null && megaApi.getRootNode() != null) {
             ArrayList<MegaUser> contacts = megaApi.getContacts();
-            if(contacts==null){
+            if (contacts == null) {
                 showSnackbar(getString(R.string.no_contacts_invite));
-            }
-            else {
-                if(contacts.isEmpty()){
+            } else {
+                if (contacts.isEmpty()) {
                     showSnackbar(getString(R.string.no_contacts_invite));
-                }
-                else{
+                } else {
                     Intent in = new Intent(this, AddContactActivityLollipop.class);
-                    in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+                    in.putExtra("contactType", CONTACT_TYPE_MEGA);
                     in.putExtra("chat", true);
                     in.putExtra("chatId", chatHandle);
                     in.putExtra("aBtitle", getString(R.string.add_participants_menu_item));
-                    startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
+                    startActivityForResult(in, REQUEST_ADD_PARTICIPANTS);
                 }
             }
         }
-        else{
-            log("Online but not megaApi");
-            Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+        else {
+            logWarning("Online but not megaApi");
+            showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
         }
     }
 
     public void showRemoveParticipantConfirmation (long handle, MegaChatRoom chatToChange){
-        log("showRemoveParticipantConfirmation");
+        logDebug("Participant Handle: " + handle + ", Chat ID: " + chatToChange.getChatId());
 
-        if(megaChatApi.isSignalActivityRequired()){
+        if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:{
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE: {
                         removeParticipant();
                         break;
                     }
@@ -738,29 +693,29 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(groupChatInfoActivity, R.style.AppCompatAlertDialogStyle);
         String name = chatToChange.getPeerFullnameByHandle(handle);
-        String message= getResources().getString(R.string.confirmation_remove_chat_contact,name);
+        String message = getResources().getString(R.string.confirmation_remove_chat_contact, name);
         builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
     }
 
     public void removeParticipant(){
-        log("removeParticipant: "+selectedHandleParticipant);
-        log("before remove, participants: "+chat.getPeerCount());
+        logDebug("selectedHandleParticipant: " + selectedHandleParticipant);
+        logDebug("before remove, participants: " + chat.getPeerCount());
         ChatController cC = new ChatController(groupChatInfoActivity);
         cC.removeParticipant(chatHandle, selectedHandleParticipant);
     }
 
     public void changeTitle(String title){
-        log("changeTitle: "+title);
+        logDebug("changeTitle");
         ChatController cC = new ChatController(groupChatInfoActivity);
         cC.changeTitle(chatHandle, title);
     }
 
-    public void showChangePermissionsDialog(long handle, MegaChatRoom chatToChange){
+    public void showChangePermissionsDialog(long handle, MegaChatRoom chatToChange) {
         //Change permissions
 
-        if(megaChatApi.isSignalActivityRequired()){
+        if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
 
@@ -771,9 +726,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         final LinearLayout administratorLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator_layout);
         final CheckedTextView administratorCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator);
-        administratorCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        administratorCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams administratorMLP = (ViewGroup.MarginLayoutParams) administratorCheck.getLayoutParams();
-        administratorMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0);
+        administratorMLP.setMargins(scaleWidthPx(17, outMetrics), 0, 0, 0);
 
         final TextView administratorTitle = (TextView) dialoglayout.findViewById(R.id.administrator_title);
         administratorTitle.setText(getString(R.string.administrator_permission_label_participants_panel));
@@ -783,13 +738,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         administratorSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
         final LinearLayout administratorTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.administrator_text_layout);
         ViewGroup.MarginLayoutParams administratorSubtitleMLP = (ViewGroup.MarginLayoutParams) administratorTextLayout.getLayoutParams();
-        administratorSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
+        administratorSubtitleMLP.setMargins(scaleHeightPx(10, outMetrics), scaleHeightPx(15, outMetrics), 0, scaleHeightPx(15, outMetrics));
 
         final LinearLayout memberLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_member_layout);
         final CheckedTextView memberCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_member);
-        memberCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        memberCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams memberMLP = (ViewGroup.MarginLayoutParams) memberCheck.getLayoutParams();
-        memberMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0);
+        memberMLP.setMargins(scaleWidthPx(17, outMetrics), 0, 0, 0);
 
         final TextView memberTitle = (TextView) dialoglayout.findViewById(R.id.member_title);
         memberTitle.setText(getString(R.string.standard_permission_label_participants_panel));
@@ -799,13 +754,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         memberSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
         final LinearLayout memberTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.member_text_layout);
         ViewGroup.MarginLayoutParams memberSubtitleMLP = (ViewGroup.MarginLayoutParams) memberTextLayout.getLayoutParams();
-        memberSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
+        memberSubtitleMLP.setMargins(scaleHeightPx(10, outMetrics), scaleHeightPx(15, outMetrics), 0, scaleHeightPx(15, outMetrics));
 
         final LinearLayout observerLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_observer_layout);
         final CheckedTextView observerCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_observer);
-        observerCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        observerCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams observerMLP = (ViewGroup.MarginLayoutParams) observerCheck.getLayoutParams();
-        observerMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0);
+        observerMLP.setMargins(scaleWidthPx(17, outMetrics), 0, 0, 0);
 
         final TextView observerTitle = (TextView) dialoglayout.findViewById(R.id.observer_title);
         observerTitle.setText(getString(R.string.observer_permission_label_participants_panel));
@@ -815,7 +770,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         observerSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
         final LinearLayout observerTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.observer_text_layout);
         ViewGroup.MarginLayoutParams observerSubtitleMLP = (ViewGroup.MarginLayoutParams) observerTextLayout.getLayoutParams();
-        observerSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
+        observerSubtitleMLP.setMargins(scaleHeightPx(10, outMetrics), scaleHeightPx(15, outMetrics), 0, scaleHeightPx(15, outMetrics));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setView(dialoglayout);
@@ -827,17 +782,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         int permission = chatToChange.getPeerPrivilegeByHandle(handleToChange);
 
-        if(permission==MegaChatRoom.PRIV_STANDARD) {
+        if (permission == MegaChatRoom.PRIV_STANDARD) {
             administratorCheck.setChecked(false);
             memberCheck.setChecked(true);
             observerCheck.setChecked(false);
-        }
-        else if(permission==MegaChatRoom.PRIV_MODERATOR){
+        } else if (permission == MegaChatRoom.PRIV_MODERATOR) {
             administratorCheck.setChecked(true);
             memberCheck.setChecked(false);
             observerCheck.setChecked(false);
-        }
-        else{
+        } else {
             administratorCheck.setChecked(false);
             memberCheck.setChecked(false);
             observerCheck.setChecked(true);
@@ -862,7 +815,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         break;
                     }
                 }
-                if (dialog != null){
+                if (dialog != null) {
                     dialog.dismiss();
                 }
             }
@@ -871,53 +824,52 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         memberLayout.setOnClickListener(clickListener);
         observerLayout.setOnClickListener(clickListener);
 
-        log("Change permissions");
+        logDebug("Change permissions");
     }
 
+
     public void changePermissions(int newPermissions){
-        log("changePermissions: "+newPermissions);
+        logDebug("New permissions: " + newPermissions);
         ChatController cC = new ChatController(groupChatInfoActivity);
         cC.alterParticipantsPermissions(chatHandle, selectedHandleParticipant, newPermissions);
     }
 
     public void createGroupChatAvatar(){
-        log("createGroupChatAvatar()");
+        logDebug("createGroupChatAvatar()");
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
-        p.setColor(ContextCompat.getColor(this,R.color.divider_upgrade_account));
+        p.setColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
 
         int radius;
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
+            radius = defaultAvatar.getWidth() / 2;
         else
-            radius = defaultAvatar.getHeight()/2;
+            radius = defaultAvatar.getHeight() / 2;
 
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+        c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, p);
         avatarImageView.setImageBitmap(defaultAvatar);
 
         Display display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        float density  = getResources().getDisplayMetrics().density;
+        float density = getResources().getDisplayMetrics().density;
 
 
         int avatarTextSize = getAvatarTextSize(density);
-        log("DENSITY: " + density + ":::: " + avatarTextSize);
+        logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
 
 
         String firstLetter = initialLetter.getText().toString();
 
-        if(firstLetter.trim().isEmpty()){
+        if (firstLetter.trim().isEmpty()) {
             initialLetter.setVisibility(View.INVISIBLE);
-        }
-        else{
-            if(firstLetter.equals("(")){
+        } else {
+            if (firstLetter.equals("(")) {
                 initialLetter.setVisibility(View.INVISIBLE);
-            }
-            else{
+            } else {
                 initialLetter.setText(firstLetter);
                 initialLetter.setTextColor(Color.WHITE);
                 initialLetter.setVisibility(View.VISIBLE);
@@ -926,43 +878,34 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    private int getAvatarTextSize (float density){
-        float textSize = 0.0f;
+    private int getAvatarTextSize(float density) {
+        float textSize;
 
-        if (density > 3.0){
+        if (density > 3.0) {
             textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-        }
-        else if (density > 2.0){
+        } else if (density > 2.0) {
             textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-        }
-        else if (density > 1.5){
+        } else if (density > 1.5) {
             textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-        }
-        else if (density > 1.0){
+        } else if (density > 1.0) {
             textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-        }
-        else if (density > 0.75){
+        } else if (density > 0.75) {
             textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-        }
-        else{
+        } else {
             textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
         }
 
-        return (int)textSize;
+        return (int) textSize;
     }
 
+
     public void showParticipantsPanel(MegaChatParticipant participant){
-        log("showParticipantsPanel");
+        logDebug("Participant Handle: " + participant.getHandle());
 
-        if(participant!=null){
-            this.selectedHandleParticipant = participant.getHandle();
-        }
-        else{
-            log("participant is NULL");
-            return;
-        }
+        if (participant == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
-        ParticipantBottomSheetDialogFragment bottomSheetDialogFragment = new ParticipantBottomSheetDialogFragment();
+        selectedHandleParticipant = participant.getHandle();
+        bottomSheetDialogFragment = new ParticipantBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
@@ -976,7 +919,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onClick(View view) {
-        log("onClick");
+        logDebug("onClick");
 
         switch (view.getId()) {
 
@@ -989,29 +932,27 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 break;
             }
             case R.id.chat_group_contact_properties_clear_layout: {
-                log("Clear chat option");
+                logDebug("Clear chat option");
                 showConfirmationClearChat();
                 break;
             }
-            case R.id.chat_group_contact_properties_archive_layout:{
+            case R.id.chat_group_contact_properties_archive_layout: {
                 ChatController chatC = new ChatController(this);
                 chatC.archiveChat(chat);
                 break;
             }
             case R.id.chat_group_contact_properties_switch:{
-                log("click on switch notifications");
+                logDebug("Click on switch notifications");
                 if(!generalChatNotifications){
                     notificationsSwitch.setChecked(false);
                     showSnackbar("The chat notifications are disabled, go to settings to set up them");
-                }
-                else{
+                } else {
                     boolean enabled = notificationsSwitch.isChecked();
 
                     ChatController chatC = new ChatController(this);
-                    if(enabled){
+                    if (enabled) {
                         chatC.unmuteChat(chatHandle);
-                    }
-                    else{
+                    } else {
                         chatC.muteChat(chatHandle);
                     }
                 }
@@ -1019,18 +960,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 break;
 
             }
-            case R.id.chat_group_contact_properties_chat_link_layout:{
+            case R.id.chat_group_contact_properties_chat_link_layout: {
                 megaChatApi.queryChatLink(chatHandle, groupChatInfoActivity);
                 break;
             }
             case R.id.chat_group_contact_properties_private_layout: {
-                log("Make chat private");
+                logDebug("Make chat private");
                 showConfirmationPrivateChatDialog();
                 break;
             }
-            case R.id.chat_group_contact_properties_chat_files_shared_layout:{
+            case R.id.chat_group_contact_properties_chat_files_shared_layout: {
                 Intent nodeHistoryIntent = new Intent(this, NodeAttachmentHistoryActivity.class);
-                if(chat!=null){
+                if (chat != null) {
                     nodeHistoryIntent.putExtra("chatId", chat.getChatId());
                 }
                 startActivity(nodeHistoryIntent);
@@ -1040,34 +981,32 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     }
 
+
     public void copyLink(){
-        log("copyLink");
+        logDebug("copyLink");
         if(chatLink!=null) {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
             clipboard.setPrimaryClip(clip);
             showSnackbar(getString(R.string.chat_link_copied_clipboard));
-        }
-        else {
+        } else {
             showSnackbar(getString(R.string.general_text_error));
         }
     }
 
+
     public void removeChatLink(){
-        log("removeChatLink");
+        logDebug("removeChatLink");
         megaChatApi.removeChatLink(chatHandle, this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-
-        log("onActivityResult, resultCode: "+resultCode);
-
-       if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
-            log("onActivityResult REQUEST_ADD_PARTICIPANTS OK");
-
+        logDebug("Result Code: " + resultCode);
+       if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
+           logDebug("REQUEST_ADD_PARTICIPANTS OK");
             if (intent == null) {
-                log("Return.....");
+                logWarning("Return.....");
                 return;
             }
 
@@ -1082,7 +1021,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, this);
                     }
                 } else {
-                    log("Add multiple participants "+contactsData.size());
+                    logDebug("Add multiple participants " + contactsData.size());
                     multipleListener = new MultipleGroupChatRequestListener(this);
                     for (int i = 0; i < contactsData.size(); i++) {
                         MegaUser user = megaApi.getContact(contactsData.get(i));
@@ -1094,96 +1033,102 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
         }
         else{
-            log("Error onActivityResult: REQUEST_ADD_PARTICIPANTS");
+           logError("Error REQUEST_ADD_PARTICIPANTS");
         }
 
         super.onActivityResult(requestCode, resultCode, intent);
     }
 
-    public void showRenameGroupDialog(boolean fromGetLink){
-        log("showRenameGroupDialog");
 
+    public void showRenameGroupDialog(boolean fromGetLink){
+        logDebug("fromGetLink: " + fromGetLink);
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-        if(fromGetLink){
+        if (fromGetLink) {
             final TextView alertRename = new TextView(this);
             alertRename.setText(getString(R.string.message_error_set_title_get_link));
 
             LinearLayout.LayoutParams paramsText = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            paramsText.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(12, outMetrics), 0);
+            paramsText.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(8, outMetrics), scaleWidthPx(12, outMetrics), 0);
             alertRename.setLayoutParams(paramsText);
             layout.addView(alertRename);
-
-            params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+            params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(8, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
         }
         else{
-            params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(16, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+            params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(16, outMetrics), scaleWidthPx(17, outMetrics), 0);
         }
 
-        final EditText input = new EditText(this);
-        int maxLength = 30;
-        input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
+        final EmojiEditText input = new EmojiEditText(this);
 
         layout.addView(input, params);
 
+        input.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return false;
+            }
+        });
         input.setSingleLine();
-        input.setText(chat.getTitle());
         input.setSelectAllOnFocus(true);
         input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        input.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        int maxAllowed = getMaxAllowed(chat.getTitle());
+        input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxAllowed)});
+        input.setText(chat.getTitle());
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String title = input.getText().toString();
                     if(title.equals("")||title.isEmpty()){
-                        log("input is empty");
+                        logWarning("Input is empty");
                         input.setError(getString(R.string.invalid_string));
                         input.requestFocus();
                     }
                     else if(title.trim().isEmpty()){
-                        log("title trim is empty");
+                        logWarning("Title trim is empty");
                         input.setError(getString(R.string.invalid_string));
                         input.requestFocus();
                     }
                     else {
-                        log("action DONE ime - change title");
+                        logDebug("Action DONE ime - change title");
                         changeTitle(title);
                         changeTitleDialog.dismiss();
                     }
                 }
                 else{
-                    log("other IME" + actionId);
+                    logDebug("Other IME" + actionId);
                 }
                 return false;
             }
         });
-        input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
+        input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
         builder.setTitle(getString(R.string.context_rename));
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String title = input.getText().toString();
                         if(title.equals("")||title.isEmpty()){
-                            log("input is empty");
+                            logWarning("Input is empty");
                             input.setError(getString(R.string.invalid_string));
                             input.requestFocus();
                         }
                         else if(title.trim().isEmpty()){
-                            log("title trim is empty");
+                            logWarning("Title trim is empty");
                             input.setError(getString(R.string.invalid_string));
                             input.requestFocus();
                         }
                         else {
-                            log("positive button pressed - change title");
+                            logDebug("Positive button pressed - change title");
                             changeTitle(title);
                             changeTitleDialog.dismiss();
                         }
@@ -1194,7 +1139,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                Util.hideKeyboard(groupChatInfoActivity, InputMethodManager.HIDE_NOT_ALWAYS);
+                hideKeyboard(groupChatInfoActivity, InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
 
@@ -1206,22 +1151,23 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         changeTitleDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                log("OK BTTN CHANGE");
+                logDebug("OK BTTN CHANGE");
                 String title = input.getText().toString();
                 if(title.equals("")||title.isEmpty()){
-                    log("input is empty");
+                    logWarning("Input is empty");
                     input.setError(getString(R.string.invalid_string));
                     input.requestFocus();
                 }
                 else if(title.trim().isEmpty()){
-                    log("title trim is empty");
+                    logWarning("Title trim is empty");
                     input.setError(getString(R.string.invalid_string));
                     input.requestFocus();
                 }
                 else {
-                    log("positive button pressed - change title");
+                    logDebug("Positive button pressed - change title");
                     changeTitle(title);
                     changeTitleDialog.dismiss();
+
                 }
             }
         });
@@ -1229,16 +1175,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void showConfirmationClearChat(){
-        log("showConfirmationClearChat");
-
+        logDebug("showConfirmationClearChat");
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        log("Clear chat!");
+                        logDebug("Clear chat!");
 //						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
-                        log("Clear history selected!");
+                        logDebug("Clear history selected!");
                         ChatController chatC = new ChatController(groupChatInfoActivity);
                         chatC.clearHistory(chat);
                         break;
@@ -1251,19 +1196,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         };
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        String message= getResources().getString(R.string.confirmation_clear_group_chat);
+        String message = getResources().getString(R.string.confirmation_clear_group_chat);
         builder.setTitle(R.string.title_confirmation_clear_group_chat);
         builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     public void showConfirmationLeaveChat (final MegaChatRoom c){
-        log("showConfirmationLeaveChat");
-
+        logDebug("Chat ID: " + c.getChatId());
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE: {
                         ChatController chatC = new ChatController(groupChatInfoActivity);
                         chatC.leaveChat(c);
@@ -1278,14 +1222,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
-        String message= getResources().getString(R.string.confirmation_leave_group_chat);
+        String message = getResources().getString(R.string.confirmation_leave_group_chat);
         builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     public void inviteContact (String email){
-        log("inviteContact");
-
+        logDebug("inviteContact");
         ContactController cC = new ContactController(this);
         cC.inviteContact(email);
     }
@@ -1307,91 +1250,89 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish CHAT: "+request.getType()+ " "+e.getErrorCode());
+        logDebug("onRequestFinish CHAT: " + request.getType()+ " " + e.getErrorCode());
 
         if(request.getType() == MegaChatRequest.TYPE_UPDATE_PEER_PERMISSIONS){
-            log("Permissions changed");
-            int index=-1;
-            MegaChatParticipant participantToUpdate=null;
+            logDebug("Permissions changed");
+            int index = -1;
+            MegaChatParticipant participantToUpdate = null;
 
-            log("Participants count: "+participantsCount);
-            for(int i=0;i<participantsCount;i++){
-                if(request.getUserHandle()==participants.get(i).getHandle()){
+            logDebug("Participants count: " + participantsCount);
+            for (int i = 0; i < participantsCount; i++) {
+                if (request.getUserHandle() == participants.get(i).getHandle()) {
                     participantToUpdate = participants.get(i);
 
                     participantToUpdate.setPrivilege(request.getPrivilege());
-                    index=i;
+                    index = i;
                     break;
                 }
             }
 
-            if(index!=-1 && participantToUpdate!=null){
-                participants.set(index,participantToUpdate);
+            if (index != -1 && participantToUpdate != null) {
+                participants.set(index, participantToUpdate);
 //                adapter.setParticipants(participants);
-                adapter.updateParticipant(index+1, participants);
+                adapter.updateParticipant(index + 1, participants);
             }
 
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
+        } else if (request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM) {
             long chatHandle = request.getChatHandle();
             MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
             String chatTitle = chat.getTitle();
 
-            if(chatTitle==null){
+            if (chatTitle == null) {
                 chatTitle = "";
-            }
-            else if(!chatTitle.isEmpty() && chatTitle.length()>60){
-                chatTitle = chatTitle.substring(0,59)+"...";
+            } else if (!chatTitle.isEmpty() && chatTitle.length() > MAX_LENGTH_CHAT_TITLE) {
+                chatTitle = chatTitle.substring(0, 59) + "...";
             }
 
-            if(!chatTitle.isEmpty() && chat.isGroup() && !chat.hasCustomTitle()){
-                chatTitle = "\""+chatTitle+"\"";
+            if (!chatTitle.isEmpty() && chat.isGroup() && !chat.hasCustomTitle()) {
+                chatTitle = "\"" + chatTitle + "\"";
             }
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 if(request.getFlag()){
-                    log("Chat archived");
+                    logDebug("Chat archived");
                     showSnackbar(getString(R.string.success_archive_chat, chatTitle));
                 }
                 else{
-                    log("Chat unarchived");
+                    logDebug("Chat unarchived");
                     showSnackbar(getString(R.string.success_unarchive_chat, chatTitle));
                 }
             }
             else{
                 if(request.getFlag()){
-                    log("EEEERRRRROR WHEN ARCHIVING CHAT " + e.getErrorString());
+                    logError("ERROR WHEN ARCHIVING CHAT " + e.getErrorString());
                     showSnackbar(getString(R.string.error_archive_chat, chatTitle));
                 }
                 else{
-                    log("EEEERRRRROR WHEN UNARCHIVING CHAT " + e.getErrorString());
+                    logError("ERROR WHEN UNARCHIVING CHAT " + e.getErrorString());
                     showSnackbar(getString(R.string.error_unarchive_chat, chatTitle));
                 }
             }
 
-            if(chat.isArchived()){
+            if (chat.isArchived()) {
                 archiveChatTitle.setText(getString(R.string.general_unarchive));
-                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_b_unarchive));
-            }
-            else{
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_unarchive));
+            } else {
                 archiveChatTitle.setText(getString(R.string.general_archive));
-                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_b_archive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_archive));
             }
+
         }
         else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
-            log("Remove participant: "+request.getUserHandle());
-            log("My user handle: "+megaChatApi.getMyUserHandle());
+            logDebug("Remove participant: " + request.getUserHandle());
+            logDebug("My user handle: " + megaChatApi.getMyUserHandle());
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 if(request.getUserHandle()==-1){
-                    log("I left the chatroom");
+                    logDebug("I left the chatroom");
                     finish();
                 }
                 else{
-                    log("Removed from chat");
+                    logDebug("Removed from chat");
 
                     chat = megaChatApi.getChatRoom(chatHandle);
-                    log("Peers after onChatListItemUpdate: "+chat.getPeerCount());
+                    logDebug("Peers after onChatListItemUpdate: " + chat.getPeerCount());
 //                chat = megaChatApi.getChatRoom(chatHandle);
                     participants.clear();
                     setParticipants();
@@ -1414,52 +1355,49 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                     showSnackbar(getString(R.string.remove_participant_success));
                 }
-            }
-            else{
+            } else {
 
                 if(request.getUserHandle()==-1){
-                    log("EEEERRRRROR WHEN LEAVING CHAT" + e.getErrorString());
+                    logError("ERROR WHEN LEAVING CHAT" + e.getErrorString());
                     showSnackbar("Error.Chat not left");
                 }
                 else{
-                    log("EEEERRRRROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
+                    logError("ERROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
                     showSnackbar(getString(R.string.remove_participant_error));
                 }
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_EDIT_CHATROOM_NAME) {
-            log("Change title");
+            logDebug("Change title");
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 if(request.getText()!=null) {
-                    log("NEW title: "+request.getText());
                     infoTitleChatText.setText(request.getText());
                 }
-            }
-            else{
-
-                log("EEEERRRRROR WHEN TYPE_EDIT_CHATROOM_NAME " + e.getErrorString());
+            } else {
+                logError("ERROR WHEN TYPE_EDIT_CHATROOM_NAME " + e.getErrorString());
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
-            log("Truncate history request finish!!!");
+            logDebug("Truncate history request finish!!!");
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("Ok. Clear history done");
+                logDebug("Ok. Clear history done");
                 showSnackbar(getString(R.string.clear_history_success));
             }
             else{
-                log("Error clearing history: "+e.getErrorString());
+                logError("Error clearing history: " + e.getErrorString());
                 showSnackbar(getString(R.string.clear_history_error));
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_INVITE_TO_CHATROOM) {
-            log("Invite to chatroom request finish!!!");
+            logDebug("Invite to chatroom request finish!!!");
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                log("Ok. Invited");
+                logDebug("Ok. Invited");
                 showSnackbar(getString(R.string.add_participant_success));
+
                 if(request.getChatHandle()==chatHandle){
-                    log("Changes in my chat");
+                    logDebug("Changes in my chat");
                     chat = megaChatApi.getChatRoom(chatHandle);
-                    log("Peers after onChatListItemUpdate: "+chat.getPeerCount());
+                    logDebug("Peers after onChatListItemUpdate: " + chat.getPeerCount());
 //                chat = megaChatApi.getChatRoom(chatHandle);
                     participants.clear();
                     setParticipants();
@@ -1467,7 +1405,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //                scrollView.setFillViewport(false);
                 }
                 else{
-                    log("Changes NOT interested in");
+                    logWarning("Changes NOT interested in");
                 }
 //                chat = megaChatApi.getChatRoom(chatHandle);
 //                participants.clear();
@@ -1476,135 +1414,126 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //                scrollView.setFillViewport(false);
             }
             else if (e.getErrorCode() == MegaChatError.ERROR_EXIST){
-                log("Error inviting ARGS: "+e.getErrorString());
+                logError("Error inviting ARGS: " + e.getErrorString());
                 showSnackbar(getString(R.string.add_participant_error_already_exists));
             }
             else{
-                log("Error inviting: "+e.getErrorString()+" "+e.getErrorCode());
+                logError("Error inviting: " + e.getErrorString() + " " + e.getErrorCode());
                 showSnackbar(getString(R.string.add_participant_error));
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
-            log("Create chat request finish!!!");
+            logDebug("Create chat request finish!!!");
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-
-                log("open new chat");
+                logDebug("Open new chat");
                 Intent intent = new Intent(this, ChatActivityLollipop.class);
-                intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+                intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
                 intent.putExtra("CHAT_ID", request.getChatHandle());
                 this.startActivity(intent);
             }
             else{
-                log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
+                logError("ERROR WHEN CREATING CHAT " + e.getErrorString());
                 showSnackbar(getString(R.string.create_chat_error));
             }
         }
         else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE){
-            log("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!");
+            logDebug("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!");
             if(request.getFlag()==false){
                 if(request.getNumRetry()==0){
 //                    Query chat link
-                    if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                    if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                         chatLink = request.getText();
-                        ChatUtil.showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink);
+                        showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink);
                         return;
                     }
                     else if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
-                        log("The chatroom isn't grupal or public");
+                        logError("The chatroom isn't grupal or public");
                     }
                     else if (e.getErrorCode()==MegaChatError.ERROR_NOENT){
-                        log("The chatroom doesn't exist or the chatid is invalid");
+                        logError("The chatroom doesn't exist or the chatid is invalid");
                     }
                     else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
-                        log("The chatroom doesn't have a topic or the caller isn't an operator");
+                        logError("The chatroom doesn't have a topic or the caller isn't an operator");
                     }
                     else{
-                        log("Error TYPE_CHAT_LINK_HANDLE "+e.getErrorCode());
+                        logError("Error TYPE_CHAT_LINK_HANDLE " + e.getErrorCode());
                     }
                     if (chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR){
                         if (chat.hasCustomTitle()) {
                             megaChatApi.createChatLink(chatHandle, groupChatInfoActivity);
-                        }
-                        else {
+                        } else {
                             showRenameGroupDialog(true);
                         }
-                    }
-                    else {
+                    } else {
                         showSnackbar(getString(R.string.no_chat_link_available));
                     }
-                }
-                else if(request.getNumRetry()==1){
+                } else if (request.getNumRetry() == 1) {
 //                    Create chat link
-                    if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                    if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                         chatLink = request.getText();
-                        ChatUtil.showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink);
+                        showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink);
                     }
                     else{
-                        log("Error TYPE_CHAT_LINK_HANDLE "+e.getErrorCode());
+                        logError("Error TYPE_CHAT_LINK_HANDLE " + e.getErrorCode());
                         showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
                     }
                 }
             }
             else{
                 if(request.getNumRetry()==0){
-                    log("Removing chat link");
+                    logDebug("Removing chat link");
                     if(e.getErrorCode()==MegaChatError.ERROR_OK){
                         chatLink = null;
                         showSnackbar(getString(R.string.chat_link_deleted));
-                    }
-                    else{
+                    } else {
                         if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
-                            log("The chatroom isn't grupal or public");
+                            logError("The chatroom isn't grupal or public");
                         }
                         else if (e.getErrorCode()==MegaChatError.ERROR_NOENT){
-                            log("The chatroom doesn't exist or the chatid is invalid");
+                            logError("The chatroom doesn't exist or the chatid is invalid");
                         }
                         else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
-                            log("The chatroom doesn't have a topic or the caller isn't an operator");
+                            logError("The chatroom doesn't have a topic or the caller isn't an operator");
                         }
                         else{
-                            log("Error TYPE_CHAT_LINK_HANDLE "+e.getErrorCode());
+                            logError("Error TYPE_CHAT_LINK_HANDLE " + e.getErrorCode());
                         }
                         showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
                     }
                 }
             }
-
             updatePreviewers();
-
         }
         else if (request.getType() == MegaChatRequest.TYPE_SET_PRIVATE_MODE){
-            log("MegaChatRequest.TYPE_SET_PRIVATE_MODE finished!!!");
+            logDebug("MegaChatRequest.TYPE_SET_PRIVATE_MODE finished!!!");
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 chatLink = null;
-                log("Chat is PRIVATE now");
+                logDebug("Chat is PRIVATE now");
                 chatLinkLayout.setVisibility(View.GONE);
                 chatLinkSeparator.setVisibility(View.GONE);
                 privateLayout.setVisibility(View.GONE);
                 privateSeparator.setVisibility(View.GONE);
-
                 updatePreviewers();
             }
             else{
-                log("Error on closeChatLink");
+                logError("Error on closeChatLink");
                 if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
-                    log("NOT public chatroom");
+                    logError("NOT public chatroom");
                 }
                 else if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
-                    log("Chatroom not FOUND");
+                    logError("Chatroom not FOUND");
                 }
                 else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
-                    log("NOT privileges or private chatroom");
+                    logError("NOT privileges or private chatroom");
                 }
                 showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
             }
         }
     }
 
-    public void showSnackbar(String s){
+    public void showSnackbar(String s) {
         showSnackbar(fragmentContainer, s);
     }
-
 
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
@@ -1623,36 +1552,32 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish "+request.getRequestString());
+        logDebug("onRequestFinish " + request.getRequestString());
 
         if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
-            log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
-
-            if(request.getNumber()== MegaContactRequest.INVITE_ACTION_REMIND){
+            logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
+            if (request.getNumber() == MegaContactRequest.INVITE_ACTION_REMIND) {
                 showSnackbar(getString(R.string.context_contact_invitation_resent));
             }
             else{
                 if (e.getErrorCode() == MegaError.API_OK){
-                    log("OK INVITE CONTACT: "+request.getEmail());
+                    logDebug("OK INVITE CONTACT: " + request.getEmail());
                     if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
                     {
                         showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
                     }
                 }
                 else{
-                    log("Code: "+e.getErrorString());
+                    logError("Error - Code: " + e.getErrorString());
                     if(e.getErrorCode()==MegaError.API_EEXIST)
                     {
                         showSnackbar(getString(R.string.context_contact_already_invited, request.getEmail()));
-                    }
-                    else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS)
-                    {
+                    } else if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode() == MegaError.API_EARGS) {
                         showSnackbar(getString(R.string.error_own_email_as_contact));
-                    }
-                    else{
+                    } else {
                         showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
                     }
-                    log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+                    logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
                 }
             }
         }
@@ -1663,80 +1588,69 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     }
 
-    public static void log(String message) {
-        Util.log("GroupChatInfoActivity", message);
-    }
-
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-        log("onChatListItemUpdate");
+        logDebug("Chat ID: " + item.getChatId());
 
         if(item.getChatId()==chatHandle){
-            log("Changes in my chat");
+            logDebug("Changes in my chat");
             chat = megaChatApi.getChatRoom(chatHandle);
 
             if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
-                log("Change participants");
+                logDebug("Change participants");
                 participants.clear();
                 setParticipants();
             }
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)){
-                log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
+                logDebug("Change status: CHANGE_TYPE_OWN_PRIV");
                 setChatPermissions();
                 participants.clear();
                 setParticipants();
             }
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
-
-                log("NEW title: "+chat.getTitle());
+                logDebug("Change status: CHANGE_TYPE_TITLE");
                 infoTitleChatText.setText(chat.getTitle());
 
-                if (chat.getTitle().length() > 0){
-                    String chatTitle = chat.getTitle().trim();
-                    String firstLetter = "";
-                    if(!chatTitle.isEmpty()){
-                        firstLetter = chatTitle.charAt(0) + "";
-                        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                    }
+                if (chat.getTitle().length() > 0) {
+                    String firstLetter = getFirstLetter(chat.getTitle());
                     initialLetter.setText(firstLetter);
                 }
 
                 createGroupChatAvatar();
             }
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
-                log("CHANGE_TYPE_CLOSED");
+                logDebug("CHANGE_TYPE_CLOSED");
             }
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-                log("CHANGE_TYPE_UNREAD_COUNT");
+                logDebug("CHANGE_TYPE_UNREAD_COUNT");
             }
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UPDATE_PREVIEWERS)){
                 updatePreviewers();
             }
-            else{
-                log("Changes other: "+item.getChanges());
-                log("Chat title: "+item.getTitle());
+            else {
+                logDebug("Changes other: " + item.getChanges());
+                logDebug("Chat ID: " + item.getChatId());
             }
         }
         else{
-            log("Changes NOT interested in");
+            logDebug("Changes NOT interested in");
         }
-
     }
 
     @Override
     public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-        log("onChatInitStateUpdate");
+        logDebug("New state: " + newState);
     }
 
     @Override
     public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userHandle, int status, boolean inProgress) {
-        log("onChatOnlineStatusUpdate");
+        logDebug("User Handle: " + userHandle + ", Status: " + status + ", inProgress: " + inProgress);
 
-        if(inProgress){
+        if (inProgress) {
             status = -1;
         }
         if(userHandle == megaChatApi.getMyUserHandle()){
-            log("My own status update");
+            logDebug("My own status update");
             int position = participants.size()-1;
             if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
                 adapter.updateContactStatus(position+1);
@@ -1746,8 +1660,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
         }
         else{
-            log("Status update for the user: "+userHandle);
-
+            logDebug("Status update for the user: " + userHandle);
             int indexToReplace = -1;
             ListIterator<MegaChatParticipant> itrReplace = participants.listIterator();
             while (itrReplace.hasNext()) {
@@ -1755,10 +1668,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 if (participant != null) {
                     if (participant.getHandle() == userHandle) {
                         if(status != MegaChatApi.STATUS_ONLINE && status != MegaChatApi.STATUS_BUSY && status != MegaChatApi.STATUS_INVALID){
-                            log("Request last green for user");
+                            logDebug("Request last green for user");
                             megaChatApi.requestLastGreen(userHandle, this);
-                        }
-                        else{
+                        } else {
                             participant.setLastGreen("");
                         }
                         indexToReplace = itrReplace.nextIndex() - 1;
@@ -1769,7 +1681,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             }
             if (indexToReplace != -1) {
-                log("Index to replace: " + indexToReplace);
+                logDebug("Index to replace: " + indexToReplace);
                 if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
                     adapter.updateContactStatus(indexToReplace+1);
                 }
@@ -1782,7 +1694,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-        log("onChatPresenceConfigUpdate");
+        logDebug("onChatPresenceConfigUpdate");
     }
 
     @Override
@@ -1790,10 +1702,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     }
 
-
     public void showConfirmationPrivateChatDialog(){
-        log("showConfirmationPrivateChatDialog");
-
+        logDebug("showConfirmationPrivateChatDialog");
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
         LayoutInflater inflater = this.getLayoutInflater();
@@ -1814,7 +1724,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         chatLinkDialog = dialogBuilder.create();
 
-        actionButton.setOnClickListener(new View.OnClickListener(){
+        actionButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 chatLinkDialog.dismiss();
                 megaChatApi.setPublicChatToPrivate(chatHandle, groupChatInfoActivity);
@@ -1826,7 +1736,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void showConfirmationCreateChatLinkDialog() {
-        log("showConfirmationCreateChatLinkDialog");
+        logDebug("showConfirmationCreateChatLinkDialog");
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
@@ -1844,7 +1754,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         firstText.setText(getString(R.string.context_create_chat_link_warning_text));
 
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) firstText.getLayoutParams();
-        params.bottomMargin = Util.scaleHeightPx(12, outMetrics);
+        params.bottomMargin = scaleHeightPx(12, outMetrics);
         firstText.setLayoutParams(params);
 
         chatLinkDialog = dialogBuilder.create();
@@ -1861,31 +1771,31 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
 
+
     public void startConversation(long handle){
-        log("startConversation");
+        logDebug("Handle: " + handle);
         MegaChatRoom chat = megaChatApi.getChatRoomByUser(handle);
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
         if(chat==null){
-            log("No chat, create it!");
+            logDebug("No chat, create it!");
             peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
             megaChatApi.createChat(false, peers, this);
         }
         else{
-            log("There is already a chat, open it!");
+            logDebug("There is already a chat, open it!");
             Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-            intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
             intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
             this.startActivity(intentOpenChat);
         }
     }
 
-    public void createPublicGroupAndGetLink(){
+    public void createPublicGroupAndGetLink() {
 
         long participantsCount = chat.getPeerCount();
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
-
-        for (int i=0;i<participantsCount;i++){
-            log("Add participant: "+chat.getPeerHandle(i)+" privilege: "+chat.getPeerPrivilege(i));
+        for (int i = 0; i < participantsCount; i++) {
+            logDebug("Add participant: " + chat.getPeerHandle(i) + ", privilege: " + chat.getPeerPrivilege(i));
             peers.addPeer(chat.getPeerHandle(i), chat.getPeerPrivilege(i));
         }
 
@@ -1893,32 +1803,33 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         megaChatApi.createPublicChat(peers, chat.getTitle(), listener);
     }
 
+
     public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean publicLink){
         if(errorCode==MegaChatError.ERROR_OK){
-            log("open new chat: " + chatHandle);
+            logDebug("Open new chat: " + chatHandle);
             Intent intent = new Intent(this, ChatActivityLollipop.class);
-            intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
             intent.putExtra("CHAT_ID", chatHandle);
-            if(publicLink){
+            if (publicLink) {
                 intent.putExtra("PUBLIC_LINK", errorCode);
             }
             this.startActivity(intent);
         }
         else{
-            log("EEEERRRRROR WHEN CREATING CHAT " + errorCode);
+            logError("ERROR WHEN CREATING CHAT " + errorCode);
             showSnackbar(getString(R.string.create_chat_error));
         }
     }
 
     @Override
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-        log("onChatPresenceLastGreen");
+        logDebug("User Handle: " + userhandle + ", Last green: " + lastGreen);
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-            String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
+            String formattedDate = lastGreenDate(this, lastGreen);
 
             if(userhandle != megaChatApi.getMyUserHandle()){
-                log("Status last green for the user: "+userhandle);
+                logDebug("Status last green for the user: " + userhandle);
                 int indexToReplace = -1;
                 ListIterator<MegaChatParticipant> itrReplace = participants.listIterator();
                 while (itrReplace.hasNext()) {
@@ -1934,7 +1845,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     }
                 }
                 if (indexToReplace != -1) {
-                    log("Index to replace: " + indexToReplace);
+                    logDebug("Index to replace: " + indexToReplace);
                     if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
                         adapter.updateContactStatus(indexToReplace+1);
                     }
@@ -1944,7 +1855,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             }
 
-            log("Date last green: "+formattedDate);
+            logDebug("Date last green: " + formattedDate);
         }
     }
 }

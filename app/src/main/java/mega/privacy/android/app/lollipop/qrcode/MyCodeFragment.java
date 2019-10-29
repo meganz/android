@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.qrcode;
 
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ClipData;
@@ -53,6 +52,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -60,10 +60,11 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
-/**
- * Created by mega on 22/01/18.
- */
 
 public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
@@ -103,14 +104,14 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     DisplayMetrics outMetrics;
 
     public static MyCodeFragment newInstance() {
-        log("newInstance");
+        logDebug("newInstance");
         MyCodeFragment fragment = new MyCodeFragment();
         return fragment;
     }
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
 
@@ -130,27 +131,17 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
     }
 
-    public File queryIfQRExists (){
-        log("queryIfQRExists");
-
-        if (context.getExternalCacheDir() != null){
-            File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
-            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-        }
-        else{
-            File qrDir = context.getDir("qrMEGA", 0);
-            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-        }
-
-        if (qrFile.exists()){
+    public File queryIfQRExists() {
+        logDebug("queryIfQRExists");
+        qrFile = buildQrFile(context,myEmail + "QRcode.jpg");
+        if (isFileAvailable(qrFile)) {
             return qrFile;
         }
-
         return null;
     }
 
     public void setImageQR (){
-        log("setImageQR");
+        logDebug("setImageQR");
 
         if (qrFile.exists()) {
             if (qrFile.length() > 0) {
@@ -173,7 +164,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        logDebug("onCreateView");
 
         v = inflater.inflate(R.layout.fragment_mycode, container, false);
 
@@ -232,7 +223,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     }
 
     public Bitmap createQRCode (Bitmap qr, Bitmap avatar){
-        log("createQRCode");
+        logDebug("createQRCode");
 
         Bitmap qrCode = Bitmap.createBitmap(WIDTH,WIDTH, Bitmap.Config.ARGB_8888);
 //        int width = (int)getResources().getDimension(R.dimen.width_qr);
@@ -258,7 +249,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     }
 
     public Bitmap queryQR () {
-        log("queryQR");
+        logDebug("queryQR");
 
         Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
@@ -292,7 +283,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
                 if (pixels[offset + x] == color){
                     c.drawCircle(x*resize, y*resize, 5, paint);
                 }
-                log("pixels[offset + x]: "+Integer.toString(pixels[offset + x])+ " offset+x: "+(offset+x));
+                logDebug("pixels[offset + x]: "+ pixels[offset + x] + " offset+x: " + (offset+x));
             }
         }
         paint.setColor(WHITE);
@@ -334,17 +325,11 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     }
 
     public Bitmap setUserAvatar(){
-        log("setUserAvatar");
+        logDebug("setUserAvatar");
 
-        File avatar = null;
-        if (context.getExternalCacheDir() != null){
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-        }
-        else{
-            avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-        }
+        File avatar = buildAvatarFile(context, myEmail + ".jpg");
         Bitmap bitmap = null;
-        if (avatar.exists()){
+        if (isFileAvailable(avatar)){
             if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
@@ -367,7 +352,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     }
 
     private Bitmap getCircleBitmap(Bitmap bitmap) {
-        log("getCircleBitmap");
+        logDebug("getCircleBitmap");
 
         final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(output);
@@ -391,23 +376,32 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     }
 
     public Bitmap createDefaultAvatar(){
-        log("createDefaultAvatar()");
+        logDebug("createDefaultAvatar()");
 
         UserCredentials credentials = dbH.getCredentials();
-        String fullName = null;
+        String fullName;
         if(credentials!=null){
             fullName = credentials.getFirstName();
             if (fullName == null) {
                 fullName = credentials.getLastName();
                 if (fullName == null) {
-                    fullName = myEmail;
+
+                    fullName = ((QRCodeActivity) context).getName();
+                    if(fullName == null) {
+                        fullName = myEmail;
+                    }
                 }
             }
         }
         else{
             fullName = myEmail;
+
         }
-        String firstLetter = fullName.charAt(0) + "";
+
+        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            firstLetter = " ";
+        }
 
         return Util.createDefaultAvatar(megaApi.getUserAvatarColor(myUser), firstLetter);
     }
@@ -416,19 +410,19 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        log("onConfigurationChanged");
+        logDebug("onConfigurationChanged");
         if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
-            log("onConfigurationChanged: changed to LANDSCAPE");
+            logDebug("Changed to LANDSCAPE");
 
         }else{
-            log("onConfigurationChanged: changed to PORTRAIT");
+            logDebug("Changed to PORTRAIT");
 
         }
     }
 
     @Override
     public void onAttach(Activity activity) {
-        log("onAttach");
+        logDebug("onAttach");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -436,19 +430,15 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach context");
+        logDebug("onAttach context");
         super.onAttach(context);
         this.context = context;
         aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
     }
 
-    private static void log(String log) {
-        Util.log("MyCodeFragment", log);
-    }
-
     @Override
     public void onClick(View v) {
-        log("onClick");
+        logDebug("onClick");
         switch (v.getId()) {
             case R.id.qr_code_button_copy_link: {
                 if (copyLink) {
@@ -463,7 +453,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     }
 
     public void copyLink () {
-        log("copyLink");
+        logDebug("copyLink");
 
         ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("label", contactLink);
@@ -500,28 +490,14 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             reset = true;
         }
         if (e.getErrorCode() == MegaError.API_OK) {
-            log("Contact link create LONG: " + request.getNodeHandle());
-            log("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
+            logDebug("Contact link create LONG: " + request.getNodeHandle());
+            logDebug("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
 
             handle = request.getNodeHandle();
             contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
             qrcode_link.setText(contactLink);
             qrCodeBitmap = createQRCode(queryQR(), setUserAvatar());
-            File qrCodeFile = null;
-            if (context.getExternalCacheDir() != null){
-                File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
-                if (qrDir != null){
-                    qrDir.mkdirs();
-                }
-                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
-            else{
-                File qrDir = context.getDir("qrMEGA", 0);
-                if (qrDir != null){
-                    qrDir.mkdirs();
-                }
-                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
+            File qrCodeFile = buildQrFile(context, myEmail + "QRcode.jpg");
 
             if (qrCodeFile != null) {
                 try {
@@ -556,17 +532,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
     public void initDeleteQR(MegaRequest request, MegaError e){
         if (e.getErrorCode() == MegaError.API_OK){
-            log("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
-            File qrCodeFile = null;
-            if (context.getExternalCacheDir() != null){
-                File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
-                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
-            else{
-                File qrDir = context.getDir("qrMEGA", 0);
-                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
-            if (qrCodeFile != null && qrCodeFile.exists()){
+            logDebug("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
+            File qrCodeFile = buildQrFile(context, myEmail + "QRcode.jpg");
+            if (isFileAvailable(qrCodeFile)){
                 qrCodeFile.delete();
             }
             ((QRCodeActivity) context).showSnackbar(v, getResources().getString(R.string.qrcode_delete_successfully));
@@ -583,7 +551,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     }
 
     public void resetQRCode () {
-        log("resetQRCode");
+        logDebug("resetQRCode");
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -593,7 +561,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     }
 
     public void deleteQRCode() {
-        log("deleteQRCode");
+        logDebug("deleteQRCode");
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();

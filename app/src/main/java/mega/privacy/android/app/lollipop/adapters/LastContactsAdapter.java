@@ -31,11 +31,16 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapter.ViewHolder> {
     
@@ -76,7 +81,8 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         
         View main = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_last_contacts,parent,false);
         ViewHolder holder = new ViewHolder(main);
-        holder.contactInitialLetter = (TextView)main.findViewById(R.id.contact_list_initial_letter);
+        holder.contactInitialLetter = main.findViewById(R.id.contact_list_initial_letter);
+        holder.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
         holder.avatarImage = (ImageView)main.findViewById(R.id.item_last_contacts_avatar);
         holder.avatarImage.setOnClickListener(new View.OnClickListener() {
             
@@ -127,14 +133,9 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         String email = contact.getEmail();
         holder.contactMail = email;
         UserAvatarListener listener = new UserAvatarListener(context,holder);
-        File avatar;
-        if (context.getExternalCacheDir() != null) {
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(),email + ".jpg");
-        } else {
-            avatar = new File(context.getCacheDir().getAbsolutePath(),email + ".jpg");
-        }
+        File avatar = buildAvatarFile(context, email + ".jpg");
         Bitmap bitmap;
-        if (avatar.exists()) {
+        if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
@@ -142,28 +143,16 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(),bOpts);
                 if (bitmap == null) {
                     avatar.delete();
-                    if (context.getExternalCacheDir() != null) {
-                        megaApi.getUserAvatar(contact,context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-                    } else {
-                        megaApi.getUserAvatar(contact,context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-                    }
+                    megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
                 } else {
                     holder.contactInitialLetter.setVisibility(View.GONE);
                     holder.avatarImage.setImageBitmap(bitmap);
                 }
             } else {
-                if (context.getExternalCacheDir() != null) {
-                    megaApi.getUserAvatar(contact,context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-                } else {
-                    megaApi.getUserAvatar(contact,context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-                }
+                megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
             }
         } else {
-            if (context.getExternalCacheDir() != null) {
-                megaApi.getUserAvatar(contact,context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-            } else {
-                megaApi.getUserAvatar(contact,context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg",listener);
-            }
+            megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
         }
         
     }
@@ -197,15 +186,20 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     }
     
     private void displayFirstLetter(MegaUser contact,ViewHolder holder) {
-        String firstLetter = getFirstLetter(contact);
-        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-        holder.contactInitialLetter.setText(firstLetter);
-        holder.contactInitialLetter.setTextColor(Color.WHITE);
-        holder.contactInitialLetter.setVisibility(View.VISIBLE);
-        holder.contactInitialLetter.setTextSize(12);
+        String fullName = getName(contact);
+        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            holder.contactInitialLetter.setVisibility(View.INVISIBLE);
+        }else {
+            holder.contactInitialLetter.setText(firstLetter);
+            holder.contactInitialLetter.setTextColor(Color.WHITE);
+            holder.contactInitialLetter.setVisibility(View.VISIBLE);
+            holder.contactInitialLetter.setTextSize(12);
+        }
+
     }
     
-    private String getFirstLetter(MegaUser contact) {
+    private String getName(MegaUser contact) {
         MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
         String fullName;
         if (contactDB != null) {
@@ -214,7 +208,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         } else {
             fullName = contact.getEmail();
         }
-        return String.valueOf(fullName.charAt(0));
+        return fullName;
     }
     
     @Override

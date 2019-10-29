@@ -31,12 +31,14 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop.PhotoSyncHolder;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList> implements OnClickListener, SectionTitleProvider, View.OnLongClickListener {
@@ -72,7 +74,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
 	Object fragment;
-	int type = Constants.CAMERA_UPLOAD_ADAPTER;
+	int type = CAMERA_UPLOAD_ADAPTER;
 	
 	/*public static view holder class*/
     public static class ViewHolderPhotoSyncList extends RecyclerView.ViewHolder {
@@ -117,6 +119,22 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		this.nodes = nodes;
 		notifyDataSetChanged();
 	}
+
+	public void setContext(Context context) {
+		this.context = context;
+	}
+
+	public Context getContext() {
+		return this.context;
+	}
+
+	public void setListFragment(RecyclerView listFragment) {
+		this.listFragment = listFragment;
+	}
+
+	public RecyclerView getListFragment() {
+		return this.listFragment;
+	}
 	
 	public void setPhotoSyncHandle(long photoSyncHandle){
 		this.photosyncHandle = photoSyncHandle;
@@ -150,7 +168,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		
 		switch (v.getId()){
 			case R.id.photo_sync_list_item_layout:{
-				if (type == Constants.CAMERA_UPLOAD_ADAPTER){
+				if (type == CAMERA_UPLOAD_ADAPTER){
 					ImageView imageView = (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
 					int[] positionIV = new int[2];
 					imageView.getLocationOnScreen(positionIV);
@@ -236,12 +254,12 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 	boolean putOrDeletePosition (int pos) {
 		if (selectedItems.get(pos, false)) {
-			log("toggleSelection delete pos: "+pos);
+			logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
 			return true;
 		}
 		else {
-			log("toggleSelection PUT pos: "+pos);
+			logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
 			return false;
 		}
@@ -250,12 +268,12 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	void startAnimation (final int pos, final boolean delete) {
 		MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList view = (MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList)listFragment.findViewHolderForLayoutPosition(pos);
 		if (view != null) {
-			log("toggleSelection Start animation: " + pos);
+			logDebug("Start animation: " + pos);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
 				public void onAnimationStart(Animation animation) {
-					log("toggleSelection onAnimationStart");
+					logDebug("onAnimationStart");
 					if (!delete) {
 						notifyItemChanged(pos);
 					}
@@ -263,7 +281,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					log("toggleSelection onAnimationEnd");
+					logDebug("onAnimationEnd");
 					if (selectedItems.size() <= 0) {
 						((CameraUploadFragmentLollipop) fragment).hideMultipleSelect();
 					}
@@ -288,13 +306,13 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	}
 
 	public void toggleAllSelection(int pos) {
-		log("toggleAllSelection: " + pos);
+		logDebug("Position: " + pos);
 
 		startAnimation(pos, putOrDeletePosition(pos));
 	}
 	
 	public void toggleSelection(final int pos) {
-		log("toggleSelection");
+		logDebug("Position: " + pos);
 
 		startAnimation(pos, putOrDeletePosition(pos));
 	}
@@ -318,10 +336,6 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			}
 		}
 	}
-	
-	private static void log(String log) {
-		Util.log("MegaPhotoSyncListAdapter", log);
-	}
 
 	@Override
 	public int getItemCount() {
@@ -330,15 +344,15 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 	@Override
 	public void onBindViewHolder(ViewHolderPhotoSyncList holder, int position) {
-		log("onBindViewHolder");
+		logDebug("Position: " + position);
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
+		float scaleW = getScaleW(outMetrics, density);
+		float scaleH = getScaleH(outMetrics, density);
 
 		holder.currentPosition = position;
 		
@@ -369,7 +383,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			}
 			else{
 				long nodeSize = node.getSize();
-				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+				holder.textViewFileSize.setText(getSizeString(nodeSize));
 				if (this.isItemChecked(position)) {
 					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
 					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
@@ -438,7 +452,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	}
 	@Override
 	public int getItemViewType(int position) {
-		log("getItemViewType: position"+position);
+		logDebug("Position: " + position);
 		PhotoSyncHolder psh = (PhotoSyncHolder) getItem(position);
 		if (psh.isNode){
 				return ITEM_VIEW_TYPE_NODE;
@@ -462,15 +476,15 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 	@Override
 	public ViewHolderPhotoSyncList onCreateViewHolder(ViewGroup parent, int viewType) {
-		log("onCreateViewHolder");
+		logDebug("onCreateViewHolder");
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
+		float scaleW = getScaleW(outMetrics, density);
+		float scaleH = getScaleH(outMetrics, density);
 
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_photo_sync_list, parent, false);
 		
@@ -481,7 +495,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		holder.imageView = (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
 		holder.textViewFileName = (TextView) v.findViewById(R.id.photo_sync_list_filename);
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
+		holder.textViewFileName.getLayoutParams().width = px2dp((225*scaleW), outMetrics);
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.photo_sync_list_filesize);
 		
 		v.setTag(holder);

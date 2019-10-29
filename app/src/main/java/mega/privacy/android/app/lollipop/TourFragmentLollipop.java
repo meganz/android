@@ -13,12 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class TourFragmentLollipop extends Fragment implements View.OnClickListener{
 
@@ -31,14 +33,15 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     private ImageView fourthItem;
     private Button bRegister;
     private Button bLogin;
+    private ScrollView baseContainer;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
-            log("context is null");
+            logError("Context is null");
             return;
         }
     }
@@ -68,11 +71,22 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     public void onResume() {
         super.onResume();
         setStatusBarColor(viewPager.getCurrentItem());
+
+        // For small screen like nexus one or bigger screen, this is to force the scroll view to bottom to show buttons
+        // Meanwhile, tour image glide could also be shown
+        baseContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                if (baseContainer != null) {
+                    baseContainer.fullScroll(View.FOCUS_DOWN);
+                }
+            }
+        });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        logDebug("onCreateView");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
@@ -84,6 +98,8 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         secondItem = (ImageView) v.findViewById(R.id.second_item);
         thirdItem = (ImageView) v.findViewById(R.id.third_item);
         fourthItem = (ImageView) v.findViewById(R.id.fourth_item);
+
+        baseContainer = (ScrollView) v.findViewById(R.id.tour_fragment_base_container);
 
         bLogin = (Button) v.findViewById(R.id.button_login_tour);
         bRegister = (Button) v.findViewById(R.id.button_register_tour);
@@ -149,32 +165,27 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
         switch(v.getId()){
             case R.id.button_register_tour:
-                log("onRegisterClick");
-                ((LoginActivityLollipop)context).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT);
+                logDebug("onRegisterClick");
+                ((LoginActivityLollipop)context).showFragment(CREATE_ACCOUNT_FRAGMENT);
                 break;
             case R.id.button_login_tour:
-                log("onLoginClick");
-                ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
+                logDebug("onLoginClick");
+                ((LoginActivityLollipop)context).showFragment(LOGIN_FRAGMENT);
                 break;
         }
     }
 
     @Override
     public void onAttach(Context context) {
-        log("onAttach");
+        logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
     }
 
     @Override
     public void onAttach(Activity context) {
-        log("onAttach Activity");
+        logDebug("onAttach Activity");
         super.onAttach(context);
         this.context = context;
     }
-
-    public static void log(String message) {
-        Util.log("TourFragmentLollipop", message);
-    }
-
 }

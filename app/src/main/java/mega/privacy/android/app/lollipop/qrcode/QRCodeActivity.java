@@ -35,14 +35,18 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class QRCodeActivity extends PinActivityLollipop implements MegaRequestListenerInterface{
 
@@ -77,10 +81,12 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     DisplayMetrics outMetrics;
 
+    private QRCodeSaveBottomSheetDialogFragment qrCodeSaveBottomSheetDialogFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log("onCreate");
+        logDebug("onCreate");
 
         if (savedInstanceState != null) {
             contacts = savedInstanceState.getBoolean("contacts", false);
@@ -99,7 +105,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
         tB = (Toolbar) findViewById(R.id.toolbar);
         if(tB==null){
-            log("Tb is Null");
+            logWarning("Tb is Null");
             return;
         }
 
@@ -190,7 +196,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        log("onCreateOptionsMenu");
+        logDebug("onCreateOptionsMenu");
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_qr_code, menu);
@@ -230,7 +236,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        log("onOptionsItemSelected");
+        logDebug("onOptionsItemSelected");
 
         int id = item.getItemId();
         switch(id) {
@@ -243,7 +249,9 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 break;
             }
             case R.id.qr_code_save: {
-                QRCodeSaveBottomSheetDialogFragment qrCodeSaveBottomSheetDialogFragment = new QRCodeSaveBottomSheetDialogFragment();
+                if (isBottomSheetDialogShown(qrCodeSaveBottomSheetDialogFragment)) break;
+
+                qrCodeSaveBottomSheetDialogFragment = new QRCodeSaveBottomSheetDialogFragment();
                 qrCodeSaveBottomSheetDialogFragment.show(getSupportFragmentManager(), qrCodeSaveBottomSheetDialogFragment.getTag());
 
                 break;
@@ -271,6 +279,11 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         return super.onOptionsItemSelected(item);
     }
 
+    public String getName(){
+       return  ((MegaApplication) getApplication()).getMyAccountInfo().getFullName();
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -282,14 +295,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                     megaApi = ((MegaApplication) getApplication()).getMegaApi();
                 }
                 String myEmail = megaApi.getMyEmail();
-                if (this.getExternalCacheDir() != null) {
-                    File qrDir = new File (this.getExternalCacheDir(), "qrMEGA");
-                    qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-                }
-                else {
-                    File qrDir = this.getDir("qrMEGA", 0);
-                    qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-                }
+                qrFile = buildQrFile(this,myEmail + "QRcode.jpg");
                 if (qrFile == null) {
                     showSnackbar(drawerLayout, getString(R.string.general_error));
                 }
@@ -298,7 +304,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
                             if (!hasStoragePermission) {
-                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
                             }
                         }
 
@@ -341,10 +347,10 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     }
 
     public void shareQR () {
-        log("shareQR");
+        logDebug("shareQR");
 
         if (myCodeFragment == null) {
-            log("MyCodeFragment is NULL");
+            logWarning("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
         if (myCodeFragment!= null && myCodeFragment.isAdded()){
@@ -354,7 +360,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 share.setType("image/*");
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    log("Use provider to share");
+                    logDebug("Use provider to share");
                     Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider",qrCodeFile);
                     share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
                     share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -371,10 +377,10 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     }
 
     public void resetQR () {
-        log("resetQR");
+        logDebug("resetQR");
 
         if (myCodeFragment == null) {
-            log("MyCodeFragment is NULL");
+            logWarning("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
         if (myCodeFragment != null && myCodeFragment.isAdded()) {
@@ -383,10 +389,10 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     }
 
     public void deleteQR () {
-        log("deleteQR");
+        logDebug("deleteQR");
 
         if (myCodeFragment == null) {
-            log("MyCodeFragment is NULL");
+            logWarning("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
         if (myCodeFragment != null && myCodeFragment.isAdded()){
@@ -395,7 +401,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     }
 
     public void resetSuccessfully (boolean success) {
-        log("resetSuccessfully");
+        logDebug("resetSuccessfully");
         if (success){
             showSnackbar(drawerLayout, getString(R.string.qrcode_reset_successfully));
         }
@@ -406,15 +412,11 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     public void showSnackbar(View view, String s){
         if (view == null) {
-            showSnackbar(drawerLayout, s);
+            showSnackbar(SNACKBAR_TYPE, drawerLayout, s);
         }
         else {
-            showSnackbar(view, s);
+            showSnackbar(SNACKBAR_TYPE, view, s);
         }
-    }
-
-    public static void log(String message) {
-        Util.log("QRCodeActivity", message);
     }
 
     @Override
@@ -429,16 +431,16 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish ");
+        logDebug("onRequestFinish ");
         if(request.getType() == MegaRequest.TYPE_INVITE_CONTACT  && request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD){
             if (scanCodeFragment == null) {
-                log("ScanCodeFragment is NULL");
+                logWarning("ScanCodeFragment is NULL");
                 scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
             }
             if (scanCodeFragment != null && scanCodeFragment.isAdded()){
                 scanCodeFragment.myEmail = request.getEmail();
                 if (e.getErrorCode() == MegaError.API_OK){
-                    log("OK INVITE CONTACT: "+request.getEmail());
+                    logDebug("OK INVITE CONTACT: " + request.getEmail());
                     scanCodeFragment.dialogTitleContent = R.string.invite_sent;
                     scanCodeFragment.dialogTextContent = R.string.invite_sent_text;
                     scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
@@ -470,7 +472,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
             }
             else {
                 if (scanCodeFragment == null) {
-                    log("ScanCodeFragment is NULL");
+                    logWarning("ScanCodeFragment is NULL");
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
                 if (scanCodeFragment != null && scanCodeFragment.isAdded()) {
@@ -481,15 +483,15 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         }
         else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
             if (scanCodeFragment == null) {
-                log("ScanCodeFragment is NULL");
+                logWarning("ScanCodeFragment is NULL");
                 scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
             }
             if (scanCodeFragment != null && scanCodeFragment.isAdded()) {
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    log("Get user avatar OK");
+                    logDebug("Get user avatar OK");
                     scanCodeFragment.setAvatar();
                 } else {
-                    log("Get user avatar FAIL");
+                    logWarning("Get user avatar FAIL");
                     scanCodeFragment.setDefaultAvatar();
                 }
             }
@@ -497,7 +499,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 //        megaApi.contactLinkCreate(true/false, this);
         else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
             if (myCodeFragment == null){
-                log("MyCodeFragment is NULL");
+                logWarning("MyCodeFragment is NULL");
                 myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
             }
             if (myCodeFragment != null && myCodeFragment.isAdded()){
@@ -507,7 +509,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 //        megaApi.contactLinkDelete(request.getNodeHandle(), this);
         else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_DELETE){
             if (myCodeFragment == null){
-                log("MyCodeFragment is NULL");
+                logWarning("MyCodeFragment is NULL");
                 myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
             }
             if (myCodeFragment != null && myCodeFragment.isAdded()){
@@ -522,7 +524,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     }
 
     public void deleteSuccessfully() {
-        log("deleteSuccessfully");
+        logDebug("deleteSuccessfully");
         shareMenuItem.setVisible(false);
         saveMenuItem.setVisible(false);
         settingsMenuItem.setVisible(true);
@@ -531,7 +533,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     }
 
     public void createSuccessfully() {
-        log("createSuccesfully");
+        logDebug("createSuccesfully");
         shareMenuItem.setVisible(true);
         saveMenuItem.setVisible(true);
         settingsMenuItem.setVisible(true);

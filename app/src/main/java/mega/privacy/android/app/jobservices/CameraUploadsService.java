@@ -1,49 +1,51 @@
 package mega.privacy.android.app.jobservices;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.job.JobParameters;
-import android.app.job.JobService;
+import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
 import android.database.Cursor;
-import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.StatFs;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.media.ExifInterface;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.provider.DocumentFile;
-import android.text.format.Time;
-import android.widget.RemoteViews;
+import android.support.v4.content.ContextCompat;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import mega.privacy.android.app.CameraSyncService;
+import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
+import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -52,2027 +54,2102 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaEvent;
-import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-import nz.mega.sdk.MegaUser;
-import nz.mega.sdk.MegaUserAlert;
 
-public class CameraUploadsService extends JobService implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface {
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.jobservices.SyncRecord.*;
+import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.VIDEO_QUALITY_MEDIUM;
+import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
+import static mega.privacy.android.app.utils.ImageProcessor.*;
+import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.SDCardUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
-    private static String PHOTO_SYNC = "PhotoSync";
-    private static String CAMERA_UPLOADS = "Camera Uploads";
-    private static String SECONDARY_UPLOADS = "Media Uploads";
+public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
+    private static final String OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "overquotanotification";
+    private static final String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
+    private static final String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
+    private static final String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
+    private static final int BATTERY_STATE_LOW = 20;
+    private static final int LOW_BATTERY_LEVEL = 20;
+    public static String PHOTO_SYNC = "PhotoSync";
+    public static String CAMERA_UPLOADS = "Camera Uploads";
+    public static String SECONDARY_UPLOADS = "Media Uploads";
+    public static String ACTION_CANCEL = "CANCEL_SYNC";
+    public static String ACTION_STOP = "STOP_SYNC";
+    public static String ACTION_CANCEL_ALL = "CANCEL_ALL";
+    public static String ACTION_LOGOUT = "LOGOUT_SYNC";
+    public static String ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER = "PHOTOS_VIDEOS_NEW_FOLDER";
+    public static String CU_CACHE_FOLDER = "cu";
+    public static int PAGE_SIZE = 200;
+    public static int PAGE_SIZE_VIDEO = 10;
+    public static boolean isServiceRunning = false;
+    
     private NotificationCompat.Builder mBuilder;
-    NotificationManager mNotificationManager;
-
-    private int notificationId = Constants.NOTIFICATION_CAMERA_UPLOADS;
-    private int notificationIdFinal = Constants.NOTIFICATION_CAMERA_UPLOADS_FINAL;
-    private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
-    private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
-
-    Thread task;
-
-    static public boolean running = false;
+    private NotificationManager mNotificationManager;
+    
+    private int notificationId = NOTIFICATION_CAMERA_UPLOADS;
+    private String notificationChannelId = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
+    private String notificationChannelName = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
+    
+    private Thread task;
+    
+    public static boolean running = false;
     private Handler handler;
-
-    WifiManager.WifiLock lock;
-    PowerManager.WakeLock wl;
-
-    private boolean isOverquota = false;
+    
+    private ExecutorService threadPool = Executors.newCachedThreadPool();
+    
+    private WifiManager.WifiLock lock;
+    private PowerManager.WakeLock wl;
+    
+    private boolean isOverQuota = false;
     private boolean canceled;
-    private boolean isForeground;
-    boolean newFileList = false;
-
-    DatabaseHandler dbH;
-
-    MegaPreferences prefs;
-    String localPath = "";
-    boolean isExternalSDCard = false;
-    ChatSettings chatSettings;
-    long cameraUploadHandle = -1;
-    boolean secondaryEnabled= false;
-    String localPathSecondary = "";
-    long secondaryUploadHandle = -1;
-    MegaNode secondaryUploadNode = null;
-
-    boolean isLoggingIn = false;
-
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-    MegaApplication app;
-
-    JobParameters globalParams;
-
-    int LOGIN_IN = 12;
-
-    static CameraUploadsService cameraUploadsService;
-    static String gSession;
-
-    private class Media {
+    private boolean stopByNetworkStateChange;
+    
+    private DatabaseHandler dbH;
+    
+    private MegaPreferences prefs;
+    private String localPath = "";
+    private ChatSettings chatSettings;
+    private long cameraUploadHandle = -1;
+    private boolean secondaryEnabled = false;
+    private String localPathSecondary = "";
+    private long secondaryUploadHandle = -1;
+    private MegaNode secondaryUploadNode = null;
+    
+    private boolean isLoggingIn = false;
+    
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
+    private MegaApplication app;
+    
+    private int LOGIN_IN = 12;
+    
+    private long lastUpdated = 0;
+    private static String gSession;
+    private boolean isSec;
+    private boolean stopped = false;
+    private NetworkTypeChangeReceiver receiver;
+    
+    public class Media {
         public String filePath;
         public long timestamp;
     }
-
-    Queue<Media> cameraFiles = new LinkedList<Media>();
-    Queue<Media> mediaFilesSecondary = new LinkedList<Media>();
-    ArrayList<DocumentFile> cameraFilesExternalSDCardList = new ArrayList<DocumentFile>();
-    Queue<DocumentFile> cameraFilesExternalSDCardQueue;
-    MegaNode cameraUploadNode = null;
+    
+    private Queue<Media> cameraFiles = new LinkedList<>();
+    private Queue<Media> primaryVideos = new LinkedList<>();
+    private Queue<Media> secondaryVideos = new LinkedList<>();
+    private ArrayList<SyncRecord> pendingUploadsList = new ArrayList<>();
+    private ArrayList<SyncRecord> pendingUploadsListSecondary = new ArrayList<>();
+    private ArrayList<SyncRecord> pendingVideoUploadsList = new ArrayList<>();
+    private ArrayList<SyncRecord> pendingVideoUploadsListSecondary = new ArrayList<>();
+    private Queue<Media> mediaFilesSecondary = new LinkedList<>();
+    private MegaNode cameraUploadNode = null;
     private int totalUploaded;
-    private long totalSizeToUpload;
     private int totalToUpload;
-    private long totalSizeUploaded;
-    private int successCount;
+    private List<MegaTransfer> cuTransfers = new ArrayList<>();
+    
+    private long currentTimeStamp = 0;
+    private long secondaryTimeStamp = 0;
+    private long currentVideoTimeStamp = 0;
+    private long secondaryVideoTimeStamp = 0;
+    private Notification mNotification;
+    private Intent mIntent, batteryIntent;
+    private PendingIntent mPendingIntent;
+    private String tempRoot;
+    private Context mContext;
+    private VideoCompressor mVideoCompressor;
 
-    long currentTimeStamp = 0;
+    private BroadcastReceiver chargingStopReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context,Intent intent) {
+            if(mVideoCompressor != null && isChargingRequired(mVideoCompressor.getTotalInputSize() / (1024 * 1024))){
+                logDebug("Detected device stops charging");
+                mVideoCompressor.stop();
+            }
+        }
+    };
+
+    private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            batteryIntent = intent;
+            if(isDeviceLowOnBattery(batteryIntent)){
+                stopped = true;
+                if(megaApi != null){
+                    for(MegaTransfer transfer : cuTransfers) {
+                        megaApi.cancelTransfer(transfer);
+                    }
+                }
+                finish();
+            }
+        }
+    };
+    
+    @Override
+    public void onCreate() {
+        registerReceiver(chargingStopReceiver,new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
+        registerReceiver(batteryInfoReceiver,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+    }
 
     @Override
-    public boolean onStartJob(JobParameters params) {
-        log("onStartJob");
-
-        cameraUploadsService = this;
-
-        globalParams = params;
-
-        handler = new Handler();
-
-        try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        log("startCameraSyncService");
-                        startService(new Intent(getApplicationContext(), CameraSyncService.class));
-                    }
-                }, 30000);
-            }
-            else{
-                log("Start service here");
-
-                initService();
-
-                task = new Thread()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try{
-                            int result = shouldRun();
-                            if (result == 0){
-                                startCameraUploads();
-                            }
-                        } catch (Exception e) {}
-                    }
-                };
-
-                task.start();
-
-                return true;
-            }
+    public void onDestroy() {
+        logDebug("onDestroy()");
+        super.onDestroy();
+        isServiceRunning = false;
+        if(receiver != null) {
+            unregisterReceiver(receiver);
         }
-        catch (Exception e){
-            log("CameraUploadsService Exception: " + e.getMessage() + "_" + e.getStackTrace());
+        if(chargingStopReceiver != null) {
+            unregisterReceiver(chargingStopReceiver);
         }
-
-        return false;
-    }
-
-    private void startCameraUploads(){
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setShowBadge(false);
-            channel.setSound(null, null);
-            mNotificationManager.createNotificationChannel(channel);
-
-            mBuilder = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
-
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setOngoing(false)
-                    .setContentTitle(getString(R.string.section_photo_sync))
-//                    .setSubText(getString(R.string.section_photo_sync))
-                    .setContentText(getString(R.string.settings_camera_notif_title))
-                    .setOnlyAlertOnce(true);
-
-            Notification notification = mBuilder.build();
-
-            isForeground = true;
-            startForeground(notificationId, notification);
-
-            try{
-                startUploads();
-            } catch (Exception e) {}
-
-//            stopForeground(true);
-//            if (mNotificationManager != null){
-//                mNotificationManager.cancel(notificationId);
-//            }
-//            jobFinished(globalParams, true);
+        if(batteryInfoReceiver != null){
+            unregisterReceiver(batteryInfoReceiver);
         }
     }
+    
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
-    private void startUploads(){
-        log("startUploads()");
-        if(!wl.isHeld()){
-            wl.acquire();
-        }
-        if(!lock.isHeld()){
-            lock.acquire();
-        }
-
-        if (!isExternalSDCard) {
-            log("if (!isExternalSDCard)");
-            String projection[] = {MediaStore.MediaColumns.DATA,
-                    //MediaColumns.MIME_TYPE,
-                    MediaStore.MediaColumns.DATE_ADDED,
-                    MediaStore.MediaColumns.DATE_MODIFIED};
-
-            String selectionCamera = null;
-            String selectionSecondary = null;
-            String[] selectionArgs = null;
-
-            prefs = dbH.getPreferences();
-
-            if (prefs != null){
-                log("if (prefs != null)");
-                if (prefs.getCamSyncTimeStamp() != null){
-                    log("if (prefs.getCamSyncTimeStamp() != null)");
-                    long camSyncTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
-                    selectionCamera = "(" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + camSyncTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + camSyncTimeStamp;
-                    log("SELECTION: " + selectionCamera);
+    public void onTypeChanges(int type) {
+        logDebug("onTypeChanges: " + type);
+        DatabaseHandler handler = DatabaseHandler.getDbHandler(this);
+        MegaPreferences prefs = handler.getPreferences();
+        if (prefs != null) {
+            stopByNetworkStateChange = type == MOBILE && Boolean.valueOf(prefs.getCamSyncWifi());
+            if (stopByNetworkStateChange) {
+                for (MegaTransfer transfer : cuTransfers) {
+                    megaApi.cancelTransfer(transfer, this);
                 }
-            }
-
-            String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC";
-
-            ArrayList<Uri> uris = new ArrayList<Uri>();
-            if (prefs.getCamSyncFileUpload() == null){
-                log("if (prefs.getCamSyncFileUpload() == null)");
-                dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-                uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-            }
-            else{
-                log("if (prefs.getCamSyncFileUpload() != null)");
-                switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
-                    case MegaPreferences.ONLY_PHOTOS:{
-                        log("case MegaPreferences.ONLY_PHOTOS:");
-                        uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                        break;
-                    }
-                    case MegaPreferences.ONLY_VIDEOS:{
-                        log("case MegaPreferences.ONLY_VIDEOS:");
-                        uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-                        uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-                        break;
-                    }
-                    case MegaPreferences.PHOTOS_AND_VIDEOS:{
-                        log("case MegaPreferences.PHOTOS_AND_VIDEOS:");
-                        uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                        uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-                        uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-                        break;
-                    }
-                }
-            }
-
-            for(int i=0; i<uris.size(); i++){
-                log("for(int i=0; i<uris.size(); i++)");
-                Cursor cursorCamera = app.getContentResolver().query(uris.get(i), projection, selectionCamera, selectionArgs, order);
-                if (cursorCamera != null){
-                    log("if (cursorCamera != null)");
-                    int dataColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                    int timestampColumn = 0;
-                    if(cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED)==0){
-                        log("if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED) == 0)");
-                        timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED);
-                    }
-                    else
-                    {
-                        log("if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED) != 0)");
-                        timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED);
-                    }
-
-                    while(cursorCamera.moveToNext()){
-
-                        Media media = new Media();
-                        media.filePath = cursorCamera.getString(dataColumn);
-                        //			        log("Tipo de fichero:--------------------------: "+media.filePath);
-                        media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
-
-                        log("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + localPath);
-
-                        //Check files of the Camera Uploads
-                        if (checkFile(media,localPath)){
-                            log("if (checkFile(media," + localPath + "))");
-                            cameraFiles.add(media);
-                            log("Camera Files added: "+media.filePath);
-                        }
-                    }
-                }
-
-                //Secondary Media Folder
-                if(secondaryEnabled){
-                    log("if(secondaryEnabled)");
-                    Cursor cursorSecondary = app.getContentResolver().query(uris.get(i), projection, selectionSecondary, selectionArgs, order);
-                    if (cursorSecondary != null){
-                        try {
-                            log("SecondaryEnabled en initsync COUNT: "+cursorSecondary.getCount());
-                            int dataColumn = cursorSecondary.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                            int timestampColumn = 0;
-                            if(cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED)==0){
-                                timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED);
-                            }
-                            else
-                            {
-                                timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED);
-                            }
-                            while(cursorSecondary.moveToNext()){
-
-                                Media media = new Media();
-                                media.filePath = cursorSecondary.getString(dataColumn);
-                                media.timestamp = cursorSecondary.getLong(timestampColumn) * 1000;
-                                log("Check: " + media.filePath + " in localPath: " + localPathSecondary);
-                                //Check files of Secondary Media Folder
-                                if (checkFile(media, localPathSecondary)) {
-                                    mediaFilesSecondary.add(media);
-                                    log("-----SECONDARY MEDIA Files added: " + media.filePath + " in localPath: " + localPathSecondary);
-                                }
-                            }
-                        }
-                        catch (Exception e){
-                            log("Exception cursorSecondary:" + e.getMessage() + "____" + e.getStackTrace());
-                        }
-                    }
-                }
-            }
-
-            cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
-            if(cameraUploadNode == null){
-                log("ERROR: cameraUploadNode == null");
-                //			showSyncError(R.string.settings_camera_notif_error_no_folder);
-                finish();
-                return;
-            }
-
-            totalToUpload = cameraFiles.size();
-            totalUploaded=0;
-            totalSizeUploaded=0;
-
-            totalSizeToUpload = 0;
-            Iterator<Media> itCF = cameraFiles.iterator();
-            while (itCF.hasNext()){
-                Media m = itCF.next();
-                File f = new File(m.filePath);
-                totalSizeToUpload = totalSizeToUpload + f.length();
-                log("m.filePath -> " + m.filePath);
-            }
-
-            Iterator<Media> itmFS = mediaFilesSecondary.iterator();
-            while (itmFS.hasNext()){
-                Media m = itmFS.next();
-                File f = new File(m.filePath);
-                totalSizeToUpload = totalSizeToUpload + f.length();
-                log("mS.filePath -> " + m.filePath);
-            }
-
-            uploadNext();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        else{
-            log("isExternalSDCard");
-            DocumentFile pickedDir = null;
-            if (prefs != null){
-                if (prefs.getUriExternalSDCard() != null){
-                    String uriString = prefs.getUriExternalSDCard();
-                    Uri uri = Uri.parse(uriString);
-                    pickedDir = DocumentFile.fromTreeUri(getApplicationContext(), uri);
-                    log("PICKEDDIR: " + pickedDir.getName());
-                    DocumentFile[] files = pickedDir.listFiles();
-                    if(files!=null){
-                        log("The number of files is: "+files.length);
-                    }
-                    else{
-                        log("files is NULL!");
-                    }
-                    ArrayList<DocumentFile> auxCameraFilesExternalSDCard = new ArrayList<DocumentFile>();
-                    for (int i=0;i<files.length;i++){
-                        log("Name to check: "+ files[i].getName());
-                        switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
-                            case MegaPreferences.ONLY_PHOTOS:{
-                                String fileType = files[i].getType();
-                                if (fileType != null){
-                                    if (fileType.startsWith("image/")){
-                                        auxCameraFilesExternalSDCard.add(files[i]);
-                                    }
-                                    else{
-                                        log("No image");
-                                    }
-                                }
-                                else{
-                                    log("File is null");
-                                }
-                                break;
-                            }
-                            case MegaPreferences.ONLY_VIDEOS:{
-                                String fileType = files[i].getType();
-                                String fileName = files[i].getName();
-                                if (fileType != null){
-                                    if (fileName != null){
-                                        if (fileType.startsWith("video/") || (fileName.endsWith(".mkv"))) {
-                                            auxCameraFilesExternalSDCard.add(files[i]);
-                                        }
-                                    }
-                                }
-                                break;
-                            }
-                            case MegaPreferences.PHOTOS_AND_VIDEOS:{
-                                String fileType = files[i].getType();
-                                String fileName = files[i].getName();
-                                if (fileType != null){
-                                    if (fileName != null) {
-                                        if (fileType.startsWith("image/") || fileType.startsWith("video/") || (fileName.endsWith(".mkv"))) {
-                                            auxCameraFilesExternalSDCard.add(files[i]);
-                                        }
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
-
-                    log("auxCameraFilesExternalSDCard.size() = " + auxCameraFilesExternalSDCard.size());
-                    int j=0;
-                    for (int i=0;i<auxCameraFilesExternalSDCard.size();i++){
-                        if (cameraUploadNode == null){
-                            log("Camera Upload Node null");
-                            cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
-                        }
-                        if (cameraUploadNode != null){
-                            log("Camera Upload Node not null");
-                            if (megaApi.getChildNode(cameraUploadNode, auxCameraFilesExternalSDCard.get(i).getName()) == null){
-                                cameraFilesExternalSDCardList.add(j, auxCameraFilesExternalSDCard.get(i));
-                                log("FILE ADDED: " + auxCameraFilesExternalSDCard.get(i).getName());
-                                j++;
-                            }
-                        }
-                        else{
-                            log("Camera Upload null");
-                        }
-                    }
-
-
-//					Collections.sort(auxCameraFilesExternalSDCard, new MediaComparator());
-
-//					for (int i=0;i<auxCameraFilesExternalSDCard.size();i++){
-//						long camSyncTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
-//						log("CAMSYNCTIMESTAMP: " + camSyncTimeStamp + "___" + auxCameraFilesExternalSDCard.get(i).lastModified());
-//						if (auxCameraFilesExternalSDCard.get(i).lastModified() > camSyncTimeStamp){
-//							int j = 0;
-//							for ( ; j<cameraFilesExternalSDCardList.size(); j++){
-//								if (auxCameraFilesExternalSDCard.get(i).lastModified() < cameraFilesExternalSDCardList.get(j).lastModified()){
-//									break;
-//								}
-//							}
-//							cameraFilesExternalSDCardList.add(j, auxCameraFilesExternalSDCard.get(i));
-//						}
-////						if (cameraFilesExternalSDCardList.size() == 25){
-////							break;
-////						}
-//						log("NAME: " + auxCameraFilesExternalSDCard.get(i).getName() + "_LAST_ " + auxCameraFilesExternalSDCard.get(i).lastModified());
-//					}
-
-                    for (int i=0;i<cameraFilesExternalSDCardList.size();i++){
-                        log("ORD_NAME: " + cameraFilesExternalSDCardList.get(i).getName() + "____" + cameraFilesExternalSDCardList.get(i).lastModified());
-                    }
-
-                    cameraFilesExternalSDCardQueue = new LinkedList<DocumentFile>(cameraFilesExternalSDCardList);
-
-                    totalToUpload = cameraFilesExternalSDCardQueue.size();
-                    totalUploaded=0;
-                    totalSizeUploaded=0;
-
-                    totalSizeToUpload = 0;
-                    Iterator<DocumentFile> itCF = cameraFilesExternalSDCardQueue.iterator();
-                    while (itCF.hasNext()){
-                        DocumentFile dF = itCF.next();
-                        totalSizeToUpload = totalSizeToUpload + dF.length();
-                    }
-                    uploadNextSDCard();
-                }
-                else{
-                    finish();
-                }
-            }
-            else{
+                stopped = true;
                 finish();
             }
-            //TODO: The secondary media folder has to be here implemented also (or separate in two pieces - isExternal !isExternal)
         }
     }
 
-    public void uploadNext(){
-        log("uploadNext()");
+    @Override
+    public int onStartCommand(Intent intent,int flags,int startId) {
+        logDebug("Starting CU service (flags: " + flags + ", startId: " + startId + ")");
+        isServiceRunning = true;
+        mContext = getApplicationContext();
+        mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        Notification notification = createNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
+        startForeground(notificationId,notification);
+        initService();
 
-        if (cameraUploadNode == null){
-            log("if (cameraUploadNode == null)");
-            cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
+        if (megaApi == null) {
+            logError("megaApi is null");
+            finish();
+            return START_NOT_STICKY;
         }
-
+        
+        if (intent != null && intent.getAction() != null) {
+            if (intent.getAction().equals(ACTION_CANCEL) ||
+                    intent.getAction().equals(ACTION_STOP) ||
+                    intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER) ) {
+                logDebug("Intent action is " + intent.getAction());
+                for(MegaTransfer transfer : cuTransfers) {
+                    megaApi.cancelTransfer(transfer,this);
+                }
+            } else if(ACTION_CANCEL_ALL.equals(intent.getAction()) || intent.getAction().equals(ACTION_LOGOUT)) {
+                logDebug("Intent action is " + intent.getAction());
+                megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
+            }
+            stopped = true;
+            finish();
+            return START_NOT_STICKY;
+        }
+        
         try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        if (cameraFiles.size() > 0){
-            log("if (cameraFiles.size() > 0)");
-            uploadNextImage();
-        }
-        else if(mediaFilesSecondary.size() > 0){
-            log("else if(mediaFilesSecondary.size() > 0)");
-            uploadNextMediaFile();
-        }
-        else{
-            log("else");
-            onQueueComplete(true, totalUploaded);
+            logDebug("Start service here, creating new thread");
+            task = createWorkerThread();
+            task.start();
+        } catch (Exception e) {
+            logError("Exception", e);
             finish();
         }
+        logDebug("STARTS NOW");
+        return START_NOT_STICKY;
     }
 
-    private void onQueueComplete(boolean success, int totalUploaded) {
-        log("onQueueComplete");
-        log("Stopping foreground!");
-        log("stopping service! success: " + successCount + " total: " + totalToUpload);
-        megaApi.resetTotalUploads();
-
-        if((lock != null) && (lock.isHeld()))
-            try{ lock.release(); } catch(Exception ex) {}
-        if((wl != null) && (wl.isHeld()))
-            try{ wl.release(); } catch(Exception ex) {}
-
-        //Sleep so the SDK keeps alive
-        //TODO: Must create a method to know if the SDK is waiting for any operation
-//		try {
-//			Thread.sleep(5000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-
-        if (totalUploaded == 0) {
-            log("TotalUploaded == 0");
-        } else {
-            log("stopping service!");
-            if (success){
-                if (totalSizeUploaded != 0){
-//					showCompleteSuccessNotification();
-                }
-            }
+    private void registerNetworkTypeChangeReceiver() {
+        if(receiver != null) {
+            unregisterReceiver(receiver);
         }
-
-        log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
-        isForeground = false;
-        finish();
-        stopForeground(true);
-        if (mNotificationManager != null){
-            mNotificationManager.cancel(notificationId);
-        }
-        jobFinished(globalParams, true);
+        receiver = new NetworkTypeChangeReceiver();
+        receiver.setCallback(this);
+        registerReceiver(receiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
     }
-
-    void uploadNextMediaFile(){
-
-        //Check problem with secondary
-
-        totalUploaded++;
-        log("uploadNextMediaFile: "+totalUploaded +" of "+totalToUpload);
-
-        int result = shouldRun();
-        if (result != 0){
-            return;
-        }
-
-        if (cameraUploadNode == null){
-            cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
-        }
-
-        if (mediaFilesSecondary.size() > 0){
-            final Media mediaSecondary = mediaFilesSecondary.poll();
-
-            File file = new File(mediaSecondary.filePath);
-            if(!file.exists()){
-                uploadNext();
-            }
-
-            log("mediaSecondary.filePath: "+mediaSecondary.filePath);
-            String localFingerPrint = megaApi.getFingerprint(mediaSecondary.filePath);
-
-            MegaNode nodeExists = null;
-            //Source file
-            File sourceFile = new File(mediaSecondary.filePath);
-
-            nodeExists = megaApi.getNodeByFingerprint(localFingerPrint, secondaryUploadNode);
-
-            if(nodeExists == null)
-            {
-                log("nodeExists1==null");
-                //Check if the file is already uploaded in the correct folder but without a fingerprint
-                int photoIndex = 0;
-                MegaNode possibleNode = null;
-                String photoFinalName;
-                do {
-                    //Create the final name taking into account the
-                    if(Boolean.parseBoolean(prefs.getKeepFileNames())){
-                        //Keep the file names as device
-
-                        photoFinalName = mediaSecondary.filePath;
-                        log("Keep the secondary name: "+photoFinalName);
+    
+    private Thread createWorkerThread() {
+        return new Thread() {
+            @Override
+            public void run() {
+                try {
+                    int result = shouldRun();
+                    logDebug("onStartJob should run result: " + result + "");
+                    if (result == 0) {
+                        startCameraUploads();
+                    } else if (result == LOGIN_IN) {
+                        logDebug("Waiting for login");
+                    } else {
+                        finish();
                     }
-                    else{
-                        photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
-                        log("CHANGE the secondary name: "+photoFinalName);
-                    }
-
-                    //Iterate between all files with the correct target name
-
-                    possibleNode = megaApi.getChildNode(secondaryUploadNode, photoFinalName);
-                    // If the file matches name, mtime and size, and doesn't have a fingerprint,
-                    // => we consider that it's the correct one
-                    if(possibleNode != null &&
-                            sourceFile.length() == possibleNode.getSize() &&
-                            megaApi.getFingerprint(possibleNode) == null)
-                    {
-                        log("nodeExists = possibleNode: "+possibleNode);
-                        nodeExists = possibleNode;
-                        break;
-                    }
-
-                    //Continue iterating
-                    photoIndex++;
-                } while(possibleNode != null);
-
-                if(nodeExists == null)
-                {
-                    // If the file wasn't found by fingerprint nor in the destination folder,
-                    // take a look in the folder from v1
-                    SharedPreferences prefs = this.getSharedPreferences("prefs_main.xml", 0);
-                    if(prefs != null)
-                    {
-                        String handle = prefs.getString("camera_sync_folder_hash", null);
-                        if(handle != null)
-                        {
-                            MegaNode prevFolder = megaApi.getNodeByHandle(MegaApiAndroid.base64ToHandle(handle));
-                            if(prevFolder != null)
-                            {
-                                // If we reach this code, the app is an updated v1 and the previously selected
-                                // folder still exists
-
-                                // If the file matches name, mtime and size, and doesn't have a fingerprint,
-                                // => we consider that it's the correct one
-                                possibleNode = megaApi.getChildNode(prevFolder, sourceFile.getName());
-                                if(possibleNode != null &&
-                                        sourceFile.length() == possibleNode.getSize() &&
-                                        megaApi.getFingerprint(possibleNode) == null)
-                                {
-                                    nodeExists = possibleNode;
-                                }
-                            }
-                        }
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    handleException(e);
                 }
             }
-
-            if (nodeExists == null){
-                log("SECONDARY MEDIA: SUBIR EL FICHERO: " + mediaSecondary.filePath);
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(mediaSecondary.timestamp);
-                log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
-                boolean photoAlreadyExists = false;
-                ArrayList<MegaNode> nL = megaApi.getChildren(secondaryUploadNode, MegaApiJava.ORDER_ALPHABETICAL_ASC);
-                for (int i=0;i<nL.size();i++){
-                    if ((nL.get(i).getName().compareTo(Util.getPhotoSyncName(mediaSecondary.timestamp, mediaSecondary.filePath)) == 0) && (nL.get(i).getSize() == file.length())){
-                        photoAlreadyExists = true;
-                    }
-                }
-
-                if (!photoAlreadyExists){
-
-                    if(Boolean.parseBoolean(prefs.getKeepFileNames())){
-                        //Keep the file names as device
-                        currentTimeStamp = mediaSecondary.timestamp;
-                        megaApi.startUpload(file.getAbsolutePath(), secondaryUploadNode, file.getName(), this);
-                        log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
-                    }
-                    else{
-                        int photoIndex = 0;
-                        String photoFinalName = null;
-                        do {
-                            photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
-                            photoIndex++;
-                        }while(megaApi.getChildNode(secondaryUploadNode, photoFinalName) != null);
-
-                        log("photoFinalName: " + photoFinalName + "______" + photoIndex);
-                        currentTimeStamp = mediaSecondary.timestamp;
-
-                        megaApi.startUpload(file.getAbsolutePath(), secondaryUploadNode, photoFinalName, this);
-                        log("CHANGED!!!! MediaFinalName: " + photoFinalName + "______" + photoIndex);
-                    }
-                }
-                else{
-                    currentTimeStamp = mediaSecondary.timestamp;
-                    dbH.setSecSyncTimeStamp(currentTimeStamp);
-                    File f = new File(mediaSecondary.filePath);
-                    totalSizeUploaded += f.length();
-                    uploadNext();
-                }
-            }
-            else{
-                log("nodeExists=!null");
-
-                if(megaApi.getParentNode(nodeExists)!=null){
-                    if (megaApi.getParentNode(nodeExists).getHandle() != secondaryUploadHandle){
-
-                        if(Boolean.parseBoolean(prefs.getKeepFileNames())){
-                            //Keep the file names as device
-                            currentTimeStamp = mediaSecondary.timestamp;
-                            megaApi.copyNode(nodeExists, secondaryUploadNode, file.getName(), this);
-                            log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
-                        }
-                        else{
-                            int photoIndex = 0;
-                            String photoFinalName = null;
-                            do {
-                                photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
-                                photoIndex++;
-                            }while(megaApi.getChildNode(secondaryUploadNode, photoFinalName) != null);
-
-                            currentTimeStamp = mediaSecondary.timestamp;
-
-                            megaApi.copyNode(nodeExists, secondaryUploadNode, photoFinalName, this);
-                            log("CHANGED!!!! SecondaryFinalName: " + photoFinalName + "______" + photoIndex);
-                        }
-                    }
-                    else{
-                        if(!(Boolean.parseBoolean(prefs.getKeepFileNames()))){
-                            //Change the file names as device
-                            log("Call Look for Rename Task");
-                            final MegaNode existingNode = nodeExists;
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    new LookForRenameTask(mediaSecondary, secondaryUploadNode).rename(existingNode);
-                                }
-                            });
-                        }
-                    }
-                }
-                else{
-                    //What if the parent node is null
-                    log("This is an error!!!");
-                }
-            }
-        }
-        else{
-            uploadNext();
-        }
+        };
     }
-
-    void uploadNextImage(){
-        totalUploaded++;
-        log("uploadNextImage: "+totalUploaded +" of "+totalToUpload);
-
-        int result = shouldRun();
-        if (result != 0){
-            return;
-        }
-
-        if (cameraUploadNode == null){
-            log("if (cameraUploadNode == null)");
-            cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
-        }
-
-        if (cameraFiles.size() > 0){
-            log("if (cameraFiles.size() > 0)");
-            final Media media = cameraFiles.poll();
-
-            File file = new File(media.filePath);
-            if(!file.exists()){
-                uploadNext();
-            }
-
-            String localFingerPrint = megaApi.getFingerprint(media.filePath);
-
-            MegaNode nodeExists = null;
-            //Source file
-            File sourceFile = new File(media.filePath);
-
-            nodeExists = megaApi.getNodeByFingerprint(localFingerPrint, cameraUploadNode);
-            if(nodeExists == null)
-            {
-                log("if(nodeExists == null)");
-                //Check if the file is already uploaded in the correct folder but without a fingerprint
-                int photoIndex = 0;
-                MegaNode possibleNode = null;
-                String photoFinalName;
-                do {
-                    //Iterate between all files with the correct target name
-
-                    //Create the final name taking into account the
-                    if(Boolean.parseBoolean(prefs.getKeepFileNames())){
-                        //Keep the file names as device
-
-                        photoFinalName = media.filePath;
-                        log("Keep the camera file name: "+photoFinalName);
-                    }
-                    else{
-                        photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
-                        log("CHANGE the camera file name: "+photoFinalName);
-                    }
-
-                    possibleNode = megaApi.getChildNode(cameraUploadNode, photoFinalName);
-
-                    // If the file matches name, mtime and size, and doesn't have a fingerprint,
-                    // => we consider that it's the correct one
-                    if(possibleNode != null &&
-                            sourceFile.length() == possibleNode.getSize() &&
-                            megaApi.getFingerprint(possibleNode) == null)
-                    {
-                        nodeExists = possibleNode;
-                        log("nodeExists = possibleNode;");
-                        break;
-                    }
-
-                    //Continue iterating
-                    photoIndex++;
-                } while(possibleNode != null);
-
-                if(nodeExists == null)
-                {
-                    log("if(nodeExists == null)");
-                    // If the file wasn't found by fingerprint nor in the destination folder,
-                    // take a look in the folder from v1
-                    SharedPreferences prefs = this.getSharedPreferences("prefs_main.xml", 0);
-                    if(prefs != null)
-                    {
-                        String handle = prefs.getString("camera_sync_folder_hash", null);
-                        if(handle != null)
-                        {
-                            MegaNode prevFolder = megaApi.getNodeByHandle(MegaApiAndroid.base64ToHandle(handle));
-                            if(prevFolder != null)
-                            {
-                                // If we reach this code, the app is an updated v1 and the previously selected
-                                // folder still exists
-
-                                // If the file matches name, mtime and size, and doesn't have a fingerprint,
-                                // => we consider that it's the correct one
-                                possibleNode = megaApi.getChildNode(prevFolder, sourceFile.getName());
-                                if(possibleNode != null &&
-                                        sourceFile.length() == possibleNode.getSize() &&
-                                        megaApi.getFingerprint(possibleNode) == null)
-                                {
-                                    nodeExists = possibleNode;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (nodeExists == null){
-                log("UPLOAD THE FILE: " + media.filePath);
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(media.timestamp);
-                log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
-                boolean photoAlreadyExists = false;
-                ArrayList<MegaNode> nL = megaApi.getChildren(cameraUploadNode, MegaApiJava.ORDER_ALPHABETICAL_ASC);
-                for (int i=0;i<nL.size();i++){
-                    if ((nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0) && (nL.get(i).getSize() == file.length())){
-                        photoAlreadyExists = true;
-                    }
-                }
-
-                if (!photoAlreadyExists){
-                    log("if (!photoAlreadyExists)");
-
-                    if(Boolean.parseBoolean(prefs.getKeepFileNames())){
-                        //Keep the file names as device
-                        currentTimeStamp = media.timestamp;
-                        megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, file.getName(), this);
-                        log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
-                    }
-                    else{
-                        int photoIndex = 0;
-                        String photoFinalName = null;
-                        do {
-                            photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
-                            photoIndex++;
-                        }while(megaApi.getChildNode(cameraUploadNode, photoFinalName) != null);
-
-                        log("photoFinalName: " + photoFinalName + "______" + photoIndex);
-                        currentTimeStamp = media.timestamp;
-
-                        megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, photoFinalName, this);
-                        log("CHANGEEEEEEE: filePath: "+file.getAbsolutePath()+" Change finalName: "+photoFinalName);
-                    }
-                }
-                else{
-                    log("if (photoAlreadyExists)");
-                    currentTimeStamp = media.timestamp;
-                    dbH.setCamSyncTimeStamp(currentTimeStamp);
-                    File f = new File(media.filePath);
-                    totalSizeUploaded += f.length();
-                    uploadNext();
-                }
-            }
-            else{
-                log("NODE EXISTS: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());
-                if (megaApi.getParentNode(nodeExists).getHandle() != cameraUploadHandle){
-
-                    if(Boolean.parseBoolean(prefs.getKeepFileNames())){
-                        //Keep the file names as device
-                        currentTimeStamp = media.timestamp;
-                        megaApi.copyNode(nodeExists, cameraUploadNode, file.getName(), this);
-                        log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
-                    }
-                    else{
-                        int photoIndex = 0;
-                        String photoFinalName = null;
-                        do {
-                            photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
-                            photoIndex++;
-                        }while(megaApi.getChildNode(cameraUploadNode, photoFinalName) != null);
-
-                        log("photoFinalName: " + photoFinalName + "______" + photoIndex);
-                        currentTimeStamp = media.timestamp;
-                        megaApi.copyNode(nodeExists, cameraUploadNode, photoFinalName, this);
-                        log("CHANGED!!!! MediaFinalName: " + file.getName());
-                    }
-                }
-                else{
-                    if(!(Boolean.parseBoolean(prefs.getKeepFileNames()))){
-                        //Change the file names as device
-                        log("Call Look for Rename Task");
-                        final MegaNode existingNode = nodeExists;
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                new LookForRenameTask(media,cameraUploadNode).rename(existingNode);
-                            }
-                        });
-                    }
-                    else{
-                        currentTimeStamp = media.timestamp;
-                        dbH.setCamSyncTimeStamp(currentTimeStamp);
-                        uploadNext();
-                    }
-
-                }
-            }
-        }
-        else{
-            uploadNext();
-        }
+    
+    private void startCameraUploads() {
+        logDebug("startCameraUploads");
+        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent,false);
+        getFilesFromMediaStore();
     }
-
-    private class LookForRenameTask{
-        Media media;
-        String photoFinalName;
-        MegaNode uploadNode;
-
-        public LookForRenameTask(Media media, MegaNode uploadNode) {
-            this.media = media;
-            this.uploadNode = uploadNode;
+    
+    private boolean shouldCompressVideo() {
+        String qualitySetting = prefs.getUploadVideoQuality();
+        if (qualitySetting != null && Integer.parseInt(qualitySetting) == VIDEO_QUALITY_MEDIUM) {
+            return true;
         }
-
-        protected Boolean rename(MegaNode nodeExists) {
-
-            File file = new File(media.filePath);
-            log("RENOMBRAR EL FICHERO: " + media.filePath);
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(media.timestamp);
-            log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
-            boolean photoAlreadyExists = false;
-            ArrayList<MegaNode> nL = megaApi.getChildren(uploadNode, MegaApiJava.ORDER_ALPHABETICAL_ASC);
-            for (int i=0;i<nL.size();i++){
-                if ((nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0) && (nL.get(i).getSize() == file.length())){
-                    photoAlreadyExists = true;
-                }
-            }
-
-            if (!photoAlreadyExists){
-                int photoIndex = 0;
-                this.photoFinalName = null;
-                do {
-                    photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
-                    photoIndex++;
-                }while(megaApi.getChildNode(uploadNode, photoFinalName) != null);
-
-                log("photoFinalName: " + photoFinalName + "______" + photoIndex);
-                currentTimeStamp = media.timestamp;
-
-                megaApi.renameNode(nodeExists, photoFinalName, cameraUploadsService);
-                log("RENAMED!!!! MediaFinalName: " + photoFinalName + "______" + photoIndex);
-
-                return true;
-            }
-            else{
-                currentTimeStamp = media.timestamp;
-//				long parentHandle = megaApi.getParentNode(uploadNode).getHandle();
-                if(uploadNode.getHandle() == secondaryUploadHandle){
-                    log("renameTask: Update SECONDARY Sync TimeStamp, parentHandle= "+uploadNode.getHandle()+" secondaryHandle: "+secondaryUploadHandle);
-                    dbH.setSecSyncTimeStamp(currentTimeStamp);
-                }
-                else{
-                    log("renameTask: Update Camera Sync TimeStamp, parentHandle= "+uploadNode.getHandle()+" cameraHandle: "+cameraUploadHandle);
-                    dbH.setCamSyncTimeStamp(currentTimeStamp);
-                }
-
-                log("Upoad NODE: "+uploadNode.getName());
-
-                File f = new File(media.filePath);
-                totalSizeUploaded += f.length();
-
-                uploadNext();
-                return false;
-            }
-        }
-    }
-
-    @SuppressLint("NewApi")
-    public void uploadNextSDCard(){
-        log("uploadNextSDCard()");
-    }
-
-    private boolean checkFile(Media media, String path){
-
-        if (media.filePath != null){
-            if (path != null){
-                if (path.compareTo("") != 0){
-                    if (media.filePath.startsWith(path)){
-                        Time t = new Time(Time.getCurrentTimezone());
-                        t.setToNow();
-                        long timeSpent = t.toMillis(true) - media.timestamp;
-                        if (timeSpent > ((5 * 60 * 1000)-1)){
-                            return true;
-                        }
-                        return true;
-                    }
-                }
-            }
-        }
-
         return false;
     }
+    
+    private void extractMedia(Cursor cursorCamera,boolean isSecondary,boolean isVideo) {
+        try {
 
+            logDebug("if (cursorCamera != null)");
+            String path = isSecondary ? localPathSecondary : localPath;
+            
+            int dataColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATA);
+            int modifiedColumn = 0, addedColumn = 0;
+            if (cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED) != -1) {
+                modifiedColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
+            }
+            if (cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED) != -1) {
+                addedColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED);
+            }
+
+            while (cursorCamera.moveToNext()) {
+                
+                Media media = new Media();
+                media.filePath = cursorCamera.getString(dataColumn);
+                long addedTime = cursorCamera.getLong(addedColumn) * 1000;
+                long modifiedTime = cursorCamera.getLong(modifiedColumn) * 1000;
+                media.timestamp = addedTime > modifiedTime ? addedTime : modifiedTime;
+
+                logDebug("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + path);
+                
+                //Check files of the Camera Uploads
+                if (checkFile(media,path)) {
+                    if (isSecondary) {
+                        if (isVideo) {
+                            secondaryVideos.add(media);
+                        } else {
+                            mediaFilesSecondary.add(media);
+                        }
+                    } else {
+                        if (isVideo) {
+                            primaryVideos.add(media);
+                        } else {
+                            cameraFiles.add(media);
+                        }
+                    }
+                    logDebug("Camera Files added: " + media.filePath);
+                }
+            }
+        } catch (Exception e) {
+            logError("Exception cursorSecondary", e);
+        }
+    }
+    
+    private void getFilesFromMediaStore() {
+        logDebug("getFilesFromMediaStore()");
+        cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
+        if (cameraUploadNode == null) {
+            logError("ERROR: cameraUploadNode == null");
+            finish();
+            return;
+        }
+        
+        if (!wl.isHeld()) {
+            wl.acquire();
+        }
+        if (!lock.isHeld()) {
+            lock.acquire();
+        }
+        
+        String projection[] = {
+                MediaStore.MediaColumns.DATA,
+                MediaStore.MediaColumns.DATE_ADDED,
+                MediaStore.MediaColumns.DATE_MODIFIED
+        };
+        
+        String selectionCamera = null;
+        String selectionCameraVideo = null;
+        String selectionSecondary = null;
+        String selectionSecondaryVideo = null;
+        String[] selectionArgs = null;
+        prefs = dbH.getPreferences();
+        
+        if (prefs != null) {
+            logDebug("if (prefs != null)");
+            if (prefs.getCamSyncTimeStamp() != null) {
+                currentTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
+            } else {
+                currentTimeStamp = 0;
+            }
+            selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+            logDebug("SELECTION photo: " + selectionCamera);
+
+            if (prefs.getCamVideoSyncTimeStamp() != null) {
+                currentVideoTimeStamp = Long.parseLong(prefs.getCamVideoSyncTimeStamp());
+            } else {
+                currentVideoTimeStamp = 0;
+            }
+            selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+            logDebug("SELECTION video: " + selectionCameraVideo);
+
+            if (secondaryEnabled) {
+                logDebug("if(secondaryEnabled)");
+                if (prefs.getSecSyncTimeStamp() != null) {
+                    secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
+                    selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
+                    logDebug("SELECTION SECONDARY photo: " + selectionSecondary);
+                }
+                if (prefs.getSecVideoSyncTimeStamp() != null) {
+                    secondaryVideoTimeStamp = Long.parseLong(prefs.getSecVideoSyncTimeStamp());
+                    selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
+                    logDebug("SELECTION SECONDARY video: " + selectionSecondaryVideo);
+                }
+            }
+        }
+        
+        ArrayList<Uri> uris = new ArrayList<>();
+        if (prefs.getCamSyncFileUpload() == null) {
+            logDebug("if (prefs.getCamSyncFileUpload() == null)");
+            dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+            uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        } else {
+            logDebug("if (prefs.getCamSyncFileUpload() != null)");
+            switch (Integer.parseInt(prefs.getCamSyncFileUpload())) {
+                case MegaPreferences.ONLY_PHOTOS: {
+                    logDebug("case MegaPreferences.ONLY_PHOTOS:");
+                    uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                    break;
+                }
+                case MegaPreferences.ONLY_VIDEOS: {
+                    logDebug("case MegaPreferences.ONLY_VIDEOS:");
+                    uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                    uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
+                    break;
+                }
+                case MegaPreferences.PHOTOS_AND_VIDEOS: {
+                    logDebug("case MegaPreferences.PHOTOS_AND_VIDEOS:");
+                    uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                    uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                    uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
+                    break;
+                }
+            }
+        }
+        
+        for (int i = 0;i < uris.size();i++) {
+            Uri uri = uris.get(i);
+            boolean isVideo = uri.equals(MediaStore.Video.Media.EXTERNAL_CONTENT_URI) || uri.equals(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
+            
+            //Primary Media Folder
+            Cursor cursorCamera;
+            String orderVideo = MediaStore.MediaColumns.DATE_MODIFIED;
+            String orderImage = MediaStore.MediaColumns.DATE_MODIFIED;
+            if(!isLocalFolderOnSDCard(this,localPath)) {
+                orderVideo += " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
+                orderImage += " ASC LIMIT 0," + PAGE_SIZE;
+            }
+            if (isVideo) {
+                cursorCamera = app.getContentResolver().query(uri,projection,selectionCameraVideo,selectionArgs,orderVideo);
+            } else {
+                cursorCamera = app.getContentResolver().query(uri,projection,selectionCamera,selectionArgs,orderImage);
+            }
+            if (cursorCamera != null) {
+                extractMedia(cursorCamera,false,isVideo);
+            }
+            
+            //Secondary Media Folder
+            if (secondaryEnabled) {
+                logDebug("if(secondaryEnabled)");
+                Cursor cursorSecondary;
+                String orderVideoSecondary = MediaStore.MediaColumns.DATE_MODIFIED;
+                String orderImageSecondary = MediaStore.MediaColumns.DATE_MODIFIED;
+                if(!isLocalFolderOnSDCard(this,localPathSecondary)) {
+                    orderVideoSecondary += " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
+                    orderImageSecondary += " ASC LIMIT 0," + PAGE_SIZE;
+                }
+                if (isVideo) {
+                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondaryVideo,selectionArgs,orderVideoSecondary);
+                } else {
+                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondary,selectionArgs,orderImageSecondary);
+                }
+                
+                if (cursorSecondary != null) {
+                    extractMedia(cursorSecondary,true,isVideo);
+                }
+            }
+        }
+        
+        totalUploaded = 0;
+        prepareUpload(cameraFiles,mediaFilesSecondary,primaryVideos,secondaryVideos);
+    }
+    
+    private void prepareUpload(Queue<Media> primaryList,Queue<Media> secondaryList,Queue<Media> primaryVideoList,Queue<Media> secondaryVideoList) {
+        logDebug("primaryList " + primaryList.size() + " secondaryList " + secondaryList.size() + " primaryVideoList " + primaryVideoList.size() + " secondaryVideoList " + secondaryVideoList.size());
+        pendingUploadsList = getPendingList(primaryList,false,false);
+        saveDataToDB(pendingUploadsList);
+        prefs = dbH.getPreferences();
+        pendingVideoUploadsList = getPendingList(primaryVideoList,false,true);
+        saveDataToDB(pendingVideoUploadsList);
+        
+        //secondary list
+        if (secondaryEnabled) {
+            pendingUploadsListSecondary = getPendingList(secondaryList,true,false);
+            saveDataToDB(pendingUploadsListSecondary);
+            pendingVideoUploadsListSecondary = getPendingList(secondaryVideoList,true,true);
+            saveDataToDB(pendingVideoUploadsListSecondary);
+        }
+        if(stopped) {
+            return;
+        }
+        //need to maintain timestamp for better performance
+        updateTimeStamp();
+        List<SyncRecord> finalList = dbH.findAllPendingSyncRecords();
+
+        if (finalList.size() == 0) {
+            logDebug("Pending upload list is empty, now check view compression status");
+            if (isCompressedVideoPending()) {
+                startVideoCompression();
+            } else {
+                logDebug("Nothing to upload");
+                finish();
+                purgeDirectory(new File(tempRoot));
+                return;
+            }
+        } else {
+            logDebug("Got pending uploads " + finalList.size());
+            startParallelUpload(finalList,false);
+        }
+    }
+    
+    private void startParallelUpload(List<SyncRecord> finalList,boolean isCompressedVideo) {
+        for (SyncRecord file : finalList) {
+            if (!running) {
+                break;
+            }
+            isSec = file.isSecondary();
+            MegaNode parent;
+            if (isSec) {
+                parent = secondaryUploadNode;
+            } else {
+                parent = cameraUploadNode;
+            }
+
+            if (file.getType() == SyncRecord.TYPE_PHOTO && !file.isCopyOnly()) {
+                String newPath = createTempFile(file);
+                //IOException occurs.
+                if (ERROR_CREATE_FILE_IO_ERROR.equals(newPath)) {
+                    continue;
+                }
+
+                // only retry for 60 seconds
+                int counter = 60;
+                while (ERROR_NOT_ENOUGH_SPACE.equals(newPath) && running && counter != 0) {
+                    counter--;
+                    try {
+                        logDebug("Waiting for disk space to process");
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    //show no space notification
+                    if (megaApi.getNumPendingUploads() == 0) {
+                        logWarning("Stop service due to out of space issue");
+                        finish();
+                        String title = getString(R.string.title_out_of_space);
+                        String message = getString(R.string.error_not_enough_free_space);
+                        Intent intent = new Intent(this,ManagerActivityLollipop.class);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+                        showNotification(title,message,pendingIntent,true);
+                        return;
+                    }
+                    newPath = createTempFile(file);
+                }
+                if (!newPath.equals(file.getNewPath())) {
+                    file.setNewPath(newPath);
+                }
+            }
+
+            String path;
+            if (isCompressedVideo || file.getType() == SyncRecord.TYPE_PHOTO || (file.getType() == SyncRecord.TYPE_VIDEO && shouldCompressVideo())) {
+                path = file.getNewPath();
+                File temp = new File(path);
+                if (!temp.exists()) {
+                    path = file.getLocalPath();
+                }
+            } else {
+                path = file.getLocalPath();
+            }
+
+            if (file.isCopyOnly()) {
+                logDebug("Copy node " + file.getFileName());
+                totalToUpload++;
+                megaApi.copyNode(megaApi.getNodeByHandle(file.getNodeHandle()),parent,file.getFileName(),this);
+            } else {
+                File toUpload = new File(path);
+                if (toUpload.exists()) {
+                    logDebug("Upload node " + path);
+                    //compare size
+                    MegaNode node = checkExsitBySize(parent,toUpload.length());
+                    if(node != null && node.getOriginalFingerprint() == null) {
+                        dbH.deleteSyncRecordByPath(path,isSec);
+                    } else {
+                        totalToUpload++;
+                        long lastModified = getLastModifiedTime(file);
+                        megaApi.startUpload(path,parent,file.getFileName(),lastModified / 1000,this);
+                    }
+                } else {
+                    dbH.deleteSyncRecordByPath(path,isSec);
+                }
+            }
+        }
+        if (totalToUpload == totalUploaded) {
+            if (isCompressedVideoPending() && !canceled && isCompressorAvailable()) {
+                logDebug("Got pending videos, will start compress");
+                startVideoCompression();
+            } else {
+                logDebug("No pending videos, finish");
+                onQueueComplete();
+            }
+        }
+    }
+
+    private MegaNode checkExsitBySize(MegaNode parent,long size) {
+        ArrayList<MegaNode> nL = megaApi.getChildren(parent,MegaApiJava.ORDER_ALPHABETICAL_ASC);
+        for (MegaNode node : nL) {
+            if(node.getSize() == size) {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    private long getLastModifiedTime(SyncRecord file) {
+        File source = new File(file.getLocalPath());
+        return source.lastModified();
+    }
+    
+    private void saveDataToDB(ArrayList<SyncRecord> list) {
+        logDebug("List length is " + list.size());
+        for (SyncRecord file : list) {
+            if(stopped) {
+                return;
+            }
+            SyncRecord exist = dbH.recordExists(file.getOriginFingerprint(),file.isSecondary(),file.isCopyOnly());
+            if (exist != null) {
+                if (exist.getTimestamp() < file.getTimestamp()) {
+                    logDebug("Got newer time stamp");
+                    dbH.deleteSyncRecordByLocalPath(exist.getLocalPath(),exist.isSecondary());
+                } else {
+                    logWarning("Duplicated sync records");
+                    continue;
+                }
+            }
+            
+            boolean isSec = file.isSecondary();
+            MegaNode parent;
+            if (isSec) {
+                parent = secondaryUploadNode;
+            } else {
+                parent = cameraUploadNode;
+            }
+            logDebug("is Secondary " + isSec);
+            
+            if (file.isCopyOnly()) {
+                //file exist in other location, server will copy internally
+            } else {
+                File f = new File(file.getLocalPath());
+                if (!f.exists()) {
+                    logWarning("File does not exist, remove from DB");
+                    dbH.deleteSyncRecordByLocalPath(file.getLocalPath(),isSec);
+                    continue;
+                }
+            }
+            
+            String fileName;
+            boolean inCloud;
+            boolean inDatabase;
+            int photoIndex = 0;
+            if (Boolean.parseBoolean(prefs.getKeepFileNames())) {
+                //Keep the file names as device but need to handle same file name in different location
+                String tempFileName = file.getFileName();
+                
+                do {
+                    if(stopped) {
+                        return;
+                    }
+                    fileName = getNoneDuplicatedDeviceFileName(tempFileName,photoIndex);
+                    photoIndex++;
+                    
+                    inCloud = megaApi.getChildNode(parent,fileName) != null;
+                    inDatabase = dbH.fileNameExists(fileName,isSec,SyncRecord.TYPE_ANY);
+                } while ((inCloud || inDatabase));
+            } else {
+                do {
+                    if(stopped) {
+                        return;
+                    }
+                    fileName = getPhotoSyncNameWithIndex(getLastModifiedTime(file),file.getLocalPath(),photoIndex);
+                    photoIndex++;
+                    
+                    inCloud = megaApi.getChildNode(parent,fileName) != null;
+                    inDatabase = dbH.fileNameExists(fileName,isSec,SyncRecord.TYPE_ANY);
+                } while ((inCloud || inDatabase));
+            }
+            
+            String extension = "";
+            String[] s = fileName.split("\\.");
+            if (s != null && s.length > 0) {
+                if (s.length > 0) {
+                    extension = s[s.length - 1];
+                }
+            }
+            
+            file.setFileName(fileName);
+            file.setNewPath(tempRoot + System.nanoTime() + "." + extension);
+            logDebug("File name is " + fileName + "temp path is " + file.getNewPath());
+            dbH.saveSyncRecord(file);
+        }
+    }
+    
+    private void onQueueComplete() {
+        logDebug("Stopping foreground!");
+
+        if(megaApi.getNumPendingUploads() <= 0) {
+            megaApi.resetTotalUploads();
+        }
+        totalUploaded = 0;
+        totalToUpload = 0;
+        
+        finish();
+    }
+    
+    private ArrayList<SyncRecord> getPendingList(Queue<Media> mediaList,boolean isSecondary,boolean isVideo) {
+        ArrayList<SyncRecord> pendingList = new ArrayList<>();
+        MegaNode uploadNode;
+        if (isSecondary) {
+            uploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
+        } else {
+            uploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
+        }
+        long uploadNodeHandle = uploadNode.getHandle();
+        int type = isVideo ? SyncRecord.TYPE_VIDEO : SyncRecord.TYPE_PHOTO;
+
+        while (mediaList.size() > 0) {
+            if(stopped) {
+                break;
+            }
+            logDebug("if (mediaList.size() > 0)");
+            final Media media = mediaList.poll();
+            if (dbH.localPathExists(localPath,isSecondary,SyncRecord.TYPE_ANY)) {
+                continue;
+            }
+            
+            //Source file
+            File sourceFile = new File(media.filePath);
+            String localFingerPrint = megaApi.getFingerprint(media.filePath);
+            MegaNode nodeExists = null;
+            
+            try {
+                nodeExists = getPossibleNodeFromCloud(localFingerPrint,uploadNode);
+            } catch (Exception e) {
+                logError("Exception, can not get possible nodes from cloud", e);
+            }
+
+            if (nodeExists == null) {
+                logDebug("UPLOAD THE FILE: " + media.filePath);
+                SyncRecord record = new SyncRecord(sourceFile.getAbsolutePath(),sourceFile.getName(),media.timestamp,isSecondary,type);
+                if (shouldCompressVideo() && type == SyncRecord.TYPE_VIDEO) {
+                    record.setStatus(STATUS_TO_COMPRESS);
+                }
+                float gpsData[] = getGPSCoordinates(sourceFile.getAbsolutePath(),isVideo);
+                record.setLatitude(gpsData[0]);
+                record.setLongitude(gpsData[1]);
+                record.setOriginFingerprint(localFingerPrint);
+
+                pendingList.add(record);
+                logDebug("MediaFinalName: " + sourceFile.getName());
+            } else {
+                logDebug("NODE EXISTS: " + megaApi.getParentNode(nodeExists).getName() + " : " + nodeExists.getName());
+                if (megaApi.getParentNode(nodeExists).getHandle() != uploadNodeHandle) {
+                    SyncRecord record = new SyncRecord(nodeExists.getHandle(),sourceFile.getName(),true,media.filePath,media.timestamp,isSecondary,type);
+                    record.setOriginFingerprint(nodeExists.getOriginalFingerprint());
+                    record.setNewFingerprint(nodeExists.getFingerprint());
+                    pendingList.add(record);
+                    logDebug("MediaFinalName: " + sourceFile.getName());
+                } else {
+                    if (!isSecondary) {
+                        if (isVideo) {
+                            if (media.timestamp > currentVideoTimeStamp) {
+                                currentVideoTimeStamp = media.timestamp;
+                                dbH.setCamVideoSyncTimeStamp(media.timestamp);
+                            }
+                        } else {
+                            if (media.timestamp > currentTimeStamp) {
+                                currentTimeStamp = media.timestamp;
+                                dbH.setCamSyncTimeStamp(media.timestamp);
+                            }
+                        }
+                    } else {
+                        if (isVideo) {
+                            if (media.timestamp > secondaryVideoTimeStamp) {
+                                secondaryVideoTimeStamp = media.timestamp;
+                                dbH.setSecVideoSyncTimeStamp(media.timestamp);
+                            }
+                        } else {
+                            if (media.timestamp > secondaryTimeStamp) {
+                                secondaryTimeStamp = media.timestamp;
+                                dbH.setSecSyncTimeStamp(media.timestamp);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return pendingList;
+    }
+    
+    private boolean checkFile(Media media,String path) {
+        
+        if (media.filePath != null &&
+                path != null &&
+                path.compareTo("") != 0 &&
+                media.filePath.startsWith(path)
+        ) {
+            return true;
+        }
+        
+        return false;
+    }
+    
     private int shouldRun() {
-        log("shouldRun()");
-
-        if (!Util.isOnline(this)){
-            log("Not online");
+        logDebug("shouldRun()");
+        
+        if (!isOnline(this)) {
+            logWarning("Not online");
             finish();
             return 1;
         }
 
+        if (isDeviceLowOnBattery(batteryIntent)) {
+            return BATTERY_STATE_LOW;
+        }
+
         prefs = dbH.getPreferences();
-        if (prefs == null){
-            log("Not defined, so not enabled");
+        if (prefs == null) {
+            logWarning("Not defined, so not enabled");
             finish();
             return 2;
-        }
-        else{
-            if (prefs.getCamSyncEnabled() == null){
-                log("Not defined, so not enabled");
+        } else {
+            if (prefs.getCamSyncEnabled() == null) {
+                logWarning("Not defined, so not enabled");
                 finish();
                 return 3;
-            }
-            else{
-                if (!Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-                    log("Camera Sync Not enabled");
+            } else {
+                if (!Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
+                    logDebug("Camera Sync Not enabled");
                     finish();
                     return 4;
-                }
-                else{
-                    localPath = prefs.getCamSyncLocalPath();
-                    if (localPath == null){
-                        log("Not defined, so not enabled");
+                } else {
+                    if (prefs.getCameraFolderExternalSDCard() != null && Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard())) {
+                        Uri uri = Uri.parse(prefs.getUriExternalSDCard());
+                        localPath = getFullPathFromTreeUri(uri,this);
+                    } else {
+                        localPath = prefs.getCamSyncLocalPath();
+                    }
+                    
+                    if (localPath == null) {
+                        logWarning("Not defined, so not enabled");
                         finish();
                         return 5;
-                    }
-                    else{
-                        if ("".compareTo(localPath) == 0){
-                            log("Not defined, so not enabled");
+                    } else {
+                        if ("".compareTo(localPath) == 0) {
+                            logWarning("Not defined, so not enabled");
                             finish();
                             return 6;
-
-                        }
-                        else{
-                            log("Localpath: " + localPath);
+                            
+                        } else {
+                            if(!localPath.endsWith(File.separator)) {
+                                localPath += File.separator;
+                            }
+                            logDebug("Localpath: " + localPath);
                         }
                     }
-
-                    boolean isWifi = Util.isOnWifi(this);
-                    if (prefs.getCamSyncWifi() == null){
-                        if (!isWifi){
-                            log("no wifi...");
+                    
+                    boolean isWifi = isOnWifi(this);
+                    if (prefs.getCamSyncWifi() == null) {
+                        if (!isWifi) {
+                            logWarning("No wifi...");
                             finish();
                             return 7;
                         }
-                    }
-                    else{
-                        if (Boolean.parseBoolean(prefs.getCamSyncWifi())){
-                            if (!isWifi){
-                                log("no wifi...");
+                    } else {
+                        if (Boolean.parseBoolean(prefs.getCamSyncWifi())) {
+                            if (!isWifi) {
+                                logDebug("No wifi...");
                                 finish();
                                 return 8;
                             }
                         }
                     }
-
-                    boolean isCharging = Util.isCharging(this);
-                    if (prefs.getCamSyncCharging() == null){
-                        if (!isCharging){
-                            log("not charging...");
-                            finish();
-                            return 9;
-                        }
-                    }
-                    else{
-                        if (Boolean.parseBoolean(prefs.getCamSyncCharging())){
-                            if (!isCharging){
-                                log("not charging...");
-                                finish();
-                                return 10;
-                            }
-                        }
-                    }
-
-                    if (prefs.getCameraFolderExternalSDCard() != null){
-                        isExternalSDCard = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
-                    }
-
+                    
                     UserCredentials credentials = dbH.getCredentials();
-                    if (credentials == null){
-                        log("There are not user credentials");
+                    if (credentials == null) {
+                        logWarning("There are not user credentials");
                         finish();
                         return 11;
                     }
-
+                    
                     gSession = credentials.getSession();
-
-                    if (megaApi.getRootNode() == null){
-                        log("RootNode = null");
-
+                    isLoggingIn = MegaApplication.isLoggingIn();
+                    if (megaApi.getRootNode() == null && !isLoggingIn) {
+                        logWarning("RootNode = null");
+                        
                         running = true;
-
+                        
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 if (megaApi.getRootNode() == null) {
                                     isLoggingIn = MegaApplication.isLoggingIn();
                                     if (!isLoggingIn) {
-
-                                        isLoggingIn = true;
-                                        MegaApplication.setLoggingIn(isLoggingIn);
-
-                                        if (Util.isChatEnabled()) {
-                                            log("shouldRun: Chat is ENABLED");
+    
+                                        setLoginState(true);
+    
+                                        if (isChatEnabled()) {
+                                            logWarning("shouldRun: Chat is ENABLED");
                                             if (megaChatApi == null) {
-                                                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+                                                megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
                                             }
-
+                                            
                                             int ret = megaChatApi.getInitState();
 
                                             if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
                                                 ret = megaChatApi.init(gSession);
-                                                log("shouldRun: result of init ---> " + ret);
+                                                logDebug("shouldRun: result of init ---> " + ret);
                                                 chatSettings = dbH.getChatSettings();
                                                 if (ret == MegaChatApi.INIT_NO_CACHE) {
-                                                    log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-                                                    megaChatApi.enableGroupChatCalls(true);
+                                                    logDebug("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
 
                                                 } else if (ret == MegaChatApi.INIT_ERROR) {
-                                                    log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
+                                                    logDebug("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
                                                     if (chatSettings == null) {
-                                                        log("1 - shouldRun: ERROR----> Switch OFF chat");
+                                                        logWarning("shouldRun: ERROR----> Switch OFF chat");
                                                         chatSettings = new ChatSettings();
                                                         chatSettings.setEnabled(false + "");
                                                         dbH.setChatSettings(chatSettings);
                                                     } else {
-                                                        log("2 - shouldRun: ERROR----> Switch OFF chat");
+                                                        logWarning("shouldRun: ERROR----> Switch OFF chat");
                                                         dbH.setEnabledChat(false + "");
                                                     }
-                                                    megaChatApi.logout(cameraUploadsService);
+                                                    megaChatApi.logout(CameraUploadsService.this);
                                                 } else {
-                                                    log("shouldRun: Chat correctly initialized");
-                                                    megaChatApi.enableGroupChatCalls(true);
+                                                    logDebug("shouldRun: Chat correctly initialized");
                                                 }
                                             }
                                         }
-
-                                        megaApi.fastLogin(gSession, cameraUploadsService);
+                                        logDebug("Camera upload start fast login");
+                                        megaApi.fastLogin(gSession,CameraUploadsService.this);
                                     } else {
-                                        log("Another login is processing");
+                                        logWarning("Another login is processing");
                                     }
-                                }
-                                else{
-                                    log("postDelayed RootNode != null");
-
+                                } else {
+                                    logDebug("postDelayed RootNode != null");
+                                    
                                     int r = runLoggedIn();
-                                    log("shouldRunAfterLoginDelayed -> " + r);
+                                    logDebug("shouldRunAfterLoginDelayed -> " + r);
                                     if (r == 0) {
-                                        startCameraUploads();
+                                        try {
+                                            startCameraUploads();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            handleException(e);
+                                        }
                                     }
                                 }
                             }
-                        }, 30000);
-
+                        },10 * 1000);
+                        
                         return LOGIN_IN;
                     }
 
-                    log("RootNode != null");
+                    logDebug("RootNode != null");
                     int r = runLoggedIn();
                     return r;
                 }
             }
         }
     }
-
-    private int runLoggedIn(){
-
-        if (prefs.getCamSyncHandle() == null){
-            log("if (prefs.getCamSyncHandle() == null)");
+    
+    private int runLoggedIn() {
+        
+        if (prefs.getCamSyncHandle() == null) {
+            logWarning("if (prefs.getCamSyncHandle() == null)");
             cameraUploadHandle = -1;
-        }
-        else{
-            log("if (prefs.getCamSyncHandle() != null)");
+        } else {
+            logDebug("if (prefs.getCamSyncHandle() != null)");
             cameraUploadHandle = Long.parseLong(prefs.getCamSyncHandle());
         }
-
-        if (prefs.getSecondaryMediaFolderEnabled() == null){
-            log("if (prefs.getSecondaryMediaFolderEnabled() == null)");
+        
+        if (prefs.getSecondaryMediaFolderEnabled() == null) {
+            logWarning("if (prefs.getSecondaryMediaFolderEnabled() == null)");
             dbH.setSecondaryUploadEnabled(false);
-            log("Not defined, so not enabled");
-            secondaryEnabled=false;
-        }
-        else {
-            log("if (prefs.getSecondaryMediaFolderEnabled() != null)");
+            logWarning("Not defined, so not enabled");
+            secondaryEnabled = false;
+        } else {
+            logDebug("if (prefs.getSecondaryMediaFolderEnabled() != null)");
             if (!Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
-                log("Not enabled Secondary");
+                logDebug("Not enabled Secondary");
                 secondaryEnabled = false;
             } else {
                 secondaryEnabled = true;
                 localPathSecondary = prefs.getLocalPathSecondaryFolder();
+                if(!localPathSecondary.endsWith(File.separator)) {
+                    localPathSecondary += File.separator;
+                }
+                logDebug("localPathSecondary: " + localPathSecondary);
             }
         }
-
+        
         ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
-        if (cameraUploadHandle == -1){
-            log("Find the Camera Uploads folder of the old PhotoSync");
-            for (int i=0;i<nl.size();i++){
-                if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+        if (cameraUploadHandle == -1) {
+            logDebug("Find the Camera Uploads folder of the old PhotoSync");
+            for (int i = 0;i < nl.size();i++) {
+                if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
                     cameraUploadHandle = nl.get(i).getHandle();
                     dbH.setCamSyncHandle(cameraUploadHandle);
-                }
-                else if((PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+                } else if ((PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
                     cameraUploadHandle = nl.get(i).getHandle();
                     dbH.setCamSyncHandle(cameraUploadHandle);
-                    megaApi.renameNode(nl.get(i), CAMERA_UPLOADS, this);
+                    megaApi.renameNode(nl.get(i),CAMERA_UPLOADS,this);
                 }
             }
-            
-            log("If not Camera Uploads nor Photosync");
-            if (cameraUploadHandle == -1){
-                log("must create the folder");
-                megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
+
+            logDebug("If not Camera Uploads nor Photosync");
+            if (cameraUploadHandle == -1) {
+                logWarning("Must create the folder");
+                megaApi.createFolder(CAMERA_UPLOADS,megaApi.getRootNode(),this);
                 return 13;
             }
-        }
-        else{
+        } else {
             MegaNode n = megaApi.getNodeByHandle(cameraUploadHandle);
-            if(n==null){
-                log("Node with cameraUploadHandle is not NULL");
+            if (n == null) {
+                logWarning("Node with cameraUploadHandle is NULL");
                 cameraUploadHandle = -1;
-                for (int i=0;i<nl.size();i++){
-                    if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+                for (int i = 0;i < nl.size();i++) {
+                    if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
                         cameraUploadHandle = nl.get(i).getHandle();
                         dbH.setCamSyncHandle(cameraUploadHandle);
-                    }
-                    else if((PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+                    } else if ((PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
                         cameraUploadHandle = nl.get(i).getHandle();
                         dbH.setCamSyncHandle(cameraUploadHandle);
-                        megaApi.renameNode(nl.get(i), CAMERA_UPLOADS, this);
+                        megaApi.renameNode(nl.get(i),CAMERA_UPLOADS,this);
                     }
                 }
                 
-                if (cameraUploadHandle == -1){
-                    log("If not Camera Uploads nor Photosync--- must create the folder");
-                    megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
+                if (cameraUploadHandle == -1) {
+                    logWarning("If not Camera Uploads nor Photosync--- must create the folder");
+                    megaApi.createFolder(CAMERA_UPLOADS,megaApi.getRootNode(),this);
                     return 14;
                 }
-            }
-            else{
-                log("Sync Folder " + cameraUploadHandle + " Node: "+n.getName());
+            } else {
+                logDebug("Sync Folder " + cameraUploadHandle + " Node: " + n.getName());
             }
         }
-
-        if(secondaryEnabled){
-            log("the secondary uploads are enabled");
+        
+        if (secondaryEnabled) {
+            logDebug("The secondary uploads are enabled");
             String temp = prefs.getMegaHandleSecondaryFolder();
-            if (temp != null){
-                if (temp.compareTo("") != 0){
-                    secondaryUploadHandle= Long.parseLong(prefs.getMegaHandleSecondaryFolder());
-                    if (secondaryUploadHandle == -1){
-                        for (int i=0;i<nl.size();i++){
-                            if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+            if (temp != null) {
+                if (temp.compareTo("") != 0) {
+                    secondaryUploadHandle = Long.parseLong(prefs.getMegaHandleSecondaryFolder());
+                    if (secondaryUploadHandle == -1) {
+                        for (int i = 0;i < nl.size();i++) {
+                            if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
                                 secondaryUploadHandle = nl.get(i).getHandle();
                                 dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                             }
                         }
                         
                         //If not "Media Uploads"
-                        if (secondaryUploadHandle == -1){
-                            log("must create the secondary folder");
-                            megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
+                        if (secondaryUploadHandle == -1) {
+                            logWarning("Must create the secondary folder");
+                            megaApi.createFolder(SECONDARY_UPLOADS,megaApi.getRootNode(),this);
                             return 15;
                         }
-                    }
-                    else{
-                        log("SecondaryUploadHandle: "+secondaryUploadHandle);
+                    } else {
+                        logDebug("SecondaryUploadHandle: " + secondaryUploadHandle);
                         MegaNode n = megaApi.getNodeByHandle(secondaryUploadHandle);
                         //If ERROR with the handler (the node may no longer exist): Create the folder Media Uploads
-                        if(n==null){
-                            secondaryUploadHandle=-1;
-                            log("The secondary media folder may not longer exists");
-                            for (int i=0;i<nl.size();i++){
-                                if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+                        if (n == null) {
+                            secondaryUploadHandle = -1;
+                            logWarning("The secondary media folder may not longer exists");
+                            for (int i = 0;i < nl.size();i++) {
+                                if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
                                     secondaryUploadHandle = nl.get(i).getHandle();
                                     dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                                 }
                             }
                             
                             //If not "Media Uploads"
-                            if (secondaryUploadHandle == -1){
-                                log("must create the folder");
-                                megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
+                            if (secondaryUploadHandle == -1) {
+                                logWarning("Must create the folder");
+                                megaApi.createFolder(SECONDARY_UPLOADS,megaApi.getRootNode(),this);
                                 return 16;
                             }
-                        }
-                        else{
-                            log("Secondary Folder " + secondaryUploadHandle + " Node: "+n.getName());
-                            secondaryUploadNode=megaApi.getNodeByHandle(secondaryUploadHandle);
+                        } else {
+                            logDebug("Secondary Folder " + secondaryUploadHandle + " Node: " + n.getName());
+                            secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
                         }
                     }
-                }
-                else{
+                } else {
                     //If empty string as SecondaryHandle
-                    secondaryUploadHandle=-1;
-                    for (int i=0;i<nl.size();i++){
-                        if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+                    secondaryUploadHandle = -1;
+                    for (int i = 0;i < nl.size();i++) {
+                        if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
                             secondaryUploadHandle = nl.get(i).getHandle();
                             dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                         }
                     }
                     
                     //If not "Media Uploads"
-                    if (secondaryUploadHandle == -1){
-                        log("must create the folder");
-                        megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
+                    if (secondaryUploadHandle == -1) {
+                        logWarning("Mmust create the folder");
+                        megaApi.createFolder(SECONDARY_UPLOADS,megaApi.getRootNode(),this);
                         return 17;
                     }
                 }
-            }
-            else{
-                for (int i=0;i<nl.size();i++){
-                    if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+            } else {
+                for (int i = 0;i < nl.size();i++) {
+                    if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
                         secondaryUploadHandle = nl.get(i).getHandle();
                         dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                     }
                 }
                 
                 //If not "Media Uploads"
-                if (secondaryUploadHandle == -1){
-                    log("must create the folder");
-                    megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
+                if (secondaryUploadHandle == -1) {
+                    logWarning("Must create the folder");
+                    megaApi.createFolder(SECONDARY_UPLOADS,megaApi.getRootNode(),this);
                     return 18;
                 }
             }
+        } else {
+            logDebug("Secondary NOT Enabled");
         }
-        else{
-            log("Secondary NOT Enabled");
-        }
-
+        
         return 0;
     }
-
-    private void initService(){
-        log("initService()");
-        
-        totalUploaded = -1;
-        totalSizeToUpload = 0;
-        totalToUpload = 0;
-        totalSizeUploaded = 0;
-        successCount = 0;
-
-        canceled = false;
-        isOverquota = false;
-        newFileList = false;
-
-        try{
-            app = (MegaApplication) getApplication();
-        }
-        catch(Exception ex){
+    
+    private void initService() {
+        logDebug("initService()");
+        registerNetworkTypeChangeReceiver();
+        try {
+            app = (MegaApplication)getApplication();
+        } catch (Exception ex) {
             finish();
         }
 
+        int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
+        WifiManager wifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
+        lock = wifiManager.createWifiLock(wifiLockMode,"MegaDownloadServiceWifiLock");
+        PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MegaDownloadServicePowerLock:");
+        
+        if (!wl.isHeld()) {
+            wl.acquire();
+        }
+        if (!lock.isHeld()) {
+            lock.acquire();
+        }
+
+        stopByNetworkStateChange = false;
+        lastUpdated = 0;
+        totalUploaded = 0;
+        totalToUpload = 0;
+        canceled = false;
+        isOverQuota = false;
+        running = true;
+        handler = new Handler();
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PAGE_SIZE = 1000;
+            PAGE_SIZE_VIDEO = 50;
+        } else {
+            PAGE_SIZE = 400;
+            PAGE_SIZE_VIDEO = 10;
+        }
+        
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-
-        if (megaApi == null){
+        
+        if (megaApi == null) {
             finish();
             return;
         }
-
-        megaApi.addGlobalListener(this);
-
-        int wifiLockMode = WifiManager.WIFI_MODE_FULL;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-            wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-        }
-
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaDownloadServicePowerLock");
-
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        
+        initDbH();
 
         String previousIP = app.getLocalIpAddress();
-        String currentIP = Util.getLocalIpAddress();
-        if (previousIP == null || (previousIP.length() == 0) || (previousIP.compareTo("127.0.0.1") == 0)) {
-            app.setLocalIpAddress(currentIP);
-        }
-        else if ((currentIP != null) && (currentIP.length() != 0) && (currentIP.compareTo("127.0.0.1") != 0) && (currentIP.compareTo(previousIP) != 0))
+        // the new logic implemented in NetworkStateReceiver
+        String currentIP = getLocalIpAddress(getApplicationContext());
+        app.setLocalIpAddress(currentIP);
+        if ((currentIP != null) && (currentIP.length() != 0) && (currentIP.compareTo("127.0.0.1") != 0))
         {
-            app.setLocalIpAddress(currentIP);
-            log("reconnect");
-            megaApi.reconnect();
+            if ((previousIP == null) || (currentIP.compareTo(previousIP) != 0)) {
+                logDebug("Reconnecting...");
+                megaApi.reconnect();
+            }
+            else{
+                logDebug("Retrying pending connections...");
+                megaApi.retryPendingConnections();
+            }
+        }
+        // end new logic
+        mIntent = new Intent(this,ManagerActivityLollipop.class);
+        mIntent.setAction(ACTION_CANCEL_CAM_SYNC);
+        mPendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
+        tempRoot = new File(getCacheDir(),CU_CACHE_FOLDER).getAbsolutePath() + File.separator;
+        File root = new File(tempRoot);
+        if (!root.exists()) {
+            root.mkdirs();
+        }
+        
+        if (dbH.shouldClearCamsyncRecords()) {
+            dbH.deleteAllSyncRecords(TYPE_ANY);
+            dbH.saveShouldClearCamsyncRecords(false);
         }
     }
-
-    private void finish(){
-        log("finish CameraUploadsService");
-
-        if(running){
+    
+    private void handleException(Exception e) {
+        logWarning("Handle exception", e);
+        
+        if (running) {
+            handler.removeCallbacksAndMessages(null);
+            running = false;
+        }
+        releaseLocks();
+        
+        if (isOverQuota) {
+            showStorageOverQuotaNotification();
+        }
+        
+        canceled = true;
+        running = false;
+        stopForeground(true);
+        cancelNotification();
+    }
+    
+    private void finish() {
+        logDebug("finish");
+        
+        if (running) {
             handler.removeCallbacksAndMessages(null);
             running = false;
         }
         cancel();
     }
-
+    
     private void cancel() {
-        if((lock != null) && (lock.isHeld()))
-            try{ lock.release(); } catch(Exception ex) {}
-        if((wl != null) && (wl.isHeld()))
-            try{ wl.release(); } catch(Exception ex) {}
-
-        if(isOverquota){
-            showStorageOverquotaNotification();
+        releaseLocks();
+        
+        if (isOverQuota) {
+            showStorageOverQuotaNotification();
+            stopRunningCameraUploadService(this);
         }
-
+        
+        if (mVideoCompressor != null) {
+            mVideoCompressor.stop();
+        }
+        cuTransfers.clear();
         canceled = true;
-        isForeground = false;
         running = false;
         stopForeground(true);
-        if (mNotificationManager != null){
+        cancelNotification();
+        stopSelf();
+    }
+    
+    private void cancelNotification() {
+        if (mNotificationManager != null) {
+            logDebug("Cancelling notification ID is " + notificationId);
             mNotificationManager.cancel(notificationId);
+        } else {
+            logWarning("No notification to cancel");
         }
-        jobFinished(globalParams, true);
+    }
+    
+    @Override
+    public void onRequestStart(MegaChatApiJava api,MegaChatRequest request) {
+    
+    }
+    
+    @Override
+    public void onRequestUpdate(MegaChatApiJava api,MegaChatRequest request) {
+    
+    }
+    
+    @Override
+    public void onRequestFinish(MegaChatApiJava api,MegaChatRequest request,MegaChatError e) {
+        if (request.getType() == MegaChatRequest.TYPE_CONNECT) {
+            setLoginState(false);
+        }
+    }
+    
+    @Override
+    public void onRequestTemporaryError(MegaChatApiJava api,MegaChatRequest request,MegaChatError e) {
+    
+    }
+    
+    @Override
+    public void onRequestStart(MegaApiJava api,MegaRequest request) {
+        logDebug("onRequestStart: " + request.getRequestString());
+    }
+    
+    @Override
+    public void onRequestUpdate(MegaApiJava api,MegaRequest request) {
+        logDebug("onRequestUpdate: " + request.getRequestString());
+    }
+    
+    @Override
+    public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
+        logDebug("onRequestFinish: " + request.getRequestString());
+        
+        try {
+            requestFinished(request,e);
+        } catch (Throwable th) {
+            logError("Error", th);
+            th.printStackTrace();
+        }
+    }
+    
+    private synchronized void requestFinished(MegaRequest request,MegaError e) {
+        if (request.getType() == MegaRequest.TYPE_LOGIN) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                logDebug("Fast login OK");
+                logDebug("Calling fetchNodes from CameraSyncService");
+                megaApi.fetchNodes(this);
+            } else {
+                logError("ERROR: " + e.getErrorString());
+                setLoginState(false);
+                finish();
+            }
+        } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                logDebug("Fetch nodes ok");
+                chatSettings = dbH.getChatSettings();
+                if (chatSettings != null) {
+                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+                    if (chatEnabled) {
+                        logDebug("Chat enabled-->connect");
+                        megaChatApi.connectInBackground(this);
+                    } else {
+                        logWarning("Chat NOT enabled - readyToManager");
+                    }
+                } else {
+                    logWarning("chatSettings NULL - readyToManager");
+                }
+                setLoginState(false);
+    
+                try {
+                    logDebug("Start service here MegaRequest.TYPE_FETCH_NODES");
+                    task = createWorkerThread();
+                    task.start();
+                } catch (Exception ex) {
+                    logError("Exception", ex);
+                    finish();
+                }
+            } else {
+                logError("ERROR: " + e.getErrorString());
+                setLoginState(false);
+                finish();
+            }
+        } else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                logDebug("Folder created: " + request.getName());
+                String name = request.getName();
+                if (name.contains(CAMERA_UPLOADS)) {
+                    logDebug("CamSync Folder UPDATED DB");
+                    dbH.setCamSyncHandle(request.getNodeHandle());
+                } else {
+                    //Update in database
+                    logDebug("Secondary Folder UPDATED DB");
+                    dbH.setSecondaryFolderHandle(request.getNodeHandle());
+                }
+            } else {
+                finish();
+            }
+        } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER) {
+            logDebug("Cancel transfer received");
+            if (e.getErrorCode() == MegaError.API_OK) {
+                //clear pause state and reset
+                megaApi.pauseTransfers(false,this);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(megaApi.getNumPendingUploads() <= 0) {
+                            megaApi.resetTotalUploads();
+                        }
+                    }
+                }, 200);
+            } else {
+                finish();
+            }
+        } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS) {
+            logDebug("Cancel all uploads received");
+            megaApi.pauseTransfers(false,this);
+            megaApi.resetTotalUploads();
+        } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
+            logDebug("Pausetransfer false received");
+            if (e.getErrorCode() == MegaError.API_OK) {
+                finish();
+            }
+        } else if (request.getType() == MegaRequest.TYPE_COPY) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
+                String fingerPrint = node.getFingerprint();
+                boolean isSecondary = node.getParentHandle() == secondaryUploadHandle;
+                dbH.deleteSyncRecordByFingerprint(fingerPrint,fingerPrint,isSecondary);
+            }
+            updateUpload();
+        }
+    }
+    
+    private void setLoginState(boolean b) {
+        isLoggingIn = b;
+        MegaApplication.setLoggingIn(b);
+    }
+    
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
+        logWarning("onRequestTemporaryError: " + request.getRequestString());
+    }
+    
+    @Override
+    public void onTransferStart(MegaApiJava api,MegaTransfer transfer) {
+        logDebug("onTransferStart: " + transfer.getFileName());
+        cuTransfers.add(transfer);
+    }
+    
+    @Override
+    public void onTransferUpdate(MegaApiJava api,MegaTransfer transfer) {
+        transferUpdated(api,transfer);
+    }
+    
+    private synchronized void transferUpdated(MegaApiJava api,MegaTransfer transfer) {
+        if (canceled) {
+            logDebug("Transfer cancel: " + transfer.getFileName());
+            megaApi.cancelTransfer(transfer);
+            cancel();
+            return;
+        }
+        
+        if (isOverQuota) {
+            return;
+        }
+        
+        updateProgressNotification();
+    }
+    
+    @Override
+    public void onTransferTemporaryError(MegaApiJava api,MegaTransfer transfer,MegaError e) {
+        logWarning("onTransferTemporaryError: " + transfer.getFileName());
+        if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+            if (e.getValue() != 0)
+                logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+            else
+                logWarning("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
+
+            isOverQuota = true;
+            cancel();
+        }
+    }
+    
+    @Override
+    public void onTransferFinish(MegaApiJava api,MegaTransfer transfer,MegaError e) {
+        logDebug("Image sync finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
+        logDebug("transfer.getPath:" + transfer.getPath());
+        logDebug("transfer.getNodeHandle:" + transfer.getNodeHandle());
+
+        try {
+            transferFinished(api, transfer, e);
+        } catch (Throwable th) {
+            logError("onTransferFinish error", th);
+            th.printStackTrace();
+        }
+    }
+    
+    private synchronized void transferFinished(final MegaApiJava api,final MegaTransfer transfer,MegaError e) {
+        String path = transfer.getPath();
+        if (isOverQuota) {
+            return;
+        }
+
+        if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
+            String size = getSizeString(transfer.getTotalBytes());
+            AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
+            dbH.setCompletedTransfer(completedTransfer);
+        }
+
+        if (e.getErrorCode() == MegaError.API_OK) {
+            logDebug("Image Sync OK: " + transfer.getFileName() + " IMAGESYNCFILE: " + path);
+            MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+            boolean isSecondary = (node.getParentHandle() == secondaryUploadHandle);
+            SyncRecord record = dbH.findSyncRecordByNewPath(path);
+            if (record == null) {
+                record = dbH.findSyncRecordByLocalPath(path,isSecondary);
+            }
+            if (record != null) {
+                String originalFingerprint = record.getOriginFingerprint();
+                megaApi.setOriginalFingerprint(node,originalFingerprint,this);
+                megaApi.setNodeCoordinates(node,record.getLatitude(),record.getLongitude(),null);
+                
+                File src = new File(record.getLocalPath());
+                if (src.exists()) {
+                    logDebug("Creating preview");
+                    File previewDir = getPreviewFolder(this);
+                    final File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                    File thumbDir = getThumbFolder(this);
+                    final File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                    final SyncRecord finalRecord = record;
+                    if(isVideoFile(transfer.getPath())) {
+                        threadPool.execute(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                File img = new File(finalRecord.getLocalPath());
+                                if(!preview.exists()) {
+                                    //for Android 5, 5.1 devices may have insufficient memory, so don't create previews.
+                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        createVideoPreview(CameraUploadsService.this, img, preview);
+                                    }
+                                }
+                                createVideoThumbnail(api,finalRecord.getLocalPath(),thumb);
+                            }
+                        });
+                    } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
+                        threadPool.execute(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                File img = new File(finalRecord.getLocalPath());
+                                if(!preview.exists()) {
+                                    //for Android 5, 5.1 devices may have insufficient memory, so don't create previews.
+                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        createImagePreview(img, preview);
+                                    }
+                                }
+                                createImageThumbnail(api,finalRecord.getLocalPath(),thumb);
+                            }
+                        });
+                    }
+                }
+                //delete database record
+                dbH.deleteSyncRecordByPath(path,isSecondary);
+                //delete temp files
+                if (path.startsWith(tempRoot)) {
+                    File temp = new File(path);
+                    if (temp.exists()) {
+                        temp.delete();
+                    }
+                }
+            }
+        } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+            logWarning("Over quota error: " + e.getErrorCode());
+            isOverQuota = true;
+            cancel();
+        } else {
+            logWarning("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
+        }
+        if (canceled) {
+            logWarning("Image sync cancelled: " + transfer.getFileName());
+            cancel();
+        }
+        updateUpload();
+    }
+    
+    private void updateUpload() {
+        if (!canceled) {
+            updateProgressNotification();
+        }
+        
+        totalUploaded++;
+        logDebug("Total to upload is " + totalToUpload + " totalUploaded " + totalUploaded + " pendings are " + megaApi.getNumPendingUploads());
+        if (totalToUpload == totalUploaded) {
+            logDebug("Photo upload finished, now checking videos");
+            if (isCompressedVideoPending() && !canceled && isCompressorAvailable()) {
+                logDebug("Got pending videos, will start compress");
+                startVideoCompression();
+            } else {
+                logDebug("No pending videos, finish");
+                onQueueComplete();
+            }
+        }
+    }
+    
+    @Override
+    public boolean onTransferData(MegaApiJava api,MegaTransfer transfer,byte[] buffer) {
+        return true;
+    }
+    
+    private void updateTimeStamp() {
+        //primary
+        Long timeStampPrimary = dbH.findMaxTimestamp(false,SyncRecord.TYPE_PHOTO);
+        if (timeStampPrimary == null) {
+            timeStampPrimary = 0L;
+        }
+        if (timeStampPrimary > currentTimeStamp) {
+            updateCurrentTimeStamp(timeStampPrimary);
+        }
+        
+        Long timeStampPrimaryVideo = dbH.findMaxTimestamp(false,SyncRecord.TYPE_VIDEO);
+        if (timeStampPrimaryVideo == null) {
+            timeStampPrimaryVideo = 0L;
+        }
+        if (timeStampPrimaryVideo > currentVideoTimeStamp) {
+            updateCurrentVideoTimeStamp(timeStampPrimaryVideo);
+        }
+        
+        //secondary
+        if (secondaryEnabled) {
+            Long timeStampSecondary = dbH.findMaxTimestamp(true,SyncRecord.TYPE_PHOTO);
+            if (timeStampSecondary == null) {
+                timeStampSecondary = 0L;
+            }
+            if (timeStampSecondary > secondaryTimeStamp) {
+                updateSecondaryTimeStamp(timeStampSecondary);
+            }
+            
+            Long timeStampSecondaryVideo = dbH.findMaxTimestamp(true,SyncRecord.TYPE_VIDEO);
+            if (timeStampSecondaryVideo == null) {
+                timeStampSecondaryVideo = 0L;
+            }
+            if (timeStampSecondaryVideo > secondaryVideoTimeStamp) {
+                updateSecondaryVideoTimeStamp(timeStampSecondaryVideo);
+            }
+        }
+    }
+    
+    private void updateCurrentTimeStamp(long timeStamp) {
+        logDebug("timesTamp: " + timeStamp);
+        currentTimeStamp = timeStamp;
+        dbH.setCamSyncTimeStamp(currentTimeStamp);
+    }
+    
+    private void updateCurrentVideoTimeStamp(long timeStamp) {
+        logDebug("timesTamp: " + timeStamp);
+        currentVideoTimeStamp = timeStamp;
+        dbH.setCamVideoSyncTimeStamp(currentVideoTimeStamp);
+    }
+    
+    private void updateSecondaryTimeStamp(long timeStamp) {
+        logDebug("timesTamp: " + timeStamp);
+        secondaryTimeStamp = timeStamp;
+        dbH.setSecSyncTimeStamp(secondaryTimeStamp);
+    }
+    
+    private void updateSecondaryVideoTimeStamp(long timeStamp) {
+        logDebug("timesTamp: " + timeStamp);
+        secondaryVideoTimeStamp = timeStamp;
+        dbH.setSecVideoSyncTimeStamp(secondaryVideoTimeStamp);
+    }
+    
+    private boolean isCompressedVideoPending() {
+        return dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS).size() > 0 && String.valueOf(VIDEO_QUALITY_MEDIUM).equals(prefs.getUploadVideoQuality());
+    }
+    
+    private boolean isCompressorAvailable() {
+        if (mVideoCompressor == null) {
+            return true;
+        } else {
+            return !mVideoCompressor.isRunning();
+        }
+    }
+    
+    private void startVideoCompression() {
+        logDebug("startVideoCompression");
+        
+        List<SyncRecord> fullList = dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS);
+        if(megaApi.getNumPendingUploads() <= 0) {
+            megaApi.resetTotalUploads();
+        }
+        totalUploaded = 0;
+        totalToUpload = 0;
+
+        mVideoCompressor = new VideoCompressor(this,this);
+        mVideoCompressor.setPendingList(fullList);
+        mVideoCompressor.setOutputRoot(tempRoot);
+        long totalPendingSizeInMB = mVideoCompressor.getTotalInputSize() / (1024 * 1024);
+        logDebug("Total videos are " + fullList.size() + " " + totalPendingSizeInMB + "mbyte to Conversion");
+        
+        if (shouldStartVideoCompression(totalPendingSizeInMB)) {
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    logDebug("Starting compressor");
+                    mVideoCompressor.start();
+                }
+            });
+            t.start();
+        } else {
+            logDebug("Compression queue bigger than setting, show notification to user.");
+            finish();
+            Intent intent = new Intent(this,ManagerActivityLollipop.class);
+            intent.setAction(ACTION_SHOW_SETTINGS);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+            String title = getString(R.string.title_compression_size_over_limit);
+            String size = prefs.getChargingOnSize();
+            String message = getString(R.string.message_compression_size_over_limit, size + getString(R.string.label_file_size_mega_byte));
+            showNotification(title,message,pendingIntent,true);
+        }
+        
+    }
+    
+    private boolean shouldStartVideoCompression(long queueSize) {
+    
+        if (isChargingRequired(queueSize) && !isCharging(mContext)) {
+            logDebug("shouldStartVideoCompression " + false);
+            return false;
+        
+        }
+        logDebug("shouldStartVideoCompression " + true);
+        return true;
+    }
+    
+    @Override
+    public void onInsufficientSpace() {
+        logWarning("onInsufficientSpace");
+        finish();
+        Intent intent = new Intent(this,ManagerActivityLollipop.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+        String title = getResources().getString(R.string.title_out_of_space);
+        String message = getResources().getString(R.string.message_out_of_space);
+        showNotification(title,message,pendingIntent,true);
+    }
+    
+    public synchronized void onCompressUpdateProgress(int progress) {
+        if (!canceled) {
+            String message = getString(R.string.message_compress_video, progress + "%");
+            String subText = getString(R.string.title_compress_video, mVideoCompressor.getCurrentFileIndex(),mVideoCompressor.getTotalCount());
+            showProgressNotification(progress,mPendingIntent,message,subText,"");
+        }
+    }
+    
+    public synchronized void onCompressSuccessful(SyncRecord record) {
+        logDebug("Compression successfully " + record.getLocalPath());
+        dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,record.getLocalPath(),record.isSecondary());
+    }
+    
+    public synchronized void onCompressNotSupported(SyncRecord record) {
+        logDebug("Compression failed " + record.getLocalPath());
+    }
+    
+    public synchronized void onCompressFailed(SyncRecord record) {
+        String localPath = record.getLocalPath();
+        boolean isSecondary = record.isSecondary();
+        logWarning("Compression failed " + localPath);
+        //file can not be compress will be uploaded directly?
+        File srcFile = new File(localPath);
+        if (srcFile.exists()) {
+            StatFs stat = new StatFs(tempRoot);
+            double availableFreeSpace = stat.getAvailableBytes();
+            if (availableFreeSpace > srcFile.length()) {
+                logDebug("Can not compress but got enough disk space, so should be un-supported format issue");
+                String newPath = record.getNewPath();
+                File temp = new File(newPath);
+                dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,localPath,isSecondary);
+                if (newPath.startsWith(tempRoot) && temp.exists()) {
+                    temp.delete();
+                }
+            } else {
+                //record will remain in DB and will be re-compressed next launch
+            }
+        } else {
+            logWarning("Compressed video not exists, remove from DB");
+            dbH.deleteSyncRecordByLocalPath(localPath,isSecondary);
+        }
+    }
+    
+    public void onCompressFinished(String currentIndexString) {
+        logDebug("onCompressFinished");
+
+        if (!canceled) {
+            logDebug("Preparing to upload compressed video");
+            ArrayList<SyncRecord> compressedList = new ArrayList<>(dbH.findVideoSyncRecordsByState(STATUS_PENDING));
+            if (compressedList.size() > 0) {
+                startParallelUpload(compressedList,true);
+            } else {
+                onQueueComplete();
+            }
+        }
+    }
+    
+    private synchronized void updateProgressNotification() {
+        //refresh UI every 1 seconds to avoid too much workload on main thread
+        long now = System.currentTimeMillis();
+        if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS) {
+            lastUpdated = now;
+        } else {
+            return;
+        }
+        
+        int pendingTransfers = megaApi.getNumPendingUploads();
+        int totalTransfers = megaApi.getTotalUploads();
+        long totalSizePendingTransfer = megaApi.getTotalUploadBytes();
+        long totalSizeTransferred = megaApi.getTotalUploadedBytes();
+        
+        int progressPercent = (int)Math.round((double)totalSizeTransferred / totalSizePendingTransfer * 100);
+        
+        String message;
+        if (totalTransfers == 0) {
+            message = getString(R.string.download_preparing_files);
+        } else {
+            int inProgress;
+            if (pendingTransfers == 0) {
+                inProgress = totalTransfers - pendingTransfers;
+            } else {
+                inProgress = totalTransfers - pendingTransfers + 1;
+            }
+            message = getResources().getQuantityString(R.plurals.upload_service_notification,totalTransfers,inProgress,totalTransfers);
+        }
+        
+        String info = getProgressSize(this,totalSizeTransferred,totalSizePendingTransfer);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
+        showProgressNotification(progressPercent,pendingIntent,message,info,getString(R.string.settings_camera_notif_title));
     }
 
-    private void showStorageOverquotaNotification(){
-        log("showStorageOverquotaNotification");
+    private Notification createNotification(String title,String content,PendingIntent intent,boolean isAutoCancel){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(false);
+            channel.setSound(null,null);
+            mNotificationManager.createNotificationChannel(channel);
+        }
+
+        mBuilder = new NotificationCompat.Builder(mContext,notificationChannelId);
+        mBuilder.setSmallIcon(R.drawable.ic_stat_camera_sync)
+                .setOngoing(false)
+                .setContentTitle(title)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
+                .setContentText(content)
+                .setOnlyAlertOnce(true)
+                .setAutoCancel(isAutoCancel);
+
+        if (intent != null) {
+            mBuilder.setContentIntent(intent);
+        }
+        return mBuilder.build();
+    }
+    
+    private void showNotification(String title,String content,PendingIntent intent,boolean isAutoCancel) {
+        mNotification = createNotification(title, content, intent, isAutoCancel);
+        mNotificationManager.notify(notificationId,mNotification);
+    }
+
+    private void showProgressNotification(int progressPercent, PendingIntent pendingIntent, String message, String subText, String contentText) {
+        mNotification = null;
+        mBuilder = new NotificationCompat.Builder(mContext, notificationChannelId);
+        mBuilder
+                .setSmallIcon(R.drawable.ic_stat_camera_sync)
+                .setProgress(100, progressPercent, false)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
+                .setContentTitle(message)
+                .setContentText(contentText)
+                .setOnlyAlertOnce(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            channel.setSound(null, null);
+            mNotificationManager.createNotificationChannel(channel);
+            mBuilder.setSubText(subText);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mBuilder.setSubText(subText);
+        } else {
+            mBuilder.setColor(ContextCompat.getColor(this, R.color.mega))
+                    .setContentInfo(subText);
+        }
+        mNotification = mBuilder.build();
+        mNotificationManager.notify(notificationId, mNotification);
+    }
+
+    private void showStorageOverQuotaNotification() {
+        logDebug("showStorageOverQuotaNotification");
 
         String contentText = getString(R.string.download_show_info);
         String message = getString(R.string.overquota_alert_title);
 
         Intent intent = new Intent(this, ManagerActivityLollipop.class);
-        intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+        intent.setAction(ACTION_OVERQUOTA_STORAGE);
 
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, OVER_QUOTA_NOTIFICATION_CHANNEL_ID);
+        builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
+                .setContentIntent(PendingIntent.getActivity(mContext, 0, intent, 0))
+                .setAutoCancel(true)
+                .setTicker(contentText)
+                .setContentTitle(message)
+                .setOngoing(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(OVER_QUOTA_NOTIFICATION_CHANNEL_ID, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(true);
             channel.setSound(null, null);
             mNotificationManager.createNotificationChannel(channel);
-
-            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
-
-            mBuilderCompatO
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-                    .setAutoCancel(true).setTicker(contentText)
-                    .setContentTitle(message).setContentText(contentText)
-                    .setOngoing(false);
-
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompatO.build());
-        }
-    }
-
-    @Override
-    public boolean onStopJob(JobParameters params) {
-
-        log("onStopJob");
-
-        // Called by Android when it has to terminate a running service.
-        return true;
-    }
-
-    public static void log(String message) {
-        Util.log("CameraUploadsService", message);
-    }
-
-    @Override
-    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-
-    }
-
-    @Override
-    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        log("onUserAlertsUpdate");
-    }
-
-    @Override
-    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
-
-    }
-
-    @Override
-    public void onReloadNeeded(MegaApiJava api) {
-
-    }
-
-    @Override
-    public void onAccountUpdate(MegaApiJava api) {
-
-    }
-
-    @Override
-    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
-
-    }
-
-    @Override
-    public void onEvent(MegaApiJava api, MegaEvent event) {
-
-    }
-
-    @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
-    }
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart: " + request.getRequestString());
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        log("onRequestUpdate: " + request.getRequestString());
-    }
-
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish: " + request.getRequestString());
-
-        if (request.getType() == MegaRequest.TYPE_LOGIN){
-            if (e.getErrorCode() == MegaError.API_OK){
-                log("Fast login OK");
-                log("Calling fetchNodes from CameraUploadsService");
-                megaApi.fetchNodes(this);
-            }
-            else{
-                log("ERROR: " + e.getErrorString());
-                isLoggingIn = false;
-                MegaApplication.setLoggingIn(isLoggingIn);
-                finish();
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-            if (e.getErrorCode() == MegaError.API_OK){
-                chatSettings = dbH.getChatSettings();
-                if(chatSettings!=null) {
-                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-                    if(chatEnabled){
-                        log("Chat enabled-->connect");
-                        megaChatApi.connectInBackground(this);
-                        isLoggingIn = false;
-                        MegaApplication.setLoggingIn(isLoggingIn);
-
-                        int r = runLoggedIn();
-                        log("shouldRunAfterLogin -> " + r);
-                        if (r == 0) {
-                            startCameraUploads();
-                        }
-                    }
-                    else{
-                        log("Chat NOT enabled - readyToManager");
-                        isLoggingIn = false;
-                        MegaApplication.setLoggingIn(isLoggingIn);
-
-                        int r = runLoggedIn();
-                        log("shouldRunAfterLogin -> " + r);
-                        if (r == 0) {
-                            startCameraUploads();
-                        }
-                    }
-                }
-                else{
-                    log("chatSettings NULL - readyToManager");
-                    isLoggingIn = false;
-                    MegaApplication.setLoggingIn(isLoggingIn);
-
-                    int r = runLoggedIn();
-                    log("shouldRunAfterLogin -> " + r);
-                    if (r == 0) {
-                        startCameraUploads();
-                    }
-                }
-            }
-            else{
-                log("ERROR: " + e.getErrorString());
-                isLoggingIn = false;
-                MegaApplication.setLoggingIn(isLoggingIn);
-                finish();
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-            if (e.getErrorCode() == MegaError.API_OK){
-                log("Folder created: "+request.getName());
-                String name = request.getName();
-                if(name.contains(CAMERA_UPLOADS)){
-                    log("CamSync Folder UPDATED DB");
-                    dbH.setCamSyncHandle(request.getNodeHandle());
-                }
-                else if(name.contains(SECONDARY_UPLOADS)){
-                    //Update in database
-                    log("Secondary Folder UPDATED DB");
-                    dbH.setSecondaryFolderHandle(request.getNodeHandle());
-                }
-
-                startCameraUploads();
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_RENAME || request.getType() == MegaRequest.TYPE_COPY){
-            if (e.getErrorCode() == MegaError.API_OK){
-                if (megaApi.getNodeByHandle(request.getNodeHandle()).getName().compareTo(CAMERA_UPLOADS) == 0){
-                    log("Folder renamed to CAMERA_UPLOADS");
-                    startCameraUploads();
-                }
-                else{
-                    MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
-                    if(megaApi.getParentNode(node)!=null){
-                        long parentHandle = megaApi.getParentNode(node).getHandle();
-                        if(parentHandle == secondaryUploadHandle){
-                            log("Update SECONDARY Sync TimeStamp");
-                            dbH.setSecSyncTimeStamp(currentTimeStamp);
-                        }
-                        else{
-                            log("Update Camera Sync TimeStamp");
-                            dbH.setCamSyncTimeStamp(currentTimeStamp);
-                        }
-                    }
-
-                    totalSizeUploaded += megaApi.getNodeByHandle(request.getNodeHandle()).getSize();
-                    if (cameraFilesExternalSDCardQueue != null){
-                        if (cameraFilesExternalSDCardQueue.size() > 0){
-                            uploadNextSDCard();
-                        }
-                        else{
-                            uploadNext();
-                        }
-                    }
-                    else{
-                        uploadNext();
-                    }
-                }
-            }
-            else {
-                log("Error ("+e.getErrorCode()+"): "+request.getType()+" : "+request.getRequestString());
-                if(request.getNodeHandle()!=-1){
-                    MegaNode nodeError = megaApi.getNodeByHandle(request.getNodeHandle());
-                    if(nodeError!=null){
-                        log("Node: "+nodeError.getName());
-                    }
-                }
-
-                if (e.getErrorCode() == MegaError.API_EOVERQUOTA)
-                    isOverquota = true;
-
-                finish();
-            }
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestTemporaryError: " + request.getRequestString());
-    }
-
-    @Override
-    public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-        log("onTransferStart: " + transfer.getFileName());
-    }
-
-    @Override
-    public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-        if (canceled) {
-            log("Transfer cancel: " + transfer.getFileName());
-
-            if((lock != null) && (lock.isHeld()))
-                try{ lock.release(); } catch(Exception ex) {}
-            if((wl != null) && (wl.isHeld()))
-                try{ wl.release(); } catch(Exception ex) {}
-
-            megaApi.cancelTransfer(transfer);
-            cancel();
-            return;
-        }
-
-        if(isOverquota){
-            log("After overquota error");
-            isOverquota = false;
-        }
-
-        final long bytes = transfer.getTransferredBytes();
-//		log("Transfer update: " + transfer.getFileName() + "  Bytes: " + bytes);
-        updateProgressNotification(totalSizeUploaded + bytes);
-    }
-
-    @Override
-    public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-        log("onTransferTemporaryError: " + transfer.getFileName());
-
-        if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-            if (e.getValue() != 0)
-                log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
-            else
-                log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
-
-            isOverquota = true;
-
-            updateProgressNotification(totalSizeUploaded);
-        }
-    }
-
-    @Override
-    public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-        log("Image sync finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
-        log("transfer.getPath:" + transfer.getPath());
-        log("transfer.getNodeHandle:" + transfer.getNodeHandle());
-
-        if (canceled) {
-            log("Image sync cancelled: " + transfer.getFileName());
-            if((lock != null) && (lock.isHeld()))
-                try{ lock.release(); } catch(Exception ex) {}
-            if((wl != null) && (wl.isHeld()))
-                try{ wl.release(); } catch(Exception ex) {}
-
-            if (isExternalSDCard){
-                File fileToDelete = new File(transfer.getPath());
-                if (fileToDelete != null){
-                    if (fileToDelete.exists()){
-                        fileToDelete.delete();
-                    }
-                }
-            }
-
-            cancel();
-        }
-        else{
-            if (e.getErrorCode() == MegaError.API_OK) {
-
-                if(isOverquota){
-                    log("After overquota error");
-                    isOverquota = false;
-                }
-
-                log("Image Sync OK: " + transfer.getFileName());
-                totalSizeUploaded += transfer.getTransferredBytes();
-                log("IMAGESYNCFILE: " + transfer.getPath());
-
-                String tempPath = transfer.getPath();
-                if (!isExternalSDCard){
-                    if(tempPath.startsWith(localPath)){
-                        log("onTransferFinish: Update Camera Sync TimeStamp");
-                        dbH.setCamSyncTimeStamp(currentTimeStamp);
-                    }
-                    else{
-                        log("onTransferFinish: Update SECONDARY Sync TimeStamp");
-                        dbH.setSecSyncTimeStamp(currentTimeStamp);
-                    }
-                }
-
-                if (isExternalSDCard){
-                    dbH.setCamSyncTimeStamp(currentTimeStamp);
-                }
-
-                if(Util.isVideoFile(transfer.getPath())){
-                    log("Is video!!!");
-                    File previewDir = PreviewUtils.getPreviewFolder(this);
-                    File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-                    File thumbDir = ThumbnailUtils.getThumbFolder(this);
-                    File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-                    megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-                    megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-
-                    MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-                    if(node!=null){
-                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                        retriever.setDataSource(transfer.getPath());
-
-                        String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
-                        if(location!=null){
-                            log("Location: "+location);
-
-                            boolean secondTry = false;
-                            try{
-                                final int mid = location.length() / 2; //get the middle of the String
-                                String[] parts = {location.substring(0, mid),location.substring(mid)};
-
-                                Double lat = Double.parseDouble(parts[0]);
-                                Double lon = Double.parseDouble(parts[1]);
-                                log("Lat: "+lat); //first part
-                                log("Long: "+lon); //second part
-
-                                megaApi.setNodeCoordinates(node, lat, lon, null);
-                            }
-                            catch (Exception exc){
-                                secondTry = true;
-                                log("Exception, second try to set GPS coordinates");
-                            }
-
-                            if(secondTry){
-                                try{
-                                    String latString = location.substring(0,7);
-                                    String lonString = location.substring(8,17);
-
-                                    Double lat = Double.parseDouble(latString);
-                                    Double lon = Double.parseDouble(lonString);
-                                    log("Lat2: "+lat); //first part
-                                    log("Long2: "+lon); //second part
-
-                                    megaApi.setNodeCoordinates(node, lat, lon, null);
-                                }
-                                catch (Exception ex){
-                                    log("Exception again, no chance to set coordinates of video");
-                                }
-                            }
-                        }
-                        else{
-                            log("No location info");
-                        }
-                    }
-                }
-                else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
-                    log("Is image!!!");
-
-                    File previewDir = PreviewUtils.getPreviewFolder(this);
-                    File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-                    File thumbDir = ThumbnailUtils.getThumbFolder(this);
-                    File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-                    megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-                    megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-
-                    MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-                    if(node!=null){
-                        try {
-                            final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
-                            float[] latLong = new float[2];
-                            if (exifInterface.getLatLong(latLong)) {
-                                log("Latitude: "+latLong[0]+" Longitude: " +latLong[1]);
-                                megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
-                            }
-
-                        } catch (Exception exception) {
-                            log("Couldn't read exif info: " + transfer.getPath());
-                        }
-                    }
-                }
-                else{
-                    log("NOT video or image!");
-                }
-
-                if (isExternalSDCard){
-                    File fileToDelete = new File(transfer.getPath());
-                    if (fileToDelete != null){
-                        if (fileToDelete.exists()){
-                            fileToDelete.delete();
-                        }
-                    }
-                }
-
-                if (cameraFilesExternalSDCardQueue != null){
-                    if (cameraFilesExternalSDCardQueue.size() > 0){
-                        uploadNextSDCard();
-                    }
-                    else{
-                        uploadNext();
-                    }
-                }
-                else{
-                    uploadNext();
-                }
-            }
-            else{
-                log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
-
-                if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-                    log("OVERQUOTA ERROR: "+e.getErrorCode());
-                    isOverquota = true;
-                }
-
-                cancel();
-            }
-        }
-    }
-
-    @Override
-    public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer){
-        return true;
-    }
-
-    @SuppressWarnings("deprecation")
-    @SuppressLint("NewApi")
-    private void updateProgressNotification(final long progress) {
-        int progressPercent = (int) Math.round((double) progress / totalSizeToUpload
-                * 100);
-        log(progressPercent + " " + progress + " " + totalSizeToUpload);
-        int left = totalToUpload - totalUploaded;
-        int current = totalToUpload - left;
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-
-        String message = current + " ";
-        if (totalToUpload == 1) {
-            message += getResources().getQuantityString(
-                    R.plurals.general_num_files, 1);
+            builder.setContentText(contentText);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setContentText(contentText);
         } else {
-            message += getString(R.string.general_x_of_x)
-                    + " "
-                    + totalToUpload;
+            builder.setContentInfo(contentText)
+                    .setColor(ContextCompat.getColor(this, R.color.mega));
 
-            if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB)
-            {
-                message += " "
-                        + getResources().getQuantityString(
-                        R.plurals.general_num_files, totalToUpload);
+        }
+        mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, builder.build());
+    }
+    
+    private void removeGPSCoordinates(String filePath) {
+        logDebug("Remove GPS coordinates from path " + filePath);
+        try {
+            ExifInterface exif = new ExifInterface(filePath);
+            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE,"0/1,0/1,0/1000");
+            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF,"0");
+            exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE,"0/1,0/1,0/1000");
+            exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF,"0");
+            exif.setAttribute(ExifInterface.TAG_GPS_ALTITUDE,"0/1,0/1,0/1000");
+            exif.setAttribute(ExifInterface.TAG_GPS_ALTITUDE_REF,"0");
+            exif.saveAttributes();
+        } catch (IOException e) {
+            logError("Exception", e);
+            e.printStackTrace();
+        }
+    }
+    
+    private String createTempFile(SyncRecord file) {
+        logDebug("createTempFile");
+        File srcFile = new File(file.getLocalPath());
+        if (!srcFile.exists()) {
+            logError(ERROR_SOURCE_FILE_NOT_EXIST);
+            return ERROR_SOURCE_FILE_NOT_EXIST;
+        }
+        
+        try {
+            StatFs stat = new StatFs(tempRoot);
+            double availableFreeSpace = stat.getAvailableBytes();
+            if (availableFreeSpace <= srcFile.length()) {
+                logError(ERROR_NOT_ENOUGH_SPACE);
+                return ERROR_NOT_ENOUGH_SPACE;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            logError("Exception", ex);
+        }
+        
+        String destPath = file.getNewPath();
+        File destFile = new File(destPath);
+        try {
+            copyFile(srcFile,destFile);
+            removeGPSCoordinates(destPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            logError(ERROR_CREATE_FILE_IO_ERROR, e);
+            return ERROR_CREATE_FILE_IO_ERROR;
+        }
+        return destPath;
+    }
+    
+    private String getNoneDuplicatedDeviceFileName(String fileName,int index) {
+        if (index == 0) {
+            return fileName;
+        }
+        
+        String name = "", extension = "";
+        int pos = fileName.lastIndexOf(".");
+        if (pos > 0) {
+            name = fileName.substring(0,pos);
+            extension = fileName.substring(pos);
+        }
+        
+        fileName = name + "_" + index + extension;
+
+        logDebug("Filename: " + fileName);
+        return fileName;
+    }
+    
+    private float[] getGPSCoordinates(String filePath,boolean isVideo) {
+        float output[] = new float[2];
+        try {
+            if (isVideo) {
+                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(filePath);
+                
+                String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+                if (location != null) {
+                    logDebug("Location: " + location);
+                    
+                    boolean secondTry = false;
+                    try {
+                        final int mid = location.length() / 2; //get the middle of the String
+                        String[] parts = {location.substring(0,mid),location.substring(mid)};
+                        
+                        output[0] = Float.parseFloat(parts[0]);
+                        output[1] = Float.parseFloat(parts[1]);
+                        
+                    } catch (Exception exc) {
+                        secondTry = true;
+                        logError("Exception, second try to set GPS coordinates", exc);
+                    }
+                    
+                    if (secondTry) {
+                        try {
+                            String latString = location.substring(0,7);
+                            String lonString = location.substring(8,17);
+                            
+                            output[0] = Float.parseFloat(latString);
+                            output[1] = Float.parseFloat(lonString);
+                            
+                        } catch (Exception ex) {
+                            logError("Exception again, no chance to set coordinates of video", ex);
+                        }
+                    }
+                } else {
+                    logWarning("No location info");
+                }
+                retriever.release();
+            } else {
+                ExifInterface exif = new ExifInterface(filePath);
+                exif.getLatLong(output);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logError("Exception", e);
+        }
+        return output;
+    }
+
+    private MegaNode getPossibleNodeFromCloud(String localFingerPrint, MegaNode uploadNode) {
+        logDebug("getPossibleNodeFromCloud");
+        long targetFolderHanlde = uploadNode.getHandle();
+        MegaNode preferNode = null;
+
+        MegaNodeList possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, uploadNode);
+        if(possibleNodeListFPO != null && possibleNodeListFPO.size() > 0) {
+            // the desired node, do nothing.
+            logDebug("Found node with same fingerprint in the same folder!");
+            return getFirstNodeFromList(possibleNodeListFPO);
+        }
+
+        possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, null);
+        if(possibleNodeListFPO != null && possibleNodeListFPO.size() > 0) {
+            // node with same fingerprint but in different folder, copy.
+            preferNode =  getFirstNodeFromList(possibleNodeListFPO);
+        }
+
+        MegaNode nodeFP = megaApi.getNodeByFingerprint(localFingerPrint, uploadNode);
+        if (nodeFP != null) {
+            if(nodeFP.getParentHandle() == targetFolderHanlde) {
+                // the desired node, do nothing.
+                logDebug("Found node with same fingerprint in the same folder!");
+                return nodeFP;
+            } else {
+                // node with same fingerprint but in different folder, copy.
+                preferNode = nodeFP;
             }
         }
 
-        String status = isOverquota ? getString(R.string.overquota_alert_title) :
-                getString(R.string.settings_camera_notif_title);
+        logDebug("No possibile node found");
+        return preferNode;
+    }
 
-        Intent intent = null;
-
-        intent = new Intent(this, ManagerActivityLollipop.class);
-        intent.setAction(isOverquota ? Constants.ACTION_OVERQUOTA_STORAGE :
-                Constants.ACTION_CANCEL_CAM_SYNC);
-
-        String info = Util.getProgressSize(this, progress, totalSizeToUpload);
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        Notification notification = null;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setShowBadge(true);
-            channel.setSound(null, null);
-            mNotificationManager.createNotificationChannel(channel);
-
-            NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
-
-            mBuilderCompat
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setProgress(100, progressPercent, false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .setContentTitle(message)
-                    .setSubText(info)
-                    .setContentText(status)
-                    .setOnlyAlertOnce(true);
-
-            notification = mBuilderCompat.build();
+    private MegaNode getFirstNodeFromList(MegaNodeList megaNodeList) {
+        if(megaNodeList != null && megaNodeList.size() > 0) {
+            return megaNodeList.get(0);
         }
-        else if (currentapiVersion >= android.os.Build.VERSION_CODES.N) {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setProgress(100, progressPercent, false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .setContentTitle(message)
-                    .setSubText(info)
-                    .setContentText(status)
-                    .setOnlyAlertOnce(true);
-            notification = mBuilder.getNotification();
+        return null;
+    }
+    
+    private void releaseLocks() {
+        if ((lock != null) && (lock.isHeld())) {
+            try {
+                lock.release();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
-        else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-        {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setProgress(100, progressPercent, false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .setContentTitle(message)
-                    .setContentInfo(info)
-                    .setContentText(status)
-                    .setOnlyAlertOnce(true);
-            notification = mBuilder.getNotification();
-//					notification = mBuilder.build();
+        if ((wl != null) && (wl.isHeld())) {
+            try {
+                wl.release();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
-        else
-        {
-            notification = new Notification(R.drawable.ic_stat_camera_sync, null, 1);
-            notification.flags |= Notification.FLAG_ONGOING_EVENT;
-            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-            notification.contentIntent = pendingIntent;
-            notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_camera_sync);
-            notification.contentView.setTextViewText(R.id.status_text, message);
-            notification.contentView.setTextViewText(R.id.progress_text, info);
-            notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
+    }
+    
+    private boolean isChargingRequired(long queueSize) {
+        initDbH();
+        MegaPreferences preferences = dbH.getPreferences();
+        if (preferences != null && preferences.getConversionOnCharging() != null) {
+            if (Boolean.parseBoolean(preferences.getConversionOnCharging())) {
+                int queueSizeLimit = Integer.parseInt(preferences.getChargingOnSize());
+                if (queueSize > queueSizeLimit) {
+                    logDebug("isChargingRequired " + true + ", queue size is " + queueSize + ", limit size is " + queueSizeLimit);
+                    return true;
+                }
+            }
         }
+        logDebug("isChargingRequired " + false);
+        return false;
+    }
+    
+    private void initDbH(){
+        if(dbH == null){
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        }
+    }
 
-        mNotificationManager.notify(notificationId, notification);
+    private boolean isDeviceLowOnBattery(Intent intent){
+        if(intent == null){
+            return false;
+        }
+        int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        logDebug("Device battery level is " + level);
+        return level <= LOW_BATTERY_LEVEL && !isCharging(CameraUploadsService.this);
     }
 }

@@ -40,6 +40,10 @@ import java.util.HashMap;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
+import mega.privacy.android.app.lollipop.adapters.MediaRecentsAdapter;
+import mega.privacy.android.app.FileDocument;
+import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter.ViewHolderFileStorage;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
@@ -50,6 +54,8 @@ import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollip
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter.ViewHolderTransfer;
+import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter;
+import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.lollipop.providers.MegaProviderLollipopAdapter;
@@ -60,8 +66,11 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static nz.mega.sdk.MegaUtilsAndroid.createThumbnail;
 
 /*
  * Service to create thumbnails
@@ -70,11 +79,10 @@ public class ThumbnailUtilsLollipop {
 	public static File thumbDir;
 	public static ThumbnailCache thumbnailCache = new ThumbnailCache();
 	public static ThumbnailCache thumbnailCachePath = new ThumbnailCache(1);
-//	public static ArrayList<Long> pendingThumbnails = new ArrayList<Long>();
-	
+	public static Boolean isDeviceMemoryLow = false;
+
 	static HashMap<Long, ThumbnailDownloadListenerListBrowser> listenersList = new HashMap<Long, ThumbnailDownloadListenerListBrowser>();
 	static HashMap<Long, ThumbnailDownloadListenerGridBrowser> listenersGrid = new HashMap<Long, ThumbnailDownloadListenerGridBrowser>();
-//	static HashMap<Long, ThumbnailDownloadListenerNewGrid> listenersNewGrid = new HashMap<Long, ThumbnailDownloadListenerNewGrid>();
 	static HashMap<Long, ThumbnailDownloadListenerExplorerLollipop> listenersExplorerLollipop = new HashMap<Long, ThumbnailDownloadListenerExplorerLollipop>();
 	static HashMap<Long, ThumbnailDownloadListenerProvider> listenersProvider = new HashMap<Long, ThumbnailDownloadListenerProvider>();
 	static HashMap<Long, ThumbnailDownloadListenerFull> listenersFull = new HashMap<Long, ThumbnailDownloadListenerFull>();
@@ -86,7 +94,7 @@ public class ThumbnailUtilsLollipop {
 
 	public static Bitmap getRoundedRectBitmap(Context context, final Bitmap bitmap,final int pixels)
 	{
-		log("getRoundedRectBitmap");
+		logDebug("getRoundedRectBitmap");
 		final Bitmap result = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
 		final Canvas canvas = new Canvas(result);
 		final Paint paint = new Paint();
@@ -100,10 +108,6 @@ public class ThumbnailUtilsLollipop {
 		paint.setColor(ContextCompat.getColor(context, R.color.white));
 		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 
-		//draw rectangles over the corners we want to be square
-//		canvas.drawRect(0, 0, bitmap.getWidth()/2, bitmap.getHeight()/2, paint);
-//		canvas.drawRect(bitmap.getWidth()/2, 0, bitmap.getWidth(), bitmap.getHeight()/2, paint);
-
 		canvas.drawRect(0, bitmap.getHeight()/2, bitmap.getWidth()/2, bitmap.getHeight(), paint);
 		canvas.drawRect(bitmap.getWidth()/2, bitmap.getHeight()/2, bitmap.getWidth(), bitmap.getHeight(), paint);
 
@@ -113,7 +117,7 @@ public class ThumbnailUtilsLollipop {
 	}
 
 	public static Bitmap getRoundedBitmap(Context context, final Bitmap bitmap,final int pixels){
-		log("getRoundedRectBitmap");
+		logDebug("getRoundedRectBitmap");
 		final Bitmap result = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
 		final Canvas canvas = new Canvas(result);
 		final Paint paint = new Paint();
@@ -202,15 +206,13 @@ public class ThumbnailUtilsLollipop {
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-			
-			log("Downloading thumbnail finished");
+
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
-			
-//			pendingThumbnails.remove(handle);
-			
+
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 				
 				if (holder != null){
@@ -225,8 +227,8 @@ public class ThumbnailUtilsLollipop {
 									holder.imageView.setImageBitmap(bitmap);
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.imageView.startAnimation(fadeInAnimation);
-									adapter.notifyDataSetChanged();
-									log("Thumbnail update");
+									adapter.notifyItemChanged(holder.getAdapterPosition());
+									logDebug("Thumbnail update");
 								}
 							}
 						}
@@ -234,7 +236,7 @@ public class ThumbnailUtilsLollipop {
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -269,10 +271,10 @@ public class ThumbnailUtilsLollipop {
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("OK thumb de video");
+				logDebug("OK thumb de video");
 			}
 			else{
-				log("ERROR thumb de video: "+e.getErrorString());
+				logError("ERROR thumb de video: " + e.getErrorString());
 			}
 			
 		}
@@ -307,15 +309,12 @@ public class ThumbnailUtilsLollipop {
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-			
-			log("Downloading thumbnail finished");
+
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
-			
-//			pendingThumbnails.remove(handle);
-			
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 				
 				if (holder != null){
@@ -331,8 +330,8 @@ public class ThumbnailUtilsLollipop {
 									holder.imageViews.get(numView).setImageBitmap(bitmap);
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.imageViews.get(numView).startAnimation(fadeInAnimation);
-									adapter.notifyDataSetChanged();
-									log("Thumbnail update");
+									adapter.notifyItemChanged(holder.getAdapterPosition());
+									logDebug("Thumbnail update");
 								}								
 							}
 						}
@@ -340,7 +339,7 @@ public class ThumbnailUtilsLollipop {
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -377,58 +376,76 @@ public class ThumbnailUtilsLollipop {
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 
-			log("Downloading thumbnail finished");
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			String base64 = MegaApiJava.handleToBase64(handle);
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 
-				if (holder != null){
-					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, base64+".jpg");
+				if (holder == null) return;
 
-					if (thumb.exists()) {
-						if (thumb.length() > 0) {
-							final Bitmap bitmap = getBitmapForCache(thumb, context);
-							if (bitmap != null) {
-								thumbnailCache.put(handle, bitmap);
-								if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
-									if ((((MegaNodeAdapter.ViewHolderBrowserList)holder).document == handle)){
-										((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
-										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-										((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
-										adapter.notifyDataSetChanged();
-										log("Thumbnail update");
-									}
-								}
-								else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
-									if ((((VersionsFileAdapter.ViewHolderVersion)holder).document == handle)){
-										((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setImageBitmap(bitmap);
-										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-										((VersionsFileAdapter.ViewHolderVersion)holder).imageView.startAnimation(fadeInAnimation);
-										adapter.notifyDataSetChanged();
-										log("Thumbnail update");
-									}
-								}
-								else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserList){
-									if ((((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).document == handle)){
-										((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
-										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-										((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
-										int position = holder.getAdapterPosition();
-										adapter.notifyItemChanged(position);
-										log("Thumbnail update");
-									}
-								}
-							}
+				File thumbDir = getThumbFolder(context);
+				File thumb = new File(thumbDir, base64+".jpg");
+
+				if (!thumb.exists() || thumb.length() <= 0) return;
+
+				final Bitmap bitmap = getBitmapForCache(thumb, context);
+				if (bitmap == null) return;
+
+				thumbnailCache.put(handle, bitmap);
+
+				Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+
+				if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
+					if ((((MegaNodeAdapter.ViewHolderBrowserList)holder).document == handle)){
+						((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
+						((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
+					}
+				}
+				else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
+					if ((((VersionsFileAdapter.ViewHolderVersion)holder).document == handle)){
+						((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setImageBitmap(bitmap);
+						((VersionsFileAdapter.ViewHolderVersion)holder).imageView.startAnimation(fadeInAnimation);
+					}
+				}
+				else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserList){
+					if ((((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).document == handle)){
+						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
+						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
+					}
+				}
+				else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
+					RecentsAdapter.ViewHolderBucket viewHolderBucket = (RecentsAdapter.ViewHolderBucket) holder;
+					if (viewHolderBucket.getDocument() == handle) {
+						viewHolderBucket.setImageThumbnail(bitmap);
+						viewHolderBucket.getImageThumbnail().startAnimation(fadeInAnimation);
+					}
+				}
+				else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
+					MediaRecentsAdapter.ViewHolderMediaBucket viewHolderMediaBucket = (MediaRecentsAdapter.ViewHolderMediaBucket) holder;
+					if (viewHolderMediaBucket.getDocument() == handle) {
+						viewHolderMediaBucket.setImage(bitmap);
+						viewHolderMediaBucket.getThumbnail().startAnimation(fadeInAnimation);
+					}
+				}
+				else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
+					MultipleBucketAdapter.ViewHolderMultipleBucket viewHolderMultipleBucket = (MultipleBucketAdapter.ViewHolderMultipleBucket) holder;
+					if (viewHolderMultipleBucket.getDocument() == handle) {
+						viewHolderMultipleBucket.setImageThumbnail(bitmap);
+						if (((MultipleBucketAdapter) adapter).isMedia()) {
+							viewHolderMultipleBucket.getThumbnailMedia().startAnimation(fadeInAnimation);
+						} else {
+							viewHolderMultipleBucket.getThumbnailList().startAnimation(fadeInAnimation);
 						}
 					}
 				}
+
+				adapter.notifyItemChanged(holder.getAdapterPosition());
 			}
 			else{
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -465,14 +482,11 @@ public class ThumbnailUtilsLollipop {
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
-			log("Downloading thumbnail finished");
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
-
-//			pendingThumbnails.remove(handle);
-
 			if (e.getErrorCode() == MegaError.API_OK) {
-				log("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 
 				if (holder != null) {
@@ -491,8 +505,8 @@ public class ThumbnailUtilsLollipop {
 										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.startAnimation(fadeInAnimation);
-										adapter.notifyDataSetChanged();
-										log("Thumbnail update");
+										adapter.notifyItemChanged(holder.getAdapterPosition());
+										logDebug("Thumbnail update");
 									}
 								}
 								else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid){
@@ -503,8 +517,8 @@ public class ThumbnailUtilsLollipop {
 										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.startAnimation(fadeInAnimation);
-										adapter.notifyDataSetChanged();
-										log("Thumbnail update");
+										adapter.notifyItemChanged(holder.getAdapterPosition());
+										logDebug("Thumbnail update");
 									}
 								}
 							}
@@ -512,7 +526,7 @@ public class ThumbnailUtilsLollipop {
 					}
 				}
 			} else {
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -548,15 +562,12 @@ public class ThumbnailUtilsLollipop {
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-			
-			log("Downloading thumbnail finished");
+
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
-			
-//			pendingThumbnails.remove(handle);
-			
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 				
 				if (holder != null){
@@ -568,11 +579,22 @@ public class ThumbnailUtilsLollipop {
 							if (bitmap != null) {
 								thumbnailCache.put(handle, bitmap);
 								if ((holder.document == handle)){
-									holder.imageView.setImageBitmap(bitmap);
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-									holder.imageView.startAnimation(fadeInAnimation);
-									adapter.notifyDataSetChanged();
-									log("Thumbnail update");
+									if (holder instanceof MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop) {
+										MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop holderList = (MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop) holder;
+										holderList.imageView.setImageBitmap(bitmap);
+										holderList.imageView.startAnimation(fadeInAnimation);
+										adapter.notifyItemChanged(holderList.getAdapterPosition());
+									}
+									else if (holder instanceof MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop) {
+										MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop holderGrid = (MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop) holder;
+										holderGrid.fileThumbnail.setImageBitmap(ThumbnailUtilsLollipop.getRoundedRectBitmap(context,bitmap,2));
+										holderGrid.fileThumbnail.setVisibility(View.VISIBLE);
+										holderGrid.fileIcon.setVisibility(View.GONE);
+										holderGrid.fileThumbnail.startAnimation(fadeInAnimation);
+										adapter.notifyItemChanged(holderGrid.getAdapterPosition());
+									}
+									logDebug("Thumbnail update");
 								}
 							}
 						}
@@ -580,14 +602,14 @@ public class ThumbnailUtilsLollipop {
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
 		@Override
 		public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -616,15 +638,12 @@ public class ThumbnailUtilsLollipop {
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-			
-			log("Downloading thumbnail finished");
+
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
-			
-//			pendingThumbnails.remove(handle);
-			
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 				
 				if (holder != null){
@@ -639,8 +658,8 @@ public class ThumbnailUtilsLollipop {
 									holder.imageView.setImageBitmap(bitmap);
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.imageView.startAnimation(fadeInAnimation);
-									adapter.notifyDataSetChanged();
-									log("Thumbnail update");
+									adapter.notifyItemChanged(holder.getAdapterPosition());
+									logDebug("Thumbnail update");
 								}
 							}
 						}
@@ -648,7 +667,7 @@ public class ThumbnailUtilsLollipop {
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -684,15 +703,12 @@ public class ThumbnailUtilsLollipop {
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-			
-			log("Downloading thumbnail finished");
+
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
-			
-//			pendingThumbnails.remove(handle);
-			
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 				
 				if (holder != null){
@@ -708,7 +724,7 @@ public class ThumbnailUtilsLollipop {
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.imgDisplay.startAnimation(fadeInAnimation);
 									adapter.notifyDataSetChanged();
-									log("Thumbnail update");
+									logDebug("Thumbnail update");
 								}
 							}
 						}
@@ -716,7 +732,7 @@ public class ThumbnailUtilsLollipop {
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -752,15 +768,15 @@ public class ThumbnailUtilsLollipop {
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-			
-			log("Downloading thumbnail finished");
+
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
 //			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 				
 				if (holder != null){
@@ -775,8 +791,8 @@ public class ThumbnailUtilsLollipop {
 									holder.imageView.setImageBitmap(bitmap);
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.imageView.startAnimation(fadeInAnimation);
-									adapter.notifyDataSetChanged();
-									log("Thumbnail update");
+									adapter.notifyItemChanged(holder.getAdapterPosition());
+									logDebug("Thumbnail update");
 								}
 							}
 						}
@@ -784,7 +800,7 @@ public class ThumbnailUtilsLollipop {
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -805,21 +821,11 @@ public class ThumbnailUtilsLollipop {
 	 * Get thumbnail folder
 	 */	
 	public static File getThumbFolder(Context context) {
-		if (thumbDir == null) {
-			if (context.getExternalCacheDir() != null){
-				thumbDir = new File (context.getExternalCacheDir(), "thumbnailsMEGA");
-			}
-			else{
-				thumbDir = context.getDir("thumbnailsMEGA", 0);
-			}
-		}
-
-		if (thumbDir != null){
-			thumbDir.mkdirs();
-		}
-
-		log("getThumbFolder(): thumbDir= " + thumbDir);
-		return thumbDir;
+        if(!isFileAvailable(thumbDir)) {
+            thumbDir = getCacheFolder(context, THUMBNAIL_FOLDER);
+        }
+		logDebug("getThumbFolder(): thumbDir= " + thumbDir);
+        return thumbDir;
 	}
 	
 	public static Bitmap getThumbnailFromCache(MegaNode node){
@@ -863,16 +869,9 @@ public class ThumbnailUtilsLollipop {
 	
 	public static Bitmap getThumbnailFromMegaList(MegaNode document, Context context, RecyclerView.ViewHolder viewHolder, MegaApiAndroid megaApi, RecyclerView.Adapter adapter){
 
-//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-//			log("the thumbnail is already downloaded or added to the list");
-//			return thumbnailCache.get(document.getHandle());
-//		}
-
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
-
-//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerListBrowser listener = new ThumbnailDownloadListenerListBrowser(context, viewHolder, adapter);
 		listenersList.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -884,21 +883,14 @@ public class ThumbnailUtilsLollipop {
 	}
 
 	public static Bitmap getThumbnailFromMegaGrid(MegaNode document, Context context, RecyclerView.ViewHolder viewHolder, MegaApiAndroid megaApi, RecyclerView.Adapter adapter){
-
-//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-//			log("the thumbnail is already downloaded or added to the list");
-//			return thumbnailCache.get(document.getHandle());
-//		}
-
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
 
-//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerGridBrowser listener = new ThumbnailDownloadListenerGridBrowser(context, viewHolder, adapter);
 		listenersGrid.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
-		log("Lo descargare aqui: " + thumbFile.getAbsolutePath());
+		logDebug("Will download here: " + thumbFile.getAbsolutePath());
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 
 		return thumbnailCache.get(document.getHandle());
@@ -906,21 +898,15 @@ public class ThumbnailUtilsLollipop {
 	}
 	
 	public static Bitmap getThumbnailFromMegaPhotoSyncList(MegaNode document, Context context, ViewHolderPhotoSyncList viewHolder, MegaApiAndroid megaApi, MegaPhotoSyncListAdapterLollipop adapter){
-		
-//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-//			log("the thumbnail is already downloaded or added to the list");
-//			return thumbnailCache.get(document.getHandle());
-//		}
-		
+
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
-		
-//		pendingThumbnails.add(document.getHandle());
+
 		ThumbnailDownloadListenerPhotoSyncList listener = new ThumbnailDownloadListenerPhotoSyncList(context, viewHolder, adapter);
 		listenersPhotoSyncList.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
-		log("Lo descargare aqui: " + thumbFile.getAbsolutePath());
+		logDebug("Will download here: " + thumbFile.getAbsolutePath());
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 		
 		return thumbnailCache.get(document.getHandle());
@@ -928,21 +914,14 @@ public class ThumbnailUtilsLollipop {
 	}
 	
 	public static Bitmap getThumbnailFromMegaTransfer(MegaNode document, Context context, ViewHolderTransfer viewHolder, MegaApiAndroid megaApi, MegaTransfersLollipopAdapter adapter){
-		
-//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-//			log("the thumbnail is already downloaded or added to the list");
-//			return thumbnailCache.get(document.getHandle());
-//		}
-		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
-		
-//		pendingThumbnails.add(document.getHandle());
+
 		ThumbnailDownloadListenerTransfer listener = new ThumbnailDownloadListenerTransfer(context, viewHolder, adapter);
 		listenersTransfer.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
-		log("Lo descargare aqui: " + thumbFile.getAbsolutePath());
+		logDebug("Will download here: " + thumbFile.getAbsolutePath());
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 		
 		return thumbnailCache.get(document.getHandle());
@@ -950,17 +929,10 @@ public class ThumbnailUtilsLollipop {
 	}
 	
 	public static Bitmap getThumbnailFromMegaExplorerLollipop(MegaNode document, Context context, ViewHolderExplorerLollipop viewHolder, MegaApiAndroid megaApi, MegaExplorerLollipopAdapter adapter){
-		
-//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-//			log("the thumbnail is already downloaded or added to the list");
-//			return thumbnailCache.get(document.getHandle());
-//		}
-		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
-		
-//		pendingThumbnails.add(document.getHandle());
+
 		ThumbnailDownloadListenerExplorerLollipop listener = new ThumbnailDownloadListenerExplorerLollipop(context, viewHolder, adapter);
 		listenersExplorerLollipop.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -971,17 +943,10 @@ public class ThumbnailUtilsLollipop {
 	}
 	
 	public static Bitmap getThumbnailFromMegaProvider(MegaNode document, Context context, ViewHolderLollipopProvider viewHolder, MegaApiAndroid megaApi, MegaProviderLollipopAdapter adapter){
-		
-//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-//			log("the thumbnail is already downloaded or added to the list");
-//			return thumbnailCache.get(document.getHandle());
-//		}
-		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
-		
-//		pendingThumbnails.add(document.getHandle());
+
 		ThumbnailDownloadListenerProvider listener = new ThumbnailDownloadListenerProvider(context, viewHolder, adapter);
 		listenersProvider.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -992,16 +957,10 @@ public class ThumbnailUtilsLollipop {
 	}
 
 	public static Bitmap getThumbnailFromMegaPhotoSyncGrid(MegaNode document, Context context, ViewHolderPhotoSyncGrid viewHolder, MegaApiAndroid megaApi, MegaPhotoSyncGridAdapterLollipop adapter, int numView){
-//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-//			log("the thumbnail is already downloaded or added to the list");
-//			return thumbnailCache.get(document.getHandle());
-//		}
-		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
-		
-//		pendingThumbnails.add(document.getHandle());
+
 		ThumbnailDownloadListenerPhotoSyncGrid listener = new ThumbnailDownloadListenerPhotoSyncGrid(context, viewHolder, adapter, numView);
 		listenersPhotoSyncGrid.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -1011,17 +970,11 @@ public class ThumbnailUtilsLollipop {
 	}
 	
 	public static Bitmap getThumbnailFromMegaFull(MegaNode document, Context context, MegaFullScreenImageAdapterLollipop.ViewHolderFullImage viewHolder, MegaApiAndroid megaApi, MegaFullScreenImageAdapterLollipop adapter){
-		
-//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-//			log("the thumbnail is already downloaded or added to the list");
-//			return thumbnailCache.get(document.getHandle());
-//		}
-		
+
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
-		
-//		pendingThumbnails.add(document.getHandle());
+
 		ThumbnailDownloadListenerFull listener = new ThumbnailDownloadListenerFull(context, viewHolder, adapter);
 		listenersFull.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -1041,12 +994,61 @@ public class ThumbnailUtilsLollipop {
 		Bitmap bmp = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
 		return bmp;
 	}
+    
+    private static Bitmap getBitmapForCacheForList(File bmpFile, Context context) {
+        if(isDeviceMemoryLow){
+            return null;
+        }
+        BitmapFactory.Options bOpts = new BitmapFactory.Options();
+        Bitmap bmp = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
+        return bmp;
+    }
 	
 	public static class ResizerParams {
 		File file;
 		MegaNode document;
 	}
-	
+
+
+	/*
+	* This async task is to patch thumbnail picture to video or image files
+	* in device folder when select device file to upload
+	*/
+	static class AttachThumbnailToFileStorageExplorerTask extends AsyncTask<FileDocument, Void, Boolean> {
+
+		Context context;
+		File thumbFile;
+		File originalFile;
+		FileStorageLollipopAdapter adapter;
+		MegaApiAndroid megaApi;
+		int position;
+
+		AttachThumbnailToFileStorageExplorerTask(Context context, MegaApiAndroid megaApi, FileStorageLollipopAdapter adapter, int position) {
+			this.context = context;
+			this.adapter = adapter;
+			this.thumbFile = null;
+			this.megaApi = megaApi;
+			this.position = position;
+		}
+
+		@Override
+		protected Boolean doInBackground(FileDocument... params) {
+			logDebug("Attach Thumbnails to file storage explorer Start");
+			File thumbDir = getThumbFolder(context);
+			this.originalFile = params[0].getFile();
+			thumbFile = new File(thumbDir, megaApi.getFingerprint(this.originalFile.getAbsolutePath()) + ".jpg" );
+			boolean thumbCreated = createThumbnail(this.originalFile, thumbFile);
+			return thumbCreated;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean shouldContinueObject) {
+			if (shouldContinueObject){
+				onThumbnailGeneratedExplorerLollipop(megaApi, this.thumbFile, this.originalFile, adapter, position);
+			}
+		}
+	}
+
 	static class AttachThumbnailTaskExplorerLollipop extends AsyncTask<ResizerParams, Void, Boolean>
 	{
 		Context context;
@@ -1068,12 +1070,12 @@ public class ThumbnailUtilsLollipop {
 		
 		@Override
 		protected Boolean doInBackground(ResizerParams... params) {
-			log("AttachPreviewStart");
+			logDebug("AttachPreviewStart");
 			param = params[0];
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1081,7 +1083,7 @@ public class ThumbnailUtilsLollipop {
 		@Override
 		protected void onPostExecute(Boolean shouldContinueObject) {
 			if (shouldContinueObject){
-				onThumbnailGeneratedExplorerLollipop(megaApi, thumbFile, param.document, holder, adapter);
+				onThumbnailGeneratedExplorerLollipop(context, thumbFile, param.document, holder, adapter);
 			}
 		}
 	}
@@ -1107,12 +1109,12 @@ public class ThumbnailUtilsLollipop {
 		
 		@Override
 		protected Boolean doInBackground(ResizerParams... params) {
-			log("AttachPreviewStart");
+			logDebug("AttachPreviewStart");
 			param = params[0];
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1124,18 +1126,41 @@ public class ThumbnailUtilsLollipop {
 			}
 		}
 	}	
-	
-	private static void onThumbnailGeneratedExplorerLollipop(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderExplorerLollipop holder, MegaExplorerLollipopAdapter adapter){
-		log("onPreviewGenerated");
-		//Tengo que mostrarla
+
+	private static void onThumbnailGeneratedExplorerLollipop(Context context, File thumbFile, MegaNode document, ViewHolderExplorerLollipop holder, MegaExplorerLollipopAdapter adapter){
+		logDebug("onPreviewGenerated");
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
-		holder.imageView.setImageBitmap(bitmap);
+		if (holder instanceof MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop) {
+			MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop holderList = (MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop) holder;
+			holderList.imageView.setImageBitmap(bitmap);
+			adapter.notifyItemChanged(holderList.getAdapterPosition());
+		}
+		else if (holder instanceof MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop) {
+			MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop holderGrid = (MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop) holder;
+			holderGrid.fileThumbnail.setImageBitmap(ThumbnailUtilsLollipop.getRoundedRectBitmap(context,bitmap,2));
+			holderGrid.fileThumbnail.setVisibility(View.VISIBLE);
+			holderGrid.fileIcon.setVisibility(View.GONE);
+			adapter.notifyItemChanged(holderGrid.getAdapterPosition());
+		}
 		thumbnailCache.put(document.getHandle(), bitmap);
-		adapter.notifyDataSetChanged();
-		
-		log("AttachThumbnailTask end");		
+		logDebug("AttachThumbnailTask end");
+	}
+
+	private static void onThumbnailGeneratedExplorerLollipop(MegaApiAndroid megaApi,File thumbFile, File originalFile, FileStorageLollipopAdapter adapter, int position){
+		logDebug("onPreviewGenerated");
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
+		String key = megaApi.getFingerprint(originalFile.getAbsolutePath());
+		//put thumbnail picture into cache
+		if (key != null && bitmap != null) {
+			thumbnailCache.put(megaApi.getFingerprint(originalFile.getAbsolutePath()), bitmap);
+		}
+		//refresh the position only in required
+		adapter.notifyItemChanged(position);
+		logDebug("AttachThumbnailTask end");
 	}
 
 	static class AttachThumbnailTaskPhotoSyncList extends AsyncTask<ResizerParams, Void, Boolean>
@@ -1159,12 +1184,12 @@ public class ThumbnailUtilsLollipop {
 		
 		@Override
 		protected Boolean doInBackground(ResizerParams... params) {
-			log("AttachPreviewStart");
+			logDebug("AttachPreviewStart");
 			param = params[0];
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1178,16 +1203,15 @@ public class ThumbnailUtilsLollipop {
 	}
 	
 	private static void onThumbnailGeneratedPhotoSyncList(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderPhotoSyncList holder, MegaPhotoSyncListAdapterLollipop adapter){
-		log("onPreviewGenerated");
+		logDebug("onPreviewGenerated");
 		//Tengo que mostrarla
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 		holder.imageView.setImageBitmap(bitmap);
 		thumbnailCache.put(document.getHandle(), bitmap);
-		adapter.notifyDataSetChanged();
-		
-		log("AttachThumbnailTask end");		
+		adapter.notifyItemChanged(holder.getAdapterPosition());
+		logDebug("AttachThumbnailTask end");
 	}
 	
 	static class AttachThumbnailTaskList extends AsyncTask<ResizerParams, Void, Boolean>
@@ -1212,12 +1236,12 @@ public class ThumbnailUtilsLollipop {
 		
 		@Override
 		protected Boolean doInBackground(ResizerParams... params) {
-			log("AttachThumbnailTaskList");
+			logDebug("AttachThumbnailTaskList");
 			param = params[0];
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1225,27 +1249,34 @@ public class ThumbnailUtilsLollipop {
 		@Override
 		protected void onPostExecute(Boolean shouldContinueObject) {
 
-			if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
-				if (shouldContinueObject){
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) ((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(18, 0, 12, 0);
-					((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.setLayoutParams(params1);
+			if (!shouldContinueObject) return;
 
-					onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
-				}
+			if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
+				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) ((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.getLayoutParams();
+				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.setMargins(18, 0, 12, 0);
+				((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.setLayoutParams(params1);
+
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
 			}
 			else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
-				if (shouldContinueObject){
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) ((VersionsFileAdapter.ViewHolderVersion)holder).imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(18, 0, 12, 0);
-					((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setLayoutParams(params1);
+				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) ((VersionsFileAdapter.ViewHolderVersion)holder).imageView.getLayoutParams();
+				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.setMargins(18, 0, 12, 0);
+				((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setLayoutParams(params1);
 
-					onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
-				}
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
+			}
+			else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
+			}
+			else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
+			}
+			else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
 			}
 		}
 	}
@@ -1271,12 +1302,12 @@ public class ThumbnailUtilsLollipop {
 
 		@Override
 		protected Boolean doInBackground(ResizerParams... params) {
-			log("AttachThumbnailTaskGrid");
+			logDebug("AttachThumbnailTaskGrid");
 			param = params[0];
 
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1291,7 +1322,7 @@ public class ThumbnailUtilsLollipop {
 	}
 
 	private static void onThumbnailGeneratedList(MegaApiAndroid megaApi, File thumbFile, MegaNode document, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter){
-		log("onThumbnailGeneratedList");
+		logDebug("onThumbnailGeneratedList");
 
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -1303,54 +1334,58 @@ public class ThumbnailUtilsLollipop {
 		else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
 			((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setImageBitmap(bitmap);
 		}
+		else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
+			((RecentsAdapter.ViewHolderBucket) holder).setImageThumbnail(bitmap);
+		}
+		else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
+			((MediaRecentsAdapter.ViewHolderMediaBucket) holder).setImage(bitmap);
+		}
+		else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
+			((MultipleBucketAdapter.ViewHolderMultipleBucket) holder).setImageThumbnail(bitmap);
+		}
 
 		thumbnailCache.put(document.getHandle(), bitmap);
-		adapter.notifyDataSetChanged();
-		
-		log("AttachThumbnailTask end");		
+
+		adapter.notifyItemChanged(holder.getAdapterPosition());
+		logDebug("AttachThumbnailTask end");
 	}
 
 	private static void onThumbnailGeneratedGrid(Context context, File thumbFile, MegaNode document, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter){
-		log("onThumbnailGeneratedGrid");
+		logDebug("onThumbnailGeneratedGrid");
+
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 
 		if(holder instanceof MegaNodeAdapter.ViewHolderBrowserGrid){
-
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-			Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-			thumbnailCache.put(document.getHandle(), bitmap);
-			adapter.notifyDataSetChanged();
 		}
 		else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid){
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-			Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-			thumbnailCache.put(document.getHandle(), bitmap);
-			adapter.notifyDataSetChanged();
 		}
 
-		log("AttachThumbnailTask end");
+		thumbnailCache.put(document.getHandle(), bitmap);
+		adapter.notifyItemChanged(holder.getAdapterPosition());
+		logDebug("AttachThumbnailTask end");
 	}
 	
 	public static void createThumbnailPhotoSyncList(Context context, MegaNode document, ViewHolderPhotoSyncList holder, MegaApiAndroid megaApi, MegaPhotoSyncListAdapterLollipop adapter){
 		
 		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
-			log("no image");
+			logWarning("No image");
 			return;
 		}
 		
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
-			log("localPath no es nulo: " + localPath);
+			logDebug("localPath is not null: " + localPath);
 			ResizerParams params = new ResizerParams();
 			params.document = document;
 			params.file = new File(localPath);
@@ -1358,34 +1393,15 @@ public class ThumbnailUtilsLollipop {
 		} //Si no, no hago nada
 		
 	}
-	
-//	public static void createThumbnailList(Context context, MegaNode document, MegaNodeAdapter.ViewHolderBrowserList holder, MegaApiAndroid megaApi, MegaNodeAdapter adapter){
-//
-//		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
-//			log("no image");
-//			return;
-//		}
-//
-//		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
-//		if(localPath != null) //Si la tengo en el sistema de ficheros
-//		{
-//			log("localPath no es nulo: " + localPath);
-//			ResizerParams params = new ResizerParams();
-//			params.document = document;
-//			params.file = new File(localPath);
-//			new AttachThumbnailTaskList(context, megaApi, holder, adapter).execute(params);
-//		} //Si no, no hago nada
-//
-//	}
 
 	public static void createThumbnailList(Context context, MegaNode document, RecyclerView.ViewHolder holder, MegaApiAndroid megaApi, RecyclerView.Adapter adapter){
 
 		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
-			log("no image");
+			logWarning("No image");
 			return;
 		}
 
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			ResizerParams params = new ResizerParams();
@@ -1399,14 +1415,14 @@ public class ThumbnailUtilsLollipop {
 	public static void createThumbnailGrid(Context context, MegaNode document, RecyclerView.ViewHolder holder, MegaApiAndroid megaApi, RecyclerView.Adapter adapter){
 
 		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
-			log("no image");
+			logWarning("No image");
 			return;
 		}
 
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
-			log("localPath no es nulo: " + localPath);
+			logDebug("localPath is not null: " + localPath);
 			ResizerParams params = new ResizerParams();
 			params.document = document;
 			params.file = new File(localPath);
@@ -1419,14 +1435,14 @@ public class ThumbnailUtilsLollipop {
 	public static void createThumbnailExplorerLollipop(Context context, MegaNode document, ViewHolderExplorerLollipop holder, MegaApiAndroid megaApi, MegaExplorerLollipopAdapter adapter){
 		
 		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
-			log("no image");
+			logWarning("No image");
 			return;
 		}
 		
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
-			log("localPath no es nulo: " + localPath);
+			logDebug("localPath is not null: " + localPath);
 			ResizerParams params = new ResizerParams();
 			params.document = document;
 			params.file = new File(localPath);
@@ -1434,18 +1450,56 @@ public class ThumbnailUtilsLollipop {
 		} //Si no, no hago nada
 		
 	}
-	
+
+	public static void createThumbnailExplorerLollipop(Context context, FileDocument document, ViewHolderFileStorage holder, MegaApiAndroid megaApi, FileStorageLollipopAdapter adapter, int position) {
+		if (!MimeTypeList.typeForName(document.getName()).isImage() &&
+				!MimeTypeList.typeForName(document.getName()).isVideo()) {
+			logDebug("no image or video");
+			return;
+		}
+
+		// if the document is gone or deleted
+		String key = megaApi.getFingerprint(document.getFile().getAbsolutePath());
+		if (key == null) {
+			logDebug("no key");
+			return;
+		}
+
+		// if the thumbnail bitmap is cached in memory cache
+		Bitmap bitmap = getThumbnailFromCache(key);
+		if (bitmap != null) {
+			holder.imageView.setImageBitmap(bitmap);
+			return;
+		}
+
+//		 if the thumbnail bitmap is cached in device file directory
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		File directoryCachedFile = new File(getThumbFolder(context), key + ".jpg" );
+		if (directoryCachedFile.exists()) {
+            bitmap = BitmapFactory.decodeFile(directoryCachedFile.getAbsolutePath(), options);
+            if (bitmap != null) {
+                holder.imageView.setImageBitmap(bitmap);
+                return;
+            }
+        }
+
+		// There is no cache before, we have to start an async task to have the thumbnail bitmap
+		new AttachThumbnailToFileStorageExplorerTask(context, megaApi, adapter, position).execute(document);
+
+	}
+
 	public static void createThumbnailProviderLollipop(Context context, MegaNode document, ViewHolderLollipopProvider holder, MegaApiAndroid megaApi, MegaProviderLollipopAdapter adapter){
 		
 		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
-			log("no image");
+			logWarning("No image");
 			return;
 		}
 		
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
-			log("localPath no es nulo: " + localPath);
+			logDebug("localPath is not null: " + localPath);
 			ResizerParams params = new ResizerParams();
 			params.document = document;
 			params.file = new File(localPath);
@@ -1455,12 +1509,12 @@ public class ThumbnailUtilsLollipop {
 	}
 
 	public static void createThumbnailPdf(Context context, String localPath, MegaApiAndroid megaApi, long handle){
-		log("createThumbnailPdf: "+localPath+ " : "+handle);
+		logDebug("createThumbnailPdf: " + localPath + " : " + handle);
 
 		MegaNode pdfNode = megaApi.getNodeByHandle(handle);
 
 		if (pdfNode == null){
-			log("pdf is NULL");
+			logWarning("Pdf is NULL");
 			return;
 		}
 
@@ -1482,11 +1536,11 @@ public class ThumbnailUtilsLollipop {
 			out = new FileOutputStream(thumb);
 			boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 			if(result){
-				log("Compress OK!");
+				logDebug("Compress OK!");
 				megaApi.setThumbnail(pdfNode, thumb.getAbsolutePath());
 			}
 			else{
-				log("Not Compress");
+				logDebug("Not Compress");
 			}
 			pdfiumCore.closeDocument(pdfDocument);
 		} catch(Exception e) {
@@ -1502,7 +1556,7 @@ public class ThumbnailUtilsLollipop {
 	}
 
 	public static void createThumbnailVideo(Context context, String localPath, MegaApiAndroid megaApi, long handle){
-		log("createThumbnailVideo: "+localPath+ " : "+handle);
+		logDebug("createThumbnailVideo: " + localPath+ " : " + handle);
 		
 		//mp4 and 3gp OK, other formats check from Android DB with loadVideoThumbnail
 		// mov, mkv, flv not working even not in Android DB
@@ -1510,7 +1564,7 @@ public class ThumbnailUtilsLollipop {
 		MegaNode videoNode = megaApi.getNodeByHandle(handle);
 		
 		if(videoNode==null){
-			log("videoNode is NULL");
+			logWarning("videoNode is NULL");
 			return;
 		}
 		
@@ -1518,17 +1572,17 @@ public class ThumbnailUtilsLollipop {
 		// MICRO_KIND, size: 96 x 96 thumbnail 
 		bmThumbnail = ThumbnailUtils.createVideoThumbnail(localPath, Thumbnails.MICRO_KIND);
 		if(bmThumbnail==null){
-			log("Create video thumb NULL, get with Cursor");
+			logDebug("Create video thumb NULL, get with Cursor");
 			bmThumbnail= loadVideoThumbnail(localPath, context);
 		}	
 		else{
-			log("Create Video Thumb worked!");
+			logDebug("Create Video Thumb worked!");
 		}
 		
 		if(bmThumbnail!=null){
 			Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmThumbnail, 200, 200, false);
-			
-			log("After resize thumb: "+resizedBitmap.getHeight()+" : "+resizedBitmap.getWidth());			
+
+			logDebug("After resize thumb: " + resizedBitmap.getHeight() + " : " + resizedBitmap.getWidth());
 			
 			try {
 				File thumbDir = getThumbFolder(context);
@@ -1541,49 +1595,60 @@ public class ThumbnailUtilsLollipop {
 				    out = new FileOutputStream(thumbVideo);
 				    boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 				    if(result){
-				    	log("Compress OK!");
+						logDebug("Compress OK!");
 						megaApi.setThumbnail(videoNode, thumbVideo.getAbsolutePath(), new VideoThumbGeneratorListener());
 				    }
 				    else{
-				    	log("Not Compress");
+						logDebug("Not Compress");
 				    }
 				} catch (Exception e) {
-					log("Error with FileOutputStream: "+e.getMessage());		    
+					logError("Error with FileOutputStream", e);
 				} finally {
 				    try {
 				        if (out != null) {
 				            out.close();
 				        }
 				    } catch (IOException e) {
-				    	log("Error: "+e.getMessage());
+						logError("Error", e);
 				    }
 				}			
 
 			} catch (IOException e1) {
-				log("Error creating new thumb file: "+e1.getMessage());	
+				logError("Error creating new thumb file", e1);
 			}			
 		}
 		else{
-			log("Create video thumb NULL");
+			logWarning("Create video thumb NULL");
 		}
 	}
 	
 	private static final String SELECTION = MediaColumns.DATA + "=?";
 	private static final String[] PROJECTION = { BaseColumns._ID };
-	public static Bitmap loadVideoThumbnail(String videoFilePath,  Context context) {
-		log("loadVideoThumbnail");
-	    Bitmap result = null;
-	    Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-	    String[] selectionArgs = { videoFilePath };
-	    ContentResolver cr = context.getContentResolver();
-	    Cursor cursor = cr.query(uri, PROJECTION, SELECTION, selectionArgs, null);
-	    if (cursor.moveToFirst()) {
-	        // it's the only & first thing in projection, so it is 0
-	        long videoId = cursor.getLong(0);
-	        result = MediaStore.Video.Thumbnails.getThumbnail(cr, videoId, Thumbnails.MICRO_KIND, null);
-	    }
-	    cursor.close();
-	    return result;
+
+	public static Bitmap loadVideoThumbnail(String videoFilePath, Context context) {
+		logDebug("loadVideoThumbnail");
+		Bitmap result = null;
+		Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+		String[] selectionArgs = {videoFilePath};
+		ContentResolver cr = context.getContentResolver();
+		Cursor cursor = null;
+		try {
+			cursor = cr.query(uri, PROJECTION, SELECTION, selectionArgs, null);
+			if (cursor.moveToFirst()) {
+				// it's the only & first thing in projection, so it is 0
+				long videoId = cursor.getLong(0);
+				result = MediaStore.Video.Thumbnails.getThumbnail(cr, videoId, Thumbnails.MICRO_KIND, null);
+			}
+			cursor.close();
+			return result;
+		} catch (Exception ex) {
+			logError("Exception is thrown", ex);
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		return null;
 	}
 
 	public interface ThumbnailInterface{
@@ -1615,14 +1680,12 @@ public class ThumbnailUtilsLollipop {
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 
-			log("Downloading thumbnail finished");
+			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 
-//			pendingThumbnails.remove(handle);
-
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Downloading thumbnail OK: " + handle);
+				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 
 				if (holder != null){
@@ -1636,14 +1699,12 @@ public class ThumbnailUtilsLollipop {
 
 								if ((holder.getDocument() == handle)){
 									holder.postSetImageView();
-//									holder.getImageView().setImageBitmap(bitmap);
 									holder.setBitmap(bitmap);
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.getImageView().startAnimation(fadeInAnimation);
 									holder.postSetImageView();
 									adapter.notifyItemChanged(holder.getPositionOnAdapter());
-//									adapter.notifyDataSetChanged();
-									log("Thumbnail update");
+									logDebug("Thumbnail update");
 								}
 							}
 						}
@@ -1651,7 +1712,7 @@ public class ThumbnailUtilsLollipop {
 				}
 			}
 			else{
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -1669,16 +1730,10 @@ public class ThumbnailUtilsLollipop {
 	}
 
 	public static Bitmap getThumbnailFromThumbnailInterface(MegaNode document, Context context, ThumbnailInterface viewHolder, MegaApiAndroid megaApi, RecyclerView.Adapter adapter){
-//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-//			log("the thumbnail is already downloaded or added to the list");
-//			return thumbnailCache.get(document.getHandle());
-//		}
-
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
 
-//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerThumbnailInterface listener = new ThumbnailDownloadListenerThumbnailInterface(context, viewHolder, adapter);
 		listenersThumbnailInterface.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -1686,8 +1741,4 @@ public class ThumbnailUtilsLollipop {
 
 		return thumbnailCache.get(document.getHandle());
 	}
-	
-	private static void log(String log) {
-		Util.log("ThumbnailUtilsLollipop", log);
-	}	
 }

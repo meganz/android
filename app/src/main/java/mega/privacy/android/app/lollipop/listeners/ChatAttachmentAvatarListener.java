@@ -8,12 +8,14 @@ import android.graphics.BitmapFactory;
 import java.io.File;
 
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ChatAttachmentAvatarListener implements MegaRequestListenerInterface {
 
@@ -31,12 +33,12 @@ public class ChatAttachmentAvatarListener implements MegaRequestListenerInterfac
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart()");
+        logDebug("onRequestStart()");
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish()");
+        logDebug("onRequestFinish()");
         if (e.getErrorCode() == MegaError.API_OK){
 
             String mail = "";
@@ -48,15 +50,9 @@ public class ChatAttachmentAvatarListener implements MegaRequestListenerInterfac
             }
 
             if (mail.compareTo(request.getEmail()) == 0){
-                File avatar = null;
-                if (context.getExternalCacheDir() != null){
-                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), mail + ".jpg");
-                }
-                else{
-                    avatar = new File(context.getCacheDir().getAbsolutePath(), mail + ".jpg");
-                }
+                File avatar = buildAvatarFile(context, mail + ".jpg");
                 Bitmap bitmap = null;
-                if (avatar.exists()){
+                if (isFileAvailable(avatar)){
                     if (avatar.length() > 0){
                         BitmapFactory.Options bOpts = new BitmapFactory.Options();
                         bOpts.inPurgeable = true;
@@ -81,16 +77,11 @@ public class ChatAttachmentAvatarListener implements MegaRequestListenerInterfac
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
-        log("onRequestTemporaryError");
+        logWarning("onRequestTemporaryError");
     }
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
         // TODO Auto-generated method stub
     }
-
-    private static void log(String log) {
-        Util.log("ChatAttachmentAvatarListener", log);
-    }
-
 }
