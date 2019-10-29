@@ -572,7 +572,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if(megaApi==null){
                     logDebug("Refresh session - sdk");
                     Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                    intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                    intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                     intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intentLogin);
                     finish();
@@ -583,7 +583,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         if(megaApi.getRootNode()==null){
                             logDebug("Refresh session logged in but no fetch - sdk");
                             Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                            intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                            intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                             intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intentLogin);
                             finish();
@@ -600,7 +600,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
                         logDebug("Refresh session - karere");
                         Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                        intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                        intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                         intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intentLogin);
                         finish();

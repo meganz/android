@@ -176,11 +176,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         intentReceived = getIntent();
         if(savedInstanceState!=null) {
             logDebug("Bundle is NOT NULL");
-            visibleFragment = savedInstanceState.getInt("visibleFragment", LOGIN_FRAGMENT);
+            visibleFragment = savedInstanceState.getInt(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
         }
         else{
             if (intentReceived != null) {
-                visibleFragment = intentReceived.getIntExtra("visibleFragment", LOGIN_FRAGMENT);
+                visibleFragment = intentReceived.getIntExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                 logDebug("There is an intent! VisibleFragment: " + visibleFragment);
             } else {
                 visibleFragment = LOGIN_FRAGMENT;
@@ -870,7 +870,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
         super.onSaveInstanceState(outState);
 
-        outState.putInt("visibleFragment", visibleFragment);
+        outState.putInt(VISIBLE_FRAGMENT, visibleFragment);
     }
 
     @Override

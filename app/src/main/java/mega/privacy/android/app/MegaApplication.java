@@ -1214,7 +1214,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						if(getUrlConfirmationLink()!=null){
 							logDebug("Launch intent to confirmation account screen");
 							Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-							confirmIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+							confirmIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 							confirmIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
 							confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 							confirmIntent.setAction(ACTION_CONFIRM);
@@ -1233,7 +1233,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						if(getUrlConfirmationLink()!=null){
 							logDebug("Show confirmation account screen");
 							Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-							confirmIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+							confirmIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 							confirmIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
 							confirmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 							confirmIntent.setAction(ACTION_CONFIRM);

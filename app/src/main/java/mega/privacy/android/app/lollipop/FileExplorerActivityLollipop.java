@@ -418,7 +418,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		if (credentials == null){
 			logWarning("User credentials NULL");
 			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-			loginIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+			loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 			loginIntent.setAction(ACTION_FILE_EXPLORER_UPLOAD);
 			startActivity(loginIntent);
 			finish();

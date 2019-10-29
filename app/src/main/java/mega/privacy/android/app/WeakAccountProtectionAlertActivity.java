@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -138,6 +140,13 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
 
     public void whyAmIBlockedResult(String result) {
         if (!result.equals(WEAK_PROTECTION_ACCOUNT_BLOCK)) {
+            if (megaApi.getRootNode() == null) {
+                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+                intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+                intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intentLogin);
+            }
+
             finish();
         }
     }

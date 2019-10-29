@@ -394,6 +394,8 @@ public class Constants {
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String HANDLE = "handle";
 
+    public static final String VISIBLE_FRAGMENT = "VISIBLE_FRAGMENT";
+
     public static final int EMOJI_SIZE_EXTRA_SMALL = 10;
     public static final int EMOJI_SIZE_SMALL = 15;
     public static final int EMOJI_SIZE = 20;

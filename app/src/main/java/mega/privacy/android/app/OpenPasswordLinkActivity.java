@@ -83,7 +83,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 //		if(megaApi==null||megaApi.getRootNode()==null){
 //			log("Refresh session - sdk");
 //			Intent intent = new Intent(this, LoginActivityLollipop.class);
-//			intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+//			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 //			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //			startActivity(intent);
 //			finish();
@@ -97,7 +97,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 //			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
 //				log("Refresh session - karere");
 //				Intent intent = new Intent(this, LoginActivityLollipop.class);
-//				intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+//				intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 //				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //				startActivity(intent);
 //				finish();

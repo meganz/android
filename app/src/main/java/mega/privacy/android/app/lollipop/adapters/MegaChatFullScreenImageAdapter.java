@@ -266,7 +266,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		
 		if (node == null){
 			Intent intent = new Intent(activity, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", TOUR_FRAGMENT);
+			intent.putExtra(VISIBLE_FRAGMENT, TOUR_FRAGMENT);
 	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 	        activity.startActivity(intent);
