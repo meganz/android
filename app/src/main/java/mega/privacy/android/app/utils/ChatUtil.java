@@ -316,16 +316,18 @@ public class ChatUtil {
     }
 
     public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat) {
-        if (chronometer == null || callChat == null) return;
-        if (activateChrono) {
+        if (chronometer == null) return;
+        if(!activateChrono){
+            chronometer.stop();
+            chronometer.setVisibility(View.GONE);
+            return;
+        }
+        if (callChat != null) {
             chronometer.setVisibility(View.VISIBLE);
             chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration() * 1000));
             chronometer.start();
             chronometer.setFormat(" %s");
-            return;
         }
-        chronometer.stop();
-        chronometer.setVisibility(View.GONE);
     }
 
     /**

@@ -17778,10 +17778,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		if(drawerItem != DrawerItem.CLOUD_DRIVE && drawerItem != DrawerItem.SHARED_ITEMS && drawerItem != DrawerItem.CHAT  || this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_PORTRAIT){
 
-			callInProgressLayout.setVisibility(View.GONE);
 			if (callInProgressChrono != null) {
 				activateChrono(false, callInProgressChrono, null);
 			}
+			callInProgressLayout.setVisibility(View.GONE);
+
 			return;
 		}
 
