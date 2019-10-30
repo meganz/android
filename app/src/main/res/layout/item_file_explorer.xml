@@ -23,7 +23,7 @@
 
     <HorizontalScrollView
         android:id="@+id/scroll_view_filename"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="13dp"
         android:layout_marginRight="12dp"
