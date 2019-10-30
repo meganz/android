@@ -2073,10 +2073,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else{
                         boolean initialCam = false;
-//								DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-                        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                         MegaPreferences prefs = dbH.getPreferences();
-                        prefs = dbH.getPreferences();
                         if (prefs != null){
                             if (prefs.getCamSyncEnabled() != null){
                                 if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
@@ -2334,8 +2331,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 fetchingNodesText.setVisibility(View.VISIBLE);
                 prepareNodesText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
-
-                gSession = megaApi.dumpSession();
+                saveCredentials();
 
                 logDebug("Logged in with session");
 
@@ -2393,25 +2389,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             MegaApplication.setLoggingIn(false);
 
             if (error.getErrorCode() == MegaError.API_OK){
-                logDebug("Ok fetch nodes");
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-
-                gSession = megaApi.dumpSession();
-                MegaUser myUser = megaApi.getMyUser();
-                String myUserHandle = "";
-                if(myUser!=null){
-                    lastEmail = megaApi.getMyUser().getEmail();
-                    myUserHandle = megaApi.getMyUser().getHandle()+"";
-                }
-
-                UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
-
-                dbH.saveCredentials(credentials);
-
-                logDebug("readyToManager");
+                logDebug("Ok fetch nodes, ready to Manager");
                 readyToManager();
-
-            }else{
+            } else{
                 if(confirmLogoutDialog != null) {
                     confirmLogoutDialog.dismiss();
                 }
@@ -2552,6 +2532,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if (confirmLogoutDialog != null) {
             confirmLogoutDialog.dismiss();
         }
+    }
+
+    private void saveCredentials() {
+        gSession = megaApi.dumpSession();
+        MegaUser myUser = megaApi.getMyUser();
+        String myUserHandle = "";
+        if (myUser != null) {
+            lastEmail = megaApi.getMyUser().getEmail();
+            myUserHandle = megaApi.getMyUser().getHandle() + "";
+        }
+
+        UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
+        dbH.saveCredentials(credentials);
     }
 
     @Override

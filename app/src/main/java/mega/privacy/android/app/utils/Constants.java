@@ -44,6 +44,7 @@ public class Constants {
     public static final int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
     public static final int REQUEST_CODE_SEND_LOCATION = 1030;
 
+    public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
     public static final String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
     public static final String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";

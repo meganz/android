@@ -11,22 +11,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class ResendVerificationEmailListener implements MegaRequestListenerInterface {
-
-    private Context context;
+public class ResendVerificationEmailListener extends BaseListener {
 
     public ResendVerificationEmailListener(Context context) {
-        this.context = context;
-    }
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
+        super(context);
     }
 
     @Override
@@ -41,10 +29,5 @@ public class ResendVerificationEmailListener implements MegaRequestListenerInter
                 ((WeakAccountProtectionAlertActivity) context).showSnackbar(R.string.general_error);
             }
         }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
     }
 }

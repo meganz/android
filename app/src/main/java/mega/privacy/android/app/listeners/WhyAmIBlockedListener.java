@@ -9,22 +9,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class WhyAmIBlockedListener implements MegaRequestListenerInterface {
-
-    private Context context;
+public class WhyAmIBlockedListener extends BaseListener {
 
     public WhyAmIBlockedListener(Context context) {
-        this.context = context;
-    }
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
+        super(context);
     }
 
     @Override
@@ -35,10 +23,5 @@ public class WhyAmIBlockedListener implements MegaRequestListenerInterface {
             String result = String.valueOf(request.getNumber());
             ((WeakAccountProtectionAlertActivity) context).whyAmIBlockedResult(result);
         }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
     }
 }

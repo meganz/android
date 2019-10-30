@@ -24,6 +24,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 public class WeakAccountProtectionAlertActivity extends PinActivityLollipop implements View.OnClickListener {
 
     private static final String IS_INFO_DIALOG_SHOWN = "IS_INFO_DIALOG_SHOWN";
+    private static final String IS_ACCOUNT_BLOCKED = "IS_ACCOUNT_BLOCKED";
 
     private MegaApiAndroid megaApi;
 
@@ -34,6 +35,7 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
 
     private AlertDialog infoDialog;
     private boolean isInfoDialogShown;
+    private boolean isAccountBlocked = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,7 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
 
         if (savedInstanceState != null) {
             isInfoDialogShown = savedInstanceState.getBoolean(IS_INFO_DIALOG_SHOWN, false);
+            isAccountBlocked = savedInstanceState.getBoolean(IS_ACCOUNT_BLOCKED, true);
             if (isInfoDialogShown) {
                 showInfoDialog();
             }
@@ -80,6 +83,7 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(IS_INFO_DIALOG_SHOWN, isInfoDialogShown);
+        outState.putBoolean(IS_ACCOUNT_BLOCKED, isAccountBlocked);
 
         super.onSaveInstanceState(outState);
     }
@@ -88,7 +92,9 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
     protected void onResume() {
         super.onResume();
 
-        megaApi.whyAmIBlocked(new WhyAmIBlockedListener(this));
+        if (isAccountBlocked) {
+            megaApi.whyAmIBlocked(new WhyAmIBlockedListener(this));
+        }
     }
 
     @Override
@@ -139,9 +145,11 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
     }
 
     public void whyAmIBlockedResult(String result) {
-        if (!result.equals(WEAK_PROTECTION_ACCOUNT_BLOCK)) {
+        if (!result.equals(WEAK_PROTECTION_ACCOUNT_BLOCK) && isAccountBlocked) {
+            isAccountBlocked = false;
             if (megaApi.getRootNode() == null) {
                 Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+                intentLogin.setAction(ACTION_REFRESH_AFTER_BLOCKED);
                 intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                 intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intentLogin);

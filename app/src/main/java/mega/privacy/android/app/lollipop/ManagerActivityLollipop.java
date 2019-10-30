@@ -3179,7 +3179,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        			if (intentRec.getAction().equals(ACTION_SHOW_TRANSFERS)){
 	        				drawerItem = DrawerItem.TRANSFERS;
 							setIntent(null);
-	        			}
+	        			} else if (intentRec.getAction().equals(ACTION_REFRESH_AFTER_BLOCKED)) {
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+	        				setIntent(null);
+						}
 	        		}
 	        	}
 				drawerLayout.closeDrawer(Gravity.LEFT);
