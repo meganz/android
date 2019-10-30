@@ -19,7 +19,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             rounded:corner_radius="20dp"/>
-        <mega.privacy.android.app.components.twemoji.EmojiTextView
+        <TextView
             android:id="@+id/contact_list_initial_letter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
             android:paddingTop="24dp"
             android:src="@drawable/ic_add_avatar"/>
     </RelativeLayout>
-    <mega.privacy.android.app.components.twemoji.EmojiTextView
+    <TextView
         android:id="@+id/name_chip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

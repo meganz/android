@@ -67,8 +67,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
         ContactViewHolder holder = new ContactViewHolder(v);
         holder.itemLayout = v.findViewById(R.id.chip_layout);
-        holder.contactInitialLetter = v.findViewById(R.id.contact_list_initial_letter);
-        holder.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+        holder.textViewInitialLetter = v.findViewById(R.id.contact_list_initial_letter);
         holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
         holder.avatar = v.findViewById(R.id.add_rounded_avatar);
@@ -140,7 +139,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
                 avatar.delete();
                 megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
             } else {
-                holder.contactInitialLetter.setVisibility(View.GONE);
+                holder.textViewInitialLetter.setVisibility(View.GONE);
                 holder.avatar.setImageBitmap(bitmap);
             }
         } else {
@@ -155,12 +154,12 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
         String firstLetter = ChatUtil.getFirstLetter(contact.getLocalName());
         if (firstLetter.trim().isEmpty() || firstLetter.equals("(")) {
-            holder.contactInitialLetter.setVisibility(View.INVISIBLE);
+            holder.textViewInitialLetter.setVisibility(View.INVISIBLE);
         } else {
-            holder.contactInitialLetter.setText(firstLetter);
-            holder.contactInitialLetter.setTextColor(Color.WHITE);
-            holder.contactInitialLetter.setVisibility(View.VISIBLE);
-            holder.contactInitialLetter.setTextSize(24);
+            holder.textViewInitialLetter.setText(firstLetter);
+            holder.textViewInitialLetter.setTextColor(Color.WHITE);
+            holder.textViewInitialLetter.setVisibility(View.VISIBLE);
+            holder.textViewInitialLetter.setTextSize(24);
         }
     }
 
@@ -176,7 +175,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     public static class ContactViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
 
-        TextView textViewName;
+        TextView textViewName,textViewInitialLetter;
 
         ImageView addIcon;
 
@@ -187,13 +186,5 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         ContactViewHolder(View itemView) {
             super(itemView);
         }
-    }
-
-    private String getFirstLetter(ContactViewHolder holder) {
-        CharSequence name = holder.textViewName.getText();
-        if(TextUtils.isEmpty(name)) {
-            return "";
-        }
-        return String.valueOf(name.charAt(0));
     }
 }
