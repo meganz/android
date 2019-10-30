@@ -462,11 +462,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		}		
 	}
 
-
-
-
-
-	
 	public int getPositionClicked (){
     	return positionClicked;
     }
