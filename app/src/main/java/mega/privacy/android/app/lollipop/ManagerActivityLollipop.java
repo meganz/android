@@ -1533,8 +1533,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		logDebug ("Creating IAB helper.");
 		mHelper = new IabHelper(this, base64EncodedPublicKey);
-		mHelper.enableDebugLogging(true);
-
 		mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
             public void onIabSetupFinished(IabResult result) {
 				logDebug("Setup finished.");

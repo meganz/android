@@ -22,27 +22,30 @@ import org.json.JSONObject;
  * Represents an in-app product's listing details.
  */
 public class SkuDetails {
-    String mItemType;
-    String mSku;
-    String mType;
-    String mPrice;
-    String mTitle;
-    String mDescription;
-    String mJson;
 
-    public SkuDetails(String jsonSkuDetails) throws JSONException {
-        this(IabHelper.ITEM_TYPE_INAPP, jsonSkuDetails);
-    }
+    private static final String KEY_PRODUCTION_ID = "productId";
+    private static final String KEY_TYPE = "type";
+    private static final String KEY_PRICE = "price";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_DESCRIPTION = "description";
 
-    public SkuDetails(String itemType, String jsonSkuDetails) throws JSONException {
+    private String mItemType;
+    private String mSku;
+    private String mType;
+    private String mPrice;
+    private String mTitle;
+    private String mDescription;
+    private String mJson;
+
+    SkuDetails(String itemType, String jsonSkuDetails) throws JSONException {
         mItemType = itemType;
         mJson = jsonSkuDetails;
         JSONObject o = new JSONObject(mJson);
-        mSku = o.optString("productId");
-        mType = o.optString("type");
-        mPrice = o.optString("price");
-        mTitle = o.optString("title");
-        mDescription = o.optString("description");
+        mSku = o.optString(KEY_PRODUCTION_ID);
+        mType = o.optString(KEY_TYPE);
+        mPrice = o.optString(KEY_PRICE);
+        mTitle = o.optString(KEY_TITLE);
+        mDescription = o.optString(KEY_DESCRIPTION);
     }
 
     public String getSku() { return mSku; }
@@ -50,6 +53,7 @@ public class SkuDetails {
     public String getPrice() { return mPrice; }
     public String getTitle() { return mTitle; }
     public String getDescription() { return mDescription; }
+    public String getmItemType() { return mItemType; }
 
     @Override
     public String toString() {

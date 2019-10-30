@@ -22,28 +22,39 @@ import org.json.JSONObject;
  * Represents an in-app billing purchase.
  */
 public class Purchase {
-    String mItemType;  // ITEM_TYPE_INAPP or ITEM_TYPE_SUBS
-    String mOrderId;
-    String mPackageName;
-    String mSku;
-    long mPurchaseTime;
-    int mPurchaseState;
-    String mDeveloperPayload;
-    String mToken;
-    String mOriginalJson;
-    String mSignature;
+
+    private static final String KEY_ORDER_ID = "orderId";
+    private static final String KEY_PACKAGE_NAME = "packageName";
+    private static final String KEY_PRODUCT_ID = "productId";
+    private static final String KEY_PURCHASE_TIME = "purchaseTime";
+    private static final String KEY_PURCHASE_STATE = "purchaseState";
+    private static final String KEY_DEVELOPER_PAY_LOAD = "developerPayload";
+    private static final String KEY_PURCHASE_TOKEN = "purchaseToken";
+    private static final String KEY_TOKEN = "token";
+
+
+    private String mItemType;  // ITEM_TYPE_INAPP or ITEM_TYPE_SUBS
+    private String mOrderId;
+    private String mPackageName;
+    private String mSku;
+    private long mPurchaseTime;
+    private int mPurchaseState;
+    private String mDeveloperPayload;
+    private String mToken;
+    private String mOriginalJson;
+    private String mSignature;
 
     public Purchase(String itemType, String jsonPurchaseInfo, String signature) throws JSONException {
         mItemType = itemType;
         mOriginalJson = jsonPurchaseInfo;
         JSONObject o = new JSONObject(mOriginalJson);
-        mOrderId = o.optString("orderId");
-        mPackageName = o.optString("packageName");
-        mSku = o.optString("productId");
-        mPurchaseTime = o.optLong("purchaseTime");
-        mPurchaseState = o.optInt("purchaseState");
-        mDeveloperPayload = o.optString("developerPayload");
-        mToken = o.optString("token", o.optString("purchaseToken"));
+        mOrderId = o.optString(KEY_ORDER_ID);
+        mPackageName = o.optString(KEY_PACKAGE_NAME);
+        mSku = o.optString(KEY_PRODUCT_ID);
+        mPurchaseTime = o.optLong(KEY_PURCHASE_TIME);
+        mPurchaseState = o.optInt(KEY_PURCHASE_STATE);
+        mDeveloperPayload = o.optString(KEY_DEVELOPER_PAY_LOAD);
+        mToken = o.optString(KEY_TOKEN, o.optString(KEY_PURCHASE_TOKEN));
         mSignature = signature;
     }
 
