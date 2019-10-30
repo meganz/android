@@ -17,12 +17,14 @@ import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
@@ -175,18 +177,17 @@ public class ChatUtil {
     }
 
     public static String getFirstLetter(String title) {
+
+        if(title.isEmpty()) return "";
+        title = title.trim();
+        if(title.length() == 1) return String.valueOf(title.charAt(0)).toUpperCase(Locale.getDefault());
+
         String resultTitle = EmojiUtilsShortcodes.emojify(title);
-        resultTitle = resultTitle.trim();
-        if (resultTitle.isEmpty()) return "";
-        if (resultTitle.length() == 1) return resultTitle;
-        String lastEmoji = resultTitle.substring(0, 2);
-        int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
-        if (numEmojis > 0) return lastEmoji;
-        String result = String.valueOf(resultTitle.charAt(0)).toUpperCase(Locale.getDefault());
+        List<EmojiRange> emojis = EmojiManager.getInstance().findAllEmojis(resultTitle);
+        if(emojis.size() > 0 && emojis.get(0).start == 0) return resultTitle.substring(emojis.get(0).start, emojis.get(0).end);
 
-        return result;
+        return String.valueOf(resultTitle.charAt(0)).toUpperCase(Locale.getDefault());
     }
-
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
 
