@@ -361,7 +361,7 @@
                         android:gravity="center"
                         android:src="@drawable/ic_mutate_layout" />
 
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/text_mutate_contact_call"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -374,6 +374,7 @@
                         android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="14sp"
+                        app:emojiSize="14dp"
                         android:textStyle="normal" />
 
                 </LinearLayout>

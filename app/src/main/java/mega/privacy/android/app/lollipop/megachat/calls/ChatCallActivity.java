@@ -114,7 +114,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private TextView subtitleToobar;
     private Chronometer callInProgressChrono;
     private RelativeLayout mutateContactCallLayout;
-    private TextView mutateCallText;
+    private EmojiTextView mutateCallText;
     private RelativeLayout mutateOwnCallLayout;
     private LinearLayout linearParticipants;
     private TextView participantText;
