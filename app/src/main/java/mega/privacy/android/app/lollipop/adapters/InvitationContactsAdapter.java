@@ -97,20 +97,17 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
                     boolean isSelected = !invitationContactInfo.isHighlighted();
                     if (isSelected) {
                         invitationContactInfo.setHighlighted(true);
-                        setItemHighlighted(v);
                     } else {
                         invitationContactInfo.setHighlighted(false);
-                        setItemNormal(v, invitationContactInfo.getBitmap());
                     }
-
-                    callback.onItemClick(v, position);
+                    callback.onItemClick(position);
                 }
             }
         }
     }
 
     public interface OnItemClickListener {
-        void onItemClick(View view, int position);
+        void onItemClick(int position);
     }
 
     @Override
@@ -197,7 +194,6 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         holder.displayLabelTextView = rowView.findViewById(R.id.contact_explorer_phone_mail);
         holder.imageView = rowView.findViewById(R.id.contact_explorer_thumbnail);
         holder.initialLetter = rowView.findViewById(R.id.contact_explorer_initial_letter);
-        holder.initialLetter.setVisibility(View.GONE);
         rowView.setTag(holder);
         return holder;
     }
@@ -218,6 +214,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
         if (contact.isHighlighted()) {
             setItemHighlighted(holder.contactLayout);
+            holder.initialLetter.setVisibility(View.GONE);
         } else {
             Bitmap bitmap;
             if (isMegaContact) {
@@ -229,9 +226,12 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
             // create default one if unable to get user pre-set avatar
             if (bitmap == null) {
                 logDebug("create default avatar as unable to get user pre-set one");
-                String initial = contact.getInitial();
                 String color = contact.getAvatarColor();
-                bitmap = Util.createDefaultAvatar(color, initial);
+                bitmap = Util.createAvatarBackground(color);
+                holder.initialLetter.setText(contact.getInitial());
+                holder.initialLetter.setVisibility(View.VISIBLE);
+            } else {
+                holder.initialLetter.setVisibility(View.GONE);
             }
 
             contact.setBitmap(bitmap);

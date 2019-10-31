@@ -647,7 +647,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     @Override
-    public void onItemClick(View view, int position) {
+    public void onItemClick(int position) {
         InvitationContactInfo invitationContactInfo = invitationContactsAdapter.getItem(position);
         logDebug("on Item click at " + position + " name is " + invitationContactInfo.getName());
         if (isContactAdded(invitationContactInfo)) {
