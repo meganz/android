@@ -118,7 +118,7 @@ public class ChatUtil {
         if (megaChatApi == null || callInProgressLayout == null) return;
         logDebug("showCallLayout");
 
-        if (!Util.isChatEnabled() || !participatingInACall(megaChatApi)) {
+        if (!isChatEnabled() || !participatingInACall(megaChatApi)) {
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
             return;
