@@ -1,26 +1,29 @@
 package mega.privacy.android.app;
 
+import nz.mega.sdk.MegaApiJava;
+
 public class MegaAttributes {
 	
-	String online = "";
-	int attemps = 0;
-	String askSizeDownload = "true";
-	String askNoAppDownload = "true";
-	String fileLoggerSDK = "false";
-	String accountDetailsTimeStamp="";
-	String paymentMethodsTimeStamp="";
-	String pricingTimeStamp ="";
-	String extendedAccountDetailsTimeStamp="";
-	String invalidateSdkCache = "false";
-	String fileLoggerKarere = "false";
-	String useHttpsOnly = "false";
-	String showCopyright = "true";
-	String showNotifOff = "true";
-    String staging = "false";
-	String lastPublicHandle = "";
-	String lastPublicHandleTimeStamp = "";
+	private String online = "";
+	private int attemps = 0;
+	private String askSizeDownload = "true";
+	private String askNoAppDownload = "true";
+	private String fileLoggerSDK = "false";
+	private String accountDetailsTimeStamp="";
+	private String paymentMethodsTimeStamp="";
+	private String pricingTimeStamp ="";
+	private String extendedAccountDetailsTimeStamp="";
+	private String invalidateSdkCache = "false";
+	private String fileLoggerKarere = "false";
+	private String useHttpsOnly = "false";
+	private String showCopyright = "true";
+	private String showNotifOff = "true";
+	private String staging = "false";
+	private String lastPublicHandle = "";
+	private String lastPublicHandleTimeStamp = "";
+	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN;
 
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String showCopyright, String showNotifOff, String staging, String lastPublicHandle, String lastPublicHandleTimeStamp) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String showCopyright, String showNotifOff, String staging, String lastPublicHandle, String lastPublicHandleTimeStamp, int storageState) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -38,9 +41,10 @@ public class MegaAttributes {
         this.staging = staging;
 		this.lastPublicHandle = lastPublicHandle;
 		this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
+		this.storageState = storageState;
 	}
 
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright, String showNotifOff, String staging, String lastPublicHandle, String lastPublicHandleTimeStamp) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright, String showNotifOff, String staging, String lastPublicHandle, String lastPublicHandleTimeStamp, int storageState) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -58,6 +62,7 @@ public class MegaAttributes {
         this.staging = staging;
 		this.lastPublicHandle = lastPublicHandle;
 		this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
+		this.storageState = storageState;
 	}
 	
 	public String getOnline(){
@@ -194,5 +199,13 @@ public class MegaAttributes {
 
 	public void setLastPublicHandleTimeStamp(String lastPublicHandleTimeStamp){
 		this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
+	}
+
+	public int getStorageState(){
+		return storageState;
+	}
+
+	public void setStorageState(int storageState){
+		this.storageState = storageState;
 	}
 }

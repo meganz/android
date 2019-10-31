@@ -111,7 +111,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	MyAccountInfo myAccountInfo;
 	boolean esid = false;
 
-	private int storageState = MegaApiJava.STORAGE_STATE_GREEN; //Default value
+	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
@@ -440,6 +440,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
 
+        storageState = dbH.getStorageState();
+
 		setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		boolean staging = false;
@@ -545,7 +547,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
             public void onReceive(Context context,Intent intent) {
                 if (intent != null) {
                     if (intent.getAction() == ACTION_LOG_OUT) {
-                        storageState = MegaApiJava.STORAGE_STATE_GREEN; //Default value
+                        storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
                     }
                 }
             }
@@ -1371,13 +1373,16 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			int state = (int) event.getNumber();
 			if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
 				api.getAccountDetails(null);
-			}
-			else {
-				storageState = state;
-				Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-				intent.setAction(ACTION_STORAGE_STATE_CHANGED);
-				intent.putExtra("state", state);
-				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+			} else {
+				dbH.setStorageState(state);
+				if(state != storageState) {
+					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+					intent.setAction(ACTION_STORAGE_STATE_CHANGED);
+					intent.putExtra(EXTRA_STORAGE_STATE, state);
+					LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
+					storageState = state;
+				}
 			}
 		}
 	}
