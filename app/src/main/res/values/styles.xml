@@ -306,4 +306,17 @@
         <item name="android:progressTint">@color/accentColor</item>
         <item name="android:colorControlActivated">@color/accentColor</item>
     </style>
+
+    <style name="AccentBorderBackgroundBorderlessButton" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/background_button_border_accent</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/accentColor</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="AccentBorderBackgroundButton" parent="ButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/accentColor</item>
+        <item name="android:background">@drawable/background_button_border_accent</item>
+    </style>
 </resources>

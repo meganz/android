@@ -72,19 +72,15 @@
 
             <Button
                 android:id="@+id/invite_button"
-                android:layout_width="wrap_content"
-                android:minWidth="96dp"
+                style="@style/AccentBorderBackgroundBorderlessButton"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:gravity="center"
+                android:minWidth="96dp"
                 android:paddingLeft="20dp"
-                android:paddingRight="20dp"
                 android:paddingTop="10dp"
+                android:paddingRight="20dp"
                 android:paddingBottom="10dp"
-                android:textColor="@color/accentColor"
-                android:textSize="16sp"
-                android:background="@drawable/background_button_border_accent"
-                style="?android:attr/borderlessButtonStyle"/>
+                android:textSize="16sp" />
 
         </LinearLayout>
 

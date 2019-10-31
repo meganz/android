@@ -94,35 +94,30 @@
                         android:layout_marginBottom="16dp"
                         android:text="@string/allow_acces_contact_subtitle"
                         android:textSize="14sp"/>
+
                     <Button
                         android:id="@+id/dismiss_button"
-                        android:layout_width="wrap_content"
+                        style="@style/AccentBorderBackgroundBorderlessButton"
                         android:layout_height="36dp"
-                        android:text="@string/general_dismiss"
-                        android:minWidth="82dp"
                         android:layout_below="@id/request_permission_message"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="122dp"
                         android:layout_marginBottom="16dp"
-                        android:gravity="center"
-                        android:textColor="@color/accentColor"
-                        android:textSize="14sp"
-                        style="?android:attr/borderlessButtonStyle"/>
+                        android:minWidth="82dp"
+                        android:text="@string/general_dismiss"
+                        android:textSize="14sp" />
+
                     <Button
                         android:id="@+id/allow_button"
-                        android:layout_width="wrap_content"
+                        style="@style/AccentBorderBackgroundBorderlessButton"
                         android:layout_height="36dp"
-                        android:text="@string/general_allow"
-                        android:minWidth="82dp"
                         android:layout_below="@id/request_permission_message"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="16dp"
                         android:layout_marginBottom="16dp"
-                        android:gravity="center"
-                        android:textColor="@color/accentColor"
-                        android:textSize="14sp"
-                        android:background="@drawable/background_button_border_accent"
-                        style="?android:attr/borderlessButtonStyle"/>
+                        android:minWidth="82dp"
+                        android:text="@string/general_allow"
+                        android:textSize="14sp" />
                 </RelativeLayout>
                 <RelativeLayout
                     android:id="@+id/contacts_list_layout"
@@ -148,7 +143,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#1F000000"
+                android:background="@color/divider_upgrade_account"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"/>
             </LinearLayout>
@@ -200,20 +195,16 @@
 
                 <Button
                     android:id="@+id/invite_button"
-                    style="?android:attr/borderlessButtonStyle"
-                    android:layout_width="wrap_content"
+                    style="@style/AccentBorderBackgroundBorderlessButton"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/empty_text_chat_recent"
                     android:layout_centerHorizontal="true"
                     android:layout_gravity="center_horizontal"
-                    android:background="@drawable/background_button_border_accent"
-                    android:gravity="center"
                     android:minWidth="96dp"
                     android:paddingLeft="20dp"
                     android:paddingTop="10dp"
                     android:paddingRight="20dp"
                     android:paddingBottom="10dp"
-                    android:textColor="@color/accentColor"
                     android:textSize="16sp" />
             </RelativeLayout>
         </ScrollView>
