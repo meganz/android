@@ -365,7 +365,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(R.string.ongoing_call_messages));
 						}else{
 							((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-							((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.call_in_progress));
+							((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.title_notification_call_in_progress));
 						}
 					}else if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS || call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT ){
 						((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);

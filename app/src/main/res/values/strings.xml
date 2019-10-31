@@ -2560,6 +2560,4 @@
 
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
 
-    <string name="call_in_progress" context="Label to indicate there is a call in progress in a different client">Call in Progress</string>
-
 </resources>
