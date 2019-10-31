@@ -1328,90 +1328,58 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR);
 
 			if (proLiteMonthly != null){
-//            	if (megaApi.getMyUser().getEmail() != null){
-//	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(0);
 				((MegaApplication) getApplication()).getMyAccountInfo().setProLiteMonthly(proLiteMonthly);
 				maxP = proLiteMonthly;
-//	        		}
-//            	}
 				logDebug("PRO LITE MONTHLY (JSON): " + proLiteMonthly.getOriginalJson());
 			}
 
 			if (proLiteYearly != null){
-//            	if (megaApi.getMyUser().getEmail() != null){
-//	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(0);
 				((MegaApplication) getApplication()).getMyAccountInfo().setProLiteYearly(proLiteYearly);
 				maxP = proLiteYearly;
-//	        		}
-//            	}
 				logDebug("PRO LITE ANNUALY (JSON): " + proLiteYearly.getOriginalJson());
 			}
 
 			if (proIMonthly != null){
-//            	if (megaApi.getMyUser().getEmail() != null){
-//	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(1);
 				((MegaApplication) getApplication()).getMyAccountInfo().setProIMonthly(proIMonthly);
 				maxP = proIMonthly;
-//	        		}
-//            	}
 				logDebug("PRO I MONTHLY (JSON): " + proIMonthly.getOriginalJson());
 			}
 
 			if (proIYearly != null){
-//            	if (megaApi.getMyUser().getEmail() != null){
-//	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(1);
 				((MegaApplication) getApplication()).getMyAccountInfo().setProIYearly(proIYearly);
 				maxP = proIYearly;
-//	        		}
-//            	}
 				logDebug("PRO I ANNUALY (JSON): " + proIYearly.getOriginalJson());
 			}
 
 			if (proIIMonthly != null){
-//            	if (megaApi.getMyUser().getEmail() != null){
-//	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(2);
 				((MegaApplication) getApplication()).getMyAccountInfo().setProIIMonthly(proIIMonthly);
 				maxP = proIIMonthly;
-//	        		}
-//            	}
 				logDebug("PRO II MONTHLY (JSON): " + proIIMonthly.getOriginalJson());
 			}
 
 			if (proIIYearly != null){
-//            	if (megaApi.getMyUser().getEmail() != null){
-//	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(2);
 				((MegaApplication) getApplication()).getMyAccountInfo().setProIIYearly(proIIYearly);
 				maxP = proIIYearly;
-//	        		}
-//            	}
 				logDebug("PRO II ANNUALY (JSON): " + proIIYearly.getOriginalJson());
 			}
 
 			if (proIIIMonthly != null){
-//            	if (megaApi.getMyUser().getEmail() != null){
-//	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(3);
 				maxP = proIIIMonthly;
 				((MegaApplication) getApplication()).getMyAccountInfo().setProIIIMonthly(proIIIMonthly);
-//	        		}
-//            	}
 				logDebug("PRO III MONTHLY (JSON): " + proIIIMonthly.getOriginalJson());
 			}
 
 			if (proIIIYearly != null){
-//            	if (megaApi.getMyUser().getEmail() != null){
-//	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(3);
 				((MegaApplication) getApplication()).getMyAccountInfo().setProIIIYearly(proIIIYearly);
 				maxP = proIIIYearly;
-//	        		}
-//            	}
 				logDebug("PRO III ANNUALY (JSON): " + proIIIYearly.getOriginalJson());
 			}
 
