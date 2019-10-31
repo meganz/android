@@ -37,6 +37,7 @@
                     android:layout_width="wrap_content"
                     android:gravity="center_vertical|left"
                     android:orientation="vertical">
+                    <!--orientation is not required in linear layout-->
                     <RelativeLayout
                         android:id="@+id/toolbar_elements_inside"
                         android:layout_width="wrap_content"
@@ -107,6 +108,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:textSize="12sp"
+                        android:padding="10dp"
                         android:visibility="gone"
                         android:singleLine="true"
                         android:ellipsize="marquee"
