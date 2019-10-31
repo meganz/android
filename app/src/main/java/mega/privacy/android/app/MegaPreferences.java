@@ -38,6 +38,7 @@ public class MegaPreferences{
 	String smallGridCamera = "";
 	String uploadVideoQuality = "";
 	String conversionOnCharging = "";
+	private String removeGPS;
 	String chargingOnSize = "";
 	String shouldClearCameraSyncRecords;
 
@@ -56,7 +57,7 @@ public class MegaPreferences{
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
 			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String pinLockType, String preferredSortCloud, String preferredSortContacts,
-			String preferredSortOthers, String firstTimeChat, String smallGridCamera,String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String shouldClearCameraSyncRecords,String camVideoSyncTimeStamp,String secVideoSyncTimeStamp, String isAutoPlayEnabled,String showInviteBanner){
+			String preferredSortOthers, String firstTimeChat, String smallGridCamera,String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String shouldClearCameraSyncRecords,String camVideoSyncTimeStamp,String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,String showInviteBanner){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -94,6 +95,7 @@ public class MegaPreferences{
 		this.camVideoSyncTimeStamp = camVideoSyncTimeStamp;
 		this.secVideoSyncTimeStamp = secVideoSyncTimeStamp;
 		this.isAutoPlayEnabled = isAutoPlayEnabled;
+		this.removeGPS = removeGPS;
 		this.showInviteBanner = showInviteBanner;
 	}
 
@@ -394,6 +396,14 @@ public class MegaPreferences{
 
     public void setSecVideoSyncTimeStamp(String secVideoSyncTimeStamp) {
         this.secVideoSyncTimeStamp = secVideoSyncTimeStamp;
+    }
+
+    public String getRemoveGPS() {
+        return removeGPS;
+    }
+
+    public void setRemoveGPS(String removeGPS) {
+        this.removeGPS = removeGPS;
     }
 
     @Override

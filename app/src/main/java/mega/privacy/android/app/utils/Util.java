@@ -322,19 +322,20 @@ public class Util {
            default:
                return bitmap;
         }
-	     
-        try {
-            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            if (bitmap != null && !bitmap.isRecycled()) {
-                bitmap.recycle();
-                bitmap = null; 
-            }
-            return bmRotated;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+
+		try {
+			Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+			if (bitmap != null && !bitmap.isRecycled()) {
+				bitmap.recycle();
+				bitmap = null;
+				System.gc();
+			}
+			return bmRotated;
+		} catch (Exception e) {
+			logError("Exception creating rotated bitmap", e);
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {

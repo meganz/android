@@ -475,6 +475,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 holder.fileThumbnail.setImageBitmap(ThumbnailUtilsLollipop.getRoundedRectBitmap(context,thumb,2));
                 holder.fileThumbnail.setVisibility(View.VISIBLE);
                 holder.fileIcon.setVisibility(View.GONE);
+            } else {
+                holder.fileThumbnail.setVisibility(View.GONE);
+                holder.fileIcon.setVisibility(View.VISIBLE);
             }
 
             if(selectFile){

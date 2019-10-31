@@ -35,9 +35,9 @@ import static mega.privacy.android.app.utils.Util.aes_encrypt;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-	
-	private static final int DATABASE_VERSION = 46;
-    private static final String DATABASE_NAME = "megapreferences"; 
+
+	private static final int DATABASE_VERSION = 47;
+    private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
     private static final String TABLE_ATTRIBUTES = "attributes";
@@ -77,6 +77,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CAM_SYNC_CHARGING = "camSyncCharging";
     private static final String KEY_UPLOAD_VIDEO_QUALITY = "uploadVideoQuality";
     private static final String KEY_CONVERSION_ON_CHARGING = "conversionOnCharging";
+    private static final String KEY_REMOVE_GPS = "removeGPS";
     private static final String KEY_CHARGING_ON_SIZE = "chargingOnSize";
     private static final String KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = "shouldclearcamsyncrecords";
     private static final String KEY_KEEP_FILE_NAMES = "keepFileNames";
@@ -299,7 +300,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       //35
                 + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //36
                 + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //37
-                + KEY_SHOW_INVITE_BANNER + " TEXT" + ")";           //38
+                + KEY_REMOVE_GPS + " TEXT,"                         //38
+                + KEY_SHOW_INVITE_BANNER + " TEXT" + ")";           //39
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -709,6 +711,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
         if(oldVersion <= 45) {
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_REMOVE_GPS + " TEXT;");
+            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_REMOVE_GPS + " = '" + encrypt("true") + "';");
+        }
+
+        if(oldVersion <= 46) {
             db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
 
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SHOW_INVITE_BANNER + " TEXT;");
@@ -1099,6 +1106,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    public void setRemoveGPS (boolean removeGPS){
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_REMOVE_GPS + "= '" + encrypt(String.valueOf(removeGPS)) + "' WHERE " + KEY_ID + " = '1'";
+            db.execSQL(UPDATE_PREFERENCES_TABLE);
+        }
+        else{
+            values.put(KEY_REMOVE_GPS, encrypt(String.valueOf(removeGPS)));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
+    }
+
 	public void saveEphemeral(EphemeralCredentials ephemeralCredentials) {
 		ContentValues values = new ContentValues();
 		if (ephemeralCredentials.getEmail() != null){
@@ -1340,6 +1362,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(prefs.getPreferredSortOthers()));
 		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
 		values.put(KEY_SMALL_GRID_CAMERA, encrypt(prefs.getSmallGridCamera()));
+		values.put(KEY_REMOVE_GPS, encrypt(prefs.getRemoveGPS()));
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 
@@ -1388,13 +1411,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String shouldClearCameraSyncRecords = decrypt(cursor.getString(35));
 			String camVideoSyncTimeStamp = decrypt(cursor.getString(36));
 			String secVideoSyncTimeStamp = decrypt(cursor.getString(37));
-			String closeInviteBanner = decrypt(cursor.getString(38));
+			String removeGPS = decrypt(cursor.getString(38));
+			String closeInviteBanner = decrypt(cursor.getString(39));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
 					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,shouldClearCameraSyncRecords,camVideoSyncTimeStamp,
-                    secVideoSyncTimeStamp,isAutoPlayEnabled,closeInviteBanner);
+                    secVideoSyncTimeStamp,isAutoPlayEnabled,removeGPS,closeInviteBanner);
 		}
 		cursor.close();
 

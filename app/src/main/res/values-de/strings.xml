@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">Fehler! Bitte versuchen Sie es später erneut.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">Der Zweitmedienordner existiert nicht. Bitte wählen Sie einen anderen Ordner.</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Kein externes Speichermedium gefunden</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Dieser Ordner ist nur zum Lesen freigegeben. Sie können nicht in ihn uploaden.</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail-Ansicht</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Listenansicht</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Rettungsschlüssel sichern</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Rettungsschlüssel löschen</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Abonnement stornieren</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">Der Rettungsschlüssel wurde gelöscht.</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Das Abonnement wurde storniert.</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Wir konnten Ihr Abonnement nicht stornieren. Bitte setzen Sie sich mit support&#64;mega.nz in Verbindung.</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Alle anderen Sitzungen beenden</string>
@@ -232,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">Alle Transfers löschen?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Neue/Geänderte Dateien</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Medienuploads</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Posteingang</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Für Offline-Zugriff gespeichert</string>
@@ -612,7 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Die Voransicht wird geladen. Bitte warten Sie.</string>
-    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">The preview is not able to load due to insufficient memory available. Please try again later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Bitte loggen Sie sich aus, bevor Sie einen Account erstellen</string>
 
@@ -933,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Diese E-Mail-Adresse ist bereits belegt.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">Sie haben einen Bestätigungslink für diese E-Mail-Adresse angefordert.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">Die neue E-Mail-Adresse muss sich von der jetzigen unterscheiden</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Um Ihre E-Mail-Adresse jetzt zu ändern, geben Sie bitte Ihr Passwort ein.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">E-Mail-Adresse ändern</string>
 
@@ -2322,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Gespräch aktiv</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL-Schlüssel ungültig</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA kann keine gesicherte SSL-Verbindung aufbauen. Möglicherweise müssen Sie sich zunächst in den WLAN-Hotspot einloggen.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">Ihre SSL-Verbindung zu den MEGA-Servern wurde manipuliert. Bitte prüfen Sie, ob Ihr WLAN-Hotspot einen Login erfordert.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Keine [/B][A]Benachrichtigungen[/A][B].[/B]</string>
 
@@ -2519,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d Dateien in der Warteschlange</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Neue/Geänderte Dateien</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 Bild und 1 Video</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Ich</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Sie können während eines laufenden Gesprächs keine Sprachnachricht aufzeichnen</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Fehler beim Versenden der Sprachnachricht</string>
 
@@ -2527,5 +2546,6 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Lade</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Bitte warten&#8230;</string>
 
-    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s Kontakte versandt.</string>
 </resources>
