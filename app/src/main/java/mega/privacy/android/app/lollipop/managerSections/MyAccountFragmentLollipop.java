@@ -948,6 +948,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
      * If not, hide the text.
      */
 	public void checkLogoutWarnings() {
+		if (logoutWarning == null) return;
+
 		boolean existOfflineFiles = existsOffline(context);
 		boolean existOutgoingTransfers = existOngoingTransfers(megaApi);
 		int oldVisibility = logoutWarning.getVisibility();
