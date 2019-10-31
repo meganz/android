@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="13dp"
         android:layout_marginRight="12dp"
+        android:overScrollMode="never"
         android:layout_toRightOf="@id/file_explorer_thumbnail"
         android:scrollbars="none">
         <TextView

@@ -38,7 +38,7 @@ import static mega.privacy.android.app.utils.Util.*;
 /*
  * Adapter for FilestorageActivity list
  */
-public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorageLollipopAdapter.ViewHolderFileStorage> implements OnClickListener {
+public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorageLollipopAdapter.ViewHolderFileStorage> implements OnClickListener, View.OnLongClickListener {
 
 	private Context context;
 	private MegaApiAndroid megaApi;
@@ -97,9 +97,11 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 
 		holder.itemLayout = v.findViewById(R.id.file_explorer_item_layout);
 		holder.itemLayout.setOnClickListener(this);
+		holder.itemLayout.setOnLongClickListener(this);
 		holder.imageView = v.findViewById(R.id.file_explorer_thumbnail);
 		holder.textViewFileName =  v.findViewById(R.id.file_explorer_filename);
 		holder.textViewFileName.setOnClickListener(this);
+		holder.textViewFileName.setOnLongClickListener(this);
 		holder.textViewFileName.setTag(holder);
 		holder.textViewFileSize = v.findViewById(R.id.file_explorer_filesize);
 
@@ -455,4 +457,15 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			}
 		}
 	}
+	@Override
+	public boolean onLongClick(View view) {
+		logDebug("OnLongClick");
+
+		ViewHolderFileStorage holder = (ViewHolderFileStorage) view.getTag();
+		int currentPosition = holder.getAdapterPosition();
+		((FileStorageActivityLollipop) context).itemClick(currentPosition);
+
+		return true;
+	}
+
 }
