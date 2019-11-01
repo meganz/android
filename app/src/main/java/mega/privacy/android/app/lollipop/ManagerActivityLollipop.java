@@ -141,8 +141,8 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
-import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -196,12 +196,11 @@ import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -277,6 +276,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private final int OFFLINE_BNV = 4;
 	private final int HIDDEN_BNV = 5;
 	private final int MEDIA_UPLOADS_BNV = 6;
+
+	private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
 	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
@@ -524,7 +525,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	boolean firstLogin = false;
-	private static boolean shouldShowSMSDialog = false;
+	private static boolean shouldShowSMSDialog;
+	private boolean hasSMSFragmentShowed;
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
@@ -1990,7 +1992,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
-
+        smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
 		cC = new ContactController(this);
 		aC = new AccountController(this);
@@ -3272,7 +3274,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         }
 
         //don't show the dialog again.
-        shouldShowSMSDialog = false;
+        hasSMSFragmentShowed = true;
         onAskingSMSVerificationFragment = true;
         if (svF == null) {
             svF = new SMSVerificationFragment();
@@ -4664,7 +4666,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
         //This account hasn't verified a phone number and first login.
-        if (megaApi.smsVerifiedPhoneNumber() == null && shouldShowSMSDialog) {
+        if (megaApi.smsVerifiedPhoneNumber() == null && !hasSMSFragmentShowed && (shouldShowSMSDialog || smsDialogTimeChecker.shouldShow())) {
             showSMSVerificationDialog();
         }
     }
@@ -14715,6 +14717,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showSMSVerificationDialog() {
 	    logDebug("showSMSVerificationDialog");
+        smsDialogTimeChecker.update();
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
