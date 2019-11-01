@@ -2502,7 +2502,6 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            dbH.setStorageDownloadLocation(parentPath);
             if(adapterType == FILE_LINK_ADAPTER){
 				if (nC == null) {
 					nC = new NodeController(this);

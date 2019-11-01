@@ -2386,7 +2386,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            dbH.setStorageDownloadLocation(parentPath);
             if (type == FILE_LINK_ADAPTER){
                 if (nC == null) {
                     nC = new NodeController(this);

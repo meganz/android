@@ -134,8 +134,6 @@ public class DownloadableActivity extends SorterContentActivity {
     }
 
     private String extractRealPath(Uri treeUri) {
-        String path = FileUtil.getFullPathFromTreeUri(treeUri, this);
-        dbH.setStorageDownloadLocation(path);
-        return path;
+        return FileUtil.getFullPathFromTreeUri(treeUri, this);
     }
 }

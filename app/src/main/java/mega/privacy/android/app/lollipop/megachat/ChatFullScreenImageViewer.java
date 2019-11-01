@@ -818,7 +818,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			logDebug("Local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            dbH.setStorageDownloadLocation(parentPath);
 			chatC.prepareForDownload(intent, parentPath);
 		} else if (requestCode == REQUEST_CODE_TREE) {
             onRequestSDCardWritePermission(intent, resultCode, true, null);
