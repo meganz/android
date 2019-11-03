@@ -1,14 +1,17 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:rounded="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/my_account_complete_relative_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white">
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:rounded="http://schemas.android.com/apk/res-auto"
+		android:id="@+id/my_account_complete_relative_layout"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@color/white">
+
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:background="@color/white"
 		android:orientation="vertical">
+
 		<LinearLayout
 			android:id="@+id/parent_linear_layout"
 			android:layout_width="match_parent"
@@ -18,6 +21,7 @@
 			android:layout_marginRight="16dp"
 			android:background="@color/white"
 			android:orientation="vertical">
+
 			<LinearLayout
 				android:id="@+id/my_account_email_layout"
 				android:layout_width="match_parent"
@@ -27,6 +31,7 @@
 				android:background="@color/white"
 				android:gravity="left"
 				android:orientation="horizontal">
+
 				<LinearLayout
 					android:id="@+id/my_account_email_text_layout"
 					android:layout_width="wrap_content"
@@ -35,10 +40,12 @@
 					android:background="@color/white"
 					android:gravity="left"
 					android:orientation="vertical">
+
 					<RelativeLayout
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content">
-						<TextView
+
+						<mega.privacy.android.app.components.twemoji.EmojiTextView
 							android:id="@+id/my_account_name"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
@@ -48,6 +55,7 @@
 							android:singleLine="true"
 							android:textColor="@color/name_my_account"
 							android:textSize="16sp"/>
+
 						<ImageView
 							android:id="@+id/my_account_edit_icon"
 							android:layout_width="wrap_content"
@@ -56,6 +64,7 @@
 							android:layout_toRightOf="@+id/my_account_name"
 							android:src="@drawable/ic_rename_title"/>
 					</RelativeLayout>
+
 					<TextView
 						android:id="@+id/my_account_email"
 						android:layout_width="wrap_content"
@@ -76,7 +85,9 @@
 						android:singleLine="true"
 						android:textColor="@color/accentColor"
 						android:textSize="14sp"/>
+
 				</LinearLayout>
+
 				<LinearLayout
 					android:id="@+id/my_account_extra_layout"
 					android:layout_width="fill_parent"
@@ -84,6 +95,7 @@
 					android:layout_alignParentRight="true"
 					android:layout_gravity="center_vertical"
 					android:orientation="horizontal">
+
 					<RelativeLayout
 						android:layout_width="fill_parent"
 						android:layout_height="match_parent">
@@ -105,9 +117,13 @@
 									rounded:border_color="@color/border_file_properties"
 									rounded:border_width="0dp"
 									rounded:corner_radius="30dp" />
+
 						</RelativeLayout>
+
 					</RelativeLayout>
+
 				</LinearLayout>
+
 			</LinearLayout>
 
 			<LinearLayout
@@ -116,12 +132,14 @@
 				android:layout_height="1dp"
 				android:background="@color/divider_upgrade_account"
 				android:orientation="horizontal"/>
+
 			<LinearLayout
 				android:id="@+id/my_account_account_type_layout_container"
 				android:layout_width="match_parent"
 				android:layout_height="80dp"
 				android:gravity="center_vertical"
 				android:orientation="horizontal">
+
 				<LinearLayout
 					android:id="@+id/my_account_account_type_layout"
 					android:layout_width="wrap_content"
@@ -129,6 +147,7 @@
 					android:layout_centerVertical="true"
 					android:gravity="left|center_vertical"
 					android:orientation="vertical">
+
 					<TextView
 						android:id="@+id/my_account_account_type_text"
 						android:layout_width="wrap_content"
@@ -136,22 +155,27 @@
 						android:layout_marginBottom="4dp"
 						android:textColor="@color/name_my_account"
 						android:textSize="16sp"/>
+
 					<TextView
 						android:id="@+id/my_account_used_space"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:textColor="@color/mail_my_account"
 						android:textSize="14sp"/>
+
 				</LinearLayout>
+
 				<RelativeLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content">
+
 					<RelativeLayout
 						android:id="@+id/my_account_account_upgrade_layout"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:layout_alignParentRight="true"
 						android:background="@color/white">
+
 						<Button
 							android:id="@+id/my_account_account_type_button"
 							android:layout_width="wrap_content"
@@ -164,15 +188,20 @@
 							android:paddingTop="10dp"
 							android:text="@string/my_account_upgrade_pro"
 							android:textColor="@color/accentColor"/>
+
 					</RelativeLayout>
+
 				</RelativeLayout>
+
 			</LinearLayout>
+
 			<LinearLayout
 				android:id="@+id/my_account_type_separator"
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
 				android:background="@color/divider_upgrade_account"
 				android:orientation="horizontal"/>
+
 			<LinearLayout
 				android:id="@+id/my_account_achievements_layout"
 				android:layout_width="match_parent"
@@ -180,6 +209,7 @@
 				android:background="@color/white"
 				android:gravity="center_vertical|left"
 				android:orientation="horizontal">
+
 				<LinearLayout
 					android:id="@+id/my_account_achievements_text_layout"
 					android:layout_width="wrap_content"
@@ -187,6 +217,7 @@
 					android:background="@color/white"
 					android:gravity="left"
 					android:orientation="vertical">
+
 					<TextView
 						android:id="@+id/my_account_achievements_title"
 						android:layout_width="wrap_content"
@@ -198,6 +229,7 @@
 						android:text="@string/achievements_title"
 						android:textColor="@color/name_my_account"
 						android:textSize="16sp"/>
+
 					<TextView
 						android:id="@+id/my_account_achievements_subtitle"
 						android:layout_width="wrap_content"
@@ -209,13 +241,16 @@
 						android:textColor="@color/accentColor"
 						android:textSize="14sp"/>
 				</LinearLayout>
+
 			</LinearLayout>
+
 			<LinearLayout
 				android:id="@+id/my_account_achievements_separator"
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
 				android:background="@color/divider_upgrade_account"
 				android:orientation="horizontal"/>
+
 			<Button
 				android:id="@+id/MK_button"
 				android:layout_width="wrap_content"
@@ -234,6 +269,7 @@
 				android:text="@string/action_export_master_key"
 				android:textColor="@color/white"
 				android:tint="@android:color/white"/>
+
 			<Button
 				android:id="@+id/change_pass_button"
 				android:layout_width="wrap_content"
@@ -252,18 +288,21 @@
 				android:stateListAnimator="@anim/button_upgrade_elevation"
 				android:text="@string/my_account_change_password"
 				android:textColor="@color/name_my_account"/>
+
 			<LinearLayout
 				android:id="@+id/my_account_type_buttons_separator"
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
 				android:background="@color/divider_upgrade_account"
 				android:orientation="horizontal"/>
+
 			<RelativeLayout
 				android:id="@+id/my_account_connections_layout"
 				android:layout_width="fill_parent"
 				android:layout_height="72dp"
 				android:background="@color/white"
 				android:gravity="center_vertical|left">
+
 				<LinearLayout
 					android:id="@+id/my_account_connections_text_layout"
 					android:layout_width="wrap_content"
@@ -273,6 +312,7 @@
 					android:layout_centerVertical="true"
 					android:layout_alignParentLeft="true"
 					android:orientation="vertical">
+
 					<TextView
 						android:id="@+id/my_account_connections_label"
 						android:layout_width="wrap_content"
@@ -281,13 +321,16 @@
 						android:text="@string/my_account_connections"
 						android:textColor="@color/name_my_account"
 						android:textSize="16sp"/>
+
 					<TextView
 						android:id="@+id/my_account_connections"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:textColor="@color/mail_my_account"
 						android:textSize="14sp"/>
+
 				</LinearLayout>
+
 				<mega.privacy.android.app.components.CustomizedGridRecyclerView
 					android:id="@+id/last_contacts_gridview"
 					android:layout_width="70dp"
@@ -297,68 +340,97 @@
 					android:layout_alignParentRight="true"
 					android:columnWidth="20dp">
 				</mega.privacy.android.app.components.CustomizedGridRecyclerView>
+
 			</RelativeLayout>
+
 			<LinearLayout
 				android:id="@+id/my_account_connections_separator"
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
 				android:background="@color/divider_upgrade_account"
 				android:orientation="horizontal"/>
+
 			<LinearLayout
-				android:id="@+id/my_account_last_session_layout"
 				android:layout_width="match_parent"
-				android:layout_height="80dp"
-				android:background="@color/white"
-				android:gravity="center_vertical"
-				android:orientation="horizontal">
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
+
 				<LinearLayout
-					android:id="@+id/my_account_last_session_text_layout"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_centerVertical="true"
-					android:background="@color/white"
-					android:gravity="left|center_vertical"
-					android:orientation="vertical">
-					<TextView
-						android:id="@+id/my_account_last_session_label"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_marginBottom="4dp"
-						android:text="@string/my_account_last_session"
-						android:textColor="@color/name_my_account"
-						android:textSize="16sp"/>
-					<TextView
-						android:id="@+id/my_account_last_session"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:textColor="@color/mail_my_account"
-						android:textSize="14sp"/>
-				</LinearLayout>
-				<RelativeLayout
+					android:id="@+id/my_account_last_session_layout"
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
-					<RelativeLayout
-						android:id="@+id/my_account_logout_button_layout"
+					android:layout_height="80dp"
+					android:background="@color/white"
+					android:gravity="center_vertical"
+					android:orientation="horizontal">
+
+					<LinearLayout
+						android:id="@+id/my_account_last_session_text_layout"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:layout_alignParentRight="true"
-						android:background="@color/white">
-						<Button
-							android:id="@+id/logout_button"
+						android:layout_centerVertical="true"
+						android:background="@color/white"
+						android:gravity="left|center_vertical"
+						android:orientation="vertical">
+
+						<TextView
+							android:id="@+id/my_account_last_session_label"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
-							android:layout_centerVertical="true"
-							android:background="@drawable/background_grey_button"
-							android:minHeight="0dp"
-							android:paddingBottom="10dp"
-							android:paddingLeft="16dp"
-							android:paddingRight="16dp"
-							android:paddingTop="10dp"
-							android:text="@string/action_logout"
-							android:textColor="@color/name_my_account"/>
+							android:layout_marginBottom="4dp"
+							android:text="@string/my_account_last_session"
+							android:textColor="@color/name_my_account"
+							android:textSize="16sp"/>
+
+						<TextView
+							android:id="@+id/my_account_last_session"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/mail_my_account"
+							android:textSize="14sp"/>
+
+					</LinearLayout>
+
+					<RelativeLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content">
+
+						<RelativeLayout
+							android:id="@+id/my_account_logout_button_layout"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_alignParentRight="true"
+							android:background="@color/white">
+
+							<Button
+								android:id="@+id/logout_button"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_centerVertical="true"
+								android:background="@drawable/background_grey_button"
+								android:minHeight="0dp"
+								android:paddingBottom="10dp"
+								android:paddingLeft="16dp"
+								android:paddingRight="16dp"
+								android:paddingTop="10dp"
+								android:text="@string/action_logout"
+								android:textColor="@color/name_my_account"/>
+						</RelativeLayout>
+
 					</RelativeLayout>
-				</RelativeLayout>
+
+				</LinearLayout>
+
+				<TextView
+					android:id="@+id/logout_warning_text"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:textSize="12sp"
+					android:textColor="@color/black_40_alpha"/>
+
 			</LinearLayout>
+
 		</LinearLayout>
+
 	</LinearLayout>
+
 </ScrollView>

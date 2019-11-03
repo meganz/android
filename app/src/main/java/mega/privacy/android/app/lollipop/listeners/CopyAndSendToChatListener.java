@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -27,6 +28,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
 
+    private long idChat = -1;
     private int counter = 0;
     private MegaNode parentNode;
     private ArrayList<MegaNode> nodesCopied = new ArrayList<>();
@@ -35,6 +37,16 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
 
     public CopyAndSendToChatListener(Context context) {
         super();
+        initListener(context);
+    }
+
+    public CopyAndSendToChatListener(Context context, long idChat) {
+        super();
+        initListener(context);
+        this.idChat = idChat;
+    }
+
+    void initListener(Context context) {
         this.context = context;
 
         if (megaApi == null) {
@@ -80,10 +92,15 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
             counter --;
             if (e.getErrorCode() == MegaError.API_OK){
                 nodesCopied.add(megaApi.getNodeByHandle(request.getNodeHandle()));
-                if (counter == 0){
-                    if (nodesCopied != null) {
+                if (counter == 0) {
+                    if (idChat == -1) {
                         NodeController nC = new NodeController(context);
                         nC.selectChatsToSendNodes(nodesCopied);
+                    }
+                    else if (context instanceof ChatActivityLollipop) {
+                        for (MegaNode node : nodesCopied) {
+                            ((ChatActivityLollipop) context).retryNodeAttachment(node.getHandle());
+                        }
                     }
                 }
             }

@@ -81,7 +81,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -302,19 +301,20 @@ public class Util {
            default:
                return bitmap;
         }
-	     
-        try {
-            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            if (bitmap != null && !bitmap.isRecycled()) {
-                bitmap.recycle();
-                bitmap = null; 
-            }
-            return bmRotated;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+
+		try {
+			Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+			if (bitmap != null && !bitmap.isRecycled()) {
+				bitmap.recycle();
+				bitmap = null;
+				System.gc();
+			}
+			return bmRotated;
+		} catch (Exception e) {
+			logError("Exception creating rotated bitmap", e);
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -560,8 +560,8 @@ public class Util {
 	public static String getProgressSize(Context context, long progress,
 			long size) {
 		return String.format("%s/%s",
-				Formatter.formatFileSize(context, progress),
-				Formatter.formatFileSize(context, size));
+				getSizeString(progress),
+				getSizeString(size));
 	}
 	
 	/*
@@ -1422,42 +1422,14 @@ public class Util {
 		return icon;
 	}
 
-	//Notice user that any transfer prior to login will be destroyed
-	public static void checkPendingTransfer(MegaApiAndroid megaApi, Context context, final AbortPendingTransferCallback callback){
-		if(megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0){
-			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-			if(context instanceof ManagerActivityLollipop){
-				logDebug("Show dialog to cancel transfers before logging OUT");
-				builder.setMessage(R.string.logout_warning_abort_transfers);
-				builder.setPositiveButton(R.string.action_logout, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						callback.onAbortConfirm();
-					}
-				});
-			}
-			else{
-				logDebug("Show dialog to cancel transfers before logging IN");
-				builder.setMessage(R.string.login_warning_abort_transfers);
-				builder.setPositiveButton(R.string.login_text, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						callback.onAbortConfirm();
-					}
-				});
-			}
-
-			builder.setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					callback.onAbortCancel();
-				}
-			});
-			builder.show();
-		}else{
-			callback.onAbortConfirm();
-		}
+	/**
+	 *Check if exist ongoing transfers
+	 *
+	 * @param megaApi
+	 * @return true if exist ongoing transfers, false otherwise
+	 */
+	public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
+		return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
 	}
 
 	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
@@ -1542,6 +1514,10 @@ public class Util {
 		c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
 
 		return defaultAvatar;
+	}
+
+	public static MegaPreferences getPreferences (Context context) {
+		return DatabaseHandler.getDbHandler(context).getPreferences();
 	}
 
     public static boolean askMe (Context context) {
@@ -1687,7 +1663,6 @@ public class Util {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
-
 	public static boolean isScreenInPortrait(Context context) {
 		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			return true;
@@ -1695,6 +1670,7 @@ public class Util {
 			return false;
 		}
 	}
+
 	/**
 	 * This method detects whether the android device is tablet
 	 *
@@ -1722,6 +1698,7 @@ public class Util {
 			}
 		}
 		return false;
+
 	}
 
     public static boolean hasPermissions(Context context, String... permissions) {

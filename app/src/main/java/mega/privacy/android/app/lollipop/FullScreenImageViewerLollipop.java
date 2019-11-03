@@ -2623,10 +2623,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
 			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-			logDebug("Send to " + (chatHandles.length + contactHandles.length) + " chats");
-
 			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
-			logDebug("Send " + nodeHandles.length + " nodes");
 
 			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
 				if (contactHandles != null && contactHandles.length > 0) {
@@ -2859,38 +2856,38 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		logDebug("onNodesUpdate");
 
-		boolean thisNode = false;
-		if(nodes==null){
-			return;
-		}
+		if ((adapterType != OFFLINE_ADAPTER) && adapterType != FILE_LINK_ADAPTER && adapterType != ZIP_ADAPTER) {
+			boolean thisNode = false;
+			if(nodes==null){
+				return;
+			}
 
-		Iterator<MegaNode> it = nodes.iterator();
-		while (it.hasNext()){
-			MegaNode n = it.next();
-			if (n != null){
-				if (positionG < imageHandles.size() && n.getHandle() == imageHandles.get(positionG)){
-					thisNode = true;
+
+			Iterator<MegaNode> it = nodes.iterator();
+			while (it.hasNext()){
+				MegaNode n = it.next();
+				if (n != null && positionG < imageHandles.size() && n.getHandle() == imageHandles.get(positionG)){
+						thisNode = true;
 				}
 			}
+
+			if (!thisNode){
+				logWarning("Not related to this node");
+				return;
+			}
+
+			if (positionG < imageHandles.size() && imageHandles.get(positionG) != -1){
+				logDebug("Node updated");
+				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			}
+
+			if (node == null){
+				return;
+			}
+
+			fileNameTextView.setText(node.getName());
+			supportInvalidateOptionsMenu();
 		}
-
-		if (!thisNode){
-			logWarning("Not related to this node");
-			return;
-		}
-
-		if (positionG < imageHandles.size() && imageHandles.get(positionG) != -1){
-			logDebug("Node updated");
-			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-		}
-
-		if (node == null){
-			return;
-		}
-
-		fileNameTextView.setText(node.getName());
-		supportInvalidateOptionsMenu();
-
 	}
 
 	@Override

@@ -148,6 +148,7 @@ public class Constants {
     public static final int REQUEST_STORAGE_VOICE_CLIP = 12;
     public static final int REQUEST_CAMERA_TAKE_PICTURE = 13;
     public static final int REQUEST_WRITE_STORAGE_TAKE_PICTURE = 14;
+
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
     public static final int REQUEST_WRITE_STORAGE_OFFLINE = 16;
 
@@ -236,6 +237,8 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
     public static final String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
     public static final String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
+    public static final String BROADCAST_ACTION_INTENT_UPDATE_ORDER = "INTENT_UPDATE_ORDER";
+    public static final String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
 
@@ -331,6 +334,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
     public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
     public static final String CHAT_FOLDER = "My chat files";
+    public static final String AUTHORITY_STRING_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider";
 
     public static final int RICH_WARNING_TRUE = 1;
     public static final int RICH_WARNING_FALSE = 0;
@@ -349,6 +353,7 @@ public class Constants {
     public static final long BUFFER_COMP = 1073741824;      // 1 GB
     public static final int MAX_BUFFER_16MB = 16777216; // 16 MB
     public static final int MAX_BUFFER_32MB = 33554432; // 32 MB
+    public static final int MAX_AUTOAWAY_TIMEOUT = 1457; //in minute, the max value supported by SDK
 
     public static final String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 
@@ -395,7 +400,18 @@ public class Constants {
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String HANDLE = "handle";
 
-	public static final String[] FILE_LINK_REGEXS = {
+    public static final int EMOJI_SIZE_EXTRA_SMALL = 10;
+    public static final int EMOJI_SIZE_SMALL = 15;
+    public static final int EMOJI_SIZE = 20;
+    public static final int EMOJI_SIZE_MEDIUM = 25;
+    public static final int EMOJI_AVATAR_SIZE = 30;
+    public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
+    public static final int EMOJI_AVATAR_CALL_SMALL = 40;
+    public static final int EMOJI_AVATAR_CALL_HIGH = 60;
+    public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
+
+
+    public static final String[] FILE_LINK_REGEXS = {
 			"^https://mega\\.co\\.nz/#!.+$",
 			"^https://mega\\.nz/#!.+$"
 	};

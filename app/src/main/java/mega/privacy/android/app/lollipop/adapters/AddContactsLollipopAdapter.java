@@ -25,8 +25,12 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.PhoneContactInfo;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -55,7 +59,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
             super(itemView);
         }
 
-        TextView textViewName;
+        EmojiTextView textViewName;
         ImageView deleteIcon;
         RoundedImageView avatar;
         RelativeLayout itemLayout;
@@ -77,8 +81,9 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
         holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
         holder.itemLayout.setOnClickListener(this);
 
-        holder.textViewName = (TextView) v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(px2dp(60, outMetrics));
+        holder.textViewName = v.findViewById(R.id.name_chip);
+        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
+        holder.textViewName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
 
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
@@ -206,8 +211,10 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
         }
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-        String firstLetter = fullName.charAt(0) + "";
-        logDebug("Draw letter: " + firstLetter);
+        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            firstLetter = " ";
+        }
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
