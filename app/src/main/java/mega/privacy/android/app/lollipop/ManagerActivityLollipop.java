@@ -201,7 +201,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -10001,13 +10000,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         	newFile.createNewFile();
         } catch (IOException e) {}
 
-		Uri outputFileUri;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
-		}
-		else{
-			outputFileUri = Uri.fromFile(newFile);
-		}
+        //This method is in the v4 support library, so can be applied to all devices
+		Uri outputFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, newFile);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
@@ -10598,7 +10592,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         View v = inflater.inflate(R.layout.dialog_autoaway, null);
         builder.setView(v);
 
-        final RelativeLayout error = (RelativeLayout) v.findViewById(R.id.autoaway_error);
         final EditText input = v.findViewById(R.id.autoaway_edittext);
         input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -10608,9 +10601,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (error.getVisibility() == View.VISIBLE) {
-                    error.setVisibility(View.GONE);
-                }
+
             }
 
             @Override
@@ -10622,14 +10613,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (validAutoaway(value)) {
+					String value = validateAutoAway(v.getText());
+					if (value != null) {
 						setAutoAwayValue(value, false);
-						newFolderDialog.dismiss();
 					}
-					else {
-						error.setVisibility(View.VISIBLE);
-					}
+					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
@@ -10648,16 +10636,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
 		set.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
-                String value = input.getText().toString().trim();
-                if (validAutoaway(value)) {
-                    setAutoAwayValue(value, false);
-					newFolderDialog.dismiss();
-                }
-                else {
-                    error.setVisibility(View.VISIBLE);
-                }
-            }
+			public void onClick(View v) {
+				String value = validateAutoAway(input.getText());
+				if (value != null) {
+					setAutoAwayValue(value, false);
+				}
+				newFolderDialog.dismiss();
+			}
         });
 		Button cancel = (Button) v.findViewById(R.id.autoaway_cancel_button);
 	    cancel.setOnClickListener(new OnClickListener() {
@@ -10672,12 +10657,21 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		newFolderDialog.show();
 	}
 
-	boolean validAutoaway(String value) {
-		if (Integer.parseInt(value) > 0) {
-			return true;
+	private String validateAutoAway(CharSequence value) {
+		int timeout;
+		try {
+			timeout = Integer.parseInt(value.toString().trim());
+			if (timeout <= 0) {
+				timeout = 1;
+			} else if (timeout > MAX_AUTOAWAY_TIMEOUT) {
+				timeout = MAX_AUTOAWAY_TIMEOUT;
+			}
+			return String.valueOf(timeout);
+		} catch (Exception e) {
+			logWarning("Unable to parse user input, user entered: '" + value + "'");
+			return null;
 		}
-	    return false;
-    }
+	}
 
 	public void setAutoAwayValue(String value, boolean cancelled){
 		logDebug("Value: " + value);
