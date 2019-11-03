@@ -100,6 +100,10 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
@@ -206,6 +210,7 @@ import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
 import mega.privacy.android.app.utils.billing.Purchase;
+import mega.privacy.android.app.utils.billing_v2.BillingManager;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -254,7 +259,7 @@ import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
+			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, BillingManager.BillingUpdatesListener {
 
 	private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
 	private final String INDEX_CLOUD = "INDEX_CLOUD";
@@ -381,6 +386,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     int orientationSaved;
 
     float elevation = 0;
+	private BillingManager mBillingManager;
+	private List<SkuDetails> mSkuDetailsList;
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
@@ -1137,7 +1144,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public static final int RC_REQUEST = 10001;
     String orderId = "";
 
-	IabHelper mHelper;
 	// SKU for our subscription PRO_I monthly
     public static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
     // SKU for our subscription PRO_I yearly
@@ -1185,8 +1191,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("Purchase successful.");
 			logDebug("ORIGINAL JSON: " + purchase.getOriginalJson());
 
-            orderId = purchase.getOrderId();
-//            Toast.makeText(getApplicationContext(), "ORDERID WHEN FINISHED: ****_____" + purchase.getOrderId() + "____*****", Toast.LENGTH_LONG).show();
 			logDebug("ORDERID WHEN FINISHED: ***____" + purchase.getOrderId() + "___***");
             if (purchase.getSku().equals(SKU_PRO_I_MONTH)) {
 				logDebug("PRO I Monthly subscription purchased.");
@@ -1306,9 +1310,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
 		public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
 			logDebug("Query inventory finished.");
-
-			// Have we been disposed of in the meantime? If so, quit.
-			if (mHelper == null) return;
 
 			// Is it a failure?
 			if (result.isFailure()) {
@@ -1443,83 +1444,191 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	};
 
     public void launchPayment(String productId){
-    	/* TODO: for security, generate your payload here for verification. See the comments on
-         *        verifyDeveloperPayload() for more info. Since this is a SAMPLE, we just use
-         *        an empty string, but on a production app you should carefully generate this. */
     	String payload = megaApi.getMyUser().getEmail();
 
-    	if (mHelper == null){
-    		initGooglePlayPayments();
-    	}
-
-    	if (productId.compareTo(SKU_PRO_I_MONTH) == 0){
-    		mHelper.launchPurchaseFlow(this,
-        			SKU_PRO_I_MONTH, IabHelper.ITEM_TYPE_SUBS,
-                    RC_REQUEST, mPurchaseFinishedListener, payload);
-    	}
-    	else if (productId.compareTo(SKU_PRO_I_YEAR) == 0){
-    		mHelper.launchPurchaseFlow(this,
-    				SKU_PRO_I_YEAR, IabHelper.ITEM_TYPE_SUBS,
-                    RC_REQUEST, mPurchaseFinishedListener, payload);
-    	}
-    	else if (productId.compareTo(SKU_PRO_II_MONTH) == 0){
-    		mHelper.launchPurchaseFlow(this,
-    				SKU_PRO_II_MONTH, IabHelper.ITEM_TYPE_SUBS,
-                    RC_REQUEST, mPurchaseFinishedListener, payload);
-    	}
-    	else if (productId.compareTo(SKU_PRO_II_YEAR) == 0){
-    		mHelper.launchPurchaseFlow(this,
-    				SKU_PRO_II_YEAR, IabHelper.ITEM_TYPE_SUBS,
-                    RC_REQUEST, mPurchaseFinishedListener, payload);
-    	}
-    	else if (productId.compareTo(SKU_PRO_III_MONTH) == 0){
-    		mHelper.launchPurchaseFlow(this,
-    				SKU_PRO_III_MONTH, IabHelper.ITEM_TYPE_SUBS,
-                    RC_REQUEST, mPurchaseFinishedListener, payload);
-    	}
-    	else if (productId.compareTo(SKU_PRO_III_YEAR) == 0){
-    		mHelper.launchPurchaseFlow(this,
-    				SKU_PRO_III_YEAR, IabHelper.ITEM_TYPE_SUBS,
-                    RC_REQUEST, mPurchaseFinishedListener, payload);
-    	}
-    	else if (productId.compareTo(SKU_PRO_LITE_MONTH) == 0){
-			logDebug("LAUNCH PURCHASE FLOW!");
-    		mHelper.launchPurchaseFlow(this,
-    				SKU_PRO_LITE_MONTH, IabHelper.ITEM_TYPE_SUBS,
-                    RC_REQUEST, mPurchaseFinishedListener, payload);
-    	}
-    	else if (productId.compareTo(SKU_PRO_LITE_YEAR) == 0){
-    		mHelper.launchPurchaseFlow(this,
-    				SKU_PRO_LITE_YEAR, IabHelper.ITEM_TYPE_SUBS,
-                    RC_REQUEST, mPurchaseFinishedListener, payload);
-    	}
-
+		//start purchase flow
+		SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
+		mBillingManager.initiatePurchaseFlow(skuDetails);
     }
 
-    public void initGooglePlayPayments(){
-		String base64EncodedPublicKey = base64EncodedPublicKey_1 + base64EncodedPublicKey_2 + base64EncodedPublicKey_3 + base64EncodedPublicKey_4 + base64EncodedPublicKey_5;
+    private SkuDetails getSkuDetails(List<SkuDetails> list, String key){
+    	if (list == null || list.isEmpty()){
+    		return null;
+		}
 
-		logDebug ("Creating IAB helper.");
-		mHelper = new IabHelper(this, base64EncodedPublicKey);
-		mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-            public void onIabSetupFinished(IabResult result) {
-				logDebug("Setup finished.");
-
-                if (!result.isSuccess()) {
-                    // Oh noes, there was a problem.
-					logError("Problem setting up in-app billing: " + result);
-                    return;
-                }
-
-                // Have we been disposed of in the meantime? If so, quit.
-                if (mHelper == null) return;
-
-                // IAB is fully set up. Now, let's get an inventory of stuff we own.
-				logDebug("Setup successful. Querying inventory.");
-                mHelper.queryInventoryAsync(mGotInventoryListener);
-            }
-        });
+    	for(SkuDetails details : list){
+    		if(details.getSku().equals(key)){
+    			return details;
+			}
+		}
+    	return null;
 	}
+
+    public void initGooglePlayPayments(){
+		initBilling();
+	}
+
+
+	//////todo new billing lib
+	private void initBilling(){
+    	try {
+    		//must enable pending purchases to use billing library
+    		BillingClient.newBuilder(this).enablePendingPurchases();
+			mBillingManager = new BillingManager(this, this);
+		}catch (Exception e) {
+			logError(e.toString());
+		}
+
+	}
+
+	@Override
+	public void onBillingClientSetupFinished() {
+		//billing client is ready now, ready for next step
+		//todo get subscription?
+		List<String> inAppSkus = new ArrayList<>();
+		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
+			@Override
+			public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
+				if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+					logWarning("Failed to get SkuDetails, error code is " + billingResult.getResponseCode());
+				}
+				if (skuDetailsList != null && skuDetailsList.size() > 0) {
+					mSkuDetailsList = skuDetailsList;
+				}
+			}
+		};
+
+		inAppSkus.add(SKU_PRO_I_MONTH);
+		inAppSkus.add(SKU_PRO_I_YEAR);
+		inAppSkus.add(SKU_PRO_II_MONTH);
+		inAppSkus.add(SKU_PRO_II_YEAR);
+		inAppSkus.add(SKU_PRO_III_MONTH);
+		inAppSkus.add(SKU_PRO_III_YEAR);
+		inAppSkus.add(SKU_PRO_LITE_MONTH);
+		inAppSkus.add(SKU_PRO_LITE_YEAR);
+
+		mBillingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
+	}
+
+	@Override
+	public void onConsumeFinished(String token, int result) {
+		//todo need to confirm if we have such cases
+	}
+
+	@Override
+	public void onPurchasesUpdated(List<com.android.billingclient.api.Purchase> purchases) {
+		//todo update ui, e.g. disable purchased option, notify api and so on
+
+		logDebug("Query inventory was successful.");
+
+		proLiteMonthly = inventory.getPurchase(SKU_PRO_LITE_MONTH);
+		proLiteYearly = inventory.getPurchase(SKU_PRO_LITE_YEAR);
+		proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
+		proIYearly = inventory.getPurchase(SKU_PRO_I_YEAR);
+		proIIMonthly = inventory.getPurchase(SKU_PRO_II_MONTH);
+		proIIYearly = inventory.getPurchase(SKU_PRO_II_YEAR);
+		proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
+		proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR);
+
+		if (proLiteMonthly != null) {
+			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(0);
+			((MegaApplication) getApplication()).getMyAccountInfo().setProLiteMonthly(proLiteMonthly);
+			maxP = proLiteMonthly;
+			logDebug("PRO LITE MONTHLY (JSON): " + proLiteMonthly.getOriginalJson());
+		}
+
+		if (proLiteYearly != null) {
+			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(0);
+			((MegaApplication) getApplication()).getMyAccountInfo().setProLiteYearly(proLiteYearly);
+			maxP = proLiteYearly;
+			logDebug("PRO LITE ANNUALY (JSON): " + proLiteYearly.getOriginalJson());
+		}
+
+		if (proIMonthly != null) {
+			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(1);
+			((MegaApplication) getApplication()).getMyAccountInfo().setProIMonthly(proIMonthly);
+			maxP = proIMonthly;
+			logDebug("PRO I MONTHLY (JSON): " + proIMonthly.getOriginalJson());
+		}
+
+		if (proIYearly != null) {
+			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(1);
+			((MegaApplication) getApplication()).getMyAccountInfo().setProIYearly(proIYearly);
+			maxP = proIYearly;
+			logDebug("PRO I ANNUALY (JSON): " + proIYearly.getOriginalJson());
+		}
+
+		if (proIIMonthly != null) {
+			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(2);
+			((MegaApplication) getApplication()).getMyAccountInfo().setProIIMonthly(proIIMonthly);
+			maxP = proIIMonthly;
+			logDebug("PRO II MONTHLY (JSON): " + proIIMonthly.getOriginalJson());
+		}
+
+		if (proIIYearly != null) {
+			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(2);
+			((MegaApplication) getApplication()).getMyAccountInfo().setProIIYearly(proIIYearly);
+			maxP = proIIYearly;
+			logDebug("PRO II ANNUALY (JSON): " + proIIYearly.getOriginalJson());
+		}
+
+		if (proIIIMonthly != null) {
+			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(3);
+			maxP = proIIIMonthly;
+			((MegaApplication) getApplication()).getMyAccountInfo().setProIIIMonthly(proIIIMonthly);
+			logDebug("PRO III MONTHLY (JSON): " + proIIIMonthly.getOriginalJson());
+		}
+
+		if (proIIIYearly != null) {
+			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(3);
+			((MegaApplication) getApplication()).getMyAccountInfo().setProIIIYearly(proIIIYearly);
+			maxP = proIIIYearly;
+			logDebug("PRO III ANNUALY (JSON): " + proIIIYearly.getOriginalJson());
+		}
+
+		((MegaApplication) getApplication()).getMyAccountInfo().setInventoryFinished(true);
+
+		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
+		if (upAFL != null) {
+			upAFL.setPricing();
+		}
+
+		myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
+		if (myFL != null) {
+			myFL.setPricing();
+		}
+
+		logDebug("LEVELACCOUNTDETAILS: " + ((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() +
+				"; LEVELINVENTORY: " + ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory() +
+				"; ACCOUNTDETAILSFINISHED: " + ((MegaApplication) getApplication()).getMyAccountInfo().isAccountDetailsFinished());
+
+		if (((MegaApplication) getApplication()).getMyAccountInfo().isAccountDetailsFinished()) {
+			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory() > ((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails()) {
+				if (maxP != null) {
+					logDebug("ORIGINAL JSON:" + maxP.getOriginalJson());
+					if (dbH == null) {
+						dbH = DatabaseHandler.getDbHandler(managerActivity);
+					}
+
+					MegaAttributes attributes = dbH.getAttributes();
+
+					long lastPublicHandle = getLastPublicHandle(attributes);
+					if (lastPublicHandle == -1) {
+						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), managerActivity);
+					} else {
+						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle, managerActivity);
+					}
+				}
+			}
+		}
+
+		boolean isProLiteMonthly = false;
+		if (proLiteMonthly != null) {
+			isProLiteMonthly = true;
+		}
+	}
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -12920,22 +13029,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				cC.inviteMultipleContacts(contactsData);
 			}
 		}
-		else if (requestCode == RC_REQUEST){
-			// Pass on the activity result to the helper for handling
-	        if (!mHelper.handleActivityResult(requestCode, resultCode, intent)) {
-	            // not handled, so handle it ourselves (here's where you'd
-	            // perform any handling of activity results not related to in-app
-	            // billing...
-
-	        	super.onActivityResult(requestCode, resultCode, intent);
-	        }
-	        else {
-				logDebug("Handled by IABUtil.");
-	            drawerItem = DrawerItem.ACCOUNT;
-//	            Toast.makeText(this, "HURRAY!: ORDERID: **__" + orderId + "__**", Toast.LENGTH_LONG).show();
-				logDebug("HURRAY! - ORDERID: " + orderId);
-	        }
-		}
+		//todo yuan
+//		else if (requestCode == RC_REQUEST){
+//			// Pass on the activity result to the helper for handling
+//	        if (!mHelper.handleActivityResult(requestCode, resultCode, intent)) {
+//	            // not handled, so handle it ourselves (here's where you'd
+//	            // perform any handling of activity results not related to in-app
+//	            // billing...
+//
+//	        	super.onActivityResult(requestCode, resultCode, intent);
+//	        }
+//	        else {
+//				logDebug("Handled by IABUtil.");
+//	            drawerItem = DrawerItem.ACCOUNT;
+////	            Toast.makeText(this, "HURRAY!: ORDERID: **__" + orderId + "__**", Toast.LENGTH_LONG).show();
+//				logDebug("HURRAY! - ORDERID: " + orderId);
+//	        }
+//		}
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
@@ -17075,6 +17185,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void onActionModeStarted(ActionMode mode) {
 		super.onActionModeStarted(mode);
 		getTheme().applyStyle(R.style.ActionOverflowButtonStyle, true);
+	}
+
+	@Override
+	public void onPointerCaptureChanged(boolean hasCapture) {
+
 	}
 
 	public void setChatBadge() {

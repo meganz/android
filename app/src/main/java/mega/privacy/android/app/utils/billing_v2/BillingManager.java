@@ -41,6 +41,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static mega.privacy.android.app.utils.billing_v2.BillingConstants.BASE64_ENCODED_PUBLIC_KEY_1;
+import static mega.privacy.android.app.utils.billing_v2.BillingConstants.BASE64_ENCODED_PUBLIC_KEY_2;
+import static mega.privacy.android.app.utils.billing_v2.BillingConstants.BASE64_ENCODED_PUBLIC_KEY_3;
+import static mega.privacy.android.app.utils.billing_v2.BillingConstants.BASE64_ENCODED_PUBLIC_KEY_4;
+import static mega.privacy.android.app.utils.billing_v2.BillingConstants.BASE64_ENCODED_PUBLIC_KEY_5;
+
 /**
  * Handles all the interactions with Play Store (via Billing library), maintains connection to
  * it through BillingClient and caches temporary states/data if needed
@@ -82,7 +88,7 @@ public class BillingManager implements PurchasesUpdatedListener {
      * want to make it easy for an attacker to replace the public key with one
      * of their own and then fake messages from the server.
      */
-    private static final String BASE_64_ENCODED_PUBLIC_KEY = "CONSTRUCT_YOUR_KEY_AND_PLACE_IT_HERE";
+    private static final String BASE_64_ENCODED_PUBLIC_KEY = BASE64_ENCODED_PUBLIC_KEY_1 + BASE64_ENCODED_PUBLIC_KEY_2 + BASE64_ENCODED_PUBLIC_KEY_3 + BASE64_ENCODED_PUBLIC_KEY_4 + BASE64_ENCODED_PUBLIC_KEY_5;
 
     /**
      * Listener to the updates that happen when purchases list was updated or consumption of the
@@ -139,14 +145,14 @@ public class BillingManager implements PurchasesUpdatedListener {
     /**
      * Start a purchase flow
      */
-    public void initiatePurchaseFlow(final String skuId, final SkuDetails skuDetails) {
-        initiatePurchaseFlow(skuId, null, skuDetails);
+    public void initiatePurchaseFlow(final SkuDetails skuDetails) {
+        initiatePurchaseFlow(null, skuDetails);
     }
 
     /**
      * Start a purchase or subscription replace flow
      */
-    public void initiatePurchaseFlow(final String skuId, final String oldSku, final SkuDetails skuDetails) {
+    public void initiatePurchaseFlow(final String oldSku, final SkuDetails skuDetails) {
         Runnable purchaseFlowRequest = new Runnable() {
             @Override
             public void run() {
@@ -298,8 +304,7 @@ public class BillingManager implements PurchasesUpdatedListener {
                 if (areSubscriptionsSupported()) {
                     PurchasesResult subscriptionResult = mBillingClient.queryPurchases(SkuType.SUBS);
                     if (subscriptionResult.getResponseCode() == BillingResponseCode.OK) {
-                        purchasesResult.getPurchasesList().addAll(
-                                subscriptionResult.getPurchasesList());
+                        purchasesResult.getPurchasesList().addAll(subscriptionResult.getPurchasesList());
                     }
                 }
                 onQueryPurchasesFinished(purchasesResult);
