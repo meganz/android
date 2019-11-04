@@ -132,12 +132,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         //remove QR image in old format
         File oldImage = buildQrFile(context, myEmail + QR_IMAGE_FILE_NAME_OLD);
         if (oldImage != null) {
-            try {
-                oldImage.delete();
-            } catch (SecurityException e) {
-                //permission denied
-                logWarning("no permission to delete old QR image");
-            }
+            oldImage.delete();
         }
     }
 
