@@ -1025,7 +1025,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-						searchMenuItem.setVisible(true);
+//						searchMenuItem.setVisible(true);
 					}
 				}
 
@@ -1066,7 +1066,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-						searchMenuItem.setVisible(true);
+//						searchMenuItem.setVisible(true);
 					}
 				}
 			}
