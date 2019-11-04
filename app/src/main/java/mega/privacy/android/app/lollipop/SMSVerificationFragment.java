@@ -66,21 +66,24 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.enable_button:
-                logDebug("to sms verification");
+                logDebug("To sms verification");
                 startActivity(new Intent(context, SMSVerificationActivity.class));
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        ((ManagerActivityLollipop)context).askForAccess();
-                        ((ManagerActivityLollipop)context).destroySMSVerificationFragment();
+                        toAskForAccess();
                     }
                 }, 1000);
                 break;
             case R.id.not_now_button_2:
-                logDebug("don't verify now");
-                ((ManagerActivityLollipop)context).askForAccess();
-                ((ManagerActivityLollipop)context).destroySMSVerificationFragment();
+                logDebug("Don't verify now");
+                toAskForAccess();
                 break;
         }
+    }
+
+    private void toAskForAccess() {
+        ((ManagerActivityLollipop)context).askForAccess();
+        ((ManagerActivityLollipop)context).destroySMSVerificationFragment();
     }
 }

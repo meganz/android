@@ -1396,8 +1396,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
             logDebug("whyAmIBlocked: " + whyAmIBlocked + ",state: " + state);
             if (whyAmIBlocked == 500 && state != 0) {
                 if (!isVerifySMSShowed) {
-                    Intent intent = new Intent(this,SMSVerificationActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    Intent intent = new Intent(getApplicationContext(),SMSVerificationActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra(NAME_USER_LOCKED,true);
                     startActivity(intent);
                 }

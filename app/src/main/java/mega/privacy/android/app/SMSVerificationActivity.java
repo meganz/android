@@ -77,13 +77,8 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         selectedCountry = findViewById(R.id.verify_account_selected_country);
 
         TelephonyManager tm = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
-        if(tm != null) {
-            // grant the country code from SIM first.
-            inferredCountryCode = tm.getSimCountryIso();
-            if(TextUtils.isEmpty(inferredCountryCode)) {
-                //grant by network.
-                inferredCountryCode = tm.getNetworkCountryIso();
-            }
+        if (tm != null) {
+            inferredCountryCode = tm.getNetworkCountryIso();
             logDebug("Inferred Country Code is: " + inferredCountryCode);
         }
         megaApi.getCountryCallingCodes(this);
