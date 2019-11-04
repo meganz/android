@@ -321,7 +321,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				logDebug ("Account details request");
 				if (e.getErrorCode() == MegaError.API_OK){
 
-					dbH.setAccountDetailsTimeStamp();
+					boolean storage = (request.getNumDetails() & myAccountInfo.hasStorageDetails) != 0;
+					if (storage) {
+						dbH.setAccountDetailsTimeStamp();
+					}
 
 					if(myAccountInfo!=null && request.getMegaAccountDetails()!=null){
 						myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
@@ -595,7 +598,13 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void askForFullAccountInfo(){
 		logDebug("askForFullAccountInfo");
 		megaApi.getPaymentMethods(null);
-		megaApi.getAccountDetails(null);
+
+		if (storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN) {
+			megaApi.getAccountDetails();
+		} else {
+			megaApi.getSpecificAccountDetails(false, true, true);
+		}
+
 		megaApi.getPricing(null);
 		megaApi.creditCardQuerySubscriptions(null);
 	}

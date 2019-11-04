@@ -2179,7 +2179,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			@Override
 			public void onDrawerOpened(@NonNull View drawerView) {
-				refreshDrawerInfo(true);
+				refreshDrawerInfo(storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN);
 			}
 
 			@Override

@@ -2335,7 +2335,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		//Check if the call is recently
 		logDebug("Check the last call to getAccountDetails");
-		if(callToAccountDetails(context)){
+		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		if(callToAccountDetails(context) || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
 			logDebug("megaApi.getAccountDetails SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
 		}
