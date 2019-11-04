@@ -99,7 +99,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	final String TAG = "MegaApplication";
 
 	final private static int INITIAL_SOUND_LEVEL = 10;
-	static final public String USER_AGENT = "MEGAAndroid/3.7.2_267";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.2_268";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
