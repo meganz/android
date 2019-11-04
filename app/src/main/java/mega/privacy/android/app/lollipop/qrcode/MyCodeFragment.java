@@ -52,6 +52,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -378,20 +379,29 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         logDebug("createDefaultAvatar()");
 
         UserCredentials credentials = dbH.getCredentials();
-        String fullName = null;
+        String fullName;
         if(credentials!=null){
             fullName = credentials.getFirstName();
             if (fullName == null) {
                 fullName = credentials.getLastName();
                 if (fullName == null) {
-                    fullName = myEmail;
+
+                    fullName = ((QRCodeActivity) context).getName();
+                    if(fullName == null) {
+                        fullName = myEmail;
+                    }
                 }
             }
         }
         else{
             fullName = myEmail;
+
         }
-        String firstLetter = fullName.charAt(0) + "";
+
+        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            firstLetter = " ";
+        }
 
         return Util.createDefaultAvatar(megaApi.getUserAvatarColor(myUser), firstLetter);
     }

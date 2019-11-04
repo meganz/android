@@ -223,15 +223,9 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 			else if (gridLayoutManager != null){
 				View v = gridLayoutManager.findViewByPosition(position);
-                MegaOffline offline = adapter.getItemOff(position);
-                if (v != null && offline != null) {
-                    if (MimeTypeThumbnail.typeForName(offline.getName()).isImage()){
-                        return v.findViewById(R.id.file_grid_thumbnail);
-                    } else {
-                        //videos don't have thumnail, only have icon.here should use the ImageView of icon.
-                        return v.findViewById(R.id.file_grid_icon_for_file);
-                    }
-                }
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
 			}
 		}
 

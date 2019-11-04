@@ -1036,6 +1036,8 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	public void findNodes(){
 		logDebug("findNodes");
 		ArrayList<MegaShare> outNodeList = megaApi.getOutShares();
+		ArrayList<MegaShare> pendingNodeList = megaApi.getPendingOutShares();
+
 		nodes.clear();
 		long lastFolder=-1;		
 		

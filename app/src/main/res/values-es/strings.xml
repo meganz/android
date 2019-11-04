@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">Error. Por favor, inténtalo de nuevo.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-CLAVEDERECUPERACION</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">La carpeta secundaria no existe, por favor elige una nueva</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">No se ha detectado ningún dispositivo de almacenamiento externo</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Esta carpeta es de sólo lectura. No tienes permisos para subir contenido</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Vista en miniatura</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Ver como lista</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Guardar Clave de recuperación</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Eliminar Clave de recuperación</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancelar suscripción</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">El archivo de la Clave de recuperación ha sido eliminado</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">La suscripción ha sido cancelada</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">La suscripción no se ha cancelado correctamente. Ponte en contacto con support&#64;mega.nz para obtener ayuda</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Cerrar el resto de sesiones</string>
@@ -232,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">¿Eliminar todas las transferencias?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Mi nube</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Recientes</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Subidas multimedia</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Buzón de entrada</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Sin conexión</string>
@@ -612,7 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">La vista previa todavía no se ha descargado, por favor espera</string>
-    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">The preview is not able to load due to insufficient memory available. Please try again later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Por favor, cierra sesión antes de crear la cuenta</string>
 
@@ -725,7 +726,7 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">No configurado</string>
-    <string name="settings_reset_lock_code" context="settings of the pin lock">Restaurar código PIN</string>
+    <string name="settings_reset_lock_code" context="settings of the pin lock">Restablecer código PIN</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">Bloqueo con PIN</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Entrar</string>
@@ -933,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. Este correo electrónico ya está asociado a una cuenta de MEGA.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">Ya has solicitado un enlace de confirmación para esa dirección de correo electrónico.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">El nuevo correo electrónico no puede coincidir con el antiguo</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Este es el último paso para cambiar tu correo electrónico. Por favor, introduce tu contraseña.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Cambiar correo electrónico</string>
 
@@ -2322,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Llamada iniciada</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Error clave SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA no se puede conectar de forma segura a través de SSL. Es posible que estés conectado a una Wi-Fi pública con requisitos adicionales.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA no puede conectarse de forma segura a través de SSL. Es posible que estés conectado a una Wi-Fi pública con requisitos adicionales.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No hay [/B][A]notificaciones[/A][B].[/B]</string>
 
@@ -2519,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d archivos pendientes.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Recientes</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 imagen y 1 vídeo</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Yo</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">No es posible grabar mensajes de voz si hay una llamada en curso.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">No se ha podido subir el mensaje de voz.</string>
 
@@ -2527,5 +2546,6 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Cargando</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Por favor espera&#8230;</string>
 
-    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s contactos enviados.</string>
 </resources>

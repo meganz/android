@@ -50,7 +50,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -58,12 +58,14 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
@@ -73,9 +75,10 @@ import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
+public class MyAccountFragmentLollipop extends Fragment implements OnClickListener {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 	final int WIDTH = 500;
@@ -87,7 +90,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	RelativeLayout avatarLayout;
 	RoundedImageView myAccountImage;
 
-	TextView nameView;
+	private EmojiTextView nameView;
 
 	TextView typeAccount;
 	TextView infoEmail;
@@ -126,6 +129,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	boolean staging = false;
 
 	DatabaseHandler dbH;
+
+	private TextView logoutWarning;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -213,8 +218,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
 		}
 
-		nameView = (TextView) v.findViewById(R.id.my_account_name);
+		nameView = v.findViewById(R.id.my_account_name);
+		nameView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
 		nameView.setOnClickListener(this);
+
 
 		editImageView = (ImageView) v.findViewById(R.id.my_account_edit_icon);
 		editImageView.setOnClickListener(this);
@@ -319,6 +326,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         
         lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
 
+        logoutWarning = v.findViewById(R.id.logout_warning_text);
+        checkLogoutWarnings();
+
 		setAccountDetails();
 
 		return v;
@@ -331,8 +341,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
 		refreshAccountInfo();
         updateView();
+		checkLogoutWarnings();
     }
-    
     /**
      * Update last contacts list and refresh last contacts' avatar.
      */
@@ -549,7 +559,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 			case R.id.logout_button:{
 				logDebug("Logout button");
-				checkPendingTransfer(megaApi, getContext(), this);
+				((ManagerActivityLollipop) context).setPasswordReminderFromMyAccount(true);
+				megaApi.shouldShowPasswordReminderDialog(true, (ManagerActivityLollipop) context);
 				break;
 			}
 			case R.id.my_account_relative_layout_avatar:{
@@ -761,11 +772,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
-
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-
-		myAccountImage.setImageBitmap(createDefaultAvatar(color, myAccountInfo.getFirstLetter()));
-
+		String firstLetter = ChatUtil.getFirstLetter(myAccountInfo.getFullName());
+		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+			firstLetter = " ";
+		}
+		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, firstLetter));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){
@@ -930,17 +942,39 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
-	@Override
-	public void onAbortConfirm() {
-		logDebug("onAbortConfirm");
-		megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-		megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-		((ManagerActivityLollipop)getContext()).setPasswordReminderFromMyAccount(true);
-		megaApi.shouldShowPasswordReminderDialog(true, (ManagerActivityLollipop)context);
-	}
+    /**
+     * Check if there is offline files and transfers.
+     * If yes, show the corresponding warning text at the end of My Account section.
+     * If not, hide the text.
+     */
+	public void checkLogoutWarnings() {
+		if (logoutWarning == null) return;
 
-	@Override
-	public void onAbortCancel() {
-		logDebug("onAbortCancel");
+		boolean existOfflineFiles = existsOffline(context);
+		boolean existOutgoingTransfers = existOngoingTransfers(megaApi);
+		int oldVisibility = logoutWarning.getVisibility();
+		String oldText = logoutWarning.getText().toString();
+		int newVisibility = View.GONE;
+		String newText = "";
+
+		if (existOfflineFiles || existOutgoingTransfers) {
+			if (existOfflineFiles && existOutgoingTransfers) {
+				newText = getString(R.string.logout_warning_offline_and_transfers);
+			} else if (existOfflineFiles) {
+				newText = getString(R.string.logout_warning_offline);
+			} else if (existOutgoingTransfers) {
+				newText = getString(R.string.logout_warning_transfers);
+			}
+
+			newVisibility = View.VISIBLE;
+		}
+
+		if (oldVisibility != newVisibility) {
+			logoutWarning.setVisibility(newVisibility);
+		}
+
+		if (!oldText.equals(newText)) {
+			logoutWarning.setText(newText);
+		}
 	}
 }
