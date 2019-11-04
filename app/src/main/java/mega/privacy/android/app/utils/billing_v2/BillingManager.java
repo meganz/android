@@ -112,6 +112,9 @@ public class BillingManager implements PurchasesUpdatedListener {
     public BillingManager(Activity activity, final BillingUpdatesListener updatesListener) {
         mActivity = activity;
         mBillingUpdatesListener = updatesListener;
+
+        //must enable pending purchases to use billing library
+        BillingClient.newBuilder(mActivity).enablePendingPurchases();
         mBillingClient = BillingClient.newBuilder(mActivity).setListener(this).build();
 
         // Start setup. This is asynchronous and the specified listener will be called
