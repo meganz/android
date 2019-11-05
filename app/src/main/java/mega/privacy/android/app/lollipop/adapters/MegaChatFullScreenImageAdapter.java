@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -25,8 +26,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
@@ -50,6 +52,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -58,7 +61,7 @@ import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface  {
+public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface {
 
 	private Activity activity;
 	private MegaChatFullScreenImageAdapter megaFullScreenImageAdapter;
@@ -290,6 +293,8 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		Bitmap preview = null;
 		Bitmap thumb = null;
 
+		final ProgressBar pb = holder.progressBar;
+
 		if (MimeTypeList.typeForName(node.getName()).isGIF()){
 			holder.isGIF = true;
 			holder.imgDisplay.setVisibility(View.GONE);
@@ -310,21 +315,26 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			logDebug("isOnMegaDownloads: " + isOnMegaDownloads + ", Node Handle: " + node.getHandle());
 			if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))){
 
-				final ProgressBar pb = holder.progressBar;
 
 				if (drawable != null){
-					Glide.with(context).load(new File(localPath)).listener(new RequestListener<File, GlideDrawable>() {
-						@Override
-						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
-							return false;
-						}
+					Glide.with(context)
+							.load(new File(localPath))
+							.listener(new RequestListener<Drawable>() {
+								@Override
+								public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+									return false;
+								}
 
-						@Override
-						public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-							pb.setVisibility(View.GONE);
-							return false;
-						}
-					}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+								@Override
+								public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+									pb.setVisibility(View.GONE);
+									return false;
+								}
+							})
+							.placeholder(drawable)
+							.diskCacheStrategy(DiskCacheStrategy.ALL)
+							.transition(withCrossFade())
+							.into(holder.gifImgDisplay);
 				}
 			}
 			else {
@@ -349,34 +359,44 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 
 				String url = megaApi.httpServerGetLocalLink(node);
 				if (url != null){
-					final ProgressBar pb = holder.progressBar;
 					if (drawable != null){
-						Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
-							@Override
-							public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
-								return false;
-							}
+						Glide.with(context)
+								.load(Uri.parse(url))
+								.listener(new RequestListener<Drawable>() {
+									@Override
+									public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+										return false;
+									}
 
-							@Override
-							public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-								pb.setVisibility(View.GONE);
-								return false;
-							}
-						}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+									@Override
+									public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+										pb.setVisibility(View.GONE);
+										return false;
+									}
+								})
+								.placeholder(drawable)
+								.diskCacheStrategy(DiskCacheStrategy.ALL)
+								.transition(withCrossFade())
+								.into(holder.gifImgDisplay);
 					}
 					else {
-						Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
-							@Override
-							public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
-								return false;
-							}
+						Glide.with(context)
+								.load(Uri.parse(url))
+								.listener(new RequestListener<Drawable>() {
+									@Override
+									public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+										return false;
+									}
 
-							@Override
-							public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-								pb.setVisibility(View.GONE);
-								return false;
-							}
-						}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+									@Override
+									public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+										pb.setVisibility(View.GONE);
+										return false;
+									}
+								})
+								.diskCacheStrategy(DiskCacheStrategy.ALL)
+								.transition(withCrossFade())
+								.into(holder.gifImgDisplay);
 					}
 				}
 			}

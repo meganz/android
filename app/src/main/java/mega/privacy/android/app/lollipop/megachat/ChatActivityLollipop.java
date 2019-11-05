@@ -3100,8 +3100,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         logDebug("onBackPressed");
         retryConnectionsAndSignalPresence();
 
-        closeChat(true);
-
         if(emojiKeyboard!=null && (emojiKeyboard.getLetterKeyboardShown() || emojiKeyboard.getEmojiKeyboardShown())){
             emojiKeyboard.hideBothKeyboard(this);
         }else{
@@ -3114,6 +3112,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if (handlerKeyboard != null){
                     handlerKeyboard.removeCallbacksAndMessages(null);
                 }
+                closeChat(true);
                 ifAnonymousModeLogin(false);
             }
         }
