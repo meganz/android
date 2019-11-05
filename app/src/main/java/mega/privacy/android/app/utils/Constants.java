@@ -62,6 +62,8 @@ public class Constants {
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
 
+    public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
+
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
     public static final int MULTIPLE_SEND_RUBBISH = 1;

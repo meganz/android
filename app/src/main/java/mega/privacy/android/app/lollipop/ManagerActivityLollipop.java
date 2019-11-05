@@ -373,7 +373,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public boolean openSettingsQR = false;
 	boolean newAccount = false;
 
-	private int storageState = -1; //Default value (-1) indicates that is not initialized
+	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 	private boolean isStorageStatusDialogShown = false;
 
 	private boolean userNameChanged;
@@ -710,7 +710,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (intent != null){
 				if (intent.getAction() == ACTION_STORAGE_STATE_CHANGED) {
 					int newStorageState =
-							intent.getIntExtra("state", MegaApiJava.STORAGE_STATE_GREEN);
+							intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
 					checkStorageStatus(newStorageState, false);
 					updateAccountDetailsVisibleInfo();
 					return;
@@ -1943,7 +1943,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				pF = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
 			}
 			elevation = savedInstanceState.getFloat("elevation", 0);
-			storageState = savedInstanceState.getInt("storageState", -1);
+			storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 			drawerItemPreUpgradeAccount = (DrawerItem) savedInstanceState.getSerializable("drawerItemPreUpgradeAccount");
 			accountFragmentPreUpgradeAccount = savedInstanceState.getInt("accountFragmentPreUpgradeAccount", -1);
@@ -2186,7 +2186,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			@Override
 			public void onDrawerOpened(@NonNull View drawerView) {
-				refreshDrawerInfo(true);
+				refreshDrawerInfo(storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN);
 			}
 
 			@Override
@@ -3377,6 +3377,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
         checkScrollElevation();
+
+		if (drawerItem == DrawerItem.ACCOUNT ) {
+			app.refreshAccountInfo();
+		}
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -5271,6 +5275,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 			default:{
+				app.refreshAccountInfo();
 				accountFragment=MY_ACCOUNT_FRAGMENT;
 
 				if (mTabsAdapterMyAccount == null){
@@ -13460,11 +13465,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
 	 */
 	private void checkCurrentStorageStatus(boolean onCreate) {
-		// If the current storage state is not initialized (-1) is because the app received the
+		// If the current storage state is not initialized is because the app received the
 		// event informing about the storage state  during login, the ManagerActivityLollipop
 		// wasn't active and for this reason the value is stored in the MegaApplication object.
-		int storageStateToCheck = (storageState != -1) ? storageState :
-				((MegaApplication)getApplication()).getStorageState();
+		int storageStateToCheck = (storageState != MegaApiJava.STORAGE_STATE_UNKNOWN) ?
+				storageState : app.getStorageState();
 
 		checkStorageStatus(storageStateToCheck, onCreate);
 	}
@@ -13476,7 +13481,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 */
 	private void checkStorageStatus(int newStorageState, boolean onCreate) {
         Intent intent = new Intent(this,UploadService.class);
-        MegaApplication app = (MegaApplication)getApplication();
         switch (newStorageState) {
             case MegaApiJava.STORAGE_STATE_GREEN:
 				logDebug("STORAGE STATE GREEN");
@@ -13492,7 +13496,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					e.printStackTrace();
 				}
 
-				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
+				int accountType = app.getMyAccountInfo().getAccountType();
 				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
 					logDebug("ACCOUNT TYPE FREE");
 					if(showMessageRandom()){
