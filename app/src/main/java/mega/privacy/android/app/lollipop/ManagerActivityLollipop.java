@@ -3274,6 +3274,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             } else {
                 askForAccess();
             }
+        } else if(firstLogin){
+            if(megaApi.smsVerifiedPhoneNumber() == null && !onAskingPermissionsFragment) {
+                askForSMSVerification();
+            }
         }
 
 		if (openLinkDialogIsShown) {
@@ -3313,7 +3317,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             logDebug("mobile only portrait mode");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
-
+        smsDialogTimeChecker.update();
+        shouldShowSMSDialog = false;
         //don't show the dialog again.
         hasSMSFragmentShowed = true;
         onAskingSMSVerificationFragment = true;
@@ -3380,6 +3385,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
         onAskingSMSVerificationFragment = false;
         svF = null;
+        if(!firstTimeAfterInstallation) {
+            tB.setVisibility(View.VISIBLE);
+            abL.setVisibility(View.VISIBLE);
+
+            deleteCurrentFragment();
+
+
+            changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
+
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            supportInvalidateOptionsMenu();
+            selectDrawerItemLollipop(drawerItem);
+        }
     }
 
 	public void destroyPermissionsFragment () {
@@ -4621,9 +4639,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			firstTimeAfterInstallation = false;
             dbH.setFirstTime(false);
 		}
+        checkBeforeShow();
+    }
 
+    public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
-        if (megaApi.smsVerifiedPhoneNumber() == null && !hasSMSFragmentShowed && (shouldShowSMSDialog || smsDialogTimeChecker.shouldShow())) {
+        boolean hasVerified = megaApi.smsVerifiedPhoneNumber() != null;
+        if (!hasVerified && !hasSMSFragmentShowed && (shouldShowSMSDialog || smsDialogTimeChecker.shouldShow())) {
             showSMSVerificationDialog();
         }
     }
@@ -13727,6 +13749,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showSMSVerificationDialog() {
 	    logDebug("showSMSVerificationDialog");
         smsDialogTimeChecker.update();
+        shouldShowSMSDialog = false;
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);

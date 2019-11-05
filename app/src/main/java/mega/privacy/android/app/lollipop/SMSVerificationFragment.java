@@ -24,9 +24,11 @@ import nz.mega.sdk.MegaApiJava;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
-public class SMSVerificationFragment extends Fragment implements View.OnClickListener{
+public class SMSVerificationFragment extends Fragment implements View.OnClickListener {
 
     private Context context;
+
+    private ManagerActivityLollipop managerActivity;
 
     private MegaApiJava megaApi;
 
@@ -34,11 +36,11 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
 
-        megaApi = ((MegaApplication)context.getApplicationContext()).getMegaApi();
+        megaApi = MegaApplication.getInstance().getMegaApi();
 
         View v = inflater.inflate(R.layout.fragment_sms_verification, container, false);
         TextView msg = v.findViewById(R.id.sv_dialog_msg);
@@ -60,6 +62,9 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+        if (context instanceof ManagerActivityLollipop) {
+            this.managerActivity = (ManagerActivityLollipop) context;
+        }
     }
 
     @Override
@@ -71,19 +76,21 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        toAskForAccess();
+                        fadeOut();
                     }
                 }, 1000);
                 break;
             case R.id.not_now_button_2:
                 logDebug("Don't verify now");
-                toAskForAccess();
+                fadeOut();
                 break;
         }
     }
 
-    private void toAskForAccess() {
-        ((ManagerActivityLollipop)context).askForAccess();
-        ((ManagerActivityLollipop)context).destroySMSVerificationFragment();
+    private void fadeOut() {
+        if (managerActivity.firstTimeAfterInstallation) {
+            managerActivity.askForAccess();
+        }
+        managerActivity.destroySMSVerificationFragment();
     }
 }
