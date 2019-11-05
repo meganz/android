@@ -1242,8 +1242,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			setOnlineOptions(false);
 		}
 
-		refreshAccountInfo();
-
 		return v;
 	}
 
@@ -2290,6 +2288,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	@Override
 	public void onResume() {
 		logDebug("onResume");
+
+		refreshAccountInfo();
 
 		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);

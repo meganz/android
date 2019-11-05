@@ -87,6 +87,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -638,6 +639,24 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			dbH.resetExtendedAccountDetailsTimestamp();
 		}
 		megaApi.getExtendedAccountDetails(true,false, false, null);
+	}
+
+	public void refreshAccountInfo(){
+		//Check if the call is recently
+		if(callToAccountDetails(context) || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
+			logDebug("megaApi.getAccountDetails SEND");
+			askForAccountDetails();
+		}
+
+		if(callToExtendedAccountDetails(context)){
+			logDebug("megaApi.getExtendedAccountDetails SEND");
+			askForExtendedAccountDetails();
+		}
+
+		if(callToPaymentMethods(context)){
+			logDebug("megaApi.getPaymentMethods SEND");
+			askForPaymentMethods();
+		}
 	}
 
 	static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator) {
