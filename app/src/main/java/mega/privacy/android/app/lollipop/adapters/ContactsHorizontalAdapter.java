@@ -139,7 +139,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
                 avatar.delete();
                 megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
             } else {
-                holder.textViewInitialLetter.setVisibility(View.GONE);
+                holder.textViewInitialLetter.setVisibility(View.INVISIBLE);
                 holder.avatar.setImageBitmap(bitmap);
             }
         } else {
@@ -175,7 +175,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     public static class ContactViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
 
-        TextView textViewName,textViewInitialLetter;
+        public TextView textViewName,textViewInitialLetter;
 
         ImageView addIcon;
 

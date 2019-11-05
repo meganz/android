@@ -207,6 +207,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 }
             } else {
                 logDebug("get registered contacts faild with error code: " + e.getErrorCode());
+                //current account has requested mega contacts too many times and reached the limitation, no need to re-try.
+                if(e.getErrorCode() == MegaError.API_ETOOMANY) {
+                    updateLastSyncTimestamp();
+                }
                 if (updater != null) {
                     updater.onException(e.getErrorCode(), request.getRequestString());
                 }
