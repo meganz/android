@@ -7,11 +7,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -29,7 +29,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -48,6 +47,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaUtilsAndroid.createThumbnail;
 
 
 public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener, RotatableAdapter {
@@ -60,15 +60,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	Context context;
  
 	int positionClicked;
-	public static String DB_FILE = "0";
-	public static String DB_FOLDER = "1";
 	public DatabaseHandler dbH;
 
 	private ArrayList<MegaOffline> mOffList = new ArrayList<MegaOffline>();
 	public int folderCount = 0;
     private int placeholderCount;
-	
-//	int getAdapterType();
 	
 	RecyclerView listFragment;
 	ImageView emptyImageViewFragment;
@@ -127,67 +123,44 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		public ImageView fileGridSelected;
 	}
     
-    private class OfflineThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
+    private class OfflineThumbnailAsyncTask extends AsyncTask<Void, Void, Boolean>{
 
-    	ViewHolderOffline holder;
-    	String currentPath;
+    	private ViewHolderOffline holder;
+    	private File file;
+    	private File thumbFile;
     	
-    	public OfflineThumbnailAsyncTask(ViewHolderOffline holder) {
-			logDebug("OfflineThumbnailAsyncTask::OfflineThumbnailAsyncTask");
+    	public OfflineThumbnailAsyncTask(ViewHolderOffline holder, File file) {
 			this.holder = holder;
+			this.file = file;
 		}
-    	
+
 		@Override
-		protected Bitmap doInBackground(String... params) {
-			logDebug("OfflineThumbnailAsyncTask::doInBackground");
-			currentPath = params[0];
-			File currentFile = new File(currentPath);
-			
+		protected Boolean doInBackground(Void... voids) {
+			File thumbDir = getThumbFolder(context);
+			String thumbName = Base64.encodeToString(holder.currentHandle.getBytes(), Base64.DEFAULT);
+			thumbFile = new File(thumbDir, thumbName + ".jpg");
+
+			if (isFileAvailable(thumbFile)) {
+				return true;
+			}
+
+			return createThumbnail(file, thumbFile);
+		}
+
+		@Override
+		protected void onPostExecute(Boolean shouldContinue){
+    		if (!shouldContinue) return;
+
 			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inJustDecodeBounds = true;
-			Bitmap thumb = null;
-			
-			ExifInterface exif;
-			int orientation = ExifInterface.ORIENTATION_NORMAL;
-			try {
-				exif = new ExifInterface(currentFile.getAbsolutePath());
-				orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-			} catch (IOException e) {}  
-			
-			// Calculate inSampleSize
-		    options.inSampleSize = calculateInSampleSize(options, 270, 270);
-		    
-		    // Decode bitmap with inSampleSize set
-		    options.inJustDecodeBounds = false;
+			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+			Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 
-		    try {
-				thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
-			} catch (OutOfMemoryError e){
-		    	e.printStackTrace();
-		    	logError("OutOfMemoryError getting bitmap", e);
-			}
+    		setThumbnail(holder, bitmap);
+			Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+			holder.imageView.startAnimation(fadeInAnimation);
+			notifyItemChanged(holder.getAdapterPosition());
 
-			if (thumb != null){
-				thumb = rotateBitmap(thumb, orientation);
-				long handle = Long.parseLong(holder.currentHandle);
-				setThumbnailCache(handle, thumb);
-				return thumb;
-			}
-			
-			return null;
-		}
-		
-		@Override
-		protected void onPostExecute(Bitmap thumb){
-			logDebug("OfflineThumbnailAsyncTask::onPostExecute");
-			if (thumb != null){
-				if (holder.currentPath.compareTo(currentPath) == 0){
-					setThumbnail(holder, thumb);
-					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-					holder.imageView.startAnimation(fadeInAnimation);
-					notifyItemChanged(holder.getAdapterPosition());
-				}
-			}
+			thumbnailCache.put(Long.parseLong(holder.currentHandle), bitmap);
 		}    	
     }
 
@@ -736,7 +709,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		Bitmap thumb = getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
 		if (thumb == null) {
 			try {
-				new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
+				new OfflineThumbnailAsyncTask(holder, currentFile).execute();
 			} catch (Exception e) {
 				//Too many AsyncTasks
 				e.printStackTrace();
@@ -803,14 +776,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     	positionClicked = p;
 		notifyDataSetChanged();
     }
-    
-//    public void setAdapterType(int getAdapterType()){
-//    	this.getAdapterType() = getAdapterType();
-//    }
-//
-//    public int getAdapterType(){
-//    	return getAdapterType();
-//	}
 
 	@Override
 	public void onClick(View v) {
