@@ -392,17 +392,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
-//		loginLogin.setVisibility(View.GONE);
-//		loginCreateAccount.setVisibility(View.GONE);
-//		loginDelimiter.setVisibility(View.GONE);
-//		loginLoggingIn.setVisibility(View.VISIBLE);
-//		generatingKeysText.setVisibility(View.VISIBLE);
-//		loggingInText.setVisibility(View.VISIBLE);
-//		fetchingNodesText.setVisibility(View.VISIBLE);
-//		prepareNodesText.setVisibility(View.VISIBLE);
-//		loginProgressBar.setVisibility(View.VISIBLE);
-//		queryingSignupLinkText.setVisibility(View.VISIBLE);
-//		confirmingAccountText.setVisibility(View.VISIBLE);
 
         forgotPassLayout = (RelativeLayout) v.findViewById(R.id.forgot_pass_full_layout);
         forgotPassTitle = (TextView) v.findViewById(R.id.title_forgot_pass_layout);
@@ -876,8 +865,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startFastLogin();
                     return v;
-                }
-                else if (action.equals(ACTION_ENABLE_CHAT)){
+                } else if (action.equals(ACTION_REFRESH_AFTER_BLOCKED)) {
+                    startFastLogin();
+                    return v;
+                } else if (action.equals(ACTION_ENABLE_CHAT)){
                     logDebug("With credentials -> intentReceived ACTION_ENABLE_CHAT");
                     enableChat();
                     return v;
@@ -2165,6 +2156,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (twoFA){
                         intent.setAction(ACTION_REFRESH_STAGING);
                         twoFA = false;
+                    }
+
+                    if (action != null && action.equals(ACTION_REFRESH_AFTER_BLOCKED)) {
+                        intent.setAction(ACTION_REFRESH_AFTER_BLOCKED);
                     }
 
                     startActivity(intent);
