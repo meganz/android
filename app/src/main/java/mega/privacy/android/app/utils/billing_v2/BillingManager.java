@@ -16,7 +16,6 @@
 package mega.privacy.android.app.utils.billing_v2;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.android.billingclient.api.BillingClient;
@@ -41,53 +40,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static mega.privacy.android.app.utils.billing_v2.BillingConstants.BASE64_ENCODED_PUBLIC_KEY_1;
-import static mega.privacy.android.app.utils.billing_v2.BillingConstants.BASE64_ENCODED_PUBLIC_KEY_2;
-import static mega.privacy.android.app.utils.billing_v2.BillingConstants.BASE64_ENCODED_PUBLIC_KEY_3;
-import static mega.privacy.android.app.utils.billing_v2.BillingConstants.BASE64_ENCODED_PUBLIC_KEY_4;
-import static mega.privacy.android.app.utils.billing_v2.BillingConstants.BASE64_ENCODED_PUBLIC_KEY_5;
-
 /**
  * Handles all the interactions with Play Store (via Billing library), maintains connection to
  * it through BillingClient and caches temporary states/data if needed
  */
 public class BillingManager implements PurchasesUpdatedListener {
-    // Default value of mBillingClientResponseCode until BillingManager was not yeat initialized
-    public static final int BILLING_MANAGER_NOT_INITIALIZED = -1;
 
-    private static final String TAG = "BillingManager";
-
-    /**
-     * A reference to BillingClient
-     **/
+    private static final String TAG = "iab"; //todo to be removed before release
+    private static final int BILLING_MANAGER_NOT_INITIALIZED = -1;
     private BillingClient mBillingClient;
-
-    /**
-     * True if billing service is connected now.
-     */
     private boolean mIsServiceConnected;
-
     private final BillingUpdatesListener mBillingUpdatesListener;
-
     private final Activity mActivity;
-
     private final List<Purchase> mPurchases = new ArrayList<>();
-
     private Set<String> mTokensToBeConsumed;
-
     private int mBillingClientResponseCode = BILLING_MANAGER_NOT_INITIALIZED;
-
-    /* BASE_64_ENCODED_PUBLIC_KEY should be YOUR APPLICATION'S PUBLIC KEY
-     * (that you got from the Google Play developer console). This is not your
-     * developer public key, it's the *app-specific* public key.
-     *
-     * Instead of just storing the entire literal string here embedded in the
-     * program,  construct the key at runtime from pieces or
-     * use bit manipulation (for example, XOR with some other string) to hide
-     * the actual key.  The key itself is not secret information, but we don't
-     * want to make it easy for an attacker to replace the public key with one
-     * of their own and then fake messages from the server.
-     */
+    private static final String BASE64_ENCODED_PUBLIC_KEY_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_3 = "55k9FIh3vDXXTHJn4oM9JwFwbcZf1zmVLyes5ld7+G15SZ7QmCchqfY4N/a/qVcGFsfwqm";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_4 = "RU3VzOUwAYHb4mV/frPctPIRlJbzwCXpe3/mrcsAP+k6ECcd19uIUCPibXhsTkNbAk8CRkZ";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_5 = "KOy+czuZWfjWYx3Mp7srueyQ7xF6/as6FWrED0BlvmhJYj0yhTOTOopAXhGNEk7cUSFxqP2FKYX8e3pHm/uNZvKcSrLXbLUhQnULhn4WmKOQIDAQAB";
     private static final String BASE_64_ENCODED_PUBLIC_KEY = BASE64_ENCODED_PUBLIC_KEY_1 + BASE64_ENCODED_PUBLIC_KEY_2 + BASE64_ENCODED_PUBLIC_KEY_3 + BASE64_ENCODED_PUBLIC_KEY_4 + BASE64_ENCODED_PUBLIC_KEY_5;
 
     /**
@@ -100,13 +72,6 @@ public class BillingManager implements PurchasesUpdatedListener {
         void onConsumeFinished(String token, @BillingResponseCode int result);
 
         void onPurchasesUpdated(List<Purchase> purchases);
-    }
-
-    /**
-     * Listener for the Billing client state to become connected
-     */
-    public interface ServiceConnectedListener {
-        void onServiceConnected(@BillingResponseCode int resultCode);
     }
 
     public BillingManager(Activity activity, final BillingUpdatesListener updatesListener) {
@@ -137,19 +102,12 @@ public class BillingManager implements PurchasesUpdatedListener {
     @Override
     public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
         int resultCode = billingResult.getResponseCode();
-        if (resultCode == BillingResponseCode.OK) {
+        if (resultCode == BillingResponseCode.OK && purchases != null) {
             for (Purchase purchase : purchases) {
                 handlePurchase(purchase);
             }
             mBillingUpdatesListener.onPurchasesUpdated(mPurchases);
         }
-    }
-
-    /**
-     * Start a purchase flow
-     */
-    public void initiatePurchaseFlow(final SkuDetails skuDetails) {
-        initiatePurchaseFlow(null, skuDetails);
     }
 
     /**
@@ -159,7 +117,7 @@ public class BillingManager implements PurchasesUpdatedListener {
         Runnable purchaseFlowRequest = new Runnable() {
             @Override
             public void run() {
-                //todo
+                //todo check purchase and upgrade case
                 BillingFlowParams purchaseParams = BillingFlowParams
                         .newBuilder()
                         .setSkuDetails(skuDetails)
@@ -170,10 +128,6 @@ public class BillingManager implements PurchasesUpdatedListener {
         };
 
         executeServiceRequest(purchaseFlowRequest);
-    }
-
-    public Context getContext() {
-        return mActivity;
     }
 
     /**
@@ -288,7 +242,7 @@ public class BillingManager implements PurchasesUpdatedListener {
      * a retry-mechanism implemented.
      * </p>
      */
-    public boolean areSubscriptionsSupported() {
+    private boolean areSubscriptionsSupported() {
         int responseCode = mBillingClient.isFeatureSupported(FeatureType.SUBSCRIPTIONS).getResponseCode();
         return responseCode == BillingResponseCode.OK;
     }
@@ -297,7 +251,7 @@ public class BillingManager implements PurchasesUpdatedListener {
      * Query purchases across various use cases and deliver the result in a formalized way through
      * a listener
      */
-    public void queryPurchases() {
+    private void queryPurchases() {
         Runnable queryToExecute = new Runnable() {
             @Override
             public void run() {
@@ -310,14 +264,23 @@ public class BillingManager implements PurchasesUpdatedListener {
                         purchasesResult.getPurchasesList().addAll(subscriptionResult.getPurchasesList());
                     }
                 }
-                onQueryPurchasesFinished(purchasesResult);
+
+                //verify all available purchases
+                List<Purchase> list = new ArrayList<>();
+                for (Purchase purchase : purchasesResult.getPurchasesList()) {
+                    if (verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
+                        list.add(purchase);
+                    }
+                }
+                PurchasesResult finalResult = new PurchasesResult(purchasesResult.getBillingResult(), list);
+                onQueryPurchasesFinished(finalResult);
             }
         };
 
         executeServiceRequest(queryToExecute);
     }
 
-    public void startServiceConnection(final Runnable executeOnSuccess) {
+    private void startServiceConnection(final Runnable executeOnSuccess) {
         mBillingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingSetupFinished(BillingResult billingResult) {
@@ -356,13 +319,6 @@ public class BillingManager implements PurchasesUpdatedListener {
      * </p>
      */
     private boolean verifyValidSignature(String signedData, String signature) {
-        // Some sanity checks to see if the developer (that's you!) really followed the
-        // instructions to run this sample (don't put these checks on your app!)
-        if (BASE_64_ENCODED_PUBLIC_KEY.contains("CONSTRUCT_YOUR")) {
-            throw new RuntimeException("Please update your app's public key at: "
-                    + "BASE_64_ENCODED_PUBLIC_KEY");
-        }
-
         try {
             return Security.verifyPurchase(BASE_64_ENCODED_PUBLIC_KEY, signedData, signature);
         } catch (IOException e) {
