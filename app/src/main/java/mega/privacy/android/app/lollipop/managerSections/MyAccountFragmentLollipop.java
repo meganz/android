@@ -234,12 +234,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		infoEmail.setOnClickListener(this);
 
         String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
-		addPhoneNumber = (TextView)v.findViewById(R.id.add_phone_number);
+		addPhoneNumber = v.findViewById(R.id.add_phone_number);
 		if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
             addPhoneNumber.setText(registeredPhoneNumber);
-        }else{
-            addPhoneNumber.setText(R.string.add_phone_number_label);
-            addPhoneNumber.setOnClickListener(this);
+        } else {
+		    if(Util.canVoluntaryVerifyPhoneNumber(megaApi)) {
+                addPhoneNumber.setText(R.string.add_phone_number_label);
+                addPhoneNumber.setOnClickListener(this);
+            } else {
+		        addPhoneNumber.setVisibility(View.GONE);
+            }
         }
 
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);

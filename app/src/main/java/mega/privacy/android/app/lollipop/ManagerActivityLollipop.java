@@ -3269,13 +3269,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         if (firstTimeAfterInstallation) {
             //haven't verified phone number
-            if(megaApi.smsVerifiedPhoneNumber() == null && !onAskingPermissionsFragment) {
+            if(canVoluntaryVerifyPhoneNumber(megaApi) && !onAskingPermissionsFragment) {
                 askForSMSVerification();
             } else {
                 askForAccess();
             }
         } else if(firstLogin){
-            if(megaApi.smsVerifiedPhoneNumber() == null && !onAskingPermissionsFragment) {
+            if(canVoluntaryVerifyPhoneNumber(megaApi) && !onAskingPermissionsFragment) {
                 askForSMSVerification();
             }
         }
@@ -4644,8 +4644,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
-        boolean hasVerified = megaApi.smsVerifiedPhoneNumber() != null;
-        if (!hasVerified && !hasSMSFragmentShowed && (shouldShowSMSDialog || smsDialogTimeChecker.shouldShow())) {
+        if (canVoluntaryVerifyPhoneNumber(megaApi) && !hasSMSFragmentShowed && (shouldShowSMSDialog || smsDialogTimeChecker.shouldShow())) {
             showSMSVerificationDialog();
         }
     }
@@ -17705,10 +17704,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        return;
         }
         registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
-        if (registeredPhoneNumber != null) {
-            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
-        } else {
+        if(canVoluntaryVerifyPhoneNumber(megaApi)) {
             navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
+        } else {
+            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
         }
     }
 

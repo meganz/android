@@ -1307,6 +1307,10 @@ public class Util {
 		}
 	}
 
+	public static boolean canVoluntaryVerifyPhoneNumber(MegaApiAndroid api) {
+	    return api.smsVerifiedPhoneNumber() == null && api.smsAllowedState() == 2;
+    }
+
 	public static void resetAndroidLogger(){
 
 		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
