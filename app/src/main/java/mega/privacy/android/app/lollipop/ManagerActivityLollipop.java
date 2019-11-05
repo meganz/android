@@ -1488,7 +1488,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	public void onBillingClientSetupFinished() {
 		//billing client is ready now, ready for next step
-		//todo get subscription?
+		//todo get subscription and one off?
 		List<String> inAppSkus = new ArrayList<>();
 		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
 			@Override
