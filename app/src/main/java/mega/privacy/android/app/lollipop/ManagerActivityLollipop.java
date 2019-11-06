@@ -384,7 +384,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private boolean userNameChanged;
 	private boolean userEmailChanged;
 
-	private String registeredPhoneNumber;
 	private LinearLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
 
@@ -3260,17 +3259,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		updateAccountDetailsVisibleInfo();
 
 		setContactStatus();
-        showAddPhoneNumberInMenu();
+		new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showAddPhoneNumberInMenu();
+            }
+        }, 100);
+
 
         if (firstTimeAfterInstallation) {
             //haven't verified phone number
-            if(canVoluntaryVerifyPhoneNumber(megaApi) && !onAskingPermissionsFragment) {
+            if(canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
                 askForSMSVerification();
             } else {
                 askForAccess();
             }
         } else if(firstLogin){
-            if(canVoluntaryVerifyPhoneNumber(megaApi) && !onAskingPermissionsFragment) {
+            if(canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
                 askForSMSVerification();
             }
         }
@@ -4638,12 +4643,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			firstTimeAfterInstallation = false;
             dbH.setFirstTime(false);
 		}
-        checkBeforeShow();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkBeforeShow();
+            }
+        }, 100);
     }
 
     public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
-        if (canVoluntaryVerifyPhoneNumber(megaApi) && !hasSMSFragmentShowed && (shouldShowSMSDialog || smsDialogTimeChecker.shouldShow())) {
+        if (canVoluntaryVerifyPhoneNumber() && !hasSMSFragmentShowed && (shouldShowSMSDialog || smsDialogTimeChecker.shouldShow())) {
             showSMSVerificationDialog();
         }
     }
@@ -17702,8 +17712,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	    if(megaApi == null){
 	        return;
         }
-        registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
-        if(canVoluntaryVerifyPhoneNumber(megaApi)) {
+        if(canVoluntaryVerifyPhoneNumber()) {
             navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
         } else {
             navigationDrawerAddPhoneContainer.setVisibility(View.GONE);

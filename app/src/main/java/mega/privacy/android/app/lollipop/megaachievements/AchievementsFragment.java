@@ -230,12 +230,17 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		zeroFiguresInstallAppText = (TextView) v.findViewById(R.id.zero_figures_install_app_text);
 
         addPhoneLayout = v.findViewById(R.id.add_phone_layout);
-        addPhoneLayout.setOnClickListener(this);
-        titleAddPhone = v.findViewById(R.id.title_add_phone);
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            titleAddPhone.setMaxWidth(scaleWidthPx(250, outMetrics));
-        }else{
-            titleAddPhone.setMaxWidth(scaleWidthPx(190, outMetrics));
+        if(megaApi.smsAllowedState() == 2) {
+            addPhoneLayout.setOnClickListener(this);
+            titleAddPhone = v.findViewById(R.id.title_add_phone);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                titleAddPhone.setMaxWidth(scaleWidthPx(250, outMetrics));
+            }else{
+                titleAddPhone.setMaxWidth(scaleWidthPx(190, outMetrics));
+            }
+        } else {
+            v.findViewById(R.id.separator_add_phone).setVisibility(View.GONE);
+            addPhoneLayout.setVisibility(View.GONE);
         }
         figuresAddPhoneLayout = v.findViewById(R.id.figures_add_phone_layout);
         figuresAddPhoneLayout.setVisibility(View.GONE);

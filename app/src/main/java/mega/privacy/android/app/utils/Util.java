@@ -78,6 +78,7 @@ import javax.crypto.spec.SecretKeySpec;
 import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
@@ -1307,8 +1308,11 @@ public class Util {
 		}
 	}
 
-	public static boolean canVoluntaryVerifyPhoneNumber(MegaApiAndroid api) {
-	    return api.smsVerifiedPhoneNumber() == null && api.smsAllowedState() == 2;
+	public static boolean canVoluntaryVerifyPhoneNumber() {
+        MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
+	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;
+	    boolean allowVerify = api.smsAllowedState() == 2;
+	    return hasNotVerified && allowVerify;
     }
 
 	public static void resetAndroidLogger(){
