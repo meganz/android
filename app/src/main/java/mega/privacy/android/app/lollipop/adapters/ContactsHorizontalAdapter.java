@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -33,11 +32,7 @@ import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -96,41 +91,18 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(final DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
+                        contacts.remove(position);
+                        recentChatsFragment.onContactsCountChange(contacts);
+                        notifyDataSetChanged();
 
-                        final String email = holder.contactMail;
+                        String email = holder.contactMail;
                         logDebug("sent invite to: " + email);
                         //ignore the callback
-                        megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, new MegaRequestListenerInterface() {
-
-                            @Override
-                            public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-                            }
-
-                            @Override
-                            public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
-                            }
-
-                            @Override
-                            public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-                                if(e.getErrorCode() == MegaError.API_OK) {
-                                    contacts.remove(position);
-                                    recentChatsFragment.onContactsCountChange(contacts);
-                                    notifyDataSetChanged();
-                                    Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
-                                    dialog.dismiss();
-                                }
-                            }
-
-                            @Override
-                            public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
-                            }
-                        });
+                        megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
+                        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         dialog.dismiss();
