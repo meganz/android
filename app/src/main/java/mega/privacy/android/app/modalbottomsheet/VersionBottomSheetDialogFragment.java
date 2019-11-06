@@ -28,6 +28,7 @@ import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
@@ -113,7 +114,8 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
         optionRevert.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
-        LinearLayout separatorRevert = (LinearLayout) contentView.findViewById(R.id.separator_revert);
+        LinearLayout separatorRevert = contentView.findViewById(R.id.separator_revert);
+        LinearLayout separatorDelete = contentView.findViewById(R.id.separator_delete);
 
         nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
         nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
@@ -149,14 +151,34 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
             } else {
                 nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             }
-            optionDownload.setVisibility(View.VISIBLE);
-            optionDelete.setVisibility(View.VISIBLE);
 
-            if(((VersionsFileActivity) context).getSelectedPosition()==0){
+            boolean isRevertVisible;
+
+            switch (((VersionsFileActivity) context).getAccessLevel()) {
+                case MegaShare.ACCESS_READWRITE:
+                    isRevertVisible = true;
+                    optionDelete.setVisibility(View.GONE);
+                    separatorDelete.setVisibility(View.GONE);
+                    break;
+
+                case MegaShare.ACCESS_FULL:
+                case MegaShare.ACCESS_OWNER:
+                    isRevertVisible = true;
+                    optionDelete.setVisibility(View.VISIBLE);
+                    separatorDelete.setVisibility(View.VISIBLE);
+                    break;
+
+                default:
+                    isRevertVisible = false;
+                    optionDelete.setVisibility(View.GONE);
+                    separatorDelete.setVisibility(View.GONE);
+
+            }
+
+            if(!isRevertVisible || ((VersionsFileActivity) context).getSelectedPosition() == 0){
                 optionRevert.setVisibility(View.GONE);
                 separatorRevert.setVisibility(View.GONE);
-            }
-            else{
+            } else {
                 optionRevert.setVisibility(View.VISIBLE);
                 separatorRevert.setVisibility(View.VISIBLE);
             }

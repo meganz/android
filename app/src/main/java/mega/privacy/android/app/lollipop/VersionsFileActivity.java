@@ -53,6 +53,7 @@ import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
@@ -61,7 +62,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class VersionsFileActivity extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
+public class VersionsFileActivity extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, MegaGlobalListenerInterface {
 
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
@@ -76,7 +77,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	RelativeLayout container;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
-	GestureDetectorCompat detector;
 	ImageView emptyImage;
 	TextView emptyText;
 
@@ -108,6 +108,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	private VersionBottomSheetDialogFragment bottomSheetDialogFragment;
 
+	private int accessLevel;
+
 	private class GetVersionsSizeTask extends AsyncTask<String, Void, String> {
 
 		@Override
@@ -131,32 +133,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		}
 	}
 
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-
-	    public void onLongPress(MotionEvent e) {
-			logDebug("onLongPress -- RecyclerViewOnGestureListener");
-
-			View view = listView.findChildViewUnder(e.getX(), e.getY());
-			int position = listView.getChildLayoutPosition(view);
-
-			if (!adapter.isMultipleSelect()){
-
-				if(position<0){
-					logDebug("Position not valid: " + position);
-				}
-				else{
-					adapter.setMultipleSelect(true);
-
-					actionMode = startSupportActionMode(new ActionBarCallBack());
-
-					itemClick(position);
-				}
-			}
-
-			super.onLongPress(e);
-	    }
-	}
-	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -245,7 +221,11 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				}
 
 				if (selected.size() == 1) {
-					menu.findItem(R.id.action_revert_version).setVisible(true);
+					if (getSelectedPosition() == 0) {
+						menu.findItem(R.id.action_revert_version).setVisible(false);
+					} else {
+						menu.findItem(R.id.action_revert_version).setVisible(true);
+					}
 					menu.findItem(R.id.action_download_versions).setVisible(true);
 				}
 				else {
@@ -324,15 +304,12 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 		container = (RelativeLayout) findViewById(R.id.versions_main_layout);
 
-		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
-
 		listView = (RecyclerView) findViewById(R.id.recycler_view_versions_file);
 		listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 		listView.setClipToPadding(false);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator());
 		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
@@ -362,6 +339,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			node=megaApi.getNodeByHandle(nodeHandle);
 
 			if(node!=null){
+				accessLevel = megaApi.getAccess(node);
 				nodeVersions = megaApi.getVersions(node);
 
 				GetVersionsSizeTask getVersionsSizeTask = new GetVersionsSizeTask();
@@ -460,8 +438,22 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		selectMenuItem.setVisible(true);
-		unSelectMenuItem.setVisible(false);
+
+		switch (accessLevel) {
+			case MegaShare.ACCESS_FULL:
+			case MegaShare.ACCESS_OWNER:
+				selectMenuItem.setVisible(true);
+				unSelectMenuItem.setVisible(false);
+				deleteVersionsMenuItem.setVisible(true);
+				break;
+
+			default:
+				selectMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				deleteVersionsMenuItem.setVisible(false);
+
+		}
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -809,14 +801,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			GetVersionsSizeTask getVersionsSizeTask = new GetVersionsSizeTask();
 			getVersionsSizeTask.execute();
 		}
-
-//		for(int i=0; i<nodes.size();i++){
-//			MegaNode node = nodes.get(i);
-//			if(node.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
-//				for(int j=0; i<node)
-//			}
-//		}
-
 	}
 
 	@Override
@@ -840,62 +824,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api,
 			ArrayList<MegaContactRequest> requests) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -1007,6 +935,15 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 		outState.putLong(EXTRA_NODE_HANDLE, node.getHandle());
+	}
+
+	public int getAccessLevel() {
+		return accessLevel;
+	}
+
+	public void startActionMode(int position) {
+		actionMode = startSupportActionMode(new ActionBarCallBack());
+		itemClick(position);
 	}
 }
 
