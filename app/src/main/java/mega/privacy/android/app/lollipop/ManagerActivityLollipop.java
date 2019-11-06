@@ -15285,9 +15285,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
 					}
-				}
-				else if (drawerItem == DrawerItem.SHARED_ITEMS){
+				} else if (drawerItem == DrawerItem.SHARED_ITEMS){
 					onNodesSharedUpdate();
+				} else if (drawerItem == DrawerItem.SEARCH) {
+					refreshFragment(FragmentTag.SEARCH.getTag());
 				}
 			}
 			else{
