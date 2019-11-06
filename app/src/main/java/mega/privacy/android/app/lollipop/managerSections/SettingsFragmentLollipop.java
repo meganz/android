@@ -1242,8 +1242,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			setOnlineOptions(false);
 		}
 
-		refreshAccountInfo();
-
 		return v;
 	}
 
@@ -2291,6 +2289,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	public void onResume() {
 		logDebug("onResume");
 
+		refreshAccountInfo();
+
 		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
 		filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
@@ -2335,7 +2335,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		//Check if the call is recently
 		logDebug("Check the last call to getAccountDetails");
-		if(callToAccountDetails(context)){
+		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		if(callToAccountDetails(context) || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
 			logDebug("megaApi.getAccountDetails SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
 		}
