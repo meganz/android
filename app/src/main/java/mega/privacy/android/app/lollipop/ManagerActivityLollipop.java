@@ -202,7 +202,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -373,7 +372,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public boolean openSettingsQR = false;
 	boolean newAccount = false;
 
-	private int storageState = -1; //Default value (-1) indicates that is not initialized
+	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 	private boolean isStorageStatusDialogShown = false;
 
 	private boolean userNameChanged;
@@ -711,7 +710,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (intent != null){
 				if (intent.getAction() == ACTION_STORAGE_STATE_CHANGED) {
 					int newStorageState =
-							intent.getIntExtra("state", MegaApiJava.STORAGE_STATE_GREEN);
+							intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
 					checkStorageStatus(newStorageState, false);
 					updateAccountDetailsVisibleInfo();
 					return;
@@ -1944,7 +1943,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				pF = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
 			}
 			elevation = savedInstanceState.getFloat("elevation", 0);
-			storageState = savedInstanceState.getInt("storageState", -1);
+			storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 			drawerItemPreUpgradeAccount = (DrawerItem) savedInstanceState.getSerializable("drawerItemPreUpgradeAccount");
 			accountFragmentPreUpgradeAccount = savedInstanceState.getInt("accountFragmentPreUpgradeAccount", -1);
@@ -2180,7 +2179,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			@Override
 			public void onDrawerOpened(@NonNull View drawerView) {
-				refreshDrawerInfo(true);
+				refreshDrawerInfo(storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN);
 			}
 
 			@Override
@@ -3371,6 +3370,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
         checkScrollElevation();
+
+		if (drawerItem == DrawerItem.ACCOUNT ) {
+			app.refreshAccountInfo();
+		}
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -5257,6 +5260,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 			default:{
+				app.refreshAccountInfo();
 				accountFragment=MY_ACCOUNT_FRAGMENT;
 
 				if (mTabsAdapterMyAccount == null){
@@ -10002,13 +10006,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         	newFile.createNewFile();
         } catch (IOException e) {}
 
-		Uri outputFileUri;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
-		}
-		else{
-			outputFileUri = Uri.fromFile(newFile);
-		}
+        //This method is in the v4 support library, so can be applied to all devices
+		Uri outputFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, newFile);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
@@ -10599,7 +10598,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         View v = inflater.inflate(R.layout.dialog_autoaway, null);
         builder.setView(v);
 
-        final RelativeLayout error = (RelativeLayout) v.findViewById(R.id.autoaway_error);
         final EditText input = v.findViewById(R.id.autoaway_edittext);
         input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -10609,9 +10607,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (error.getVisibility() == View.VISIBLE) {
-                    error.setVisibility(View.GONE);
-                }
+
             }
 
             @Override
@@ -10623,14 +10619,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (validAutoaway(value)) {
+					String value = validateAutoAway(v.getText());
+					if (value != null) {
 						setAutoAwayValue(value, false);
-						newFolderDialog.dismiss();
 					}
-					else {
-						error.setVisibility(View.VISIBLE);
-					}
+					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
@@ -10649,16 +10642,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
 		set.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
-                String value = input.getText().toString().trim();
-                if (validAutoaway(value)) {
-                    setAutoAwayValue(value, false);
-					newFolderDialog.dismiss();
-                }
-                else {
-                    error.setVisibility(View.VISIBLE);
-                }
-            }
+			public void onClick(View v) {
+				String value = validateAutoAway(input.getText());
+				if (value != null) {
+					setAutoAwayValue(value, false);
+				}
+				newFolderDialog.dismiss();
+			}
         });
 		Button cancel = (Button) v.findViewById(R.id.autoaway_cancel_button);
 	    cancel.setOnClickListener(new OnClickListener() {
@@ -10673,12 +10663,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		newFolderDialog.show();
 	}
 
-	boolean validAutoaway(String value) {
-		if (Integer.parseInt(value) > 0) {
-			return true;
+	private String validateAutoAway(CharSequence value) {
+		int timeout;
+		try {
+			timeout = Integer.parseInt(value.toString().trim());
+			if (timeout <= 0) {
+				timeout = 1;
+			} else if (timeout > MAX_AUTOAWAY_TIMEOUT) {
+				timeout = MAX_AUTOAWAY_TIMEOUT;
+			}
+			return String.valueOf(timeout);
+		} catch (Exception e) {
+			logWarning("Unable to parse user input, user entered: '" + value + "'");
+			return null;
 		}
-	    return false;
-    }
+	}
 
 	public void setAutoAwayValue(String value, boolean cancelled){
 		logDebug("Value: " + value);
@@ -13483,11 +13482,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
 	 */
 	private void checkCurrentStorageStatus(boolean onCreate) {
-		// If the current storage state is not initialized (-1) is because the app received the
+		// If the current storage state is not initialized is because the app received the
 		// event informing about the storage state  during login, the ManagerActivityLollipop
 		// wasn't active and for this reason the value is stored in the MegaApplication object.
-		int storageStateToCheck = (storageState != -1) ? storageState :
-				((MegaApplication)getApplication()).getStorageState();
+		int storageStateToCheck = (storageState != MegaApiJava.STORAGE_STATE_UNKNOWN) ?
+				storageState : app.getStorageState();
 
 		checkStorageStatus(storageStateToCheck, onCreate);
 	}
@@ -13499,7 +13498,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 */
 	private void checkStorageStatus(int newStorageState, boolean onCreate) {
         Intent intent = new Intent(this,UploadService.class);
-        MegaApplication app = (MegaApplication)getApplication();
         switch (newStorageState) {
             case MegaApiJava.STORAGE_STATE_GREEN:
 				logDebug("STORAGE STATE GREEN");
@@ -13515,7 +13513,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					e.printStackTrace();
 				}
 
-				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
+				int accountType = app.getMyAccountInfo().getAccountType();
 				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
 					logDebug("ACCOUNT TYPE FREE");
 					if(showMessageRandom()){
@@ -17485,6 +17483,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        searchView.setQuery(searchQuery, true);
         }
     }
+
+	public boolean isSearchOpen() {
+		return searchQuery != null && searchExpand;
+	}
 
     public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
 		this.accountFragmentPreUpgradeAccount = accountFragment;

@@ -1037,6 +1037,8 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	public void findNodes(){
 		logDebug("findNodes");
 		ArrayList<MegaShare> outNodeList = megaApi.getOutShares();
+		ArrayList<MegaShare> pendingNodeList = megaApi.getPendingOutShares();
+
 		nodes.clear();
 		long lastFolder=-1;		
 		
@@ -1050,6 +1052,19 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 					lastFolder=node.getHandle();
 					nodes.add(node);			
 				}	
+			}
+		}
+
+		for (int k = 0; k < pendingNodeList.size(); k++) {
+
+			if (pendingNodeList.get(k).getUser() != null) {
+				MegaShare mS = pendingNodeList.get(k);
+				MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
+
+				if (lastFolder != node.getHandle()) {
+					lastFolder = node.getHandle();
+					nodes.add(node);
+				}
 			}
 		}
 

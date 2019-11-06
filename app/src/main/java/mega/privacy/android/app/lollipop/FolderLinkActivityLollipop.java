@@ -1600,12 +1600,21 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		adapterList.setMultipleSelect(false);
+		if (adapterList != null) {
+			adapterList.setMultipleSelect(false);
+		}
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
-		optionsBar.setVisibility(View.VISIBLE);
-		separator.setVisibility(View.VISIBLE);
+
+		if (optionsBar != null) {
+			optionsBar.setVisibility(View.VISIBLE);
+		}
+
+		if (separator != null) {
+			separator.setVisibility(View.VISIBLE);
+		}
 	}
 	
 	public void selectAll(){

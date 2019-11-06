@@ -71,7 +71,6 @@ import nz.mega.sdk.MegaUser;
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -339,8 +338,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         super.onResume();
         //Refresh
 		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
-		refreshAccountInfo();
-        updateView();
+		updateView();
 		checkLogoutWarnings();
     }
     /**
@@ -407,27 +405,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		logDebug("newInstance");
 		MyAccountFragmentLollipop fragment = new MyAccountFragmentLollipop();
 		return fragment;
-	}
-
-	public void refreshAccountInfo(){
-		logDebug("refreshAccountInfo");
-
-		//Check if the call is recently
-		logDebug("Check the last call to getAccountDetails");
-		if(callToAccountDetails(context)){
-			logDebug("megaApi.getAccountDetails SEND");
-			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
-		}
-		logDebug("Check the last call to getExtendedAccountDetails");
-		if(callToExtendedAccountDetails(context)){
-			logDebug("megaApi.getExtendedAccountDetails SEND");
-			((MegaApplication) ((Activity)context).getApplication()).askForExtendedAccountDetails();
-		}
-		logDebug("Check the last call to getPaymentMethods");
-		if(callToPaymentMethods(context)){
-			logDebug("megaApi.getPaymentMethods SEND");
-			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
-		}
 	}
 
 	public void setAccountDetails(){
@@ -948,6 +925,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
      * If not, hide the text.
      */
 	public void checkLogoutWarnings() {
+		if (logoutWarning == null) return;
+
 		boolean existOfflineFiles = existsOffline(context);
 		boolean existOutgoingTransfers = existOngoingTransfers(megaApi);
 		int oldVisibility = logoutWarning.getVisibility();
