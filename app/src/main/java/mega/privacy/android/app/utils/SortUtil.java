@@ -9,8 +9,8 @@ import nz.mega.sdk.MegaNode;
 public class SortUtil {
 
     public static void sortByMailDescending(ArrayList<MegaNode> nodes){
-        ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
-        ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
+        ArrayList<MegaNode> folderNodes = new ArrayList<>();
+        ArrayList<MegaNode> fileNodes = new ArrayList<>();
 
         for (int i=0;i<nodes.size();i++){
             if(nodes.get(i) == null) {
@@ -33,9 +33,9 @@ public class SortUtil {
     }
 
     public static void sortByNameDescending(ArrayList<MegaNode> nodes){
-        ArrayList<String> foldersOrder = new ArrayList<String>();
-        ArrayList<String> filesOrder = new ArrayList<String>();
-        ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
+        ArrayList<String> foldersOrder = new ArrayList<>();
+        ArrayList<String> filesOrder = new ArrayList<>();
+        ArrayList<MegaNode> tempOffline = new ArrayList<>();
 
 
         for(int k = 0; k < nodes.size() ; k++) {
@@ -90,15 +90,12 @@ public class SortUtil {
     }
 
     public static void sortByNameAscending(ArrayList<MegaNode> nodes){
-        ArrayList<String> foldersOrder = new ArrayList<String>();
-        ArrayList<String> filesOrder = new ArrayList<String>();
-        ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
+        ArrayList<String> foldersOrder = new ArrayList<>();
+        ArrayList<String> filesOrder = new ArrayList<>();
+        ArrayList<MegaNode> tempOffline = new ArrayList<>();
 
         for(int k = 0; k < nodes.size() ; k++) {
             MegaNode node = nodes.get(k);
-            if(node == null) {
-                continue;
-            }
             if(node == null) {
                 continue;
             }
@@ -144,121 +141,69 @@ public class SortUtil {
         nodes.addAll(tempOffline);
     }
 
-    public static void sortOfflineByNameDescending(ArrayList<MegaOffline> mOffList){
-        ArrayList<String> foldersOrder = new ArrayList<>();
-        ArrayList<String> filesOrder = new ArrayList<>();
-        ArrayList<MegaOffline> tempOffline = new ArrayList<>();
-
-        //Remove MK before sorting
-        if(mOffList.size()>0){
-            MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-            if(lastItem.getHandle().equals("0")){
-                mOffList.remove(mOffList.size()-1);
-            }
-        }
-        else{
-            return;
-        }
-
-        for(int k = 0; k < mOffList.size() ; k++) {
-            MegaOffline node = mOffList.get(k);
-            if(node.getType().equals("1")){
-                foldersOrder.add(node.getName());
-            }
-            else{
-                filesOrder.add(node.getName());
-            }
-        }
-
-        Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-        Collections.reverse(foldersOrder);
-        Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-        Collections.reverse(filesOrder);
-
-        for(int k = 0; k < foldersOrder.size() ; k++) {
-            for(int j = 0; j < mOffList.size() ; j++) {
-                String name = foldersOrder.get(k);
-                String nameOffline = mOffList.get(j).getName();
-                if(name.equals(nameOffline)){
-                    tempOffline.add(mOffList.get(j));
-                }
-            }
-        }
-
-        for(int k = 0; k < filesOrder.size() ; k++) {
-            for(int j = 0; j < mOffList.size() ; j++) {
-                String name = filesOrder.get(k);
-                String nameOffline = mOffList.get(j).getName();
-                if(name.equals(nameOffline)){
-                    tempOffline.add(mOffList.get(j));
-                }
-            }
-        }
-
-        mOffList.clear();
-        mOffList.addAll(tempOffline);
+    public static void sortOfflineByNameDescending(ArrayList<MegaOffline> mOffList) {
+        sortOffline(mOffList, true);
     }
 
 
     public static void sortOfflineByNameAscending(ArrayList<MegaOffline> mOffList) {
+        sortOffline(mOffList, false);
+    }
+
+    private static void sortOffline(ArrayList<MegaOffline> mOffList, boolean reverse) {
+        if (mOffList.size() <= 0) {
+            return;
+        }
+
         ArrayList<String> foldersOrder = new ArrayList<>();
         ArrayList<String> filesOrder = new ArrayList<>();
         ArrayList<MegaOffline> tempOffline = new ArrayList<>();
 
-        //Remove MK before sorting
-        if(mOffList.size()>0){
-            MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-            if(lastItem.getHandle().equals("0")){
-                mOffList.remove(mOffList.size()-1);
-            }
-        }
-        else{
-            return;
-        }
-
-        for(int k = 0; k < mOffList.size() ; k++) {
+        for (int k = 0; k < mOffList.size(); k++) {
             MegaOffline node = mOffList.get(k);
-            if(node == null) {
+            if (node == null) {
                 continue;
             }
-            if(node.getType().equals("1")){
+            if (node.getType().equals("1")) {
                 foldersOrder.add(node.getName());
-            }
-            else{
+            } else {
                 filesOrder.add(node.getName());
             }
         }
 
         Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
         Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+        if (reverse) {
+            Collections.reverse(foldersOrder);
+            Collections.reverse(filesOrder);
+        }
 
-        for(int k = 0; k < foldersOrder.size() ; k++) {
-            for(int j = 0; j < mOffList.size() ; j++) {
+        for (int k = 0; k < foldersOrder.size(); k++) {
+            for (int j = 0; j < mOffList.size(); j++) {
                 String name = foldersOrder.get(k);
                 MegaOffline offline = mOffList.get(j);
-                if(offline == null) {
+                if (offline == null) {
                     continue;
                 }
                 String nameOffline = offline.getName();
-                if(name.equals(nameOffline)){
+                if (name.equals(nameOffline)) {
                     tempOffline.add(offline);
                 }
             }
         }
 
-        for(int k = 0; k < filesOrder.size() ; k++) {
-            for(int j = 0; j < mOffList.size() ; j++) {
+        for (int k = 0; k < filesOrder.size(); k++) {
+            for (int j = 0; j < mOffList.size(); j++) {
                 String name = filesOrder.get(k);
                 MegaOffline offline = mOffList.get(j);
-                if(offline == null) {
+                if (offline == null) {
                     continue;
                 }
                 String nameOffline = offline.getName();
-                if(name.equals(nameOffline)){
+                if (name.equals(nameOffline)) {
                     tempOffline.add(offline);
                 }
             }
-
         }
 
         mOffList.clear();

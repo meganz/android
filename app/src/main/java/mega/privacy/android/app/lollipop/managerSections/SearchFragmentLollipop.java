@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -65,19 +64,16 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.utils.SortUtil.*;
+import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
 public class SearchFragmentLollipop extends RotatableFragment{
 
@@ -130,8 +126,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	}
 
 	public void activateActionMode(){
-		logDebug("activateActionMode");
-
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -683,16 +677,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	}
 
 	public void setProgressView(boolean inProgress) {
-		contentLayout.setEnabled(!inProgress);
-		if (inProgress) {
-			contentLayout.setAlpha(0.4f);
-			searchProgressBar.setVisibility(View.VISIBLE);
-			recyclerView.setVisibility(View.GONE);
-		} else {
-			contentLayout.setAlpha(1);
-			searchProgressBar.setVisibility(View.GONE);
-			recyclerView.setVisibility(View.VISIBLE);
-		}
+		setSearchProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
 	}
 
 	@Override

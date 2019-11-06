@@ -3,6 +3,10 @@ package mega.privacy.android.app;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 
@@ -130,16 +134,16 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                             if (managerA.getParentHandleIncoming() == -1) {
                                 nodes = filterInShares(query);
                                 return;
-                            } else {
-                                parent = megaApi.getNodeByHandle(managerA.getParentHandleIncoming());
                             }
+
+                            parent = megaApi.getNodeByHandle(managerA.getParentHandleIncoming());
                         } else if (managerA.getTabItemShares() == 1) {
                             if (managerA.getParentHandleOutgoing() == -1) {
                                 nodes = filterOutShares(query);
                                 return;
-                            } else {
-                                parent = megaApi.getNodeByHandle(managerA.getParentHandleOutgoing());
                             }
+
+                            parent = megaApi.getNodeByHandle(managerA.getParentHandleOutgoing());
                         }
                         break;
                     }
@@ -171,9 +175,9 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                 if (fileExplorerA.getParentHandleIncoming() == -1) {
                     nodes = filterInShares(query);
                     return;
-                } else {
-                    parent = megaApi.getNodeByHandle(fileExplorerA.getParentHandleIncoming());
                 }
+
+                parent = megaApi.getNodeByHandle(fileExplorerA.getParentHandleIncoming());
             }
         } else {
             parent = megaApi.getNodeByHandle(parentHandleSearch);
@@ -251,5 +255,18 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
 
     private boolean isCDExplorerF() {
         return isFileExplorerA() && cDExplorerF != null;
+    }
+
+    public static void setSearchProgressView(RelativeLayout contentLayout, ProgressBar searchProgressBar, RecyclerView recyclerView, boolean inProgress) {
+        contentLayout.setEnabled(!inProgress);
+        if (inProgress) {
+            contentLayout.setAlpha(0.4f);
+            searchProgressBar.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            contentLayout.setAlpha(1);
+            searchProgressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 }

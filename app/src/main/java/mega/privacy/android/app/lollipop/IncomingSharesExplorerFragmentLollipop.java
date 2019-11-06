@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -56,8 +55,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -737,7 +736,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 					}
 				}
 
-
 				((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 				return 2;
 			}
@@ -912,16 +910,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 	}
 
 	public void setProgressView(boolean inProgress) {
-		contentLayout.setEnabled(!inProgress);
-		if (inProgress) {
-			contentLayout.setAlpha(0.4f);
-			searchProgressBar.setVisibility(View.VISIBLE);
-			recyclerView.setVisibility(View.GONE);
-		} else {
-			contentLayout.setAlpha(1);
-			searchProgressBar.setVisibility(View.GONE);
-			recyclerView.setVisibility(View.VISIBLE);
-		}
+		setSearchProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
 	}
 
 	public void setSearchNodes(ArrayList<MegaNode> nodes) {

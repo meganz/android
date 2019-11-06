@@ -754,7 +754,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 
 	public void openFile(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
 		if (MimeTypeList.typeForName(node.getName()).isImage()) {
-			logDebug("itemClick:isFile:isImage");
 			Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 			//Put flag to notify FullScreenImageViewerLollipop.
 			intent.putExtra("placeholder", placeholderCount);
@@ -773,8 +772,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
 			imageDrag = imageView;
 		} else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
-			logDebug("itemClick:isFile:isVideoReproducibleOrIsAudio");
-
 			MegaNode file = node;
 
 			String mimeType = MimeTypeList.typeForName(file.getName()).getType();
@@ -790,7 +787,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 					opusFile = true;
 				}
 			} else {
-				logDebug("itemClick:setIntentToAudioVideoPlayer");
 				mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 				internalIntent = true;
 			}

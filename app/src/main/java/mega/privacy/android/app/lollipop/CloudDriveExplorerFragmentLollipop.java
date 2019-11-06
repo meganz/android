@@ -53,6 +53,7 @@ import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -89,7 +90,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	private Button optionButton;
 	private Button cancelButton;
 	private View separator;
-
 
 	private ArrayList<Long> nodeHandleMoveCopy;
 
@@ -610,7 +610,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 			if (adapter.getItemCount() == 0 && (modeCloud == FileExplorerActivityLollipop.MOVE || modeCloud == FileExplorerActivityLollipop.COPY)) {
 				activateButton(true);
-			} else if ((modeCloud == FileExplorerActivityLollipop.MOVE) || (modeCloud == FileExplorerActivityLollipop.COPY)) {
+			} else if (modeCloud == FileExplorerActivityLollipop.MOVE || modeCloud == FileExplorerActivityLollipop.COPY) {
 				MegaNode parent = ((FileExplorerActivityLollipop) context).parentMoveCopy();
 				if (parent != null && parent.getHandle() == parentHandle) {
 					activateButton(false);
@@ -918,16 +918,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	}
 
 	public void setProgressView(boolean inProgress) {
-		contentLayout.setEnabled(!inProgress);
-		if (inProgress) {
-			contentLayout.setAlpha(0.4f);
-			searchProgressBar.setVisibility(View.VISIBLE);
-			recyclerView.setVisibility(View.GONE);
-		} else {
-			contentLayout.setAlpha(1);
-			searchProgressBar.setVisibility(View.GONE);
-			recyclerView.setVisibility(View.VISIBLE);
-		}
+		setSearchProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
 	}
 
 	public void setSearchNodes(ArrayList<MegaNode> nodes) {

@@ -2546,7 +2546,7 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Loading</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Please wait&#8230;</string>
 
-    <string name="error_picture_not_uploaded" context="Alert shown to the user when some error curred uploading a picture">Error. Picture not uploaded.</string>
+    <string name="error_picture_not_uploaded" context="Alert shown to the user when some error occurred uploading a picture">Error. Picture not uploaded.</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
 

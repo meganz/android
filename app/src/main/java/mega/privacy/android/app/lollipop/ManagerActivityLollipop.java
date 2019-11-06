@@ -6401,7 +6401,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					searchMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
-					searchMenuItem.setVisible(false);
 				}
 			}
 			else if(drawerItem == DrawerItem.RUBBISH_BIN){
@@ -15312,7 +15311,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 			}
 			else{
-//				logDebug("ERROR MegaRequest.TYPE_SHARE: "+request.getEmail()+" : "+request.getName());
 				if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed_shared), -1);
 				}
@@ -16246,7 +16244,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-//		logDebug("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
 
 		if(transfer.isStreamingTransfer()){
 			return;
@@ -16668,12 +16665,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				} else if (searchSharedTab == 1 && parentHandleOutgoing != -1) {
 					return true;
 				}
-				break;
 			default:
 				return false;
 		}
-
-		return false;
 	}
 
 	public void openAdvancedDevices (long handleToDownload, boolean highPriority){
