@@ -2,6 +2,8 @@ package mega.privacy.android.app.lollipop;
 
 import android.content.Context;
 
+import com.android.billingclient.api.Purchase;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Locale;
@@ -10,7 +12,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;

@@ -102,6 +102,7 @@ import android.widget.Toast;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -206,10 +207,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.billing.IabHelper;
-import mega.privacy.android.app.utils.billing.IabResult;
-import mega.privacy.android.app.utils.billing.Inventory;
-import mega.privacy.android.app.utils.billing.Purchase;
 import mega.privacy.android.app.utils.billing_v2.BillingManager;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -379,6 +376,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private int storageState = -1; //Default value (-1) indicates that is not initialized
 	private boolean isStorageStatusDialogShown = false;
+	private Purchase highestGooglePlaySubscription = null;
 
 	private boolean userNameChanged;
 	private boolean userEmailChanged;
@@ -1138,12 +1136,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	};
 
-	//Billing
-
-	// (arbitrary) request code for the purchase flow
-    public static final int RC_REQUEST = 10001;
-    String orderId = "";
-
 	// SKU for our subscription PRO_I monthly
     public static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
     // SKU for our subscription PRO_I yearly
@@ -1161,312 +1153,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     // SKU for our subscription PRO_LITE yearly
 	public static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
 
-//    Purchase proLiteMonthly;
-//    Purchase proLiteYearly;
-//    Purchase proIMonthly;
-//    Purchase proIYearly;
-//    Purchase proIIMonthly;
-//    Purchase proIIYearly;
-//    Purchase proIIIMonthly;
-//    Purchase proIIIYearly;
-    Purchase maxP;
-
- // Callback for when a purchase is finished
-    IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
-        public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
-			logDebug("Purchase finished: " + result + ", purchase: " + purchase);
-
-            // if we were disposed of in the meantime, quit.
-//            if (mHelper == null) return;
-
-            if (result.isFailure()) {
-				logError("Error purchasing: " + result);
-                return;
-            }
-            if (!verifyDeveloperPayload(purchase)) {
-				logDebug("Error purchasing. Authenticity verification failed.");
-                return;
-            }
-
-			logDebug("Purchase successful.");
-			logDebug("ORIGINAL JSON: " + purchase.getOriginalJson());
-
-			logDebug("ORDERID WHEN FINISHED: ***____" + purchase.getOrderId() + "___***");
-            if (purchase.getSku().equals(SKU_PRO_I_MONTH)) {
-				logDebug("PRO I Monthly subscription purchased.");
-				if (managerActivity != null){
-					showAlert(managerActivity, "Thank you for subscribing to PRO I Monthly!", null);
-				}
-            }
-            else if (purchase.getSku().equals(SKU_PRO_I_YEAR)) {
-				logDebug("PRO I Yearly subscription purchased.");
-				if (managerActivity != null){
-					showAlert(managerActivity, "Thank you for subscribing to PRO I Yearly!", null);
-				}
-            }
-            else if (purchase.getSku().equals(SKU_PRO_II_MONTH)) {
-				logDebug("PRO II Monthly subscription purchased.");
-				if (managerActivity != null){
-					showAlert(managerActivity, "Thank you for subscribing to PRO II Monthly!", null);
-				}
-            }
-            else if (purchase.getSku().equals(SKU_PRO_II_YEAR)) {
-				logDebug("PRO II Yearly subscription purchased.");
-				if (managerActivity != null){
-					showAlert(managerActivity, "Thank you for subscribing to PRO II Yearly!", null);
-				}
-            }
-            else if (purchase.getSku().equals(SKU_PRO_III_MONTH)) {
-				logDebug("PRO III Monthly subscription purchased.");
-				if (managerActivity != null){
-					showAlert(managerActivity, "Thank you for subscribing to PRO III Monthly!", null);
-				}
-            }
-            else if (purchase.getSku().equals(SKU_PRO_III_YEAR)) {
-				logDebug("PRO III Yearly subscription purchased.");
-				if (managerActivity != null){
-					showAlert(managerActivity, "Thank you for subscribing to PRO III Yearly!", null);
-				}
-            }
-            else if (purchase.getSku().equals(SKU_PRO_LITE_MONTH)) {
-				logDebug("PRO LITE Monthly subscription purchased.");
-				if (managerActivity != null){
-					showAlert(managerActivity, "Thank you for subscribing to PRO LITE Monthly!", null);
-				}
-            }
-            else if (purchase.getSku().equals(SKU_PRO_LITE_YEAR)) {
-				logDebug("PRO LITE Yearly subscription purchased.");
-				if (managerActivity != null){
-					showAlert(managerActivity, "Thank you for subscribing to PRO LITE Yearly!", null);
-				}
-            }
-
-            if (managerActivity != null){
-				logDebug("ORIGINAL JSON:" + purchase.getOriginalJson() + ":::");
-				if (dbH == null){
-					dbH = DatabaseHandler.getDbHandler(managerActivity);
-				}
-
-				MegaAttributes attributes = dbH.getAttributes();
-
-				long lastPublicHandle = getLastPublicHandle(attributes);
-				if (lastPublicHandle == -1){
-					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), managerActivity);
-				}
-				else{
-					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle, managerActivity);
-				}
-            }
-            else{
-				logDebug("ORIGINAL JSON:" + purchase.getOriginalJson() + ":::");
-				if (dbH != null){
-					MegaAttributes attributes = dbH.getAttributes();
-
-					long lastPublicHandle = getLastPublicHandle(attributes);
-					if (lastPublicHandle == -1){
-						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson());
-					}
-					else{
-						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle);
-					}
-				}
-				else{
-					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson());
-				}
-            }
-        }
-    };
-
-    /** Verifies the developer payload of a purchase. */
-    boolean verifyDeveloperPayload(Purchase p) {
-        String payload = p.getDeveloperPayload();
-
-        /*
-         * TODO: verify that the developer payload of the purchase is correct. It will be
-         * the same one that you sent when initiating the purchase.
-         *
-         * WARNING: Locally generating a random string when starting a purchase and
-         * verifying it here might seem like a good approach, but this will fail in the
-         * case where the user purchases an item on one device and then uses your app on
-         * a different device, because on the other device you will not have access to the
-         * random string you originally generated.
-         *
-         * So a good developer payload has these characteristics:
-         *
-         * 1. If two different users purchase an item, the payload is different between them,
-         *    so that one user's purchase can't be replayed to another user.
-         *
-         * 2. The payload must be such that you can verify it even when the app wasn't the
-         *    one who initiated the purchase flow (so that items purchased by the user on
-         *    one device work on other devices owned by the user).
-         *
-         * Using your own server to store and verify developer payloads across app
-         * installations is recommended.
-         */
-
-        return true;
-    }
-	// Listener that's called when we finish querying the items and subscriptions we own
-	IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-		public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-//			logDebug("Query inventory finished.");
-//
-//			// Is it a failure?
-//			if (result.isFailure()) {
-//				logError("Failed to query inventory: " + result);
-//				return;
-//			}
-//
-//			logDebug("Query inventory was successful.");
-//
-//			proLiteMonthly = inventory.getPurchase(SKU_PRO_LITE_MONTH);
-//			proLiteYearly = inventory.getPurchase(SKU_PRO_LITE_YEAR);
-//			proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
-//			proIYearly = inventory.getPurchase(SKU_PRO_I_YEAR);
-//			proIIMonthly = inventory.getPurchase(SKU_PRO_II_MONTH);
-//			proIIYearly = inventory.getPurchase(SKU_PRO_II_YEAR);
-//			proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
-//			proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR);
-//
-//			if (proLiteMonthly != null){
-//				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(0);
-//				((MegaApplication) getApplication()).getMyAccountInfo().setProLiteMonthly(proLiteMonthly);
-//				maxP = proLiteMonthly;
-//				logDebug("PRO LITE MONTHLY (JSON): " + proLiteMonthly.getOriginalJson());
-//			}
-//
-//			if (proLiteYearly != null){
-//				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(0);
-//				((MegaApplication) getApplication()).getMyAccountInfo().setProLiteYearly(proLiteYearly);
-//				maxP = proLiteYearly;
-//				logDebug("PRO LITE ANNUALY (JSON): " + proLiteYearly.getOriginalJson());
-//			}
-//
-//			if (proIMonthly != null){
-//				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(1);
-//				((MegaApplication) getApplication()).getMyAccountInfo().setProIMonthly(proIMonthly);
-//				maxP = proIMonthly;
-//				logDebug("PRO I MONTHLY (JSON): " + proIMonthly.getOriginalJson());
-//			}
-//
-//			if (proIYearly != null){
-//				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(1);
-//				((MegaApplication) getApplication()).getMyAccountInfo().setProIYearly(proIYearly);
-//				maxP = proIYearly;
-//				logDebug("PRO I ANNUALY (JSON): " + proIYearly.getOriginalJson());
-//			}
-//
-//			if (proIIMonthly != null){
-//				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(2);
-//				((MegaApplication) getApplication()).getMyAccountInfo().setProIIMonthly(proIIMonthly);
-//				maxP = proIIMonthly;
-//				logDebug("PRO II MONTHLY (JSON): " + proIIMonthly.getOriginalJson());
-//			}
-//
-//			if (proIIYearly != null){
-//				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(2);
-//				((MegaApplication) getApplication()).getMyAccountInfo().setProIIYearly(proIIYearly);
-//				maxP = proIIYearly;
-//				logDebug("PRO II ANNUALY (JSON): " + proIIYearly.getOriginalJson());
-//			}
-//
-//			if (proIIIMonthly != null){
-//				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(3);
-//				maxP = proIIIMonthly;
-//				((MegaApplication) getApplication()).getMyAccountInfo().setProIIIMonthly(proIIIMonthly);
-//				logDebug("PRO III MONTHLY (JSON): " + proIIIMonthly.getOriginalJson());
-//			}
-//
-//			if (proIIIYearly != null){
-//				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(3);
-//				((MegaApplication) getApplication()).getMyAccountInfo().setProIIIYearly(proIIIYearly);
-//				maxP = proIIIYearly;
-//				logDebug("PRO III ANNUALY (JSON): " + proIIIYearly.getOriginalJson());
-//			}
-//
-//			((MegaApplication) getApplication()).getMyAccountInfo().setInventoryFinished(true);
-//
-//			upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-//			if (upAFL != null) {
-//				upAFL.setPricing();
-//			}
-//
-//			myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
-//			if (myFL != null) {
-//				myFL.setPricing();
-//			}
-//
-//			logDebug("LEVELACCOUNTDETAILS: " + ((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() +
-//					"; LEVELINVENTORY: " + ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory() +
-//					"; ACCOUNTDETAILSFINISHED: " + ((MegaApplication) getApplication()).getMyAccountInfo().isAccountDetailsFinished());
-//
-//			if (((MegaApplication) getApplication()).getMyAccountInfo().isAccountDetailsFinished()){
-//				if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory() > ((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails()){
-//					if (maxP != null){
-//						logDebug("ORIGINAL JSON:" + maxP.getOriginalJson());
-//						if (dbH == null){
-//							dbH = DatabaseHandler.getDbHandler(managerActivity);
-//						}
-//
-//						MegaAttributes attributes = dbH.getAttributes();
-//
-//						long lastPublicHandle = getLastPublicHandle(attributes);
-//						if (lastPublicHandle == -1){
-//							megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), managerActivity);
-//						}
-//						else{
-//							megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle, managerActivity);
-//						}
-//					}
-//				}
-//			}
-//
-//			boolean isProLiteMonthly = false;
-//			if (proLiteMonthly != null){
-//				isProLiteMonthly = true;
-//			}
-//			if (isProLiteMonthly){
-//				logDebug("PRO LITE IS SUBSCRIPTED: ORDERID: " + proLiteMonthly.getOrderId());
-//			}else{
-//				logWarning("PRO LITE IS NOT SUBSCRIPTED");
-//			}
-//
-////			if (!mHelper.subscriptionsSupported()) {
-////				logWarning("SUBSCRIPTIONS NOT SUPPORTED");
-////			}
-////			else{
-////				logDebug("SUBSCRIPTIONS SUPPORTED");
-////			}
-//
-//
-//			logDebug("Initial inventory query finished.");
-		}
-	};
-
-    //todo yuan launch payment flow
     public void launchPayment(String productId){
-    	//todo need to know purchase or upgrade by checking current account level
 		//start purchase/subscription flow
 		SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
-		int currentAccountType = MegaApplication.getInstance().getMyAccountInfo().getAccountType();
-		String oldSku = null;
-		//if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE)
+		String oldSku = highestGooglePlaySubscription == null ? null : highestGooglePlaySubscription.getSku();
 		mBillingManager.initiatePurchaseFlow(oldSku, skuDetails);
     }
-
-    private String getCurrentSkuId(int accountType){
-//		public final static int ACCOUNT_TYPE_FREE = 0;
-//		public final static int ACCOUNT_TYPE_PROI = 1;
-//		public final static int ACCOUNT_TYPE_PROII = 2;
-//		public final static int ACCOUNT_TYPE_PROIII = 3;
-//		public final static int ACCOUNT_TYPE_LITE = 4;
-		switch (accountType) {
-			case 1:
-				return "";
-			default:
-				return "";
-		}
-	}
 
     private SkuDetails getSkuDetails(List<SkuDetails> list, String key){
     	if (list == null || list.isEmpty()){
@@ -1487,8 +1179,103 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	@Override
 	public void onBillingClientSetupFinished() {
-		//billing client is ready now, ready for next step
-		//todo get subscription and one off?
+		logInfo("Google play billing client setup finished");
+		getInventory();
+	}
+
+	@Override
+	public void onConsumeFinished(String token, int result) {
+		//todo need to confirm if we have such cases
+	}
+
+	@Override
+	public void onPurchasesUpdated(int resultCode, List<Purchase> purchases) {
+		//todo update ui, e.g. disable purchased option, notify api and so on
+
+		if (resultCode != BillingClient.BillingResponseCode.OK || purchases == null) {
+			logWarning("onPurchasesUpdated failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
+			return;
+		}
+
+		MyAccountInfo myAccountInfo = app.getMyAccountInfo();
+		for (Purchase purchase : purchases) {
+			logDebug("purchased (JSON): " + purchase.getOriginalJson());
+			switch (purchase.getSku()) {
+				case SKU_PRO_LITE_MONTH:
+					myAccountInfo.setLevelInventory(0);
+					myAccountInfo.setProLiteMonthly(purchase);
+					break;
+				case SKU_PRO_LITE_YEAR:
+					myAccountInfo.setLevelInventory(0);
+					myAccountInfo.setProLiteYearly(purchase);
+					break;
+				case SKU_PRO_I_MONTH:
+					myAccountInfo.setLevelInventory(1);
+					myAccountInfo.setProIMonthly(purchase);
+					break;
+				case SKU_PRO_I_YEAR:
+					myAccountInfo.setLevelInventory(1);
+					myAccountInfo.setProIYearly(purchase);
+					break;
+				case SKU_PRO_II_MONTH:
+					myAccountInfo.setLevelInventory(2);
+					myAccountInfo.setProIIMonthly(purchase);
+					break;
+				case SKU_PRO_II_YEAR:
+					myAccountInfo.setLevelInventory(2);
+					myAccountInfo.setProIIYearly(purchase);
+					break;
+				case SKU_PRO_III_MONTH:
+					myAccountInfo.setLevelInventory(3);
+					myAccountInfo.setProIIIMonthly(purchase);
+					break;
+				case SKU_PRO_III_YEAR:
+					myAccountInfo.setLevelInventory(3);
+					myAccountInfo.setProIIIYearly(purchase);
+					break;
+			}
+		}
+
+		myAccountInfo.setInventoryFinished(true);
+		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
+		if (upAFL != null) {
+			upAFL.setPricing();
+		}
+
+		myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
+		if (myFL != null) {
+			myFL.setPricing();
+		}
+
+		logDebug("getLevelAccountDetails: " + myAccountInfo.getLevelAccountDetails() +
+				"; getLevelInventory: " + myAccountInfo.getLevelInventory() +
+				"; isAccountDetailsFinished: " + myAccountInfo.isAccountDetailsFinished());
+		updateSubscriptionLevel(myAccountInfo);
+	}
+
+	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo){
+		if (myAccountInfo.isAccountDetailsFinished()
+				&& myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()
+				&& highestGooglePlaySubscription != null) {
+			if (dbH == null) {
+				dbH = DatabaseHandler.getDbHandler(managerActivity);
+			}
+
+			MegaAttributes attributes = dbH.getAttributes();
+
+			long lastPublicHandle = getLastPublicHandle(attributes);
+			String json = highestGooglePlaySubscription.getOriginalJson();
+			if (lastPublicHandle == -1) {
+				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, managerActivity);
+			} else {
+				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, lastPublicHandle, managerActivity);
+			}
+		}
+	}
+
+
+	private void getInventory(){
+		//todo yuan get subscription and one off?
 		List<String> inAppSkus = new ArrayList<>();
 		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
 			@Override
@@ -1513,126 +1300,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		mBillingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
 	}
-
-	@Override
-	public void onConsumeFinished(String token, int result) {
-		//todo need to confirm if we have such cases
-	}
-
-	@Override
-	public void onPurchasesUpdated(List<com.android.billingclient.api.Purchase> purchases) {
-		//todo update ui, e.g. disable purchased option, notify api and so on
-
-//		logDebug("Query inventory was successful.");
-//
-//		proLiteMonthly = inventory.getPurchase(SKU_PRO_LITE_MONTH);
-//		proLiteYearly = inventory.getPurchase(SKU_PRO_LITE_YEAR);
-//		proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
-//		proIYearly = inventory.getPurchase(SKU_PRO_I_YEAR);
-//		proIIMonthly = inventory.getPurchase(SKU_PRO_II_MONTH);
-//		proIIYearly = inventory.getPurchase(SKU_PRO_II_YEAR);
-//		proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
-//		proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR);
-//
-//		if (proLiteMonthly != null) {
-//			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(0);
-//			((MegaApplication) getApplication()).getMyAccountInfo().setProLiteMonthly(proLiteMonthly);
-//			maxP = proLiteMonthly;
-//			logDebug("PRO LITE MONTHLY (JSON): " + proLiteMonthly.getOriginalJson());
-//		}
-//
-//		if (proLiteYearly != null) {
-//			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(0);
-//			((MegaApplication) getApplication()).getMyAccountInfo().setProLiteYearly(proLiteYearly);
-//			maxP = proLiteYearly;
-//			logDebug("PRO LITE ANNUALY (JSON): " + proLiteYearly.getOriginalJson());
-//		}
-//
-//		if (proIMonthly != null) {
-//			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(1);
-//			((MegaApplication) getApplication()).getMyAccountInfo().setProIMonthly(proIMonthly);
-//			maxP = proIMonthly;
-//			logDebug("PRO I MONTHLY (JSON): " + proIMonthly.getOriginalJson());
-//		}
-//
-//		if (proIYearly != null) {
-//			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(1);
-//			((MegaApplication) getApplication()).getMyAccountInfo().setProIYearly(proIYearly);
-//			maxP = proIYearly;
-//			logDebug("PRO I ANNUALY (JSON): " + proIYearly.getOriginalJson());
-//		}
-//
-//		if (proIIMonthly != null) {
-//			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(2);
-//			((MegaApplication) getApplication()).getMyAccountInfo().setProIIMonthly(proIIMonthly);
-//			maxP = proIIMonthly;
-//			logDebug("PRO II MONTHLY (JSON): " + proIIMonthly.getOriginalJson());
-//		}
-//
-//		if (proIIYearly != null) {
-//			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(2);
-//			((MegaApplication) getApplication()).getMyAccountInfo().setProIIYearly(proIIYearly);
-//			maxP = proIIYearly;
-//			logDebug("PRO II ANNUALY (JSON): " + proIIYearly.getOriginalJson());
-//		}
-//
-//		if (proIIIMonthly != null) {
-//			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(3);
-//			maxP = proIIIMonthly;
-//			((MegaApplication) getApplication()).getMyAccountInfo().setProIIIMonthly(proIIIMonthly);
-//			logDebug("PRO III MONTHLY (JSON): " + proIIIMonthly.getOriginalJson());
-//		}
-//
-//		if (proIIIYearly != null) {
-//			((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(3);
-//			((MegaApplication) getApplication()).getMyAccountInfo().setProIIIYearly(proIIIYearly);
-//			maxP = proIIIYearly;
-//			logDebug("PRO III ANNUALY (JSON): " + proIIIYearly.getOriginalJson());
-//		}
-//
-//		((MegaApplication) getApplication()).getMyAccountInfo().setInventoryFinished(true);
-//
-//		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-//		if (upAFL != null) {
-//			upAFL.setPricing();
-//		}
-//
-//		myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
-//		if (myFL != null) {
-//			myFL.setPricing();
-//		}
-//
-//		logDebug("LEVELACCOUNTDETAILS: " + ((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() +
-//				"; LEVELINVENTORY: " + ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory() +
-//				"; ACCOUNTDETAILSFINISHED: " + ((MegaApplication) getApplication()).getMyAccountInfo().isAccountDetailsFinished());
-//
-//		if (((MegaApplication) getApplication()).getMyAccountInfo().isAccountDetailsFinished()) {
-//			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory() > ((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails()) {
-//				if (maxP != null) {
-//					logDebug("ORIGINAL JSON:" + maxP.getOriginalJson());
-//					if (dbH == null) {
-//						dbH = DatabaseHandler.getDbHandler(managerActivity);
-//					}
-//
-//					MegaAttributes attributes = dbH.getAttributes();
-//
-//					long lastPublicHandle = getLastPublicHandle(attributes);
-//					if (lastPublicHandle == -1) {
-//						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), managerActivity);
-//					} else {
-//						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle, managerActivity);
-//					}
-//				}
-//			}
-//		}
-//
-//		boolean isProLiteMonthly = false;
-//		if (proLiteMonthly != null) {
-//			isProLiteMonthly = true;
-//		}
-	}
-
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -11691,33 +11358,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				usedSpaceLayout.setVisibility(View.GONE);
 				logDebug("usedSpaceLayout is GONE");
 			}
-//				String usedSpaceString = getString(R.string.used_space, used, total);
 		}
 		else{
 			logWarning("usedSpaceLayout is NULL");
 		}
-
-		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
-			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() < ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory()){
-				if (maxP != null){
-					logDebug("ORIGINAL JSON:" + maxP.getOriginalJson());
-
-					if (dbH == null){
-						dbH = DatabaseHandler.getDbHandler(this);
-					}
-
-					MegaAttributes attributes = dbH.getAttributes();
-
-					long lastPublicHandle = getLastPublicHandle(attributes);
-					if (lastPublicHandle == -1){
-						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), this);
-					}
-					else{
-						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle, this);
-					}
-				}
-			}
-		}
+		updateSubscriptionLevel(app.getMyAccountInfo());
 
 		switch (storageState) {
 			case MegaApiJava.STORAGE_STATE_GREEN:
