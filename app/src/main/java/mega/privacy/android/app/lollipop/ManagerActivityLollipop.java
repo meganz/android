@@ -1191,7 +1191,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	public void onPurchasesUpdated(int resultCode, List<Purchase> purchases) {
 		//todo update ui, e.g. disable purchased option, notify api and so on
-
+		//todo if user purchased, show alert to welcome
 		if (resultCode != BillingClient.BillingResponseCode.OK || purchases == null) {
 			logWarning("onPurchasesUpdated failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
 			return;
@@ -12678,23 +12678,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				cC.inviteMultipleContacts(contactsData);
 			}
 		}
-		//todo yuan when comes back from purchase activity
-//		else if (requestCode == RC_REQUEST){
-//			// Pass on the activity result to the helper for handling
-//	        if (!mHelper.handleActivityResult(requestCode, resultCode, intent)) {
-//	            // not handled, so handle it ourselves (here's where you'd
-//	            // perform any handling of activity results not related to in-app
-//	            // billing...
-//
-//	        	super.onActivityResult(requestCode, resultCode, intent);
-//	        }
-//	        else {
-//				logDebug("Handled by IABUtil.");
-//	            drawerItem = DrawerItem.ACCOUNT;
-////	            Toast.makeText(this, "HURRAY!: ORDERID: **__" + orderId + "__**", Toast.LENGTH_LONG).show();
-//				logDebug("HURRAY! - ORDERID: " + orderId);
-//	        }
-//		}
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
