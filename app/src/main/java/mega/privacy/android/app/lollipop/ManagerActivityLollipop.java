@@ -209,6 +209,7 @@ import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
 import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
+import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -261,7 +262,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
     private final String INDEX_CLOUD = "INDEX_CLOUD";
 
-    public static final String BONUS_STORAGE_SPACE_SMS = "20GB";
+    private String bonusStorageSMS = "20 GB";
 
 	private final int ERROR_TAB = -1;
 	private final int CLOUD_TAB = 0;
@@ -2283,14 +2284,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         addPhoneNumberButton.setOnClickListener(this);
 
         addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
-        boolean isAchievementUser = megaApi.isAchievementsEnabled();
-        logDebug("is achievement user: " + isAchievementUser);
-        if (isAchievementUser) {
-            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), BONUS_STORAGE_SPACE_SMS);
-            addPhoneNumberLabel.setText(message);
-        } else {
-            addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
-        }
+        megaApi.getAccountAchievements(this);
 
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
@@ -3260,8 +3254,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		updateAccountDetailsVisibleInfo();
 
 		setContactStatus();
-        showAddPhoneNumberInMenu();
-
 
         if (firstTimeAfterInstallation) {
             //haven't verified phone number
@@ -13739,11 +13731,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void showSMSVerificationDialog() {
-	    logDebug("showSMSVerificationDialog");
         smsDialogTimeChecker.update();
         shouldShowSMSDialog = false;
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
+        LayoutInflater inflater = getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
         dialogBuilder.setView(dialogView);
 
@@ -13751,7 +13742,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         boolean isAchievementUser = megaApi.isAchievementsEnabled();
         logDebug("is achievement user: " + isAchievementUser);
         if (isAchievementUser) {
-            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), BONUS_STORAGE_SPACE_SMS);
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
             msg.setText(message);
         } else {
             msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
@@ -14516,7 +14507,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else if (e.getErrorCode() != MegaError.API_ESID){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 			}
-		}
+		} else if(request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                bonusStorageSMS = getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE));
+            }
+            showAddPhoneNumberInMenu();
+            checkBeforeShow();
+        }
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
 			logDebug("TYPE_SET_ATTR_USER");
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
@@ -15769,16 +15766,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	@Override
 	public void onEvent(MegaApiJava api, MegaEvent event) {
-	    if(event.getType() == MegaEvent.EVENT_MISC_FLAGS_READY) {
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    checkBeforeShow();
-                    showAddPhoneNumberInMenu();
-                }
-            }, 1000);
-        }
 	}
 
 	public void updateMyEmail(String email){
@@ -17707,6 +17695,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        return;
         }
         if(canVoluntaryVerifyPhoneNumber()) {
+            if(megaApi.isAchievementsEnabled()) {
+                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+                addPhoneNumberLabel.setText(message);
+            } else {
+                addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
+            }
             navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
         } else {
             navigationDrawerAddPhoneContainer.setVisibility(View.GONE);

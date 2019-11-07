@@ -19,18 +19,27 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.utils.Constants;
+import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.getSizeString;
 
 
-public class SMSVerificationFragment extends Fragment implements View.OnClickListener {
+public class SMSVerificationFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface {
 
     private Context context;
 
     private ManagerActivityLollipop managerActivity;
 
     private MegaApiJava megaApi;
+
+    private String bonusStorageSMS = "20 GB";
+
+    private TextView msg;
 
 
     @Nullable
@@ -43,14 +52,15 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
         megaApi = MegaApplication.getInstance().getMegaApi();
 
         View v = inflater.inflate(R.layout.fragment_sms_verification, container, false);
-        TextView msg = v.findViewById(R.id.sv_dialog_msg);
+        msg = v.findViewById(R.id.sv_dialog_msg);
         v.findViewById(R.id.enable_button).setOnClickListener(this);
         v.findViewById(R.id.not_now_button_2).setOnClickListener(this);
 
         boolean isAchievementUser = megaApi.isAchievementsEnabled();
         logDebug("is achievement user: " + isAchievementUser);
         if (isAchievementUser) {
-            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), ManagerActivityLollipop.BONUS_STORAGE_SPACE_SMS);
+            megaApi.getAccountAchievements(this);
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
             msg.setText(message);
         } else {
             msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
@@ -86,6 +96,32 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
                 fadeOut();
                 break;
         }
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        if(request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                bonusStorageSMS = getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE));
+            }
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+            msg.setText(message);
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
     }
 
     private void fadeOut() {

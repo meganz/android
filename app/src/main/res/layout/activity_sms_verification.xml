@@ -30,7 +30,6 @@
 		          android:layout_width="match_parent"
 		          android:layout_height="wrap_content"
 		          android:padding="24dp"
-		          android:text="@string/verify_account_helper_locked"
 		          android:textSize="16sp"/>
 		<RelativeLayout android:id="@+id/verify_account_country_selector"
 		                android:layout_width="match_parent"

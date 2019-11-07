@@ -21,10 +21,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -53,7 +53,8 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     private ArrayList<String> countryCodeList;
     private boolean pendingSelectingCountryCode = false;
     private String inferredCountryCode;
-    
+    private String bonusStorageSMS = "20 GB";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +90,8 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             boolean isAchievementUser = megaApi.isAchievementsEnabled();
             logDebug("Is achievement user: " + isAchievementUser);
             if (isAchievementUser) {
-                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), ManagerActivityLollipop.BONUS_STORAGE_SPACE_SMS);
+                megaApi.getAccountAchievements(this);
+                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
                 helperText.setText(message);
             } else {
                 helperText.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
@@ -378,6 +380,14 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);
                 showPhoneNumberValidationError(errorMessage);
             }
+        }
+
+        if(request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                bonusStorageSMS = getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE));
+            }
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+            helperText.setText(message);
         }
 
         if (request.getType() == MegaRequest.TYPE_GET_COUNTRY_CALLING_CODES) {
