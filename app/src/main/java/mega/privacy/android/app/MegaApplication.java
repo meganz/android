@@ -87,6 +87,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -98,7 +99,6 @@ import static mega.privacy.android.app.utils.Util.*;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	final private static int INITIAL_SOUND_LEVEL = 10;
 	static final public String USER_AGENT = "MEGAAndroid/3.7.2_266";
 
 	DatabaseHandler dbH;
@@ -112,7 +112,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	MyAccountInfo myAccountInfo;
 	boolean esid = false;
 
-	private int storageState = MegaApiJava.STORAGE_STATE_GREEN; //Default value
+	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
@@ -322,7 +322,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				logDebug ("Account details request");
 				if (e.getErrorCode() == MegaError.API_OK){
 
-					dbH.setAccountDetailsTimeStamp();
+					boolean storage = (request.getNumDetails() & myAccountInfo.hasStorageDetails) != 0;
+					if (storage) {
+						dbH.setAccountDetailsTimeStamp();
+					}
 
 					if(myAccountInfo!=null && request.getMegaAccountDetails()!=null){
 						myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
@@ -441,6 +444,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
 
+        storageState = dbH.getStorageState();
+
 		setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		boolean staging = false;
@@ -546,7 +551,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
             public void onReceive(Context context,Intent intent) {
                 if (intent != null) {
                     if (intent.getAction() == ACTION_LOG_OUT) {
-                        storageState = MegaApiJava.STORAGE_STATE_GREEN; //Default value
+                        storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
                     }
                 }
             }
@@ -594,7 +599,13 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void askForFullAccountInfo(){
 		logDebug("askForFullAccountInfo");
 		megaApi.getPaymentMethods(null);
-		megaApi.getAccountDetails(null);
+
+		if (storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN) {
+			megaApi.getAccountDetails();
+		} else {
+			megaApi.getSpecificAccountDetails(false, true, true);
+		}
+
 		megaApi.getPricing(null);
 		megaApi.creditCardQuerySubscriptions(null);
 	}
@@ -628,6 +639,24 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			dbH.resetExtendedAccountDetailsTimestamp();
 		}
 		megaApi.getExtendedAccountDetails(true,false, false, null);
+	}
+
+	public void refreshAccountInfo(){
+		//Check if the call is recently
+		if(callToAccountDetails(context) || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
+			logDebug("megaApi.getAccountDetails SEND");
+			askForAccountDetails();
+		}
+
+		if(callToExtendedAccountDetails(context)){
+			logDebug("megaApi.getExtendedAccountDetails SEND");
+			askForExtendedAccountDetails();
+		}
+
+		if(callToPaymentMethods(context)){
+			logDebug("megaApi.getPaymentMethods SEND");
+			askForPaymentMethods();
+		}
 	}
 
 	static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator) {
@@ -1372,13 +1401,16 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			int state = (int) event.getNumber();
 			if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
 				api.getAccountDetails(null);
-			}
-			else {
-				storageState = state;
-				Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-				intent.setAction(ACTION_STORAGE_STATE_CHANGED);
-				intent.putExtra("state", state);
-				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+			} else {
+				dbH.setStorageState(state);
+				if(state != storageState) {
+					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+					intent.setAction(ACTION_STORAGE_STATE_CHANGED);
+					intent.putExtra(EXTRA_STORAGE_STATE, state);
+					LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
+					storageState = state;
+				}
 			}
 		}
 	}
