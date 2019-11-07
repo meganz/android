@@ -17584,11 +17584,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public boolean isValidSearchQuery() {
-		if (searchQuery == null || searchQuery.isEmpty()) {
-			return false;
-		}
-
-		return true;
+		return searchQuery != null && !searchQuery.isEmpty();
 	}
 
 	public void openSearchNode(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
@@ -17597,6 +17593,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				case CLOUD_DRIVE: {
 					setParentHandleBrowser(node.getHandle());
 					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+					if (cloudPageAdapter != null) {
+						cloudPageAdapter.notifyDataSetChanged();
+					}
 					break;
 				}
 				case SHARED_ITEMS: {
@@ -17672,7 +17671,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void setTextSubmitted () {
 	    if (searchView != null) {
-	    	if (searchQuery == null || searchQuery.isEmpty()) {
+	    	if (!isValidSearchQuery()) {
 				searchExpand = false;
 				return;
 			}

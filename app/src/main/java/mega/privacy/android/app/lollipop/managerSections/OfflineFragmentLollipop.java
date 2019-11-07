@@ -95,7 +95,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 	private MegaOfflineLollipopAdapter adapter;
 	private DatabaseHandler dbH = null;
-	private ArrayList<MegaOffline> mOffList= null;
+	private ArrayList<MegaOffline> mOffList = null;
 	private String pathNavigation = null;
 	private int orderGetChildren;
 	private MegaApiAndroid megaApi;
@@ -585,7 +585,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 
 		mOffList = dbH.findByPath(pathNavigation);
-		setNodes(mOffList);
+		orderNodes();
 		return v;
 	}
 
@@ -652,7 +652,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 				((ManagerActivityLollipop)context).setToolbarTitle();
 
-				mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
+				mOffList = dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);

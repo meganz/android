@@ -6,6 +6,8 @@ import java.util.Collections;
 import mega.privacy.android.app.MegaOffline;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.MegaOffline.*;
+
 public class SortUtil {
 
     public static void sortByMailDescending(ArrayList<MegaNode> nodes){
@@ -164,7 +166,7 @@ public class SortUtil {
             if (node == null) {
                 continue;
             }
-            if (node.getType().equals("1")) {
+            if (node.getType().equals(FOLDER)) {
                 foldersOrder.add(node.getName());
             } else {
                 filesOrder.add(node.getName());
