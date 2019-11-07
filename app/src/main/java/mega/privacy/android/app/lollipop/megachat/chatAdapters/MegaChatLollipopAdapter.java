@@ -568,14 +568,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         //        TextView meText;
         TextView timeOwnText;
         RelativeLayout contentOwnMessageLayout;
-        EmojiTextView contentOwnMessageText;
+        private EmojiTextView contentOwnMessageText;
 
         //Own rich links
         RelativeLayout urlOwnMessageLayout;
         RelativeLayout urlOwnMessageTextrl;
         RelativeLayout forwardOwnRichLinks;
 
-        EmojiTextView urlOwnMessageText;
+        private EmojiTextView urlOwnMessageText;
         LinearLayout urlOwnMessageWarningButtonsLayout;
         Button neverRichLinkButton;
         Button alwaysAllowRichLinkButton;
@@ -604,7 +604,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         //Contact's rich links
         RelativeLayout urlContactMessageLayout;
-        EmojiTextView urlContactMessageText;
+        private EmojiTextView urlContactMessageText;
         RelativeLayout urlContactMessageTitleLayout;
         TextView urlContactMessageTitle;
         TextView urlContactMessageDescription;
@@ -697,7 +697,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         private EmojiTextView contactInitialLetter;
 
         RelativeLayout contentContactMessageLayout;
-        EmojiTextView contentContactMessageText;
+        private EmojiTextView contentContactMessageText;
 
         RoundedImageView contentContactMessageThumbLand;
         RelativeLayout gradientContactMessageThumbLand;
@@ -738,10 +738,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ImageView iconContactTypeDocPortraitPreview;
 
         RelativeLayout ownManagementMessageLayout;
-        EmojiTextView ownManagementMessageText;
+        private EmojiTextView ownManagementMessageText;
         ImageView ownManagementMessageIcon;
 
-        EmojiTextView contactManagementMessageText;
+        private EmojiTextView contactManagementMessageText;
         ImageView contactManagementMessageIcon;
         RelativeLayout contactManagementMessageLayout;
 
@@ -845,6 +845,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageLayout = v.findViewById(R.id.content_own_message_layout);
             holder.contentOwnMessageText = v.findViewById(R.id.content_own_message_text);
+            holder.contentOwnMessageText.setNeccessaryShortCode(false);
 
             //Own rich links message
             holder.urlOwnMessageLayout = v.findViewById(R.id.url_own_message_layout);
@@ -859,6 +860,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardOwnRichLinks.setVisibility(View.GONE);
 
             holder.urlOwnMessageText = v.findViewById(R.id.url_own_message_text);
+            holder.urlOwnMessageText.setNeccessaryShortCode(false);
             holder.urlOwnMessageText.setTag(holder);
 
             holder.urlOwnMessageWarningButtonsLayout = v.findViewById(R.id.url_own_message_buttons_warning_layout);
@@ -975,6 +977,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageContactLayoutAvatar = v.findViewById(R.id.content_own_message_contact_layout_avatar);
             holder.contentOwnMessageContactThumb = v.findViewById(R.id.content_own_message_contact_thumb);
             holder.contentOwnMessageContactName = v.findViewById(R.id.content_own_message_contact_name);
+            holder.contentOwnMessageContactName.setNeccessaryShortCode(false);
             holder.contentOwnMessageContactEmail = v.findViewById(R.id.content_own_message_contact_email);
 
             holder.contentOwnMessageContactInitialLetter = v.findViewById(R.id.content_own_message_contact_initial_letter);
@@ -1016,6 +1019,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardOwnLandscape.setOnClickListener(this);
 
             holder.ownManagementMessageText = v.findViewById(R.id.own_management_message_text);
+            holder.ownManagementMessageText.setNeccessaryShortCode(false);
             holder.ownManagementMessageLayout = v.findViewById(R.id.own_management_message_layout);
             holder.ownManagementMessageIcon = v.findViewById(R.id.own_management_message_icon);
 
@@ -1033,6 +1037,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageLayout = v.findViewById(R.id.content_contact_message_layout);
             holder.contentContactMessageText = v.findViewById(R.id.content_contact_message_text);
+            holder.contentContactMessageText.setNeccessaryShortCode(false);
             holder.contentContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape);
 
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
@@ -1054,6 +1059,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardContactRichLinks.setVisibility(View.GONE);
 
             holder.urlContactMessageText = v.findViewById(R.id.url_contact_message_text);
+            holder.urlContactMessageText.setNeccessaryShortCode(false);
             holder.urlContactMessageText.setTag(holder);
 
             holder.urlContactMessageTitleLayout = v.findViewById(R.id.url_contact_message_enable_layout_inside);
@@ -1141,6 +1147,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageContactLayoutAvatar = v.findViewById(R.id.content_contact_message_contact_layout_avatar);
             holder.contentContactMessageContactThumb = v.findViewById(R.id.content_contact_message_contact_thumb);
             holder.contentContactMessageContactName = v.findViewById(R.id.content_contact_message_contact_name);
+            holder.contentContactMessageContactName.setNeccessaryShortCode(false);
             holder.contentContactMessageContactEmail = v.findViewById(R.id.content_contact_message_contact_email);
             holder.contentContactMessageContactInitialLetter = v.findViewById(R.id.content_contact_message_contact_initial_letter);
             holder.contentContactMessageContactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
@@ -1150,6 +1157,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contactManagementMessageLayout = v.findViewById(R.id.contact_management_message_layout);
             holder.contactManagementMessageText = v.findViewById(R.id.contact_management_message_text);
+            holder.contactManagementMessageText.setNeccessaryShortCode(false);
             holder.contactManagementMessageIcon = v.findViewById(R.id.contact_management_message_icon);
 
             //Location message
@@ -5788,7 +5796,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } else {
                 //Show default avatar with userCount
                 StringBuilder name = new StringBuilder("");
-                name.append(converterShortCodes(message.getUserName(0)));
+                name.append(message.getUserName(0));
                 for (int i = 1; i < userCount; i++) {
                     name.append(", " + message.getUserName(i));
                 }
@@ -8584,7 +8592,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (chatRoom.isGroup()) {
             holder.fullNameTitle = getContactMessageName(pos, holder, handle);
             holder.nameContactText.setVisibility(View.VISIBLE);
-            holder.nameContactText.setText(converterShortCodes(holder.fullNameTitle));
+            holder.nameContactText.setText(holder.fullNameTitle);
         }
         else {
             holder.fullNameTitle = chatRoom.getTitle();

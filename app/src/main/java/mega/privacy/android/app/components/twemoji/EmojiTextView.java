@@ -25,6 +25,8 @@ import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.ChatUtil.*;
+
 public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface {
 
     public static final int LAST_MESSAGE_TEXTVIEW_WIDTH = 190;
@@ -34,6 +36,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     private Display display;
     private DisplayMetrics mOutMetrics = new DisplayMetrics();
     private int textViewMaxWidth;
+    private boolean neccessaryShortCode = true;
 
     public EmojiTextView(final Context context) {
         this(context, null);
@@ -80,10 +83,12 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         setText(getText());
     }
 
-
     @Override
     public void setText(CharSequence rawText, BufferType type) {
         CharSequence text = rawText == null ? "" : rawText;
+        if(isNeccessaryShortCode()){
+            text = converterShortCodes(text.toString());
+        }
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
         Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
         float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
@@ -101,6 +106,14 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             super.setText(spannableStringBuilder, type);
         }
 
+    }
+
+    public boolean isNeccessaryShortCode() {
+        return neccessaryShortCode;
+    }
+
+    public void setNeccessaryShortCode(boolean neccessaryShortCode) {
+        this.neccessaryShortCode = neccessaryShortCode;
     }
 
     @Override

@@ -1188,7 +1188,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 setPreviewersView();
-                titleToolbar.setText(converterShortCodes(chatRoom.getTitle()));
+                titleToolbar.setText(chatRoom.getTitle());
                 setChatSubtitle();
 
                 if (!chatRoom.isPublic()) {
@@ -1541,10 +1541,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 customSubtitle.append(", ");
             }
 
-            String participantName = converterShortCodes(chatRoom.getPeerFirstname(i));
+            String participantName = chatRoom.getPeerFirstname(i);
             if(participantName==null){
                 //Get the lastname
-                String participantLastName = converterShortCodes(chatRoom.getPeerLastname(i));
+                String participantLastName = chatRoom.getPeerLastname(i);
                 if(participantLastName==null){
                     //Get the email
                     String participantEmail = chatRoom.getPeerEmail(i);
@@ -1565,7 +1565,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 if(participantName.trim().isEmpty()){
                     //Get the lastname
-                    String participantLastName = converterShortCodes(chatRoom.getPeerLastname(i));
+                    String participantLastName = chatRoom.getPeerLastname(i);
                     if(participantLastName==null){
                         //Get the email
                         String participantEmail = chatRoom.getPeerEmail(i);
@@ -5329,7 +5329,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("Change of chat title");
             String newTitle = msg.getContent();
             if(newTitle!=null){
-                titleToolbar.setText(converterShortCodes(newTitle));
+                titleToolbar.setText(newTitle);
             }
         }
         else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
