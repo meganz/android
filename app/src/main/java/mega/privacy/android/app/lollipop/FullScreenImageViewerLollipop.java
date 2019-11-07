@@ -108,8 +108,10 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
+import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
+import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -1173,18 +1175,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			fileNameTextView.setText(new File(paths.get(positionG)).getName());
 		}
 		else if(adapterType == SEARCH_ADAPTER){
-
-			ArrayList<MegaNode> nodes = null;
-			if (parentNodeHandle == -1){
-				String query = intent.getStringExtra("searchQuery");
-				nodes = megaApi.search(query,ORDER_DEFAULT_ASC);
-			}
-			else{
-				parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
-				nodes = megaApi.getChildren(parentNode, orderGetChildren);
-			}
-
-			getImageHandles(nodes, savedInstanceState);
+			ArrayList<String> serialized = intent.getStringArrayListExtra(ARRAY_SEARCH);
+			getImageHandles(getSearchedNodes(serialized), savedInstanceState);
 		}else if(adapterType == SEARCH_BY_ADAPTER){
 			handlesNodesSearched = intent.getLongArrayExtra("handlesNodesSearch");
 

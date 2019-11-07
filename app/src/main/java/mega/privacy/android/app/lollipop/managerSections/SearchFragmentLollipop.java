@@ -77,6 +77,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class SearchFragmentLollipop extends RotatableFragment{
 
+	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
+
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
 	public static ImageView imageDrag;
@@ -693,7 +695,13 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		this.context = context;
 	}
 
-
+	private void serializeNodes(Intent intent) {
+		ArrayList<String> serialized = new ArrayList<>();
+		for (MegaNode node : nodes) {
+			serialized.add(node.serialize());
+		}
+		intent.putExtra(ARRAY_SEARCH, serialized);
+	}
 	
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		logDebug("Position: " + position);
@@ -755,6 +763,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
+					serializeNodes(intent);
 					context.startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 					imageDrag = imageView;
@@ -792,6 +801,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("screenPosition", screenPosition);
+					serializeNodes(mediaIntent);
 
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());

@@ -269,4 +269,14 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
             recyclerView.setVisibility(View.VISIBLE);
         }
     }
+
+    public static ArrayList<MegaNode> getSearchedNodes(ArrayList<String> serialized) {
+        ArrayList<MegaNode> nodes = new ArrayList<>();
+
+        for (String serialize : serialized) {
+            nodes.add(MegaNode.unserialize(serialize));
+        }
+
+        return nodes;
+    }
 }

@@ -151,8 +151,10 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
+import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
+import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -848,17 +850,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             else if(adapterType == SEARCH_ADAPTER){
                 mediaHandles = new ArrayList<>();
-
-                ArrayList<MegaNode> nodes = null;
-                if (parentNodeHandle == -1){
-                    nodes = megaApi.search(query, MegaApiJava.ORDER_DEFAULT_ASC);
-                }
-                else{
-                    parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
-                    nodes = megaApi.getChildren(parentNode, orderGetChildren);
-                }
-
-                getMediaHandles(nodes);
+                ArrayList<String> serialized = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
+                getMediaHandles(getSearchedNodes(serialized));
             }
             else if(adapterType == FILE_LINK_ADAPTER){
                 if (currentDocument != null) {
