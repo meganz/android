@@ -482,4 +482,9 @@ public class ChatUtil {
                 return  String.valueOf(status);
         }
     }
+
+    public static String converterShortCodes(String text){
+        return EmojiUtilsShortcodes.emojify(text);
+    }
+
 }

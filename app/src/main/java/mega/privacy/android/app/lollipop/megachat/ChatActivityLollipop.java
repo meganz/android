@@ -608,10 +608,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         privateIconToolbar.setVisibility(View.GONE);
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
-
         updateNavigationToolbarIcon();
-
-
 
         joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
         joinButton = findViewById(R.id.join_button);
@@ -1191,7 +1188,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 setPreviewersView();
-                titleToolbar.setText(chatRoom.getTitle());
+                titleToolbar.setText(converterShortCodes(chatRoom.getTitle()));
                 setChatSubtitle();
 
                 if (!chatRoom.isPublic()) {
@@ -1544,10 +1541,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 customSubtitle.append(", ");
             }
 
-            String participantName = chatRoom.getPeerFirstname(i);
+            String participantName = converterShortCodes(chatRoom.getPeerFirstname(i));
             if(participantName==null){
                 //Get the lastname
-                String participantLastName = chatRoom.getPeerLastname(i);
+                String participantLastName = converterShortCodes(chatRoom.getPeerLastname(i));
                 if(participantLastName==null){
                     //Get the email
                     String participantEmail = chatRoom.getPeerEmail(i);
@@ -1568,7 +1565,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 if(participantName.trim().isEmpty()){
                     //Get the lastname
-                    String participantLastName = chatRoom.getPeerLastname(i);
+                    String participantLastName = converterShortCodes(chatRoom.getPeerLastname(i));
                     if(participantLastName==null){
                         //Get the email
                         String participantEmail = chatRoom.getPeerEmail(i);
@@ -5332,7 +5329,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("Change of chat title");
             String newTitle = msg.getContent();
             if(newTitle!=null){
-                titleToolbar.setText(newTitle);
+                titleToolbar.setText(converterShortCodes(newTitle));
             }
         }
         else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){

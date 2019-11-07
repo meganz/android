@@ -89,7 +89,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.isVoiceClip;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -649,7 +648,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout contentOwnMessageContactLayoutAvatar;
         RoundedImageView contentOwnMessageContactThumb;
         private EmojiTextView contentOwnMessageContactName;
-        public TextView contentOwnMessageContactEmail;
+        public EmojiTextView contentOwnMessageContactEmail;
         private EmojiTextView contentOwnMessageContactInitialLetter;
         RelativeLayout forwardOwnContact;
 
@@ -727,7 +726,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout contentContactMessageContactLayoutAvatar;
         RoundedImageView contentContactMessageContactThumb;
         private EmojiTextView contentContactMessageContactName;
-        public TextView contentContactMessageContactEmail;
+        public EmojiTextView contentContactMessageContactEmail;
         private EmojiTextView contentContactMessageContactInitialLetter;
 
         RelativeLayout contentContactMessageVoiceClipLayout;
@@ -2090,7 +2089,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-
     public void bindAlterParticipantsMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         logDebug("bindAlterParticipantsMessage");
         ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.GONE);
@@ -2125,10 +2123,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 logDebug("I was added");
 
                 if(message.getUserHandle() == message.getHandleOfAction()){
-                    textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(megaChatApi.getMyFullname()));
+                    textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), converterShortCodes(toCDATA(megaChatApi.getMyFullname())));
                 }
                 else{
-                    textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(megaChatApi.getMyFullname()), toCDATA(fullNameAction));
+                    textToShow = String.format(context.getString(R.string.message_add_participant), converterShortCodes(toCDATA(megaChatApi.getMyFullname())), converterShortCodes(toCDATA(fullNameAction)));
                 }
 
                 try {
@@ -2144,7 +2142,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 logDebug("I was removed or left");
                 if (message.getUserHandle() == message.getHandleOfAction()) {
                     logDebug("I left the chat");
-                    textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), toCDATA(megaChatApi.getMyFullname()));
+                    textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), converterShortCodes(toCDATA(megaChatApi.getMyFullname())));
                     try {
                         textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
@@ -2153,7 +2151,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     } catch (Exception e) {
                     }
                 } else {
-                    textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(megaChatApi.getMyFullname()), toCDATA(fullNameAction));
+                    textToShow = String.format(context.getString(R.string.message_remove_participant), converterShortCodes(toCDATA(megaChatApi.getMyFullname())), converterShortCodes(toCDATA(fullNameAction)));
                     try {
                         textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
@@ -2265,10 +2263,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     logDebug("By me");
 
                     if(message.getUserHandle() == message.getHandleOfAction()){
-                        textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(holder.fullNameTitle));
+                        textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), converterShortCodes(toCDATA(holder.fullNameTitle)));
                     }
                     else{
-                        textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle), toCDATA(megaChatApi.getMyFullname()));
+                        textToShow = String.format(context.getString(R.string.message_add_participant), converterShortCodes(toCDATA(holder.fullNameTitle)), converterShortCodes(toCDATA(megaChatApi.getMyFullname())));
                     }
 
                     try {
@@ -2286,10 +2284,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
 
                     if(message.getUserHandle() == message.getHandleOfAction()){
-                        textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
+                        textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), converterShortCodes(toCDATA(holder.fullNameTitle)));
                     }
                     else{
-                        textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle), toCDATA(fullNameAction));
+                        textToShow = String.format(context.getString(R.string.message_add_participant), converterShortCodes(toCDATA(holder.fullNameTitle)), converterShortCodes(toCDATA(fullNameAction)));
                     }
 
                     try {
@@ -2307,7 +2305,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             else {
                 logDebug("Participant was removed or left");
                 if (message.getUserHandle() == myUserHandle) {
-                    textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle), toCDATA(megaChatApi.getMyFullname()));
+                    textToShow = String.format(context.getString(R.string.message_remove_participant), converterShortCodes(toCDATA(holder.fullNameTitle)), converterShortCodes(toCDATA(megaChatApi.getMyFullname())));
                     try {
                         textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
@@ -2322,7 +2320,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (message.getUserHandle() == message.getHandleOfAction()) {
                         logDebug("The participant left the chat");
 
-                        textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
+                        textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), converterShortCodes(toCDATA(holder.fullNameTitle)));
                         try {
                             textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                             textToShow = textToShow.replace("[/A]", "</font>");
@@ -2335,7 +2333,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         logDebug("The participant was removed");
                         String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
 
-                        textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle), toCDATA(fullNameAction));
+                        textToShow = String.format(context.getString(R.string.message_remove_participant), converterShortCodes(toCDATA(holder.fullNameTitle)), converterShortCodes(toCDATA(fullNameAction)));
                         try {
                             textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                             textToShow = textToShow.replace("[/A]", "</font>");
@@ -2405,7 +2403,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (message.getUserHandle() == myUserHandle) {
                 logDebug("I changed my Own permission");
-                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(megaChatApi.getMyFullname()), toCDATA(privilegeString), toCDATA(megaChatApi.getMyFullname()));
+                textToShow = String.format(context.getString(R.string.message_permissions_changed), converterShortCodes(toCDATA(megaChatApi.getMyFullname())), toCDATA(privilegeString), converterShortCodes(toCDATA(megaChatApi.getMyFullname())));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -2423,7 +2421,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 logDebug("I was change by someone");
                 String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
 
-                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(megaChatApi.getMyFullname()), toCDATA(privilegeString), toCDATA(fullNameAction));
+                textToShow = String.format(context.getString(R.string.message_permissions_changed), converterShortCodes(toCDATA(megaChatApi.getMyFullname())), toCDATA(privilegeString), converterShortCodes(toCDATA(fullNameAction)));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -2550,7 +2548,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             String textToShow = "";
             if (message.getUserHandle() == myUserHandle) {
                 logDebug("The privilege was change by me");
-                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(holder.fullNameTitle), toCDATA(privilegeString), toCDATA(megaChatApi.getMyFullname()));
+                textToShow = String.format(context.getString(R.string.message_permissions_changed), converterShortCodes(toCDATA(holder.fullNameTitle)), toCDATA(privilegeString), converterShortCodes(toCDATA(megaChatApi.getMyFullname())));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -2569,7 +2567,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 logDebug("By other");
                 String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
 
-                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(holder.fullNameTitle), toCDATA(privilegeString), toCDATA(fullNameAction));
+                textToShow = String.format(context.getString(R.string.message_permissions_changed), converterShortCodes(toCDATA(holder.fullNameTitle)), toCDATA(privilegeString), converterShortCodes(toCDATA(fullNameAction)));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -3119,7 +3117,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return null;
     }
 
-
     private Bitmap getResizeBitmap (Bitmap originalBitmap) {
         if (originalBitmap == null) return null;
 
@@ -3496,8 +3493,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
             holder.urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
+            String messageContent = "";
+
+            if (message.getContent() != null) {
+                messageContent = converterShortCodes(message.getContent());
+            }
+
             if (message.isEdited()) {
-                Spannable content = new SpannableString(message.getContent());
+                Spannable content = new SpannableString(messageContent);
                 int status = message.getStatus();
                 if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
                     logDebug("Show triangle retry!");
@@ -3528,7 +3531,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 SimpleSpanBuilder ssb = null;
 
                 try {
-                    RTFFormatter formatter = new RTFFormatter(message.getContent(), context);
+                    RTFFormatter formatter = new RTFFormatter(messageContent, context);
                     ssb = formatter.setRTFFormat();
                 } catch (Exception e) {
                     logError("FORMATTER EXCEPTION!!!", e);
@@ -3550,15 +3553,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.append(edited);
                 }
 
-                checkEmojiSize(message.getContent(), holder.contentOwnMessageText);
+                checkEmojiSize(messageContent, holder.contentOwnMessageText);
 
             } else {
 
                 SimpleSpanBuilder ssb = null;
 
                 try {
-                    if (message.getContent() != null) {
-                        RTFFormatter formatter = new RTFFormatter(message.getContent(), context);
+                    if (messageContent != null) {
+
+                        RTFFormatter formatter = new RTFFormatter(messageContent, context);
                         ssb = formatter.setRTFFormat();
                     }
                 } catch (Exception e) {
@@ -3591,12 +3595,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).forwardOwnRichLinks.setVisibility(View.VISIBLE);
                 }
 
-                checkEmojiSize(message.getContent(), holder.urlOwnMessageText);
+                checkEmojiSize(messageContent, holder.urlOwnMessageText);
 
                 if (ssb != null) {
                     holder.urlOwnMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                 } else {
-                    holder.urlOwnMessageText.setText(message.getContent());
+                    holder.urlOwnMessageText.setText(messageContent);
                 }
             }
 
@@ -3744,12 +3748,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             String messageContent = "";
+
+            if (message.getContent() != null) {
+                messageContent = converterShortCodes(message.getContent());
+            }
+
             if (message.isEdited()) {
                 logDebug("Message is edited");
 
-                if (message.getContent() != null) {
-                    messageContent = message.getContent();
-                }
 
                 SimpleSpanBuilder ssb = null;
                 try {
@@ -3793,9 +3799,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             } else {
 
-                if (message.getContent() != null) {
-                    messageContent = message.getContent();
-                }
 
                 //Color always status SENT
                 ((ViewHolderMessageChat) holder).urlContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
@@ -4017,7 +4020,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             String messageContent = "";
 
             if (message.getContent() != null) {
-                messageContent = message.getContent();
+                messageContent = converterShortCodes(message.getContent());
             }
 
             int lastPosition = messages.size();
@@ -4164,6 +4167,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 if(ssb!=null){
+
                     ssb.append(" "+context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), new StyleSpan(Typeface.ITALIC));
                     ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                 }
@@ -4376,7 +4380,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 String messageContent = "";
                 if (message.getContent() != null) {
-                    messageContent = message.getContent();
+                    messageContent = converterShortCodes(message.getContent());
                 }
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat) holder).urlContactMessageLayout.setVisibility(View.GONE);
@@ -5291,8 +5295,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
 
-
-
     public void bindVoiceClipAttachmentMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int positionInAdapter) {
         logDebug("positionInAdapter: " + positionInAdapter);
 
@@ -5769,6 +5771,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageContactEmail.setMaxWidth((int) width);
             }
             holder.contentOwnMessageContactName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+            holder.contentOwnMessageContactEmail.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
 
             long userCount = message.getUsersCount();
 
@@ -5779,13 +5782,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     name = message.getUserEmail(0);
                 }
                 String email = message.getUserEmail(0);
-                holder.contentOwnMessageContactName.setText(name);
+                holder.contentOwnMessageContactName.setText(converterShortCodes(name));
                 holder.contentOwnMessageContactEmail.setText(email);
                 setUserAvatar(holder, message);
             } else {
                 //Show default avatar with userCount
                 StringBuilder name = new StringBuilder("");
-                name.append(message.getUserName(0));
+                name.append(converterShortCodes(message.getUserName(0)));
                 for (int i = 1; i < userCount; i++) {
                     name.append(", " + message.getUserName(i));
                 }
@@ -5889,8 +5892,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             holder.contentContactMessageContactName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
-
-
+            holder.contentContactMessageContactEmail.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
 
             long userCount = message.getUsersCount();
 
@@ -5901,14 +5903,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     name = message.getUserEmail(0);
                 }
                 String email = message.getUserEmail(0);
-                holder.contentContactMessageContactName.setText(name);
+                holder.contentContactMessageContactName.setText(converterShortCodes(name));
                 holder.contentContactMessageContactEmail.setText(email);
                 setUserAvatar(holder, message);
 
             } else {
                 //Show default avatar with userCount
                 StringBuilder name = new StringBuilder("");
-                name.append(message.getUserName(0));
+                name.append(converterShortCodes(message.getUserName(0)));
                 for (int i = 1; i < userCount; i++) {
                     name.append(", " + message.getUserName(i));
                 }
@@ -5978,7 +5980,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             String messageContent = message.getContent();
 
-            String textToShow = String.format(context.getString(R.string.change_title_messages),toCDATA( megaChatApi.getMyFullname()), toCDATA(messageContent));
+            String textToShow = String.format(context.getString(R.string.change_title_messages), converterShortCodes(toCDATA( megaChatApi.getMyFullname())), converterShortCodes(toCDATA(messageContent)));
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
@@ -6088,7 +6090,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             String messageContent = message.getContent();
 
-            String textToShow = String.format(context.getString(R.string.change_title_messages), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle), toCDATA(messageContent));
+            String textToShow = String.format(context.getString(R.string.change_title_messages), converterShortCodes(toCDATA(holder.fullNameTitle)), converterShortCodes(toCDATA(messageContent)));
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
@@ -6169,7 +6171,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         String textToShow = "";
         int messageType = message.getType();
         if(messageType == MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE){
-            textToShow = String.format(context.getString(R.string.message_created_chat_link), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
+            textToShow = String.format(context.getString(R.string.message_created_chat_link), converterShortCodes(toCDATA(holder.fullNameTitle)));
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
@@ -6181,7 +6183,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
         else if(messageType == MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE){
-            textToShow = String.format(context.getString(R.string.message_deleted_chat_link), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
+            textToShow = String.format(context.getString(R.string.message_deleted_chat_link), converterShortCodes(toCDATA(holder.fullNameTitle)));
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
@@ -6193,7 +6195,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
         else{
-            textToShow = String.format(context.getString(R.string.message_set_chat_private), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
+            textToShow = String.format(context.getString(R.string.message_set_chat_private), converterShortCodes(toCDATA(holder.fullNameTitle)));
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
@@ -6240,20 +6242,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
-            String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(megaChatApi.getMyFullname()));
+            ((ViewHolderMessageChat) holder).ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+
+            String textToShow = String.format(context.getString(R.string.history_cleared_by), converterShortCodes(toCDATA(megaChatApi.getMyFullname())));
+
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#00BFA5\'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
                 textToShow = textToShow.replace("[/B]", "</font>");
             } catch (Exception e) {
             }
+
             Spanned result = null;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
             } else {
                 result = Html.fromHtml(textToShow);
             }
+
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
 
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
@@ -6342,7 +6349,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
+            String textToShow = String.format(context.getString(R.string.history_cleared_by), converterShortCodes(toCDATA(holder.fullNameTitle)));
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
@@ -8577,7 +8584,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (chatRoom.isGroup()) {
             holder.fullNameTitle = getContactMessageName(pos, holder, handle);
             holder.nameContactText.setVisibility(View.VISIBLE);
-            holder.nameContactText.setText(holder.fullNameTitle);
+            holder.nameContactText.setText(converterShortCodes(holder.fullNameTitle));
         }
         else {
             holder.fullNameTitle = chatRoom.getTitle();

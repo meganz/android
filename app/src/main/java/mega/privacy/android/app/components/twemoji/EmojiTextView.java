@@ -16,7 +16,6 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
@@ -81,11 +80,11 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         setText(getText());
     }
 
+
     @Override
     public void setText(CharSequence rawText, BufferType type) {
         CharSequence text = rawText == null ? "" : rawText;
-        String resultText = EmojiUtilsShortcodes.emojify(text.toString());
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultText);
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
         Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
         float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
         EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
