@@ -451,6 +451,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     };
 
+    private BroadcastReceiver chatArchivedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+
+            String title = intent.getStringExtra(CHAT_TITLE);
+            sendBroadcastChatArchived(title);
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
@@ -549,6 +559,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         LocalBroadcastManager.getInstance(this).registerReceiver(dialogConnectReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
         LocalBroadcastManager.getInstance(this).registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
@@ -6925,7 +6936,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 if(request.getFlag()){
                     logDebug("Chat archived");
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.success_archive_chat, chatTitle), -1);
+                    sendBroadcastChatArchived(chatTitle);
                 }
                 else{
                     logDebug("Chat unarchived");
@@ -7056,6 +7067,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(voiceclipDownloadedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);
@@ -8297,5 +8309,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void setShareLinkDialogDismissed (boolean dismissed) {
         isShareLinkDialogDismissed = dismissed;
+    }
+
+    private void sendBroadcastChatArchived(String chatTitle) {
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED);
+        intent.putExtra(CHAT_TITLE, chatTitle);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        closeChat(true);
+        finish();
     }
 }
