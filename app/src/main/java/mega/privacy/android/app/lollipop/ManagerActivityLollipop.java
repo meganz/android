@@ -3259,12 +3259,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		updateAccountDetailsVisibleInfo();
 
 		setContactStatus();
-		new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                showAddPhoneNumberInMenu();
-            }
-        }, 100);
+        showAddPhoneNumberInMenu();
 
 
         if (firstTimeAfterInstallation) {
@@ -4643,12 +4638,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			firstTimeAfterInstallation = false;
             dbH.setFirstTime(false);
 		}
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                checkBeforeShow();
-            }
-        }, 100);
+        checkBeforeShow();
     }
 
     public void checkBeforeShow() {
@@ -15784,7 +15774,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	@Override
 	public void onEvent(MegaApiJava api, MegaEvent event) {
+	    if(event.getType() == MegaEvent.EVENT_MISC_FLAGS_READY) {
 
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    checkBeforeShow();
+                    showAddPhoneNumberInMenu();
+                }
+            }, 1000);
+        }
 	}
 
 	public void updateMyEmail(String email){
