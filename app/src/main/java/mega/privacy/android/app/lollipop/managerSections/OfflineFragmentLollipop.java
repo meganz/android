@@ -78,6 +78,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineFragmentLollipop extends RotatableFragment{
 
+	public static final String ARRAY_OFFLINE = "ARRAY_OFFLINE";
+
 	public static ImageView imageDrag;
 	public static final String REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list";
 	
@@ -693,9 +695,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						intent.putExtra("adapterType", OFFLINE_ADAPTER);
 						intent.putExtra("parentNodeHandle", -1L);
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
-						intent.putExtra("pathNavigation", pathNavigation);
-						intent.putExtra("orderGetChildren", orderGetChildren);
 						intent.putExtra("screenPosition", screenPosition);
+						intent.putExtra(ARRAY_OFFLINE, mOffList);
 
 						startActivity(intent);
 						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
@@ -728,9 +729,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 						mediaIntent.putExtra("position", position);
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 						mediaIntent.putExtra("offlinePathDirectory", currentFile.getParent());
-						mediaIntent.putExtra("pathNavigation", pathNavigation);
-						mediaIntent.putExtra("orderGetChildren", orderGetChildren);
 						mediaIntent.putExtra("screenPosition", screenPosition);
+						mediaIntent.putExtra(ARRAY_OFFLINE, mOffList);
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
