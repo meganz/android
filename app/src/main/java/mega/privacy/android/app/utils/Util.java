@@ -93,6 +93,14 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_III_MONTH;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_III_YEAR;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_II_MONTH;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_II_YEAR;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_I_MONTH;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_I_YEAR;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_LITE_MONTH;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_LITE_YEAR;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
@@ -1687,6 +1695,43 @@ public class Util {
         }
         return true;
     }
+
+	public static String getSubscriptionRenewalType(Context context, String sku) {
+		switch (sku){
+			case SKU_PRO_LITE_MONTH:
+			case SKU_PRO_I_MONTH:
+			case SKU_PRO_II_MONTH:
+			case SKU_PRO_III_MONTH:
+				return context.getString(R.string.subscription_type_monthly);
+			case SKU_PRO_LITE_YEAR:
+			case SKU_PRO_I_YEAR:
+			case SKU_PRO_II_YEAR:
+			case SKU_PRO_III_YEAR:
+				return context.getString(R.string.subscription_type_yearly);
+			default:
+				return "";
+
+		}
+	}
+
+	public static String getSubscriptionType(Context context, String sku) {
+		switch (sku) {
+			case SKU_PRO_LITE_MONTH:
+			case SKU_PRO_LITE_YEAR:
+				return context.getString(R.string.prolite_account);
+			case SKU_PRO_I_MONTH:
+			case SKU_PRO_I_YEAR:
+				return context.getString(R.string.pro1_account);
+			case SKU_PRO_II_MONTH:
+			case SKU_PRO_II_YEAR:
+				return context.getString(R.string.pro2_account);
+			case SKU_PRO_III_MONTH:
+			case SKU_PRO_III_YEAR:
+				return context.getString(R.string.pro3_account);
+			default:
+				return "";
+		}
+	}
 
     public static void showKeyboardDelayed(final View view) {
 		logDebug("showKeyboardDelayed");

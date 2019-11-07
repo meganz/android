@@ -497,6 +497,11 @@
     -->
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Thank you for your feedback! Are you sure you want to cancel your MEGA subscription?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Your subscription has not been cancelled. Please provide a reason for your cancellation</string>
+    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Thank you for subscribing to %1$s %2$s!</string>
+    <string name="subscription_type_monthly" context="">Monthly</string>
+    <string name="subscription_type_yearly" context="">Yearly</string>
+
+    <string name="error_subscription_purchased_already" context="error message when user wants to purchase subscription he already on">You have purchased this subscription already.</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">The folder is now private</string>
 

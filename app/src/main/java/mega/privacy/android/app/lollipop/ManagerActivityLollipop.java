@@ -207,6 +207,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1195,18 +1196,28 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	@Override
 	public void onPurchasesUpdated(int resultCode, List<Purchase> purchases) {
+		String message = null;
 		switch (resultCode) {
 			case BillingClient.BillingResponseCode.OK:
 				updateAccountInfo(purchases);
-				showSnackBar(this, SNACKBAR_TYPE, "Thanks for buying...", -1);
+				if (highestGooglePlaySubscription != null) {
+					String sku = highestGooglePlaySubscription.getSku();
+					message = getString(R.string.message_user_purchased_subscription,
+							getSubscriptionType(this, sku),
+							getSubscriptionRenewalType(this, sku));
+				}
 				break;
 			case BillingClient.BillingResponseCode.USER_CANCELED:
-				return;
+				break;
 			case BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED:
-				showSnackBar(this, SNACKBAR_TYPE, "Brought already", -1);
-				return;
+				message = getString(R.string.error_subscription_purchased_already);
+				break;
 			default:
-				showSnackBar(this, SNACKBAR_TYPE, "Something goes wrong, please try again...", -1);
+				message = getString(R.string.general_text_error);
+		}
+
+		if(!TextUtil.isTextEmpty(message)){
+			showAlert(this, message, null);
 		}
 	}
 
