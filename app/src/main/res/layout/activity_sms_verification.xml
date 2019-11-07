@@ -51,7 +51,7 @@
 			          android:layout_marginLeft="8dp"
 			          android:layout_marginBottom="5dp"
 			          android:layout_toRightOf="@+id/verify_account_country_icon"
-			          android:text="@string/verify_account_counry_label"
+			          android:text="@string/general_country_label"
 			          android:textColor="@color/accentColor"
 			          android:visibility="gone"
 			/>
@@ -60,7 +60,7 @@
 			          android:layout_marginLeft="8dp"
 			          android:layout_marginTop="22dp"
 			          android:layout_toRightOf="@+id/verify_account_country_icon"
-			          android:text="@string/verify_account_counry_label"
+			          android:text="@string/general_country_label"
 			          android:textSize="14sp"
 			/>
 			<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -161,7 +161,7 @@
 				android:paddingRight="16dp"
 				android:paddingBottom="10dp"
 				android:layout_marginLeft="10dp"
-				android:text="@string/verify_account_next_button"
+				android:text="@string/general_next"
 				android:textColor="@color/white"/>
 
 			<TextView

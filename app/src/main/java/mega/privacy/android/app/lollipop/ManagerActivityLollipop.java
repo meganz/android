@@ -258,8 +258,10 @@ import static mega.privacy.android.app.utils.Util.*;
 public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
-	private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
-	private final String INDEX_CLOUD = "INDEX_CLOUD";
+    private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
+    private final String INDEX_CLOUD = "INDEX_CLOUD";
+
+    public static final String BONUS_STORAGE_SPACE_SMS = "20GB";
 
 	private final int ERROR_TAB = -1;
 	private final int CLOUD_TAB = 0;
@@ -386,8 +388,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private LinearLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
-
-    private int newStorageState = -1;
 
     float elevation = 0;
 
@@ -2282,11 +2282,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
         addPhoneNumberButton.setOnClickListener(this);
 
-        addPhoneNumberLabel = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_label);
+        addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
         boolean isAchievementUser = megaApi.isAchievementsEnabled();
         logDebug("is achievement user: " + isAchievementUser);
         if (isAchievementUser) {
-            addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_achievement_user);
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), BONUS_STORAGE_SPACE_SMS);
+            addPhoneNumberLabel.setText(message);
         } else {
             addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
         }
@@ -3418,13 +3419,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
 		selectDrawerItemLollipop(drawerItem);
-
-		// onboarding process finishes, check storage state.
-        firstTimeAfterInstallation = false;
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-        intent.setAction(ACTION_STORAGE_STATE_CHANGED);
-        intent.putExtra("state", newStorageState);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
 	void setContactStatus() {
@@ -13757,7 +13751,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         boolean isAchievementUser = megaApi.isAchievementsEnabled();
         logDebug("is achievement user: " + isAchievementUser);
         if (isAchievementUser) {
-            msg.setText(R.string.sms_add_phone_number_dialog_msg_achievement_user);
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), BONUS_STORAGE_SPACE_SMS);
+            msg.setText(message);
         } else {
             msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
         }

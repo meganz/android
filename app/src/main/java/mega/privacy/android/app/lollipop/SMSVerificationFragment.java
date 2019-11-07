@@ -50,7 +50,8 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
         boolean isAchievementUser = megaApi.isAchievementsEnabled();
         logDebug("is achievement user: " + isAchievementUser);
         if (isAchievementUser) {
-            msg.setText(R.string.sms_add_phone_number_dialog_msg_achievement_user);
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), ManagerActivityLollipop.BONUS_STORAGE_SPACE_SMS);
+            msg.setText(message);
         } else {
             msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
         }

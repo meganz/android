@@ -101,7 +101,7 @@
 
     <string name="action_settings" context="Menu item">Settings</string>
     <string name="action_search" context="Search button">Search</string>
-    <string name="action_search_country" context="Select country page title">SELECT COUNTRY</string>
+    <string name="action_search_country" context="Select country page title">Select country</string>
     <string name="action_play" context="Search button">Play</string>
     <string name="action_pause" context="Search button">Pause</string>
     <string name="action_refresh" context="Menu item">Refresh</string>
@@ -670,17 +670,13 @@
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Always ask for download location</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
-	<string name="navigation_drawer_add_phone_number_label" context="label of button in navigation drawer that ask user to add their phone number">Add phone number</string>
-	<string name="navigation_drawer_add_phone_number_helper" context="Text to explain the benefits of adding phone number">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you one MEGA</string>
 	<string name="verify_account_title" context="Title of verify phone number page">Verify your account</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
-	<string name="verify_account_helper_add_new" context="Text to explain the benefits of adding phone number">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
-	<string name="verify_account_counry_label" context="Country list button label">Country</string>
+    <string name="general_country_label" context="Country label for a button, title, etc.">Country</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>
-	<string name="verify_account_next_button" context="button label - go to next page">Next</string>
-	<string name="verify_account_back_button" context="button label - go to previous page">Back</string>
+    <string name="general_back_button" context="Button label - go to previous page">Back</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
-	<string name="verify_account_confirm_button" context="button label - submit verification code">Confirm</string>
+    <string name="general_confirm_button" context="Button label - confirm some action">Confirm</string>
 	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
     <string name="verify_account_not_loading_country_code" context="error message if the country code cannot be fetched">Country codes could not be fetched.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
@@ -689,10 +685,11 @@
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Verify your account</string>
 	<string name="verify_account_incorrect_code" context="error message when user entered an incorrect verification code">Wrong code. Please try again or resend.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">You didn\'t receive a code?</string>
-	<string name="verify_account_resend_button" context="label for resend verification code button">&#160;Resend</string>
+    <string name="general_resend_button" context="Label for resend button">Resend</string>
 	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a Mega account.</string>
 	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
-	<string name="verify_account_verify_limit" context="error message that will show to user when per code to be verified more than twice">Only two attempts to verify per code</string>
+	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">The verification code doesn\'t match.</string>
+	<string name="verify_account_verify_limit" context="error message that will show to user when provide a verification code which doesn\'t match.">Only two attempts to verify per code</string>
 	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
 	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
 	<string name="verify_account_successfully" context="verify phone number successfully">Your phone number has been verified successfully</string>
@@ -2568,11 +2565,8 @@
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Me</string>
 
-    <string name="sms_add_phone_number_dialog_title" context="Dialog title for adding phone number">Add phone number</string>
-    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get free %1$s when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
-    <string name="sms_add_phone_number_dialog_btn_add" context="Dialog button add phone number">ADD</string>
-    <string name="sms_add_phone_number_dialog_btn_not_now" context="Dialog button don't add phone number for now">NOT NOW</string>
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 

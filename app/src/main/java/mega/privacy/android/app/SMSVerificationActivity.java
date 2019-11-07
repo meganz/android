@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
@@ -22,9 +21,9 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -57,7 +56,6 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        logDebug("SMSVerificationActivity onCreate");
         super.onCreate(savedInstanceState);
         MegaApplication.smsVerifyShowed(true);
         setContentView(R.layout.activity_sms_verification);
@@ -65,7 +63,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         if (intent != null) {
             isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED,false);
         }
-        logDebug("is user locked " + isUserLocked);
+        logDebug("Is user locked " + isUserLocked);
 
         //divider
         divider1 = findViewById(R.id.verify_account_divider1);
@@ -89,9 +87,10 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             helperText.setText(text);
         } else {
             boolean isAchievementUser = megaApi.isAchievementsEnabled();
-            logDebug("is achievement user: " + isAchievementUser);
+            logDebug("Is achievement user: " + isAchievementUser);
             if (isAchievementUser) {
-                helperText.setText(R.string.sms_add_phone_number_dialog_msg_achievement_user);
+                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), ManagerActivityLollipop.BONUS_STORAGE_SPACE_SMS);
+                helperText.setText(message);
             } else {
                 helperText.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
             }
@@ -129,8 +128,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             
             @Override
             public void afterTextChanged(Editable s) {
-                String input = s.toString();
-                int inputLength = input == null ? 0 : input.length();
+                int inputLength = s == null ? 0 : s.toString().length();
                 if (inputLength > 0) {
                     titlePhoneNumber.setTextColor(Color.parseColor("#FF00BFA5"));
                     titlePhoneNumber.setVisibility(View.VISIBLE);
@@ -225,7 +223,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     protected void onActivityResult(int requestCode,int resultCode,Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
         if (requestCode == Constants.REQUEST_CODE_COUNTRY_PICKER && resultCode == RESULT_OK) {
-            logDebug("onActivityResult REQUEST_CODE_COUNTRY_PICKER OK");
+            logDebug("REQUEST_CODE_COUNTRY_PICKER OK");
             selectedCountryCode = data.getStringExtra(COUNTRY_CODE);
             selectedCountryName = data.getStringExtra(COUNTRY_NAME);
             selectedDialCode = data.getStringExtra(DIAL_CODE);
@@ -238,36 +236,33 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             selectedCountry.setTextColor(Color.parseColor("#DE000000"));
             divider1.setBackgroundColor(Color.parseColor("#8A000000"));
         } else if (requestCode == Constants.REQUEST_CODE_VERIFY_CODE && resultCode == RESULT_OK) {
-            logDebug("onActivityResult REQUEST_CODE_VERIFY_CODE OK");
+            logDebug("REQUEST_CODE_VERIFY_CODE OK");
             setResult(RESULT_OK);
             finish();
         }
     }
     
     private void launchCountryPicker() {
-        logDebug("launchCountryPicker");
         Intent intent = new Intent(getApplicationContext(),CountryCodePickerActivityLollipop.class);
         intent.putStringArrayListExtra("country_code", this.countryCodeList);
         startActivityForResult(intent, Constants.REQUEST_CODE_COUNTRY_PICKER);
     }
     
     private void nextButtonClicked() {
-        logDebug("nextButtonClicked");
         hideKeyboard(this);
         hideError();
         validateFields();
         if (isPhoneNumberValid && isSelectedCountryValid) {
-            logDebug("nextButtonClicked no error");
             hideError();
             RequestTxt();
         } else {
+            logWarning("Phone number or country code is invalid.");
             showCountryCodeValidationError();
             showPhoneNumberValidationError(null);
         }
     }
     
     private void validateFields() {
-        logDebug("validateFields");
         //validate phone number
         String phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumberInput.getText().toString(),selectedCountryCode);
         if(phoneNumber != null){
@@ -276,14 +271,10 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             phoneNumberInput.setHint("");
             isPhoneNumberValid = false;
         }
+
+        isSelectedCountryValid = selectedDialCode != null && selectedDialCode.length() >= 3;
         
-        if (selectedDialCode != null && selectedDialCode.length() >= 3) {
-            isSelectedCountryValid = true;
-        } else {
-            isSelectedCountryValid = false;
-        }
-        
-        logDebug("validateFields isSelectedCountryValid " + isSelectedCountryValid + " isPhoneNumberValid " + isPhoneNumberValid);
+        logDebug("isSelectedCountryValid: " + isSelectedCountryValid + " , isPhoneNumberValid: " + isPhoneNumberValid);
     }
     
     private void showCountryCodeValidationError() {
@@ -291,9 +282,9 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             if(selectedDialCode == null) {
                 selectedCountry.setText("");
             } else {
-                selectedCountry.setText(R.string.verify_account_counry_label);
+                selectedCountry.setText(R.string.general_country_label);
             }
-            logDebug("show invalid country error");
+            logWarning("Invalid country code");
             errorInvalidCountryCode.setVisibility(View.VISIBLE);
             titleCountryCode.setVisibility(View.VISIBLE);
             titleCountryCode.setTextColor(Color.parseColor("#FFFF333A"));
@@ -303,7 +294,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     
     private void showPhoneNumberValidationError(String errorMessage) {
         if (!isPhoneNumberValid) {
-            logDebug("show invalid phone number error");
+            logWarning("Invalid phone number: " + errorMessage);
             errorInvalidPhoneNumber.setVisibility(View.VISIBLE);
             errorInvalidPhoneNumberIcon.setVisibility(View.VISIBLE);
             titlePhoneNumber.setVisibility(View.VISIBLE);
@@ -316,7 +307,6 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     }
     
     private void hideError() {
-        logDebug("hide Errors");
         errorInvalidCountryCode.setVisibility(View.GONE);
         errorInvalidPhoneNumber.setVisibility(View.GONE);
         errorInvalidPhoneNumberIcon.setVisibility(View.GONE);
@@ -327,11 +317,11 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     }
     
     private void RequestTxt() {
-        logDebug("RequestTxt shouldDisableNextButton is " + shouldDisableNextButton);
+        logDebug("shouldDisableNextButton is " + shouldDisableNextButton);
         if(!shouldDisableNextButton){
             nextButton.setBackground(getDrawable(R.drawable.background_button_disable));
             String phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumberInput.getText().toString(),selectedCountryCode);
-            logDebug(" RequestTxt phone number is " + phoneNumber);
+            logDebug("Phone number is " + phoneNumber);
             shouldDisableNextButton = true;
             megaApi.sendSMSVerificationCode(phoneNumber,this);
         }
@@ -355,7 +345,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         if (request.getType() == MegaRequest.TYPE_SEND_SMS_VERIFICATIONCODE) {
             logDebug("send phone number,get code" + e.getErrorCode());
             if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("will receive sms");
+                logDebug("The SMS verification request has been sent successfully.");
                 String enteredPhoneNumber = phoneNumberInput.getText().toString();
                 Intent intent = new Intent(this,SMSVerificationReceiveTxtActivity.class);
                 intent.putExtra(SELECTED_COUNTRY_CODE,selectedDialCode);
@@ -363,27 +353,27 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 intent.putExtra(NAME_USER_LOCKED,isUserLocked);
                 startActivityForResult(intent,REQUEST_CODE_VERIFY_CODE);
             } else if (e.getErrorCode() == MegaError.API_ETEMPUNAVAIL) {
-                logDebug("reached limitation.");
+                logWarning("Reached daily limitation.");
                 errorInvalidPhoneNumber.setVisibility(View.VISIBLE);
                 errorInvalidPhoneNumber.setTextColor(Color.parseColor("#FFFF333A"));
                 errorInvalidPhoneNumber.setText(R.string.verify_account_error_reach_limit);
             } else if (e.getErrorCode() == MegaError.API_EACCESS) {
-                logDebug("already verified");
+                logWarning("The account is already verified with an SMS number.");
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);
                 showPhoneNumberValidationError(errorMessage);
             }else if (e.getErrorCode() == MegaError.API_EARGS) {
-                logDebug("Invalid phone number");
+                logWarning("Invalid phone number");
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);
                 showPhoneNumberValidationError(errorMessage);
             } else if (e.getErrorCode() == MegaError.API_EEXIST) {
-                logDebug("Phone number has been registered");
+                logWarning("The phone number is already verified for some other account.");
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_error_phone_number_register);
                 showPhoneNumberValidationError(errorMessage);
             } else {
-                logDebug("sms TYPE_SEND_SMS_VERIFICATIONCODE " + e.getErrorString());
+                logWarning("Request TYPE_SEND_SMS_VERIFICATIONCODE error: " + e.getErrorString());
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);
                 showPhoneNumberValidationError(errorMessage);
@@ -420,7 +410,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                     pendingSelectingCountryCode = false;
                 }
             } else {
-                logDebug("the country code is not responded correctly");
+                logWarning("The country code is not responded correctly");
                 Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.verify_account_not_loading_country_code), -1);
             }
         }

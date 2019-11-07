@@ -304,7 +304,7 @@
 			          android:paddingTop="10dp"
 			          android:paddingRight="16dp"
 			          android:paddingBottom="10dp"
-			          android:text="@string/navigation_drawer_add_phone_number_label"
+			          android:text="@string/add_phone_number_label"
 			          android:textAllCaps="true"
 			          android:textColor="@color/accentColor"
 			          android:textSize="14sp"
@@ -314,7 +314,6 @@
 		          android:layout_width="wrap_content"
 		          android:layout_height="wrap_content"
 		          android:layout_marginLeft="72dp"
-		          android:text="@string/navigation_drawer_add_phone_number_helper"
 		          android:textSize="11sp"/>
 	</LinearLayout>
 

@@ -6,9 +6,9 @@ import android.content.SharedPreferences;
 
 public class LastShowSMSDialogTimeChecker {
 
-    public static final int WEEK = 7 * 24 * 60 * 60 * 1000;
-    public static final String LAST_SHOW_SMS_FILE = "last_show_sms_timestamp_sp";
-    public static final String LAST_SHOW_SMS_KEY = "last_show_sms_timestamp";
+    private static final int WEEK = 7 * 24 * 60 * 60 * 1000;
+    private static final String LAST_SHOW_SMS_FILE = "last_show_sms_timestamp_sp";
+    private static final String LAST_SHOW_SMS_KEY = "last_show_sms_timestamp";
 
     private SharedPreferences sp;
 

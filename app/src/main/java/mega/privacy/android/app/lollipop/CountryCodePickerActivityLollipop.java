@@ -93,7 +93,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
-        actionBar.setTitle(getString(R.string.action_search_country));
+        actionBar.setTitle(getString(R.string.action_search_country).toUpperCase());
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(Util.mutateIcon(this,R.drawable.ic_arrow_back_white,R.color.black));

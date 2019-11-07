@@ -155,7 +155,7 @@
 			android:paddingTop="10dp"
 			android:paddingRight="16dp"
 			android:paddingBottom="10dp"
-			android:text="@string/verify_account_confirm_button"
+			android:text="@string/general_confirm_button"
 			android:textColor="@color/white"/>
 		<TextView
 			android:id="@+id/verify_account_back_button"
@@ -169,7 +169,7 @@
 			android:paddingTop="10dp"
 			android:paddingRight="16dp"
 			android:paddingBottom="10dp"
-			android:text="@string/verify_account_back_button"
+			android:text="@string/general_back_button"
 			android:textAllCaps="true"
 			android:textColor="@color/accentColor"
 			android:textStyle="bold"/>

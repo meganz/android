@@ -17,7 +17,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="25dp"
-                android:text="@string/sms_add_phone_number_dialog_title"
+                android:text="@string/add_phone_number_label"
                 android:textColor="@color/name_my_account"
                 android:textStyle="bold"
                 android:textSize="18sp"/>
@@ -57,7 +57,8 @@
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     android:stateListAnimator="@null"
-                    android:text="@string/sms_add_phone_number_dialog_btn_not_now"/>
+                    android:textAllCaps="true"
+                    android:text="@string/verify_account_not_now_button"/>
                 <Button
                     android:id="@+id/sv_btn_horizontal_add"
                     style="@style/Button"
@@ -69,7 +70,8 @@
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     android:stateListAnimator="@null"
-                    android:text="@string/sms_add_phone_number_dialog_btn_add"/>
+                    android:textAllCaps="true"
+                    android:text="@string/general_add"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

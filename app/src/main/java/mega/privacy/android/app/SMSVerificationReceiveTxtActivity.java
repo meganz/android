@@ -78,11 +78,9 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(getResources().getString(R.string.verify_account_enter_code_title).toUpperCase());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getColor(R.color.dark_primary_color));
-        }
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(getResources().getColor(R.color.dark_primary_color));
 
         //labels
         Intent intent = getIntent();
@@ -98,7 +96,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         resendTextView = findViewById(R.id.verify_account_resend);
         String text = getResources().getString(R.string.verify_account_resend_label);
         int start = text.length();
-        text += getResources().getString(R.string.verify_account_resend_button);
+        text += (" " + getString(R.string.general_resend_button));
         int end = text.length();
         SpannableString spanString = new SpannableString(text);
         ClickableSpan clickableSpan = new ClickableSpan() {
@@ -596,7 +594,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         sixthPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
         pinError.setVisibility(View.VISIBLE);
         if (errorMessage != null) {
-            logDebug("error message is " + errorMessage);
+            logWarning("Error message is: " + errorMessage);
             pinError.setText(errorMessage);
         }
     }
@@ -665,12 +663,17 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         if (request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
             logDebug("send verification code,get " +  e.getErrorCode());
             if (e.getErrorCode() == MegaError.API_EEXPIRED) {
-                logDebug("the code has been verified.");
+                logWarning("The code has been already verified.");
                 showError(getString(R.string.verify_account_error_code_verified));
             } else if (e.getErrorCode() == MegaError.API_EACCESS) {
+                logWarning("You have reached the verification limits.");
                 showError(getString(R.string.verify_account_error_reach_limit));
             } else if (e.getErrorCode() == MegaError.API_EEXIST) {
+                logWarning("This number is already associated with an account.");
                 showError(getString(R.string.verify_account_error_phone_number_register));
+            } else if(e.getErrorCode() == MegaError.API_EFAILED) {
+                logWarning("The verification code does not match.");
+                showError(getString(R.string.verify_account_error_wrong_code));
             } else if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("verification successful");
                 Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER);
@@ -697,7 +700,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                     }
                 }, 2000);
             } else {
-                logDebug("invalid code");
+                logWarning("Invalid code");
                 showError(getString(R.string.verify_account_error_invalid_code));
             }
         }

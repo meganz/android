@@ -58,7 +58,7 @@ public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.
         CountryCodePickerActivityLollipop.Country country = getItem(position);
         String name = country.getName();
         String code =country.getCode();
-        String nameAndCode = name + "(" +code +  ")";
+        String nameAndCode = name + " (" + code +  ")";
         holder.nameAndCode.setTag(code);
         holder.nameAndCode.setText(nameAndCode);
     }
