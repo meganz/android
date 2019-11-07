@@ -68,9 +68,9 @@ public class BillingManager implements PurchasesUpdatedListener {
     public interface BillingUpdatesListener {
         void onBillingClientSetupFinished();
 
-        void onConsumeFinished(String token, @BillingResponseCode int result);
-
         void onPurchasesUpdated(int resultCode, List<Purchase> purchases);
+
+        void onQueryPurchasesFinished(int resultCode, List<Purchase> purchases);
     }
 
     public BillingManager(Activity activity, final BillingUpdatesListener updatesListener) {
@@ -102,11 +102,8 @@ public class BillingManager implements PurchasesUpdatedListener {
     public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
         int resultCode = billingResult.getResponseCode();
         log("Purchases updated, response code is " + resultCode);
-        if (resultCode == BillingResponseCode.OK && purchases != null) {
-            for (Purchase purchase : purchases) {
-                handlePurchase(purchase);
-            }
-            log("total purchased are: " + mPurchases.size());
+        if (resultCode == BillingResponseCode.OK) {
+            handlePurchaseList(purchases);
         }
         mBillingUpdatesListener.onPurchasesUpdated(resultCode, mPurchases);
     }
@@ -165,6 +162,16 @@ public class BillingManager implements PurchasesUpdatedListener {
         executeServiceRequest(queryRequest);
     }
 
+    private void handlePurchaseList(List<Purchase> purchases) {
+        if (purchases == null) {
+            return;
+        }
+        for (Purchase purchase : purchases) {
+            handlePurchase(purchase);
+        }
+        log("total purchased are: " + mPurchases.size());
+    }
+
     /**
      * Handles the purchase
      * <p>Note: Notice that for each purchase, we check if signature is valid on the client.
@@ -217,7 +224,13 @@ public class BillingManager implements PurchasesUpdatedListener {
 
         // Update the UI and purchases inventory with new list of purchases
         mPurchases.clear();
-        onPurchasesUpdated(result.getBillingResult(), result.getPurchasesList());
+
+        int resultCode = result.getResponseCode();
+        log("Purchases updated, response code is " + resultCode);
+        if (resultCode == BillingResponseCode.OK) {
+            handlePurchaseList(result.getPurchasesList());
+        }
+        mBillingUpdatesListener.onQueryPurchasesFinished(resultCode, mPurchases);
     }
 
     /**

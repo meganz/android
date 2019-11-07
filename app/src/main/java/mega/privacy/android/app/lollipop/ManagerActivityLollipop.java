@@ -1137,43 +1137,43 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	};
 
 	// SKU for our subscription PRO_I monthly
-    public static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
-    // SKU for our subscription PRO_I yearly
+	public static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
+	// SKU for our subscription PRO_I yearly
 	public static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
-    // SKU for our subscription PRO_II monthly
+	// SKU for our subscription PRO_II monthly
 	public static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
-    // SKU for our subscription PRO_II yearly
+	// SKU for our subscription PRO_II yearly
 	public static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
-    // SKU for our subscription PRO_III monthly
+	// SKU for our subscription PRO_III monthly
 	public static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
-    // SKU for our subscription PRO_III yearly
+	// SKU for our subscription PRO_III yearly
 	public static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
-    // SKU for our subscription PRO_LITE monthly
+	// SKU for our subscription PRO_LITE monthly
 	public static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
-    // SKU for our subscription PRO_LITE yearly
+	// SKU for our subscription PRO_LITE yearly
 	public static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
 
-    public void launchPayment(String productId){
+	public void launchPayment(String productId) {
 		//start purchase/subscription flow
 		SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
 		String oldSku = highestGooglePlaySubscription == null ? null : highestGooglePlaySubscription.getSku();
 		mBillingManager.initiatePurchaseFlow(oldSku, skuDetails);
-    }
-
-    private SkuDetails getSkuDetails(List<SkuDetails> list, String key){
-    	if (list == null || list.isEmpty()){
-    		return null;
-		}
-
-    	for(SkuDetails details : list){
-    		if(details.getSku().equals(key)){
-    			return details;
-			}
-		}
-    	return null;
 	}
 
-    public void initGooglePlayPayments(){
+	private SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
+		if (list == null || list.isEmpty()) {
+			return null;
+		}
+
+		for (SkuDetails details : list) {
+			if (details.getSku().equals(key)) {
+				return details;
+			}
+		}
+		return null;
+	}
+
+	public void initGooglePlayPayments() {
 		mBillingManager = new BillingManager(this, this);
 	}
 
@@ -1184,19 +1184,33 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	@Override
-	public void onConsumeFinished(String token, int result) {
-		//todo need to confirm if we have such cases
-	}
-
-	@Override
-	public void onPurchasesUpdated(int resultCode, List<Purchase> purchases) {
-		//todo update ui, e.g. disable purchased option, notify api and so on
-		//todo if user purchased, show alert to welcome
+	public void onQueryPurchasesFinished(int resultCode, List<Purchase> purchases) {
 		if (resultCode != BillingClient.BillingResponseCode.OK || purchases == null) {
 			logWarning("onPurchasesUpdated failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
 			return;
 		}
 
+		updateAccountInfo(purchases);
+	}
+
+	@Override
+	public void onPurchasesUpdated(int resultCode, List<Purchase> purchases) {
+		switch (resultCode) {
+			case BillingClient.BillingResponseCode.OK:
+				updateAccountInfo(purchases);
+				showSnackBar(this, SNACKBAR_TYPE, "Thanks for buying...", -1);
+				break;
+			case BillingClient.BillingResponseCode.USER_CANCELED:
+				return;
+			case BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED:
+				showSnackBar(this, SNACKBAR_TYPE, "Brought already", -1);
+				return;
+			default:
+				showSnackBar(this, SNACKBAR_TYPE, "Something goes wrong, please try again...", -1);
+		}
+	}
+
+	private void updateAccountInfo(List<Purchase> purchases) {
 		MyAccountInfo myAccountInfo = app.getMyAccountInfo();
 		for (Purchase purchase : purchases) {
 			logDebug("purchased (JSON): " + purchase.getOriginalJson());
@@ -1234,9 +1248,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					myAccountInfo.setProIIIYearly(purchase);
 					break;
 			}
+
+			//we should only have single purchase once
+			highestGooglePlaySubscription = purchase;
 		}
 
 		myAccountInfo.setInventoryFinished(true);
+
 		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 		if (upAFL != null) {
 			upAFL.setPricing();
@@ -1250,15 +1268,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("getLevelAccountDetails: " + myAccountInfo.getLevelAccountDetails() +
 				"; getLevelInventory: " + myAccountInfo.getLevelInventory() +
 				"; isAccountDetailsFinished: " + myAccountInfo.isAccountDetailsFinished());
+
 		updateSubscriptionLevel(myAccountInfo);
 	}
 
-	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo){
+	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo) {
 		if (myAccountInfo.isAccountDetailsFinished()
 				&& myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()
 				&& highestGooglePlaySubscription != null) {
 			if (dbH == null) {
-				dbH = DatabaseHandler.getDbHandler(managerActivity);
+				dbH = DatabaseHandler.getDbHandler(this);
 			}
 
 			MegaAttributes attributes = dbH.getAttributes();
@@ -1266,17 +1285,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			long lastPublicHandle = getLastPublicHandle(attributes);
 			String json = highestGooglePlaySubscription.getOriginalJson();
 			if (lastPublicHandle == -1) {
-				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, managerActivity);
+				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, this);
 			} else {
-				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, lastPublicHandle, managerActivity);
+				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, lastPublicHandle, this);
 			}
 		}
 	}
 
-
-	private void getInventory(){
-		//todo yuan get subscription and one off?
-		List<String> inAppSkus = new ArrayList<>();
+	private void getInventory() {
 		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
 			@Override
 			public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
@@ -1289,6 +1305,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
+		List<String> inAppSkus = new ArrayList<>();
 		inAppSkus.add(SKU_PRO_I_MONTH);
 		inAppSkus.add(SKU_PRO_I_YEAR);
 		inAppSkus.add(SKU_PRO_II_MONTH);
@@ -1298,6 +1315,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		inAppSkus.add(SKU_PRO_LITE_MONTH);
 		inAppSkus.add(SKU_PRO_LITE_YEAR);
 
+		//we only support subscription for google pay
 		mBillingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
 	}
 
