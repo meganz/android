@@ -1125,6 +1125,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				logDebug("date timestamp: "+date);
 				int maxAllowed = ChatUtil.getMaxAllowed(title);
 				((ViewHolderNormalChatList)holder).textViewContactName.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
+				title = converterShortCodes(title);
 				((ViewHolderNormalChatList)holder).textViewContactName.setText(title);
 
 				if(!chat.isGroup()){
@@ -1243,7 +1244,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			int messageType = chat.getLastMessageType();
 			MegaChatMessage lastMessage = megaChatApi.getMessage(chat.getChatId(), chat.getLastMessageId());
 			logDebug("MessageType: " + messageType);
-			String lastMessageString = chat.getLastMessage();
+			String lastMessageString = converterShortCodes(chat.getLastMessage());
 
             ((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
 
@@ -1312,10 +1313,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 
 						if(chat.getLastMessageSender() == chat.getLastMessageHandle()){
-							textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(myFullName));
+							textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), converterShortCodes(toCDATA(myFullName)));
 						}
 						else{
-							textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(myFullName), toCDATA(fullNameAction));
+							textToShow = String.format(context.getString(R.string.message_add_participant), converterShortCodes(toCDATA(myFullName)), converterShortCodes(toCDATA(fullNameAction)));
 						}
 
 						try{
@@ -1339,7 +1340,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(myFullName.trim().length()<=0){
 								myFullName = megaChatApi.getMyEmail();
 							}
-							textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), toCDATA(myFullName));
+							textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), converterShortCodes(toCDATA(myFullName)));
 							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1356,7 +1357,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(myFullName.trim().length()<=0){
 								myFullName = megaChatApi.getMyEmail();
 							}
-							textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(myFullName), toCDATA(fullNameAction));
+							textToShow = String.format(context.getString(R.string.message_remove_participant), converterShortCodes(toCDATA(myFullName)), converterShortCodes(toCDATA(fullNameAction)));
 							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1421,10 +1422,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							}
 
 							if(chat.getLastMessageSender() == chat.getLastMessageHandle()){
-								textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(fullNameTitle));
+								textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), converterShortCodes(toCDATA(fullNameTitle)));
 							}
 							else{
-								textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(fullNameTitle), toCDATA(myFullName));
+								textToShow = String.format(context.getString(R.string.message_add_participant), converterShortCodes(toCDATA(fullNameTitle)), converterShortCodes(toCDATA(myFullName)));
 							}
 							try{
 								textToShow = textToShow.replace("[A]", "");
@@ -1471,10 +1472,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							}
 
 							if(chat.getLastMessageSender() == chat.getLastMessageHandle()){
-								textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(fullNameTitle));
+								textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), converterShortCodes(toCDATA(fullNameTitle)));
 							}
 							else{
-								textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(fullNameTitle), toCDATA(fullNameAction));
+								textToShow = String.format(context.getString(R.string.message_add_participant), converterShortCodes(toCDATA(fullNameTitle)), converterShortCodes(toCDATA(fullNameAction)));
 							}
 
 							try{
@@ -1499,7 +1500,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(myFullName.trim().length()<=0){
 								myFullName = megaChatApi.getMyEmail();
 							}
-							textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(fullNameTitle), toCDATA(myFullName));
+							textToShow = String.format(context.getString(R.string.message_remove_participant), converterShortCodes(toCDATA(fullNameTitle)), converterShortCodes(toCDATA(myFullName)));
 							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1515,7 +1516,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(chat.getLastMessageSender()==chat.getLastMessageHandle()){
 								logDebug("The participant left the chat");
 
-								textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), toCDATA(fullNameTitle));
+								textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), converterShortCodes(toCDATA(fullNameTitle)));
 								try{
 									textToShow = textToShow.replace("[A]", "");
 									textToShow = textToShow.replace("[/A]", "");
@@ -1557,7 +1558,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 									}
 								}
 
-								textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(fullNameTitle), toCDATA(fullNameAction));
+								textToShow = String.format(context.getString(R.string.message_remove_participant), converterShortCodes(toCDATA(fullNameTitle)), converterShortCodes(toCDATA(fullNameAction)));
 								try{
 									textToShow = textToShow.replace("[A]", "");
 									textToShow = textToShow.replace("[/A]", "");
@@ -1618,7 +1619,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						if(myFullName.trim().length()<=0){
 							myFullName = megaChatApi.getMyEmail();
 						}
-						textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(myFullName), toCDATA(privilegeString), toCDATA(myFullName));
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), converterShortCodes(toCDATA(myFullName)), toCDATA(privilegeString), converterShortCodes(toCDATA(myFullName)));
 						try{
 							textToShow = textToShow.replace("[A]", "");
 							textToShow = textToShow.replace("[/A]", "");
@@ -1674,7 +1675,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							myFullName = megaChatApi.getMyEmail();
 						}
 
-						textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(myFullName), toCDATA(privilegeString), toCDATA(fullNameAction));
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), converterShortCodes(toCDATA(myFullName)), toCDATA(privilegeString), converterShortCodes(toCDATA(fullNameAction)));
 						try{
 							textToShow = textToShow.replace("[A]", "");
 							textToShow = textToShow.replace("[/A]", "");
@@ -1730,7 +1731,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						if(myFullName.trim().length()<=0){
 							myFullName = megaChatApi.getMyEmail();
 						}
-						textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(fullNameTitle), toCDATA(privilegeString), toCDATA(myFullName));
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), converterShortCodes(toCDATA(fullNameTitle)), toCDATA(privilegeString), converterShortCodes(toCDATA(myFullName)));
 						try{
 							textToShow = textToShow.replace("[A]", "");
 							textToShow = textToShow.replace("[/A]", "");
@@ -1779,7 +1780,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							}
 						}
 
-						textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(fullNameTitle), toCDATA(privilegeString), toCDATA(fullNameAction));
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), converterShortCodes(toCDATA(fullNameTitle)), toCDATA(privilegeString), converterShortCodes(toCDATA(fullNameAction)));
 						try{
 							textToShow = textToShow.replace("[A]", "");
 							textToShow = textToShow.replace("[/A]", "");
@@ -1819,7 +1820,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					if(myFullName.trim().length()<=0){
 						myFullName = megaChatApi.getMyEmail();
 					}
-					textToShow = String.format(context.getString(R.string.history_cleared_by),toCDATA(myFullName));
+					textToShow = String.format(context.getString(R.string.history_cleared_by),converterShortCodes(toCDATA(myFullName)));
 				}
 				else{
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
@@ -1855,7 +1856,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 					}
 
-					textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(fullNameAction));
+					textToShow = String.format(context.getString(R.string.history_cleared_by), converterShortCodes(toCDATA(fullNameAction)));
 				}
 
 				try{
@@ -1881,7 +1882,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				logDebug("Message type TYPE_PUBLIC_HANDLE_CREATE");
 				String fullNameAction = getFullNameAction(chat);
 
-				String textToShow = String.format(context.getString(R.string.message_created_chat_link), toCDATA(fullNameAction));
+				String textToShow = String.format(context.getString(R.string.message_created_chat_link), converterShortCodes(toCDATA(fullNameAction)));
 
 				try{
 					textToShow = textToShow.replace("[A]", "");
@@ -1906,7 +1907,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				logDebug("Message type TYPE_PUBLIC_HANDLE_DELETE");
 				String fullNameAction = getFullNameAction(chat);
 
-				String textToShow = String.format(context.getString(R.string.message_deleted_chat_link), toCDATA(fullNameAction));
+				String textToShow = String.format(context.getString(R.string.message_deleted_chat_link), converterShortCodes(toCDATA(fullNameAction)));
 
 				try{
 					textToShow = textToShow.replace("[A]", "");
@@ -1932,7 +1933,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				String fullNameAction = getFullNameAction(chat);
 
-				String textToShow = String.format(context.getString(R.string.message_set_chat_private), toCDATA(fullNameAction));
+				String textToShow = String.format(context.getString(R.string.message_set_chat_private), converterShortCodes(toCDATA(fullNameAction)));
 
 				try{
 					textToShow = textToShow.replace("[A]", "");
@@ -1960,7 +1961,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				String messageContent = chat.getLastMessage();
 				String fullNameAction = getFullNameAction(chat);
 
-				String textToShow = String.format(context.getString(R.string.change_title_messages), toCDATA(fullNameAction), messageContent);
+				String textToShow = String.format(context.getString(R.string.change_title_messages), converterShortCodes(toCDATA(fullNameAction)), converterShortCodes(messageContent));
 
 				try {
 					textToShow = textToShow.replace("[A]", "");
@@ -2163,7 +2164,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 							String fullNameAction = "";
 							if(chatRoom!=null){
-								fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+								fullNameAction = converterShortCodes(chatRoom.getPeerFirstnameByHandle(lastMsgSender));
 								if(fullNameAction==null){
 									fullNameAction = "";
 								}
@@ -2254,7 +2255,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 							String fullNameAction = "";
 							if(chatRoom!=null){
-								fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+								fullNameAction = converterShortCodes(chatRoom.getPeerFirstnameByHandle(lastMsgSender));
 								if(fullNameAction==null){
 									fullNameAction = "";
 								}
@@ -2292,7 +2293,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 							if(chat.getUnreadCount()==0){
 								logDebug("Message READ");
-
 								Spannable myMessage = new SpannableString(lastMessageString);
 								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 								CharSequence indexedText = TextUtils.concat(name, myMessage);
@@ -2346,7 +2346,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 							String fullNameAction = "";
 							if(chatRoom!=null){
-								fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+								fullNameAction = converterShortCodes(chatRoom.getPeerFirstnameByHandle(lastMsgSender));
 								if(fullNameAction==null){
 									fullNameAction = "";
 								}
@@ -2413,7 +2413,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			} else if (messageType == MegaChatMessage.TYPE_CONTACT_ATTACHMENT && lastMessage != null && lastMessage.getUsersCount() > 1) {
 				long contactsCount = lastMessage.getUsersCount();
-				String contactAttachmentMessage = context.getString(R.string.contacts_sent, contactsCount);
+				String contactAttachmentMessage = converterShortCodes(context.getString(R.string.contacts_sent, contactsCount));
 				Spannable myMessage = new SpannableString(contactAttachmentMessage);
 
 				if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {
@@ -2433,7 +2433,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					String fullNameAction = "";
 					if (chatRoom != null) {
-						fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+						fullNameAction = converterShortCodes(chatRoom.getPeerFirstnameByHandle(lastMsgSender));
 						if (fullNameAction == null) {
 							fullNameAction = "";
 						}
@@ -2523,7 +2523,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						String fullNameAction = "";
 						if(chatRoom!=null){
-							fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+							fullNameAction = converterShortCodes(chatRoom.getPeerFirstnameByHandle(lastMsgSender));
 							if(fullNameAction==null){
 								fullNameAction = "";
 							}

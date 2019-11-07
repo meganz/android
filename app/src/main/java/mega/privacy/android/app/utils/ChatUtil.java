@@ -484,6 +484,7 @@ public class ChatUtil {
     }
 
     public static String converterShortCodes(String text){
+        if(text == null || text.isEmpty()) return text;
         return EmojiUtilsShortcodes.emojify(text);
     }
 
