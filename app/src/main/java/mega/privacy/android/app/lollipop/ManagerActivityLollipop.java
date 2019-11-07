@@ -6129,6 +6129,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		searchDrawerItem = null;
 	}
 
+	private void offlineSearch() {
+		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+		if (oFLol != null) {
+			oFLol.filterOffline(searchQuery);
+		}
+	}
+
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		logDebug("onCreateOptionsMenuLollipop");
@@ -6160,7 +6167,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("onMenuItemActionExpand");
 				searchQuery = "";
 				searchExpand = true;
-				if (drawerItem != DrawerItem.CHAT && drawerItem != DrawerItem.SAVED_FOR_OFFLINE) {
+				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					if (!isOfflineSearchPathEmpty()) {
+						offlineSearchPaths.clear();
+					}
+					offlineSearch();
+				} else if (drawerItem != DrawerItem.CHAT) {
 					textsearchQuery = false;
 					firstNavigationLevel = true;
 					parentHandleSearch = -1;
@@ -6205,6 +6217,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					hideKeyboard(managerActivity, 0);
 				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
 					searchExpand = false;
+					textSubmitted = true;
 					hideKeyboard(managerActivity, 0);
 					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 					if (oFLol != null) {
@@ -6235,13 +6248,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						rChatFL.filterChats(newText);
 					}
 				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-					if (!isOfflineSearchPathEmpty() && getOfflineSearchPath().contains(OFFLINE_SEARCH_QUERY)) return false;
+					if (textSubmitted) {
+						textSubmitted = false;
+						return true;
+					}
 
 					searchQuery = newText;
-					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-					if (oFLol != null) {
-						oFLol.filterOffline(newText);
-					}
+					offlineSearch();
 				} else {
 					sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
 					if (textSubmitted) {
@@ -17728,11 +17741,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public boolean isOfflineSearchPathEmpty() {
-		if (offlineSearchPaths == null || offlineSearchPaths.isEmpty()) {
-			return true;
-		}
-
-		return false;
+		return offlineSearchPaths == null || offlineSearchPaths.isEmpty();
 	}
 
     public DrawerItem getSearchDrawerItem(){

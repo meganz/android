@@ -534,6 +534,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			emptyTextViewFirst = v.findViewById(R.id.offline_empty_text_grid_first);
 		}
 
+		recyclerView.setVisibility(View.GONE);
+		emptyImageView.setVisibility(View.GONE);
+		emptyTextView.setVisibility(View.GONE);
+
 		setAdapter();
 		recyclerView.setAdapter(adapter);
 		recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
@@ -549,14 +553,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				checkScroll();
 			}
 		});
-
-		String searchString = getSearchString();
-		if (searchString != null) {
-			filterOffline(searchString);
-			return v;
-		}
-
-		mOffList = dbH.findByPath(pathNavigation);
 
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			emptyImageView.setImageResource(R.drawable.offline_empty_landscape);
@@ -582,6 +578,13 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 		emptyTextViewFirst.setText(result);
 
+		String searchString = getSearchString();
+		if (searchString != null) {
+			filterOffline(searchString);
+			return v;
+		}
+
+		mOffList = dbH.findByPath(pathNavigation);
 		setNodes(mOffList);
 		return v;
 	}
