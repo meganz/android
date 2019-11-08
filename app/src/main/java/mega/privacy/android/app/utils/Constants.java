@@ -406,6 +406,7 @@ public class Constants {
     public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;
+    public static final int MAX_WIDTH_ADD_CONTACTS = 60;
 
 
     public static final String[] FILE_LINK_REGEXS = {

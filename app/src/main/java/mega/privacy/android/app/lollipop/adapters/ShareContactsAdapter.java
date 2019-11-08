@@ -18,8 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -30,9 +28,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -40,6 +35,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdapter.ViewHolderChips> implements View.OnClickListener{
 
@@ -88,8 +84,8 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         holder.itemLayout.setOnClickListener(this);
 
         holder.textViewName = v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
-        holder.textViewName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
+        holder.textViewName.setMaxWidthEmojis(px2dp(MAX_WIDTH_ADD_CONTACTS, outMetrics));
+        holder.textViewName.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
 
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
 
@@ -314,7 +310,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
             //No name, ask for it and later refresh!!
             fullName = mail;
         }
-        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        String firstLetter = getFirstLetter(fullName);
         if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
             firstLetter = " ";
         }

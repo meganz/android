@@ -30,9 +30,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
@@ -41,6 +38,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipChatExplorerAdapter.ViewHolderChips> implements View.OnClickListener{
 
@@ -102,8 +100,8 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         holder = new ViewHolderChips(v);
         holder.itemLayout = v.findViewById(R.id.item_layout_chip);
         holder.textViewName = v.findViewById(R.id.name_chip);
-        holder.textViewName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
-        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
+        holder.textViewName.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
+        holder.textViewName.setMaxWidthEmojis(px2dp(MAX_WIDTH_ADD_CONTACTS, outMetrics));
         holder.avatar = v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = v.findViewById(R.id.delete_icon_chip);
         holder.deleteIcon.setOnClickListener(this);
@@ -305,7 +303,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-        String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
+        String firstLetter = getFirstLetter(item.getTitle());
 
         logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
@@ -357,7 +355,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             radius = defaultAvatar.getHeight()/2;
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-        String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
+        String firstLetter = getFirstLetter(item.getTitle());
         if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
             firstLetter = " ";
         }

@@ -123,7 +123,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -7903,7 +7902,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (callInProgressText != null) {
             callInProgressText.setText(text);
         }
-        ChatUtil.activateChrono(chrono, callInProgressChrono, call);
+        activateChrono(chrono, callInProgressChrono, call);
 
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
             callInProgressLayout.setVisibility(View.VISIBLE);

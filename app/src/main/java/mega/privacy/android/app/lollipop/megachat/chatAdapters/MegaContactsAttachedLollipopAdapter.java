@@ -28,7 +28,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -40,9 +39,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -58,6 +54,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 
 public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<MegaContactsAttachedLollipopAdapter.ViewHolderContacts> implements OnClickListener, View.OnLongClickListener {
@@ -219,17 +216,17 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		    holderList.imageButtonThreeDots = (ImageView) v.findViewById(R.id.contact_list_three_dots);
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			if(!isScreenInPortrait(context)){
 				logDebug("Landscape configuration");
-				holderList.textViewContactName.setMaxWidth(scaleWidthPx(280, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(scaleWidthPx(280, outMetrics));
 			}
 			else{
-				holderList.textViewContactName.setMaxWidth(scaleWidthPx(230, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(scaleWidthPx(230, outMetrics));
 			}
 
-			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+			holderList.textViewContactName.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
 
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
 		    holderList.itemLayout.setTag(holderList);
 		    holderList.itemLayout.setOnClickListener(this);
@@ -248,19 +245,18 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		    holderGrid.imageView = (ImageView) v.findViewById(R.id.contact_grid_thumbnail);
 		    holderGrid.contactInitialLetter = v.findViewById(R.id.contact_grid_initial_letter);
 		    holderGrid.textViewContactName = v.findViewById(R.id.contact_grid_name);
-//		    holderGrid.textViewContent = (TextView) v.findViewById(R.id.contact_grid_content);
 		    holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_grid_three_dots);
 			holderGrid.contactStateIcon = (ImageView) v.findViewById(R.id.contact_grid_drawable_state);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				holderGrid.textViewContactName.setMaxWidth(scaleWidthPx(70, outMetrics));
+				holderGrid.textViewContactName.setMaxWidthEmojis(scaleWidthPx(70, outMetrics));
 			}
 			else{
-				holderGrid.textViewContactName.setMaxWidth(scaleWidthPx(120, outMetrics));
+				holderGrid.textViewContactName.setMaxWidthEmojis(scaleWidthPx(120, outMetrics));
 			}
-			holderGrid.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+			holderGrid.textViewContactName.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
 
-			holderGrid.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+			holderGrid.contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
 
 			holderGrid.itemLayout.setTag(holderGrid);
@@ -573,7 +569,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		int avatarTextSize = getAvatarTextSize(density);
 		logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
 
-		String firstLetter = ChatUtil.getFirstLetter(fullName);
+		String firstLetter = getFirstLetter(fullName);
 		if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
 			holder.contactInitialLetter.setVisibility(View.INVISIBLE);
 		}else {

@@ -55,9 +55,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -511,16 +508,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList) holder).textViewContactName = v.findViewById(R.id.recent_chat_list_name);
 			((ViewHolderNormalChatList) holder).textViewContent = v.findViewById(R.id.recent_chat_list_content);
 
-			((ViewHolderNormalChatList) holder).textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			((ViewHolderNormalChatList) holder).contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
-			((ViewHolderNormalChatList) holder).textViewContent.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+			((ViewHolderNormalChatList) holder).textViewContactName.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+			((ViewHolderNormalChatList) holder).contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
+			((ViewHolderNormalChatList) holder).textViewContent.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 
 			if(isScreenInPortrait(context)){
-				((ViewHolderNormalChatList) holder).textViewContactName.setMaxWidthEmojis(Util.px2dp(MAX_WIDTH_TITLE_PORT, outMetrics));
-				((ViewHolderNormalChatList) holder).textViewContent.setMaxWidthEmojis(Util.px2dp(MAX_WIDTH_CONTENT_PORT, outMetrics));
+				((ViewHolderNormalChatList) holder).textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_TITLE_PORT, outMetrics));
+				((ViewHolderNormalChatList) holder).textViewContent.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTENT_PORT, outMetrics));
 			}else{
-				((ViewHolderNormalChatList) holder).textViewContactName.setMaxWidthEmojis(Util.px2dp(MAX_WIDTH_TITLE_LAND, outMetrics));
-				((ViewHolderNormalChatList) holder).textViewContent.setMaxWidthEmojis(Util.px2dp(MAX_WIDTH_CONTENT_LAND, outMetrics));
+				((ViewHolderNormalChatList) holder).textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_TITLE_LAND, outMetrics));
+				((ViewHolderNormalChatList) holder).textViewContent.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTENT_LAND, outMetrics));
 			}
 
 			((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout = v.findViewById(R.id.last_message_voice_clip_or_location);
@@ -638,7 +635,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
 
-		String firstLetter = ChatUtil.getFirstLetter(chatTitle);
+		String firstLetter = getFirstLetter(chatTitle);
 		if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
 			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.INVISIBLE);
 		}else {
@@ -682,7 +679,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		boolean setInitialByMail = false;
 
 		if (((ViewHolderNormalChatList)holder).fullName != null && ((ViewHolderNormalChatList)holder).fullName.trim().length() > 0){
-			String firstLetter = ChatUtil.getFirstLetter(((ViewHolderNormalChatList)holder).fullName);
+			String firstLetter = getFirstLetter(((ViewHolderNormalChatList)holder).fullName);
 			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
 			((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
 			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
@@ -1134,7 +1131,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				logDebug("chat timestamp: "+chat.getLastTimestamp());
 				String date = formatDateAndTime(context,chat.getLastTimestamp(), DATE_LONG_FORMAT);
 				logDebug("date timestamp: "+date);
-				int maxAllowed = ChatUtil.getMaxAllowed(title);
+				int maxAllowed = getMaxAllowed(title);
 				((ViewHolderNormalChatList)holder).textViewContactName.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
 				((ViewHolderNormalChatList)holder).textViewContactName.setText(title);
 
