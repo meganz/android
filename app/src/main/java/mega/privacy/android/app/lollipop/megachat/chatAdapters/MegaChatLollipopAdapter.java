@@ -637,7 +637,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout contentOwnMessageContactLayoutAvatar;
         RoundedImageView contentOwnMessageContactThumb;
         private EmojiTextView contentOwnMessageContactName;
-        public TextView contentOwnMessageContactEmail;
+        public EmojiTextView contentOwnMessageContactEmail;
         private EmojiTextView contentOwnMessageContactInitialLetter;
         RelativeLayout forwardOwnContact;
 
@@ -715,7 +715,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout contentContactMessageContactLayoutAvatar;
         RoundedImageView contentContactMessageContactThumb;
         private EmojiTextView contentContactMessageContactName;
-        public TextView contentContactMessageContactEmail;
+        public EmojiTextView contentContactMessageContactEmail;
         private EmojiTextView contentContactMessageContactInitialLetter;
 
         RelativeLayout contentContactMessageVoiceClipLayout;
@@ -5747,16 +5747,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (!isScreenInPortrait(context)) {
                 logDebug("Landscape configuration");
-                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
-                holder.contentOwnMessageContactName.setMaxWidthEmojis((int) width);
-                holder.contentOwnMessageContactEmail.setMaxWidth((int) width);
+                holder.contentOwnMessageContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_LAND, outMetrics));
+                holder.contentOwnMessageContactEmail.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_LAND, outMetrics));
             } else {
                 logDebug("Portrait configuration");
-                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
-                holder.contentOwnMessageContactName.setMaxWidthEmojis((int) width);
-                holder.contentOwnMessageContactEmail.setMaxWidth((int) width);
+                holder.contentOwnMessageContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_PORT, outMetrics));
+                holder.contentOwnMessageContactEmail.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_PORT, outMetrics));
             }
             holder.contentOwnMessageContactName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 
@@ -5866,21 +5864,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageContactName.setVisibility(View.VISIBLE);
             holder.contentContactMessageContactEmail.setVisibility(View.VISIBLE);
 
-            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                logDebug("Landscape configuration");
-                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
-                holder.contentContactMessageContactName.setMaxWidthEmojis((int) width);
-                holder.contentContactMessageContactEmail.setMaxWidth((int) width);
+            if (!isScreenInPortrait(context)) {
+                holder.contentContactMessageContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_LAND, outMetrics));
+                holder.contentContactMessageContactEmail.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_LAND, outMetrics));
             } else {
-                logDebug("Portrait configuration");
-                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
-                holder.contentContactMessageContactName.setMaxWidthEmojis((int) width);
-                holder.contentContactMessageContactEmail.setMaxWidth((int) width);
+                holder.contentContactMessageContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_PORT, outMetrics));
+                holder.contentContactMessageContactEmail.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_PORT, outMetrics));
             }
 
             holder.contentContactMessageContactName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
-
-
 
             long userCount = message.getUsersCount();
 
@@ -5902,9 +5894,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 for (int i = 1; i < userCount; i++) {
                     name.append(", " + message.getUserName(i));
                 }
-                holder.contentContactMessageContactName.setText(name);
+                holder.contentContactMessageContactEmail.setText(name);
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
-                holder.contentContactMessageContactEmail.setText(email);
+                holder.contentContactMessageContactName.setText(email);
                 createDefaultAvatar(holder, null, email, false, userCount);
             }
 

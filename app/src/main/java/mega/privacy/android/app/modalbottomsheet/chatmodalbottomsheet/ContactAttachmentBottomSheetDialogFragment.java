@@ -76,7 +76,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     public LinearLayout mainLinearLayout;
     public EmojiTextView titleNameContactChatPanel;
     public ImageView stateIcon;
-    public TextView titleMailContactChatPanel;
+    public EmojiTextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
     public EmojiTextView contactInitialLetter;
     LinearLayout optionView;
@@ -191,10 +191,10 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
         if(isScreenInPortrait(context)){
             titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleMailContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
         }else{
             titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleMailContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
         titleNameContactChatPanel.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));

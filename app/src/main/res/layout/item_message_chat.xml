@@ -1092,11 +1092,9 @@
                             android:layout_marginTop="11dp"
                             android:layout_marginBottom="2dp"
                             android:singleLine="true"
-                            android:ellipsize="middle"
-                            android:maxWidth="10dp"
                             android:gravity="left"/>
 
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_own_message_contact_email"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1105,7 +1103,6 @@
                             android:textSize="12sp"
                             android:singleLine="true"
                             android:maxLines="1"
-                            android:ellipsize="end"
                             android:gravity="left"
                             android:layout_marginBottom="11dp" />
                     </RelativeLayout>
@@ -1972,10 +1969,8 @@
                             android:layout_marginTop="11dp"
                             android:layout_marginBottom="2dp"
                             android:singleLine="true"
-                            android:ellipsize="middle"
-                            android:maxWidth="10dp"
                             android:gravity="left"/>
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_contact_message_contact_email"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1984,7 +1979,6 @@
                             android:textSize="12sp"
                             android:singleLine="true"
                             android:maxLines="1"
-                            android:ellipsize="end"
                             android:gravity="left"
                             android:layout_marginBottom="11dp" />
                     </RelativeLayout>
