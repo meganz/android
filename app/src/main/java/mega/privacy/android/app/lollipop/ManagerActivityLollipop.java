@@ -6124,6 +6124,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void closeSearchSection() {
+    	searchQuery = "";
 		drawerItem = searchDrawerItem;
 		selectDrawerItemLollipop(drawerItem);
 		searchDrawerItem = null;
@@ -6487,12 +6488,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					if(oFLol != null && oFLol.getItemCount()>0){
 						sortByMenuItem.setVisible(true);
 						selectMenuItem.setVisible(true);
-						searchMenuItem.setVisible(true);
 					}
 					else{
 						sortByMenuItem.setVisible(false);
 						selectMenuItem.setVisible(false);
+					}
+
+					ArrayList<MegaOffline> offlineFiles;
+					if (!isOfflineSearchPathEmpty()) {
+						offlineFiles = dbH.findByPath(getInitialSearchPath());
+					} else {
+						offlineFiles = dbH.findByPath(pathNavigationOffline);
+					}
+
+					if (offlineFiles == null || offlineFiles.isEmpty()) {
 						searchMenuItem.setVisible(false);
+					} else {
+						searchMenuItem.setVisible(true);
 					}
 				}
 

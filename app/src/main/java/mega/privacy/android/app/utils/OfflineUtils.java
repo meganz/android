@@ -243,21 +243,6 @@ public class OfflineUtils {
         }
     }
 
-    public static String getOfflineAbsolutePath(Context context, MegaOffline offlineNode) {
-
-        switch (offlineNode.getOrigin()) {
-            case MegaOffline.INCOMING: {
-                return context.getFilesDir().getAbsolutePath() + File.separator + OFFLINE_DIR + File.separator + offlineNode.getHandleIncoming();
-            }
-            case MegaOffline.INBOX: {
-                return context.getFilesDir().getAbsolutePath() + File.separator + OFFLINE_INBOX_DIR;
-            }
-            default: {
-                return context.getFilesDir().getAbsolutePath() + File.separator + OFFLINE_DIR;
-            }
-        }
-    }
-
     public static File getOfflineFile(Context context, MegaOffline offlineNode) {
         String path = context.getFilesDir().getAbsolutePath() + File.separator;
         if (offlineNode.isFolder()) {

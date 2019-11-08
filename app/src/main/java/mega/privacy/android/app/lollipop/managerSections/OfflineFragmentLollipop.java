@@ -898,14 +898,9 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		int files=0;
 		
 		if(documents.size()>0){
-			String pathI = getOfflineAbsolutePath(context, documents.get(0));
-			
 			for(int i=0; i<documents.size();i++){
-				MegaOffline mOff = (MegaOffline) documents.get(i);
-				String path = pathI + mOff.getPath() + mOff.getName();			
-
-				File destination = new File(path);
-				if (destination.exists()){
+				File destination = getOfflineFile(context, documents.get(i));
+				if (isFileAvailable(destination)){
 					if(destination.isFile()){
 						files++;					
 					}
