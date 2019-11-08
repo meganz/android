@@ -183,7 +183,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private final static int ROTATION_LANDSCAPE = 1;
     private final static int ROTATION_REVERSE_PORTRAIT = 2;
     private final static int ROTATION_REVERSE_LANDSCAPE = 3;
-
+    private final static int TITLE_TOOLBAR_PORT = 180;
+    private final static int TITLE_TOOLBAR_LAND = 400;
 
     public static int MEGA_FILE_LINK = 1;
     public static int MEGA_FOLDER_LINK = 2;
@@ -600,6 +601,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
         groupalSubtitleToolbar.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
+
+        int width;
+        if(isScreenInPortrait(this)){
+            width = px2dp(TITLE_TOOLBAR_PORT, outMetrics);
+        }else{
+            width = px2dp(TITLE_TOOLBAR_LAND, outMetrics);
+        }
+        groupalSubtitleToolbar.setMaxWidthEmojis(width);
+        titleToolbar.setMaxWidthEmojis(width);
+
         groupalSubtitleToolbar.setVisibility(View.GONE);
         subtitleCall.setVisibility(View.GONE);
         subtitleChronoCall.setVisibility(View.GONE);

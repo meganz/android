@@ -102,6 +102,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int ALPHA_ANIMATION = 600;
     final private static int ALPHA_ARROW_ANIMATION = 1000;
     final private static int NECESSARY_CHANGE_OF_SIZES = 4;
+    private final static int TITLE_TOOLBAR = 250;
     private float widthScreenPX, heightScreenPX;
     private long chatId;
     private MegaChatRoom chat;
@@ -110,7 +111,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private Display display;
     private DisplayMetrics outMetrics;
     private Toolbar tB;
-    private TextView titleToolbar;
+    private EmojiTextView titleToolbar;
     private TextView subtitleToobar;
     private Chronometer callInProgressChrono;
     private RelativeLayout mutateContactCallLayout;
@@ -388,6 +389,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         titleToolbar = tB.findViewById(R.id.title_toolbar);
         titleToolbar.setText(" ");
+        titleToolbar.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+        titleToolbar.setMaxWidthEmojis(px2dp(TITLE_TOOLBAR, outMetrics));
+
         subtitleToobar = tB.findViewById(R.id.subtitle_toolbar);
         callInProgressChrono = tB.findViewById(R.id.simple_chronometer);
         linearParticipants = tB.findViewById(R.id.ll_participants);

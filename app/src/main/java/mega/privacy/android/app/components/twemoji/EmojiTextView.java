@@ -1,6 +1,5 @@
 package mega.privacy.android.app.components.twemoji;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.TypedArray;
@@ -13,28 +12,14 @@ import android.support.v7.widget.AppCompatTextView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.KeyEvent;
-
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
-import mega.privacy.android.app.utils.Util;
 
 public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface {
 
-    public static final int LAST_MESSAGE_TEXTVIEW_WIDTH = 190;
-    public static final int TITLE_TOOLBAR = 180;
     private float emojiSize;
     private Context mContext;
-    private Display display;
-    private DisplayMetrics mOutMetrics = new DisplayMetrics();
-    private int textViewMaxWidth;
+    private int textViewMaxWidth = 0;
 
     public EmojiTextView(final Context context) {
         this(context, null);
@@ -67,17 +52,6 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
                 a.recycle();
             }
         }
-
-        if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof ManagerActivityLollipop || mContext instanceof ChatExplorerActivity || mContext instanceof ArchivedChatsActivity) {
-            display = ((Activity) mContext).getWindowManager().getDefaultDisplay();
-            display.getMetrics(mOutMetrics);
-            textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH, mOutMetrics);
-        } else if (mContext instanceof ContextWrapper && (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity)) {
-            display = ((Activity) ((ContextWrapper) mContext).getBaseContext()).getWindowManager().getDefaultDisplay();
-            display.getMetrics(mOutMetrics);
-            textViewMaxWidth = Util.px2dp(TITLE_TOOLBAR, mOutMetrics);
-        }
-
         setText(getText());
     }
 
@@ -90,18 +64,12 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
         EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
 
-        if (mContext == null || (mContext instanceof ContextWrapper && ((ContextWrapper) mContext).getBaseContext() == null)) {
+        if(mContext == null || (mContext instanceof ContextWrapper && ((ContextWrapper) mContext).getBaseContext() == null) || (textViewMaxWidth == 0)){
             super.setText(spannableStringBuilder, type);
-        } else if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof ManagerActivityLollipop || mContext instanceof ArchivedChatsActivity || mContext instanceof ChatExplorerActivity) {
+        }else{
             CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
             super.setText(textF, type);
-        } else if (mContext instanceof ContextWrapper && (((ContextWrapper) mContext).getBaseContext() instanceof ChatActivityLollipop || ((ContextWrapper) mContext).getBaseContext() instanceof ChatCallActivity)) {
-            CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-            super.setText(textF, type);
-        } else {
-            super.setText(spannableStringBuilder, type);
         }
-
     }
 
     @Override
@@ -113,6 +81,11 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     public void backspace() {
         final KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0, KeyEvent.KEYCODE_ENDCALL);
         dispatchKeyEvent(event);
+    }
+
+    @Override
+    public final void setMaxWidthEmojis(final int maxWidth) {
+        this.textViewMaxWidth = maxWidth;
     }
 
     @Override

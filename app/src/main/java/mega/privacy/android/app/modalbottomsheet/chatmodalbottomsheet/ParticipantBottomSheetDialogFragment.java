@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,8 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.util.Locale;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -34,9 +31,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -47,7 +41,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -74,7 +68,6 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     public LinearLayout optionChangePermissionsChat;
     public LinearLayout optionRemoveParticipantChat;
     public LinearLayout optionInvite;
-    ////
 
     DisplayMetrics outMetrics;
 
@@ -166,21 +159,17 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
         LinearLayout separatorOptions = (LinearLayout) contentView.findViewById(R.id.separator_options);
         LinearLayout separatorLeave = (LinearLayout) contentView.findViewById(R.id.separator_leave);
-        //////
 
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            logDebug("Landscape configuration");
-            titleNameContactChatPanel.setMaxWidth(scaleWidthPx(270, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(scaleWidthPx(270, outMetrics));
-        }
-        else{
-            titleNameContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
+        if(isScreenInPortrait(context)){
+            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+        }else{
+            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
-        titleNameContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-        contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
-
+        titleNameContactChatPanel.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+        contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
         if(selectedChat==null){
             logWarning("Error. Selected chat is NULL");
@@ -436,7 +425,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         if(name!=null){
             if(!(name.trim().isEmpty())){
-                String firstLetter = ChatUtil.getFirstLetter(name);
+                String firstLetter = getFirstLetter(name);
                 if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
                     contactInitialLetter.setVisibility(View.INVISIBLE);
                 }else {

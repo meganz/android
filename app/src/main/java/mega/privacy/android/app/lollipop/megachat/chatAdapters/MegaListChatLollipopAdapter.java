@@ -84,6 +84,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public static final int ADAPTER_RECENT_CHATS = 0;
 	public static final int ADAPTER_ARCHIVED_CHATS = 1;
+	public static final int MAX_WIDTH_TITLE_PORT = 190;
+	public static final int MAX_WIDTH_CONTENT_PORT = 200;
+	public static final int MAX_WIDTH_TITLE_LAND = 400;
+	public static final int MAX_WIDTH_CONTENT_LAND = 410;
 
 	private static final String SPACE = " ";
 
@@ -510,7 +514,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList) holder).textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 			((ViewHolderNormalChatList) holder).contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 			((ViewHolderNormalChatList) holder).textViewContent.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
-			((ViewHolderNormalChatList) holder).textViewContent.setMaxWidth(Util.px2dp(260, outMetrics));
+
+			if(isScreenInPortrait(context)){
+				((ViewHolderNormalChatList) holder).textViewContactName.setMaxWidthEmojis(Util.px2dp(MAX_WIDTH_TITLE_PORT, outMetrics));
+				((ViewHolderNormalChatList) holder).textViewContent.setMaxWidthEmojis(Util.px2dp(MAX_WIDTH_CONTENT_PORT, outMetrics));
+			}else{
+				((ViewHolderNormalChatList) holder).textViewContactName.setMaxWidthEmojis(Util.px2dp(MAX_WIDTH_TITLE_LAND, outMetrics));
+				((ViewHolderNormalChatList) holder).textViewContent.setMaxWidthEmojis(Util.px2dp(MAX_WIDTH_CONTENT_LAND, outMetrics));
+			}
 
 			((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout = v.findViewById(R.id.last_message_voice_clip_or_location);
 			((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);

@@ -76,7 +76,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     public LinearLayout mainLinearLayout;
     public EmojiTextView titleNameContactChatPanel;
     public ImageView stateIcon;
-    public EmojiTextView titleMailContactChatPanel;
+    public TextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
     public EmojiTextView contactInitialLetter;
     LinearLayout optionView;
@@ -189,20 +189,16 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
         optionRemove.setVisibility(View.GONE);
 
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            logDebug("Landscape configuration");
-            titleNameContactChatPanel.setMaxWidth(scaleWidthPx(270, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(scaleWidthPx(270, outMetrics));
+        if(isScreenInPortrait(context)){
+            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+        }else{
+            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
-        else{
-            titleNameContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
-        }
-        titleNameContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-        contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
-        titleMailContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
 
-
+        titleNameContactChatPanel.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+        contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
         if (message != null) {
             long userCount  = message.getMessage().getUsersCount();

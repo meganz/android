@@ -56,6 +56,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 	public static final int ITEM_VIEW_TYPE_NORMAL = 0;
 	public static final int ITEM_VIEW_TYPE_ADD_PARTICIPANT = 1;
+	private static final int MAX_WIDTH_PORT = 180;
+	private static final int MAX_WIDTH_LAND = 260;
 
 	Context context;
 	int positionClicked;
@@ -150,16 +152,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			holderList.permissionsIcon = v.findViewById(R.id.participant_list_permissions);
 			holderList.statusImage = v.findViewById(R.id.group_participants_state_circle);
 
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				logDebug("Landscape configuration");
-				holderList.textViewContactName.setMaxWidth(scaleWidthPx(260, outMetrics));
-				holderList.textViewContent.setMaxWidth(scaleWidthPx(260, outMetrics));
+			if(isScreenInPortrait(context)){
+				holderList.textViewContactName.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_PORT, outMetrics));
+				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_PORT, outMetrics));
+			}else{
+				holderList.textViewContactName.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_LAND, outMetrics));
+				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_LAND, outMetrics));
 			}
-			else{
-				holderList.textViewContactName.setMaxWidth(scaleWidthPx(180, outMetrics));
-				holderList.textViewContent.setMaxWidth(scaleWidthPx(180, outMetrics));
-			}
-
 			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
 

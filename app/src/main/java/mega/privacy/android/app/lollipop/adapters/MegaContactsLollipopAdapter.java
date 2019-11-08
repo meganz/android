@@ -67,9 +67,10 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	public static final int ITEM_VIEW_TYPE_LIST_ADD_CONTACT = 2;
 	public static final int ITEM_VIEW_TYPE_LIST_GROUP_CHAT = 3;
-	public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
-	public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
-
+	private static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
+	private static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;
+	private static final int MAX_WIDTH_CONTACT_NAME_GRID_LAND = 150;
+	private static final int MAX_WIDTH_CONTACT_NAME_GRID_PORT = 120;
 	private Context context;
 	private int positionClicked;
 	private ArrayList<MegaContactAdapter> contacts;
@@ -172,14 +173,14 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
 
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			if(!isScreenInPortrait(context)){
 				logDebug("Landscape configuration");
-				holderList.textViewContactName.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
-				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 			}
 			else{
-				holderList.textViewContactName.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
-				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
 			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
@@ -207,15 +208,15 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderGrid.contactStateIcon = (ImageView) v.findViewById(R.id.contact_grid_drawable_state);
 			holderGrid.contactSelectedIcon = (ImageView) v.findViewById(R.id.contact_grid_selected_icon);
 
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				holderGrid.textViewContactName.setMaxWidth(scaleWidthPx(61, outMetrics));
+			if(!isScreenInPortrait(context)){
+				holderGrid.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_GRID_LAND, outMetrics));
 			}
 			else{
-				holderGrid.textViewContactName.setMaxWidth(scaleWidthPx(116, outMetrics));
+				holderGrid.textViewContactName.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_GRID_PORT, outMetrics));
 			}
 
-			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+			holderGrid.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+			holderGrid.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_CALL_HIGH, outMetrics));
 
 		    holderGrid.itemLayout.setTag(holderGrid);
 		    holderGrid.itemLayout.setOnClickListener(this);
@@ -238,13 +239,14 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 			holderList.declineLayout.setVisibility(View.GONE);
 
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				holderList.textViewContactName.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
-				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+			if(!isScreenInPortrait(context)){
+				logDebug("Landscape configuration");
+				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 			}
 			else{
-				holderList.textViewContactName.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
-				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
 			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
@@ -279,13 +281,14 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
 			holderList.declineLayout.setVisibility(View.VISIBLE);
 
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				holderList.textViewContactName.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
-				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+			if(!isScreenInPortrait(context)){
+				logDebug("Landscape configuration");
+				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 			}
 			else{
-				holderList.textViewContactName.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
-				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
 			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));

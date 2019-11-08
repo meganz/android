@@ -74,7 +74,6 @@
                     android:gravity="center_vertical"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"
-                    android:ellipsize="end"
                     android:maxLines="1"
                     android:singleLine="true"/>
 

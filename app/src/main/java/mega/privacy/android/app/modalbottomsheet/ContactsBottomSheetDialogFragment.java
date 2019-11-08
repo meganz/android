@@ -164,15 +164,16 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionRemove = (LinearLayout) contentView.findViewById(R.id.contact_list_option_remove_layout);
         contactStateIcon = (ImageView) contentView.findViewById(R.id.contact_list_drawable_state);
 
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            logDebug("Landscape configuration");
-            titleNameContactPanel.setMaxWidth(scaleWidthPx(280, outMetrics));
+        if(isScreenInPortrait(context)){
+            titleNameContactPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleMailContactPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+        }else{
+            titleNameContactPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleMailContactPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
-        else{
-            titleNameContactPanel.setMaxWidth(scaleWidthPx(230, outMetrics));
-        }
-        titleNameContactPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-        avatarInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+
+        titleNameContactPanel.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+        avatarInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
         optionInfoContact.setOnClickListener(this);
         optionRemove.setOnClickListener(this);

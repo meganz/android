@@ -29,8 +29,6 @@
                 android:id="@+id/chat_contact_properties_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:ellipsize="end"
                 android:layout_marginTop="16dp"
                 android:layout_marginLeft="72dp"
                 android:layout_marginRight="16dp"

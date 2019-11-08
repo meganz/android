@@ -2,13 +2,11 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,7 +30,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -66,6 +63,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.AppBarStateChangeListener;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -105,8 +103,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
-
-import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.*;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -115,6 +111,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import mega.privacy.android.app.components.AppBarStateChangeListener.State;
+
 
 
 @SuppressLint("NewApi")
@@ -123,11 +121,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	ContactController cC;
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
     private android.support.v7.app.AlertDialog renameDialog;
-    
-	public static int MAX_WIDTH_FILENAME_LAND=450;
-	public static int MAX_WIDTH_FILENAME_PORT=170;
-	public static int MAX_WIDTH_APPBAR_LAND=250;
-	public static int MAX_WIDTH_APPBAR_PORT=350;
+
+	private final static int MAX_WIDTH_APPBAR_LAND = 400;
+	private final static int MAX_WIDTH_APPBAR_PORT = 200;
 
 	RelativeLayout imageLayout;
 	android.app.AlertDialog permissionsDialog;
@@ -142,8 +138,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	LinearLayout optionsLayout;
 
 	//Info of the user
-	EmojiTextView nameText;
-	TextView emailText;
+	private EmojiTextView nameText;
+	private TextView emailText;
 
 	LinearLayout chatOptionsLayout;
 	View dividerChatOptionsLayout;
@@ -174,11 +170,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	View dividerSharedFilesLayout;
 
 	//Toolbar elements
-	ImageView contactStateIcon;
-	EmojiTextView firstLineTextToolbar;
-	TextView firstLineLengthToolbar;
-	MarqueeTextView secondLineTextToolbar;
-	TextView secondLineLengthToolbar;
+	private EmojiTextView firstLineTextToolbar;
+	private MarqueeTextView secondLineTextToolbar;
+	private ImageView contactStateIcon;
+	private State stateToolbar = State.IDLE;
 
 	RelativeLayout clearChatLayout;
 	View dividerClearChatLayout;
@@ -266,7 +261,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
-
 			megaChatApi.addChatListener(this);
 		}
 
@@ -285,62 +279,42 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		if (extras != null) {
 
 			setContentView(R.layout.activity_chat_contact_properties);
-            fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container);
-			toolbar = (Toolbar) findViewById(R.id.toolbar);
-			appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+            fragmentContainer = findViewById(R.id.fragment_container);
+			toolbar = findViewById(R.id.toolbar);
+			appBarLayout = findViewById(R.id.app_bar);
 			setSupportActionBar(toolbar);
 			aB = getSupportActionBar();
 
-			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
+			imageLayout = findViewById(R.id.chat_contact_properties_image_layout);
 
-			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
-			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
+			collapsingToolbar = findViewById(R.id.collapse_toolbar);
+			contactStateIcon = findViewById(R.id.contact_drawable_state);
 
-			/*TITLE*/
-			firstLineTextToolbar = (EmojiTextView) findViewById(R.id.first_line_toolbar);
-			firstLineLengthToolbar = (TextView) findViewById(R.id.first_line_length_toolbar);
-
-			/*SUBTITLE*/
-			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
-			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
-
-			nameText = (EmojiTextView) findViewById(R.id.chat_contact_properties_name_text);
+			/*Toolbar*/
+			firstLineTextToolbar = findViewById(R.id.first_line_toolbar);
+			secondLineTextToolbar = findViewById(R.id.second_line_toolbar);
+			nameText = findViewById(R.id.chat_contact_properties_name_text);
 			nameText.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
-			emailText =(TextView) findViewById(R.id.chat_contact_properties_email_text);
-
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				logDebug("Landscape configuration");
-
-				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
-				firstLineTextToolbar.setMaxWidth((int) width);
-				firstLineLengthToolbar.setMaxWidth((int) width);
-				secondLineTextToolbar.setMaxWidth((int) width);
-				secondLineLengthToolbar.setMaxWidth((int) width);
-
-				secondLineTextToolbar.setPadding(0,0,0,5);
-				secondLineLengthToolbar.setPadding(0,0,0,5);
-			}
-			else{
-				logDebug("Portrait configuration");
-
-				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
-				firstLineTextToolbar.setMaxWidth((int) width);
-				firstLineLengthToolbar.setMaxWidth((int) width);
-				secondLineTextToolbar.setMaxWidth((int) width);
-				secondLineLengthToolbar.setMaxWidth((int) width);
-
+			emailText = findViewById(R.id.chat_contact_properties_email_text);
+			int width;
+			if(isScreenInPortrait(this)){
+				width = px2dp(MAX_WIDTH_APPBAR_PORT, outMetrics);
 				secondLineTextToolbar.setPadding(0,0,0,11);
-				secondLineLengthToolbar.setPadding(0,0,0,11);
+			}else{
+				width = px2dp(MAX_WIDTH_APPBAR_LAND, outMetrics);
+				secondLineTextToolbar.setPadding(0,0,0,5);
 			}
+			firstLineTextToolbar.setMaxWidthEmojis(width);
+			secondLineTextToolbar.setMaxWidth(width);
 
-			imageGradient = (View) findViewById(R.id.gradient_view);
+			imageGradient = findViewById(R.id.gradient_view);
 
 			setTitle(null);
 			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			aB.setHomeButtonEnabled(true);
 			aB.setDisplayHomeAsUpEnabled(true);
 
-			contactPropertiesImage = (ImageView) findViewById(R.id.chat_contact_properties_toolbar_image);
+			contactPropertiesImage = findViewById(R.id.chat_contact_properties_toolbar_image);
 
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -352,63 +326,63 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			});
 
 			//OPTIONS LAYOUT
-			optionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_options);
+			optionsLayout = findViewById(R.id.chat_contact_properties_options);
 
 			//CHAT OPTIONS
-			chatOptionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_chat_options_layout);
-			dividerChatOptionsLayout = (View) findViewById(R.id.divider_chat_options_layout);
-			sendMessageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_send_message_layout);
+			chatOptionsLayout = findViewById(R.id.chat_contact_properties_chat_options_layout);
+			dividerChatOptionsLayout = findViewById(R.id.divider_chat_options_layout);
+			sendMessageLayout = findViewById(R.id.chat_contact_properties_chat_send_message_layout);
 			sendMessageLayout.setOnClickListener(this);
-			audioCallLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_call_layout);
+			audioCallLayout = findViewById(R.id.chat_contact_properties_chat_call_layout);
 			audioCallLayout.setOnClickListener(this);
-			videoCallLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_video_layout);
+			videoCallLayout = findViewById(R.id.chat_contact_properties_chat_video_layout);
 			videoCallLayout.setOnClickListener(this);
 
 			//Notifications Layout
 
-			notificationsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_notifications_layout);
+			notificationsLayout = findViewById(R.id.chat_contact_properties_notifications_layout);
 			notificationsLayout.setVisibility(View.VISIBLE);
 
-			notificationsTitle = (TextView) findViewById(R.id.chat_contact_properties_notifications_text);
+			notificationsTitle = findViewById(R.id.chat_contact_properties_notifications_text);
 
-			notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_contact_properties_switch);
+			notificationsSwitch = findViewById(R.id.chat_contact_properties_switch);
 			notificationsSwitch.setOnClickListener(this);
 
-			dividerNotificationsLayout = (View) findViewById(R.id.divider_notifications_layout);
+			dividerNotificationsLayout = findViewById(R.id.divider_notifications_layout);
 
 			//Shared folders layout
-			sharedFoldersLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_shared_folders_layout);
+			sharedFoldersLayout = findViewById(R.id.chat_contact_properties_shared_folders_layout);
 			sharedFoldersLayout.setOnClickListener(this);
 
-			sharedFoldersText = (TextView) findViewById(R.id.chat_contact_properties_shared_folders_label);
+			sharedFoldersText = findViewById(R.id.chat_contact_properties_shared_folders_label);
 
-			sharedFoldersButton = (Button) findViewById(R.id.chat_contact_properties_shared_folders_button);
+			sharedFoldersButton = findViewById(R.id.chat_contact_properties_shared_folders_button);
 			sharedFoldersButton.setOnClickListener(this);
 
-			dividerSharedFoldersLayout = (View) findViewById(R.id.divider_shared_folder_layout);
+			dividerSharedFoldersLayout = findViewById(R.id.divider_shared_folder_layout);
 
 			//Share Contact Layout
 
-			shareContactLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_layout);
+			shareContactLayout = findViewById(R.id.chat_contact_properties_share_contact_layout);
 			shareContactLayout.setOnClickListener(this);
 
-			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
+			dividerShareContactLayout = findViewById(R.id.divider_share_contact_layout);
 
 			//Chat Shared Files Layout
 
-			sharedFilesLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_files_shared_layout);
+			sharedFilesLayout = findViewById(R.id.chat_contact_properties_chat_files_shared_layout);
 			sharedFilesLayout.setOnClickListener(this);
 
-			dividerSharedFilesLayout = (View) findViewById(R.id.divider_chat_files_shared_layout);
+			dividerSharedFilesLayout = findViewById(R.id.divider_chat_files_shared_layout);
 
 			//Clear chat Layout
-			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
+			clearChatLayout = findViewById(R.id.chat_contact_properties_clear_layout);
 			clearChatLayout.setOnClickListener(this);
 
-			dividerClearChatLayout = (View) findViewById(R.id.divider_clear_chat_layout);
+			dividerClearChatLayout = findViewById(R.id.divider_clear_chat_layout);
 
 			//Remove contact Layout
-			removeContactChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_remove_contact_layout);
+			removeContactChatLayout = findViewById(R.id.chat_contact_properties_remove_contact_layout);
 			removeContactChatLayout.setOnClickListener(this);
 
 			chatHandle = extras.getLong("handle",-1);
@@ -431,14 +405,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				if (chat.getTitle() != null && !chat.getTitle().isEmpty() && !chat.getTitle().equals("")){
 					firstLineTextToolbar.setText(chat.getTitle());
-					firstLineLengthToolbar.setText(chat.getTitle());
 					nameText.setText(chat.getTitle());
 				}
 				else {
 					if (userEmailExtra != null) {
-
 						firstLineTextToolbar.setText(userEmailExtra);
-						firstLineLengthToolbar.setText(userEmailExtra);
 						nameText.setText(userEmailExtra);
 					}
 				}
@@ -476,7 +447,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						}
 
 						firstLineTextToolbar.setText(fullName);
-						firstLineLengthToolbar.setText(fullName);
 						nameText.setText(fullName);
 					}
 					else{
@@ -510,7 +480,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 
 					if (megaChatApi == null){
-						megaChatApi = ((MegaApplication) ((Activity)this).getApplication()).getMegaChatApi();
+						megaChatApi = ((MegaApplication) this.getApplication()).getMegaChatApi();
 					}
 
 				}
@@ -527,7 +497,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 					ArrayList<MegaNode> nodes = megaApi.getInShares(user);
                     setFoldersButtonText(nodes);
-					secondLineLengthToolbar.setText(user.getEmail());
 					emailText.setText(user.getEmail());
 
 					if(isChatEnabled()){
@@ -563,11 +532,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 					if(isChatEnabled()){
 						if(chat!=null){
-							//shareContactText.setText(chat.getPeerEmail(0));
-							secondLineLengthToolbar.setText(chat.getPeerEmail(0));
-
 							emailText.setText(user.getEmail());
-
 							clearChatLayout.setVisibility(View.VISIBLE);
 							dividerClearChatLayout.setVisibility(View.VISIBLE);
 						}
@@ -592,7 +557,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				if(chat!=null){
 					String userEmail = chat.getPeerEmail(0);
 					setOfflineAvatar(userEmail);
-				//	shareContactText.setText(userEmail);
 					emailText.setText(user.getEmail());
 				}
 				sharedFoldersLayout.setVisibility(View.GONE);
@@ -650,62 +614,59 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
-	public void setContactPresenceStatus(){
+	private void visibilityStateIcon() {
+		if (megaChatApi == null) {
+			contactStateIcon.setVisibility(View.GONE);
+			return;
+		}
+
+		int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
+		if (stateToolbar == State.EXPANDED && (userStatus == MegaChatApi.STATUS_ONLINE || userStatus == MegaChatApi.STATUS_AWAY || userStatus == MegaChatApi.STATUS_BUSY || userStatus == MegaChatApi.STATUS_OFFLINE)) {
+			contactStateIcon.setVisibility(View.VISIBLE);
+			return;
+		}
+
+		contactStateIcon.setVisibility(View.GONE);
+		return;
+	}
+
+
+	private void setContactPresenceStatus(){
 		logDebug("setContactPresenceStatus");
-		contactStateIcon.setVisibility(View.VISIBLE);
-		boolean statusGONE = false;
 		if (megaChatApi != null){
 			int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
 			if(userStatus == MegaChatApi.STATUS_ONLINE){
 				logDebug("This user is connected");
-				contactStateIcon.setVisibility(View.VISIBLE);
 				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.online_status));
-				secondLineLengthToolbar.setText(getString(R.string.online_status));
-
 			}else if(userStatus == MegaChatApi.STATUS_AWAY){
 				logDebug("This user is away");
-				contactStateIcon.setVisibility(View.VISIBLE);
 				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.away_status));
-				secondLineLengthToolbar.setText(getString(R.string.away_status));
 			} else if(userStatus == MegaChatApi.STATUS_BUSY){
 				logDebug("This user is busy");
-				contactStateIcon.setVisibility(View.VISIBLE);
 				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.busy_status));
-				secondLineLengthToolbar.setText(getString(R.string.busy_status));
 			}
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 				logDebug("This user is offline");
-				contactStateIcon.setVisibility(View.VISIBLE);
 				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.offline_status));
-				secondLineLengthToolbar.setText(getString(R.string.offline_status));
 			}
 			else if(userStatus == MegaChatApi.STATUS_INVALID){
 				logDebug("INVALID status: " + userStatus);
-				contactStateIcon.setVisibility(View.GONE);
 				secondLineTextToolbar.setVisibility(View.GONE);
-				statusGONE = true;
 			}
 			else{
 				logDebug("This user status is: " + userStatus);
-				contactStateIcon.setVisibility(View.GONE);
 				secondLineTextToolbar.setVisibility(View.GONE);
-				statusGONE = true;
 			}
 		}
-		if (statusGONE) {
-			firstLineTextToolbar.setPadding(0, px2dp(6, outMetrics), 0, px2dp(15, outMetrics));
-		}
-		else {
-			firstLineTextToolbar.setPadding(0, px2dp(6, outMetrics), 0, 0);
-		}
+		visibilityStateIcon();
 	}
 
 	public void setUpIndividualChatNotifications(){
@@ -752,48 +713,33 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		sendFileMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
 		if(isOnline(this)){
-
-			if(isChatEnabled()){
-				if(fromContacts){
-					sendFileMenuItem.setVisible(true);
-				}
-				else{
-					sendFileMenuItem.setVisible(false);
-				}
+			if(isChatEnabled() && fromContacts){
+				sendFileMenuItem.setVisible(true);
 			}
 			else{
 				sendFileMenuItem.setVisible(false);
 			}
-
 		}
 		else{
 			logDebug("Hide all - no network connection");
 			shareMenuItem.setVisible(false);
-			//viewFoldersMenuItem.setVisible(false);
 			sendFileMenuItem.setVisible(false);
 		}
 
-		appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+		appBarLayout.addOnOffsetChangedListener(new AppBarStateChangeListener() {
 			@Override
-			public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
-				if (offset == 0) {
-					// Expanded
+			public void onStateChanged(AppBarLayout appBarLayout, State state) {
+				stateToolbar = state;
+				if (stateToolbar == State.EXPANDED) {
 					firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
 					secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
 					setColorFilterWhite();
-				}
-				else {
-					if (offset<0 && Math.abs(offset)>=appBarLayout.getTotalScrollRange()/2) {
-						// Collapsed
-						firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-						secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-						setColorFilterBlack();
-					}
-					else {
-						firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
-						secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
-						setColorFilterWhite();
-					}
+					visibilityStateIcon();
+				} else if (stateToolbar == State.COLLAPSED) {
+					firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+					secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+					setColorFilterBlack();
+					visibilityStateIcon();
 				}
 			}
 		});
@@ -2479,14 +2425,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
 				String formattedDate = lastGreenDate(this, lastGreen);
-
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
 				secondLineTextToolbar.isMarqueeIsNecessary(this);
-//				secondLineTextToolbar.setText("formattedDate formattedDate formattedDate formattedDate formattedDate");
-				secondLineLengthToolbar.setText(formattedDate);
-
 				logDebug("Date last green: " + formattedDate);
 			}
 		}

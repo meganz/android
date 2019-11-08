@@ -92,7 +92,7 @@
                             android:singleLine="true"
                             android:maxLines="1"
                             android:ellipsize="end"
-                            android:textSize="20sp" />
+                            android:textSize="15sp" />
 
                         <ImageView
                             android:id="@+id/chat_group_contact_properties_edit_icon"

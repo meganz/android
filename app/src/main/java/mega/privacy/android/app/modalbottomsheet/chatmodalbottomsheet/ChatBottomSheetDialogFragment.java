@@ -37,9 +37,6 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -54,15 +51,13 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     private Context context;
     private MegaChatListItem chat = null;
     private long chatId;
-
-    private final static int MAX_WIDTH = 200;
-    private final static int ICON_STATE_SIZE = 6;
 
     private BottomSheetBehavior mBehavior;
     private LinearLayout items_layout;
@@ -154,7 +149,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         titleMailContactChatPanel = contentView.findViewById(R.id.chat_list_chat_mail_text);
         chatImageView = contentView.findViewById(R.id.sliding_chat_list_thumbnail);
         chatInitialLetter = contentView.findViewById(R.id.sliding_chat_list_initial_letter);
-        chatInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
         infoChatText = contentView.findViewById(R.id.chat_list_info_chat_text);
         optionInfoChat = contentView.findViewById(R.id.chat_list_info_chat_layout);
         optionLeaveChat = contentView.findViewById(R.id.chat_list_leave_chat_layout);
@@ -167,9 +161,16 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         archiveChatText = contentView.findViewById(R.id.chat_list_archive_chat_text);
         archiveChatIcon = contentView.findViewById(R.id.file_archive_chat_image);
 
-        titleNameContactChatPanel.setMaxWidth(Util.px2dp(MAX_WIDTH, outMetrics));
-        titleNameContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
-        titleMailContactChatPanel.setMaxWidth(Util.px2dp(MAX_WIDTH, outMetrics));
+        if(isScreenInPortrait(context)){
+            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+        }else{
+            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+        }
+
+        titleNameContactChatPanel.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+        chatInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
         optionInfoChat.setOnClickListener(this);
         optionMuteChat.setOnClickListener(this);
@@ -416,7 +417,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
         if (chat.getTitle() != null) {
             if (chat.getTitle().trim().length() > 0) {
-                String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
+                String firstLetter = getFirstLetter(chat.getTitle());
                 chatInitialLetter.setText(firstLetter);
                 chatInitialLetter.setTextColor(Color.WHITE);
                 chatInitialLetter.setVisibility(View.VISIBLE);

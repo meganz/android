@@ -67,7 +67,6 @@
                     android:textColor="@color/name_my_account"
                     android:text="User Name"
                     android:singleLine="true"
-                    android:ellipsize="end"
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"/>
 

@@ -90,7 +90,7 @@
                     android:src="@drawable/circle_status_contact_offline" />
             </LinearLayout>
 
-            <mega.privacy.android.app.components.twemoji.EmojiTextView
+            <TextView
                 android:id="@+id/chat_explorer_list_participants"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
