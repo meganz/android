@@ -377,7 +377,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 	private boolean isStorageStatusDialogShown = false;
-	private Purchase highestGooglePlaySubscription = null;
 
 	private boolean userNameChanged;
 	private boolean userEmailChanged;
@@ -1157,7 +1156,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void launchPayment(String productId) {
 		//start purchase/subscription flow
 		SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
-		String oldSku = highestGooglePlaySubscription == null ? null : highestGooglePlaySubscription.getSku();
+		Purchase purchase = app.getMyAccountInfo().getHighestGooglePlaySubscription();
+		String oldSku = purchase == null ? null : purchase.getSku();
 		mBillingManager.initiatePurchaseFlow(oldSku, skuDetails);
 	}
 
@@ -1192,6 +1192,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		updateAccountInfo(purchases);
+		updateSubscriptionLevel(app.getMyAccountInfo(), false);
 	}
 
 	@Override
@@ -1200,11 +1201,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		switch (resultCode) {
 			case BillingClient.BillingResponseCode.OK:
 				updateAccountInfo(purchases);
+				Purchase highestGooglePlaySubscription = app.getMyAccountInfo().getHighestGooglePlaySubscription();
 				if (highestGooglePlaySubscription != null) {
 					String sku = highestGooglePlaySubscription.getSku();
 					message = getString(R.string.message_user_purchased_subscription,
 							getSubscriptionType(this, sku),
 							getSubscriptionRenewalType(this, sku));
+					updateSubscriptionLevel(app.getMyAccountInfo(), true);
 				}
 				break;
 			case BillingClient.BillingResponseCode.USER_CANCELED:
@@ -1260,8 +1263,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					break;
 			}
 
-			//we should only have single purchase once
-			highestGooglePlaySubscription = purchase;
+			//we should only have single purchase once, so the list should only contain single item
+			myAccountInfo.setHighestGooglePlaySubscription(purchase);
 		}
 
 		myAccountInfo.setInventoryFinished(true);
@@ -1280,21 +1283,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				"; getLevelInventory: " + myAccountInfo.getLevelInventory() +
 				"; isAccountDetailsFinished: " + myAccountInfo.isAccountDetailsFinished());
 
-		updateSubscriptionLevel(myAccountInfo);
 	}
 
-	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo) {
-		if (myAccountInfo.isAccountDetailsFinished()
-				&& myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()
-				&& highestGooglePlaySubscription != null) {
-			if (dbH == null) {
-				dbH = DatabaseHandler.getDbHandler(this);
-			}
+	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo, boolean allowDownGrade) {
+		Purchase highestGooglePlaySubscription = myAccountInfo.getHighestGooglePlaySubscription();
+		if (!myAccountInfo.isAccountDetailsFinished() || highestGooglePlaySubscription == null) {
+			return;
+		}
 
-			MegaAttributes attributes = dbH.getAttributes();
-
-			long lastPublicHandle = getLastPublicHandle(attributes);
-			String json = highestGooglePlaySubscription.getOriginalJson();
+		MegaAttributes attributes = dbH.getAttributes();
+		long lastPublicHandle = getLastPublicHandle(attributes);
+		String json = highestGooglePlaySubscription.getOriginalJson();
+		if (allowDownGrade || myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()) {
 			if (lastPublicHandle == -1) {
 				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, this);
 			} else {
@@ -11396,7 +11396,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		else{
 			logWarning("usedSpaceLayout is NULL");
 		}
-		updateSubscriptionLevel(app.getMyAccountInfo());
+		updateSubscriptionLevel(app.getMyAccountInfo(), false);
 
 		switch (storageState) {
 			case MegaApiJava.STORAGE_STATE_GREEN:

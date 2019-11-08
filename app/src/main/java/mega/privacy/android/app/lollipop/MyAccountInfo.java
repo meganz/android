@@ -71,6 +71,7 @@ public class MyAccountInfo {
     Purchase proIIYearly = null;
     Purchase proIIIMonthly = null;
     Purchase proIIIYearly = null;
+    private Purchase highestGooglePlaySubscription = null;
 
     MegaPricing pricing;
 
@@ -591,4 +592,11 @@ public class MyAccountInfo {
         return usedStorage;
     }
 
+    public Purchase getHighestGooglePlaySubscription() {
+        return highestGooglePlaySubscription;
+    }
+
+    public void setHighestGooglePlaySubscription(Purchase highestGooglePlaySubscription) {
+        this.highestGooglePlaySubscription = highestGooglePlaySubscription;
+    }
 }
