@@ -3502,7 +3502,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
             String messageContent = "";
-
             if (message.getContent() != null) {
                 messageContent = converterShortCodes(message.getContent());
             }
@@ -3569,7 +3568,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 try {
                     if (messageContent != null) {
-
                         RTFFormatter formatter = new RTFFormatter(messageContent, context);
                         ssb = formatter.setRTFFormat();
                     }
@@ -3756,15 +3754,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             String messageContent = "";
-
             if (message.getContent() != null) {
                 messageContent = converterShortCodes(message.getContent());
             }
 
             if (message.isEdited()) {
                 logDebug("Message is edited");
-
-
                 SimpleSpanBuilder ssb = null;
                 try {
                     if (message.getContent() != null) {
@@ -6253,7 +6248,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 
             String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(megaChatApi.getMyFullname()));
-
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
@@ -6261,14 +6255,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 textToShow = textToShow.replace("[/B]", "</font>");
             } catch (Exception e) {
             }
-
             Spanned result = null;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
             } else {
                 result = Html.fromHtml(textToShow);
             }
-
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
 
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);

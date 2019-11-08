@@ -36,7 +36,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     private Display display;
     private DisplayMetrics mOutMetrics = new DisplayMetrics();
     private int textViewMaxWidth;
-    private boolean neccessaryShortCode = true;
+    private boolean necessaryShortCode = true;
 
     public EmojiTextView(final Context context) {
         this(context, null);
@@ -109,11 +109,11 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     }
 
     public boolean isNeccessaryShortCode() {
-        return neccessaryShortCode;
+        return necessaryShortCode;
     }
 
     public void setNeccessaryShortCode(boolean neccessaryShortCode) {
-        this.neccessaryShortCode = neccessaryShortCode;
+        this.necessaryShortCode = neccessaryShortCode;
     }
 
     @Override
