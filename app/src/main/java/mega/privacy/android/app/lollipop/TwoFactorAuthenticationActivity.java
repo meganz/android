@@ -964,7 +964,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 }
                 if (url != null) {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG,newAccount );
                     logDebug("URL: "+url+" seed: " + seed);
                     if (isIntentAvailable(this, intent)) {
                         startActivity(intent);
@@ -987,7 +986,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 intent.setAction(ACTION_RECOVERY_KEY_EXPORTED);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG,newAccount );
                 startActivity(intent);
                 finish();
                 break;
@@ -1254,7 +1252,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
                 newIntent.putExtra("parentPath", parentPath);
                 newIntent.setAction(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);
-                intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG,newAccount );
                 startActivity(newIntent);
             }
         }

@@ -53,7 +53,6 @@ public class Constants {
     public static final String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
-    public static final String EXTRA_SHOULD_SHOW_SMS_DIALOG = "shouldShowSMSDialog";
     public static final String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
 
     public static final String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";

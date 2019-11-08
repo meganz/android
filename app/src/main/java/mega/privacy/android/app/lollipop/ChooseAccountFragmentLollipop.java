@@ -246,7 +246,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
         intent.putExtra("firstLogin", true);
-        intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, true);
         intent.putExtra("upgradeAccount", false);
         intent.putExtra("newAccount", true);
         startActivity(intent);
@@ -262,7 +261,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", PRO_I);
         intent.putExtra("newAccount", true);
-        intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -276,7 +274,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", PRO_II);
         intent.putExtra("newAccount", true);
-        intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -290,7 +287,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", PRO_III);
         intent.putExtra("newAccount", true);
-        intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -304,7 +300,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", PRO_LITE);
         intent.putExtra("newAccount", true);
-        intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }

@@ -532,8 +532,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	boolean firstLogin = false;
-	private static boolean shouldShowSMSDialog;
-	private boolean hasSMSFragmentShowed;
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
@@ -1800,7 +1798,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
 		outState.putBoolean("firstLogin", firstLogin);
-		outState.putBoolean(EXTRA_SHOULD_SHOW_SMS_DIALOG, shouldShowSMSDialog);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
@@ -3137,8 +3134,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        		}
 	        		else{
 						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
-                        shouldShowSMSDialog = getIntent().getBooleanExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, shouldShowSMSDialog);
-						getIntent().removeExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG);
                         if (firstLogin){
 							logDebug("intent firstLogin==true");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
@@ -3158,8 +3153,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     getIntent().removeExtra("newAccount");
                     getIntent().removeExtra("upgradeAccount");
 					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
-                    shouldShowSMSDialog = intentRec.getBooleanExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, shouldShowSMSDialog);
-					intentRec.removeExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG);
                     if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
@@ -3306,9 +3299,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
         smsDialogTimeChecker.update();
-        shouldShowSMSDialog = false;
-        //don't show the dialog again.
-        hasSMSFragmentShowed = true;
         onAskingSMSVerificationFragment = true;
         if (svF == null) {
             svF = new SMSVerificationFragment();
@@ -4629,7 +4619,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
-        if (canVoluntaryVerifyPhoneNumber() && !hasSMSFragmentShowed && (shouldShowSMSDialog || smsDialogTimeChecker.shouldShow())) {
+        if (canVoluntaryVerifyPhoneNumber() && smsDialogTimeChecker.shouldShow()) {
             showSMSVerificationDialog();
         }
     }
@@ -13732,7 +13722,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void showSMSVerificationDialog() {
         smsDialogTimeChecker.update();
-        shouldShowSMSDialog = false;
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
@@ -13764,13 +13753,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             }
         });
         alertDialogSMSVerification = dialogBuilder.create();
-        alertDialogSMSVerification.setOnDismissListener(new DialogInterface.OnDismissListener() {
-
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                shouldShowSMSDialog = false;
-            }
-        });
         alertDialogSMSVerification.setCancelable(false);
         alertDialogSMSVerification.setCanceledOnTouchOutside(false);
         alertDialogSMSVerification.show();

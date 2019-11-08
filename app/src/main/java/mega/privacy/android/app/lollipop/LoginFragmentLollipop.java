@@ -2058,7 +2058,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         logDebug("First time");
                         intent = new Intent(context,ManagerActivityLollipop.class);
                         intent.putExtra("firstLogin", true);
-                        intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, true);
                         if (action != null){
                             logDebug("Action not NULL");
                             if (action.equals(ACTION_EXPORT_MASTER_KEY)){
@@ -2098,7 +2097,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         else{
                             intent = new Intent(context,ManagerActivityLollipop.class);
                             intent.putExtra("firstLogin", true);
-                            intent.putExtra(EXTRA_SHOULD_SHOW_SMS_DIALOG, true);
                             initialCam = true;
                         }
 
