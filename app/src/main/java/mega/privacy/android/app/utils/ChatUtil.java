@@ -22,6 +22,7 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -483,9 +484,23 @@ public class ChatUtil {
         }
     }
 
-    public static String converterShortCodes(String text){
-        if(text == null || text.isEmpty()) return text;
+    public static String converterShortCodes(String text) {
+        if (text == null || text.isEmpty()) return text;
         return EmojiUtilsShortcodes.emojify(text);
+    }
+
+    public static SimpleSpanBuilder formatText(Context context, String text) {
+
+        SimpleSpanBuilder result;
+
+        try {
+            RTFFormatter formatter = new RTFFormatter(text, context);
+            result = formatter.setRTFFormat();
+        } catch (Exception e) {
+            logError("FORMATTER EXCEPTION!!!", e);
+            result = null;
+        }
+        return result;
     }
 
 }

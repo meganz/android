@@ -72,7 +72,6 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MessageVoiceClip;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
-import mega.privacy.android.app.utils.RTFFormatter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2715,17 +2714,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
                 holder.urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
-                SimpleSpanBuilder ssb = null;
-
-                try{
-
-                    RTFFormatter formatter = new RTFFormatter(text, context);
-                    ssb = formatter.setRTFFormat();
-                }
-                catch (Exception e){
-                    logError("FORMATTER EXCEPTION!!!", e);
-                    ssb = null;
-                }
+                SimpleSpanBuilder ssb = formatText(context, text);
 
                 checkEmojiSize(text, holder.urlOwnMessageText);
                 if(ssb!=null){
@@ -2892,16 +2881,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 //Color always status SENT
                 ((ViewHolderMessageChat) holder).urlContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
 
-                SimpleSpanBuilder ssb = null;
-
-                try {
-                    RTFFormatter formatter = new RTFFormatter(text, context);
-                    ssb = formatter.setRTFFormat();
-                } catch (Exception e) {
-                    logDebug("FORMATTER EXCEPTION!!!");
-                    ssb = null;
-                }
-
+                SimpleSpanBuilder ssb = formatText(context, text);
                 if (ssb != null) {
                     ((ViewHolderMessageChat) holder).urlContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                 } else {
@@ -3535,18 +3515,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.forwardOwnRichLinks.setVisibility(View.VISIBLE);
                 }
 
-                SimpleSpanBuilder ssb = null;
-
-                try {
-                    RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                    ssb = formatter.setRTFFormat();
-                } catch (Exception e) {
-                    logError("FORMATTER EXCEPTION!!!", e);
-                    ssb = null;
-                }
-
+                SimpleSpanBuilder ssb = formatText(context, messageContent);
                 if (ssb != null) {
-
                     ssb.append(" " + context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), new StyleSpan(Typeface.ITALIC));
                     holder.urlOwnMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                 } else {
@@ -3564,18 +3534,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             } else {
 
-                SimpleSpanBuilder ssb = null;
-
-                try {
-                    if (messageContent != null) {
-                        RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                        ssb = formatter.setRTFFormat();
-                    }
-                } catch (Exception e) {
-                    logError("FORMATTER EXCEPTION!!!", e);
-                    ssb = null;
-                }
-
+                SimpleSpanBuilder ssb = formatText(context, messageContent);
                 int status = message.getStatus();
 
                 if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
@@ -3760,33 +3719,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (message.isEdited()) {
                 logDebug("Message is edited");
-                SimpleSpanBuilder ssb = null;
-                try {
-                    if (message.getContent() != null) {
-                        messageContent = message.getContent();
-                        RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                        ssb = formatter.setRTFFormat();
-                    }
-
-                    if (ssb != null) {
-                        ssb.append(" " + context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), new StyleSpan(Typeface.ITALIC));
-                        ((ViewHolderMessageChat) holder).urlContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
-                    } else {
-                        messageContent = messageContent + " ";
-                        Spannable content = new SpannableString(messageContent);
-                        content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                        Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
-                        edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                        CharSequence indexedText = TextUtils.concat(messageContent, edited);
-                        ((ViewHolderMessageChat) holder).urlContactMessageText.setText(indexedText);
-                    }
-                } catch (Exception e) {
-                    ssb = null;
-                    logError("FORMATTER EXCEPTION!!!", e);
+                SimpleSpanBuilder ssb = formatText(context, messageContent);
+                if (ssb != null) {
+                    ssb.append(" " + context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), new StyleSpan(Typeface.ITALIC));
+                    ((ViewHolderMessageChat) holder).urlContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
+                } else {
                     messageContent = messageContent + " ";
                     Spannable content = new SpannableString(messageContent);
                     content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -3801,21 +3738,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
             } else {
-
-
                 //Color always status SENT
                 ((ViewHolderMessageChat) holder).urlContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
 
-                SimpleSpanBuilder ssb = null;
-
-                try {
-                    RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                    ssb = formatter.setRTFFormat();
-                } catch (Exception e) {
-                    logError("FORMATTER EXCEPTION!!!", e);
-                    ssb = null;
-                }
-
+                SimpleSpanBuilder ssb = formatText(context, messageContent);
                 if (ssb != null) {
                     ((ViewHolderMessageChat) holder).urlContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                 } else {
@@ -4159,18 +4085,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.retryAlert.setVisibility(View.GONE);
                 }
 
-                SimpleSpanBuilder ssb = null;
-
-                try {
-                    RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                    ssb = formatter.setRTFFormat();
-                } catch (Exception e) {
-                    logError("FORMATTER EXCEPTION!!!", e);
-                    ssb = null;
-                }
-
+                SimpleSpanBuilder ssb = formatText(context, messageContent);
                 if(ssb!=null){
-
                     ssb.append(" "+context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), new StyleSpan(Typeface.ITALIC));
                     ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                 }
@@ -4260,19 +4176,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageVoiceClipLayout.setVisibility(View.GONE);
                 holder.contentOwnMessageContactLayout.setVisibility(View.GONE);
 
-                SimpleSpanBuilder ssb = null;
-
-                try {
-                    if (message.getContent() != null) {
-                        messageContent = message.getContent();
-                        RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                        ssb = formatter.setRTFFormat();
-                    }
-                } catch (Exception e) {
-                    logError("FORMATTER EXCEPTION!!!", e);
-                    ssb = null;
-                }
-
+                SimpleSpanBuilder ssb = formatText(context, messageContent);
                 int status = message.getStatus();
 
                 if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
@@ -4391,17 +4295,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
-                SimpleSpanBuilder ssb = null;
-                try {
+                SimpleSpanBuilder ssb = formatText(context, messageContent);
                     if (message.getContent() != null) {
                         messageContent = message.getContent();
-                        RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                        ssb = formatter.setRTFFormat();
                     }
 
                     if (ssb != null) {
                         ssb.append(" " + context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), new StyleSpan(Typeface.ITALIC));
-                        ((ViewHolderMessageChat) holder).contentContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
+                        holder.contentContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                     } else {
                         messageContent = messageContent + " ";
                         Spannable content = new SpannableString(messageContent);
@@ -4413,23 +4314,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                         CharSequence indexedText = TextUtils.concat(messageContent, edited);
-                        ((ViewHolderMessageChat) holder).contentContactMessageText.setText(indexedText);
+                        holder.contentContactMessageText.setText(indexedText);
                     }
-                } catch (Exception e) {
-                    ssb = null;
-                    logError("FORMATTER EXCEPTION!!!", e);
-                    messageContent = messageContent + " ";
-                    Spannable content = new SpannableString(messageContent);
-                    content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
-                    edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    CharSequence indexedText = TextUtils.concat(messageContent, edited);
-                    ((ViewHolderMessageChat) holder).contentContactMessageText.setText(indexedText);
-                }
 
                 if (isOnline(context)) {
                     if(isMultipleSelect()){
@@ -4536,16 +4422,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 //Color always status SENT
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
 
-                SimpleSpanBuilder ssb = null;
-
-                try {
-                    RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                    ssb = formatter.setRTFFormat();
-                } catch (Exception e) {
-                    logError("FORMATTER EXCEPTION!!!", e);
-                    ssb = null;
-                }
-
+                SimpleSpanBuilder ssb = formatText(context, messageContent);
                 if (ssb != null) {
                     ((ViewHolderMessageChat) holder).contentContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                 } else {
