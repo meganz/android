@@ -262,8 +262,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
     private final String INDEX_CLOUD = "INDEX_CLOUD";
 
-    private String bonusStorageSMS = "20 GB";
-
 	private final int ERROR_TAB = -1;
 	private final int CLOUD_TAB = 0;
 	private final int RECENTS_TAB = 1;
@@ -391,8 +389,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     int orientationSaved;
 
     float elevation = 0;
+    private boolean isSMSDialogShowing;
+    private String bonusStorageSMS = "GB";
+    private final static String STATE_KEY_SMS_DIALOG =  "isSMSDialogShowing";
+    private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 
-	public enum FragmentTag {
+    public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
 		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION;
 
@@ -1801,6 +1803,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
+		outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing);
+		outState.putString(STATE_KEY_SMS_BONUS, bonusStorageSMS);
 
 		if(parentHandleIncoming!=-1){
 			outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
@@ -1939,6 +1943,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
+			isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
+			bonusStorageSMS = savedInstanceState.getString(STATE_KEY_SMS_BONUS);
 			searchDate = savedInstanceState.getLongArray("searchDate");
 			firstLogin = savedInstanceState.getBoolean("firstLogin");
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
@@ -4500,7 +4506,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			megaChatApi.removeChatCallListener(this);
 
 		}
-
+        if (alertDialogSMSVerification != null) {
+            alertDialogSMSVerification.dismiss();
+        }
 		isStorageStatusDialogShown = false;
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
@@ -4619,7 +4627,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
-        if (canVoluntaryVerifyPhoneNumber() && smsDialogTimeChecker.shouldShow()) {
+        if (canVoluntaryVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing)) {
             showSMSVerificationDialog();
         }
     }
@@ -13721,6 +13729,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void showSMSVerificationDialog() {
+	    isSMSDialogShowing = true;
         smsDialogTimeChecker.update();
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -13752,9 +13761,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 alertDialogSMSVerification.dismiss();
             }
         });
-        alertDialogSMSVerification = dialogBuilder.create();
-        alertDialogSMSVerification.setCancelable(false);
-        alertDialogSMSVerification.setCanceledOnTouchOutside(false);
+        if(alertDialogSMSVerification == null) {
+            alertDialogSMSVerification = dialogBuilder.create();
+            alertDialogSMSVerification.setCancelable(false);
+            alertDialogSMSVerification.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    isSMSDialogShowing = false;
+                }
+            });
+            alertDialogSMSVerification.setCanceledOnTouchOutside(false);
+        }
         alertDialogSMSVerification.show();
     }
 

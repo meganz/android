@@ -53,7 +53,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     private ArrayList<String> countryCodeList;
     private boolean pendingSelectingCountryCode = false;
     private String inferredCountryCode;
-    private String bonusStorageSMS = "20 GB";
+    private String bonusStorageSMS = "GB";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
