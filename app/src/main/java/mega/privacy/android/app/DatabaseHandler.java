@@ -1685,7 +1685,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			int id = Integer.parseInt(cursor.getString(0));
 			String online = decrypt(cursor.getString(1));
-			String intents =  decrypt(cursor.getString(2));
+			String intents = decrypt(cursor.getString(2));
 			String askSizeDownload = decrypt(cursor.getString(3));
 			String askNoAppDownload = decrypt(cursor.getString(4));
 			String fileLoggerSDK = decrypt(cursor.getString(5));
@@ -1701,13 +1701,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String staging = decrypt(cursor.getString(15));
 			String lastPublicHandle = decrypt(cursor.getString(16));
 			String lastPublicHandleTimeStamp = decrypt(cursor.getString(17));
-			int storageState = Integer.parseInt(decrypt(cursor.getString(18)));
-			if(intents!=null){
-				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff, staging, lastPublicHandle, lastPublicHandleTimeStamp, storageState);
-			}
-			else{
-				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff, staging, lastPublicHandle, lastPublicHandleTimeStamp, storageState);
-			}
+			String storageState = decrypt(cursor.getString(18));
+
+			attr = new MegaAttributes(online,
+					intents != null && !intents.isEmpty() ? Integer.parseInt(intents) : 0,
+					askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp,
+					paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp,
+					invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff,
+					staging, lastPublicHandle, lastPublicHandleTimeStamp,
+					storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN);
 		}
 		cursor.close();
 
@@ -2929,7 +2931,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @return Integer value selected from the database.
 	 */
 	private int getIntValue(String tableName, String columnName, int defaultValue) {
-    	return Integer.valueOf(getStringValue(tableName, columnName, Integer.toString(defaultValue)));
+		try {
+			String value = getStringValue(tableName, columnName, Integer.toString(defaultValue));
+			if (value != null && !value.isEmpty()) {
+				return Integer.valueOf(value);
+			}
+		} catch (Exception e) {
+			logWarning("EXCEPTION - Return default value: " + defaultValue, e);
+		}
+
+    	return defaultValue;
 	}
 
 	/**
