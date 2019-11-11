@@ -116,200 +116,86 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         checkTotalMessages();
     }
 
-    public void forward(MegaChatRoom chatRoom){
-        if(chatHandles.length==1){
-            logDebug("Forward to one chat");
-            for(int i=0;i<idMessages.length;i++){
+    public void forward(MegaChatRoom chatRoom) {
+        for (int k = 0; k < chatHandles.length; k++) {
+            for (int i = 0; i < idMessages.length; i++) {
+                logDebug("Forward: " + idMessages[i] + ", Chat ID: " + chatHandles[k]);
+
                 MegaChatMessage messageToForward = getMegaChatMessage(context, megaChatApi, idChat, idMessages[i]);
-
-                if(messageToForward!=null){
-                    int type = messageToForward.getType();
-                    logDebug("Type of message to forward: " + type);
-                    switch(type){
-                        case MegaChatMessage.TYPE_NORMAL:{
-                            String text = messageToForward.getContent();
-
-                            if(chatHandles[0]==idChat){
-                                ((ChatActivityLollipop) context).sendMessage(text);
-                            }
-                            else{
-                                megaChatApi.sendMessage(chatHandles[0], text);
-                            }
-                            checkTotalMessages();
-                            break;
-                        }
-                        case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
-                            MegaChatMessage contactMessage = megaChatApi.forwardContact(idChat, messageToForward.getMsgId(),chatHandles[0]);
-                            if(chatHandles[0]==idChat){
-                                if(contactMessage!=null){
-                                    AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(contactMessage);
-                                    ((ChatActivityLollipop) context).sendMessageToUI(androidMsgSent);
-                                }
-                            }
-                            checkTotalMessages();
-                            break;
-                        }
-                        case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-
-                            if(messageToForward.getUserHandle()!=megaChatApi.getMyUserHandle()){
-                                MegaNodeList nodeList = messageToForward.getMegaNodeList();
-                                if(nodeList != null) {
-                                    for (int j = 0; j < nodeList.size(); j++) {
-                                        MegaNode temp = nodeList.get(j);
-                                        String name = temp.getName();
-                                        MegaNode chatFolder = megaApi.getNodeByPath(CHAT_FOLDER, megaApi.getRootNode());
-                                        if(chatFolder==null){
-                                            logWarning("Error no chat folder - return");
-                                            return;
-                                        }
-                                        MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
-                                        if(nodeToAttach!=null){
-                                            nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
-                                            if(chatHandles[0]==idChat){
-                                                megaChatApi.attachNode(chatHandles[0], nodeToAttach.getHandle(), this);
-                                            }
-                                            else{
-                                                megaChatApi.attachNode(chatHandles[0], nodeToAttach.getHandle(), this);
-                                            }
-                                        }
-                                        else{
-                                            logWarning("ERROR - Node to attach is NULL - one node not attached");
-                                        }
-                                    }
-                                }
-                            }
-                            else{
-                                MegaNodeList nodeList = messageToForward.getMegaNodeList();
-                                if(nodeList != null) {
-                                    for (int j = 0; j < nodeList.size(); j++) {
-                                        MegaNode temp = nodeList.get(j);
-                                        if(chatHandles[0]==idChat){
-                                            megaChatApi.attachNode(chatHandles[0], temp.getHandle(), this);
-                                        }
-                                        else{
-                                            megaChatApi.attachNode(chatHandles[0], temp.getHandle(), this);
-                                        }
-                                    }
-                                }
-                            }
-
-                            break;
-                        }
-
-                        case MegaChatMessage.TYPE_VOICE_CLIP:{
-                            logDebug("Forward to one chat TYPE_VOICE_CLIP");
-                            checkTypeVoiceClip(messageToForward, 0);
-                            break;
-                        }
-                        case MegaChatMessage.TYPE_CONTAINS_META:{
-                            checkTypeMeta(messageToForward, 0);
-                            break;
-                        }
-                    }
+                if (messageToForward == null) {
+                    logWarning("ERROR: message is null on forwarding");
+                    continue;
                 }
-                else{
-                    logWarning("ERROR -> message is null on forwarding");
-                }
-            }
-        }
-        else{
-            logDebug("Forward to many chats");
-            for(int k=0;k<chatHandles.length;k++){
-                for(int i=0;i<idMessages.length;i++){
-                    MegaChatMessage messageToForward = getMegaChatMessage(context, megaChatApi, idChat, idMessages[i]);
-                    logDebug("Forward: " + idMessages[i] + ", Chat ID: " + chatHandles[k]);
-                    if(messageToForward!=null){
-                        int type = messageToForward.getType();
-                        logDebug("Type of message to forward: " + type);
-                        switch(type){
-                            case MegaChatMessage.TYPE_NORMAL:{
-                                String text = messageToForward.getContent();
-                                if(chatHandles[k]==idChat){
-                                    ((ChatActivityLollipop) context).sendMessage(text);
-                                }
-                                else{
-                                    megaChatApi.sendMessage(chatHandles[k], text);
-                                }
-                                checkTotalMessages();
-                                break;
-                            }
-                            case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
 
-                                MegaChatMessage contactMessage = megaChatApi.forwardContact(idChat, messageToForward.getMsgId(),chatHandles[k]);
-                                if(chatHandles[k]==idChat){
-                                    if(contactMessage!=null){
-                                        AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(contactMessage);
-                                        ((ChatActivityLollipop) context).sendMessageToUI(androidMsgSent);
-                                    }
-                                }
-                                checkTotalMessages();
-                                break;
-                            }
-                            case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-                                logDebug("Forward to many chats - TYPE_NODE_ATTACHMENT");
-                                if(messageToForward.getUserHandle()!=megaChatApi.getMyUserHandle()){
-                                    MegaNodeList nodeList = messageToForward.getMegaNodeList();
-                                    if(nodeList != null) {
-                                        for (int j = 0; j < nodeList.size(); j++) {
-                                            MegaNode temp = nodeList.get(j);
-                                            String name = temp.getName();
-                                            MegaNode chatFolder = megaApi.getNodeByPath(CHAT_FOLDER, megaApi.getRootNode());
-                                            if(chatFolder==null){
-                                                logWarning("Error no chat folder - return");
-                                                return;
-                                            }
-                                            MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
-                                            if(nodeToAttach!=null){
-                                                nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
-                                                if(chatHandles[k]==idChat){
-                                                    megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), this);
-                                                }
-                                                else{
-                                                    megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), this);
-                                                }
-                                            }
-                                            else{
-                                                logWarning("ERROR - Node to attach is NULL - one node not attached");
-                                            }
-                                        }
-                                    }
-                                }
-                                else{
-                                    MegaNodeList nodeList = messageToForward.getMegaNodeList();
-                                    if(nodeList != null) {
-                                        for (int j = 0; j < nodeList.size(); j++) {
-                                            MegaNode temp = nodeList.get(j);
+                int type = messageToForward.getType();
+                logDebug("Type of message to forward: " + type);
 
-                                            if(chatHandles[k]==idChat){
-                                                megaChatApi.attachNode(chatHandles[k], temp.getHandle(), this);
-                                            }
-                                            else{
-                                                megaChatApi.attachNode(chatHandles[k], temp.getHandle(), this);
-                                            }
-                                        }
-                                    }
-                                }
-                                break;
-                            }case MegaChatMessage.TYPE_VOICE_CLIP:{
-                                logDebug("Forward to many chats - TYPE_VOICE_CLIP");
-                                checkTypeVoiceClip(messageToForward, k);
-                                break;
-                            }
-                            case MegaChatMessage.TYPE_CONTAINS_META:{
-                                logDebug("Forward to many chats - TYPE_CONTAINS_META");
-                                checkTypeMeta(messageToForward, k);
-                                break;
+                switch (type) {
+                    case MegaChatMessage.TYPE_NORMAL: {
+                        String text = messageToForward.getContent();
+                        if (chatHandles[k] == idChat) {
+                            ((ChatActivityLollipop) context).sendMessage(text);
+                        } else {
+                            megaChatApi.sendMessage(chatHandles[k], text);
+                        }
+                        checkTotalMessages();
+                        break;
+                    }
+                    case MegaChatMessage.TYPE_CONTACT_ATTACHMENT: {
+
+                        MegaChatMessage contactMessage = megaChatApi.forwardContact(idChat, messageToForward.getMsgId(), chatHandles[k]);
+                        if (chatHandles[k] == idChat) {
+                            if (contactMessage != null) {
+                                AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(contactMessage);
+                                ((ChatActivityLollipop) context).sendMessageToUI(androidMsgSent);
                             }
                         }
+                        checkTotalMessages();
+                        break;
                     }
-                    else{
-                        logWarning("ERROR -> message is null on forwarding");
+                    case MegaChatMessage.TYPE_NODE_ATTACHMENT: {
+                        if (messageToForward.getUserHandle() != megaChatApi.getMyUserHandle()) {
+                            MegaNodeList nodeList = messageToForward.getMegaNodeList();
+                            if (nodeList != null) {
+                                for (int j = 0; j < nodeList.size(); j++) {
+                                    MegaNode temp = nodeList.get(j);
+                                    String name = temp.getName();
+                                    MegaNode chatFolder = megaApi.getNodeByPath(CHAT_FOLDER, megaApi.getRootNode());
+                                    if (chatFolder == null) {
+                                        logWarning("Error no chat folder - return");
+                                        return;
+                                    }
+                                    MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
+                                    if (nodeToAttach != null) {
+                                        nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
+                                        megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), this);
+                                    } else {
+                                        logWarning("ERROR - Node to attach is NULL - one node not attached");
+                                    }
+                                }
+                            }
+                        } else {
+                            MegaNodeList nodeList = messageToForward.getMegaNodeList();
+                            if (nodeList != null) {
+                                for (int j = 0; j < nodeList.size(); j++) {
+                                    MegaNode temp = nodeList.get(j);
+                                    megaChatApi.attachNode(chatHandles[k], temp.getHandle(), this);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case MegaChatMessage.TYPE_VOICE_CLIP: {
+                        checkTypeVoiceClip(messageToForward, k);
+                        break;
+                    }
+                    case MegaChatMessage.TYPE_CONTAINS_META: {
+                        checkTypeMeta(messageToForward, k);
+                        break;
                     }
                 }
             }
         }
-
-
     }
 
     private void attachVoiceClip(long chatHandle, MegaNode megaNode){
