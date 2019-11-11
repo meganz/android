@@ -85,12 +85,8 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
         holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidthEmojis(px2dp(MAX_WIDTH_ADD_CONTACTS, outMetrics));
-        holder.textViewName.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
-
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
-
         holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
-
         holder.itemLayout.setTag(holder);
 
         v.setTag(holder);

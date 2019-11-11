@@ -144,8 +144,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         holder.stateIcon = v.findViewById(R.id.chat_explorer_list_contact_state);
         holder.lastSeenStateText = v.findViewById(R.id.chat_explorer_list_last_seen_state);
         holder.participantsText = v.findViewById(R.id.chat_explorer_list_participants);
-        holder.titleText.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
-        holder.initialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
         if(isScreenInPortrait(context)){
             holder.titleText.setMaxWidthEmojis(px2dp(MAX_WIDTH_TITLE_PORT, outMetrics));

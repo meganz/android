@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_layout_chip"
     android:layout_width="wrap_content"
     android:layout_marginLeft="10dp"
@@ -24,7 +25,7 @@
             android:layout_height="36dp"
             android:src="@drawable/ic_phone_contact_list"/>-->
 
-        <TextView
+        <mega.privacy.android.app.components.twemoji.EmojiTextView
             android:id="@+id/name_chip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,6 +33,7 @@
             android:layout_marginLeft="12dp"
             android:layout_marginRight="4dp"
             android:textSize="13dp"
+            app:emojiSize="11dp"
             android:singleLine="true"
             android:maxLines="1"
             android:ellipsize="middle"

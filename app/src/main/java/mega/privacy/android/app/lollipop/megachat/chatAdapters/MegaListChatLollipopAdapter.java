@@ -508,10 +508,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList) holder).textViewContactName = v.findViewById(R.id.recent_chat_list_name);
 			((ViewHolderNormalChatList) holder).textViewContent = v.findViewById(R.id.recent_chat_list_content);
 
-			((ViewHolderNormalChatList) holder).textViewContactName.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
-			((ViewHolderNormalChatList) holder).contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
-			((ViewHolderNormalChatList) holder).textViewContent.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
-
 			if(isScreenInPortrait(context)){
 				((ViewHolderNormalChatList) holder).textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_TITLE_PORT, outMetrics));
 				((ViewHolderNormalChatList) holder).textViewContent.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTENT_PORT, outMetrics));

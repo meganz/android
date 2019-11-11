@@ -197,9 +197,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             titleMailContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
-        titleNameContactChatPanel.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
-        contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
-
         if (message != null) {
             long userCount  = message.getMessage().getUsersCount();
             if(userCount==1){

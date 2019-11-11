@@ -32,8 +32,8 @@
             android:textColor="@color/file_list_first_row"
             android:maxLines="1"
             android:singleLine="true"
-            android:ellipsize="end"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            rounded:emojiSize="14dp"/>
 
         <ImageView
             android:id="@+id/contact_state"

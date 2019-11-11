@@ -152,8 +152,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				holderList.textViewContactName.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_LAND, outMetrics));
 				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_LAND, outMetrics));
 			}
-			holderList.textViewContactName.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
 			holderList.itemLayout.setOnClickListener(this);
 			holderList.itemLayout.setTag(holderList);
@@ -168,6 +166,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 			holderAddParticipant.imageView = v.findViewById(R.id.add_participant_list_icon);
 			holderAddParticipant.textViewContactName = v.findViewById(R.id.add_participant_list_text);
+			if(isScreenInPortrait(context)){
+				holderAddParticipant.textViewContactName.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_PORT, outMetrics));
+			}else{
+				holderAddParticipant.textViewContactName.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_LAND, outMetrics));
+			}
 			holderAddParticipant.itemLayout.setOnClickListener(this);
 			v.setTag(holderAddParticipant);
 			return holderAddParticipant;

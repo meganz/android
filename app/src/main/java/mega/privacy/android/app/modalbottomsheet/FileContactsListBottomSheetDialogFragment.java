@@ -27,6 +27,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -37,6 +38,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.getFirstLetter;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -55,10 +57,10 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
     private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
-    public TextView titleNameContactPanel;
+    public EmojiTextView titleNameContactPanel;
     public TextView titleMailContactPanel;
     public RoundedImageView contactImageView;
-    public TextView avatarInitialLetter;
+    public EmojiTextView avatarInitialLetter;
     public LinearLayout optionChangePermissions;
     public LinearLayout optionDelete;
     public LinearLayout optionInfo;
@@ -121,10 +123,10 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.file_contact_list_bottom_sheet);
         items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
-        titleNameContactPanel = (TextView) contentView.findViewById(R.id.file_contact_list_contact_name_text);
+        titleNameContactPanel = contentView.findViewById(R.id.file_contact_list_contact_name_text);
         titleMailContactPanel = (TextView) contentView.findViewById(R.id.file_contact_list_contact_mail_text);
         contactImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_file_contact_list_thumbnail);
-        avatarInitialLetter = (TextView) contentView.findViewById(R.id.sliding_file_contact_list_initial_letter);
+        avatarInitialLetter = contentView.findViewById(R.id.sliding_file_contact_list_initial_letter);
 
         optionChangePermissions = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_permissions_layout);
         optionDelete = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_delete_layout);
@@ -132,7 +134,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         optionInfo = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_info_layout);
         optionInfo.setOnClickListener(this);
 
-        titleNameContactPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
+        titleNameContactPanel.setMaxWidthEmojis(scaleWidthPx(200, outMetrics));
         titleMailContactPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
 
         optionChangePermissions.setOnClickListener(this);
@@ -289,28 +291,20 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        if (fullName != null) {
-            if (fullName.length() > 0) {
-                if (fullName.trim().length() > 0) {
-                    String firstLetter = fullName.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                    avatarInitialLetter.setText(firstLetter);
-                    avatarInitialLetter.setTextColor(Color.WHITE);
-                    avatarInitialLetter.setVisibility(View.VISIBLE);
-                    avatarInitialLetter.setTextSize(22);
-                } else {
-                    avatarInitialLetter.setVisibility(View.INVISIBLE);
-                }
-            }
-            else{
-                avatarInitialLetter.setVisibility(View.INVISIBLE);
-            }
-
-        } else {
+        if(fullName == null || fullName.length() <= 0 || fullName.trim().length() <= 0){
             avatarInitialLetter.setVisibility(View.INVISIBLE);
+        }else{
+            String firstLetter = getFirstLetter(fullName);
+            if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+                avatarInitialLetter.setVisibility(View.INVISIBLE);
+            }else {
+                avatarInitialLetter.setText(firstLetter);
+                avatarInitialLetter.setTextColor(Color.WHITE);
+                avatarInitialLetter.setVisibility(View.VISIBLE);
+                avatarInitialLetter.setTextSize(22);
+            }
         }
 
-        ////
     }
 
     @Override

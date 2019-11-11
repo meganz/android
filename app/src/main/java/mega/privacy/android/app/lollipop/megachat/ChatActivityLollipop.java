@@ -584,7 +584,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         textChat = findViewById(R.id.edit_text_chat);
         textChat.setVisibility(View.VISIBLE);
-        textChat.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
         textChat.setEnabled(true);
 
         emptyLayout = findViewById(R.id.empty_messages_layout);
@@ -595,11 +594,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
 
         titleToolbar.setText("");
-        titleToolbar.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
         individualSubtitleToobar.setText("");
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
-        groupalSubtitleToolbar.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
 
         int width;
         if(isScreenInPortrait(this)){

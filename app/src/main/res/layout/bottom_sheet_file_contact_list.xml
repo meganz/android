@@ -32,13 +32,13 @@
                 rounded:border_width="0dp"
                 rounded:corner_radius="20dp" />
 
-            <TextView
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/sliding_file_contact_list_initial_letter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:gravity="center_horizontal|center_vertical"
-                android:paddingBottom="3dp" />
+                rounded:emojiSize="25dp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -47,16 +47,16 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="16dp">
 
-            <TextView
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/file_contact_list_contact_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:singleLine="true"
                 android:maxLines="1"
-                android:ellipsize="end"
                 android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                rounded:emojiSize="14dp"/>
 
             <TextView
                 android:id="@+id/file_contact_list_contact_mail_text"

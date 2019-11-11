@@ -30,6 +30,7 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
@@ -81,13 +82,11 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			// TODO Auto-generated constructor stub
 		}
     	RoundedImageView imageView;
-    	TextView contactInitialLetter;
-//        ImageView imageView;
-        TextView textViewContactName;
+    	EmojiTextView contactInitialLetter;
+		EmojiTextView textViewContactName;
         TextView textViewContent;
         RelativeLayout threeDotsLayout;
         RelativeLayout itemLayout;
-//        ImageView arrowSelection;
         String contactMail;
     	boolean name = false;
 
@@ -177,32 +176,23 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-		
-	    float scaleW = getScaleW(outMetrics, density);
-	    float scaleH = getScaleH(outMetrics, density);
 
-
-		logDebug("ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER");
-		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_incom_request_list, parent, false);
+	    View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_incom_request_list, parent, false);
 		holder = new ViewHolderContactsRequestList(v);
-		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_request_list_item_layout);
-		holder.imageView = (RoundedImageView) v.findViewById(R.id.contact_request_list_thumbnail);
-		holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_request_list_initial_letter);
-		holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
-		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			logDebug("Landscape");
-			holder.textViewContactName.setMaxWidth(scaleWidthPx(280, outMetrics));
+		holder.itemLayout = v.findViewById(R.id.contact_request_list_item_layout);
+		holder.imageView = v.findViewById(R.id.contact_request_list_thumbnail);
+		holder.contactInitialLetter = v.findViewById(R.id.contact_request_list_initial_letter);
+		holder.textViewContactName = v.findViewById(R.id.contact_request_list_name);
+		if(!isScreenInPortrait(context)){
+			holder.textViewContactName.setMaxWidthEmojis(scaleWidthPx(280, outMetrics));
 		}else{
-			logDebug("Portrait");
-			holder.textViewContactName.setMaxWidth(scaleWidthPx(250, outMetrics));
+			holder.textViewContactName.setMaxWidthEmojis(scaleWidthPx(250, outMetrics));
 		}
-		holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
-		holder.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_request_three_dots_layout);
+		holder.textViewContent = v.findViewById(R.id.contact_request_list_content);
+		holder.threeDotsLayout = v.findViewById(R.id.contact_request_three_dots_layout);
 
 		holder.itemLayout.setOnClickListener(this);
 
-//			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
 		v.setTag(holder);
 
 		return holder;

@@ -28,7 +28,8 @@
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:gravity="center_horizontal|center_vertical"
-            android:textSize="22sp" />
+            android:textSize="22sp"
+            rounded:emojiSize="25dp"/>
     </RelativeLayout>
 
     <RelativeLayout
@@ -79,7 +80,8 @@
             android:layout_height="wrap_content"
             android:textColor="@color/file_list_first_row"
             android:maxLines="1"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            rounded:emojiSize="14dp"/>
 
         <ImageView
             android:id="@+id/contact_list_drawable_state"

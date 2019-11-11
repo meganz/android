@@ -172,9 +172,6 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
             titleMailContactPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
-        titleNameContactPanel.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
-        avatarInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
-
         optionInfoContact.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionSendFile.setOnClickListener(this);

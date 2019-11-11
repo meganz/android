@@ -168,9 +168,6 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
-        titleNameContactChatPanel.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
-        contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
-
         if(selectedChat==null){
             logWarning("Error. Selected chat is NULL");
             return;

@@ -166,8 +166,6 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics());
             holder.contactNameTextView.setMaxWidthEmojis((int) width);
         }
-        holder.contactNameTextView.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
-
         holder.emailTextView = (TextView) rowView.findViewById(R.id.contact_mail);
         holder.avatar = (RoundedImageView) rowView.findViewById(R.id.contact_avatar);
         holder.contactStateIcon = (ImageView) rowView.findViewById(R.id.contact_state);

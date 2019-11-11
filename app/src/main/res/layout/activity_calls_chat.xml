@@ -110,6 +110,7 @@
                             android:gravity="center_horizontal|center_vertical"
                             android:textColor="@color/white"
                             android:textSize="50dp"
+                            app:emojiSize="50dp"
                             android:visibility="gone" />
                     </RelativeLayout>
                     <!--Micro Avatar-->
@@ -210,6 +211,7 @@
                         android:layout_centerInParent="true"
                         android:gravity="center_horizontal|center_vertical"
                         android:textSize="15sp"
+                        app:emojiSize="50dp"
                         android:visibility="gone" />
                 </RelativeLayout>
 
@@ -239,6 +241,7 @@
                         android:fontFamily="sans-serif-light"
                         android:textStyle="bold"
                         android:textSize="20sp"
+                        app:emojiSize="18dp"
                         android:maxLines="1"
                         android:singleLine="true"
                         android:ellipsize="end"/>
@@ -374,7 +377,7 @@
                         android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="14sp"
-                        app:emojiSize="14dp"
+                        app:emojiSize="12dp"
                         android:textStyle="normal" />
 
                 </LinearLayout>
@@ -446,7 +449,8 @@
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
                         android:gravity="center_horizontal|center_vertical"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        app:emojiSize="40dp"/>
                 </RelativeLayout>
             </RelativeLayout>
 

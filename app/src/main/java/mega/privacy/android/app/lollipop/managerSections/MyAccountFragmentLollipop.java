@@ -217,9 +217,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		nameView = v.findViewById(R.id.my_account_name);
-		nameView.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 		nameView.setOnClickListener(this);
-
 
 		editImageView = (ImageView) v.findViewById(R.id.my_account_edit_icon);
 		editImageView.setOnClickListener(this);

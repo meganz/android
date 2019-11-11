@@ -71,6 +71,7 @@
                                 android:id="@+id/chat_group_properties_initial_letter"
                                 android:layout_width="fill_parent"
                                 android:layout_height="fill_parent"
+                                app:emojiSize="25dp"
                                 android:gravity="center_horizontal|center_vertical"/>
                         </RelativeLayout>
 
@@ -91,8 +92,8 @@
                             android:textColor="@color/name_my_account"
                             android:singleLine="true"
                             android:maxLines="1"
-                            android:ellipsize="end"
-                            android:textSize="15sp" />
+                            android:textSize="15sp"
+                            app:emojiSize="13dp"/>
 
                         <ImageView
                             android:id="@+id/chat_group_contact_properties_edit_icon"

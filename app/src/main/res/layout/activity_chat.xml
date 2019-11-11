@@ -52,6 +52,7 @@
                             android:fontFamily="sans-serif-light"
                             android:gravity="center_vertical|left"
                             android:textSize="20sp"
+                            app:emojiSize="18dp"
                             android:textColor="@color/white"
                             android:textStyle="bold"
                             android:singleLine="true"
@@ -115,6 +116,7 @@
                         android:singleLine="true"
                         android:textColor="@color/white"
                         android:textSize="12sp"
+                        app:emojiSize="10dp"
                         android:visibility="gone" />
 
                     <LinearLayout
@@ -221,7 +223,8 @@
                                 android:inputType="textMultiLine|textCapSentences"
                                 android:maxLines="1"
                                 android:textColor="@color/black"
-                                android:textSize="14sp" />
+                                android:textSize="14sp"
+                                app:emojiSize="12dp"/>
 
                         </RelativeLayout>
                     </RelativeLayout>

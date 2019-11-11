@@ -22,13 +22,13 @@
             rounded:border_width="0dp"
             rounded:corner_radius="20dp" />
 	    
-	    <TextView
+	    <mega.privacy.android.app.components.twemoji.EmojiTextView
 	        android:id="@+id/shared_folder_contact_initial_letter"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:gravity="center_horizontal|center_vertical"
-            android:paddingBottom="3dp" />
+            rounded:emojiSize="25dp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -56,14 +56,14 @@
         android:layout_toRightOf="@id/shared_folder_contact_relative_layout_avatar"
         android:layout_toLeftOf="@id/shared_folder_three_dots_layout">
 
-        <TextView
+        <mega.privacy.android.app.components.twemoji.EmojiTextView
             android:id="@+id/shared_folder_contact_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="13dp"
             android:textColor="@color/file_list_first_row"
-            android:ellipsize="middle"
             android:textSize="16sp"
+            rounded:emojiSize="14dp"
             android:singleLine="true"
             android:maxLines="1"/>
 

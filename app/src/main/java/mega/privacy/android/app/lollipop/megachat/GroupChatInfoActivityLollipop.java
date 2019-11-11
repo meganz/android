@@ -90,6 +90,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
 
     private final static int MAX_LENGTH_CHAT_TITLE = 60;
+    private final static int MAX_WIDTH_CHAT_TITLE_PORT = 200;
+    private final static int MAX_WIDTH_CHAT_TITLE_LAND = 300;
+
     public long chatHandle;
     public long selectedHandleParticipant;
     private GroupChatInfoActivityLollipop groupChatInfoActivity;
@@ -249,7 +252,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 String firstLetter = getFirstLetter(chat.getTitle());
                 initialLetter.setText(firstLetter);
             }
-            initialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
             createGroupChatAvatar();
 
             infoLayout = findViewById(R.id.chat_group_contact_properties_info_layout);
@@ -262,9 +264,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             infoTextContainerLayout.setLayoutParams(paramsInfoText);
 
             infoTitleChatText = findViewById(R.id.chat_group_contact_properties_info_title);
+            if(isScreenInPortrait(this)){
+                infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_PORT, outMetrics));
+            }else{
+                infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_LAND, outMetrics));
+
+            }
             infoTitleChatText.setText(chat.getTitle());
-            infoTitleChatText.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
-            infoTitleChatText.setMaxWidthEmojis(scaleWidthPx(190, outMetrics));
 
             editImageView = (ImageView) findViewById(R.id.chat_group_contact_properties_edit_icon);
             RelativeLayout.LayoutParams paramsEditIcon = (RelativeLayout.LayoutParams) editImageView.getLayoutParams();

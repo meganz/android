@@ -33,7 +33,8 @@
                 android:layout_marginLeft="72dp"
                 android:layout_marginRight="16dp"
                 android:textColor="@color/name_my_account"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                app:emojiSize="14dp"/>
 
             <TextView
                 android:id="@+id/chat_contact_properties_email_text"

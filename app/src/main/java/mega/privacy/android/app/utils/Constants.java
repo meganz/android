@@ -395,14 +395,11 @@ public class Constants {
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String HANDLE = "handle";
 
-    public static final int EMOJI_SIZE_EXTRA_SMALL = 10;
-    public static final int EMOJI_SIZE_SMALL = 15;
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;
-    public static final int EMOJI_AVATAR_SIZE = 30;
+    public static final int EMOJI_SIZE_HIGH = 30;
     public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
     public static final int EMOJI_AVATAR_CALL_SMALL = 40;
-    public static final int EMOJI_AVATAR_CALL_HIGH = 60;
     public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;

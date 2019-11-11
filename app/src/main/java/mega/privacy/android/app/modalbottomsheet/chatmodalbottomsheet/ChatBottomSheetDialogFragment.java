@@ -169,9 +169,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
-        titleNameContactChatPanel.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
-        chatInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
-
         optionInfoChat.setOnClickListener(this);
         optionMuteChat.setOnClickListener(this);
         optionLeaveChat.setOnClickListener(this);

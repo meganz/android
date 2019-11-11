@@ -77,6 +77,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.adapters.MegaFileInfoSharedContactLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -107,6 +108,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -231,11 +233,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	RelativeLayout ownerLayout;
 	LinearLayout ownerLinear;
-	TextView ownerLabel;
+	EmojiTextView ownerLabel;
 	TextView ownerLabelowner;
 	TextView ownerInfo;
 	ImageView ownerRoundeImage;
-	TextView ownerLetter;
+	EmojiTextView ownerLetter;
 	ImageView ownerState;
 
 	MenuItem downloadMenuItem;
@@ -626,34 +628,22 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         //Owner Layout
         ownerLayout = (RelativeLayout) findViewById(R.id.file_properties_owner_layout);
         ownerRoundeImage= (RoundedImageView) findViewById(R.id.contact_list_thumbnail);
-        ownerLetter = (TextView) findViewById(R.id.contact_list_initial_letter);
+        ownerLetter = findViewById(R.id.contact_list_initial_letter);
 
         ownerLinear = (LinearLayout) findViewById(R.id.file_properties_owner_linear);
-        ownerLabel =  (TextView) findViewById(R.id.file_properties_owner_label);
+        ownerLabel =  findViewById(R.id.file_properties_owner_label);
         ownerLabelowner = (TextView) findViewById(R.id.file_properties_owner_label_owner);
         String ownerString = "("+getString(R.string.file_properties_owner)+")";
         ownerLabelowner.setText(ownerString);
         ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
         ownerState = (ImageView) findViewById(R.id.file_properties_owner_state_icon);
-
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            logDebug("Landscape configuration");
-            float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
-            float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND_2, getResources().getDisplayMetrics());
-
-            ownerLabel.setMaxWidth((int) width1);
-            ownerInfo.setMaxWidth((int) width2);
-
+        if(!isScreenInPortrait(this)){
+            ownerLabel.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_LAND, outMetrics));
+            ownerInfo.setMaxWidth(px2dp(MAX_WIDTH_FILENAME_LAND_2, outMetrics));
+        }else{
+            ownerLabel.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_PORT, outMetrics));
+            ownerInfo.setMaxWidth(px2dp(MAX_WIDTH_FILENAME_PORT_2, outMetrics));
         }
-        else{
-            logDebug("Portrait configuration");
-            float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
-            float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT_2, getResources().getDisplayMetrics());
-
-            ownerLabel.setMaxWidth((int) width1);
-            ownerInfo.setMaxWidth((int) width2);
-        }
-
         ownerLayout.setVisibility(View.GONE);
 
         //Info Layout
@@ -1734,8 +1724,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		int avatarTextSize = getAvatarTextSize(density);
         logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
 
-		String firstLetter = name.charAt(0) + "";
-		firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+        String firstLetter = getFirstLetter(name);
 		ownerLetter.setText(firstLetter);
 		ownerLetter.setTextColor(Color.WHITE);
 		ownerLetter.setVisibility(View.VISIBLE);

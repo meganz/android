@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:gravity="center_horizontal|center_vertical"
-                android:paddingBottom="3dp" />
+                rounded:emojiSize="25dp"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -54,9 +54,9 @@
                 android:gravity="center_vertical"
                 android:singleLine="true"
                 android:maxLines="1"
-                android:ellipsize="end"
                 android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                rounded:emojiSize="14dp"/>
 
             <ImageView
                 android:id="@+id/contact_list_drawable_state"

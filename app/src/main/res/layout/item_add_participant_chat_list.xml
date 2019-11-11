@@ -1,8 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/add_participant_list_item_layout"
     android:layout_width="fill_parent"
     android:layout_height="56dp"
-    android:descendantFocusability="blocksDescendants" >
+    android:descendantFocusability="blocksDescendants">
 
     <RelativeLayout
         android:id="@+id/add_participant_list_relative_layout"
@@ -29,9 +30,9 @@
         android:textAllCaps="true"
         android:text="@string/add_participants_menu_item"
         android:textColor="@color/accentColor"
-        android:ellipsize="end"
         android:fontFamily="sans-serif-medium"
         android:textSize="14sp"
+        app:emojiSize="12dp"
         android:maxLines="1"/>
 
 </RelativeLayout>

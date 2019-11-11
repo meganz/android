@@ -82,7 +82,6 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         View main = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_last_contacts,parent,false);
         ViewHolder holder = new ViewHolder(main);
         holder.contactInitialLetter = main.findViewById(R.id.contact_list_initial_letter);
-        holder.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
         holder.avatarImage = (ImageView)main.findViewById(R.id.item_last_contacts_avatar);
         holder.avatarImage.setOnClickListener(new View.OnClickListener() {
             

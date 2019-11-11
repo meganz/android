@@ -2331,7 +2331,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
         nVDisplayName.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
-		nVDisplayName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 
 		nVEmail = (TextView) findViewById(R.id.navigation_drawer_account_information_email);
         nVPictureProfile = (RoundedImageView) findViewById(R.id.navigation_drawer_user_account_picture_profile);
@@ -4063,7 +4062,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
 		final EmojiEditText inputFirstName = new EmojiEditText(this);
-		inputFirstName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+		inputFirstName.setEmojiSize(px2dp(15, outMetrics));
 
 		inputFirstName.getBackground().mutate().clearColorFilter();
 		inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);

@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -35,6 +36,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -48,6 +50,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.getFirstLetter;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -188,9 +191,8 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	/*private view holder class*/
     class ViewHolderShareList extends RecyclerView.ViewHolder implements View.OnClickListener{
     	RoundedImageView imageView;
-    	TextView initialLetter;
-//        ImageView imageView;
-        TextView textViewContactName; 
+    	EmojiTextView initialLetter;
+		EmojiTextView textViewContactName;
         TextView textViewPermissions;
         RelativeLayout threeDotsLayout;
         RelativeLayout itemLayout;
@@ -246,13 +248,14 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		holder.itemLayout.setOnClickListener(this);
 		holder.itemLayout.setOnLongClickListener(this);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.shared_folder_contact_thumbnail);
-		holder.initialLetter = (TextView) v.findViewById(R.id.shared_folder_contact_initial_letter);
+		holder.initialLetter = v.findViewById(R.id.shared_folder_contact_initial_letter);
 		
-		holder.textViewContactName = (TextView) v.findViewById(R.id.shared_folder_contact_name);
+		holder.textViewContactName = v.findViewById(R.id.shared_folder_contact_name);
+		holder.textViewContactName.setTypeEllipsize(TextUtils.TruncateAt.MIDDLE);
 		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			holder.textViewContactName.setMaxWidth(scaleWidthPx(280,outMetrics));
+			holder.textViewContactName.setMaxWidthEmojis(scaleWidthPx(280,outMetrics));
 		} else {
-			holder.textViewContactName.setMaxWidth(scaleWidthPx(225,outMetrics));
+			holder.textViewContactName.setMaxWidthEmojis(scaleWidthPx(225,outMetrics));
 		}
 
 		holder.textViewPermissions = (TextView) v.findViewById(R.id.shared_folder_contact_permissions);
@@ -486,8 +489,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 
 		if(holder.textViewContactName!=null){
 			String fullName = holder.textViewContactName.getText().toString();
-			firstLetter = fullName.charAt(0) + "";
-			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			firstLetter = getFirstLetter(fullName);
 		}
 		else{
 			if (holder.contactMail != null){

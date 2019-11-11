@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -56,7 +57,7 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 		}
 
 
-        TextView textViewName;
+        EmojiTextView textViewName;
 		ImageView deleteIcon;
         RelativeLayout itemLayout;
 
@@ -77,13 +78,13 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 		holderList = new ViewHolderChips(v);
 		holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
 
-		holderList.textViewName = (TextView) v.findViewById(R.id.name_chip);
+		holderList.textViewName = v.findViewById(R.id.name_chip);
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			logDebug("Landscape");
-			holderList.textViewName.setMaxWidth(scaleWidthPx(260, outMetrics));
+			holderList.textViewName.setMaxWidthEmojis(scaleWidthPx(260, outMetrics));
 		}else{
 			logDebug("Portrait");
-			holderList.textViewName.setMaxWidth(scaleWidthPx(230, outMetrics));
+			holderList.textViewName.setMaxWidthEmojis(scaleWidthPx(230, outMetrics));
 		}
 
 		holderList.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);

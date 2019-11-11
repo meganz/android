@@ -294,7 +294,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			firstLineTextToolbar = findViewById(R.id.first_line_toolbar);
 			secondLineTextToolbar = findViewById(R.id.second_line_toolbar);
 			nameText = findViewById(R.id.chat_contact_properties_name_text);
-			nameText.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 			emailText = findViewById(R.id.chat_contact_properties_email_text);
 			int width;
 			if(isScreenInPortrait(this)){

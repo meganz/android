@@ -387,7 +387,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         titleToolbar = tB.findViewById(R.id.title_toolbar);
         titleToolbar.setText(" ");
-        titleToolbar.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
         titleToolbar.setMaxWidthEmojis(px2dp(TITLE_TOOLBAR, outMetrics));
 
         subtitleToobar = tB.findViewById(R.id.subtitle_toolbar);
@@ -489,7 +488,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         avatarBigCameraGroupCallMicro = findViewById(R.id.micro_avatar_big_camera_group_call);
         avatarBigCameraGroupCallImage = findViewById(R.id.image_big_camera_group_call);
         avatarBigCameraGroupCallInitialLetter = findViewById(R.id.initial_letter_big_camera_group_call);
-        avatarBigCameraGroupCallInitialLetter.setEmojiSize(px2dp(EMOJI_AVATAR_CALL_HIGH, outMetrics));
 
         avatarBigCameraGroupCallMicro.setVisibility(View.GONE);
         avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
@@ -554,14 +552,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             myAvatarLayout.setVisibility(View.GONE);
             myImage = findViewById(R.id.call_chat_my_image);
             myInitialLetter = findViewById(R.id.call_chat_my_image_initial_letter);
-            myInitialLetter.setEmojiSize(px2dp(EMOJI_AVATAR_CALL_SMALL, outMetrics));
-
             contactAvatarLayout = findViewById(R.id.call_chat_contact_image_rl);
             contactAvatarLayout.setOnClickListener(this);
             contactAvatarLayout.setVisibility(View.GONE);
             contactImage = findViewById(R.id.call_chat_contact_image);
             contactInitialLetter = findViewById(R.id.call_chat_contact_image_initial_letter);
-            contactInitialLetter.setEmojiSize(px2dp(EMOJI_AVATAR_CALL_HIGH, outMetrics));
 
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_video_off));

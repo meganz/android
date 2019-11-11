@@ -20,6 +20,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     private float emojiSize;
     private Context mContext;
     private int textViewMaxWidth = 0;
+    private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
 
     public EmojiTextView(final Context context) {
         this(context, null);
@@ -67,14 +68,13 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         if(mContext == null || (mContext instanceof ContextWrapper && ((ContextWrapper) mContext).getBaseContext() == null) || (textViewMaxWidth == 0)){
             super.setText(spannableStringBuilder, type);
         }else{
-            CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+            CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, typeEllipsize);
             super.setText(textF, type);
         }
     }
 
     @Override
-    protected void onTextChanged(CharSequence rawText, int start, int lengthBefore, int lengthAfter) {
-    }
+    protected void onTextChanged(CharSequence rawText, int start, int lengthBefore, int lengthAfter) {}
 
     @Override
     @CallSuper
@@ -86,6 +86,10 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     @Override
     public final void setMaxWidthEmojis(final int maxWidth) {
         this.textViewMaxWidth = maxWidth;
+    }
+
+    public void setTypeEllipsize(TextUtils.TruncateAt typeEllipsize) {
+        this.typeEllipsize = typeEllipsize;
     }
 
     @Override
@@ -114,5 +118,4 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     public final void setEmojiSizeRes(@DimenRes final int res, final boolean shouldInvalidate) {
         setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
     }
-
 }

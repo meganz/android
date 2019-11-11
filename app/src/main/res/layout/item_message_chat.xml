@@ -76,6 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
+                    rounded:emojiSize="12dp"
                     android:gravity="left|center_vertical"
                     android:layout_centerVertical="true"
                     android:textColor="@color/mail_my_account"/>
@@ -1074,6 +1075,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
+                            rounded:emojiSize="25dp"
                             android:gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
                     <RelativeLayout
@@ -1089,6 +1091,7 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
                             android:textSize="14sp"
+                            rounded:emojiSize="12dp"
                             android:layout_marginTop="11dp"
                             android:layout_marginBottom="2dp"
                             android:singleLine="true"
@@ -1101,6 +1104,7 @@
                             android:textColor="@color/white"
                             android:layout_below="@+id/content_own_message_contact_name"
                             android:textSize="12sp"
+                            rounded:emojiSize="10dp"
                             android:singleLine="true"
                             android:maxLines="1"
                             android:gravity="left"
@@ -1194,13 +1198,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
+                    rounded:emojiSize="10dp"
                     android:text="name of the contact"
                     android:textColor="@color/name_my_account"
                     android:layout_marginRight="4dp"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:layout_centerVertical="true"
-                    android:gravity="center_vertical"/>
+                    android:gravity="center_vertical" />
 
                 <TextView
                     android:id="@+id/contact_message_chat_time_text"
@@ -1245,14 +1250,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
+                        rounded:emojiSize="12dp"
                         android:gravity="left|center_vertical"
                         android:layout_centerVertical="true"
-                        android:textColor="@color/mail_my_account"/>
+                        android:textColor="@color/mail_my_account" />
                 </RelativeLayout>
 
             </RelativeLayout>
 
-            <!--Management messages-->
             <RelativeLayout
                 android:id="@+id/content_contact_message_layout"
                 android:layout_width="match_parent"
@@ -1287,6 +1292,7 @@
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
                         android:textSize="15sp"
+                        rounded:emojiSize="15dp"
                         android:gravity="center_horizontal|center_vertical"/>
 
                 </RelativeLayout>
@@ -1950,6 +1956,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
+                            rounded:emojiSize="25dp"
                             android:gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
 
@@ -1966,6 +1973,7 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/name_my_account"
                             android:textSize="14sp"
+                            rounded:emojiSize="12dp"
                             android:layout_marginTop="11dp"
                             android:layout_marginBottom="2dp"
                             android:singleLine="true"
@@ -1977,6 +1985,7 @@
                             android:textColor="@color/mail_my_account"
                             android:layout_below="@+id/content_contact_message_contact_name"
                             android:textSize="12sp"
+                            rounded:emojiSize="10dp"
                             android:singleLine="true"
                             android:maxLines="1"
                             android:gravity="left"
