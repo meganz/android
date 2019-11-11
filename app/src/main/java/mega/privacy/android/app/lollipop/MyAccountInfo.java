@@ -66,7 +66,7 @@ public class MyAccountInfo {
     public ArrayList<Product> productAccounts;
 
     private List<SkuDetails> availableSkus = new ArrayList<>();
-    private Purchase highestGooglePlaySubscription = null;
+    private Purchase activeGooglePlaySubscription = null;
 
     MegaPricing pricing;
 
@@ -523,19 +523,19 @@ public class MyAccountInfo {
         return usedStorage;
     }
 
-    public Purchase getHighestGooglePlaySubscription() {
-        return highestGooglePlaySubscription;
+    public Purchase getActiveGooglePlaySubscription() {
+        return activeGooglePlaySubscription;
     }
 
-    public void setHighestGooglePlaySubscription(Purchase highestGooglePlaySubscription) {
-        this.highestGooglePlaySubscription = highestGooglePlaySubscription;
+    public void setActiveGooglePlaySubscription(Purchase activeGooglePlaySubscription) {
+        this.activeGooglePlaySubscription = activeGooglePlaySubscription;
     }
 
     public boolean isPurchasedAlready(String sku) {
-        if (highestGooglePlaySubscription == null) {
+        if (activeGooglePlaySubscription == null) {
             return false;
         }
-        return highestGooglePlaySubscription.getSku().equals(sku);
+        return activeGooglePlaySubscription.getSku().equals(sku);
     }
 
     public void setAvailableSkus(List<SkuDetails> skuDetailsList) {

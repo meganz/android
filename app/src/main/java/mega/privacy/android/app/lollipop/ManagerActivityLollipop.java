@@ -1233,13 +1233,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		String message = null;
 		switch (resultCode) {
 			case BillingClient.BillingResponseCode.OK:
-				updateAccountInfo(purchases);
-                String sku = purchases.get(0).getSku();
-                message = getString(R.string.message_user_purchased_subscription,
-                        getSubscriptionType(this, sku),
-                        getSubscriptionRenewalType(this, sku));
-                updateSubscriptionLevel(app.getMyAccountInfo());
-                break;
+				if (purchases == null || purchases.isEmpty()) {
+					message = getString(R.string.general_text_error);
+				} else {
+					updateAccountInfo(purchases);
+					String sku = purchases.get(0).getSku();
+					message = getString(R.string.message_user_purchased_subscription,
+							getSubscriptionType(this, sku),
+							getSubscriptionRenewalType(this, sku));
+					updateSubscriptionLevel(app.getMyAccountInfo());
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItemLollipop(drawerItem);
+				}
+				break;
 			case BillingClient.BillingResponseCode.USER_CANCELED:
 				break;
 			case BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED:

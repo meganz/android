@@ -107,6 +107,7 @@ public class BillingManager implements PurchasesUpdatedListener {
         int resultCode = billingResult.getResponseCode();
         log("Purchases updated, response code is " + resultCode);
         if (resultCode == BillingResponseCode.OK) {
+            mPurchases.clear();
             handlePurchaseList(purchases);
         }
         mBillingUpdatesListener.onPurchasesUpdated(resultCode, mPurchases);
@@ -214,7 +215,7 @@ public class BillingManager implements PurchasesUpdatedListener {
             }
         }
 
-        if (payload.equals(purchase.getDeveloperPayload())) {
+        if (isPayloadValid(purchase.getDeveloperPayload())) {
             log("new purchase added, " + purchase.getOriginalJson());
             mPurchases.add(purchase);
         } else {
