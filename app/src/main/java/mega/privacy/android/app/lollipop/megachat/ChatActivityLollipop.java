@@ -98,6 +98,7 @@ import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -2554,11 +2555,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             return;
         }
 
-        if (existsMyChatFiles(messagesSelected, megaApi, this, this)) {
-            stopReproductions();
-            chatC.prepareAndroidMessagesToForward(messagesSelected, idChat);
-            isForwardingMessage = true;
-        }
+        storedUnhandledData(messagesSelected);
+        megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
+    }
+
+    public void proceedWithForward() {
+        stopReproductions();
+        chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat);
+        isForwardingMessage = true;
     }
 
     @Override
@@ -7277,14 +7281,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     logDebug("Attribute USER_ATTR_GEOLOCATION disabled");
                     MegaApplication.setEnabledGeoLocation(false);
                 }
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER && CHAT_FOLDER.equals(request.getName())) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("Create My Chat Files, copy reserved nodes");
-                handleStoredData();
-            } else {
-                logError("Not create My Chat Files" + e.getErrorCode() + " " + e.getErrorString());
             }
         }
     }

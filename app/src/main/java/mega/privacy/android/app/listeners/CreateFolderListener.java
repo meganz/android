@@ -4,9 +4,12 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
+
+import static mega.privacy.android.app.utils.Constants.*;
 
 public class CreateFolderListener extends BaseListener {
 
@@ -47,6 +50,15 @@ public class CreateFolderListener extends BaseListener {
                     fileExplorerActivityLollipop.finishCreateFolder(false, handle);
                     fileExplorerActivityLollipop.showSnackbar(context.getString(R.string.error_creating_folder, name));
                 }
+            }
+        } else if (context instanceof ChatActivityLollipop) {
+            ChatActivityLollipop chatActivityLollipop = (ChatActivityLollipop) context;
+
+            if (e.getErrorCode() == MegaError.API_OK) {
+                api.setMyChatFilesFolder(handle, new SetAttrUserListener(chatActivityLollipop));
+                chatActivityLollipop.proceedWithForward();
+            } else {
+                chatActivityLollipop.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
             }
         }
     }
