@@ -1156,7 +1156,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void launchPayment(String productId) {
 		//start purchase/subscription flow
 		SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
-		Purchase purchase = app.getMyAccountInfo().getHighestGooglePlaySubscription();
+		Purchase purchase = app.getMyAccountInfo().getActiveGooglePlaySubscription();
 		String oldSku = purchase == null ? null : purchase.getSku();
 		mBillingManager.initiatePurchaseFlow(oldSku, skuDetails);
 	}
@@ -1225,7 +1225,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		updateAccountInfo(purchases);
-		updateSubscriptionLevel(app.getMyAccountInfo(), false);
+		updateSubscriptionLevel(app.getMyAccountInfo());
 	}
 
 	@Override
@@ -1238,7 +1238,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 message = getString(R.string.message_user_purchased_subscription,
                         getSubscriptionType(this, sku),
                         getSubscriptionRenewalType(this, sku));
-                updateSubscriptionLevel(app.getMyAccountInfo(), true);
+                updateSubscriptionLevel(app.getMyAccountInfo());
                 break;
 			case BillingClient.BillingResponseCode.USER_CANCELED:
 				break;
@@ -1286,8 +1286,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             }
 		}
 
-        if(max != null && max.getPurchaseState() == Purchase.PurchaseState.PURCHASED && mBillingManager.isPayloadValid(max.getDeveloperPayload())){
-            myAccountInfo.setHighestGooglePlaySubscription(max);
+        if(max != null && mBillingManager.isPayloadValid(max.getDeveloperPayload())){
+            myAccountInfo.setActiveGooglePlaySubscription(max);
         }
 
 		myAccountInfo.setLevelInventory(highest);
@@ -1304,8 +1304,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo, boolean allowDownGrade) {
-		Purchase highestGooglePlaySubscription = myAccountInfo.getHighestGooglePlaySubscription();
+	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo) {
+		Purchase highestGooglePlaySubscription = myAccountInfo.getActiveGooglePlaySubscription();
 		if (!myAccountInfo.isAccountDetailsFinished() || highestGooglePlaySubscription == null) {
 			return;
 		}
@@ -1313,7 +1313,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		MegaAttributes attributes = dbH.getAttributes();
 		long lastPublicHandle = getLastPublicHandle(attributes);
 		String json = highestGooglePlaySubscription.getOriginalJson();
-		if (allowDownGrade || myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()) {
+		if (myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()) {
 			if (lastPublicHandle == -1) {
 				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, this);
 			} else {
@@ -11391,7 +11391,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		else{
 			logWarning("usedSpaceLayout is NULL");
 		}
-		updateSubscriptionLevel(app.getMyAccountInfo(), false);
+		updateSubscriptionLevel(app.getMyAccountInfo());
 
 		switch (storageState) {
 			case MegaApiJava.STORAGE_STATE_GREEN:
