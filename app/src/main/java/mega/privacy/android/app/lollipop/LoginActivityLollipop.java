@@ -40,6 +40,7 @@ import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
+import mega.privacy.android.app.UserCredentials;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -853,15 +854,26 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
             int whyAmIBlocked = (int) event.getNumber();
             if(whyAmIBlocked ==200){
                 accountBlocked = getString(R.string.account_suspended_multiple_breaches_ToS);
+                megaChatApi.logout(loginFragment);
             }
             else if(whyAmIBlocked ==300){
                 accountBlocked = getString(R.string.account_suspended_breache_ToS);
+                megaChatApi.logout(loginFragment);
             } else if(whyAmIBlocked == 500) {
-                accountBlocked = getString(R.string.error_account_suspended);
                 int state = api.smsAllowedState();
                 logDebug("state: " + state);
                 if (state != 0) {
                     if (!MegaApplication.isVerifySMSShowed()) {
+                        String gSession = megaApi.dumpSession();
+                        /*
+                         * for first login, keep the valid session,
+                         * after added phone number, the account can use this session to fastLogin
+                         */
+                        if (gSession != null) {
+                            UserCredentials credentials = new UserCredentials("", gSession, "", "", "");
+                            dbH.saveCredentials(credentials);
+                        }
+
                         logDebug("redirect to SMSVerificationActivity in LoginActivity");
                         Intent intent = new Intent(getApplicationContext(), SMSVerificationActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);

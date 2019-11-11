@@ -2283,7 +2283,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                     if (isChatEnabled()) {
                         if (megaChatApi != null) {
-                            megaChatApi.logout(this);
+                            if(error.getErrorCode() != MegaError.API_EBLOCKED) {
+                                megaChatApi.logout(this);
+                            }
                         }
                     }
 

@@ -114,8 +114,10 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
             if (e.getErrorCode() == MegaError.API_OK) {
                 bonusStorageSMS = getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE));
             }
-            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
-            msg.setText(message);
+            if(isAdded()) {
+                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+                msg.setText(message);
+            }
         }
     }
 

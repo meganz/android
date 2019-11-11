@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
@@ -21,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -42,7 +46,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     
     public static final String SELECTED_COUNTRY_CODE = "COUNTRY_CODE";
     public static final String ENTERED_PHONE_NUMBER = "ENTERED_PHONE_NUMBER";
-    private TextView helperText, selectedCountry, errorInvalidCountryCode, errorInvalidPhoneNumber, titleCountryCode, titlePhoneNumber, notNowButton;
+    private TextView helperText, selectedCountry, errorInvalidCountryCode, errorInvalidPhoneNumber, titleCountryCode, titlePhoneNumber, notNowButton, textLogout;
     private View divider1, divider2;
     private ImageView errorInvalidPhoneNumberIcon;
     private RelativeLayout countrySelector;
@@ -86,6 +90,20 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         if (isUserLocked) {
             String text = getResources().getString(R.string.verify_account_helper_locked);
             helperText.setText(text);
+
+            textLogout = findViewById(R.id.sms_logout);
+            String textToShow = getString(R.string.sms_logout)
+                    .replace("[A]", "<font color=\'#00BFA5\'>")
+                    .replace("[/A]", "</font>");
+            Spanned result;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                result = Html.fromHtml(textToShow);
+            }
+            textLogout.setText(result);
+            textLogout.setVisibility(View.VISIBLE);
+            textLogout.setOnClickListener(this);
         } else {
             boolean isAchievementUser = megaApi.isAchievementsEnabled();
             logDebug("Is achievement user: " + isAchievementUser);
@@ -214,6 +232,20 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             case (R.id.verify_account_not_now_button):{
                 logDebug("verify_account_not_now_button clicked");
                 finish();
+                break;
+            }
+            case R.id.sms_logout: {
+                if(megaApi.getRootNode() == null) {
+                    AccountController.logout(this, megaApi);
+                } else {
+                    // due to the account has been blocked, logout will always fail with errorCode -16, call localLogout instead
+                    megaApi.localLogout();
+                    megaChatApi.logout();
+                    AccountController.logoutConfirmed(this);
+                    Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+                    tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    this.startActivity(tourIntent);
+                }
                 break;
             }
             default:
@@ -388,6 +420,22 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             }
             String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
             helperText.setText(message);
+        }
+
+        if (request.getType() == MegaRequest.TYPE_LOGOUT) {
+            logDebug("Logout finished");
+            if (isChatEnabled()) {
+                logDebug("END logout sdk request - wait chat logout");
+            } else {
+                logDebug("END logout sdk request - chat disabled");
+                DatabaseHandler.getDbHandler(getApplicationContext()).clearEphemeral();
+                AccountController.logoutConfirmed(this);
+
+                Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+                tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                this.startActivity(tourIntent);
+                finish();
+            }
         }
 
         if (request.getType() == MegaRequest.TYPE_GET_COUNTRY_CALLING_CODES) {
