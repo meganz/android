@@ -3,9 +3,11 @@ package mega.privacy.android.app.lollipop;
 import android.content.Context;
 
 import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.SkuDetails;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -63,14 +65,7 @@ public class MyAccountInfo {
 
     public ArrayList<Product> productAccounts;
 
-    Purchase proLiteMonthly = null;
-    Purchase proLiteYearly = null;
-    Purchase proIMonthly = null;
-    Purchase proIYearly = null;
-    Purchase proIIMonthly = null;
-    Purchase proIIYearly = null;
-    Purchase proIIIMonthly = null;
-    Purchase proIIIYearly = null;
+    private List<SkuDetails> availableSkus = new ArrayList<>();
     private Purchase highestGooglePlaySubscription = null;
 
     MegaPricing pricing;
@@ -483,70 +478,6 @@ public class MyAccountInfo {
         this.firstLetter = firstLetter;
     }
 
-    public void setProLiteMonthly(Purchase proLiteMonthly) {
-        this.proLiteMonthly = proLiteMonthly;
-    }
-
-    public void setProLiteYearly(Purchase proLiteYearly) {
-        this.proLiteYearly = proLiteYearly;
-    }
-
-    public void setProIMonthly(Purchase proIMonthly) {
-        this.proIMonthly = proIMonthly;
-    }
-
-    public void setProIYearly(Purchase proIYearly) {
-        this.proIYearly = proIYearly;
-    }
-
-    public void setProIIMonthly(Purchase proIIMonthly) {
-        this.proIIMonthly = proIIMonthly;
-    }
-
-    public void setProIIYearly(Purchase proIIYearly) {
-        this.proIIYearly = proIIYearly;
-    }
-
-    public void setProIIIMonthly(Purchase proIIIMonthly) {
-        this.proIIIMonthly = proIIIMonthly;
-    }
-
-    public void setProIIIYearly(Purchase proIIIYearly) {
-        this.proIIIYearly = proIIIYearly;
-    }
-
-    public Purchase getProLiteMonthly() {
-        return proLiteMonthly;
-    }
-
-    public Purchase getProLiteYearly() {
-        return proLiteYearly;
-    }
-
-    public Purchase getProIMonthly() {
-        return proIMonthly;
-    }
-
-    public Purchase getProIYearly() {
-        return proIYearly;
-    }
-
-    public Purchase getProIIMonthly() {
-        return proIIMonthly;
-    }
-
-    public Purchase getProIIYearly() {
-        return proIIYearly;
-    }
-
-    public Purchase getProIIIMonthly() {
-        return proIIIMonthly;
-    }
-
-    public Purchase getProIIIYearly() {
-        return proIIIYearly;
-    }
-
     public boolean isGetPaymentMethodsBoolean() {
         return getPaymentMethodsBoolean;
     }
@@ -598,5 +529,16 @@ public class MyAccountInfo {
 
     public void setHighestGooglePlaySubscription(Purchase highestGooglePlaySubscription) {
         this.highestGooglePlaySubscription = highestGooglePlaySubscription;
+    }
+
+    public boolean isPurchasedAlready(String sku) {
+        if (highestGooglePlaySubscription == null) {
+            return false;
+        }
+        return highestGooglePlaySubscription.getSku().equals(sku);
+    }
+
+    public void setAvailableSkus(List<SkuDetails> skuDetailsList) {
+        this.availableSkus = skuDetailsList;
     }
 }

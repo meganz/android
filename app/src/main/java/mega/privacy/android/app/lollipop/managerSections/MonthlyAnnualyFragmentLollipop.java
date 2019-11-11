@@ -32,6 +32,14 @@ import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_III_MONTH;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_III_YEAR;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_II_MONTH;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_II_YEAR;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_I_MONTH;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_I_YEAR;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_LITE_MONTH;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_LITE_YEAR;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickListener{
@@ -360,31 +368,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						break;
-					}
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						if (myAccountInfo.getProIMonthly() != null) {
-							logDebug("ProIMonthly already subscribed: " + myAccountInfo.getProIMonthly().getOriginalJson());
+						if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_MONTH)) {
 							priceMonthlyLayout.setVisibility(View.GONE);
 						}
 
-						if (myAccountInfo.getProIYearly() != null) {
-							logDebug("ProIAnnualy already subscribed: " + myAccountInfo.getProIYearly().getOriginalJson());
+						if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_YEAR)) {
 							priceAnnualyLayout.setVisibility(View.GONE);
-							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
-							}
-							else{
-								priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
-							}
-
+							priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
 							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 						break;
@@ -462,31 +458,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						break;
-					}
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						if (myAccountInfo.getProIIMonthly() != null) {
-							logDebug("ProIIMonthly already subscribed: " + myAccountInfo.getProIIMonthly().getOriginalJson());
+						if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_MONTH)) {
 							priceMonthlyLayout.setVisibility(View.GONE);
 						}
 
-						if (myAccountInfo.getProIIYearly() != null) {
-							logDebug("ProIIAnnualy already subscribed: " + myAccountInfo.getProIIYearly().getOriginalJson());
+						if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_YEAR)) {
 							priceAnnualyLayout.setVisibility(View.GONE);
-
-							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
-							}
-							else{
-								priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
-							}
+							priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
 							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 						break;
@@ -566,30 +550,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						break;
-					}
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						if (myAccountInfo.getProIIIMonthly() != null) {
-							logDebug("ProIIIMonthly already subscribed: " + myAccountInfo.getProIIIMonthly().getOriginalJson());
+						if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_MONTH)) {
 							priceMonthlyLayout.setVisibility(View.GONE);
 						}
 
-						if (myAccountInfo.getProIIIYearly() != null) {
-							logDebug("ProIIIAnnualy already subscribed: " + myAccountInfo.getProIIIYearly().getOriginalJson());
+						if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_YEAR)) {
 							priceAnnualyLayout.setVisibility(View.GONE);
-							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
-							}
-							else{
-								priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
-							}
+							priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
 							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 						break;
@@ -699,20 +672,13 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 						logDebug("PAYMENT_METHOD_GOOGLE_WALLET");
 
-						if (myAccountInfo.getProLiteMonthly() != null) {
-							logDebug("ProLiteMonthly already subscribed: " + myAccountInfo.getProLiteMonthly().getOriginalJson());
+						if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_MONTH)) {
 							priceMonthlyLayout.setVisibility(View.GONE);
 						}
 
-						if (myAccountInfo.getProLiteYearly() != null) {
-							logDebug("ProLiteAnnualy already subscribed: " + myAccountInfo.getProLiteYearly().getOriginalJson());
+						if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_YEAR)) {
 							priceAnnualyLayout.setVisibility(View.GONE);
-							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
-							}
-							else{
-								priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
-							}
+							priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
 							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 
@@ -723,15 +689,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 		}
-
-//			/*RESULTS
-//	            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
-//        		p[1] = 7472683699866478542__9999___500___12___1___12288 - PRO 1 annually
-//        		p[2] = 7974113413762509455__1999___2048___1___2___4096  - PRO 2 montly
-//        		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
-//        		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
-//        		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
-
 	}
 
 	public void setInfo (int _paymentMethod, int _type){
@@ -781,13 +738,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_I_MONTH);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_I_MONTH);
 									break;
 								}
 							}
@@ -803,12 +754,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_II_MONTH);
 									break;
 								}
-								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
-									break;
-								}
 							}
 							break;
 						}
@@ -819,13 +764,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_III_MONTH);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_III_MONTH);
 									break;
 								}
 							}
@@ -838,7 +777,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_LITE_MONTH);
+									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_LITE_MONTH);
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
@@ -864,13 +803,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_I_YEAR);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_I_YEAR);
 									break;
 								}
 							}
@@ -886,12 +819,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_II_YEAR);
 									break;
 								}
-								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
-									break;
-								}
 							}
 							break;
 						}
@@ -905,12 +832,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_III_YEAR);
 									break;
 								}
-								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
-									break;
-								}
 							}
 							break;
 						}
@@ -922,12 +843,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
 									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_LITE_YEAR);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
 									break;
 								}
 							}

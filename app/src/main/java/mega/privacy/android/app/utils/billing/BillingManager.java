@@ -38,6 +38,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.utils.TextUtil;
+
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logInfo;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -49,6 +51,7 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 public class BillingManager implements PurchasesUpdatedListener {
 
     private static final String TAG = "iab"; //todo to be removed before release
+    private String payload;
     private BillingClient mBillingClient;
     private boolean mIsServiceConnected;
     private final BillingUpdatesListener mBillingUpdatesListener;
@@ -73,9 +76,10 @@ public class BillingManager implements PurchasesUpdatedListener {
         void onQueryPurchasesFinished(int resultCode, List<Purchase> purchases);
     }
 
-    public BillingManager(Activity activity, final BillingUpdatesListener updatesListener) {
+    public BillingManager(Activity activity, final BillingUpdatesListener updatesListener, String pl) {
         mActivity = activity;
         mBillingUpdatesListener = updatesListener;
+        payload = pl;
 
         //must enable pending purchases to use billing library
         mBillingClient = BillingClient.newBuilder(mActivity).enablePendingPurchases().setListener(this).build();
@@ -182,10 +186,11 @@ public class BillingManager implements PurchasesUpdatedListener {
      * @param purchase Purchase to be handled
      */
     private void handlePurchase(Purchase purchase) {
-        if (!verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
-            log("invalid purchase found");
-            return;
-        }
+        //todo need to validate signature
+//        if (verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
+//            log("invalid purchase found");
+//            return;
+//        }
 
         if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
             // Acknowledge the purchase if it hasn't already been acknowledged.
@@ -203,13 +208,23 @@ public class BillingManager implements PurchasesUpdatedListener {
                 AcknowledgePurchaseParams acknowledgePurchaseParams =
                         AcknowledgePurchaseParams.newBuilder()
                                 .setPurchaseToken(purchase.getPurchaseToken())
+                                .setDeveloperPayload(payload)
                                 .build();
                 mBillingClient.acknowledgePurchase(acknowledgePurchaseParams, acknowledgePurchaseResponseListener);
             }
         }
 
-        log("new purchase added, " + purchase.getOriginalJson());
-        mPurchases.add(purchase);
+        if (payload.equals(purchase.getDeveloperPayload())) {
+            log("new purchase added, " + purchase.getOriginalJson());
+            mPurchases.add(purchase);
+        } else {
+            logInfo("invalid DeveloperPayload");
+        }
+    }
+
+    public boolean isPayloadValid(String pl) {
+        //backward compatibility - old version does not have payload so just let it go
+        return payload == null || TextUtil.isTextEmpty(pl) || payload.equals(pl);
     }
 
     /**
@@ -322,6 +337,10 @@ public class BillingManager implements PurchasesUpdatedListener {
             logWarning("purchase failed to valid signature");
             return false;
         }
+    }
+
+    public String getPayload() {
+        return payload;
     }
 
     private void log(String message) {

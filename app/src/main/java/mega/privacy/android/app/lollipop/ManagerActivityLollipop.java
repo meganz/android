@@ -1174,8 +1174,41 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		return null;
 	}
 
+	private void getInventory() {
+		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
+			@Override
+			public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
+				if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+					logWarning("Failed to get SkuDetails, error code is " + billingResult.getResponseCode());
+				}
+				if (skuDetailsList != null && skuDetailsList.size() > 0) {
+					mSkuDetailsList = skuDetailsList;
+					app.getMyAccountInfo().setAvailableSkus(skuDetailsList);
+				}
+			}
+		};
+
+		List<String> inAppSkus = new ArrayList<>();
+		inAppSkus.add(SKU_PRO_I_MONTH);
+		inAppSkus.add(SKU_PRO_I_YEAR);
+		inAppSkus.add(SKU_PRO_II_MONTH);
+		inAppSkus.add(SKU_PRO_II_YEAR);
+		inAppSkus.add(SKU_PRO_III_MONTH);
+		inAppSkus.add(SKU_PRO_III_YEAR);
+		inAppSkus.add(SKU_PRO_LITE_MONTH);
+		inAppSkus.add(SKU_PRO_LITE_YEAR);
+
+		//we only support subscription for google pay
+		mBillingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
+	}
+
 	public void initGooglePlayPayments() {
-		mBillingManager = new BillingManager(this, this);
+		//make sure user logged in
+		MegaUser user = megaApi.getMyUser();
+		if (user != null) {
+			String payload = String.valueOf(user.getHandle());
+			mBillingManager = new BillingManager(this, this, payload);
+		}
 	}
 
 	@Override
@@ -1201,15 +1234,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		switch (resultCode) {
 			case BillingClient.BillingResponseCode.OK:
 				updateAccountInfo(purchases);
-				Purchase highestGooglePlaySubscription = app.getMyAccountInfo().getHighestGooglePlaySubscription();
-				if (highestGooglePlaySubscription != null) {
-					String sku = highestGooglePlaySubscription.getSku();
-					message = getString(R.string.message_user_purchased_subscription,
-							getSubscriptionType(this, sku),
-							getSubscriptionRenewalType(this, sku));
-					updateSubscriptionLevel(app.getMyAccountInfo(), true);
-				}
-				break;
+                String sku = purchases.get(0).getSku();
+                message = getString(R.string.message_user_purchased_subscription,
+                        getSubscriptionType(this, sku),
+                        getSubscriptionRenewalType(this, sku));
+                updateSubscriptionLevel(app.getMyAccountInfo(), true);
+                break;
 			case BillingClient.BillingResponseCode.USER_CANCELED:
 				break;
 			case BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED:
@@ -1226,47 +1256,41 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private void updateAccountInfo(List<Purchase> purchases) {
 		MyAccountInfo myAccountInfo = app.getMyAccountInfo();
+		int highest = -1;
+		int temp = -1;
+		Purchase max = null;
 		for (Purchase purchase : purchases) {
 			logDebug("purchased (JSON): " + purchase.getOriginalJson());
 			switch (purchase.getSku()) {
 				case SKU_PRO_LITE_MONTH:
-					myAccountInfo.setLevelInventory(0);
-					myAccountInfo.setProLiteMonthly(purchase);
-					break;
 				case SKU_PRO_LITE_YEAR:
-					myAccountInfo.setLevelInventory(0);
-					myAccountInfo.setProLiteYearly(purchase);
+					temp = 0;
 					break;
 				case SKU_PRO_I_MONTH:
-					myAccountInfo.setLevelInventory(1);
-					myAccountInfo.setProIMonthly(purchase);
-					break;
 				case SKU_PRO_I_YEAR:
-					myAccountInfo.setLevelInventory(1);
-					myAccountInfo.setProIYearly(purchase);
+                    temp = 1;
 					break;
 				case SKU_PRO_II_MONTH:
-					myAccountInfo.setLevelInventory(2);
-					myAccountInfo.setProIIMonthly(purchase);
-					break;
 				case SKU_PRO_II_YEAR:
-					myAccountInfo.setLevelInventory(2);
-					myAccountInfo.setProIIYearly(purchase);
+                    temp = 2;
 					break;
 				case SKU_PRO_III_MONTH:
-					myAccountInfo.setLevelInventory(3);
-					myAccountInfo.setProIIIMonthly(purchase);
-					break;
 				case SKU_PRO_III_YEAR:
-					myAccountInfo.setLevelInventory(3);
-					myAccountInfo.setProIIIYearly(purchase);
+                    temp = 3;
 					break;
 			}
 
-			//we should only have single purchase once, so the list should only contain single item
-			myAccountInfo.setHighestGooglePlaySubscription(purchase);
+			if(temp >= highest){
+			    highest = temp;
+			    max = purchase;
+            }
 		}
 
+        if(max != null && max.getPurchaseState() == Purchase.PurchaseState.PURCHASED && mBillingManager.isPayloadValid(max.getDeveloperPayload())){
+            myAccountInfo.setHighestGooglePlaySubscription(max);
+        }
+
+		myAccountInfo.setLevelInventory(highest);
 		myAccountInfo.setInventoryFinished(true);
 
 		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
@@ -1278,11 +1302,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (myFL != null) {
 			myFL.setPricing();
 		}
-
-		logDebug("getLevelAccountDetails: " + myAccountInfo.getLevelAccountDetails() +
-				"; getLevelInventory: " + myAccountInfo.getLevelInventory() +
-				"; isAccountDetailsFinished: " + myAccountInfo.isAccountDetailsFinished());
-
 	}
 
 	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo, boolean allowDownGrade) {
@@ -1301,33 +1320,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, lastPublicHandle, this);
 			}
 		}
-	}
-
-	private void getInventory() {
-		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
-			@Override
-			public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
-				if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-					logWarning("Failed to get SkuDetails, error code is " + billingResult.getResponseCode());
-				}
-				if (skuDetailsList != null && skuDetailsList.size() > 0) {
-					mSkuDetailsList = skuDetailsList;
-				}
-			}
-		};
-
-		List<String> inAppSkus = new ArrayList<>();
-		inAppSkus.add(SKU_PRO_I_MONTH);
-		inAppSkus.add(SKU_PRO_I_YEAR);
-		inAppSkus.add(SKU_PRO_II_MONTH);
-		inAppSkus.add(SKU_PRO_II_YEAR);
-		inAppSkus.add(SKU_PRO_III_MONTH);
-		inAppSkus.add(SKU_PRO_III_YEAR);
-		inAppSkus.add(SKU_PRO_LITE_MONTH);
-		inAppSkus.add(SKU_PRO_LITE_YEAR);
-
-		//we only support subscription for google pay
-		mBillingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
 	}
 
     @Override
@@ -4178,6 +4170,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateView);
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
+		if (mBillingManager != null) {
+			mBillingManager.destroy();
+		}
     	super.onDestroy();
 	}
 
