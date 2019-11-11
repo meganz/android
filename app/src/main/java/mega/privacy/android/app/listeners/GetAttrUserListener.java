@@ -49,7 +49,7 @@ public class GetAttrUserListener extends BaseListener {
                     ChatActivityLollipop chatActivityLollipop = (ChatActivityLollipop) context;
 
                     if (myChatFolderFound) {
-                        chatActivityLollipop.proceedWithForward();
+                        chatActivityLollipop.proceedWithAction(myChatFolderNode);
                     } else if (e.getErrorCode() == MegaError.API_ENOENT) {
                         api.createFolder(context.getString(R.string.my_chat_files_folder), api.getRootNode(), new CreateFolderListener(chatActivityLollipop, true));
                     }

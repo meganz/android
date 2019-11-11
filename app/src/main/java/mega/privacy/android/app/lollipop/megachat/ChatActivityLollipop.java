@@ -50,7 +50,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -388,6 +387,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     // Data being stored when My Chat Files folder does not exist
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
+    private Intent preservedIntent;
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
 
@@ -2555,14 +2555,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             return;
         }
 
+        isForwardingMessage = true;
         storedUnhandledData(messagesSelected);
         megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
     }
 
-    public void proceedWithForward() {
-        stopReproductions();
-        chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat);
-        isForwardingMessage = true;
+    public void proceedWithAction(MegaNode chatFolderNode) {
+        if (isForwardingMessage) {
+            stopReproductions();
+            chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat);
+        } else {
+            startUploadService(chatFolderNode);
+        }
     }
 
     @Override
@@ -2920,7 +2924,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
-                    startService(intent);
+                    checkIfServiceCanStart(intent);
                 }
                 else{
                     logError("Error when adding pending msg to the database");
@@ -7417,7 +7421,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
-                    startService(intent);
+                    checkIfServiceCanStart(intent);
                 }
                 else{
                     logError("Error when adding pending msg to the database");
@@ -7825,7 +7829,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             intent.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP);
         }
 
-        startService(intent);
+        checkIfServiceCanStart(intent);
     }
 
 
@@ -8293,5 +8297,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void setShareLinkDialogDismissed (boolean dismissed) {
         isShareLinkDialogDismissed = dismissed;
+    }
+
+    private void checkIfServiceCanStart(Intent intent) {
+        preservedIntent = intent;
+        megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
+    }
+
+    public void startUploadService(MegaNode chatFolderNode) {
+        preservedIntent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, chatFolderNode.serialize());
+        startService(preservedIntent);
     }
 }

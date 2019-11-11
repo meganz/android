@@ -1555,6 +1555,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
 					intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
 					intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
+					intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
 					startService(intent);
 
 					finishFileExplorer();
@@ -1588,6 +1589,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
 				intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
 				intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
+				intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
 				startService(intent);
 
 				finishFileExplorer();
