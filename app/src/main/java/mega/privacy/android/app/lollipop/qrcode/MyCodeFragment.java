@@ -403,7 +403,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             firstLetter = " ";
         }
 
-        return Util.createDefaultAvatar(megaApi.getUserAvatarColor(myUser), firstLetter);
+        return Util.createDefaultAvatar(megaApi.getUserAvatarColor(myUser), firstLetter, 150);
     }
 
     @Override

@@ -81,6 +81,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -108,7 +110,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
 	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
@@ -1466,16 +1468,14 @@ public class Util {
 		}
 	}
 
-	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
-		logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
-
+	public static Bitmap createDefaultAvatar (String color, String firstLetter, int textSize) {
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint paintText = new Paint();
 		Paint paintCircle = new Paint();
 
 		paintText.setColor(Color.WHITE);
-		paintText.setTextSize(150);
+		paintText.setTextSize(textSize);
 		paintText.setAntiAlias(true);
 		paintText.setTextAlign(Paint.Align.CENTER);
 		Typeface face = Typeface.SANS_SERIF;
@@ -1485,15 +1485,12 @@ public class Util {
 		paintText.setStyle(Paint.Style.FILL);
 
 		if(color!=null){
-			logDebug("The color to set the avatar is " + color);
 			paintCircle.setColor(Color.parseColor(color));
-			paintCircle.setAntiAlias(true);
 		}
 		else{
-			logDebug("Default color to the avatar");
 			paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-			paintCircle.setAntiAlias(true);
 		}
+		paintCircle.setAntiAlias(true);
 
 
 		int radius;
@@ -1504,14 +1501,20 @@ public class Util {
 
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-		logDebug("Draw letter: " + firstLetter);
-		Rect bounds = new Rect();
+		final Emoji found = EmojiManager.getInstance().getFirstEmoji(firstLetter);
+		if (found != null) {
+			Bitmap emojiBitmap = Bitmap.createScaledBitmap(found.getBitmap(context), textSize, textSize, false);
+			int xPos = (c.getWidth() - emojiBitmap.getWidth()) / 2;
+			int yPos = (c.getHeight() - emojiBitmap.getHeight()) / 2;
+			c.drawBitmap(emojiBitmap, xPos, yPos, paintText);
+		} else {
+			Rect bounds = new Rect();
+			paintText.getTextBounds(firstLetter, 0, firstLetter.length(), bounds);
+			int xPos = (c.getWidth() / 2);
+			int yPos = (int) ((c.getHeight() / 2) - ((paintText.descent() + paintText.ascent() / 2)) + 20);
+			c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
 
-		paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-		int xPos = (c.getWidth()/2);
-		int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-		c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-
+		}
 		return defaultAvatar;
 	}
 

@@ -277,6 +277,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private final int OFFLINE_BNV = 4;
 	private final int HIDDEN_BNV = 5;
 	private final int MEDIA_UPLOADS_BNV = 6;
+	private static final int AVATAR_SIZE = 150;
 
 	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
@@ -3980,8 +3981,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
 			firstLetter = " ";
 		}
-
-		nVPictureProfile.setImageBitmap(createDefaultAvatar(color, firstLetter));
+		nVPictureProfile.setImageBitmap(createDefaultAvatar(color, firstLetter, AVATAR_SIZE));
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
@@ -4037,7 +4037,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		String color = megaApi.getUserAvatarColor(myHandleEncoded);
 
 		if (nVPictureProfile != null){
-			nVPictureProfile.setImageBitmap(createDefaultAvatar(color, firstLetter));
+			nVPictureProfile.setImageBitmap(createDefaultAvatar(color, firstLetter, AVATAR_SIZE));
 		}
 	}
 

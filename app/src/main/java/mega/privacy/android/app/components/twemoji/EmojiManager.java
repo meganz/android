@@ -276,6 +276,12 @@ public final class EmojiManager {
       Emoji emojiFounded = emojiMap.get(candidate.toString());
     return emojiFounded;
   }
+  public Emoji getFirstEmoji(@NonNull final CharSequence candidate){
+    List<EmojiRange> emojis = findAllEmojis(candidate);
+    if(emojis.size() > 0) return emojis.get(0).emoji;
+    return null;
+
+  }
   void verifyInstalled() {
     if (categories == null) {
       throw new IllegalStateException("Please install an EmojiProvider through the EmojiManager.install() method first.");
