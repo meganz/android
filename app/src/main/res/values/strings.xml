@@ -2556,4 +2556,6 @@
 
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
 
+    <string name="my_chat_files_folder" context="Name by default to the folder where the files sent to the chat are strored in the cloud">My chat files</string>
+    <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Error. The folder %1$s was not created</string>
 </resources>

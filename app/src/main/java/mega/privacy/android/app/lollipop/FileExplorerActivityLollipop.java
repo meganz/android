@@ -64,6 +64,8 @@ import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.listeners.CreateFolderListener;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
@@ -1611,7 +1613,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		finishActivity();
 	}
 
-	private void checkIfFilesExistsInMEGA () {
+	public void checkIfFilesExistsInMEGA () {
 		for (ShareInfo info : filePreparedInfos) {
 			String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
 			MegaNode node = megaApi.getNodeByFingerprint(fingerprint);
@@ -1650,14 +1652,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		    showSnackbar(getString(R.string.upload_can_not_open));
 		}
 		else {
-			myChatFilesNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
-			if(myChatFilesNode == null){
-				logDebug("Create folder: " + CHAT_FOLDER);
-				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
-			}
-			else {
-				checkIfFilesExistsInMEGA();
-			}
+			megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
 		}
 	}
 
@@ -1997,7 +1992,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					return;
 				}
 				
-				megaApi.createFolder(title, parentNode, this);
+				megaApi.createFolder(title, parentNode, new CreateFolderListener(this));
 			}
 			else{
 				showSnackbar(getString(R.string.context_folder_already_exists));
@@ -2027,7 +2022,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						return;
 					}
 
-					megaApi.createFolder(title, parentNode, this);
+					megaApi.createFolder(title, parentNode, new CreateFolderListener(this));
 				}
 				else{
 					showSnackbar(getString(R.string.context_folder_already_exists));
@@ -2061,32 +2056,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
 		logDebug("onRequestFinish");
-		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-			myChatFilesNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
-			if (myChatFilesNode != null && myChatFilesNode.getHandle() == request.getNodeHandle()) {
-				checkIfFilesExistsInMEGA();
-			}
-			else {
-				try {
-					statusDialog.dismiss();
-				}
-				catch (Exception ex) {}
-
-				if (error.getErrorCode() == MegaError.API_OK){
-					cDriveExplorer = getCloudExplorerFragment();
-					iSharesExplorer = getIncomingExplorerFragment();
-
-					if (isCloudVisible()){
-						cDriveExplorer.navigateToFolder(request.getNodeHandle());
-						parentHandleCloud = request.getNodeHandle();
-					}
-					else if (isIncomingVisible()){
-						iSharesExplorer.navigateToFolder(request.getNodeHandle());
-						parentHandleIncoming = request.getNodeHandle();
-					}
-				}
-			}
-		}
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 
 			if (error.getErrorCode() != MegaError.API_OK) {
@@ -3465,5 +3434,30 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	public boolean isMultiselect() {
 		return multiselect;
+	}
+
+	public void setMyChatFilesNode(MegaNode myChatFilesNode) {
+		this.myChatFilesNode = myChatFilesNode;
+	}
+
+	public void finishCreateFolder(boolean success, long handle) {
+		try {
+			statusDialog.dismiss();
+		}
+		catch (Exception ex) {}
+
+		if (success){
+			cDriveExplorer = getCloudExplorerFragment();
+			iSharesExplorer = getIncomingExplorerFragment();
+
+			if (isCloudVisible()){
+				cDriveExplorer.navigateToFolder(handle);
+				parentHandleCloud = handle;
+			}
+			else if (isIncomingVisible()){
+				iSharesExplorer.navigateToFolder(handle);
+				parentHandleIncoming = handle;
+			}
+		}
 	}
 }
