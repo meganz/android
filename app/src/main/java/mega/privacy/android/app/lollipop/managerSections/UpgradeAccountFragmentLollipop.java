@@ -87,6 +87,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	private TextView monthSectionPro3;
 	private TextView storageSectionPro3;
 	private TextView bandwidthSectionPro3;
+	private TextView labelCustomPlan;
 
 	//Payment layout
 	View selectPaymentMethodLayoutLite;
@@ -228,6 +229,20 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		selectPaymentMethodLayoutPro3 = v.findViewById(R.id.available_payment_methods_pro_iii);
 		pro3TransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_iii_layout_transparent);
 		pro3TransparentLayout.setVisibility(View.GONE);
+		labelCustomPlan = v.findViewById(R.id.lbl_custom_plan);
+		labelCustomPlan.setVisibility(View.GONE);
+		labelCustomPlan.setOnClickListener(this);
+		String strColor = getHexValue(getResources().getColor(R.color.accentColor));
+		String textToShowB = getString(R.string.label_custom_plan);
+		textToShowB = textToShowB.replace("[A]", "<font color=\'" + strColor + "\'>");
+		textToShowB = textToShowB.replace("[/A]", "</font>");
+		Spanned resultB;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			resultB = Html.fromHtml(textToShowB, Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			resultB = Html.fromHtml(textToShowB);
+		}
+		labelCustomPlan.setText(resultB);
 		//END -- PRO III ACCOUNT
 
 		setPricing();
@@ -760,6 +775,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	private void hideProIII(){
 		logDebug("hideProIII");
 		pro3TransparentLayout.setVisibility(View.VISIBLE);
+		labelCustomPlan.setVisibility(View.VISIBLE);
 		pro3Layout.setClickable(false);
 	}
 
@@ -853,6 +869,10 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		((ManagerActivityLollipop)context).setDisplayedAccountType(-1);
 		switch (v.getId()){
+			case R.id.lbl_custom_plan: {
+				//todo start new activity
+				break;
+			}
             case R.id.button_continue:{
 				logDebug("Button button_continue pressed");
 				if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){

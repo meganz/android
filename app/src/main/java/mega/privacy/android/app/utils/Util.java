@@ -1733,6 +1733,11 @@ public class Util {
 		}
 	}
 
+	//convert color in int to hex
+	public static String getHexValue(int color){
+		return String.format("#%06X", 0xFFFFFF & color);
+	}
+
     public static void showKeyboardDelayed(final View view) {
 		logDebug("showKeyboardDelayed");
         Handler handler = new Handler();
