@@ -5,6 +5,7 @@ import android.content.Context;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -15,6 +16,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 public class CreateFolderListener extends BaseListener {
 
     private boolean isMyChatFiles;
+    private boolean isForwarding;
 
     public CreateFolderListener(Context context) {
         super(context);
@@ -24,6 +26,13 @@ public class CreateFolderListener extends BaseListener {
         super(context);
 
         this.isMyChatFiles = isMyChatFiles;
+    }
+
+    public CreateFolderListener(Context context, boolean isMyChatFiles, boolean isForwarding) {
+        super(context);
+
+        this.isMyChatFiles = isMyChatFiles;
+        this.isForwarding = isForwarding;
     }
 
     @Override
@@ -58,9 +67,24 @@ public class CreateFolderListener extends BaseListener {
 
             if (e.getErrorCode() == MegaError.API_OK) {
                 api.setMyChatFilesFolder(handle, new SetAttrUserListener(chatActivityLollipop));
-                chatActivityLollipop.proceedWithAction(node);
+                if (isForwarding) {
+                    chatActivityLollipop.setMyChatFilesFolder(node);
+                    chatActivityLollipop.handleStoredData();
+                } else {
+                    chatActivityLollipop.proceedWithAction(node);
+                }
             } else {
                 chatActivityLollipop.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+            }
+        } else if (context instanceof NodeAttachmentHistoryActivity) {
+            NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = (NodeAttachmentHistoryActivity) context;
+
+            if (e.getErrorCode() == MegaError.API_OK) {
+                api.setMyChatFilesFolder(handle, new SetAttrUserListener(nodeAttachmentHistoryActivity));
+                nodeAttachmentHistoryActivity.setMyChatFilesFolder(node);
+                nodeAttachmentHistoryActivity.handleStoredData();
+            } else {
+                nodeAttachmentHistoryActivity.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
             }
         }
     }

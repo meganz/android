@@ -5,6 +5,7 @@ import android.content.Context;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -15,8 +16,15 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class GetAttrUserListener extends BaseListener {
 
+    private boolean isForwarding;
+
     public GetAttrUserListener(Context context) {
         super(context);
+    }
+
+    public GetAttrUserListener(Context context, boolean isForwarding) {
+        super(context);
+        this.isForwarding = isForwarding;
     }
 
     @Override
@@ -49,9 +57,23 @@ public class GetAttrUserListener extends BaseListener {
                     ChatActivityLollipop chatActivityLollipop = (ChatActivityLollipop) context;
 
                     if (myChatFolderFound) {
-                        chatActivityLollipop.proceedWithAction(myChatFolderNode);
+                        if (isForwarding) {
+                            chatActivityLollipop.setMyChatFilesFolder(myChatFolderNode);
+                            chatActivityLollipop.handleStoredData();
+                        } else {
+                            chatActivityLollipop.proceedWithAction(myChatFolderNode);
+                        }
                     } else if (e.getErrorCode() == MegaError.API_ENOENT) {
-                        api.createFolder(context.getString(R.string.my_chat_files_folder), api.getRootNode(), new CreateFolderListener(chatActivityLollipop, true));
+                        api.createFolder(context.getString(R.string.my_chat_files_folder), api.getRootNode(), new CreateFolderListener(chatActivityLollipop, true, isForwarding));
+                    }
+                } else if (context instanceof NodeAttachmentHistoryActivity) {
+                    NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = (NodeAttachmentHistoryActivity) context;
+
+                    if (myChatFolderFound) {
+                        nodeAttachmentHistoryActivity.setMyChatFilesFolder(myChatFolderNode);
+                        nodeAttachmentHistoryActivity.handleStoredData();
+                    } else if (e.getErrorCode() == MegaError.API_ENOENT) {
+                        api.createFolder(context.getString(R.string.my_chat_files_folder), api.getRootNode(), new CreateFolderListener(nodeAttachmentHistoryActivity, true));
                     }
                 }
                 break;
@@ -62,7 +84,10 @@ public class GetAttrUserListener extends BaseListener {
         myChatFolderNode = api.getNodeByPath(CHAT_FOLDER, api.getRootNode());
         if (myChatFolderNode != null) {
             myChatFolderFound = true;
-            api.renameNode(myChatFolderNode, context.getString(R.string.my_chat_files_folder), new RenameListener(context, true));
+            String name = context.getString(R.string.my_chat_files_folder);
+            if (!myChatFolderNode.getName().equals(name)) {
+                api.renameNode(myChatFolderNode, name, new RenameListener(context, true));
+            }
             api.setMyChatFilesFolder(myChatFolderNode.getHandle(), new SetAttrUserListener(context));
         }
     }

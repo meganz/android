@@ -29,6 +29,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -2039,7 +2040,6 @@ public class ChatController {
 
         if(m!=null){
             messagesSelected.add(m);
-
             prepareMessagesToForward(messagesSelected, idChat);
         }
         else{
@@ -2049,6 +2049,7 @@ public class ChatController {
 
     public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat){
         ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
+
         for(int i = 0; i<androidMessagesSelected.size(); i++){
             messagesSelected.add(androidMessagesSelected.get(i).getMessage());
         }
@@ -2073,42 +2074,43 @@ public class ChatController {
         }
 
         if(messagesToImport.isEmpty()){
-            logDebug("Proceed to forward");
             forwardMessages(messagesSelected, idChat);
         }
         else{
-            logDebug("Proceed to import nodes to own Cloud");
-            ChatImportToForwardListener listener = new ChatImportToForwardListener(MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
-    
-            MegaNode target = megaApi.getNodeByPath(CHAT_FOLDER, megaApi.getRootNode());
-            if(target==null){
-                logWarning("Error no chat folder - return");
-                return;
+            if (context instanceof ChatActivityLollipop) {
+                ((ChatActivityLollipop) context).storedUnhandledData(messagesSelected, messagesToImport);
+            } else if (context instanceof NodeAttachmentHistoryActivity) {
+                ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
             }
+            megaApi.getMyChatFilesFolder(new GetAttrUserListener(context), true);
+        }
+    }
 
-            for(int j=0; j<messagesToImport.size();j++){
-                MegaChatMessage message = messagesToImport.get(j);
+    public void proceedWithForward(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat) {
+        ChatImportToForwardListener listener = new ChatImportToForwardListener(MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
 
-                if(message!=null){
+        for(int j=0; j<messagesToImport.size();j++){
+            MegaChatMessage message = messagesToImport.get(j);
 
-                    MegaNodeList nodeList = message.getMegaNodeList();
+            if(message!=null){
 
-                    for(int i=0;i<nodeList.size();i++){
-                        MegaNode document = nodeList.get(i);
-                        if (document != null) {
-                            logDebug("DOCUMENT: " + document.getHandle());
-                            document = authorizeNodeIfPreview(document, megaChatApi.getChatRoom(idChat));
-                            megaApi.copyNode(document, target, listener);
-                        }
-                        else{
-                            logWarning("DOCUMENT: null");
-                        }
+                MegaNodeList nodeList = message.getMegaNodeList();
+
+                for(int i=0;i<nodeList.size();i++){
+                    MegaNode document = nodeList.get(i);
+                    if (document != null) {
+                        logDebug("DOCUMENT: " + document.getHandle());
+                        document = authorizeNodeIfPreview(document, megaChatApi.getChatRoom(idChat));
+                        megaApi.copyNode(document, myChatFilesFolder, listener);
+                    }
+                    else{
+                        logWarning("DOCUMENT: null");
                     }
                 }
-                else{
-                    logWarning("MESSAGE is null");
-                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error));
-                }
+            }
+            else{
+                logWarning("MESSAGE is null");
+                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error));
             }
         }
     }

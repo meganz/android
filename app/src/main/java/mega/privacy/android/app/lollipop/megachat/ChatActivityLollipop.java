@@ -96,7 +96,7 @@ import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
-import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
+import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -166,7 +166,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<ArrayList<AndroidMegaChatMessage>> {
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -387,11 +387,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     // Data being stored when My Chat Files folder does not exist
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
+    private ArrayList<MegaChatMessage> preservedMsgSelected;
+    private ArrayList<MegaChatMessage> preservedMsgToImport;
+
     private Intent preservedIntent;
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
 
     private BottomSheetDialogFragment bottomSheetDialogFragment;
+
+    private MegaNode myChatFilesFolder;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -400,8 +405,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void handleStoredData() {
-        forwardMessages(preservedMessagesSelected);
-        preservedMessagesSelected = null;
+        if (preservedMessagesSelected != null && !preservedMessagesSelected.isEmpty()) {
+            forwardMessages(preservedMessagesSelected);
+            preservedMessagesSelected = null;
+        } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
+            chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat);
+            preservedMsgSelected = null;
+            preservedMsgToImport = null;
+        }
+    }
+
+    @Override
+    public void storedUnhandledData(ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport) {
+        preservedMsgSelected = messagesSelected;
+        preservedMsgToImport = messagesToImport;
     }
 
     private class UserTyping {
@@ -8307,5 +8324,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void startUploadService(MegaNode chatFolderNode) {
         preservedIntent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, chatFolderNode.serialize());
         startService(preservedIntent);
+    }
+
+    public void setMyChatFilesFolder(MegaNode myChatFilesFolder) {
+        this.myChatFilesFolder = myChatFilesFolder;
     }
 }
