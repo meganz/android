@@ -1,4 +1,4 @@
-package mega.privacy.android.app.listeners;
+package mega.privacy.android.app.lollipop.listeners;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,13 +10,13 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -28,13 +28,14 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 //Listener for  multi forward
-public class MultipleForwardChatProcessor extends ChatBaseListener{
+public class MultipleForwardChatProcessor implements MegaChatRequestListenerInterface {
+
+    private Context context;
 
     private long[] chatHandles;
     private long[] idMessages;
     private long idChat;
 
-    private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
 
     private ChatController cC;
@@ -42,14 +43,10 @@ public class MultipleForwardChatProcessor extends ChatBaseListener{
 
     public MultipleForwardChatProcessor(Context context, long[] chatHandles, long[] idMessages, long idChat) {
 
-        super(context);
+        this.context = context;
         this.idMessages = idMessages;
         this.chatHandles = chatHandles;
         this.idChat = idChat;
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
 
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
@@ -185,6 +182,16 @@ public class MultipleForwardChatProcessor extends ChatBaseListener{
     }
 
     @Override
+    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         logDebug("onRequestFinish: "+request.getRequestString());
 
@@ -205,6 +212,11 @@ public class MultipleForwardChatProcessor extends ChatBaseListener{
                 logError("Attach node error: " + e.getErrorString() + "__" + e.getErrorCode());
             }
         }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
     }
 
     private void checkTotalMessages() {

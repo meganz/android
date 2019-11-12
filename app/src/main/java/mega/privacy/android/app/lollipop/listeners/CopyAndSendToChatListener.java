@@ -1,4 +1,4 @@
-package mega.privacy.android.app.listeners;
+package mega.privacy.android.app.lollipop.listeners;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,23 +8,25 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
+import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER;
 
-public class CopyAndSendToChatListener extends BaseListener implements MyChatFilesExisitListener<ArrayList<MegaNode>> {
+public class CopyAndSendToChatListener implements MegaRequestListenerInterface, MyChatFilesExisitListener<ArrayList<MegaNode>> {
+
+    private Context context;
 
     private MegaApiAndroid megaApi;
-    private MegaChatApiAndroid megaChatApi;
 
     private long idChat = -1;
     private int counter = 0;
@@ -34,24 +36,19 @@ public class CopyAndSendToChatListener extends BaseListener implements MyChatFil
     private ArrayList<MegaNode> preservedNotOwnerNode;
 
     public CopyAndSendToChatListener(Context context) {
-        super(context);
         initListener(context);
     }
 
     public CopyAndSendToChatListener(Context context, long idChat) {
-        super(context);
         initListener(context);
         this.idChat = idChat;
     }
 
     void initListener(Context context) {
+        this.context = context;
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
         }
 
         counter = 0;
@@ -66,6 +63,16 @@ public class CopyAndSendToChatListener extends BaseListener implements MyChatFil
         counter = nodes.size();
         storedUnhandledData(nodes);
         megaApi.getMyChatFilesFolder(this);
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
     }
 
     @Override
@@ -114,6 +121,11 @@ public class CopyAndSendToChatListener extends BaseListener implements MyChatFil
                 proceedWithHandleStoredData(request.getNodeHandle());
             }
         }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
     }
 
     private void proceedWithHandleStoredData(long handle) {
