@@ -6779,13 +6779,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					else{
 						exportMK.setVisible(false);
 					}
-
-					if (((MegaApplication) getApplication()).getMyAccountInfo()!= null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0) {
-						cancelSubscription.setVisible(true);
-					}
-					else{
-						cancelSubscription.setVisible(false);
-					}
+				}
+				else if (accountFragment == UPGRADE_ACCOUNT_FRAGMENT) {
+					refreshMenuItem.setVisible(false);
+					rubbishBinMenuItem.setVisible(false);
+					logoutMenuItem.setVisible(false);
+					killAllSessions.setVisible(false);
+					upgradeAccountMenuItem.setVisible(false);
+					changePass.setVisible(false);
+					forgotPassMenuItem.setVisible(false);
+					cancelSubscription.setVisible(false);
+					exportMK.setVisible(false);
 				}
 				else{
 					refreshMenuItem.setVisible(true);
