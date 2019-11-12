@@ -176,18 +176,7 @@ public class ChatUtil {
         return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
     }
 
-    public static String getFirstLetter(String title) {
 
-        if(title.isEmpty()) return "";
-        title = title.trim();
-        if(title.length() == 1) return String.valueOf(title.charAt(0)).toUpperCase(Locale.getDefault());
-
-        String resultTitle = EmojiUtilsShortcodes.emojify(title);
-        List<EmojiRange> emojis = EmojiManager.getInstance().findAllEmojis(resultTitle);
-        if(emojis.size() > 0 && emojis.get(0).start == 0) return resultTitle.substring(emojis.get(0).start, emojis.get(0).end);
-
-        return String.valueOf(resultTitle.charAt(0)).toUpperCase(Locale.getDefault());
-    }
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
 

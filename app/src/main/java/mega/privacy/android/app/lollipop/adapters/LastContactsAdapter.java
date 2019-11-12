@@ -31,9 +31,6 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -41,6 +38,8 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.*;
 
 public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapter.ViewHolder> {
     
@@ -106,7 +105,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
             toContactInfo(contact);
         } else {
             Intent intentOpenChat = new Intent(context,ChatActivityLollipop.class);
-            intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
             intentOpenChat.putExtra("CHAT_ID",chat.getChatId());
             intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intentOpenChat);
@@ -164,7 +163,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     }
     
     private void drawCircle(MegaUser contact,ViewHolder holder) {
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT,Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
@@ -186,7 +185,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     
     private void displayFirstLetter(MegaUser contact,ViewHolder holder) {
         String fullName = getName(contact);
-        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        String firstLetter = getFirstLetter(fullName);
         if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
             holder.contactInitialLetter.setVisibility(View.INVISIBLE);
         }else {

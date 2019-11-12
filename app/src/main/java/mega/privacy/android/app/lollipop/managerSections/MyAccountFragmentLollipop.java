@@ -766,14 +766,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
-	public void setDefaultAvatar(){
-		logDebug("setDefaultAvatar");
-		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		String firstLetter = getFirstLetter(myAccountInfo.getFullName());
-		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-			firstLetter = " ";
-		}
-		myAccountImage.setImageBitmap(createDefaultAvatar(color, firstLetter));
+	private void setDefaultAvatar(){
+		myAccountImage.setImageBitmap(getDefaultAvatar(colorAvatar(context,megaApi, megaApi.getMyUser(), false), myAccountInfo.getFullName(), AVATAR_SIZE));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){

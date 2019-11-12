@@ -421,7 +421,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         display.getMetrics(outMetrics);
 
         fullName = contact.getFullName();
-        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        String firstLetter = getFirstLetter(fullName);
         if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
             avatarInitialLetter.setVisibility(View.INVISIBLE);
         }else {

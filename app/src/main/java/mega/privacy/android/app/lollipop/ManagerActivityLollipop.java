@@ -277,7 +277,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private final int OFFLINE_BNV = 4;
 	private final int HIDDEN_BNV = 5;
 	private final int MEDIA_UPLOADS_BNV = 6;
-	private static final int AVATAR_SIZE = 150;
 
 	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
@@ -3975,16 +3974,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
-
-		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		String firstLetter = getFirstLetter(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-			firstLetter = " ";
-		}
-		nVPictureProfile.setImageBitmap(createDefaultAvatar(color, firstLetter, AVATAR_SIZE));
+		nVPictureProfile.setImageBitmap(getDefaultAvatar(colorAvatar(this, megaApi, megaApi.getMyUser(), false), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE));
 	}
 
-	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
+	public void setOfflineAvatar(String email, long myHandle, String name){
 		logDebug("setOfflineAvatar");
 
 		File avatar = buildAvatarFile(this, email + ".jpg");
@@ -4025,19 +4018,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		}
 
-		String myHandleEncoded = "";
-		if(megaApi.getMyUser()!=null){
-			myHandle = megaApi.getMyUser().getHandle();
-			myHandleEncoded = MegaApiAndroid.userHandleToBase64(myHandle);
-		}
-		else{
-			myHandleEncoded = MegaApiAndroid.userHandleToBase64(myHandle);
-		}
-
-		String color = megaApi.getUserAvatarColor(myHandleEncoded);
-
 		if (nVPictureProfile != null){
-			nVPictureProfile.setImageBitmap(createDefaultAvatar(color, firstLetter, AVATAR_SIZE));
+			nVPictureProfile.setImageBitmap(getDefaultAvatar(colorAvatar(this, megaApi, myHandle), name, AVATAR_SIZE));
 		}
 	}
 
@@ -4971,10 +4953,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					nVDisplayName.setText(fullName);
 				}
 
-				String firstLetter = fullName.charAt(0) + "";
-				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-
-				setOfflineAvatar(emailCredentials, myHandle, firstLetter);
+				setOfflineAvatar(emailCredentials, myHandle, fullName);
 			}
 
 			sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());

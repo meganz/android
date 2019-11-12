@@ -497,7 +497,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
             if(name!=null){
                 if(!(name.trim().isEmpty())){
-                    String firstLetter = ChatUtil.getFirstLetter(name);
+                    String firstLetter = getFirstLetter(name);
                     if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
                        contactInitialLetter.setVisibility(View.INVISIBLE);
                     }else {
@@ -539,7 +539,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             display.getMetrics(outMetrics);
 
             if(name!=null){
-                String firstLetter = ChatUtil.getFirstLetter(name);
+                String firstLetter = getFirstLetter(name);
                 if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
                     contactInitialLetter.setVisibility(View.INVISIBLE);
                 }else {

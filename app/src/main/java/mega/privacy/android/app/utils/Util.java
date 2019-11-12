@@ -66,6 +66,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -82,6 +83,8 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.EmojiRange;
+import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -93,9 +96,11 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaUser;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 
 
 public class Util {
@@ -1468,12 +1473,46 @@ public class Util {
 		}
 	}
 
-	public static Bitmap createDefaultAvatar (String color, String firstLetter, int textSize) {
-		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+	public static String getFirstLetter(String text) {
+		if(text.isEmpty()) return "";
+		text = text.trim();
+		if(text.length() == 1) return String.valueOf(text.charAt(0)).toUpperCase(Locale.getDefault());
+
+		String resultTitle = EmojiUtilsShortcodes.emojify(text);
+		List<EmojiRange> emojis = EmojiManager.getInstance().findAllEmojis(resultTitle);
+		if(emojis.size() > 0 && emojis.get(0).start == 0) return resultTitle.substring(emojis.get(0).start, emojis.get(0).end);
+
+		String result = String.valueOf(resultTitle.charAt(0)).toUpperCase(Locale.getDefault());
+		if(result == null || result.trim().isEmpty() || result.equals("(")){
+			result = " ";
+		}
+		return result;
+	}
+
+	public static int colorAvatar(Context context, MegaApiAndroid megaApi, MegaUser user, boolean isGroup) {
+		if(isGroup) return ContextCompat.getColor(context, R.color.divider_upgrade_account);
+		return getColorAvatar(context, megaApi.getUserAvatarColor(user));
+	}
+
+	public static int colorAvatar(Context context, MegaApiAndroid megaApi, long myHandle) {
+		String myHandleEncoded = "";
+		if (megaApi.getMyUser() != null) {
+			myHandle = megaApi.getMyUser().getHandle();
+		}
+		myHandleEncoded = MegaApiAndroid.userHandleToBase64(myHandle);
+		return getColorAvatar(context, megaApi.getUserAvatarColor(myHandleEncoded));
+	}
+
+	private static int getColorAvatar(Context context, String color){
+		if(color != null) return Color.parseColor(color);
+		return ContextCompat.getColor(context, R.color.lollipop_primary_color);
+	}
+
+	public static Bitmap getDefaultAvatar (int color, String name, int textSize) {
+		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint paintText = new Paint();
 		Paint paintCircle = new Paint();
-
 		paintText.setColor(Color.WHITE);
 		paintText.setTextSize(textSize);
 		paintText.setAntiAlias(true);
@@ -1484,15 +1523,11 @@ public class Util {
 		paintText.setSubpixelText(true);
 		paintText.setStyle(Paint.Style.FILL);
 
-		if(color!=null){
-			paintCircle.setColor(Color.parseColor(color));
-		}
-		else{
-			paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-		}
+		/*Color*/
+		paintCircle.setColor(color);
 		paintCircle.setAntiAlias(true);
 
-
+		/*Shape*/
 		int radius;
 		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
 			radius = defaultAvatar.getWidth()/2;
@@ -1501,6 +1536,8 @@ public class Util {
 
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
+		/*First Letter*/
+		String firstLetter = getFirstLetter(name);
 		final Emoji found = EmojiManager.getInstance().getFirstEmoji(firstLetter);
 		if (found != null) {
 			Bitmap emojiBitmap = Bitmap.createScaledBitmap(found.getBitmap(context), textSize, textSize, false);
