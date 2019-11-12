@@ -5863,16 +5863,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		setTabsVisibility();
 	}
 
-	public void showUpAF(){
+	public void showUpAF() {
 		logDebug("showUpAF");
-
-		accountFragment=UPGRADE_ACCOUNT_FRAGMENT;
+		accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
 		setToolbarTitle();
-
-		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-		if(upAFL==null){
-			upAFL = new UpgradeAccountFragmentLollipop();
-		}
+		upAFL = new UpgradeAccountFragmentLollipop();
 		replaceFragment(upAFL, FragmentTag.UPGRADE_ACCOUNT.getTag());
 		setTabsVisibility();
 		supportInvalidateOptionsMenu();

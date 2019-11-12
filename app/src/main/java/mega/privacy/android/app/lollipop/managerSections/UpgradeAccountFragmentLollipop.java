@@ -742,22 +742,25 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	private void hideProLite(){
 		logDebug("hideProLite");
 		proLiteTransparentLayout.setVisibility(View.VISIBLE);
-
+		proLiteLayout.setClickable(false);
 	}
 
 	private void hideProI(){
 		logDebug("hideProI");
 		pro1TransparentLayout.setVisibility(View.VISIBLE);
+		pro1Layout.setClickable(false);
 	}
 
 	private void hideProII(){
 		logDebug("hideProII");
 		pro2TransparentLayout.setVisibility(View.VISIBLE);
+		pro2Layout.setClickable(false);
 	}
 
 	private void hideProIII(){
 		logDebug("hideProIII");
 		pro3TransparentLayout.setVisibility(View.VISIBLE);
+		pro3Layout.setClickable(false);
 	}
 
 	private Spanned generateByteString(long bytes, int type, int labelType) {
