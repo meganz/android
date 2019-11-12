@@ -6,6 +6,7 @@ import android.content.Context;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -27,7 +28,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 //Listener for  multi forward
-public class MultipleForwardChatProcessor extends ChatBaseListener {
+public class MultipleForwardChatProcessor extends ChatBaseListener{
 
     private long[] chatHandles;
     private long[] idMessages;
@@ -37,6 +38,7 @@ public class MultipleForwardChatProcessor extends ChatBaseListener {
     private MegaChatApiAndroid megaChatApi;
 
     private ChatController cC;
+    private NodeController nC;
 
     public MultipleForwardChatProcessor(Context context, long[] chatHandles, long[] idMessages, long idChat) {
 
@@ -54,6 +56,7 @@ public class MultipleForwardChatProcessor extends ChatBaseListener {
         }
 
         cC = new ChatController(context);
+        nC = new NodeController(context);
     }
 
     int counter = 0;
@@ -68,19 +71,17 @@ public class MultipleForwardChatProcessor extends ChatBaseListener {
         if (msg.getUserHandle() == megaChatApi.getMyUserHandle()) {
             for (int j = 0; j < nodeList.size(); j++) {
                 MegaNode temp = nodeList.get(j);
-                attachVoiceClip(chatHandles[value], temp);
+                megaChatApi.attachVoiceMessage(chatHandles[value], temp.getHandle(), this);
             }
         } else {
             for (int j = 0; j < nodeList.size(); j++) {
                 MegaNode temp = nodeList.get(j);
-                String name = temp.getName();
-                MegaNode chatFolder = megaApi.getNodeByPath(CHAT_FOLDER, megaApi.getRootNode());
-                if (chatFolder == null) {
-                    logWarning("Error no chat folder - return");
-                    return;
+                MegaNode nodeToAttach = nC.checkIfNodeIsMine(temp);
+                if (nodeToAttach != null) {
+                    megaChatApi.attachVoiceMessage(chatHandles[value], nodeToAttach.getHandle(), this);
+                } else {
+                    logWarning("The node: " + temp.getHandle() + " is not mine. Not attached.");
                 }
-                MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
-                attachVoiceClip(chatHandles[value], nodeToAttach);
             }
         }
 
@@ -148,32 +149,23 @@ public class MultipleForwardChatProcessor extends ChatBaseListener {
                         break;
                     }
                     case MegaChatMessage.TYPE_NODE_ATTACHMENT: {
-                        if (messageToForward.getUserHandle() != megaChatApi.getMyUserHandle()) {
-                            MegaNodeList nodeList = messageToForward.getMegaNodeList();
-                            if (nodeList != null) {
-                                for (int j = 0; j < nodeList.size(); j++) {
-                                    MegaNode temp = nodeList.get(j);
-                                    String name = temp.getName();
-                                    MegaNode chatFolder = megaApi.getNodeByPath(CHAT_FOLDER, megaApi.getRootNode());
-                                    if (chatFolder == null) {
-                                        logWarning("Error no chat folder - return");
-                                        return;
-                                    }
-                                    MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
-                                    if (nodeToAttach != null) {
-                                        nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
-                                        megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), this);
-                                    } else {
-                                        logWarning("ERROR - Node to attach is NULL - one node not attached");
-                                    }
-                                }
+                        MegaNodeList nodeList = messageToForward.getMegaNodeList();
+                        if (nodeList == null) continue;
+
+                        if (messageToForward.getUserHandle() == megaChatApi.getMyUserHandle()) {
+                            for (int j = 0; j < nodeList.size(); j++) {
+                                MegaNode temp = nodeList.get(j);
+                                megaChatApi.attachNode(chatHandles[k], temp.getHandle(), this);
                             }
                         } else {
-                            MegaNodeList nodeList = messageToForward.getMegaNodeList();
-                            if (nodeList != null) {
-                                for (int j = 0; j < nodeList.size(); j++) {
-                                    MegaNode temp = nodeList.get(j);
-                                    megaChatApi.attachNode(chatHandles[k], temp.getHandle(), this);
+                            for (int j = 0; j < nodeList.size(); j++) {
+                                MegaNode temp = nodeList.get(j);
+                                MegaNode nodeToAttach = nC.checkIfNodeIsMine(temp);
+                                if (nodeToAttach != null) {
+                                    nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
+                                    megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), this);
+                                } else {
+                                    logWarning("The node: " + temp.getHandle() + " is not mine. Not attached.");
                                 }
                             }
                         }
@@ -190,11 +182,6 @@ public class MultipleForwardChatProcessor extends ChatBaseListener {
                 }
             }
         }
-    }
-
-    private void attachVoiceClip(long chatHandle, MegaNode megaNode) {
-        if (megaNode == null) return;
-        megaChatApi.attachVoiceMessage(chatHandle, megaNode.getHandle(), this);
     }
 
     @Override

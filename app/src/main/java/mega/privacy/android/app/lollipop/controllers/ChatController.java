@@ -2082,7 +2082,7 @@ public class ChatController {
             } else if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
             }
-            megaApi.getMyChatFilesFolder(new GetAttrUserListener(context), true);
+            megaApi.getMyChatFilesFolder(new GetAttrUserListener(context, true));
         }
     }
 
