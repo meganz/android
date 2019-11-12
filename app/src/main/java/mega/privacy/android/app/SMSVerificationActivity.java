@@ -1,9 +1,11 @@
 package mega.privacy.android.app;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
@@ -235,22 +237,47 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 break;
             }
             case R.id.sms_logout: {
-                if(megaApi.getRootNode() == null) {
-                    AccountController.logout(this, megaApi);
-                } else {
-                    // due to the account has been blocked, logout will always fail with errorCode -16, call localLogout instead
-                    megaApi.localLogout();
-                    megaChatApi.logout();
-                    AccountController.logoutConfirmed(this);
-                    Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-                    tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    this.startActivity(tourIntent);
-                }
+                showConfirmLogoutDialog();
                 break;
             }
             default:
                 break;
         }
+    }
+
+    private void showConfirmLogoutDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog,int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        if(megaApi.getRootNode() == null) {
+                            AccountController.logout(SMSVerificationActivity.this, megaApi);
+                        } else {
+                            // due to the account has been blocked, logout will always fail with errorCode -16, call localLogout instead
+                            megaApi.localLogout();
+                            megaChatApi.logout();
+                            AccountController.logoutConfirmed(SMSVerificationActivity.this);
+                            Intent tourIntent = new Intent(SMSVerificationActivity.this, LoginActivityLollipop.class);
+                            tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            SMSVerificationActivity.this.startActivity(tourIntent);
+                        }
+                        dialog.dismiss();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        dialog.dismiss();
+                        break;
+                }
+            }
+        };
+        String message = getString(R.string.confirm_logout_from_sms_verification);
+        builder.setCancelable(true)
+                .setMessage(message)
+                .setPositiveButton(getString(R.string.general_positive_button), dialogClickListener)
+                .setNegativeButton(getString(R.string.general_negative_button), dialogClickListener)
+                .show();
     }
     
     @Override
