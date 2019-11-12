@@ -250,26 +250,16 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 
             @Override
-            public void onClick(DialogInterface dialog,int which) {
+            public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        if(megaApi.getRootNode() == null) {
-                            AccountController.logout(SMSVerificationActivity.this, megaApi);
-                        } else {
-                            // due to the account has been blocked, logout will always fail with errorCode -16, call localLogout instead
-                            megaApi.localLogout();
-                            megaChatApi.logout();
-                            AccountController.logoutConfirmed(SMSVerificationActivity.this);
-                            Intent tourIntent = new Intent(SMSVerificationActivity.this, LoginActivityLollipop.class);
-                            tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            SMSVerificationActivity.this.startActivity(tourIntent);
-                        }
-                        dialog.dismiss();
+                        megaApi.logout();
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
-                        dialog.dismiss();
                         break;
                 }
+
+                dialog.dismiss();
             }
         };
         String message = getString(R.string.confirm_logout_from_sms_verification);
@@ -447,22 +437,6 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             }
             String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
             helperText.setText(message);
-        }
-
-        if (request.getType() == MegaRequest.TYPE_LOGOUT) {
-            logDebug("Logout finished");
-            if (isChatEnabled()) {
-                logDebug("END logout sdk request - wait chat logout");
-            } else {
-                logDebug("END logout sdk request - chat disabled");
-                DatabaseHandler.getDbHandler(getApplicationContext()).clearEphemeral();
-                AccountController.logoutConfirmed(this);
-
-                Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-                tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                this.startActivity(tourIntent);
-                finish();
-            }
         }
 
         if (request.getType() == MegaRequest.TYPE_GET_COUNTRY_CALLING_CODES) {

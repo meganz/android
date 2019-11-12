@@ -852,35 +852,18 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         if(event.getType()==MegaEvent.EVENT_ACCOUNT_BLOCKED){
             logDebug("Event received: " + event.getText() + "_" + event.getNumber());
             int whyAmIBlocked = (int) event.getNumber();
-            if(whyAmIBlocked ==200){
+            if(whyAmIBlocked == 200){
                 accountBlocked = getString(R.string.account_suspended_multiple_breaches_ToS);
                 megaChatApi.logout(loginFragment);
-            }
-            else if(whyAmIBlocked ==300){
+            } else if(whyAmIBlocked == 300){
                 accountBlocked = getString(R.string.account_suspended_breache_ToS);
                 megaChatApi.logout(loginFragment);
             } else if(whyAmIBlocked == 500) {
-                int state = api.smsAllowedState();
-                logDebug("state: " + state);
-                if (state != 0) {
-                    if (!MegaApplication.isVerifySMSShowed()) {
-                        String gSession = megaApi.dumpSession();
-                        /*
-                         * for first login, keep the valid session,
-                         * after added phone number, the account can use this session to fastLogin
-                         */
-                        if (gSession != null) {
-                            UserCredentials credentials = new UserCredentials("", gSession, "", "", "");
-                            dbH.saveCredentials(credentials);
-                        }
-
-                        logDebug("redirect to SMSVerificationActivity in LoginActivity");
-                        Intent intent = new Intent(getApplicationContext(), SMSVerificationActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                        intent.putExtra(NAME_USER_LOCKED,true);
-                        startActivity(intent);
-                    }
-                }
+                //CODE REFACTOR PENDING TO UNIFY CODE
+                //Processed in the `onEvent` callback of `MegaApplication`
+            } else {
+                //Default account blocked error
+                accountBlocked = getString(R.string.error_account_suspended);
             }
         }
     }

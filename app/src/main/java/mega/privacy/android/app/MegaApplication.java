@@ -173,10 +173,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
-    public static boolean isVerifySMSShowed() {
-        return isVerifySMSShowed;
-    }
-
     public static void smsVerifyShowed(boolean isShowed) {
 	    isVerifySMSShowed = isShowed;
     }
@@ -218,14 +214,26 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			logDebug("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
 
 			if (request.getType() == MegaRequest.TYPE_LOGOUT){
-				if (e.getErrorCode() == MegaError.API_EINCOMPLETE){
+				logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() +")");
+				if (e.getErrorCode() == MegaError.API_OK) {
+					if (isChatEnabled()) {
+						logDebug("END logout sdk request - wait chat logout");
+					} else {
+						logDebug("END logout sdk request - chat disabled");
+						DatabaseHandler.getDbHandler(getApplicationContext()).clearEphemeral();
+						AccountController.logoutConfirmed(getApplicationContext());
+
+						Intent tourIntent = new Intent(getApplicationContext(), LoginActivityLollipop.class);
+						tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+						startActivity(tourIntent);
+					}
+				} else if (e.getErrorCode() == MegaError.API_EINCOMPLETE) {
 					if (request.getParamType() == MegaError.API_ESSL) {
 						logWarning("SSL verification failed");
 						Intent intent = new Intent(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED);
 						LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 					}
-				}
-				else if (e.getErrorCode() == MegaError.API_ESID){
+				} else if (e.getErrorCode() == MegaError.API_ESID) {
 					logWarning("TYPE_LOGOUT:API_ESID");
 					myAccountInfo = new MyAccountInfo(getApplicationContext());
 
@@ -239,6 +247,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					}
 
 					AccountController.localLogoutApp(getApplicationContext());
+				} else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
+					api.localLogout();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -1428,8 +1438,18 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
             int state = api.smsAllowedState();
             logDebug("whyAmIBlocked: " + whyAmIBlocked + ",state: " + state);
             if (whyAmIBlocked == 500 && state != 0) {
-                if (!isVerifySMSShowed) {
-                    Intent intent = new Intent(getApplicationContext(),SMSVerificationActivity.class);
+            	if (!isVerifySMSShowed) {
+					isVerifySMSShowed = true;
+                	String gSession = megaApi.dumpSession();
+					//For first login, keep the valid session,
+					//after added phone number, the account can use this session to fastLogin
+					if (gSession != null) {
+						UserCredentials credentials = new UserCredentials("", gSession, "", "", "");
+						dbH.saveCredentials(credentials);
+					}
+
+					logDebug("Show SMS verification activity.");
+					Intent intent = new Intent(getApplicationContext(),SMSVerificationActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra(NAME_USER_LOCKED,true);
                     startActivity(intent);
