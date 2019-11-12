@@ -59,7 +59,6 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     public ImageView permissionsIcon;
     public TextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
-    public EmojiTextView contactInitialLetter;
     public LinearLayout contactLayout;
     public LinearLayout optionContactInfoChat;
     public LinearLayout optionStartConversationChat;
@@ -137,9 +136,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.group_participants_chat_mail_text);
         contactLayout = (LinearLayout) contentView.findViewById(R.id.group_participants_chat);
-        contactImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
-        contactInitialLetter = contentView.findViewById(R.id.sliding_group_participants_chat_list_initial_letter);
-
+        contactImageView = contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
         optionContactInfoChat = (LinearLayout) contentView.findViewById(R.id.contact_info_group_participants_chat_layout);
         optionStartConversationChat = (LinearLayout) contentView.findViewById(R.id.start_chat_group_participants_chat_layout);
         optionEditProfileChat = (LinearLayout) contentView.findViewById(R.id.edit_profile_group_participants_chat_layout);
@@ -349,6 +346,10 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     public void addAvatarParticipantPanel(long handle, String email, String name){
 
         File avatar = null;
+        /*Default avatar*/
+        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, handle), name, AVATAR_SIZE));
+
+        /*Avatar*/
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
 
         if(handle == megaChatApi.getMyUserHandle()){
@@ -383,64 +384,11 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
                     avatar.delete();
                 }
                 else{
-                    contactInitialLetter.setVisibility(View.GONE);
                     contactImageView.setImageBitmap(bitmap);
                     return;
                 }
             }
         }
-
-        logDebug("Set default avatar");
-        ////DEfault AVATAR
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        String color = megaApi.getUserAvatarColor(userHandleEncoded);
-        if(color!=null){
-            logDebug("The color to set the avatar is " + color);
-            p.setColor(Color.parseColor(color));
-        }
-        else{
-            logDebug("Default color to the avatar");
-            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-        }
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-        contactImageView.setImageBitmap(defaultAvatar);
-
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
-        float density  = getResources().getDisplayMetrics().density;
-
-        if(name!=null){
-            if(!(name.trim().isEmpty())){
-                String firstLetter = getFirstLetter(name);
-                if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-                    contactInitialLetter.setVisibility(View.INVISIBLE);
-                }else {
-                    contactInitialLetter.setText(firstLetter);
-                    contactInitialLetter.setTextColor(Color.WHITE);
-                    contactInitialLetter.setVisibility(View.VISIBLE);
-                }
-                contactInitialLetter.setTextSize(24);
-            }
-            else{
-                contactInitialLetter.setVisibility(View.GONE);
-            }
-        }
-        else{
-            contactInitialLetter.setVisibility(View.GONE);
-        }
-
-        ////
     }
 
     @Override

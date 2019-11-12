@@ -78,7 +78,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     public ImageView stateIcon;
     public EmojiTextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
-    public EmojiTextView contactInitialLetter;
     LinearLayout optionView;
     LinearLayout optionInfo;
     LinearLayout optionStartConversation;
@@ -172,7 +171,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
         titleMailContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_mail_text);
         contactImageView = (RoundedImageView) contentView.findViewById(R.id.contact_attachment_thumbnail);
-        contactInitialLetter = contentView.findViewById(R.id.contact_attachment_initial_letter);
 
         optionView = (LinearLayout) contentView.findViewById(R.id.option_view_layout);
         optionInfo = (LinearLayout) contentView.findViewById(R.id.option_info_layout);
@@ -444,8 +442,11 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
     public void addAvatarParticipantPanel(long handle, String email, String name){
         logDebug("handle: " + handle);
+        /*Default Avatar*/
+        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, handle), name, AVATAR_SIZE));
+
         if (handle != -1) {
-            //Ask for avatar
+            /*Avatar*/
             File avatar = buildAvatarFile(getActivity(),email + ".jpg");
             Bitmap bitmap = null;
             if (isFileAvailable(avatar)) {
@@ -458,99 +459,10 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                         avatar.delete();
                     }
                     else{
-                        contactInitialLetter.setVisibility(View.GONE);
                         contactImageView.setImageBitmap(bitmap);
                         return;
                     }
                 }
-            }
-
-            logDebug("Set default avatar");
-            ////DEfault AVATAR
-            Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(defaultAvatar);
-            Paint p = new Paint();
-            p.setAntiAlias(true);
-            String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
-            String color = megaApi.getUserAvatarColor(userHandleEncoded);
-            if(color!=null){
-                logDebug("The color to set the avatar is " + color);
-                p.setColor(Color.parseColor(color));
-            }
-            else{
-                logDebug("Default color to the avatar");
-                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-            }
-
-            int radius;
-            if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-                radius = defaultAvatar.getWidth()/2;
-            else
-                radius = defaultAvatar.getHeight()/2;
-
-            c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-            contactImageView.setImageBitmap(defaultAvatar);
-
-            Display display = getActivity().getWindowManager().getDefaultDisplay();
-            DisplayMetrics outMetrics = new DisplayMetrics ();
-            display.getMetrics(outMetrics);
-
-            if(name!=null){
-                if(!(name.trim().isEmpty())){
-                    String firstLetter = getFirstLetter(name);
-                    if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-                       contactInitialLetter.setVisibility(View.INVISIBLE);
-                    }else {
-                       contactInitialLetter.setText(firstLetter);
-                       contactInitialLetter.setTextColor(Color.WHITE);
-                       contactInitialLetter.setVisibility(View.VISIBLE);
-                       contactInitialLetter.setTextSize(24);
-                    }
-                }
-                else{
-                    contactInitialLetter.setVisibility(View.GONE);
-                }
-            }
-            else{
-                contactInitialLetter.setVisibility(View.GONE);
-            }
-        }
-        else{
-            logWarning("Set default avatar HANDLE is Null");
-            ////DEfault AVATAR
-            Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(defaultAvatar);
-            Paint p = new Paint();
-            p.setAntiAlias(true);
-            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-
-
-            int radius;
-            if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-                radius = defaultAvatar.getWidth()/2;
-            else
-                radius = defaultAvatar.getHeight()/2;
-
-            c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-            contactImageView.setImageBitmap(defaultAvatar);
-
-            Display display = getActivity().getWindowManager().getDefaultDisplay();
-            DisplayMetrics outMetrics = new DisplayMetrics ();
-            display.getMetrics(outMetrics);
-
-            if(name!=null){
-                String firstLetter = getFirstLetter(name);
-                if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-                    contactInitialLetter.setVisibility(View.INVISIBLE);
-                }else {
-                    contactInitialLetter.setText(firstLetter);
-                    contactInitialLetter.setTextColor(Color.WHITE);
-                    contactInitialLetter.setVisibility(View.VISIBLE);
-                    contactInitialLetter.setTextSize(24);
-                }
-            }
-            else{
-                contactInitialLetter.setVisibility(View.GONE);
             }
         }
     }

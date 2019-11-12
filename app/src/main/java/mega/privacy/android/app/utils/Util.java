@@ -1491,18 +1491,13 @@ public class Util {
 
 	public static int colorAvatar(Context context, MegaApiAndroid megaApi, MegaUser user, boolean isGroup) {
 		if(isGroup) return ContextCompat.getColor(context, R.color.divider_upgrade_account);
+		if(user == null)return getColorAvatar(context, null);
 		return getColorAvatar(context, megaApi.getUserAvatarColor(user));
 	}
-
-	public static int colorAvatar(Context context, MegaApiAndroid megaApi, long myHandle) {
-		String myHandleEncoded = "";
-		if (megaApi.getMyUser() != null) {
-			myHandle = megaApi.getMyUser().getHandle();
-		}
-		myHandleEncoded = MegaApiAndroid.userHandleToBase64(myHandle);
-		return getColorAvatar(context, megaApi.getUserAvatarColor(myHandleEncoded));
+	public static int colorAvatar(Context context, MegaApiAndroid megaApi, long handle) {
+		if(handle == -1 ) return getColorAvatar(context, null);
+		return getColorAvatar(context, megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(handle)));
 	}
-
 	private static int getColorAvatar(Context context, String color){
 		if(color != null) return Color.parseColor(color);
 		return ContextCompat.getColor(context, R.color.lollipop_primary_color);
