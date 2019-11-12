@@ -1230,32 +1230,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	@Override
 	public void onPurchasesUpdated(int resultCode, List<Purchase> purchases) {
-		String message = null;
-		switch (resultCode) {
-			case BillingClient.BillingResponseCode.OK:
-				if (purchases == null || purchases.isEmpty()) {
-					message = getString(R.string.general_text_error);
-				} else {
-					updateAccountInfo(purchases);
-					String sku = purchases.get(0).getSku();
-					message = getString(R.string.message_user_purchased_subscription,
-							getSubscriptionType(this, sku),
-							getSubscriptionRenewalType(this, sku));
-					updateSubscriptionLevel(app.getMyAccountInfo());
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItemLollipop(drawerItem);
-				}
-				break;
-			case BillingClient.BillingResponseCode.USER_CANCELED:
-				break;
-			case BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED:
-				message = getString(R.string.error_subscription_purchased_already);
-				break;
-			default:
-				message = getString(R.string.general_text_error);
-		}
-
-		if(!TextUtil.isTextEmpty(message)){
+		if (resultCode == BillingClient.BillingResponseCode.OK
+				&& purchases != null
+				&& !purchases.isEmpty()) {
+			updateAccountInfo(purchases);
+			String sku = purchases.get(0).getSku();
+			String message = getString(R.string.message_user_purchased_subscription,
+					getSubscriptionType(this, sku),
+					getSubscriptionRenewalType(this, sku));
+			updateSubscriptionLevel(app.getMyAccountInfo());
+			drawerItem = DrawerItem.CLOUD_DRIVE;
+			selectDrawerItemLollipop(drawerItem);
 			showAlert(this, message, null);
 		}
 	}
