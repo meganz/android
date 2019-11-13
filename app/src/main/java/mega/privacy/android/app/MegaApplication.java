@@ -1445,7 +1445,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					//For first login, keep the valid session,
 					//after added phone number, the account can use this session to fastLogin
 					if (gSession != null) {
-						UserCredentials credentials = new UserCredentials("", gSession, "", "", "");
+                        MegaUser myUser = megaApi.getMyUser();
+                        String myUserHandle = null;
+                        String lastEmail = null;
+                        if (myUser != null) {
+                            lastEmail = myUser.getEmail();
+                            myUserHandle = myUser.getHandle() + "";
+                        }
+                        UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
 						dbH.saveCredentials(credentials);
 					}
 

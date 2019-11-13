@@ -34,7 +34,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -470,8 +469,6 @@ public class AccountController implements View.OnClickListener{
         }
         else if (context instanceof TestPasswordActivity){
             megaApi.logout(((TestPasswordActivity)context));
-        } else if(context instanceof SMSVerificationActivity) {
-            megaApi.logout((SMSVerificationActivity)context);
         }
         else{
             megaApi.logout();
