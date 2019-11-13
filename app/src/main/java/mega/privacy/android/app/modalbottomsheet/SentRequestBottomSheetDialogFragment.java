@@ -134,7 +134,7 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     public void addAvatarRequestPanel(MegaContactRequest request){
         /*Default Avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, -1), request.getTargetEmail(), AVATAR_SIZE));
+        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, -1), request.getTargetEmail(), AVATAR_SIZE, true));
     }
 
     @Override

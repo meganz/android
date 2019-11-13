@@ -117,8 +117,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
             }
         }
         int color = ContextCompat.getColor(context, R.color.color_default_avatar_phone);
-        holder.avatar.setImageBitmap(getDefaultAvatar(color, holder.textViewName.getText().toString(), AVATAR_SIZE));
-
+        holder.avatar.setImageBitmap(getDefaultAvatar(color, holder.textViewName.getText().toString(), AVATAR_SIZE, true));
     }
 
     @Override

@@ -119,8 +119,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
                 }
             }
         }
-        setUserAvatar(contact);
-
+        holder.avatar.setImageBitmap(setUserAvatar(contact));
     }
 
     @Override
@@ -180,7 +179,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
         return contacts.get(position);
     }
 
-    public void setUserAvatar(MegaContactAdapter contact){
+    private Bitmap setUserAvatar(MegaContactAdapter contact){
         logDebug("setUserAvatar");
 
         File avatar = null;
@@ -196,20 +195,34 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
             mail = contact.getFullName();
         }
 
-        /*Default avatar*/
-        holder.avatar.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, contact.getMegaUser(), false), mail, AVATAR_SIZE));
+        int color = colorAvatar(context, megaApi, contact.getMegaUser(), false);
+
+        if (contact.getMegaUser() == null && contact.getMegaContactDB() == null) {
+            return getDefaultAvatar(color, contact.getFullName(), AVATAR_SIZE,true);
+        }
 
         /*Avatar*/
         avatar = buildAvatarFile(context, mail + ".jpg");
-        Bitmap bitmap;
+        Bitmap bitmap = null;
         if (isFileAvailable(avatar) && avatar.length() > 0){
             BitmapFactory.Options bOpts = new BitmapFactory.Options();
             bOpts.inPurgeable = true;
             bOpts.inInputShareable = true;
             bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
             if (bitmap != null) {
-                holder.avatar.setImageBitmap(getCircleBitmap(bitmap));
+            return getCircleBitmap(bitmap);
             }
         }
+
+        /*Default Avatar*/
+        String fullName;
+        if (contact.getFullName() != null) {
+            fullName = contact.getFullName();
+        } else {
+            fullName = mail;
+        }
+        return getDefaultAvatar(color, fullName, AVATAR_SIZE,true);
     }
-}
+
+
+    }

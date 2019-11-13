@@ -197,14 +197,14 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         logDebug("setUserAvatar");
 
         if (item.getChat() != null && item.getChat().isGroup()) {
-            holder.avatar.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, null, true), item.getTitle(), AVATAR_SIZE));
+            holder.avatar.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, null, true), item.getTitle(), AVATAR_SIZE, true));
         }
         else {
             MegaUser user = null;
             if (item.getContact() != null && item.getContact().getMegaUser() != null) {
                 user = item.getContact().getMegaUser();
             }
-            holder.avatar.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, user, false), item.getTitle(), AVATAR_SIZE));
+            holder.avatar.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, user, false), item.getTitle(), AVATAR_SIZE, true));
 
             ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
             File avatar = null;

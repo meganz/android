@@ -347,7 +347,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         File avatar = null;
         /*Default avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, handle), name, AVATAR_SIZE));
+        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
 
         /*Avatar*/
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);

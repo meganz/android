@@ -397,7 +397,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
         }
 
-        return getDefaultAvatar(colorAvatar(context, megaApi, myUser, false), fullName, AVATAR_SIZE);
+        return getDefaultAvatar(colorAvatar(context, megaApi, myUser, false), fullName, AVATAR_SIZE, true);
     }
 
     @Override

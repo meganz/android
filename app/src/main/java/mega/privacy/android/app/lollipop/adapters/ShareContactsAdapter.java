@@ -152,7 +152,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
             }
         }
 
-        holder.avatar.setImageBitmap(setUserAvatar(contact));
+        holder.avatar.setImageBitmap(getAvatarShareContact(context, megaApi, contact));
     }
 
     @Override
@@ -211,112 +211,5 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
     public Object getItem(int position) {
         logDebug("Position: " + position);
         return contacts.get(position);
-    }
-
-    public Bitmap setUserAvatar(ShareContactInfo contact){
-        logDebug("setUserAvatar");
-
-        File avatar = null;
-        String mail = null;
-
-        mail = ((AddContactActivityLollipop) context).getShareContactMail(contact);
-
-        if (!contact.isPhoneContact() && !contact.isMegaContact()) {
-            return createDefaultAvatar(mail, contact);
-        }
-
-        avatar = buildAvatarFile(context,mail + ".jpg");
-        Bitmap bitmap = null;
-        if (isFileAvailable(avatar)){
-            if (avatar.length() > 0){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    return createDefaultAvatar(mail, contact);
-                }
-                else{
-                    return getCircleBitmap(bitmap);
-                }
-            }
-            else{
-                return createDefaultAvatar(mail, contact);
-            }
-        }
-        else{
-            return createDefaultAvatar(mail, contact);
-        }
-    }
-
-    public Bitmap createDefaultAvatar(String mail, ShareContactInfo contact){
-        logDebug("createDefaultAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint paintText = new Paint();
-        Paint paintCircle = new Paint();
-
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(150);
-        paintText.setAntiAlias(true);
-        paintText.setTextAlign(Paint.Align.CENTER);
-        Typeface face = Typeface.SANS_SERIF;
-        paintText.setTypeface(face);
-        paintText.setAntiAlias(true);
-        paintText.setSubpixelText(true);
-        paintText.setStyle(Paint.Style.FILL);
-
-        String color = null;
-        if (contact.isMegaContact() && contact.getMegaContactAdapter().getMegaUser() != null) {
-            color = megaApi.getUserAvatarColor(contact.getMegaContactAdapter().getMegaUser());
-        }
-        if(color!=null){
-            logDebug("The color to set the avatar is " + color);
-            paintCircle.setColor(Color.parseColor(color));
-        }
-        else{
-            logDebug("Default color to the avatar");
-            paintCircle.setColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
-        }
-        paintCircle.setAntiAlias(true);
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-
-        String fullName = null;
-        if(contact.isPhoneContact()){
-            fullName = contact.getPhoneContactInfo().getName();
-            if (fullName == null) {
-                fullName = mail;
-            }
-        }
-        else if (contact.isMegaContact()) {
-            fullName = contact.getMegaContactAdapter().getFullName();
-            if (fullName == null) {
-                fullName = mail;
-            }
-        }
-        else{
-            //No name, ask for it and later refresh!!
-            fullName = mail;
-        }
-        String firstLetter = getFirstLetter(fullName);
-        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-            firstLetter = " ";
-        }
-        Rect bounds = new Rect();
-
-        paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-        int xPos = (c.getWidth()/2);
-        int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-        c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-
-        return defaultAvatar;
     }
 }

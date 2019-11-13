@@ -391,7 +391,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         }else{
             color = colorAvatar(context, megaApi, contact.getMegaUser(), false);
         }
-        contactImageView.setImageBitmap(getDefaultAvatar(color, contact.getFullName(), AVATAR_SIZE));
+        contactImageView.setImageBitmap(getDefaultAvatar(color, contact.getFullName(), AVATAR_SIZE, true));
     }
 
     @Override

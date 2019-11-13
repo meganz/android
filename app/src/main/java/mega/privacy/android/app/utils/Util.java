@@ -18,6 +18,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
@@ -31,14 +32,11 @@ import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
-
 import android.support.v4.app.ActivityCompat;
-
 import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.format.Formatter;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -86,9 +84,11 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.ShareContactInfo;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -99,9 +99,11 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
-
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 
 public class Util {
 
@@ -1200,31 +1202,6 @@ public class Util {
 		return null;
 	}
 
-	public static int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
-		}
-
-		return (int)textSize;
-	}
-
 	public static void showAlert(Context context, String message, String title) {
 		logDebug("showAlert");
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -1491,45 +1468,64 @@ public class Util {
 
 	public static int colorAvatar(Context context, MegaApiAndroid megaApi, MegaUser user, boolean isGroup) {
 		if(isGroup) return ContextCompat.getColor(context, R.color.divider_upgrade_account);
+
 		if(user == null)return getColorAvatar(context, null);
+
 		return getColorAvatar(context, megaApi.getUserAvatarColor(user));
 	}
+
 	public static int colorAvatar(Context context, MegaApiAndroid megaApi, long handle) {
 		if(handle == -1 ) return getColorAvatar(context, null);
+
 		return getColorAvatar(context, megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(handle)));
 	}
-	private static int getColorAvatar(Context context, String color){
-		if(color != null) return Color.parseColor(color);
-		return ContextCompat.getColor(context, R.color.lollipop_primary_color);
+
+	public static int colorAvatar(Context context, MegaApiAndroid megaApi, String handle) {
+		if(handle == null ) return getColorAvatar(context, null);
+
+		return getColorAvatar(context, megaApi.getUserAvatarColor(handle));
 	}
 
-	public static Bitmap getDefaultAvatar (int color, String name, int textSize) {
+	private static int getColorAvatar(Context context, String color){
+		if(color == null) return ContextCompat.getColor(context, R.color.lollipop_primary_color);
+		return Color.parseColor(color);
+	}
+
+	public static Bitmap getDefaultAvatar(int color, String name, int textSize, boolean isList) {
 		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
-		Paint paintText = new Paint();
+
+		/*Background*/
 		Paint paintCircle = new Paint();
+		paintCircle.setColor(color);
+		paintCircle.setAntiAlias(true);
+
+		if(isList){
+			/*Shape list*/
+			int radius;
+			if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
+				radius = defaultAvatar.getWidth() / 2;
+			}else {
+				radius = defaultAvatar.getHeight() / 2;
+			}
+			c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, paintCircle);
+		}else{
+			/*Shape grid*/
+			Path path = getRoundedRect(0, 0, DEFAULT_AVATAR_WIDTH_HEIGHT , DEFAULT_AVATAR_WIDTH_HEIGHT, 10, 10,true, true, false, false);
+			c.drawPath(path, paintCircle);
+		}
+
+		/*Text*/
+		Typeface face = Typeface.SANS_SERIF;
+		Paint paintText = new Paint();
 		paintText.setColor(Color.WHITE);
 		paintText.setTextSize(textSize);
 		paintText.setAntiAlias(true);
 		paintText.setTextAlign(Paint.Align.CENTER);
-		Typeface face = Typeface.SANS_SERIF;
 		paintText.setTypeface(face);
 		paintText.setAntiAlias(true);
 		paintText.setSubpixelText(true);
 		paintText.setStyle(Paint.Style.FILL);
-
-		/*Color*/
-		paintCircle.setColor(color);
-		paintCircle.setAntiAlias(true);
-
-		/*Shape*/
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
 		/*First Letter*/
 		String firstLetter = getFirstLetter(name);
@@ -1549,6 +1545,44 @@ public class Util {
 		}
 		return defaultAvatar;
 	}
+
+	public static Bitmap getAvatarShareContact(Context context, MegaApiAndroid megaApi, ShareContactInfo contact){
+        String mail = ((AddContactActivityLollipop) context).getShareContactMail(contact);
+        int color;
+        if(contact.isPhoneContact()){
+            color = ContextCompat.getColor(context, R.color.color_default_avatar_phone);
+        }else{
+            color = colorAvatar(context, megaApi, contact.getMegaContactAdapter().getMegaUser(), false);
+        }
+
+        String fullName = null;
+        if(contact.isPhoneContact()){
+            fullName = contact.getPhoneContactInfo().getName();
+        } else if (contact.isMegaContact()) {
+            fullName = contact.getMegaContactAdapter().getFullName();
+        }
+        if (fullName == null) {
+            fullName = mail;
+        }
+
+        if(contact.isPhoneContact() || contact.isMegaContact()) {
+            /*Avatar*/
+            File avatar = buildAvatarFile(context, mail + ".jpg");
+            Bitmap bitmap = null;
+            if (isFileAvailable(avatar) && avatar.length() > 0) {
+                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                bOpts.inPurgeable = true;
+                bOpts.inInputShareable = true;
+                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                if (bitmap != null) {
+                    return getCircleBitmap(bitmap);
+                }
+            }
+        }
+
+        /*Default Avatar*/
+        return getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
+    }
 
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();

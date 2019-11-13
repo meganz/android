@@ -80,7 +80,6 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         
         View main = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_last_contacts,parent,false);
         ViewHolder holder = new ViewHolder(main);
-        holder.contactInitialLetter = main.findViewById(R.id.contact_list_initial_letter);
         holder.avatarImage = (ImageView)main.findViewById(R.id.item_last_contacts_avatar);
         holder.avatarImage.setOnClickListener(new View.OnClickListener() {
             
@@ -143,7 +142,6 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
                     avatar.delete();
                     megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
                 } else {
-                    holder.contactInitialLetter.setVisibility(View.GONE);
                     holder.avatarImage.setImageBitmap(bitmap);
                 }
             } else {
@@ -155,48 +153,13 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         
     }
     
-    public void setDefaultAvatar(MegaUser contact,ViewHolder holder) {
-        //Draw circle with color filled.
-        drawCircle(contact,holder);
-        //Set the first letter.
-        displayFirstLetter(contact,holder);
-    }
-    
-    private void drawCircle(MegaUser contact,ViewHolder holder) {
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT,Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        String color = megaApi.getUserAvatarColor(contact);
-        if (color != null) {
-            p.setColor(Color.parseColor(color));
-        } else {
-            p.setColor(ContextCompat.getColor(context,R.color.lollipop_primary_color));
-        }
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
-            radius = defaultAvatar.getWidth() / 2;
-        } else {
-            radius = defaultAvatar.getHeight() / 2;
-        }
-        c.drawCircle(defaultAvatar.getWidth() / 2,defaultAvatar.getHeight() / 2,radius,p);
-        holder.avatarImage.setImageBitmap(defaultAvatar);
-    }
-    
-    private void displayFirstLetter(MegaUser contact,ViewHolder holder) {
+    private void setDefaultAvatar(MegaUser contact,ViewHolder holder) {
+        int color = colorAvatar(context, megaApi, contact, false);
         String fullName = getName(contact);
-        String firstLetter = getFirstLetter(fullName);
-        if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-            holder.contactInitialLetter.setVisibility(View.INVISIBLE);
-        }else {
-            holder.contactInitialLetter.setText(firstLetter);
-            holder.contactInitialLetter.setTextColor(Color.WHITE);
-            holder.contactInitialLetter.setVisibility(View.VISIBLE);
-            holder.contactInitialLetter.setTextSize(12);
-        }
-
+        Bitmap bitmap = getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
+        holder.avatarImage.setImageBitmap(bitmap);
     }
-    
+
     private String getName(MegaUser contact) {
         MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
         String fullName;

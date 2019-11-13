@@ -443,7 +443,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     public void addAvatarParticipantPanel(long handle, String email, String name){
         logDebug("handle: " + handle);
         /*Default Avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, handle), name, AVATAR_SIZE));
+        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
 
         if (handle != -1) {
             /*Avatar*/

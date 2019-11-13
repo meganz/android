@@ -3974,7 +3974,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
-		nVPictureProfile.setImageBitmap(getDefaultAvatar(colorAvatar(this, megaApi, megaApi.getMyUser(), false), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE));
+		nVPictureProfile.setImageBitmap(getDefaultAvatar(colorAvatar(this, megaApi, megaApi.getMyUser(), false), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE, true));
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String name){
@@ -4019,7 +4019,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		if (nVPictureProfile != null){
-			nVPictureProfile.setImageBitmap(getDefaultAvatar(colorAvatar(this, megaApi, myHandle), name, AVATAR_SIZE));
+			nVPictureProfile.setImageBitmap(getDefaultAvatar(colorAvatar(this, megaApi, myHandle), name, AVATAR_SIZE, true));
 		}
 	}
 

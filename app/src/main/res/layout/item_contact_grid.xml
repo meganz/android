@@ -30,14 +30,6 @@
 			android:layout_marginLeft="7dp"
 			android:layout_marginTop="7dp"/>
 
-		<mega.privacy.android.app.components.twemoji.EmojiTextView
-			android:id="@+id/contact_grid_initial_letter"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:layout_centerInParent="true"
-			android:gravity="center_horizontal|center_vertical"
-			app:emojiSize="55dp"/>
-
 	</RelativeLayout>
 
 	<View

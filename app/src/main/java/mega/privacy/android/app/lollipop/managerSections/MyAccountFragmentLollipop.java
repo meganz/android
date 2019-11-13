@@ -767,7 +767,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 
 	private void setDefaultAvatar(){
-		myAccountImage.setImageBitmap(getDefaultAvatar(colorAvatar(context,megaApi, megaApi.getMyUser(), false), myAccountInfo.getFullName(), AVATAR_SIZE));
+		myAccountImage.setImageBitmap(getDefaultAvatar(colorAvatar(context,megaApi, megaApi.getMyUser(), false), myAccountInfo.getFullName(), AVATAR_SIZE, true));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){
