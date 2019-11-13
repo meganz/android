@@ -35,7 +35,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private SharedPreferences preferences;
 
-    private static boolean requestInProgress;
+    private boolean requestInProgress;
 
     //different instance should share
     private static long lastSyncTimestamp;
@@ -174,8 +174,6 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         if (request.getType() == MegaRequest.TYPE_GET_REGISTERED_CONTACTS) {
             requestInProgress = false;
             if (e.getErrorCode() == MegaError.API_OK) {
-                //when request is successful, update the timestamp.
-                updateLastSyncTimestamp();
                 megaContacts.clear();
                 MegaStringMap map = request.getMegaStringMap();
                 MegaStringTable table = request.getMegaStringTable();
@@ -245,7 +243,8 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
                 // filter out
                 List<MegaContact> list = filterOut(api, megaContacts);
-
+                //when request is successful, update the timestamp.
+                updateLastSyncTimestamp();
                 currentContactIndex = 0;
                 if (updater != null) {
                     updater.onFinish(list);
