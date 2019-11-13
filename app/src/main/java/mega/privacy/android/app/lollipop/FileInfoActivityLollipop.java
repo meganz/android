@@ -108,7 +108,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;

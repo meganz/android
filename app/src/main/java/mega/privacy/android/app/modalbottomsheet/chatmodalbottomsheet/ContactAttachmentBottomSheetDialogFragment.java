@@ -4,12 +4,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -19,12 +15,9 @@ import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -39,9 +32,6 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -55,6 +45,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -443,7 +434,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     public void addAvatarParticipantPanel(long handle, String email, String name){
         logDebug("handle: " + handle);
         /*Default Avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
+        contactImageView.setImageBitmap(getDefaultAvatar(context, colorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
 
         if (handle != -1) {
             /*Avatar*/

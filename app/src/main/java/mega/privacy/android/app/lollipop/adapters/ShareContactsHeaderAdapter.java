@@ -4,11 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -43,6 +38,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop> implements View.OnClickListener, SectionTitleProvider {
 
@@ -286,45 +282,6 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             }
         }
     }
-
-//    private Bitmap setUserAvatar(ShareContactInfo contact){
-//        String mail = ((AddContactActivityLollipop) mContext).getShareContactMail(contact);
-//        int color;
-//        if(contact.isPhoneContact()){
-//            color = ContextCompat.getColor(mContext, R.color.color_default_avatar_phone);
-//        }else{
-//            color = colorAvatar(mContext, megaApi, contact.getMegaContactAdapter().getMegaUser(), false);
-//        }
-//
-//        String fullName = null;
-//        if(contact.isPhoneContact()){
-//            fullName = contact.getPhoneContactInfo().getName();
-//        } else if (contact.isMegaContact()) {
-//            fullName = contact.getMegaContactAdapter().getFullName();
-//        }
-//        if (fullName == null) {
-//            fullName = mail;
-//        }
-//
-//        if(contact.isPhoneContact() || contact.isMegaContact()) {
-//            /*Avatar*/
-//            File avatar = buildAvatarFile(mContext, mail + ".jpg");
-//            Bitmap bitmap = null;
-//            if (isFileAvailable(avatar) && avatar.length() > 0) {
-//                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-//                bOpts.inPurgeable = true;
-//                bOpts.inInputShareable = true;
-//                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-//                if (bitmap != null) {
-//                    return getCircleBitmap(bitmap);
-//                }
-//            }
-//        }
-//
-//        /*Default Avatar*/
-//        return getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
-//
-//    }
     @Override
     public int getItemCount() {
         if (shareContacts == null) {

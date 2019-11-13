@@ -3,22 +3,15 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.content.ContextCompat;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -32,6 +25,8 @@ import nz.mega.sdk.MegaContactRequest;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+
 
 public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -134,7 +129,7 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     public void addAvatarRequestPanel(MegaContactRequest request){
         /*Default Avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, -1), request.getTargetEmail(), AVATAR_SIZE, true));
+        contactImageView.setImageBitmap(getDefaultAvatar(context, colorAvatar(context, megaApi, -1), request.getTargetEmail(), AVATAR_SIZE, true));
     }
 
     @Override

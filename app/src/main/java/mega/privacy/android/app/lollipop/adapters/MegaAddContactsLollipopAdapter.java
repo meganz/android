@@ -24,17 +24,12 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
-import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_ADD_CONTACTS;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.Util.colorAvatar;
-import static mega.privacy.android.app.utils.Util.getCircleBitmap;
-import static mega.privacy.android.app.utils.Util.getDefaultAvatar;
-import static mega.privacy.android.app.utils.Util.px2dp;
-
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAddContactsLollipopAdapter.ViewHolderChips> implements View.OnClickListener{
 
@@ -198,7 +193,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
         int color = colorAvatar(context, megaApi, contact.getMegaUser(), false);
 
         if (contact.getMegaUser() == null && contact.getMegaContactDB() == null) {
-            return getDefaultAvatar(color, contact.getFullName(), AVATAR_SIZE,true);
+            return getDefaultAvatar(context, color, contact.getFullName(), AVATAR_SIZE,true);
         }
 
         /*Avatar*/
@@ -221,7 +216,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
         } else {
             fullName = mail;
         }
-        return getDefaultAvatar(color, fullName, AVATAR_SIZE,true);
+        return getDefaultAvatar(context, color, fullName, AVATAR_SIZE,true);
     }
 
 

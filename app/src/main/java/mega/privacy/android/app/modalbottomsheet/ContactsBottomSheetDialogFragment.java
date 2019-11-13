@@ -28,7 +28,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -41,9 +40,6 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -55,6 +51,8 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+
 
 public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -391,7 +389,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         }else{
             color = colorAvatar(context, megaApi, contact.getMegaUser(), false);
         }
-        contactImageView.setImageBitmap(getDefaultAvatar(color, contact.getFullName(), AVATAR_SIZE, true));
+        contactImageView.setImageBitmap(getDefaultAvatar(context, color, contact.getFullName(), AVATAR_SIZE, true));
     }
 
     @Override

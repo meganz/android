@@ -74,7 +74,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+
 
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener {
 	
@@ -767,7 +768,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 
 	private void setDefaultAvatar(){
-		myAccountImage.setImageBitmap(getDefaultAvatar(colorAvatar(context,megaApi, megaApi.getMyUser(), false), myAccountInfo.getFullName(), AVATAR_SIZE, true));
+		myAccountImage.setImageBitmap(getDefaultAvatar(context, colorAvatar(context,megaApi, megaApi.getMyUser(), false), myAccountInfo.getFullName(), AVATAR_SIZE, true));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){

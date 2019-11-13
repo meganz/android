@@ -4,10 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -51,7 +48,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 
 public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContactsLollipopAdapter.ViewHolderContacts> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
@@ -783,12 +780,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		String fullName = contact.getFullName();
 
 		if (holder instanceof ViewHolderContactsList){
-			Bitmap bit = getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
+			Bitmap bit = getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true);
 			((ViewHolderContactsList)holder).imageView.setImageBitmap(bit);
 
 		}
 		else if (holder instanceof ViewHolderContactsGrid){
-			Bitmap bit = getDefaultAvatar(color, fullName, AVATAR_SIZE_GRID, false);
+			Bitmap bit = getDefaultAvatar(context, color, fullName, AVATAR_SIZE_GRID, false);
 			((ViewHolderContactsGrid)holder).imageView.setImageBitmap(bit);
 		}
 

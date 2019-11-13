@@ -4,10 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -15,14 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
@@ -38,7 +30,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 
 public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapter.ViewHolder> {
@@ -156,7 +148,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     private void setDefaultAvatar(MegaUser contact,ViewHolder holder) {
         int color = colorAvatar(context, megaApi, contact, false);
         String fullName = getName(contact);
-        Bitmap bitmap = getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
+        Bitmap bitmap = getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true);
         holder.avatarImage.setImageBitmap(bitmap);
     }
 

@@ -2,12 +2,6 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -19,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
-import java.util.Locale;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -32,8 +24,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Util.getDefaultAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 
 public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContactsLollipopAdapter.ViewHolderChips> implements View.OnClickListener{
@@ -117,7 +108,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
             }
         }
         int color = ContextCompat.getColor(context, R.color.color_default_avatar_phone);
-        holder.avatar.setImageBitmap(getDefaultAvatar(color, holder.textViewName.getText().toString(), AVATAR_SIZE, true));
+        holder.avatar.setImageBitmap(getDefaultAvatar(context, color, holder.textViewName.getText().toString(), AVATAR_SIZE, true));
     }
 
     @Override

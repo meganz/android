@@ -252,6 +252,8 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+
 
 public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -3974,7 +3976,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
-		nVPictureProfile.setImageBitmap(getDefaultAvatar(colorAvatar(this, megaApi, megaApi.getMyUser(), false), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE, true));
+		nVPictureProfile.setImageBitmap(getDefaultAvatar(this, colorAvatar(this, megaApi, megaApi.getMyUser(), false), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE, true));
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String name){
@@ -4019,7 +4021,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		if (nVPictureProfile != null){
-			nVPictureProfile.setImageBitmap(getDefaultAvatar(colorAvatar(this, megaApi, myHandle), name, AVATAR_SIZE, true));
+			nVPictureProfile.setImageBitmap(getDefaultAvatar(this, colorAvatar(this, megaApi, myHandle), name, AVATAR_SIZE, true));
 		}
 	}
 

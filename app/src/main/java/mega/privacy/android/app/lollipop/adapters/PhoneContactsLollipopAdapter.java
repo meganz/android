@@ -3,21 +3,15 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
-import android.util.TypedValue;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -43,7 +36,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 /*
  * Adapter for FilestorageActivity list
@@ -292,7 +285,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 			name = holder.contactName;
 		}
 
-		Bitmap bitmap = getDefaultAvatar(color, name, AVATAR_SIZE, true);
+		Bitmap bitmap = getDefaultAvatar(mContext, color, name, AVATAR_SIZE, true);
 		holder.imageView.setImageBitmap(bitmap);
 	}
 	

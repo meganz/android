@@ -7,9 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -41,7 +38,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -347,7 +344,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         File avatar = null;
         /*Default avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(colorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
+        contactImageView.setImageBitmap(getDefaultAvatar(context, colorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
 
         /*Avatar*/
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
