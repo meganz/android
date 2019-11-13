@@ -249,6 +249,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					AccountController.localLogoutApp(getApplicationContext());
 				} else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
 					api.localLogout();
+					megaChatApi.logout();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_FETCH_NODES){
