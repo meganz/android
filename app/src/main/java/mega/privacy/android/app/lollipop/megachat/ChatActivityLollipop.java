@@ -389,6 +389,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
     private ArrayList<MegaChatMessage> preservedMsgSelected;
     private ArrayList<MegaChatMessage> preservedMsgToImport;
+    private boolean isForwardingFromNC;
 
     private Intent preservedIntent;
     // The flag to indicate whether forwarding message is on going
@@ -410,6 +411,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             preservedMessagesSelected = null;
         } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
             chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat);
+            isForwardingFromNC = false;
             preservedMsgSelected = null;
             preservedMsgToImport = null;
         }
@@ -417,6 +419,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void storedUnhandledData(ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport) {
+        isForwardingFromNC = true;
         preservedMsgSelected = messagesSelected;
         preservedMsgToImport = messagesToImport;
     }
@@ -2577,12 +2580,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
     }
 
-    public void proceedWithAction(MegaNode chatFolderNode) {
+    public void proceedWithAction() {
         if (isForwardingMessage) {
             stopReproductions();
             chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat);
         } else {
-            startUploadService(chatFolderNode);
+            startUploadService();
         }
     }
 
@@ -8321,12 +8324,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
     }
 
-    public void startUploadService(MegaNode chatFolderNode) {
-        preservedIntent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, chatFolderNode.serialize());
+    public void startUploadService() {
+        preservedIntent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesFolder.serialize());
         startService(preservedIntent);
     }
 
     public void setMyChatFilesFolder(MegaNode myChatFilesFolder) {
         this.myChatFilesFolder = myChatFilesFolder;
+    }
+
+    public boolean isForwardingFromNC() {
+        return isForwardingFromNC;
     }
 }

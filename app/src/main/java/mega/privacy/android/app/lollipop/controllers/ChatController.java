@@ -2082,12 +2082,13 @@ public class ChatController {
             } else if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
             }
-            megaApi.getMyChatFilesFolder(new GetAttrUserListener(context, true));
+            megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
         }
     }
 
     public void proceedWithForward(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat) {
         ChatImportToForwardListener listener = new ChatImportToForwardListener(MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
+        int errors = 0;
 
         for(int j=0; j<messagesToImport.size();j++){
             MegaChatMessage message = messagesToImport.get(j);
@@ -2110,8 +2111,12 @@ public class ChatController {
             }
             else{
                 logWarning("MESSAGE is null");
-                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error));
+                errors++;
             }
+        }
+
+        if (errors > 0) {
+            showSnackbar(SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
         }
     }
 

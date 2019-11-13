@@ -12,11 +12,11 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CreateFolderListener extends BaseListener {
 
     private boolean isMyChatFiles;
-    private boolean isForwarding;
 
     public CreateFolderListener(Context context) {
         super(context);
@@ -26,13 +26,6 @@ public class CreateFolderListener extends BaseListener {
         super(context);
 
         this.isMyChatFiles = isMyChatFiles;
-    }
-
-    public CreateFolderListener(Context context, boolean isMyChatFiles, boolean isForwarding) {
-        super(context);
-
-        this.isMyChatFiles = isMyChatFiles;
-        this.isForwarding = isForwarding;
     }
 
     @Override
@@ -48,7 +41,7 @@ public class CreateFolderListener extends BaseListener {
 
             if (e.getErrorCode() == MegaError.API_OK) {
                 if (isMyChatFiles) {
-                    fileExplorerActivityLollipop.setMyChatFilesNode(node);
+                    fileExplorerActivityLollipop.setMyChatFilesFolder(node);
                     api.setMyChatFilesFolder(handle, new SetAttrUserListener(fileExplorerActivityLollipop));
                     fileExplorerActivityLollipop.checkIfFilesExistsInMEGA();
                 } else {
@@ -67,11 +60,11 @@ public class CreateFolderListener extends BaseListener {
 
             if (e.getErrorCode() == MegaError.API_OK) {
                 api.setMyChatFilesFolder(handle, new SetAttrUserListener(chatActivityLollipop));
-                if (isForwarding) {
-                    chatActivityLollipop.setMyChatFilesFolder(node);
+                chatActivityLollipop.setMyChatFilesFolder(node);
+                if (chatActivityLollipop.isForwardingFromNC()) {
                     chatActivityLollipop.handleStoredData();
                 } else {
-                    chatActivityLollipop.proceedWithAction(node);
+                    chatActivityLollipop.proceedWithAction();
                 }
             } else {
                 chatActivityLollipop.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
@@ -86,6 +79,10 @@ public class CreateFolderListener extends BaseListener {
             } else {
                 nodeAttachmentHistoryActivity.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
             }
+        }
+
+        if (e.getErrorCode() != MegaError.API_OK) {
+            logError("Error creating folder: " + e.getErrorString());
         }
     }
 }

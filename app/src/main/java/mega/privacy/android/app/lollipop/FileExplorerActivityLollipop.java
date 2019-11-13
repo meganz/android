@@ -3438,7 +3438,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		return multiselect;
 	}
 
-	public void setMyChatFilesNode(MegaNode myChatFilesNode) {
+	public void setMyChatFilesFolder(MegaNode myChatFilesNode) {
 		this.myChatFilesNode = myChatFilesNode;
 	}
 
