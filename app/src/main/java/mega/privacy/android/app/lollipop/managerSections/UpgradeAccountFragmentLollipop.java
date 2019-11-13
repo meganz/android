@@ -863,6 +863,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 //		((ManagerActivityLollipop)context).showmyF(paymentMethod, parameterType);
 	}
 
+	private void contactForCustomPlan() {
+		logDebug("Send Feedback");
+        ((ManagerActivityLollipop) context).askForCustomizedPlan();
+	}
+
 	@Override
 	public void onClick(View v) {
 		logDebug("onClick");
@@ -870,7 +875,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		((ManagerActivityLollipop)context).setDisplayedAccountType(-1);
 		switch (v.getId()){
 			case R.id.lbl_custom_plan: {
-				//todo start new activity
+                contactForCustomPlan();
 				break;
 			}
             case R.id.button_continue:{
