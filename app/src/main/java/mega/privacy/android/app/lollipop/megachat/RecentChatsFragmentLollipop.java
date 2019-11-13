@@ -467,7 +467,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         inviteTitle.setClickable(false);
         moreContactsTitle.setVisibility(View.GONE);
         invitationContainer.setVisibility(View.GONE);
-
+        closeBtn.setVisibility(View.GONE);
         loadMegaContacts();
     }
 
