@@ -93,7 +93,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			super(v);
 		}
     	RoundedImageView imageView;
-		EmojiTextView contactInitialLetter;
 		MarqueeTextView textViewContent;
 		RelativeLayout threeDotsLayout;
 		ImageView imageButtonThreeDots;
@@ -107,7 +106,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 		public void setImageView(Bitmap bitmap){
 			imageView.setImageBitmap(bitmap);
-			contactInitialLetter.setVisibility(View.GONE);
 		}
     }
 
@@ -136,7 +134,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			holderList = new ViewHolderParticipantsList(v);
 			holderList.itemLayout = v.findViewById(R.id.participant_list_item_layout);
 			holderList.imageView = v.findViewById(R.id.participant_list_thumbnail);
-			holderList.contactInitialLetter = v.findViewById(R.id.participant_list_initial_letter);
 			holderList.textViewContactName = v.findViewById(R.id.participant_list_name);
 			holderList.textViewContent = v.findViewById(R.id.participant_list_content);
 			holderList.threeDotsLayout = v.findViewById(R.id.participant_list_three_dots_layout);
@@ -184,7 +181,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		if(itemType==ITEM_VIEW_TYPE_NORMAL) {
 			((ViewHolderParticipantsList)holder).currentPosition = position;
 			((ViewHolderParticipantsList)holder).imageView.setImageBitmap(null);
-			((ViewHolderParticipantsList)holder).contactInitialLetter.setText("");
 
 			MegaChatParticipant participant = (MegaChatParticipant) getItem(position);
 			((ViewHolderParticipantsList)holder).contactMail = participant.getEmail();
@@ -257,8 +253,12 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			holder.textViewContactName.setText(((ViewHolderParticipantsList)holder).fullName);
 			((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(this);
 
-			createDefaultAvatar(((ViewHolderParticipantsList)holder));
+			/*Default Avatar*/
+			int color = colorAvatar(context, megaApi, ((ViewHolderParticipantsList) holder).userHandle);
+			String name = ((ViewHolderParticipantsList) holder).fullName;
+			((ViewHolderParticipantsList) holder).imageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
 
+			/*Avatar*/
 			String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
 			if((((ViewHolderParticipantsList)holder).userHandle).equals(myUserHandleEncoded)){
 				logDebug("It's me!!!");
@@ -268,11 +268,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 					if (avatar.exists()) {
 						if (avatar.length() > 0) {
 							BitmapFactory.Options bOpts = new BitmapFactory.Options();
-							bOpts.inPurgeable = true;
-							bOpts.inInputShareable = true;
 							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 							if (bitmap != null) {
-								((ViewHolderParticipantsList)holder).contactInitialLetter.setVisibility(View.GONE);
 								((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
 							}
 						}
@@ -308,7 +305,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 									avatar.delete();
                                     megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
                                 } else {
-									((ViewHolderParticipantsList)holder).contactInitialLetter.setVisibility(View.GONE);
 									((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
 								}
 							} else {
@@ -357,48 +353,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			logDebug("Bind item add participant");
 			((ViewHolderAddParticipant)holder).itemLayout.setOnClickListener(this);
 		}
-	}
-	
-	public void createDefaultAvatar(ViewHolderParticipantsList holder){
-		logDebug("createDefaultAvatar()");
-		
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		String color = megaApi.getUserAvatarColor(holder.userHandle);
-		if(color!=null){
-			logDebug("The color to set the avatar is " + color);
-			p.setColor(Color.parseColor(color));
-		}
-		else{
-			logDebug("Default color to the avatar");
-			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-		}
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		holder.imageView.setImageBitmap(defaultAvatar);
-
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-		display.getMetrics(outMetrics);
-
-		String firstLetter = getFirstLetter(holder.fullName);
-		if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-			holder.contactInitialLetter.setVisibility(View.GONE);
-		}else {
-			holder.contactInitialLetter.setText(firstLetter);
-			holder.contactInitialLetter.setTextColor(Color.WHITE);
-			holder.contactInitialLetter.setVisibility(View.VISIBLE);
-		}
-
-
 	}
 
 	@Override

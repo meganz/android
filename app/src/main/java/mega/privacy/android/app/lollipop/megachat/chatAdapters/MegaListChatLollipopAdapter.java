@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -36,7 +34,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -146,7 +143,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			super(arg0);
 		}
 		RoundedImageView imageView;
-		EmojiTextView contactInitialLetter;
 		EmojiTextView textViewContactName;
 		EmojiTextView textViewContent;
 		LinearLayout voiceClipOrLocationLayout;
@@ -178,7 +174,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		public void setImageView(Bitmap bitmap){
 			imageView.setImageBitmap(bitmap);
-			contactInitialLetter.setVisibility(View.GONE);
 		}
 	}
 
@@ -201,8 +196,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(itemType == ITEM_VIEW_TYPE_NORMAL) {
 			((ViewHolderNormalChatList)holder).imageView.setImageBitmap(null);
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(SPACE);
-
 			MegaChatListItem chat = (MegaChatListItem) getItem(position);
 
 			setTitle(position, holder);
@@ -229,7 +222,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 						((ViewHolderNormalChatList)holder).imageView.setImageResource(R.drawable.ic_select_avatar);
-						((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.GONE);
 					}
 					else{
 						logDebug("NOT selected");
@@ -274,8 +266,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 						((ViewHolderNormalChatList)holder).imageView.setImageResource(R.drawable.ic_select_avatar);
-
-						((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.GONE);
 					}
 					else{
 						logDebug("NOT selected");
@@ -416,9 +406,18 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 
 	public void setUserAvatar(ViewHolderChatList holder, String userHandle){
-		logDebug("setUserAvatar ");
-		createDefaultAvatar(holder, userHandle);
 
+		/*Default Avatar*/
+		int color = colorAvatar(context, megaApi, userHandle);
+		String name = SPACE;
+		if (((ViewHolderNormalChatList)holder).fullName != null && ((ViewHolderNormalChatList)holder).fullName.trim().length() > 0){
+			name = ((ViewHolderNormalChatList)holder).fullName;
+		}else if(((ViewHolderNormalChatList)holder).contactMail != null && ((ViewHolderNormalChatList)holder).contactMail.length() > 0){
+			name = ((ViewHolderNormalChatList)holder).contactMail;
+		}
+		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
+
+		/*Avatar*/
 		ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
 		File avatar = ((ViewHolderNormalChatList)holder).contactMail == null ?
                 buildAvatarFile(context,userHandle + ".jpg") :
@@ -441,7 +440,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
                     megaApi.getUserAvatar(((ViewHolderNormalChatList)holder).contactMail,buildAvatarFile(context,((ViewHolderNormalChatList)holder).contactMail + ".jpg").getAbsolutePath(),listener);
                 }else{
-					((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.GONE);
 					((ViewHolderNormalChatList)holder).imageView.setImageBitmap(bitmap);
 				}
 			}else{
@@ -504,7 +502,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList) holder).muteIcon = v.findViewById(R.id.recent_chat_list_mute_icon);
 
 			((ViewHolderNormalChatList) holder).imageView = v.findViewById(R.id.recent_chat_list_thumbnail);
-			((ViewHolderNormalChatList) holder).contactInitialLetter = v.findViewById(R.id.recent_chat_list_initial_letter);
 			((ViewHolderNormalChatList) holder).textViewContactName = v.findViewById(R.id.recent_chat_list_name);
 			((ViewHolderNormalChatList) holder).textViewContent = v.findViewById(R.id.recent_chat_list_content);
 
@@ -610,94 +607,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 
 	public void createGroupChatAvatar(ViewHolderChatList holder, String chatTitle){
-		logDebug("createGroupChatAvatar()");
-
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		p.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(defaultAvatar);
-
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-		display.getMetrics(outMetrics);
-
-		String firstLetter = getFirstLetter(chatTitle);
-		if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.INVISIBLE);
-		}else {
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
-		}
+		int color = ContextCompat.getColor(context,R.color.divider_upgrade_account);
+		String title = chatTitle;
+		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(getDefaultAvatar(context, color, title, AVATAR_SIZE, true));
 	}
 
-	public void createDefaultAvatar(ViewHolderChatList holder, String userHandle){
-		logDebug("createDefaultAvatar()");
-
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-
-		String color = megaApi.getUserAvatarColor(userHandle);
-		if(color!=null){
-			logDebug("The color to set the avatar is " + color);
-			p.setColor(Color.parseColor(color));
-		}
-		else{
-			logDebug("Default color to the avatar");
-			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-		}
-
-		int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-        	radius = defaultAvatar.getWidth()/2;
-        else
-        	radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(defaultAvatar);
-
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-
-		boolean setInitialByMail = false;
-
-		if (((ViewHolderNormalChatList)holder).fullName != null && ((ViewHolderNormalChatList)holder).fullName.trim().length() > 0){
-			String firstLetter = getFirstLetter(((ViewHolderNormalChatList)holder).fullName);
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
-
-		}
-		else{
-			setInitialByMail=true;
-		}
-		if(setInitialByMail){
-			if (((ViewHolderNormalChatList)holder).contactMail != null){
-				if (((ViewHolderNormalChatList)holder).contactMail.length() > 0){
-					String firstLetter = ((ViewHolderNormalChatList)holder).contactMail.charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-					((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
-					((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
-				}
-			}
-		}
-
-		((ViewHolderNormalChatList)holder).contactInitialLetter.setTextSize(24);
-	}
 
 	@Override
 	public int getItemCount() {

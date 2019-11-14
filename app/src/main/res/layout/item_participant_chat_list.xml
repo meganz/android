@@ -21,16 +21,6 @@
             rounded:border_color="@color/border_file_properties"
             rounded:border_width="0dp"
             rounded:corner_radius="20dp" />
-
-        <mega.privacy.android.app.components.twemoji.EmojiTextView
-            android:id="@+id/participant_list_initial_letter"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:gravity="center_horizontal|center_vertical"
-            android:textSize="22sp"
-            rounded:emojiSize="25dp"/>
-
     </RelativeLayout>
 
 
