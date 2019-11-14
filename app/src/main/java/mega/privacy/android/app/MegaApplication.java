@@ -30,13 +30,15 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
-import org.webrtc.AndroidVideoTrackSourceObserver;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
 import org.webrtc.CameraEnumerator;
-import org.webrtc.ContextUtils;
+import org.webrtc.CapturerObserver;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
+
+import org.webrtc.ContextUtils;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -590,6 +592,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		EmojiCompat.init(config);
 		// clear the cache files stored in the external cache folder.
         clearPublicCache(this);
+
+		ContextUtils.initialize(getApplicationContext());
+
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();
@@ -701,7 +706,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 	}
 
-	static public void startVideoCapture(long nativeAndroidVideoTrackSource, SurfaceTextureHelper surfaceTextureHelper) {
+	static public void startVideoCapture(SurfaceTextureHelper surfaceTextureHelper, CapturerObserver nativeAndroidVideoTrackSource) {
 		logDebug("startVideoCapture");
 
 		// Settings
@@ -724,15 +729,13 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			return;
 		}
 
-		// Link the capturer with the surfaceTextureHelper and the native video source
-		VideoCapturer.CapturerObserver capturerObserver = new AndroidVideoTrackSourceObserver(nativeAndroidVideoTrackSource);
-		videoCapturer.initialize(surfaceTextureHelper, context, capturerObserver);
+		videoCapturer.initialize(surfaceTextureHelper, context, nativeAndroidVideoTrackSource);
 
 		// Start the capture!
 		videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
 	}
 
-	static public void startVideoCaptureWithParameters(int videoWidth, int videoHeight, int videoFps, long nativeAndroidVideoTrackSource, SurfaceTextureHelper surfaceTextureHelper) {
+	static public void startVideoCaptureWithParameters(int videoWidth, int videoHeight, int videoFps, SurfaceTextureHelper surfaceTextureHelper, CapturerObserver nativeAndroidVideoTrackSource) {
 		logDebug("startVideoCaptureWithParameters");
 
 		// Settings
@@ -752,12 +755,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			return;
 		}
 
-		// Link the capturer with the surfaceTextureHelper and the native video source
-		VideoCapturer.CapturerObserver capturerObserver = new AndroidVideoTrackSourceObserver(nativeAndroidVideoTrackSource);
-		videoCapturer.initialize(surfaceTextureHelper, context, capturerObserver);
+		videoCapturer.initialize(surfaceTextureHelper, context, nativeAndroidVideoTrackSource);
 
 		// Start the capture!
 		videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
+		logDebug("Start Capture");
 	}
 
 //	private void initializeGA(){
