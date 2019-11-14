@@ -1839,14 +1839,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         setGetChatLinkVisibility();
         if(comesFromRecent) {
-            // wait 50ms for initialization
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    createNewChatLink = true;
-                    newGroup();
-                }
-            }, 50);
+            if(getContactsTask != null && getContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+                getContactsTask.cancel(true);
+            }
+            createNewChatLink = true;
+            newGroup();
         }
     }
 
