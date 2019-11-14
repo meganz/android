@@ -260,6 +260,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
     private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
+    public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
     private final String INDEX_CLOUD = "INDEX_CLOUD";
 
 	private final int ERROR_TAB = -1;
@@ -378,6 +379,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public boolean openSettingsStorage = false;
     public boolean openSettingsQR = false;
 	boolean newAccount = false;
+	public boolean newCreationAccount;
 
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 	private boolean isStorageStatusDialogShown = false;
@@ -3087,6 +3089,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
+					newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
 
                     //reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra("newAccount");
@@ -3154,7 +3157,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        	if (intentRec != null){
 					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
-
+                    newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
 					//reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra("newAccount");
                     getIntent().removeExtra("upgradeAccount");
@@ -3256,13 +3259,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         if (firstTimeAfterInstallation) {
             //haven't verified phone number
-            if(canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
                 askForSMSVerification();
             } else {
                 askForAccess();
             }
-        } else if(firstLogin){
-            if(canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+        } else if (firstLogin && !newCreationAccount) {
+            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
                 askForSMSVerification();
             }
         }
@@ -4627,7 +4630,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
-        if (canVoluntaryVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing)) {
+        if (canVoluntaryVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing) && !newCreationAccount) {
             showSMSVerificationDialog();
         }
     }
