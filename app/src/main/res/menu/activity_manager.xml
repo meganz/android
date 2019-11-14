@@ -72,7 +72,7 @@
 		android:id="@+id/action_menu_invite"
 		android:orderInCategory="100"
 		MEGA:showAsAction="never"
-		android:title="@string/invite_option_label"
+		android:title="@string/contact_invite"
 		android:icon="@drawable/ic_action_bar_null" />
 
 	<item

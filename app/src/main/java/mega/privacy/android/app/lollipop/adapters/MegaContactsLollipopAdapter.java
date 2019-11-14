@@ -43,26 +43,18 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.Constants.DEFAULT_AVATAR_WIDTH_HEIGHT;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedRect;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedRectBitmap;
-import static mega.privacy.android.app.utils.Util.getAvatarTextSize;
-import static mega.privacy.android.app.utils.Util.getSubtitleDescription;
-import static mega.privacy.android.app.utils.Util.isChatEnabled;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContactsLollipopAdapter.ViewHolderContacts> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
@@ -186,8 +178,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
-			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+			holderList.textViewContactName.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
 		    holderList.itemLayout.setTag(holderList);
 		    holderList.itemLayout.setOnClickListener(this);
@@ -218,8 +210,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderGrid.textViewContactName.setMaxWidth(scaleWidthPx(116, outMetrics));
 			}
 
-			holderGrid.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderGrid.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_CALL_HIGH, outMetrics));
+			holderGrid.textViewContactName.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+			holderGrid.contactInitialLetter.setEmojiSize(px2dp(EMOJI_AVATAR_CALL_HIGH, outMetrics));
 
 		    holderGrid.itemLayout.setTag(holderGrid);
 		    holderGrid.itemLayout.setOnClickListener(this);
@@ -251,8 +243,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
-			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+			holderList.textViewContactName.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 
@@ -292,8 +284,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
-			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+			holderList.textViewContactName.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 

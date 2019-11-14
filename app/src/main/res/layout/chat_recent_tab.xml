@@ -68,7 +68,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="20dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="@string/invite_option_label"
+                    android:text="@string/contact_invite"
                     android:textAllCaps="true"
                     android:textColor="@color/accentColor"
                     android:visibility="gone" />

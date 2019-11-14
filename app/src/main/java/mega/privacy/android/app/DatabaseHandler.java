@@ -260,13 +260,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_CREDENTIALS_TABLE);
 
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
-        		+ KEY_ID + " INTEGER PRIMARY KEY,"                  //0
+                + KEY_ID + " INTEGER PRIMARY KEY,"                  //0
                 + KEY_FIRST_LOGIN + " BOOLEAN, "                    //1
-        		+ KEY_CAM_SYNC_ENABLED + " BOOLEAN, "               //2
+                + KEY_CAM_SYNC_ENABLED + " BOOLEAN, "               //2
                 + KEY_CAM_SYNC_HANDLE + " TEXT, "                   //3
-        		+ KEY_CAM_SYNC_LOCAL_PATH + " TEXT, "               //4
+                + KEY_CAM_SYNC_LOCAL_PATH + " TEXT, "               //4
                 + KEY_CAM_SYNC_WIFI + " BOOLEAN, "                  //5
-        		+ KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, "              //6
+                + KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, "              //6
                 + KEY_PIN_LOCK_ENABLED + " TEXT, "                  //7
                 + KEY_PIN_LOCK_CODE + " TEXT, "                     //8
                 + KEY_STORAGE_ASK_ALWAYS + " TEXT, "                //9
@@ -278,11 +278,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_SEC_FOLDER_ENABLED + " TEXT, "                //15
                 + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT, "             //16
                 + KEY_SEC_FOLDER_HANDLE + " TEXT, "                 //17
-                + KEY_SEC_SYNC_TIMESTAMP+" TEXT, "                  //18
+                + KEY_SEC_SYNC_TIMESTAMP + " TEXT, "                //18
                 + KEY_KEEP_FILE_NAMES + " BOOLEAN, "                //19
-                + KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN, "      //20
-                + KEY_PREFERRED_VIEW_LIST+ "	BOOLEAN, "          //21
-                + KEY_PREFERRED_VIEW_LIST_CAMERA+ " BOOLEAN, "      //22
+                + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN, "       //20
+                + KEY_PREFERRED_VIEW_LIST + " BOOLEAN, "            //21
+                + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN, "     //22
                 + KEY_URI_EXTERNAL_SD_CARD + " TEXT, "              //23
                 + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " //24
                 + KEY_PIN_LOCK_TYPE + " TEXT, "                     //25
@@ -1250,10 +1250,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void batchInsertMegaContacts(List<MegaContactGetter.MegaContact> contacts) {
         if (contacts == null || contacts.size() == 0) {
-            logWarning("empty mega contacts list.");
+            logWarning("Empty MEGA contacts list.");
             return;
         }
-        logDebug("batchInsertMegaContacts contacts size is: " + contacts.size());
+        logDebug("Contacts size is: " + contacts.size());
         db.beginTransaction();
         try {
             ContentValues values;

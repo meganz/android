@@ -250,6 +250,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
                 inputStream.close();
             }
         } catch (IOException e) {
+            logError("Create phone contact bitmap exception.", e);
             e.printStackTrace();
         }
         return photo;
@@ -280,7 +281,6 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         File avatar = buildAvatarFile(context, email + IMAGE_EXTENSION);
         String path = avatar.getAbsolutePath();
         if (FileUtils.isFileAvailable(avatar)) {
-            logDebug("avatar exists in: " + avatar.getAbsolutePath());
             BitmapFactory.Options bOpts = new BitmapFactory.Options();
             Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
             if (bitmap == null) {

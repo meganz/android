@@ -198,13 +198,13 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                         api.getUserEmail(getUserHandler(firstContact.id), this);
                     }
                 } else {
-                    logDebug("no mega contacts.");
+                    logWarning("No mega contacts.");
                     if (updater != null) {
                         updater.noContacts();
                     }
                 }
             } else {
-                logDebug("get registered contacts faild with error code: " + e.getErrorCode());
+                logWarning("Get registered contacts faild with error code: " + e.getErrorCode());
                 //current account has requested mega contacts too many times and reached the limitation, no need to re-try.
                 if(e.getErrorCode() == MegaError.API_ETOOMANY) {
                     updateLastSyncTimestamp();
@@ -225,10 +225,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                         }
                     }
                 } else {
-                    logDebug("Contact's email is empty!");
+                    logWarning("Contact's email is empty!");
                 }
             } else {
-                logDebug("get contact's email faild with error code: " + e.getErrorCode());
+                logWarning("Get contact's email faild with error code: " + e.getErrorCode());
                 if (updater != null) {
                     updater.onException(e.getErrorCode(), request.getRequestString());
                 }

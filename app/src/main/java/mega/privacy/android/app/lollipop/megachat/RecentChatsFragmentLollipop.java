@@ -265,7 +265,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Override
     public void onException(int errorCode, String requestString) {
-        logDebug(requestString + " failed, with error code: " + errorCode);
+        logWarning(requestString + " failed, with error code: " + errorCode);
         noContacts();
     }
 

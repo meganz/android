@@ -9,19 +9,14 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
-
 public class ContactsFilter {
 
     public static <T extends ContactWithEmail> ArrayList<T> filterOutContacts(MegaApiJava api, ArrayList<T> list) {
-        logDebug("filterOutContacts");
         for (MegaUser user : api.getContacts()) {
-            logDebug("contact visibility: " + user.getVisibility() + " -> " + user.getEmail());
             Iterator<T> iterator = list.iterator();
             while (iterator.hasNext()) {
                 T t = iterator.next();
                 if (isContact(user, t.getEmail())) {
-                    logDebug("filter out: " + t);
                     iterator.remove();
                 }
             }
@@ -30,14 +25,11 @@ public class ContactsFilter {
     }
 
     public static <T extends ContactWithEmail> ArrayList<T> filterOutPendingContacts(MegaApiJava api, ArrayList<T> list) {
-        logDebug("filterOutPendingContacts");
         for (MegaContactRequest request : api.getOutgoingContactRequests()) {
-            logDebug("contact request: " + request.getStatus() + " -> " + request.getTargetEmail());
             Iterator<T> iterator = list.iterator();
             while (iterator.hasNext()) {
                 T t = iterator.next();
                 if (isPending(request,t.getEmail())) {
-                    logDebug("filter out: " + t);
                     iterator.remove();
                 }
             }
@@ -46,12 +38,10 @@ public class ContactsFilter {
     }
 
     public static <T extends ContactWithEmail> ArrayList<T> filterOutMyself(MegaApiJava api, ArrayList<T> list) {
-        logDebug("filter out myself");
         Iterator<T> iterator = list.iterator();
         while (iterator.hasNext()) {
             T t = iterator.next();
             if (isMySelf(api, t.getEmail())) {
-                logDebug("filter out: " + t);
                 iterator.remove();
             }
         }
@@ -71,7 +61,6 @@ public class ContactsFilter {
                 if (isNotHeader) {
                     if (megaContact.getEmail().equals(phoneContact.getEmail()) ||
                             megaContact.getNormalizedNumber().equals(phoneContact.getNormalizedNumber())) {
-                        logDebug("filter out: " + phoneContact);
                         iterator.remove();
                     }
                 }

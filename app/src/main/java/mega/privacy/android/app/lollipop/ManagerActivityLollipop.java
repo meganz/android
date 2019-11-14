@@ -7241,7 +7241,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				//Hide all
 				inviteMenuItem.setVisible(false);
 				selectMenuItem.setVisible(false);
-				selectMenuItem.setVisible(false);
 				searchByDate.setVisible(false);
 				addContactMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);

@@ -43,7 +43,7 @@ public class MegaPreferences{
 	String shouldClearCameraSyncRecords;
 
 	String isAutoPlayEnabled = "";
-	String showInviteBanner = "";
+	private String showInviteBanner = "";
 
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;

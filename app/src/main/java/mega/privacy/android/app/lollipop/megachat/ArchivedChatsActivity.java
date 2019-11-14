@@ -460,10 +460,13 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             if (errorCode == MegaError.API_OK && requestNumber == MegaContactRequest.INVITE_ACTION_ADD) {
                 showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
             } else if (errorCode == MegaError.API_EEXIST) {
+                logWarning(request.getEmail() + " is already a contact");
                 showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
             } else if (errorCode == MegaError.API_EARGS && requestNumber == MegaContactRequest.INVITE_ACTION_ADD) {
+                logWarning("No need to add yourself.");
                 showSnackbar(getString(R.string.error_own_email_as_contact));
             } else {
+                logWarning("Invite error.");
                 showSnackbar(getString(R.string.general_error));
             }
         }

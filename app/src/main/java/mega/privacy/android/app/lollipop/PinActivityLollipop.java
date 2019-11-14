@@ -15,9 +15,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 
 public class PinActivityLollipop extends BaseActivity {
-	
-	private MegaApiAndroid megaApi;
-	private MegaChatApiAndroid megaChatApi;
 
     private static long lastStart;
 	

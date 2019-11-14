@@ -49,7 +49,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
@@ -91,7 +90,6 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     private static final int ADDED_CONTACT_VIEW_MARGIN_LEFT = 10;
 
     private DisplayMetrics outMetrics;
-    private MegaApiAndroid megaApi;
     private ActionBar aB;
     private RelativeLayout containerContacts;
     private RecyclerView recyclerViewList;
@@ -144,8 +142,6 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        MegaApplication app = (MegaApplication) getApplication();
-        megaApi = app.getMegaApi();
         handler = new Handler();
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.activity_invite_contact);
@@ -274,12 +270,14 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
                 if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE && e.getErrorCode() == MegaError.API_OK) {
                     contactLink = CONTACT_LINK_BASE_URL + MegaApiAndroid.handleToBase64(request.getNodeHandle());
                 } else {
+                    logWarning("Create contact link failed.");
                     contactLink = "";
                 }
             }
 
             @Override
             public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+                logWarning("Create contact link temp error.");
                 contactLink = "";
             }
         };
