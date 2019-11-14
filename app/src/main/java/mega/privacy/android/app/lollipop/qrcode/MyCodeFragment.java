@@ -393,10 +393,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         }
         else{
             fullName = myEmail;
-
         }
-
-        return getDefaultAvatar(context, colorAvatar(context, megaApi, myUser, false), fullName, AVATAR_SIZE, true);
+        return getDefaultAvatar(context, colorAvatar(context, megaApi, myUser), fullName, AVATAR_SIZE, true);
     }
 
     @Override

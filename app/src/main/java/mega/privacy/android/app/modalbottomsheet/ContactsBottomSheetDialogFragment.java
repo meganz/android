@@ -384,10 +384,11 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
         /*Default Avatar*/
         int color;
+        String contactString = null;
         if(contact == null){
-            color = colorAvatar(context, megaApi, null, false);
+            color = colorAvatar(context, megaApi, contactString);
         }else{
-            color = colorAvatar(context, megaApi, contact.getMegaUser(), false);
+            color = colorAvatar(context, megaApi, contact.getMegaUser());
         }
         contactImageView.setImageBitmap(getDefaultAvatar(context, color, contact.getFullName(), AVATAR_SIZE, true));
     }

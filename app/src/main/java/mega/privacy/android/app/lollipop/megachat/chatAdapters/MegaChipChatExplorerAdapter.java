@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -199,14 +200,15 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         logDebug("setUserAvatar");
 
         if (item.getChat() != null && item.getChat().isGroup()) {
-            holder.avatar.setImageBitmap(getDefaultAvatar(context, colorAvatar(context, megaApi, null, true), item.getTitle(), AVATAR_SIZE, true));
+            int color = ContextCompat.getColor(context, R.color.divider_upgrade_account);
+            holder.avatar.setImageBitmap(getDefaultAvatar(context, color, item.getTitle(), AVATAR_SIZE, true));
         }
         else {
             MegaUser user = null;
             if (item.getContact() != null && item.getContact().getMegaUser() != null) {
                 user = item.getContact().getMegaUser();
             }
-            holder.avatar.setImageBitmap(getDefaultAvatar(context, colorAvatar(context, megaApi, user, false), item.getTitle(), AVATAR_SIZE, true));
+            holder.avatar.setImageBitmap(getDefaultAvatar(context, colorAvatar(context, megaApi, user), item.getTitle(), AVATAR_SIZE, true));
 
             ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
             File avatar = null;
