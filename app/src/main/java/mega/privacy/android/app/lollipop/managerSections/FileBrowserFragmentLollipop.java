@@ -88,7 +88,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 
 	Context context;
 	ActionBar aB;
-	LinearLayout linearLayoutRecycler;
 	RecyclerView recyclerView;
 	FastScroller fastScroller;
 
@@ -598,7 +597,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 			logDebug("isList");
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
-			linearLayoutRecycler = v.findViewById(R.id.linear_layout_recycler);
 			recyclerView = v.findViewById(R.id.file_list_view_browser);
 			fastScroller = v.findViewById(R.id.fastscroll);
 			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
@@ -661,7 +659,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
         } else {
 			logDebug("Grid View");
             View v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);
-			linearLayoutRecycler = v.findViewById(R.id.linear_layout_recycler);
             recyclerView = (NewGridRecyclerView)v.findViewById(R.id.file_grid_view_browser);
             fastScroller = v.findViewById(R.id.fastscroll);
             

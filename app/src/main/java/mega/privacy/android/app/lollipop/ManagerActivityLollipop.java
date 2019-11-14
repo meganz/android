@@ -3932,14 +3932,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-//    public void updateCallIcon(MegaChatListItem item){
-//        logDebug("updateCallIcon");
-//        rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-//        if (rChatFL != null) {
-//            rChatFL.refreshNode(item);
-//        }
-//    }
-
 	public void setProfileAvatar(){
 		logDebug("setProfileAvatar");
 		File avatar = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg");
@@ -10871,8 +10863,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (parentNode == null) return;
 
 		ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
-		for (int i=0;i<nL.size();i++){
-			if (title.compareTo(nL.get(i).getName()) == 0){
+		for (int i = 0; i < nL.size(); i++) {
+			if (title.compareTo(nL.get(i).getName()) == 0) {
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_already_exists), -1);
 				logDebug("Folder not created: folder already exists");
 				return;

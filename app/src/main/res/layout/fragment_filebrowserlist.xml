@@ -64,32 +64,27 @@
 			</LinearLayout>
 		</RelativeLayout>
 
-		<LinearLayout
-			android:id="@+id/linear_layout_recycler"
+		<RelativeLayout
+			android:id="@+id/relative_layout_recycler"
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
 			android:layout_below="@id/call_in_progress_layout"
 			android:layout_above="@id/relative_layout_file_list_browser_camera_upload_on_off">
 
-			<RelativeLayout
+			<android.support.v7.widget.RecyclerView
+				android:id="@+id/file_list_view_browser"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:choiceMode="multipleChoice" />
+
+			<mega.privacy.android.app.components.scrollBar.FastScroller
+				android:id="@+id/fastscroll"
+				android:orientation="vertical"
 				android:layout_width="wrap_content"
-				android:layout_height="match_parent">
-
-				<android.support.v7.widget.RecyclerView
-					android:id="@+id/file_list_view_browser"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:choiceMode="multipleChoice" />
-
-				<mega.privacy.android.app.components.scrollBar.FastScroller
-					android:id="@+id/fastscroll"
-					android:orientation="vertical"
-					android:layout_width="wrap_content"
-					android:layout_height="match_parent"
-					android:layout_alignParentRight="true"
-					android:gravity="right"/>
-			</RelativeLayout>
-		</LinearLayout>
+				android:layout_height="match_parent"
+				android:layout_alignParentRight="true"
+				android:gravity="right"/>
+		</RelativeLayout>
 
 	</RelativeLayout>
 

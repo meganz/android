@@ -89,7 +89,6 @@
                     android:textColor="@color/mail_my_account"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="72dp"
-                    android:text="jasjdskjdskljd"
                     android:textSize="14sp" />
             </RelativeLayout>
 

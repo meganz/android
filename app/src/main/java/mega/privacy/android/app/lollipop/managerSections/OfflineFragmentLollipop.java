@@ -505,7 +505,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 
 		String pathNavigationOffline = ((ManagerActivityLollipop)context).getPathNavigationOffline();
-		if(pathNavigationOffline!=null){
+		if (pathNavigationOffline != null) {
 			pathNavigation = pathNavigationOffline;
 		}
 		orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
@@ -525,7 +525,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			emptyImageView = v.findViewById(R.id.offline_empty_image);
 			emptyTextView = v.findViewById(R.id.offline_empty_text);
 			emptyTextViewFirst = v.findViewById(R.id.offline_empty_text_first);
-		} else{
+		} else {
 			logDebug("onCreateGRID");
 			v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
 			
@@ -1072,30 +1072,29 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		setAdapter();
 		orderNodes();
 	}
-	
-	public void refreshPaths(MegaOffline mOff){
-		logDebug("Offline node handle: " + mOff.getHandle());
-		int index=0;
-//		MegaOffline retFindPath = null;
-		
-		//Find in the tree, the last existing node
-		String pNav= mOff.getPath();
 
-		if(mOff.getType()==DB_FILE){
-			index=pNav.lastIndexOf("/");				
-			pNav=pNav.substring(0,index+1);
-		} else{
-			pNav=pNav.substring(0,pNav.length()-1);
-		}	
-			
-		if(pNav.length()==0){
-			mOffList=dbH.findByPath("/");
-		} else{
-			findPath(pNav);			
+	public void refreshPaths(MegaOffline mOff) {
+		logDebug("Offline node handle: " + mOff.getHandle());
+		int index;
+
+		//Find in the tree, the last existing node
+		String pNav = mOff.getPath();
+
+		if (mOff.getType().equals(DB_FILE)) {
+			index = pNav.lastIndexOf("/");
+			pNav = pNav.substring(0, index + 1);
+		} else {
+			pNav = pNav.substring(0, pNav.length() - 1);
 		}
-				
+
+		if (pNav.length() == 0) {
+			mOffList = dbH.findByPath("/");
+		} else {
+			findPath(pNav);
+		}
+
 		orderNodes();
-		((ManagerActivityLollipop)context).setToolbarTitle();
+		((ManagerActivityLollipop) context).setToolbarTitle();
 	}
 	
 	public int getItemCount(){
