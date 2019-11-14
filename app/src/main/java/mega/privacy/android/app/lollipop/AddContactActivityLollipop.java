@@ -195,6 +195,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     private boolean comesFromChat;
 
+    private boolean comesFromRecent;
+    public static final String FROM_RECENT = "comesFromRecent";
+
     private RelativeLayout headerContacts;
     private TextView textHeader;
 
@@ -1482,6 +1485,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             contactType = getIntent().getIntExtra("contactType", CONTACT_TYPE_MEGA);
             chatId = getIntent().getLongExtra("chatId", -1);
             newGroup = getIntent().getBooleanExtra("newGroup", false);
+            comesFromRecent = getIntent().getBooleanExtra(FROM_RECENT, false);
             if (newGroup) {
                 createNewGroup = true;
                 contactsNewGroup = getIntent().getStringArrayListExtra("contactsNewGroup");
@@ -1834,6 +1838,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         setGetChatLinkVisibility();
+        if(comesFromRecent) {
+            if(getContactsTask != null && getContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+                getContactsTask.cancel(true);
+            }
+            createNewChatLink = true;
+            newGroup();
+        }
     }
 
     private void setEmptyStateVisibility (boolean visible) {
@@ -3042,8 +3053,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             if (addedContactsMEGA.contains(myContact)) {
                 addedContactsMEGA.remove(myContact);
             }
-            returnToAddContacts();
-            createMyContact();
+            if (comesFromRecent) {
+                finish();
+            } else {
+                returnToAddContacts();
+                createMyContact();
+            }
         } else if (createNewGroup && (newGroup || onlyCreateGroup)) {
             finish();
         } else if ((createNewGroup || createNewChatLink) && (!newGroup || !onlyCreateGroup)) {

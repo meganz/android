@@ -53,6 +53,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.ContactsHorizontalAdapter;
@@ -466,7 +467,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         inviteTitle.setClickable(false);
         moreContactsTitle.setVisibility(View.GONE);
         invitationContainer.setVisibility(View.GONE);
-
+        closeBtn.setVisibility(View.GONE);
         loadMegaContacts();
     }
 
@@ -672,14 +673,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
 
         } else {
-            textToShow = context.getString(R.string.context_empty_chat_recent);
-            colorStart = COLOR_START;
-            colorEnd = COLOR_END;
-            result = getSpannedMessageForEmptyChat(textToShow, colorStart, colorEnd);
-
-            emptyTextViewInvite.setText(result);
+            emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_text));
             emptyTextViewInvite.setVisibility(View.VISIBLE);
-            inviteButton.setText(getString(R.string.contact_invite));
+            inviteButton.setText(getString(R.string.new_chat_link_label));
             inviteButton.setVisibility(View.VISIBLE);
         }
     }
@@ -762,24 +758,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             ((ManagerActivityLollipop) context).hideFabButton();
         }
 
-        String textToShow = String.format(context.getString(R.string.context_empty_chat_recent));
-
-        try {
-            textToShow = textToShow.replace("[A]", "<font color=" + COLOR_START + ">");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=" + COLOR_END + ">");
-            textToShow = textToShow.replace("[/B]", "</font>");
-        } catch (Exception e) {
-        }
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-
-        }
-
-        emptyTextViewInvite.setText(result);
+        emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_text));
         emptyTextViewInvite.setVisibility(View.INVISIBLE);
 
         inviteButton.setVisibility(View.GONE);
@@ -832,7 +811,12 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             case R.id.invite_button: {
                 if (isChatEnabled()) {
                     if (isOnline(context)) {
-                        ((ManagerActivityLollipop) context).addContactFromPhone();
+                        if(context instanceof ManagerActivityLollipop) {
+                            Intent in = new Intent(context, AddContactActivityLollipop.class);
+                            in.putExtra("contactType", CONTACT_TYPE_MEGA);
+                            in.putExtra("comesFromRecent", true);
+                            ((ManagerActivityLollipop)context).startActivityForResult(in, REQUEST_CREATE_CHAT);
+                        }
                         if (megaChatApi.isSignalActivityRequired()) {
                             megaChatApi.signalPresenceActivity();
                         }
