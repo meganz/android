@@ -11,17 +11,19 @@
 		              android:layout_height="wrap_content"
 		              android:background="#40B0D7"
 		              android:orientation="vertical">
-			<TextView android:layout_width="match_parent"
-			          android:layout_height="wrap_content"
-			          android:layout_gravity="center"
-			          android:layout_marginTop="43dp"
-			          android:layout_marginBottom="36dp"
-			          android:gravity="center"
-			          android:text="@string/verify_account_title"
-			          android:textAlignment="center"
-			          android:textColor="#ffffff"
-			          android:textSize="20sp"
-			          android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="43dp"
+                android:layout_marginBottom="36dp"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textColor="#ffffff"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 			<ImageView android:layout_width="wrap_content"
 			           android:layout_height="wrap_content"
 			           android:layout_gravity="center"

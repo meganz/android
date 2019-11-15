@@ -48,7 +48,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     
     public static final String SELECTED_COUNTRY_CODE = "COUNTRY_CODE";
     public static final String ENTERED_PHONE_NUMBER = "ENTERED_PHONE_NUMBER";
-    private TextView helperText, selectedCountry, errorInvalidCountryCode, errorInvalidPhoneNumber, titleCountryCode, titlePhoneNumber, notNowButton, textLogout;
+    private TextView helperText, selectedCountry, errorInvalidCountryCode, errorInvalidPhoneNumber, title, titleCountryCode, titlePhoneNumber, notNowButton, textLogout;
     private View divider1, divider2;
     private ImageView errorInvalidPhoneNumberIcon;
     private RelativeLayout countrySelector;
@@ -80,6 +80,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         titleCountryCode = findViewById(R.id.verify_account_country_label);
         titlePhoneNumber = findViewById(R.id.verify_account_phone_number_label);
         selectedCountry = findViewById(R.id.verify_account_selected_country);
+        title = findViewById(R.id.title);
 
         TelephonyManager tm = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
         if (tm != null) {
@@ -92,6 +93,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         if (isUserLocked) {
             String text = getResources().getString(R.string.verify_account_helper_locked);
             helperText.setText(text);
+            title.setText(R.string.verify_account_title);
 
             textLogout = findViewById(R.id.sms_logout);
             String textToShow = getString(R.string.sms_logout)
@@ -107,6 +109,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             textLogout.setVisibility(View.VISIBLE);
             textLogout.setOnClickListener(this);
         } else {
+            title.setText(R.string.add_phone_number_label);
             boolean isAchievementUser = megaApi.isAchievementsEnabled();
             logDebug("Is achievement user: " + isAchievementUser);
             if (isAchievementUser) {
