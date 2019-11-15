@@ -37,12 +37,11 @@
                     android:id="@+id/close_btn"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:paddingTop="2dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="28dp"
-                    android:src="@drawable/arrow_collapse"
+                    android:src="@drawable/close_banner"
                     android:visibility="gone" />
                 <TextView
                     android:id="@+id/invite_title"
@@ -98,6 +97,7 @@
                     <Button
                         android:id="@+id/dismiss_button"
                         style="@style/AccentBorderBackgroundBorderlessButton"
+                        android:background="@null"
                         android:layout_height="36dp"
                         android:layout_below="@id/request_permission_message"
                         android:layout_alignParentRight="true"

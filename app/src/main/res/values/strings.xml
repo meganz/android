@@ -2132,8 +2132,7 @@
         <item context="more files" quantity="other">Choose Files</item>
     </plurals>
 
-    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">Send invitation to %1$s?</string>
-    <string name="message_confirm_send_invitation" context="Message in the confirmation dialog of sending invitation to a contact">If you confirm, the invitation will be sent.</string>
+    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">Invite %1$s?</string>
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Choose folder</string>
 

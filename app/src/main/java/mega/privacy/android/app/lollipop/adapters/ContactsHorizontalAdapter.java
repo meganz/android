@@ -99,8 +99,8 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
                         notifyDataSetChanged();
 
                         String email = holder.contactMail;
-                        logDebug("sent invite to: " + email);
-                        //ignore the callback
+                        logDebug("Sent invite to: " + email);
+                        // for UI smoothness, ignore the callback
                         megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
                         Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
                         break;
@@ -113,11 +113,12 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        String title = String.format(context.getString(R.string.title_confirm_send_invitation),contact.getLocalName());
-        builder.setTitle(title);
-        builder.setMessage(context.getResources().getString(R.string.message_confirm_send_invitation));
-        builder.setPositiveButton(R.string.confirm_to_send, dialogClickListener);
-        builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+        String message = String.format(context.getString(R.string.title_confirm_send_invitation),contact.getLocalName());
+        builder.setMessage(message);
+        String invite = context.getResources().getString(R.string.contact_invite).toUpperCase();
+        builder.setPositiveButton(invite, dialogClickListener);
+        String cancel = context.getResources().getString(R.string.general_cancel).toUpperCase();
+        builder.setNegativeButton(cancel, dialogClickListener);
         builder.show();
     }
 
