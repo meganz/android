@@ -6640,8 +6640,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             name = message.getUserEmail(0);
         }
         String email = message.getUserEmail(0);
+        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(message.getUserHandle(0));
+
         ChatAttachmentAvatarListener listener;
-        int color = colorAvatar(context, megaApi, message.getUserHandle());
+        int color = colorAvatar(context, megaApi, userHandleEncoded);
         Bitmap bitmapDefaultAvatar = getDefaultAvatar(context, color, name, AVATAR_SIZE, true);
         if (myUserHandle == message.getUserHandle()) {
             holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);

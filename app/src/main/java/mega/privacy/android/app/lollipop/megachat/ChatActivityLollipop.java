@@ -184,6 +184,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private final static int ROTATION_REVERSE_LANDSCAPE = 3;
     private final static int TITLE_TOOLBAR_PORT = 180;
     private final static int TITLE_TOOLBAR_LAND = 400;
+    private final static int TITLE_TOOLBAR_IND_PORT = 120;
 
     public static int MEGA_FILE_LINK = 1;
     public static int MEGA_FOLDER_LINK = 2;
@@ -598,14 +599,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
 
-        int width;
-        if(isScreenInPortrait(this)){
-            width = px2dp(TITLE_TOOLBAR_PORT, outMetrics);
-        }else{
-            width = px2dp(TITLE_TOOLBAR_LAND, outMetrics);
-        }
-        groupalSubtitleToolbar.setMaxWidthEmojis(width);
-        titleToolbar.setMaxWidthEmojis(width);
 
         groupalSubtitleToolbar.setVisibility(View.GONE);
         subtitleCall.setVisibility(View.GONE);
@@ -614,11 +607,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         iconStateToolbar.setVisibility(View.GONE);
         privateIconToolbar.setVisibility(View.GONE);
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-
-
         updateNavigationToolbarIcon();
-
-
 
         joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
         joinButton = findViewById(R.id.join_button);
@@ -1358,6 +1347,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(chatRoom==null){
             return;
         }
+        int width;
+        if(isScreenInPortrait(this)){
+            if(isGroup()) {
+                width = px2dp(TITLE_TOOLBAR_PORT, outMetrics);
+            }else {
+                width = px2dp(TITLE_TOOLBAR_IND_PORT, outMetrics);
+            }
+        }else{
+            width = px2dp(TITLE_TOOLBAR_LAND, outMetrics);
+        }
+        groupalSubtitleToolbar.setMaxWidthEmojis(width);
+        titleToolbar.setMaxWidthEmojis(width);
 
         setSubtitleVisibility();
 
