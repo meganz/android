@@ -187,11 +187,10 @@ public class BillingManager implements PurchasesUpdatedListener {
      * @param purchase Purchase to be handled
      */
     private void handlePurchase(Purchase purchase) {
-        //todo need to validate signature
-//        if (verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
-//            log("invalid purchase found");
-//            return;
-//        }
+        if (!verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
+            log("invalid purchase found");
+            return;
+        }
 
         if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
             // Acknowledge the purchase if it hasn't already been acknowledged.
