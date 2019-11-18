@@ -383,7 +383,7 @@
                 </LinearLayout>
             </RelativeLayout>
 
-            <TextView
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/info_users_bar"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
@@ -393,6 +393,7 @@
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="14sp"
+                app:emojiSize="12dp"
                 android:textStyle="normal"
                 android:visibility="gone" />
 

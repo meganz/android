@@ -118,7 +118,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private RelativeLayout mutateOwnCallLayout;
     private LinearLayout linearParticipants;
     private TextView participantText;
-    private TextView infoUsersBar;
+    private EmojiTextView infoUsersBar;
     private ActionBar aB;
     private boolean avatarRequested = false;
     private ArrayList<InfoPeerGroupCall> peersOnCall = new ArrayList<>();
