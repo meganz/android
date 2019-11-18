@@ -184,13 +184,13 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	    	View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_grid, parent, false);
 	    	
 	    	holderGrid = new ViewHolderContactsGrid(v);
-	    	holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_grid_item_layout);
-		    holderGrid.imageView = (ImageView) v.findViewById(R.id.contact_grid_thumbnail);
-		    holderGrid.contactNameLayout = (LinearLayout) v.findViewById(R.id.contact_grid_name_layout);
+	    	holderGrid.itemLayout = v.findViewById(R.id.contact_grid_item_layout);
+		    holderGrid.imageView = v.findViewById(R.id.contact_grid_thumbnail);
+		    holderGrid.contactNameLayout = v.findViewById(R.id.contact_grid_name_layout);
 		    holderGrid.textViewContactName = v.findViewById(R.id.contact_grid_name);
-		    holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_grid_three_dots);
-			holderGrid.contactStateIcon = (ImageView) v.findViewById(R.id.contact_grid_drawable_state);
-			holderGrid.contactSelectedIcon = (ImageView) v.findViewById(R.id.contact_grid_selected_icon);
+		    holderGrid.imageButtonThreeDots = v.findViewById(R.id.contact_grid_three_dots);
+			holderGrid.contactStateIcon = v.findViewById(R.id.contact_grid_drawable_state);
+			holderGrid.contactSelectedIcon = v.findViewById(R.id.contact_grid_selected_icon);
 
 			if(!isScreenInPortrait(context)){
 				holderGrid.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_GRID_LAND, outMetrics));
@@ -211,16 +211,15 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_list, parent, false);
 
 			holderList = new ViewHolderContactsList(v);
-			holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_list_item_layout);
-			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
+			holderList.itemLayout = v.findViewById(R.id.contact_list_item_layout);
+			holderList.imageView = v.findViewById(R.id.contact_list_thumbnail);
 			holderList.textViewContactName = v.findViewById(R.id.contact_list_name);
-			holderList.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_list_content);
-			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
-			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
+			holderList.textViewContent = v.findViewById(R.id.contact_list_content);
+			holderList.declineLayout = v.findViewById(R.id.contact_list_decline);
+			holderList.contactStateIcon = v.findViewById(R.id.contact_list_drawable_state);
 			holderList.declineLayout.setVisibility(View.GONE);
 
 			if(!isScreenInPortrait(context)){
-				logDebug("Landscape configuration");
 				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 			}
@@ -229,7 +228,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
-			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
+			holderList.threeDotsLayout = v.findViewById(R.id.contact_list_three_dots_layout);
 
 			//Right margin
 			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holderList.threeDotsLayout.getLayoutParams();
@@ -249,16 +248,15 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_list, parent, false);
 
 			holderList = new ViewHolderContactsList(v);
-			holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_list_item_layout);
-			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
+			holderList.itemLayout = v.findViewById(R.id.contact_list_item_layout);
+			holderList.imageView = v.findViewById(R.id.contact_list_thumbnail);
 			holderList.textViewContactName = v.findViewById(R.id.contact_list_name);
-			holderList.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_list_content);
-			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
-			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
+			holderList.textViewContent = v.findViewById(R.id.contact_list_content);
+			holderList.contactStateIcon = v.findViewById(R.id.contact_list_drawable_state);
+			holderList.declineLayout = v.findViewById(R.id.contact_list_decline);
 			holderList.declineLayout.setVisibility(View.VISIBLE);
 
 			if(!isScreenInPortrait(context)){
-				logDebug("Landscape configuration");
 				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 			}
@@ -267,7 +265,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
-			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
+			holderList.threeDotsLayout = v.findViewById(R.id.contact_list_three_dots_layout);
 
 			holderList.declineLayout.setTag(holderList);
 			holderList.declineLayout.setOnClickListener(this);
@@ -307,7 +305,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	
 	public void onBindViewHolderGrid (ViewHolderContactsGrid holder, int position){
 		holder.imageView.setImageBitmap(null);
-
 		MegaContactAdapter contact = (MegaContactAdapter) getItem(position);
 		holder.contactMail = contact.getMegaUser().getEmail();
 

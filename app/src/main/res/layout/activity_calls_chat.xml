@@ -203,16 +203,6 @@
                         rounded:border_color="#4DFFFFFF"
                         rounded:border_width="3dp"
                         rounded:corner_radius="60dp" />
-
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/call_chat_contact_image_initial_letter"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:gravity="center_horizontal|center_vertical"
-                        android:textSize="15sp"
-                        app:emojiSize="50dp"
-                        android:visibility="gone" />
                 </RelativeLayout>
 
 
@@ -443,15 +433,6 @@
                         rounded:border_color="#4DFFFFFF"
                         rounded:border_width="3dp"
                         rounded:corner_radius="40dp" />
-
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/call_chat_my_image_initial_letter"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:gravity="center_horizontal|center_vertical"
-                        android:textSize="15sp"
-                        app:emojiSize="40dp"/>
                 </RelativeLayout>
             </RelativeLayout>
 

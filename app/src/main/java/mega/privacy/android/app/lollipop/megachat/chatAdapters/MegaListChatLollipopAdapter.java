@@ -83,8 +83,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public static final int MAX_WIDTH_TITLE_LAND = 400;
 	public static final int MAX_WIDTH_CONTENT_LAND = 410;
 
-	private static final String SPACE = " ";
-
 	Context context;
 	int positionClicked;
 	ArrayList<MegaChatListItem> chats;
@@ -409,7 +407,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		/*Default Avatar*/
 		int color = colorAvatar(context, megaApi, userHandle);
-		String name = SPACE;
+		String name = null;
 		if (((ViewHolderNormalChatList)holder).fullName != null && ((ViewHolderNormalChatList)holder).fullName.trim().length() > 0){
 			name = ((ViewHolderNormalChatList)holder).fullName;
 		}else if(((ViewHolderNormalChatList)holder).contactMail != null && ((ViewHolderNormalChatList)holder).contactMail.length() > 0){
@@ -608,8 +606,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public void createGroupChatAvatar(ViewHolderChatList holder, String chatTitle){
 		int color = ContextCompat.getColor(context,R.color.divider_upgrade_account);
-		String title = chatTitle;
-		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(getDefaultAvatar(context, color, title, AVATAR_SIZE, true));
+		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(getDefaultAvatar(context, color, chatTitle, AVATAR_SIZE, true));
 	}
 
 

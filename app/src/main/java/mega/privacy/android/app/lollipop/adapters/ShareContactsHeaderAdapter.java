@@ -235,9 +235,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                     holder.contactStateIcon.setVisibility(View.GONE);
                 }
 
-//                holder.avatar.setImageBitmap(setUserAvatar(contact));
                 holder.avatar.setImageBitmap(getAvatarShareContact(mContext, megaApi, contact));
-
                 UserAvatarListenerShare listener = new UserAvatarListenerShare(mContext, holder);
 
                 File avatar = buildAvatarFile(mContext,mail + ".jpg");

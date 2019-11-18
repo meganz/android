@@ -351,8 +351,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
     private void addAvatarChatPanel(String contactMail, MegaChatListItem chat){
         int color;
-        String name = " ";
-
+        String name = null;
         if (chat.getTitle() != null && chat.getTitle().trim().length() > 0) {
             name = chat.getTitle();
         } else if (contactMail != null && contactMail.length() > 0) {

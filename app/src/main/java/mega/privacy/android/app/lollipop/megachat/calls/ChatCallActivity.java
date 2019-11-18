@@ -136,10 +136,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private int isRemoteVideo = REMOTE_VIDEO_NOT_INIT;
     private RelativeLayout myAvatarLayout;
     private RoundedImageView myImage;
-    private EmojiTextView myInitialLetter;
     private RelativeLayout contactAvatarLayout;
     private RoundedImageView contactImage;
-    private EmojiTextView contactInitialLetter;
     private RelativeLayout fragmentContainer;
     private int totalVideosAllowed = 0;
     private FloatingActionButton videoFAB;
@@ -552,13 +550,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             myAvatarLayout = findViewById(R.id.call_chat_my_image_rl);
             myAvatarLayout.setVisibility(View.GONE);
             myImage = findViewById(R.id.call_chat_my_image);
-            myInitialLetter = findViewById(R.id.call_chat_my_image_initial_letter);
             contactAvatarLayout = findViewById(R.id.call_chat_contact_image_rl);
             contactAvatarLayout.setOnClickListener(this);
             contactAvatarLayout.setVisibility(View.GONE);
             contactImage = findViewById(R.id.call_chat_contact_image);
-            contactInitialLetter = findViewById(R.id.call_chat_contact_image_initial_letter);
-
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_video_off));
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
@@ -732,11 +727,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
             if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
                 myImage.setImageBitmap(bitmap);
-                myInitialLetter.setVisibility(View.GONE);
                 return;
             }
             contactImage.setImageBitmap(bitmap);
-            contactInitialLetter.setVisibility(View.GONE);
         }
     }
 

@@ -41,7 +41,7 @@ public class ChatAttachmentAvatarListener implements MegaRequestListenerInterfac
         logDebug("onRequestFinish()");
         if (e.getErrorCode() == MegaError.API_OK){
 
-            String mail = "";
+            String mail;
             if(myOwnMsg){
                 mail = holder.contentOwnMessageContactEmail.getText().toString();
             }
