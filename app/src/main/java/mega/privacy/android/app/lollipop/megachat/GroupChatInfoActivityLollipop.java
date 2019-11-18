@@ -152,7 +152,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     ArrayList<MegaChatParticipant> participants;
     Toolbar toolbar;
     ActionBar aB;
-    private EmojiTextView initialLetter;
     private RoundedImageView avatarImageView;
     private EmojiTextView infoTitleChatText;
     private MegaApiAndroid megaApi = null;
@@ -248,11 +247,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             //Info Layout
             avatarImageView = findViewById(R.id.chat_group_properties_thumbnail);
-            initialLetter = findViewById(R.id.chat_group_properties_initial_letter);
-            if (chat.getTitle().length() > 0) {
-                String firstLetter = getFirstLetter(chat.getTitle());
-                initialLetter.setText(firstLetter);
-            }
             createGroupChatAvatar();
 
             infoLayout = findViewById(R.id.chat_group_contact_properties_info_layout);
@@ -842,46 +836,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void createGroupChatAvatar(){
         logDebug("createGroupChatAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        p.setColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth() / 2;
-        else
-            radius = defaultAvatar.getHeight() / 2;
-
-        c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, p);
-        avatarImageView.setImageBitmap(defaultAvatar);
-
-        Display display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-        float density = getResources().getDisplayMetrics().density;
-
-
-        int avatarTextSize = getAvatarTextSize(density);
-        logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
-
-
-        String firstLetter = initialLetter.getText().toString();
-
-        if (firstLetter.trim().isEmpty()) {
-            initialLetter.setVisibility(View.INVISIBLE);
-        } else {
-            if (firstLetter.equals("(")) {
-                initialLetter.setVisibility(View.INVISIBLE);
-            } else {
-                initialLetter.setText(firstLetter);
-                initialLetter.setTextColor(Color.WHITE);
-                initialLetter.setVisibility(View.VISIBLE);
-                initialLetter.setTextSize(24);
-            }
-        }
+        int color = ContextCompat.getColor(this, R.color.divider_upgrade_account);
+        String title = chat.getTitle();
+        avatarImageView.setImageBitmap(getDefaultAvatar(this, color, title, AVATAR_SIZE, true));
     }
 
     private int getAvatarTextSize(float density) {
@@ -1616,12 +1573,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
                 logDebug("Change status: CHANGE_TYPE_TITLE");
                 infoTitleChatText.setText(chat.getTitle());
-
-                if (chat.getTitle().length() > 0) {
-                    String firstLetter = getFirstLetter(chat.getTitle());
-                    initialLetter.setText(firstLetter);
-                }
-
                 createGroupChatAvatar();
             }
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {

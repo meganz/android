@@ -237,7 +237,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	TextView ownerLabelowner;
 	TextView ownerInfo;
 	ImageView ownerRoundeImage;
-	EmojiTextView ownerLetter;
 	ImageView ownerState;
 
 	MenuItem downloadMenuItem;
@@ -628,8 +627,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         //Owner Layout
         ownerLayout = (RelativeLayout) findViewById(R.id.file_properties_owner_layout);
         ownerRoundeImage= (RoundedImageView) findViewById(R.id.contact_list_thumbnail);
-        ownerLetter = findViewById(R.id.contact_list_initial_letter);
-
         ownerLinear = (LinearLayout) findViewById(R.id.file_properties_owner_linear);
         ownerLabel =  findViewById(R.id.file_properties_owner_label);
         ownerLabelowner = (TextView) findViewById(R.id.file_properties_owner_label_owner);
@@ -1533,8 +1530,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if(from==FROM_INCOMING_SHARES){
 				//Show who is the owner
 				ownerRoundeImage.setImageBitmap(null);
-				ownerLetter.setText("");
-
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
 				for(int j=0; j<sharesIncoming.size();j++){
 					MegaShare mS = sharesIncoming.get(j);
@@ -1587,7 +1582,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                                     megaApi.getUserAvatar(user,buildAvatarFile(this, contactMail + ".jpg").getAbsolutePath(), this);
                                 }
 								else{
-									ownerLetter.setVisibility(View.GONE);
 									ownerRoundeImage.setImageBitmap(bitmap);
 								}
 							}
@@ -1692,44 +1686,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	public void createDefaultAvatar(ImageView ownerRoundeImage, MegaUser user, String name){
         logDebug("createDefaultAvatar()");
 
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		String color = megaApi.getUserAvatarColor(user);
-		if(color!=null){
-            logDebug("The color to set the avatar is " + color);
-			p.setColor(Color.parseColor(color));
-		}
-		else{
-            logDebug("Default color to the avatar");
-			p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-		}
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		ownerRoundeImage.setImageBitmap(defaultAvatar);
-
-		Display display = this.getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-		display.getMetrics(outMetrics);
-		float density  = this.getResources().getDisplayMetrics().density;
-
-
-		int avatarTextSize = getAvatarTextSize(density);
-        logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
-
-        String firstLetter = getFirstLetter(name);
-		ownerLetter.setText(firstLetter);
-		ownerLetter.setTextColor(Color.WHITE);
-		ownerLetter.setVisibility(View.VISIBLE);
-		ownerLetter.setTextSize(24);
-
+        int color = colorAvatar(this, megaApi, user);
+		ownerRoundeImage.setImageBitmap(getDefaultAvatar(this, color, name, AVATAR_SIZE, true));
 	}
 
 	private int getAvatarTextSize (float density){
@@ -2510,7 +2468,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 								avatarExists = true;
 								ownerRoundeImage.setImageBitmap(bitmap);
 								ownerRoundeImage.setVisibility(View.VISIBLE);
-								ownerLetter.setVisibility(View.GONE);
 							}
 						}
 					}

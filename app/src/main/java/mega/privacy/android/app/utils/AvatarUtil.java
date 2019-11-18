@@ -75,13 +75,13 @@ public class AvatarUtil {
     }
 
     /*Method to get the default avatar bitmap*/
-    public static Bitmap getDefaultAvatar(Context context, int color, String name, int textSize, boolean isList) {
+    public static Bitmap getDefaultAvatar(Context context, int colorAvatar, String textAvatar, int textSize, boolean isList) {
         Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
 
         /*Background*/
         Paint paintCircle = new Paint();
-        paintCircle.setColor(color);
+        paintCircle.setColor(colorAvatar);
         paintCircle.setAntiAlias(true);
 
         if(isList){
@@ -112,7 +112,10 @@ public class AvatarUtil {
         paintText.setStyle(Paint.Style.FILL);
 
         /*First Letter*/
-        String firstLetter = getFirstLetter(name);
+        if(textAvatar == null || textAvatar.trim().length() <= 0){
+            textAvatar = UNKNOWN_USER_NAME_AVATAR;
+        }
+        String firstLetter = getFirstLetter(textAvatar);
         final Emoji found = EmojiManager.getInstance().getFirstEmoji(firstLetter);
         if (found != null) {
             Bitmap emojiBitmap = Bitmap.createScaledBitmap(found.getBitmap(context), textSize, textSize, false);
@@ -125,7 +128,6 @@ public class AvatarUtil {
             int xPos = (c.getWidth() / 2);
             int yPos = (int) ((c.getHeight() / 2) - ((paintText.descent() + paintText.ascent() / 2)) + 20);
             c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-
         }
         return defaultAvatar;
     }
@@ -166,4 +168,5 @@ public class AvatarUtil {
         /*Default Avatar*/
         return getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true);
     }
+
 }

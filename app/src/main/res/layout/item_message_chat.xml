@@ -1069,14 +1069,6 @@
                             rounded:border_color="@color/white"
                             rounded:border_width="2dp"
                             rounded:corner_radius="20dp"/>
-
-                        <mega.privacy.android.app.components.twemoji.EmojiTextView
-                            android:id="@+id/content_own_message_contact_initial_letter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            rounded:emojiSize="25dp"
-                            android:gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -1285,16 +1277,6 @@
                         rounded:border_color="@color/border_file_properties"
                         rounded:border_width="0dp"
                         rounded:corner_radius="40dp" />
-
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/contact_initial_letter"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:textSize="15sp"
-                        rounded:emojiSize="15dp"
-                        android:gravity="center_horizontal|center_vertical"/>
-
                 </RelativeLayout>
 
                 <!-- text message-->

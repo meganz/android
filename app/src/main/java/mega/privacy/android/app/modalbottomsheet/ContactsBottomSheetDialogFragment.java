@@ -362,7 +362,11 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 //    }
 
     public void addAvatarContactPanel(MegaContactAdapter contact){
+        /*Default Avatar*/
+        int color = colorAvatar(context, megaApi, contact.getMegaUser());
+        contactImageView.setImageBitmap(getDefaultAvatar(context, color, contact.getFullName(), AVATAR_SIZE, true));
 
+        /*Avatar*/
         String contactMail = contact.getMegaUser().getEmail();
         File avatar = buildAvatarFile(getActivity(), contactMail + ".jpg");
         Bitmap bitmap = null;
@@ -381,16 +385,6 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                 }
             }
         }
-
-        /*Default Avatar*/
-        int color;
-        String contactString = null;
-        if(contact == null){
-            color = colorAvatar(context, megaApi, contactString);
-        }else{
-            color = colorAvatar(context, megaApi, contact.getMegaUser());
-        }
-        contactImageView.setImageBitmap(getDefaultAvatar(context, color, contact.getFullName(), AVATAR_SIZE, true));
     }
 
     @Override

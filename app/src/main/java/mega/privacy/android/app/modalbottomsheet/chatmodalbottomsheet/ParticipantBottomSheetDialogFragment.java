@@ -340,7 +340,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    public void addAvatarParticipantPanel(long handle, String email, String name){
+    private void addAvatarParticipantPanel(long handle, String email, String name){
 
         File avatar = null;
         /*Default avatar*/

@@ -394,6 +394,7 @@ public class Constants {
 
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String HANDLE = "handle";
+    public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
 
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;

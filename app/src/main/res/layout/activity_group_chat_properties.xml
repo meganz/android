@@ -66,13 +66,6 @@
                                 rounded:border_color="@color/border_file_properties"
                                 rounded:border_width="0dp"
                                 rounded:corner_radius="30dp" />
-
-                            <mega.privacy.android.app.components.twemoji.EmojiTextView
-                                android:id="@+id/chat_group_properties_initial_letter"
-                                android:layout_width="fill_parent"
-                                android:layout_height="fill_parent"
-                                app:emojiSize="25dp"
-                                android:gravity="center_horizontal|center_vertical"/>
                         </RelativeLayout>
 
                     </RelativeLayout>
