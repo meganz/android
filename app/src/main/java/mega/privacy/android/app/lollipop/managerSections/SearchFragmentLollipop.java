@@ -650,7 +650,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		if (isAdded() && ((ManagerActivityLollipop) context).getSearchQuery() != null) {
+		String query = ((ManagerActivityLollipop) context).getSearchQuery();
+		if (isAdded() && query != null && query.isEmpty()) {
 			newSearchNodesTask();
 			((ManagerActivityLollipop) context).showFabButton();
 		}
