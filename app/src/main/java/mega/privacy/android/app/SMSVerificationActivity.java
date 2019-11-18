@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
@@ -19,15 +20,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -48,6 +48,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     
     public static final String SELECTED_COUNTRY_CODE = "COUNTRY_CODE";
     public static final String ENTERED_PHONE_NUMBER = "ENTERED_PHONE_NUMBER";
+    private ScrollView container;
     private TextView helperText, selectedCountry, errorInvalidCountryCode, errorInvalidPhoneNumber, title, titleCountryCode, titlePhoneNumber, notNowButton, textLogout;
     private View divider1, divider2;
     private ImageView errorInvalidPhoneNumberIcon;
@@ -66,6 +67,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         super.onCreate(savedInstanceState);
         MegaApplication.smsVerifyShowed(true);
         setContentView(R.layout.activity_sms_verification);
+        container = findViewById(R.id.scroller_container);
         Intent intent = getIntent();
         if (intent != null) {
             isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED,false);
@@ -94,20 +96,28 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             String text = getResources().getString(R.string.verify_account_helper_locked);
             helperText.setText(text);
             title.setText(R.string.verify_account_title);
-
-            textLogout = findViewById(R.id.sms_logout);
+            //logout button
             String textToShow = getString(R.string.sms_logout)
-                    .replace("[A]", "<font color=\'#00BFA5\'>")
-                    .replace("[/A]", "</font>");
+                    .replace("[A]", "<font color=\'#00BFA5\'><u>")
+                    .replace("[/A]", "</u></font>");
             Spanned result;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
             } else {
                 result = Html.fromHtml(textToShow);
             }
+            textLogout = findViewById(R.id.sms_logout);
             textLogout.setText(result);
             textLogout.setVisibility(View.VISIBLE);
             textLogout.setOnClickListener(this);
+
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    container.fullScroll(View.FOCUS_DOWN);
+                }
+            },100);
         } else {
             title.setText(R.string.add_phone_number_label);
             boolean isAchievementUser = megaApi.isAchievementsEnabled();

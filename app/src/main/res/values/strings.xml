@@ -1251,7 +1251,7 @@
     <!--
     <string name="list_message_deleted" context="Text show in list of chats when the last message has been deleted">Message deleted</string>
     -->
-    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A], to login with another account</string>
+    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to enter with another account</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user's confirmation.">Are you sure that you want to logout current account?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">This message has been deleted by %1$s</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Chat history was cleared</string>

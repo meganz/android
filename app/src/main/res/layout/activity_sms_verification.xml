@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/scroller_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -187,7 +188,6 @@
             android:id="@+id/sms_logout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
             android:layout_gravity="center_horizontal"
             android:text="@string/sms_logout"
             android:visibility="gone"
