@@ -2247,7 +2247,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		logDebug("onNodesUpdate");
-		if (cDriveExplorer != null){
+		if (getCloudExplorerFragment() != null){
 			if (megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()) != null){
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
 				cDriveExplorer.setNodes(nodes);
