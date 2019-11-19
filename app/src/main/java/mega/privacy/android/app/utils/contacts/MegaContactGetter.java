@@ -178,6 +178,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 MegaStringMap map = request.getMegaStringMap();
                 MegaStringTable table = request.getMegaStringTable();
 
+                if(table.size() == 0) {
+                    // when there's no matched user, should be considered as successful
+                    updateLastSyncTimestamp();
+                }
                 MegaContact contact;
                 for (int i = 0; i < table.size(); i++) {
                     contact = new MegaContact();

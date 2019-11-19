@@ -1010,7 +1010,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             intent.putExtra("CHAT_ID", adapterList.getChatAt(position).getChatId());
             this.startActivity(intent);
             if (context instanceof ManagerActivityLollipop) {
-                if (((ManagerActivityLollipop) context).searchQuery != null && !((ManagerActivityLollipop) context).searchQuery.isEmpty()) {
+                if (((ManagerActivityLollipop) context).getSearchQuery() != null && !((ManagerActivityLollipop) context).getSearchQuery().isEmpty()) {
                     closeSearch();
                     ((ManagerActivityLollipop) context).closeSearchView();
                 }
@@ -1673,7 +1673,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         if (context instanceof ManagerActivityLollipop) {
             if (((ManagerActivityLollipop) context).isSearchOpen()) {
-                filterChats(((ManagerActivityLollipop) context).searchQuery);
+                filterChats(((ManagerActivityLollipop) context).getSearchQuery());
             }
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }

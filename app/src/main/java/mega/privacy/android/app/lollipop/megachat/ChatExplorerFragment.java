@@ -959,5 +959,6 @@ public class ChatExplorerFragment extends Fragment {
                 }
             }
         }
+        setListVisibility();
     }
 }

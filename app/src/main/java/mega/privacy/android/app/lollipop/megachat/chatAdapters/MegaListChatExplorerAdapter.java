@@ -155,6 +155,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         ChatExplorerListItem item = getItem(position);
         MegaChatListItem chat = item.getChat();
 
+        holder.itemLayout.setBackgroundColor(Color.WHITE);
+
         if (item.isHeader()) {
             holder.itemContainer.setVisibility(View.GONE);
             holder.headerLayout.setVisibility(View.VISIBLE);
@@ -182,7 +184,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 holder.initialLetter.setVisibility(View.GONE);
             }
             else{
-                holder.itemLayout.setBackgroundColor(Color.WHITE);
                 createGroupChatAvatar(holder);
             }
             holder.stateIcon.setVisibility(View.GONE);
@@ -219,7 +220,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 holder.initialLetter.setVisibility(View.GONE);
             }
             else{
-                holder.itemLayout.setBackgroundColor(Color.WHITE);
                 setUserAvatar(holder, userHandleEncoded);
             }
             
