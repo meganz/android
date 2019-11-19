@@ -397,6 +397,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (megaChatApi.isSignalActivityRequired()) {
                 megaChatApi.signalPresenceActivity();
             }
+            setCustomisedActionBar();
         } else {
             logDebug("Chat DISABLED");
             if (isOnline(context)) {
@@ -404,6 +405,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             } else {
                 showNoConnectionScreen();
             }
+            resetActionBar(aB);
         }
 
         //Invitation bar
@@ -432,7 +434,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             bannerContainer.setVisibility(View.GONE);
         }
 
-        setCustomisedActionBar();
         return v;
     }
 
@@ -599,6 +600,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 } else {
                     showNoConnectionScreen();
                 }
+                resetActionBar(aB);
             }
         }
     }
@@ -1377,6 +1379,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             logDebug("Chat status --> getOnlineStatus with megaChatApi: " + chatStatus);
 
             onlineStatusUpdate(chatStatus);
+        } else {
+            resetActionBar(aB);
         }
     }
 
@@ -1384,7 +1388,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         logDebug("Status: " + status);
 
         chatStatus = status;
-
+        int initStatus = megaChatApi.getInitState();
         if (isAdded()) {
             if (aB != null) {
                 switch (status) {
@@ -1415,7 +1419,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                             } else if (megaChatApi.getConnectionState() == MegaChatApi.DISCONNECTED) {
                                 setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
                             } else {
-                                setCustomisedActionBarSubtitle(null);
+                                if (initStatus == MegaChatApi.INIT_WAITING_NEW_SESSION || initStatus == MegaChatApi.INIT_NO_CACHE) {
+                                    setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
+                                }
                             }
                         }
                         break;
@@ -1432,7 +1438,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                             } else if (megaChatApi.getConnectionState() == MegaChatApi.DISCONNECTED) {
                                 setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
                             } else {
-                                int initStatus = megaChatApi.getInitState();
                                 if (initStatus == MegaChatApi.INIT_WAITING_NEW_SESSION || initStatus == MegaChatApi.INIT_NO_CACHE) {
                                     setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
                                 }
