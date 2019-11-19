@@ -108,7 +108,10 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
+import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
+import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -979,11 +982,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
         isFileLink = intent.getBooleanExtra("isFileLink",false);
 
         adapterType = intent.getIntExtra("adapterType", 0);
-        if(adapterType == RUBBISH_BIN_ADAPTER
-                || adapterType == INBOX_ADAPTER || adapterType == INCOMING_SHARES_ADAPTER||
-                adapterType == OUTGOING_SHARES_ADAPTER || adapterType == SEARCH_ADAPTER ||
-                adapterType == SEARCH_ADAPTER || adapterType == FILE_BROWSER_ADAPTER ||
-                adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
+        if(adapterType == RUBBISH_BIN_ADAPTER || adapterType == INBOX_ADAPTER ||
+				adapterType == INCOMING_SHARES_ADAPTER|| adapterType == OUTGOING_SHARES_ADAPTER ||
+				adapterType == SEARCH_ADAPTER || adapterType == FILE_BROWSER_ADAPTER ||
+				adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
             positionG -= placeholderCount;
         }
         MegaApplication app = (MegaApplication)getApplication();
@@ -1057,28 +1059,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		if (adapterType == OFFLINE_ADAPTER){
 			//OFFLINE
-			mOffList = new ArrayList<MegaOffline>();
-			String pathNavigation = intent.getStringExtra("pathNavigation");
-			int orderGetChildren = intent.getIntExtra("orderGetChildren", ORDER_DEFAULT_ASC);
-			logDebug("PATHNAVIGATION: " + pathNavigation);
-			mOffList=dbH.findByPath(pathNavigation);
+			mOffList = intent.getParcelableArrayListExtra(ARRAY_OFFLINE);
 			logDebug ("mOffList.size() = " + mOffList.size());
 
 			for(int i=0; i<mOffList.size();i++){
 				MegaOffline checkOffline = mOffList.get(i);
 				File offlineFile = getOfflineFile(this, checkOffline);
 				if(!isFileAvailable(offlineFile)){
-					logDebug("Path to remove B: " + (mOffList.get(i).getPath() + mOffList.get(i).getName()));
 					mOffList.remove(i);
 					i--;
 				}
-			}
-
-			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-				sortByNameDescending();
-			}
-			else{
-				sortByNameAscending();
 			}
 
 			if (mOffList.size() > 0){
@@ -1185,18 +1175,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			fileNameTextView.setText(new File(paths.get(positionG)).getName());
 		}
 		else if(adapterType == SEARCH_ADAPTER){
-
-			ArrayList<MegaNode> nodes = null;
-			if (parentNodeHandle == -1){
-				String query = intent.getStringExtra("searchQuery");
-				nodes = megaApi.search(query,ORDER_DEFAULT_ASC);
-			}
-			else{
-				parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
-				nodes = megaApi.getChildren(parentNode, orderGetChildren);
-			}
-
-			getImageHandles(nodes, savedInstanceState);
+			ArrayList<String> serialized = intent.getStringArrayListExtra(ARRAY_SEARCH);
+			getImageHandles(getSearchedNodes(serialized), savedInstanceState);
 		}else if(adapterType == SEARCH_BY_ADAPTER){
 			handlesNodesSearched = intent.getLongArrayExtra("handlesNodesSearch");
 
@@ -1620,219 +1600,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount );
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-	}
-
-	public void sortByNameDescending(){
-		logDebug("sortByNameDescending");
-
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
-
-
-		for(int k = 0; k < mOffList.size() ; k++) {
-			MegaOffline node = mOffList.get(k);
-			if(node.getType().equals("1")){
-				foldersOrder.add(node.getName());
-			}
-			else{
-				filesOrder.add(node.getName());
-			}
-		}
-
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(foldersOrder);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(filesOrder);
-
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = foldersOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));
-				}
-			}
-
-		}
-
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = filesOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));
-				}
-			}
-
-		}
-
-		mOffList.clear();
-		mOffList.addAll(tempOffline);
-	}
-
-
-	public void sortByNameAscending(){
-		logDebug("sortByNameAscending");
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
-
-		for(int k = 0; k < mOffList.size() ; k++) {
-			MegaOffline node = mOffList.get(k);
-			if(node.getType().equals("1")){
-				foldersOrder.add(node.getName());
-			}
-			else{
-				filesOrder.add(node.getName());
-			}
-		}
-
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = foldersOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));
-				}
-			}
-		}
-
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < mOffList.size() ; j++) {
-				String name = filesOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));
-				}
-			}
-
-		}
-
-		mOffList.clear();
-		mOffList.addAll(tempOffline);
-	}
-
-	public ArrayList<MegaNode> sortByNameAscending(ArrayList<MegaNode> nodes){
-		logDebug("sortByNameAscending");
-
-		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
-		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
-
-		for (int i=0;i<nodes.size();i++){
-			if (nodes.get(i).isFolder()){
-				folderNodes.add(nodes.get(i));
-			}
-			else{
-				fileNodes.add(nodes.get(i));
-			}
-		}
-
-		for (int i=0;i<folderNodes.size();i++){
-			for (int j=0;j<folderNodes.size()-1;j++){
-				if (folderNodes.get(j).getName().compareTo(folderNodes.get(j+1).getName()) > 0){
-					MegaNode nAuxJ = folderNodes.get(j);
-					MegaNode nAuxJ_1 = folderNodes.get(j+1);
-					folderNodes.remove(j+1);
-					folderNodes.remove(j);
-					folderNodes.add(j, nAuxJ_1);
-					folderNodes.add(j+1, nAuxJ);
-				}
-			}
-		}
-
-		for (int i=0;i<fileNodes.size();i++){
-			for (int j=0;j<fileNodes.size()-1;j++){
-				if (fileNodes.get(j).getName().compareTo(fileNodes.get(j+1).getName()) > 0){
-					MegaNode nAuxJ = fileNodes.get(j);
-					MegaNode nAuxJ_1 = fileNodes.get(j+1);
-					fileNodes.remove(j+1);
-					fileNodes.remove(j);
-					fileNodes.add(j, nAuxJ_1);
-					fileNodes.add(j+1, nAuxJ);
-				}
-			}
-		}
-
-		nodes.clear();
-		nodes.addAll(folderNodes);
-		nodes.addAll(fileNodes);
-
-		return nodes;
-	}
-
-	public ArrayList<MegaNode> sortByNameDescending(ArrayList<MegaNode> nodes){
-		logDebug("sortByNameDescending");
-
-		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
-		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
-
-		for (int i=0;i<nodes.size();i++){
-			if (nodes.get(i).isFolder()){
-				folderNodes.add(nodes.get(i));
-			}
-			else{
-				fileNodes.add(nodes.get(i));
-			}
-		}
-
-		for (int i=0;i<folderNodes.size();i++){
-			for (int j=0;j<folderNodes.size()-1;j++){
-				if (folderNodes.get(j).getName().compareTo(folderNodes.get(j+1).getName()) < 0){
-					MegaNode nAuxJ = folderNodes.get(j);
-					MegaNode nAuxJ_1 = folderNodes.get(j+1);
-					folderNodes.remove(j+1);
-					folderNodes.remove(j);
-					folderNodes.add(j, nAuxJ_1);
-					folderNodes.add(j+1, nAuxJ);
-				}
-			}
-		}
-
-		for (int i=0;i<fileNodes.size();i++){
-			for (int j=0;j<fileNodes.size()-1;j++){
-				if (fileNodes.get(j).getName().compareTo(fileNodes.get(j+1).getName()) < 0){
-					MegaNode nAuxJ = fileNodes.get(j);
-					MegaNode nAuxJ_1 = fileNodes.get(j+1);
-					fileNodes.remove(j+1);
-					fileNodes.remove(j);
-					fileNodes.add(j, nAuxJ_1);
-					fileNodes.add(j+1, nAuxJ);
-				}
-			}
-		}
-
-		nodes.clear();
-		nodes.addAll(folderNodes);
-		nodes.addAll(fileNodes);
-
-		return nodes;
-	}
-
-	public ArrayList<MegaNode> sortByMailDescending(ArrayList<MegaNode> nodes){
-		logDebug("sortByMailDescending");
-		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
-		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
-
-		for (int i=0;i<nodes.size();i++){
-			if (nodes.get(i).isFolder()){
-				folderNodes.add(nodes.get(i));
-			}
-			else{
-				fileNodes.add(nodes.get(i));
-			}
-		}
-
-//		Collections.reverse(folderNodes);
-//		Collections.reverse(fileNodes);
-
-		nodes.clear();
-		nodes.addAll(folderNodes);
-		nodes.addAll(fileNodes);
-		return nodes;
 	}
 
 	@Override
@@ -2856,38 +2623,38 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		logDebug("onNodesUpdate");
 
-		boolean thisNode = false;
-		if(nodes==null){
-			return;
-		}
+		if ((adapterType != OFFLINE_ADAPTER) && adapterType != FILE_LINK_ADAPTER && adapterType != ZIP_ADAPTER) {
+			boolean thisNode = false;
+			if(nodes==null){
+				return;
+			}
 
-		Iterator<MegaNode> it = nodes.iterator();
-		while (it.hasNext()){
-			MegaNode n = it.next();
-			if (n != null){
-				if (positionG < imageHandles.size() && n.getHandle() == imageHandles.get(positionG)){
-					thisNode = true;
+
+			Iterator<MegaNode> it = nodes.iterator();
+			while (it.hasNext()){
+				MegaNode n = it.next();
+				if (n != null && positionG < imageHandles.size() && n.getHandle() == imageHandles.get(positionG)){
+						thisNode = true;
 				}
 			}
+
+			if (!thisNode){
+				logWarning("Not related to this node");
+				return;
+			}
+
+			if (positionG < imageHandles.size() && imageHandles.get(positionG) != -1){
+				logDebug("Node updated");
+				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			}
+
+			if (node == null){
+				return;
+			}
+
+			fileNameTextView.setText(node.getName());
+			supportInvalidateOptionsMenu();
 		}
-
-		if (!thisNode){
-			logWarning("Not related to this node");
-			return;
-		}
-
-		if (positionG < imageHandles.size() && imageHandles.get(positionG) != -1){
-			logDebug("Node updated");
-			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-		}
-
-		if (node == null){
-			return;
-		}
-
-		fileNameTextView.setText(node.getName());
-		supportInvalidateOptionsMenu();
-
 	}
 
 	@Override

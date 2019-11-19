@@ -45,8 +45,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatUtil {
 
-    private static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
-
     /*Method to know if i'm participating in any A/V call*/
     public static boolean participatingInACall(MegaChatApiAndroid megaChatApi) {
         logDebug("participatingInACall");

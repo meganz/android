@@ -62,6 +62,8 @@ public class Constants {
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
 
+    public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
+
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
     public static final int MULTIPLE_SEND_RUBBISH = 1;
@@ -161,9 +163,7 @@ public class Constants {
 
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
-    public static final int COLOR_STATUS_BAR_SEARCH = 3;
-    public static final int COLOR_STATUS_BAR_ZERO = 4;
-    public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 5;
+    public static final int COLOR_STATUS_BAR_ZERO = 3;
 
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
@@ -329,6 +329,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
     public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
     public static final String CHAT_FOLDER = "My chat files";
+    public static final String AUTHORITY_STRING_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider";
 
     public static final int RICH_WARNING_TRUE = 1;
     public static final int RICH_WARNING_FALSE = 0;
@@ -347,6 +348,7 @@ public class Constants {
     public static final long BUFFER_COMP = 1073741824;      // 1 GB
     public static final int MAX_BUFFER_16MB = 16777216; // 16 MB
     public static final int MAX_BUFFER_32MB = 33554432; // 32 MB
+    public static final int MAX_AUTOAWAY_TIMEOUT = 1457; //in minute, the max value supported by SDK
 
     public static final String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 
@@ -401,6 +403,7 @@ public class Constants {
     public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
     public static final int EMOJI_AVATAR_CALL_SMALL = 40;
     public static final int EMOJI_AVATAR_CALL_HIGH = 60;
+    public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
 
 
     public static final String[] FILE_LINK_REGEXS = {

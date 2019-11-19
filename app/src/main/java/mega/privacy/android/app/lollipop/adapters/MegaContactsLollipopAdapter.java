@@ -25,12 +25,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -214,8 +212,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderGrid.textViewContactName.setMaxWidth(scaleWidthPx(116, outMetrics));
 			}
 
-			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+			holderGrid.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+			holderGrid.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_CALL_HIGH, outMetrics));
 
 		    holderGrid.itemLayout.setTag(holderGrid);
 		    holderGrid.itemLayout.setOnClickListener(this);
