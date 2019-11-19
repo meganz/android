@@ -6106,7 +6106,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		logDebug("onCreateOptionsMenuLollipop");
-
+		// Force update the toolbar title to make the the tile length to be updated
+		setToolbarTitle();
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_manager, menu);
