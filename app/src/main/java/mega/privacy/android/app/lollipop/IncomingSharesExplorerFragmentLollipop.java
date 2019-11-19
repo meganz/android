@@ -582,7 +582,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
     public void itemClick(View view, int position) {
 		ArrayList<MegaNode> clickNodes;
 
-		if (((FileExplorerActivityLollipop) context).isSearchExpanded() && searchNodes != null) {
+		if (searchNodes != null) {
 			clickNodes = searchNodes;
 			shouldResetNodes = false;
 			((FileExplorerActivityLollipop) context).collapseSearchView();
@@ -594,6 +594,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		MegaNode n = clickNodes.get(position);
 
 		if (n.isFolder()){
+		    searchNodes = null;
+
 			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
 				hideMultipleSelect();
 			}
@@ -922,10 +924,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		showEmptyScreen();
 	}
 
-	public void closeSearch() {
+	public void closeSearch(boolean collapsedByClick) {
 		setProgressView(false);
 		cancelPreviousAsyncTask();
-		searchNodes = null;
+		if (!collapsedByClick) {
+            searchNodes = null;
+        }
 		if (shouldResetNodes) {
 			getNodes();
 			setNodes(nodes);

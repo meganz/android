@@ -241,6 +241,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private String querySearch = "";
 	private boolean isSearchExpanded;
+	private boolean collapsedByClick;
 	private boolean pendingToOpenSearchView;
 	private int pendingToAttach;
 	private int totalAttached;
@@ -924,11 +925,12 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				isSearchExpanded = false;
 				if (isSearchMultiselect()) {
 					if (isCloudVisible()) {
-						cDriveExplorer.closeSearch();
+						cDriveExplorer.closeSearch(collapsedByClick);
 					}
 					else if (isIncomingVisible()) {
-						iSharesExplorer.closeSearch();
+						iSharesExplorer.closeSearch(collapsedByClick);
 					}
+					collapsedByClick = false;
 					supportInvalidateOptionsMenu();
 				}
 				else {
@@ -3350,6 +3352,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		if (searchMenuItem == null) {
 			return;
 		}
+		collapsedByClick = true;
 		searchMenuItem.collapseActionView();
 	}
 
@@ -3441,10 +3444,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			}
 		}
 		return null;
-	}
-
-	public boolean isSearchExpanded () {
-		return isSearchExpanded;
 	}
 
 	public boolean isList () {

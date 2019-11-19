@@ -558,7 +558,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		ArrayList<MegaNode> clickNodes;
 
-		if (((FileExplorerActivityLollipop) context).isSearchExpanded() && searchNodes != null) {
+		if (searchNodes != null) {
 			clickNodes = searchNodes;
 			shouldResetNodes = false;
 			((FileExplorerActivityLollipop) context).collapseSearchView();
@@ -570,6 +570,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		MegaNode n = clickNodes.get(position);
 
 		if (n.isFolder()){
+		    searchNodes = null;
+
 			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
 					hideMultipleSelect();
 			}
@@ -930,10 +932,12 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		showEmptyScreen();
 	}
 
-	public void closeSearch() {
+	public void closeSearch(boolean collapsedByClick) {
 		setProgressView(false);
 		cancelPreviousAsyncTask();
-		searchNodes = null;
+		if (!collapsedByClick) {
+            searchNodes = null;
+        }
 		if (shouldResetNodes) {
 			getNodes();
 			setNodes(nodes);
