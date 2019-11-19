@@ -300,7 +300,6 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        logDebug("onOptionsItemSelected");
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {
@@ -308,7 +307,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
                 break;
             }
             case R.id.action_more: {
-                logDebug("more button clicked - share invitation through other app");
+                logInfo("more button clicked - share invitation through other app");
                 String message = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
