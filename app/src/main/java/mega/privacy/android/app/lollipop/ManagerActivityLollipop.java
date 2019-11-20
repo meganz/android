@@ -132,6 +132,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
@@ -145,8 +146,8 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
-import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -204,12 +205,13 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
 import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
+import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -259,8 +261,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
-	private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
-	private final String INDEX_CLOUD = "INDEX_CLOUD";
+    private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
+    public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
+    private final String INDEX_CLOUD = "INDEX_CLOUD";
 
 	private final int ERROR_TAB = -1;
 	private final int CLOUD_TAB = 0;
@@ -281,6 +284,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private final int HIDDEN_BNV = 5;
 	private final int MEDIA_UPLOADS_BNV = 6;
 
+	private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
+
+	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
+	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
+	private static final String OFFLINE_SEARCH_PATHS = "OFFLINE_SEARCH_PATHS";
+	public static final String OFFLINE_SEARCH_QUERY = "OFFLINE_SEARCH_QUERY:";
 	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
 	public int accountFragment;
@@ -301,6 +310,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	TextView getProText;
 	TextView leftCancelButton;
 	TextView rightUpgradeButton;
+	TextView addPhoneNumberButton;
+	TextView addPhoneNumberLabel;
 	FloatingActionButton fabButton;
 
 	AlertDialog evaluateAppDialog;
@@ -374,20 +385,26 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public boolean openSettingsStorage = false;
     public boolean openSettingsQR = false;
 	boolean newAccount = false;
+	public boolean newCreationAccount;
 
-	private int storageState = -1; //Default value (-1) indicates that is not initialized
+	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 	private boolean isStorageStatusDialogShown = false;
 
 	private boolean userNameChanged;
 	private boolean userEmailChanged;
 
+	private LinearLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
 
     float elevation = 0;
+    private boolean isSMSDialogShowing;
+    private String bonusStorageSMS = "GB";
+    private final static String STATE_KEY_SMS_DIALOG =  "isSMSDialogShowing";
+    private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 
-	public enum FragmentTag {
+    public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
-		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS;
+		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION;
 
 		public String getTag () {
 			switch (this) {
@@ -419,6 +436,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				case TURN_ON_NOTIFICATIONS: return "tonF";
 				case EXPORT_RECOVERY_KEY: return "eRKeyF";
 				case PERMISSIONS: return "pF";
+                case SMS_VERIFICATION: return "svF";
 			}
 			return null;
 		}
@@ -453,6 +471,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public boolean turnOnNotifications = false;
 
+	private int searchSharedTab = -1;
+	private DrawerItem searchDrawerItem = null;
 	static DrawerItem drawerItem = null;
 	DrawerItem drawerItemPreUpgradeAccount = null;
 	int accountFragmentPreUpgradeAccount = -1;
@@ -461,7 +481,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	BottomNavigationViewEx bNV;
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
-	FrameLayout accountInfoFrame;
+    RelativeLayout accountInfoFrame;
 	private EmojiTextView nVDisplayName;
 	TextView nVEmail;
 	RoundedImageView nVPictureProfile;
@@ -506,10 +526,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private Chronometer callInProgressChrono;
 
 	boolean firstTimeAfterInstallation = true;
-//	String pathNavigation = "/";
+	private ArrayList<String> offlineSearchPaths = new ArrayList<>();
 	SearchView searchView;
 	public boolean searchExpand = false;
-	public String searchQuery = "";
+	private String searchQuery = "";
 	public boolean textSubmitted = false;
 	public boolean textsearchQuery = false;
 	boolean isSearching = false;
@@ -552,14 +572,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public boolean isList = true;
 
-	public long parentHandleBrowser;
-	public long parentHandleRubbish;
-	public long parentHandleIncoming;
-	public boolean isSearchEnabled;
-	public long parentHandleOutgoing;
-	public long parentHandleSearch;
-	public long parentHandleInbox;
-	public String pathNavigationOffline;
+	private long parentHandleBrowser;
+	private long parentHandleRubbish;
+	private long parentHandleIncoming;
+	private boolean isSearchEnabled;
+	private long parentHandleOutgoing;
+	private long parentHandleSearch;
+	private long parentHandleInbox;
+	private String pathNavigationOffline;
 	private int deepBrowserTreeRecents = 0;
 	private BucketSaved bucketSaved;
 	public int deepBrowserTreeIncoming = 0;
@@ -599,6 +619,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private TurnOnNotificationsFragment tonF;
 	private ExportRecoveryKeyFragment eRKeyF;
 	private PermissionsFragment pF;
+	private SMSVerificationFragment svF;
 
 	ProgressDialog statusDialog;
 
@@ -619,6 +640,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private AlertDialog setPinDialog;
 	private AlertDialog alertDialogTransferOverquota;
 	private AlertDialog alertDialogStorageStatus;
+	private AlertDialog alertDialogSMSVerification;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -705,7 +727,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private long idJoinToChatLink = -1;
 
 	private boolean onAskingPermissionsFragment = false;
+	public boolean onAskingSMSVerificationFragment = false;
 
+	private BroadcastReceiver refreshAddPhoneNumberButtonReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context,Intent intent) {
+            if (intent != null && intent.getAction() == BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER) {
+                if(drawerLayout != null) {
+                    drawerLayout.closeDrawer(Gravity.LEFT);
+                }
+                refreshAddPhoneNumberButton();
+            }
+        }
+    };
 	private EditText openLinkText;
 	private RelativeLayout openLinkError;
 	private TextView openLinkErrorText;
@@ -718,11 +752,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null){
 				if (intent.getAction() == ACTION_STORAGE_STATE_CHANGED) {
-					int newStorageState =
-							intent.getIntExtra("state", MegaApiJava.STORAGE_STATE_GREEN);
-					checkStorageStatus(newStorageState, false);
-					updateAccountDetailsVisibleInfo();
-					return;
+                    int newStorageState =
+                            intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
+                    checkStorageStatus(newStorageState, false);
+                    updateAccountDetailsVisibleInfo();
+                    return;
 				}
 
 				int actionType = intent.getIntExtra("actionType", -1);
@@ -1797,10 +1831,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
+		outState.putSerializable(SEARCH_DRAWER_ITEM, searchDrawerItem);
+		outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
 		outState.putBoolean("firstLogin", firstLogin);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
+		outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing);
+		outState.putString(STATE_KEY_SMS_BONUS, bonusStorageSMS);
 
 		if(parentHandleIncoming!=-1){
 			outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
@@ -1848,6 +1886,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		outState.putBoolean(MK_LAYOUT_VISIBLE, mkLayoutVisible);
 
+		outState.putStringArrayList(OFFLINE_SEARCH_PATHS, offlineSearchPaths);
 		if(searchQuery!=null){
 			outState.putInt("levelsSearch", levelsSearch);
 			outState.putString("searchQuery", searchQuery);
@@ -1878,6 +1917,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (onAskingPermissionsFragment && pF != null) {
 			getSupportFragmentManager().putFragment(outState, FragmentTag.PERMISSIONS.getTag(), pF);
 		}
+        outState.putBoolean("onAskingSMSVerificationFragment", onAskingSMSVerificationFragment);
+        svF = (SMSVerificationFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.SMS_VERIFICATION.getTag());
+        if (onAskingSMSVerificationFragment && svF != null) {
+            getSupportFragmentManager().putFragment(outState, FragmentTag.SMS_VERIFICATION.getTag(), svF);
+        }
 		outState.putFloat("elevation", abL.getElevation());
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
@@ -1934,11 +1978,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
+			isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
+			bonusStorageSMS = savedInstanceState.getString(STATE_KEY_SMS_BONUS);
 			searchDate = savedInstanceState.getLongArray("searchDate");
 			firstLogin = savedInstanceState.getBoolean("firstLogin");
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
+			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
+			searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
 			indexCloud = savedInstanceState.getInt(INDEX_CLOUD, indexCloud);
-			logDebug("savedInstanceState -> indexCloud: "+indexCloud);
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
 			logDebug("savedInstanceState -> indexShares: " + indexShares);
 			indexContacts = savedInstanceState.getInt("indexContacts", 0);
@@ -1948,6 +1995,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			mkLayoutVisible = savedInstanceState.getBoolean(MK_LAYOUT_VISIBLE, false);
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
+			offlineSearchPaths = savedInstanceState.getStringArrayList(OFFLINE_SEARCH_PATHS);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
@@ -1967,8 +2015,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (onAskingPermissionsFragment) {
 				pF = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
 			}
+            onAskingSMSVerificationFragment = savedInstanceState.getBoolean("onAskingSMSVerificationFragment", false);
+            if (onAskingSMSVerificationFragment) {
+                svF = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
+            }
 			elevation = savedInstanceState.getFloat("elevation", 0);
-			storageState = savedInstanceState.getInt("storageState", -1);
+			storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 			drawerItemPreUpgradeAccount = (DrawerItem) savedInstanceState.getSerializable("drawerItemPreUpgradeAccount");
 			accountFragmentPreUpgradeAccount = savedInstanceState.getInt("accountFragmentPreUpgradeAccount", -1);
@@ -2008,10 +2060,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			localBroadcastManager.registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
 
             localBroadcastManager.registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
+
+            localBroadcastManager.registerReceiver(refreshAddPhoneNumberButtonReceiver,
+                    new IntentFilter(BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER));
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
-
+        smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
 		cC = new ContactController(this);
 		aC = new AccountController(this);
@@ -2204,7 +2259,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			@Override
 			public void onDrawerOpened(@NonNull View drawerView) {
-				refreshDrawerInfo(true);
+				refreshDrawerInfo(storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN);
 			}
 
 			@Override
@@ -2233,6 +2288,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				setContactStatus();
 
 				if (!refreshStorageInfo) return;
+                showAddPhoneNumberInMenu();
 				refreshAccountInfo();
 			}
 		});
@@ -2261,6 +2317,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_grey_button));
 		}
         upgradeAccount.setOnClickListener(this);
+
+        navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
+
+        addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
+        addPhoneNumberButton.setOnClickListener(this);
+
+        addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
+        megaApi.getAccountAchievements(this);
 
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
@@ -2351,7 +2415,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
 
-		accountInfoFrame = (FrameLayout) findViewById(R.id.navigation_drawer_account_view);
+		accountInfoFrame = findViewById(R.id.navigation_drawer_account_view);
         accountInfoFrame.setOnClickListener(this);
 
         nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
@@ -3069,6 +3133,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
+					newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
 
                     //reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra("newAccount");
@@ -3122,8 +3187,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        		}
 	        		else{
 						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
-						if (firstLogin){
-							logDebug("Intent firstLogin==true");
+                        if (firstLogin){
+							logDebug("intent firstLogin==true");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
 						}
@@ -3136,12 +3201,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        	if (intentRec != null){
 					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
-
+                    newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
 					//reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra("newAccount");
                     getIntent().removeExtra("upgradeAccount");
 					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
-					if(upgradeAccount){
+                    if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
 
@@ -3236,9 +3301,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		setContactStatus();
 
-		if (firstTimeAfterInstallation) {
-			askForAccess();
-		}
+        if (firstTimeAfterInstallation) {
+            //haven't verified phone number
+            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
+                askForSMSVerification();
+            } else {
+                askForAccess();
+            }
+        } else if (firstLogin && !newCreationAccount) {
+            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+                askForSMSVerification();
+            }
+        }
 
 		if (openLinkDialogIsShown) {
 			showOpenLinkDialog();
@@ -3271,7 +3345,37 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	void askForAccess () {
+	private void askForSMSVerification() {
+        //If mobile device, only portrait mode is allowed
+        if (!isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            logDebug("mobile only portrait mode");
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        smsDialogTimeChecker.update();
+        onAskingSMSVerificationFragment = true;
+        if (svF == null) {
+            svF = new SMSVerificationFragment();
+        }
+        replaceFragment(svF, FragmentTag.SMS_VERIFICATION.getTag());
+        tabLayoutContacts.setVisibility(View.GONE);
+        viewPagerContacts.setVisibility(View.GONE);
+        tabLayoutShares.setVisibility(View.GONE);
+        viewPagerShares.setVisibility(View.GONE);
+        tabLayoutMyAccount.setVisibility(View.GONE);
+        viewPagerMyAccount.setVisibility(View.GONE);
+        tabLayoutTransfers.setVisibility(View.GONE);
+        viewPagerTransfers.setVisibility(View.GONE);
+        abL.setVisibility(View.GONE);
+
+        fragmentContainer.setVisibility(View.VISIBLE);
+        drawerLayout.closeDrawer(Gravity.LEFT);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        supportInvalidateOptionsMenu();
+        hideFabButton();
+        showHideBottomNavigationView(true);
+    }
+
+	public void askForAccess () {
     	//If mobile device, only portrait mode is allowed
 		if (!isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			logDebug("Mobile only portrait mode");
@@ -3303,6 +3407,29 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			showHideBottomNavigationView(true);
 		}
 	}
+
+	public void destroySMSVerificationFragment() {
+        //In mobile, allow all orientation after permission screen
+        if (!isTablet(this)) {
+            logDebug("mobile, all orientation");
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        }
+        onAskingSMSVerificationFragment = false;
+        svF = null;
+        if(!firstTimeAfterInstallation) {
+            tB.setVisibility(View.VISIBLE);
+            abL.setVisibility(View.VISIBLE);
+
+            deleteCurrentFragment();
+
+
+            changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
+
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            supportInvalidateOptionsMenu();
+            selectDrawerItemLollipop(drawerItem);
+        }
+    }
 
 	public void destroyPermissionsFragment () {
 		//In mobile, allow all orientation after permission screen
@@ -3404,6 +3531,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
         checkScrollElevation();
+
+		if (drawerItem == DrawerItem.ACCOUNT ) {
+			app.refreshAccountInfo();
+		}
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -3950,14 +4081,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-//    public void updateCallIcon(MegaChatListItem item){
-//        log("updateCallIcon");
-//        rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-//        if (rChatFL != null) {
-//            rChatFL.refreshNode(item);
-//        }
-//    }
-
 	public void setProfileAvatar(){
 		logDebug("setProfileAvatar");
 		File avatar = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg");
@@ -4422,7 +4545,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			megaChatApi.removeChatCallListener(this);
 
 		}
-
+        if (alertDialogSMSVerification != null) {
+            alertDialogSMSVerification.dismiss();
+        }
 		isStorageStatusDialogShown = false;
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
@@ -4431,9 +4556,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateOrder);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateView);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
+		cancelSearch();
+
     	super.onDestroy();
+	}
+
+	private void cancelSearch() {
+		sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
+		if (sFLol != null) {
+			sFLol.cancelPreviousAsyncTask();
+		}
 	}
 
 	void replaceFragment (Fragment f, String fTag) {
@@ -4461,14 +4596,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				((OutgoingSharesFragmentLollipop) f).headerItemDecoration = null;
 			}
 			else if (fTag.equals(FragmentTag.OFFLINE.getTag())) {
-				((OfflineFragmentLollipop) f).headerItemDecoration = null;
+				((OfflineFragmentLollipop) f).setHeaderItemDecoration(null);
 				((OfflineFragmentLollipop) f).setPathNavigation(pathNavigationOffline);
 			}
 			else if (fTag.equals(FragmentTag.INBOX.getTag())) {
 				((InboxFragmentLollipop) f).headerItemDecoration = null;
 			}
 			else if (fTag.equals(FragmentTag.SEARCH.getTag())) {
-				((SearchFragmentLollipop) f).headerItemDecoration = null;
+				((SearchFragmentLollipop) f).setHeaderItemDecoration(null);
 			}
 
 			ft.attach(f);
@@ -4478,6 +4613,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logWarning("Fragment == NULL. Not refresh");
 		}
 	}
+
+	public boolean isFirstLogin() {
+        return firstLogin;
+    }
 
 	public void selectDrawerItemCloudDrive(){
 		logDebug("selectDrawerItemCloudDrive");
@@ -4531,7 +4670,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			firstTimeAfterInstallation = false;
             dbH.setFirstTime(false);
 		}
-	}
+        checkBeforeShow();
+    }
+
+    public void checkBeforeShow() {
+        //This account hasn't verified a phone number and first login.
+        if (canVoluntaryVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing) && !newCreationAccount) {
+            showSMSVerificationDialog();
+        }
+    }
 
 	public void setToolbarTitle(){
 		logDebug("setToolbarTitle");
@@ -4659,8 +4806,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case SAVED_FOR_OFFLINE: {
 				aB.setSubtitle(null);
 
-				if(pathNavigationOffline!=null){
-
+				oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+				if (oFLol != null && oFLol.getSearchString() != null) {
+					String title = getString(R.string.action_search).toUpperCase() + ": " + oFLol.getSearchString();
+					aB.setTitle(title);
+					firstNavigationLevel = false;
+				} else if(pathNavigationOffline != null){
 					logDebug("AFTER PathNavigation is: " + pathNavigationOffline);
 					if (pathNavigationOffline.equals("/")){
 						aB.setTitle(getString(R.string.section_saved_for_offline_new).toUpperCase());
@@ -4728,6 +4879,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(parentHandleSearch==-1){
 					firstNavigationLevel = true;
 					if(searchQuery!=null){
+						textSubmitted = true;
 						if(!searchQuery.isEmpty()){
 							aB.setTitle(getString(R.string.action_search).toUpperCase()+": "+searchQuery);
 						}else{
@@ -4885,7 +5037,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 //					if (rChatFL != null) {
 //						if (rChatFL.isAdded()) {
-//							log("ONLINE: Update screen RecentChats");
+//							logDebug("ONLINE: Update screen RecentChats");
 //							if (!isChatEnabled()) {
 //								rChatFL.showDisableChatScreen();
 //							}
@@ -5290,6 +5442,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 			default:{
+				app.refreshAccountInfo();
 				accountFragment=MY_ACCOUNT_FRAGMENT;
 
 				if (mTabsAdapterMyAccount == null){
@@ -5601,12 +5754,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     			if (oFLol == null){
 					logWarning("New OfflineFragment");
     				oFLol = new OfflineFragmentLollipop();
-//    				oFLol.setPathNavigation("/");
-    			}
-    			else{
-					logDebug("OfflineFragment exist");
-//    				oFLol.setPathNavigation("/");
-					oFLol.findNodes();
     			}
 
 				replaceFragment(oFLol, FragmentTag.OFFLINE.getTag());
@@ -6133,20 +6280,34 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		showFabButton();
 	}
 
+	private void closeSearchSection() {
+    	searchQuery = "";
+		drawerItem = searchDrawerItem;
+		selectDrawerItemLollipop(drawerItem);
+		searchDrawerItem = null;
+	}
+
+	private void offlineSearch() {
+		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+		if (oFLol != null) {
+			oFLol.filterOffline(searchQuery);
+		}
+	}
+
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		logDebug("onCreateOptionsMenuLollipop");
-
+		// Force update the toolbar title to make the the tile length to be updated
+		setToolbarTitle();
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_manager, menu);
-//	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 
 		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
 		searchMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
 
-		searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+		searchView = (SearchView) searchMenuItem.getActionView();
 
 		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
 		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
@@ -6159,17 +6320,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			searchView.setIconifiedByDefault(true);
 		}
 
-		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+		searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
+				logDebug("onMenuItemActionExpand");
 				searchQuery = "";
 				searchExpand = true;
-				if (drawerItem != DrawerItem.CHAT) {
+				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					if (!isOfflineSearchPathEmpty()) {
+						offlineSearchPaths.clear();
+					}
+					offlineSearch();
+				} else if (drawerItem != DrawerItem.CHAT) {
 					textsearchQuery = false;
 					firstNavigationLevel = true;
 					parentHandleSearch = -1;
 					levelsSearch = -1;
-					drawerItem = DrawerItem.SEARCH;
+					setSearchDrawerItem();
 					selectDrawerItemLollipop(drawerItem);
 				}
 				return true;
@@ -6179,60 +6346,88 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			public boolean onMenuItemActionCollapse(MenuItem item) {
 				logDebug("onMenuItemActionCollapse()");
 				searchExpand = false;
-				if (drawerItem != DrawerItem.CHAT) {
-					backToDrawerItem(bottomNavigationCurrentItem);
-					textSubmitted = true;
-					changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
-				}
-				else {
+				if (drawerItem == DrawerItem.CHAT) {
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if (rChatFL != null) {
 						rChatFL.closeSearch();
 						supportInvalidateOptionsMenu();
 					}
+				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+					if (oFLol != null) {
+						oFLol.closeSearch();
+						supportInvalidateOptionsMenu();
+					}
+				} else {
+					cancelSearch();
+					textSubmitted = true;
+					closeSearchSection();
 				}
 				return true;
 			}
 		});
+
 		searchView.setMaxWidth(Integer.MAX_VALUE);
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				logDebug("onQueryTextSubmit: " + query);
-				if (drawerItem != DrawerItem.CHAT) {
+				logDebug("onQueryTextSubmit: "+query);
+				if (drawerItem == DrawerItem.CHAT) {
+					hideKeyboard(managerActivity, 0);
+				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					searchExpand = false;
+					textSubmitted = true;
+					hideKeyboard(managerActivity, 0);
+					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+					if (oFLol != null) {
+						addOfflineSearchPath(oFLol.getPathNavigation());
+						addOfflineSearchPath(OFFLINE_SEARCH_QUERY + searchQuery);
+						setToolbarTitle();
+						supportInvalidateOptionsMenu();
+					}
+				} else {
+					searchExpand = false;
 					searchQuery = "" + query;
 					setToolbarTitle();
-					supportInvalidateOptionsMenu();
 					logDebug("Search query: " + query);
 					textSubmitted = true;
-					searchExpand = false;
-				}
-				else {
-					hideKeyboard(managerActivity, 0);
+					showFabButton();
+					supportInvalidateOptionsMenu();
 				}
 				return true;
 			}
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				if (drawerItem != DrawerItem.CHAT) {
-					if (textSubmitted) {
-						sFLol.setAllowedMultiselect(true);
-						textSubmitted = false;
-					}
-					else {
-						if (!textsearchQuery) {
-							searchQuery = newText;
-						}
-						refreshFragment(FragmentTag.SEARCH.getTag());
-
-					}
-				}
-				else {
+				logDebug("onQueryTextChange");
+				if (drawerItem == DrawerItem.CHAT) {
 					searchQuery = newText;
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if (rChatFL != null) {
 						rChatFL.filterChats(newText);
+					}
+				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+					if (textSubmitted) {
+						textSubmitted = false;
+						return true;
+					}
+
+					searchQuery = newText;
+					offlineSearch();
+				} else {
+					sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
+					if (textSubmitted) {
+						if (sFLol != null) {
+							sFLol.setAllowedMultiselect(true);
+						}
+						textSubmitted = false;
+					} else {
+						if (!textsearchQuery) {
+							searchQuery = newText;
+						}
+						if (sFLol != null) {
+							sFLol.newSearchNodesTask();
+						}
 					}
 				}
 				return true;
@@ -6419,7 +6614,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 
 				clearRubbishBinMenuitem.setVisible(true);
-				searchMenuItem.setVisible(true);
 
 				//Hide
 				searchByDate.setVisible(false);
@@ -6446,11 +6640,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					sortByMenuItem.setVisible(true);
 					selectMenuItem.setVisible(true);
 					clearRubbishBinMenuitem.setVisible(true);
+					searchMenuItem.setVisible(true);
 				}
 				else{
 					sortByMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
+					searchMenuItem.setVisible(false);
 				}
 
 				rubbishBinMenuItem.setVisible(false);
@@ -6460,23 +6656,43 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 				logDebug("In Offline");
-				//Show
-				if(!firstLogin){
-					thumbViewMenuItem.setVisible(true);
-				}else{
-					thumbViewMenuItem.setVisible(false);
-				}
 
-				oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-				if(oFLol != null && oFLol.getItemCount()>0){
-					sortByMenuItem.setVisible(true);
-					selectMenuItem.setVisible(true);
-				}
-				else{
+				if (searchExpand) {
+					openSearchView();
+					thumbViewMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
+				} else {
+					//Show
+					if(!firstLogin){
+						thumbViewMenuItem.setVisible(true);
+					}else{
+						thumbViewMenuItem.setVisible(false);
+					}
+
+					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+					if(oFLol != null && oFLol.getItemCount()>0){
+						sortByMenuItem.setVisible(true);
+						selectMenuItem.setVisible(true);
+					}
+					else{
+						sortByMenuItem.setVisible(false);
+						selectMenuItem.setVisible(false);
+					}
+
+					ArrayList<MegaOffline> offlineFiles;
+					if (!isOfflineSearchPathEmpty()) {
+						offlineFiles = dbH.findByPath(getInitialSearchPath());
+					} else {
+						offlineFiles = dbH.findByPath(pathNavigationOffline);
+					}
+
+					if (offlineFiles == null || offlineFiles.isEmpty()) {
+						searchMenuItem.setVisible(false);
+					} else {
+						searchMenuItem.setVisible(true);
+					}
 				}
-				searchMenuItem.setVisible(true);
 
 				//Hide
 				searchByDate.setVisible(false);
@@ -6530,11 +6746,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				addMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				unSelectMenuItem.setVisible(false);
+				searchMenuItem.setVisible(false);
 				if(!firstLogin){
-					searchMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 				}else{
-					searchMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
 				}
 				changePass.setVisible(false);
@@ -6624,7 +6839,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				helpMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
-				searchMenuItem.setVisible(true);
+
+				searchMenuItem.setVisible(false);
 				if (isListCameraUploads){
 					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
@@ -6672,15 +6888,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(iFLol != null && iFLol.getItemCount()>0){
 					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
+					searchMenuItem.setVisible(true);
 				}
 				else{
 					selectMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
+					searchMenuItem.setVisible(false);
 				}
 
 				setGridListIcon();
 
-				searchMenuItem.setVisible(true);
 				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
@@ -6843,8 +7060,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				int index = getTabItemContacts();
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
+				searchMenuItem.setVisible(false);
+
 				if (index == CONTACTS_TAB){
-					logDebug("createOptions TAB CONTACTS");
 					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 
 					//Show
@@ -6854,7 +7072,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}else{
 						thumbViewMenuItem.setVisible(false);
 					}					upgradeAccountMenuItem.setVisible(true);
-					searchMenuItem.setVisible(false);
 					scanQRcodeMenuItem.setVisible(true);
 
 					if (cFLol != null&& cFLol.getItemCount()>0) {
@@ -6914,7 +7131,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					searchByDate.setVisible(false);
 					sortByMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
-					searchMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					createFolderMenuItem.setVisible(false);
@@ -6951,7 +7167,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 					//Hide
 					searchByDate.setVisible(false);
-					searchMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
@@ -7203,6 +7418,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						newChatMenuItem.setVisible(false);
 						selectMenuItem.setVisible(false);
 						setStatusMenuItem.setVisible(false);
+						importLinkMenuItem.setVisible(false);
 					}
 					else {
 						if (isOnline(this)) {
@@ -7218,6 +7434,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							selectMenuItem.setVisible(false);
 							setStatusMenuItem.setVisible(false);
 						}
+						importLinkMenuItem.setVisible(true);
 					}
 
 					ArrayList<MegaChatListItem> chats = null;
@@ -7232,7 +7449,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 
 					importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
-					importLinkMenuItem.setVisible(true);
+
 					//Hide
 					searchByDate.setVisible(false);
 					createFolderMenuItem.setVisible(false);
@@ -8394,7 +8611,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		if (onAskingPermissionsFragment) {
+		if (onAskingPermissionsFragment || onAskingSMSVerificationFragment) {
 			return;
 		}
 
@@ -8610,8 +8827,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		else if (drawerItem == DrawerItem.SEARCH){
 			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
     		if (sFLol != null && sFLol.onBackPressed() == 0){
-				backToDrawerItem(bottomNavigationCurrentItem);
-				changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
+    			closeSearchSection();
 				return;
     		}
     	}
@@ -10064,13 +10280,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         	newFile.createNewFile();
         } catch (IOException e) {}
 
-		Uri outputFileUri;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
-		}
-		else{
-			outputFileUri = Uri.fromFile(newFile);
-		}
+        //This method is in the v4 support library, so can be applied to all devices
+		Uri outputFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, newFile);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
@@ -10661,7 +10872,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         View v = inflater.inflate(R.layout.dialog_autoaway, null);
         builder.setView(v);
 
-        final RelativeLayout error = (RelativeLayout) v.findViewById(R.id.autoaway_error);
         final EditText input = v.findViewById(R.id.autoaway_edittext);
         input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -10671,9 +10881,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (error.getVisibility() == View.VISIBLE) {
-                    error.setVisibility(View.GONE);
-                }
+
             }
 
             @Override
@@ -10685,14 +10893,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (validAutoaway(value)) {
+					String value = validateAutoAway(v.getText());
+					if (value != null) {
 						setAutoAwayValue(value, false);
-						newFolderDialog.dismiss();
 					}
-					else {
-						error.setVisibility(View.VISIBLE);
-					}
+					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
@@ -10711,16 +10916,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
 		set.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
-                String value = input.getText().toString().trim();
-                if (validAutoaway(value)) {
-                    setAutoAwayValue(value, false);
-					newFolderDialog.dismiss();
-                }
-                else {
-                    error.setVisibility(View.VISIBLE);
-                }
-            }
+			public void onClick(View v) {
+				String value = validateAutoAway(input.getText());
+				if (value != null) {
+					setAutoAwayValue(value, false);
+				}
+				newFolderDialog.dismiss();
+			}
         });
 		Button cancel = (Button) v.findViewById(R.id.autoaway_cancel_button);
 	    cancel.setOnClickListener(new OnClickListener() {
@@ -10735,12 +10937,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		newFolderDialog.show();
 	}
 
-	boolean validAutoaway(String value) {
-		if (Integer.parseInt(value) > 0) {
-			return true;
+	private String validateAutoAway(CharSequence value) {
+		int timeout;
+		try {
+			timeout = Integer.parseInt(value.toString().trim());
+			if (timeout <= 0) {
+				timeout = 1;
+			} else if (timeout > MAX_AUTOAWAY_TIMEOUT) {
+				timeout = MAX_AUTOAWAY_TIMEOUT;
+			}
+			return String.valueOf(timeout);
+		} catch (Exception e) {
+			logWarning("Unable to parse user input, user entered: '" + value + "'");
+			return null;
 		}
-	    return false;
-    }
+	}
 
 	public void setAutoAwayValue(String value, boolean cancelled){
 		logDebug("Value: " + value);
@@ -10758,6 +10969,81 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	public long getParentHandleBrowser() {
+		if (parentHandleBrowser == -1) {
+			return megaApi.getRootNode().getHandle();
+		}
+
+		return parentHandleBrowser;
+	}
+
+	private long getCurrentParentHandle() {
+		long parentHandle = -1;
+
+		switch (drawerItem) {
+			case CLOUD_DRIVE:
+				parentHandle = getParentHandleBrowser();
+				break;
+
+			case SHARED_ITEMS:
+				if (viewPagerShares == null) break;
+
+				if (viewPagerShares.getCurrentItem() == 0) {
+					parentHandle = parentHandleIncoming;
+				} else if (viewPagerShares.getCurrentItem() == 1) {
+					parentHandle = parentHandleOutgoing;
+				}
+				break;
+
+			case SEARCH:
+				if (parentHandleSearch != -1) {
+					parentHandle = parentHandleSearch;
+					break;
+				}
+				switch (searchDrawerItem) {
+					case CLOUD_DRIVE:
+						parentHandle = getParentHandleBrowser();
+						break;
+					case SHARED_ITEMS:
+						if (searchSharedTab == 0) {
+							parentHandle = parentHandleIncoming;
+						} else if (searchSharedTab == 1) {
+							parentHandle = parentHandleOutgoing;
+						}
+						break;
+				}
+				break;
+
+			default:
+				return parentHandle;
+		}
+
+		return parentHandle;
+	}
+
+	private MegaNode getCurrentParentNode(long parentHandle, int error) {
+		String errorString = null;
+
+		if (error != -1) {
+			errorString = getString(error);
+		}
+
+		if (parentHandle == -1 && errorString != null) {
+			showSnackbar(SNACKBAR_TYPE, errorString, -1);
+			logDebug(errorString + ": parentHandle == -1");
+			return null;
+		}
+
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+
+		if (parentNode == null && errorString != null){
+			showSnackbar(SNACKBAR_TYPE, errorString, -1);
+			logDebug(errorString + ": parentNode == null");
+			return null;
+		}
+
+		return parentNode;
+	}
 
 	private void createFolder(String title) {
 		logDebug("createFolder");
@@ -10770,62 +11056,31 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		long parentHandle=-1;
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			parentHandle = parentHandleBrowser;
-			if(parentHandle==-1){
-				parentHandle= megaApi.getRootNode().getHandle();
-			}
-		}
-		else if(drawerItem == DrawerItem.SHARED_ITEMS){
-			int index = viewPagerShares.getCurrentItem();
-			if (index == 0){
-				parentHandle = parentHandleIncoming;
-			}
-			else{
-				parentHandle = parentHandleOutgoing;
+		MegaNode parentNode = getCurrentParentNode(getCurrentParentHandle(), R.string.context_folder_no_created);
+		if (parentNode == null) return;
 
+		ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
+		for (int i = 0; i < nL.size(); i++) {
+			if (title.compareTo(nL.get(i).getName()) == 0) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_already_exists), -1);
+				logDebug("Folder not created: folder already exists");
+				return;
 			}
 		}
-		else{
+
+		statusDialog = null;
+		try {
+			statusDialog = new ProgressDialog(this);
+			statusDialog.setMessage(getString(R.string.context_creating_folder));
+			statusDialog.show();
+		}
+		catch(Exception e){
+			logDebug("Exception showing 'Creating folder' dialog");
+			e.printStackTrace();
 			return;
 		}
 
-		if(parentHandle!=-1){
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-
-			if (parentNode == null){
-				parentNode = megaApi.getRootNode();
-			}
-
-			boolean exists = false;
-			ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
-			for (int i=0;i<nL.size();i++){
-				if (title.compareTo(nL.get(i).getName()) == 0){
-					exists = true;
-				}
-			}
-
-			if (!exists){
-				statusDialog = null;
-				try {
-					statusDialog = new ProgressDialog(this);
-					statusDialog.setMessage(getString(R.string.context_creating_folder));
-					statusDialog.show();
-				}
-				catch(Exception e){
-					return;
-				}
-
-				megaApi.createFolder(title, parentNode, this);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_already_exists), -1);
-			}
-		}
-		else{
-			logWarning("Incorrect parentHandle");
-		}
+		megaApi.createFolder(title, parentNode, this);
 	}
 
 	public void showClearRubbishBinDialog(){
@@ -11754,12 +12009,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 		if (oFLol != null){
 			oFLol.setOrder(orderOthers);
-			if (orderOthers == MegaApiJava.ORDER_DEFAULT_ASC){
-				oFLol.sortByNameAscending();
-			}
-			else{
-				oFLol.sortByNameDescending();
-			}
 		}
 	}
 
@@ -11987,6 +12236,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("onClick");
 
 		switch(v.getId()){
+			case R.id.navigation_drawer_add_phone_number_button:{
+                Intent intent = new Intent(this,SMSVerificationActivity.class) ;
+                startActivity(intent);
+				break;
+			}
 			case R.id.btnLeft_cancel:{
 				getProLayout.setVisibility(View.GONE);
 				break;
@@ -13552,11 +13806,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
 	 */
 	private void checkCurrentStorageStatus(boolean onCreate) {
-		// If the current storage state is not initialized (-1) is because the app received the
+		// If the current storage state is not initialized is because the app received the
 		// event informing about the storage state  during login, the ManagerActivityLollipop
 		// wasn't active and for this reason the value is stored in the MegaApplication object.
-		int storageStateToCheck = (storageState != -1) ? storageState :
-				((MegaApplication)getApplication()).getStorageState();
+		int storageStateToCheck = (storageState != MegaApiJava.STORAGE_STATE_UNKNOWN) ?
+				storageState : app.getStorageState();
 
 		checkStorageStatus(storageStateToCheck, onCreate);
 	}
@@ -13568,7 +13822,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 */
 	private void checkStorageStatus(int newStorageState, boolean onCreate) {
         Intent intent = new Intent(this,UploadService.class);
-        MegaApplication app = (MegaApplication)getApplication();
         switch (newStorageState) {
             case MegaApiJava.STORAGE_STATE_GREEN:
 				logDebug("STORAGE STATE GREEN");
@@ -13584,7 +13837,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					e.printStackTrace();
 				}
 
-				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
+				int accountType = app.getMyAccountInfo().getAccountType();
 				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
 					logDebug("ACCOUNT TYPE FREE");
 					if(showMessageRandom()){
@@ -13664,6 +13917,54 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				preWarning ? MegaApiJava.STORAGE_STATE_ORANGE : MegaApiJava.STORAGE_STATE_RED,
 				true, preWarning);
 	}
+
+	public void showSMSVerificationDialog() {
+	    isSMSDialogShowing = true;
+        smsDialogTimeChecker.update();
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
+        dialogBuilder.setView(dialogView);
+
+        TextView msg = dialogView.findViewById(R.id.sv_dialog_msg);
+        boolean isAchievementUser = megaApi.isAchievementsEnabled();
+        logDebug("is achievement user: " + isAchievementUser);
+        if (isAchievementUser) {
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+            msg.setText(message);
+        } else {
+            msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
+        }
+
+        dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                alertDialogSMSVerification.dismiss();
+            }
+        });
+        dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),SMSVerificationActivity.class));
+                alertDialogSMSVerification.dismiss();
+            }
+        });
+        if(alertDialogSMSVerification == null) {
+            alertDialogSMSVerification = dialogBuilder.create();
+            alertDialogSMSVerification.setCancelable(false);
+            alertDialogSMSVerification.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    isSMSDialogShowing = false;
+                }
+            });
+            alertDialogSMSVerification.setCanceledOnTouchOutside(false);
+        }
+        alertDialogSMSVerification.show();
+    }
 
 	/**
 	 * Method to show a dialog to indicate the storage status.
@@ -13958,6 +14259,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		dissmisDialog();
 		long parentHandle = -1;
 		MegaNode parentNode = null;
+
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			if (getTabItemCloud() == CLOUD_TAB) {
 				parentHandle = parentHandleBrowser;
@@ -14396,7 +14698,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else if (e.getErrorCode() != MegaError.API_ESID){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 			}
-		}
+		} else if(request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                bonusStorageSMS = getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE));
+            }
+            showAddPhoneNumberInMenu();
+            checkBeforeShow();
+        }
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
 			logDebug("TYPE_SET_ATTR_USER");
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
@@ -14773,6 +15081,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("The change link has been sent");
+
 				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
@@ -14781,6 +15090,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			else if(e.getErrorCode() == MegaError.API_EACCESS){
 				logWarning("The new mail already exists");
+
 				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
@@ -14802,6 +15112,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			else{
 				logError("Error when asking for change mail link: " + e.getErrorString() + "___" + e.getErrorCode());
+
 				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
@@ -14864,6 +15175,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Cancelation link received!");
+
 				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
@@ -14877,6 +15189,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			else{
 				logError("Error when asking for the cancelation link: " + e.getErrorString() + "___" + e.getErrorCode());
+
 				hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()){
 					verify2FADialog.dismiss();
@@ -15252,9 +15565,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
 					}
-				}
-				else if (drawerItem == DrawerItem.SHARED_ITEMS){
+				} else if (drawerItem == DrawerItem.SHARED_ITEMS){
 					onNodesSharedUpdate();
+				} else if (drawerItem == DrawerItem.SEARCH) {
+					refreshFragment(FragmentTag.SEARCH.getTag());
 				}
 			}
 			else{
@@ -15278,7 +15592,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 			}
 			else{
-//				log("ERROR MegaRequest.TYPE_SHARE: "+request.getEmail()+" : "+request.getName());
 				if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed_shared), -1);
 				}
@@ -16212,7 +16525,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-//		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
 
 		if(transfer.isStreamingTransfer()){
 			return;
@@ -16588,39 +16900,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 				break;
 			}
-			case SEARCH:{
-				logDebug("parentHandleSearch: " + parentHandleSearch);
-                if(levelsSearch<0){
-                    fabButton.setVisibility(View.GONE);
-                }
-                else{
-                    if(parentHandleSearch!=-1){
-                        MegaNode node = megaApi.getNodeByHandle(parentHandleSearch);
-                        if(node.isInShare()){
-							logDebug("Node is incoming folder");
-                            int accessLevel = megaApi.getAccess(node);
-
-                            if(accessLevel== MegaShare.ACCESS_FULL||accessLevel== MegaShare.ACCESS_OWNER){
-                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                                fabButton.setVisibility(View.VISIBLE);
-                            }
-                            else if(accessLevel== MegaShare.ACCESS_READWRITE){
-                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                                fabButton.setVisibility(View.VISIBLE);
-                            }
-                            else{
-                                fabButton.setVisibility(View.GONE);
-                            }
-                        }
-                        else{
-                            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                            fabButton.setVisibility(View.VISIBLE);
-                        }
-                    }
-                    else{
-                        fabButton.setVisibility(View.GONE);
-                    }
-                }
+			case SEARCH: {
+				if (shouldShowFabWhenSearch()){
+					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+					fabButton.setVisibility(View.VISIBLE);
+				} else {
+					fabButton.setVisibility(View.GONE);
+				}
 				break;
 			}
 			default:{
@@ -16630,6 +16916,37 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		}
 		fabButton.setLayoutParams(lp);
+	}
+
+	private boolean shouldShowFabWhenSearch() {
+		switch (searchDrawerItem) {
+			case RUBBISH_BIN:
+			case INBOX:
+				return false;
+			case CLOUD_DRIVE:
+				return true;
+			case SHARED_ITEMS:
+				if (searchSharedTab == 0) {
+					if (parentHandleIncoming == -1) return false;
+
+					MegaNode node;
+					if (parentHandleSearch == -1) {
+						node = megaApi.getNodeByHandle(parentHandleIncoming);
+					} else {
+						node = megaApi.getNodeByHandle(parentHandleSearch);
+					}
+					if (node == null) return false;
+
+					int accessLevel = megaApi.getAccess(node);
+					if (accessLevel == MegaShare.ACCESS_FULL || accessLevel == MegaShare.ACCESS_OWNER || accessLevel == MegaShare.ACCESS_READWRITE) {
+						return true;
+					}
+				} else if (searchSharedTab == 1 && parentHandleOutgoing != -1) {
+					return true;
+				}
+			default:
+				return false;
+		}
 	}
 
 	public void openAdvancedDevices (long handleToDownload, boolean highPriority){
@@ -16865,13 +17182,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("New state: " + newState);
 		if (newState == MegaChatApi.INIT_ERROR) {
 			// chat cannot initialize, disable chat completely
-//			log("newState == MegaChatApi.INIT_ERROR");
+//			logDebug("newState == MegaChatApi.INIT_ERROR");
 //			if (chatSettings == null) {
-//				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+//				logDebug("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
 //				chatSettings = new ChatSettings(false + "", true + "", "", true + "");
 //				dbH.setChatSettings(chatSettings);
 //			} else {
-//				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+//				logDebug("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
 //				dbH.setEnabledChat(false + "");
 //			}
 //			if(megaChatApi!=null){
@@ -16980,7 +17297,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void uploadTakePicture(String imagePath){
-		logDebug("uploadTakePicture");
 
 		MegaNode parentNode = null;
 
@@ -17019,12 +17335,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 				}, 300);
 			}
-			else if (option == COLOR_STATUS_BAR_SEARCH) {
-				window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_search));
-			}
 			else if (option == COLOR_STATUS_BAR_ZERO) {
 				window.setStatusBarColor(0);
 			}
+            else if (option == COLOR_STATUS_BAR_SMS_VERIFICATION) {
+                window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_sms_verification));
+            }
 			else if (option == COLOR_STATUS_BAR_SEARCH_DELAY){
 				handler.postDelayed(new Runnable() {
 					@Override
@@ -17543,6 +17859,86 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	public boolean isValidSearchQuery() {
+		return searchQuery != null && !searchQuery.isEmpty();
+	}
+
+	public void openSearchNode(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
+		if (node.isFolder()) {
+			switch (drawerItem) {
+				case CLOUD_DRIVE: {
+					setParentHandleBrowser(node.getHandle());
+					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+					if (cloudPageAdapter != null) {
+						cloudPageAdapter.notifyDataSetChanged();
+					}
+					break;
+				}
+				case SHARED_ITEMS: {
+					if (viewPagerShares == null || sharesPageAdapter == null) break;
+
+					if (getTabItemShares() == 0) {
+						setParentHandleIncoming(node.getHandle());
+						increaseDeepBrowserTreeIncoming();
+						sharesPageAdapter.notifyDataSetChanged();
+					} else if (getTabItemShares() == 1) {
+						setParentHandleOutgoing(node.getHandle());
+						increaseDeepBrowserTreeOutgoing();
+						sharesPageAdapter.notifyDataSetChanged();
+					}
+
+					break;
+				}
+				case INBOX: {
+					setParentHandleInbox(node.getHandle());
+					refreshFragment(FragmentTag.INBOX.getTag());
+					break;
+				}
+			}
+		} else {
+			switch (drawerItem) {
+				case CLOUD_DRIVE: {
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+					if (fbFLol != null) {
+						fbFLol.openFile(node, position, screenPosition, imageView);
+					}
+					break;
+				}
+				case SHARED_ITEMS: {
+					if (viewPagerShares == null || sharesPageAdapter == null) break;
+
+					if (getTabItemShares() == 0) {
+						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+						if (inSFLol != null && inSFLol.isAdded()) {
+							inSFLol.openFile(node, position, screenPosition, imageView);
+						}
+					} else if (getTabItemShares() == 1) {
+						outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
+						if (outSFLol != null && outSFLol.isAdded()) {
+							outSFLol.openFile(node, position, screenPosition, imageView);
+						}
+					}
+					break;
+				}
+				case INBOX: {
+					iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
+					if (iFLol != null) {
+						iFLol.openFile(node, position, screenPosition, imageView);
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	public boolean isSearchViewExpanded() {
+		if (searchMenuItem != null) {
+			return searchMenuItem.isActionViewExpanded();
+		}
+
+		return false;
+	}
+
 	public void closeSearchView () {
 	    if (searchMenuItem != null && searchMenuItem.isActionViewExpanded()) {
 	        searchMenuItem.collapseActionView();
@@ -17551,6 +17947,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void setTextSubmitted () {
 	    if (searchView != null) {
+	    	if (!isValidSearchQuery()) {
+				searchExpand = false;
+				return;
+			}
 	        searchView.setQuery(searchQuery, true);
         }
     }
@@ -17562,6 +17962,30 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
 		this.accountFragmentPreUpgradeAccount = accountFragment;
 	}
+
+    private void refreshAddPhoneNumberButton(){
+        navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+        if(maFLol != null){
+            maFLol.updateAddPhoneNumberLabel();
+        }
+    }
+
+    private void showAddPhoneNumberInMenu(){
+	    if(megaApi == null){
+	        return;
+        }
+        if(canVoluntaryVerifyPhoneNumber()) {
+            if(megaApi.isAchievementsEnabled()) {
+                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+                addPhoneNumberLabel.setText(message);
+            } else {
+                addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
+            }
+            navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
+        } else {
+            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+        }
+    }
 
 	public void deleteInviteContactHandle(){
 		handleInviteContact = -1;
@@ -17580,6 +18004,48 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			isDeviceMemoryLow = false;
         }
     }
+
+	private void setSearchDrawerItem() {
+		if (drawerItem == DrawerItem.SEARCH) return;
+
+		searchDrawerItem = drawerItem;
+		searchSharedTab = getTabItemShares();
+
+		drawerItem = DrawerItem.SEARCH;
+	}
+
+	public String getOfflineSearchPath() {
+		if (isOfflineSearchPathEmpty()) return null;
+
+		return offlineSearchPaths.get(offlineSearchPaths.size() - 1);
+	}
+
+	public String getInitialSearchPath() {
+		if (isOfflineSearchPathEmpty()) return null;
+
+		return offlineSearchPaths.get(0);
+	}
+
+	public void addOfflineSearchPath(String path) {
+		if (offlineSearchPaths == null) {
+			offlineSearchPaths = new ArrayList<>();
+		}
+		offlineSearchPaths.add(path);
+	}
+
+	public void removeOfflineSearchPath() {
+		if (isOfflineSearchPathEmpty()) return;
+
+		offlineSearchPaths.remove(offlineSearchPaths.size() - 1);
+	}
+
+	public boolean isOfflineSearchPathEmpty() {
+		return offlineSearchPaths == null || offlineSearchPaths.isEmpty();
+	}
+
+    public DrawerItem getSearchDrawerItem(){
+		return searchDrawerItem;
+	}
 
 	/**
 	 * This method show or hide the tabs of Cloud Drive section and blocks or not
@@ -17727,7 +18193,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-
 	private boolean checkPermissionsCall(){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -17748,4 +18213,27 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 
+	public String getSearchQuery() {
+		return searchQuery;
+	}
+
+	public void setSearchQuery(String searchQuery) {
+		this.searchQuery = searchQuery;
+	}
+
+	public long getParentHandleIncoming() {
+		return parentHandleIncoming;
+	}
+
+	public long getParentHandleOutgoing() {
+		return parentHandleOutgoing;
+	}
+
+	public long getParentHandleRubbish() {
+		return parentHandleRubbish;
+	}
+
+	public long getParentHandleSearch() {
+		return parentHandleSearch;
+	}
 }

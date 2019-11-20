@@ -2,18 +2,11 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
-import android.os.AsyncTask;
-import android.support.v4.content.ContextCompat;
+import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
 import android.util.SparseArray;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,13 +16,14 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -38,79 +32,21 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
-import mega.privacy.android.app.utils.OfflineUtils;
-import mega.privacy.android.app.utils.Util;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
-public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener{
+public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener {
 	
 	private Activity activity;
-	private MegaOfflineFullScreenImageAdapterLollipop megaFullScreenImageAdapter;
 	private ArrayList<MegaOffline> mOffList;
 	private ArrayList<String> paths;
 	private SparseArray<ViewHolderOfflineFullImage> visibleImgs = new SparseArray<ViewHolderOfflineFullImage>();
-	private boolean aBshown = true;
 	DatabaseHandler dbH = null;
 	private boolean zipImage = false;
     Context context;
-
-	private class OfflinePreviewAsyncTask extends AsyncTask<String, Void, Bitmap>{
-		
-		ViewHolderOfflineFullImage holder;
-		String currentPath;
-		
-		public OfflinePreviewAsyncTask(ViewHolderOfflineFullImage holder) {
-			this.holder = holder;
-		}
-		
-		@Override
-		protected Bitmap doInBackground(String... params) {
-			logDebug("doInBackground OfflinePreviewAsyncTask: " + holder.currentPath);
-			currentPath = params[0];
-			File currentFile = new File(currentPath);
-			
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inJustDecodeBounds = true;
-			Bitmap preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
-			
-			ExifInterface exif;
-			int orientation = ExifInterface.ORIENTATION_NORMAL;
-			try {
-				exif = new ExifInterface(currentFile.getAbsolutePath());
-				orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-			} catch (IOException e) {}  
-			
-			// Calculate inSampleSize
-		    options.inSampleSize = Util.calculateInSampleSize(options, 1000, 1000);
-		    
-		    // Decode bitmap with inSampleSize set
-		    options.inJustDecodeBounds = false;
-		    
-		    preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
-			if (preview != null){
-				preview = rotateBitmap(preview, orientation);
-				long handle = holder.currentHandle;
-				setPreviewCache(handle, preview);
-				return preview;
-			}
-			
-			return null;
-		}
-		
-		@Override
-		protected void onPostExecute(Bitmap preview){
-			logDebug("onPostExecute OfflinePreviewAsyncTask: " + holder.currentPath);
-			if (preview != null){
-				if (holder.currentPath.equals(currentPath)){
-					holder.imgDisplay.setImageBitmap(preview);
-				}
-			}
-		}
-	}
 		
 	/*view holder class*/
     public class ViewHolderOfflineFullImage {
@@ -119,7 +55,6 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
         ProgressBar progressBar;
         ProgressBar downloadProgressBar;
         String currentPath;
-        long currentHandle;
         int position;
         boolean isGIF;
     }
@@ -128,8 +63,6 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	public MegaOfflineFullScreenImageAdapterLollipop(Context context, Activity activity, ArrayList<MegaOffline> mOffList) {
 		this.activity = activity;
 		this.mOffList = mOffList;
-		this.megaFullScreenImageAdapter = this;
-//		dbH = new DatabaseHandler(activity);
 		dbH = DatabaseHandler.getDbHandler(activity);
 		this.zipImage = false;
         this.context = context;
@@ -140,8 +73,6 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
 		this.activity = activity;
 		this.paths = paths;
-		this.megaFullScreenImageAdapter = this;
-//			dbH = new DatabaseHandler(activity);
 		dbH = DatabaseHandler.getDbHandler(activity);
 		this.zipImage = zipImage;
         this.context = context;
@@ -165,20 +96,15 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
-		logDebug("INSTANTIATE POSITION " + position);
-        
-        File currentFile;
-        if (zipImage){
-        	currentFile = new File (paths.get(position));
-			if(currentFile!=null){
-				logDebug("Got zip Image!");
-			}
-			else{
-				logWarning("zip Image is NULL");
-			}
-        }
-        else{
-        	currentFile = new File (mOffList.get(position).getPath());
+
+        File imageFile;
+        String path;
+        if (zipImage) {
+            path = paths.get(position);
+            imageFile = new File(path);
+        } else {
+            path = mOffList.get(position).getPath();
+            imageFile = getOfflineFile(context, mOffList.get(position));
         }
         
 		ViewHolderOfflineFullImage holder = new ViewHolderOfflineFullImage();
@@ -186,7 +112,8 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
 
 		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
-		holder.progressBar.setVisibility(View.GONE);
+		holder.progressBar.setVisibility(View.VISIBLE);
+		final ProgressBar pb = holder.progressBar;
 		holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
 		holder.downloadProgressBar.setVisibility(View.GONE);
 		
@@ -195,142 +122,22 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		holder.gifImgDisplay = (ImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_gif);
 		holder.gifImgDisplay.setOnClickListener(this);
 
-		boolean isGIF;
-		if (zipImage) {
-			isGIF = isGIF(paths.get(position));
-		}
-		else {
-			isGIF = isGIF(mOffList.get(position).getName());
-		}
+		holder.currentPath = path;
 
-		if (isGIF){
-			logDebug("isGIF");
-			holder.isGIF = true;
-			holder.imgDisplay.setVisibility(View.GONE);
-			holder.gifImgDisplay.setVisibility(View.VISIBLE);
-			if (zipImage) {
-				holder.currentPath = paths.get(position);
-			}
-			else {
-				holder.currentPath = mOffList.get(position).getPath();
-			}
-			holder.progressBar.setVisibility(View.VISIBLE);
+        int icon = MimeTypeThumbnail.typeForName(imageFile.getName()).getIconResourceId();
 
-			Bitmap thumb = null;
-			Bitmap preview = null;
-			if (!zipImage) {
-				try {
-					holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
+        if (MimeTypeThumbnail.typeForName(imageFile.getName()).isGIF()) {
+            holder.imgDisplay.setVisibility(View.GONE);
+            holder.gifImgDisplay.setVisibility(View.VISIBLE);
+            setGlideParams(imageFile, icon, holder.gifImgDisplay, pb);
+        } else {
+            holder.imgDisplay.setVisibility(View.VISIBLE);
+            holder.gifImgDisplay.setVisibility(View.GONE);
+            setGlideParams(imageFile, icon, holder.imgDisplay, pb);
+        }
 
-					thumb = getThumbnailFromCache(holder.currentHandle);
-					preview = getPreviewFromCache(holder.currentHandle);
-				} catch (Exception e) {
-				}
-			}
+        visibleImgs.put(position, holder);
 
-			File file;
-			if (zipImage) {
-				file = currentFile;
-			}
-			else {
-				file = getOfflineFile(position);
-			}
-
-			Drawable drawable = null;
-			if (preview != null){
-				drawable = new BitmapDrawable(context.getResources(), preview);
-			}
-			else if (thumb != null){
-				drawable = new BitmapDrawable(context.getResources(), thumb);
-			}
-			if (drawable == null) {
-				drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(file.getName()).getIconResourceId());
-			}
-
-			if (file != null){
-				final ProgressBar pb = holder.progressBar;
-
-				if (drawable != null){
-					Glide.with(context).load(file).listener(new RequestListener<File, GlideDrawable>() {
-						@Override
-						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
-							return false;
-						}
-
-						@Override
-						public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-							pb.setVisibility(View.GONE);
-							return false;
-						}
-					}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
-				}
-				else {
-					Glide.with(context).load(file).listener(new RequestListener<File, GlideDrawable>() {
-						@Override
-						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
-							return false;
-						}
-
-						@Override
-						public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-							pb.setVisibility(View.GONE);
-							return false;
-						}
-					}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
-				}
-			}
-		}
-		else {
-			holder.isGIF = false;
-			holder.imgDisplay.setVisibility(View.VISIBLE);
-			holder.gifImgDisplay.setVisibility(View.GONE);
-			holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(currentFile.getName()).getIconResourceId());
-
-			if (zipImage){
-				holder.currentPath = paths.get(position);
-				logDebug("ZIP holder.currentPath: " + holder.currentPath);
-			}
-			else{
-				holder.currentPath = mOffList.get(position).getPath();
-				logDebug("holder.currentPath: " + holder.currentPath);
-				try{
-					holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
-
-					Bitmap thumb = getThumbnailFromCache(holder.currentHandle);
-					if (thumb != null){
-						holder.imgDisplay.setImageBitmap(thumb);
-
-					}
-
-					Bitmap preview = getPreviewFromCache(holder.currentHandle);
-					if (preview != null){
-						holder.imgDisplay.setImageBitmap(preview);
-					}
-
-					try{
-						new OfflinePreviewAsyncTask(holder).execute(currentFile.getAbsolutePath());
-					}
-					catch(Exception e){
-						//Too many AsyncTasks
-					}
-				}
-				catch(Exception e){}
-			}
-		}
-		
-		visibleImgs.put(position, holder);
-		
-        if (zipImage){
-			logDebug("isZipImage");
-			try{
-				new OfflinePreviewAsyncTask(holder).execute(currentFile.getAbsolutePath());
-			}
-			catch(Exception e){
-				//Too many AsyncTasks
-				logError("OfflinePreviewAsyncTask EXCEPTION", e);
-			}
-		}
-		
         ((ViewPager) container).addView(viewLayout);
 		
 		return viewLayout;
@@ -361,17 +168,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_gif:
 			case R.id.full_screen_image_viewer_image:{
-				
-				Display display = activity.getWindowManager().getDefaultDisplay();
-				DisplayMetrics outMetrics = new DisplayMetrics ();
-			    display.getMetrics(outMetrics);
-			    float density  = activity.getResources().getDisplayMetrics().density;
-				
-			    float scaleW = getScaleW(outMetrics, density);
-			    float scaleH = getScaleH(outMetrics, density);
-
                 ((FullScreenImageViewerLollipop) context).touchImage();
-
 
                 RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
 				activityLayout.invalidate();
@@ -381,30 +178,51 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		}
 	}
 
-	public boolean isaBshown() {
-		return aBshown;
-	}
+	private void setGlideParams(File imgFile, int icon, ImageView imageView, final ProgressBar pb) {
+    	if (MimeTypeThumbnail.typeForName(imgFile.getName()).isGIF()) {
+    		RequestListener<GifDrawable> gifListener = new RequestListener<GifDrawable>() {
+				@Override
+				public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
+					return false;
+				}
 
-	public void setaBshown(boolean aBshown) {
-		this.aBshown = aBshown;
-	}
+				@Override
+				public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
+					pb.setVisibility(View.GONE);
+					return false;
+				}
+			};
 
-	public boolean isGIF(String name){
+    		Glide.with(context)
+					.asGif()
+					.load(imgFile)
+					.listener(gifListener)
+					.placeholder(icon)
+					.diskCacheStrategy(DiskCacheStrategy.ALL)
+					.transition(withCrossFade())
+					.into(imageView);
+		} else {
+    		RequestListener<Drawable> imgListener = new RequestListener<Drawable>() {
+				@Override
+				public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+					return false;
+				}
 
-		String s[] = name.split("\\.");
+				@Override
+				public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+					pb.setVisibility(View.GONE);
+					return false;
+				}
+    		};
 
-		if (s != null){
-			if (s[s.length-1].equals("gif")){
-				return true;
-			}
+    		Glide.with(context)
+					.load(imgFile)
+					.listener(imgListener)
+					.placeholder(icon)
+					.thumbnail(Glide.with(context).load(imgFile).listener(imgListener))
+					.diskCacheStrategy(DiskCacheStrategy.ALL)
+					.transition(withCrossFade())
+					.into(imageView);
 		}
-
-		return false;
-	}
-
-	public File getOfflineFile (int position){
-		MegaOffline checkOffline = mOffList.get(position);
-
-		return OfflineUtils.getOfflineFile(context, checkOffline);
-	}
+    }
 }

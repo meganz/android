@@ -41,7 +41,7 @@ public class OfflineUtils {
 
     public static final String OLD_OFFLINE_DIR = MAIN_DIR + File.separator + OFFLINE_DIR;
 
-    private static final String DB_FILE = "0";
+    public static final String DB_FILE = "0";
     private static final String DB_FOLDER = "1";
 
     public static void saveOffline (File destination, MegaNode node, Context context, Activity activity, MegaApiAndroid megaApi){
@@ -240,21 +240,6 @@ public class OfflineUtils {
             return offlineFolder;
         } else {
             return null;
-        }
-    }
-
-    public static String getOfflineAbsolutePath(Context context, MegaOffline offlineNode) {
-
-        switch (offlineNode.getOrigin()) {
-            case MegaOffline.INCOMING: {
-                return context.getFilesDir().getAbsolutePath() + File.separator + OFFLINE_DIR + File.separator + offlineNode.getHandleIncoming();
-            }
-            case MegaOffline.INBOX: {
-                return context.getFilesDir().getAbsolutePath() + File.separator + OFFLINE_INBOX_DIR;
-            }
-            default: {
-                return context.getFilesDir().getAbsolutePath() + File.separator + OFFLINE_DIR;
-            }
         }
     }
 

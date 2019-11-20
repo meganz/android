@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">Error. Harap, coba kembali.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">Folder media sekunder tidak ada, silahkan pilih folder baru</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Tidak ada penyimpanan eksternal yang terdeteksi</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Folder ini hanya bisa dibaca. Anda tidak memiliki izin untuk mengupload</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
     <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Backup Recovery Key</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Hapus Recovery Key</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Batalkan Subscription</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">File Recovery Key telah dihapus</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Subscription berhasil dibatalkan dengan benar</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Kami tidak dapat membatalkan langganan Anda. Silahkan hubungi support&#64;mega.nz untuk mendapatkan bantuan</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Tutup sesi lain</string>
@@ -232,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">Hapus semua transfer?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Baru-baru ini</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Upload media</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Kotak Masuk</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Simpan untuk Offline</string>
@@ -612,7 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Pratinjau belum didownload. Mohon tunggu</string>
-    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">The preview is not able to load due to insufficient memory available. Please try again later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Tolong, log out sebelum membuat akun</string>
 
@@ -933,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Gagal. Alamat email ini telah terpakai.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">Anda telah me-request link konfirmasi untuk alamat email tersebut.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">Email baru dan lama harus cocok</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Ini adalah langkah terakhir untuk mengganti email anda. Harap masukan password anda di bawah ini.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Ganti email</string>
 
@@ -2322,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Panggilan Dimulai</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Kesalahan SSL certificate</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA tidak dapat terhubung dengan aman melalui SSL. Anda mungkin berada di WiFi publik dengan persyaratan tambahan.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA tidak dapat terhubung dengan aman melalui SSL. Anda mungkin menggunakan Wi-Fi publik dengan persyaratan tambahan.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Tidak ada [/B][A]Notifications[/A][B].[/B]</string>
 
@@ -2519,13 +2523,29 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d file pending.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Baru-baru ini</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 Gambar dan 1 Video</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Saya</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Tidak mungkin merekam pesan suara saat ada panggilan yang sedang berlangsung.</string>
-    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Terjadi kesalahan saat mencoba mengunggah pesan suara.</string>
 
     <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Panggilan masuk</string>
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Memuat</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Mohon tunggu&#8230;</string>
 
-    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s Kontak Terkirim.</string>
 </resources>

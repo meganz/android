@@ -74,6 +74,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -199,6 +200,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean pinLongClick = false;
 
     private boolean twoFA = false;
+    public static final String NAME_USER_LOCKED = "NAME_USER_LOCKED";
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -2047,7 +2049,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (parentHandle != -1){
                     Intent intent = new Intent();
                     intent.putExtra("PARENT_HANDLE", parentHandle);
-                    ((LoginActivityLollipop) context).setResult(Activity.RESULT_OK, intent);
+                    ((LoginActivityLollipop) context).setResult(RESULT_OK, intent);
                     ((LoginActivityLollipop) context).finish();
                 }
                 else{
@@ -2251,18 +2253,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     closeCancelDialog();
                     firstPin.requestFocus();
                     firstPin.setCursorVisible(true);
+                    return;
                 }
                 else if (error.getErrorCode() == MegaError.API_EFAILED || error.getErrorCode() == MegaError.API_EEXPIRED) {
                     if (verify2faProgressBar != null) {
                         verify2faProgressBar.setVisibility(View.GONE);
                     }
                     verifyShowError();
+                    return;
                 }
                 else{
                     if (error.getErrorCode() == MegaError.API_ENOENT) {
-                        if (is2FAEnabled) {
-                            returnToLogin();
-                        }
                         errorMessage = getString(R.string.error_incorrect_email_or_password);
                     }
                     else if (error.getErrorCode() == MegaError.API_ETOOMANY){
@@ -2271,12 +2272,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
                         errorMessage = getString(R.string.account_not_validated_login);
                     }
-                    else if (error.getErrorCode() == MegaError.API_EBLOCKED){
-                        errorMessage = getString(R.string.error_account_suspended);
-                    } else if(error.getErrorCode() == MegaError.API_EACCESS) {
+                    else if(error.getErrorCode() == MegaError.API_EACCESS) {
                         errorMessage = error.getErrorString();
-                    }
-                    else{
+                    } else if (error.getErrorCode() == MegaError.API_EBLOCKED) {
+                        //It will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
+                        logWarning("Suspended account - Reason: " + request.getNumber());
+                        return;
+                    } else {
                         errorMessage = error.getErrorString();
                     }
                     logError("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
@@ -2304,22 +2306,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
 
-                if (!is2FAEnabled) {
-                    loginLoggingIn.setVisibility(View.GONE);
-                    loginLogin.setVisibility(View.VISIBLE);
-                    closeCancelDialog();
-                    scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
-                    loginCreateAccount.setVisibility(View.VISIBLE);
-                    queryingSignupLinkText.setVisibility(View.GONE);
-                    confirmingAccountText.setVisibility(View.GONE);
-                    generatingKeysText.setVisibility(View.GONE);
-                    loggingInText.setVisibility(View.GONE);
-                    fetchingNodesText.setVisibility(View.GONE);
-                    prepareNodesText.setVisibility(View.GONE);
-                    serversBusyText.setVisibility(View.GONE);
-                }
-            }
-            else{
+                returnToLogin();
+            } else {
                 if (is2FAEnabled){
                     loginVerificationLayout.setVisibility(View.GONE);
                     ((LoginActivityLollipop) context).hideAB();
@@ -2338,23 +2326,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 gSession = megaApi.dumpSession();
 
                 logDebug("Logged in with session");
-
-//				String session = megaApi.dumpSession();
-//				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();
-
-                //TODO
-                //addAccount (email, session)
-//				String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
-//				if (accountType != null){
-//					authTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
-//					if (authTokenType == null){
-//						authTokenType = .AUTH_TOKEN_TYPE_INSTANTIATE;
-//					}
-//					Account account = new Account(lastEmail, accountscroll_view_loginType);
-//					accountManager.addAccountExplicitly(account, gSession, null);
-//					log("AUTTHO: _" + authTokenType + "_");
-//					accountManager.setAuthToken(account, authTokenType, gSession);
-//				}
 
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                 dbH.clearEphemeral();
@@ -2427,9 +2398,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
                     errorMessage = getString(R.string.account_not_validated_login);
                 }
-                else if (error.getErrorCode() == MegaError.API_EBLOCKED){
-                    errorMessage = getString(R.string.error_account_suspended);
-                }
                 else{
                     errorMessage = error.getErrorString();
                 }
@@ -2459,7 +2427,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
                 else{
-                    ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    if(error.getErrorCode() != MegaError.API_EBLOCKED) {
+                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    }
                 }
 
                 if(chatSettings==null) {
