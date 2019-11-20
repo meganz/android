@@ -108,6 +108,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
+	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
+
 	public final static int CLOUD_FRAGMENT = 0;
 	public final static int INCOMING_FRAGMENT = 1;
 	public final static int CHAT_FRAGMENT = 3;
@@ -247,6 +249,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private int totalAttached;
 	private int totalErrors;
 
+	private boolean shouldRestartSearch;
+
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -381,6 +385,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			pendingToAttach = savedInstanceState.getInt("pendingToAttach", 0);
 			totalAttached = savedInstanceState.getInt("totalAttached", 0);
 			totalErrors = savedInstanceState.getInt("totalErrors", 0);
+			shouldRestartSearch = savedInstanceState.getBoolean(SHOULD_RESTART_SEARCH, false);
 
 			if (isSearchExpanded) {
 				pendingToOpenSearchView = true;
@@ -759,6 +764,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 					public void onPageSelected(int position) {
 						logDebug("Position:"+ position);
+						clearQuerySearch();
 						supportInvalidateOptionsMenu();
 						changeTitle();
 
@@ -930,7 +936,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					else if (isIncomingVisible()) {
 						iSharesExplorer.closeSearch(collapsedByClick);
 					}
-					collapsedByClick = false;
 					supportInvalidateOptionsMenu();
 				}
 				else {
@@ -954,7 +959,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				querySearch = newText;
+				if (!collapsedByClick) {
+					querySearch = newText;
+				} else {
+					collapsedByClick = false;
+				}
 				if (isSearchMultiselect()) {
 					if (isCloudVisible()) {
 						cDriveExplorer.search(newText);
@@ -1407,6 +1416,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		bundle.putInt("pendingToAttach", pendingToAttach);
 		bundle.putInt("totalAttached", totalAttached);
 		bundle.putInt("totalErrors", totalErrors);
+		bundle.putBoolean(SHOULD_RESTART_SEARCH, shouldRestartSearch);
 	}
 	
 	@Override
@@ -3461,5 +3471,21 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	public boolean isMultiselect() {
 		return multiselect;
+	}
+
+	public void setShouldRestartSearch(boolean shouldRestartSearch) {
+		this.shouldRestartSearch = shouldRestartSearch;
+	}
+
+	public boolean shouldRestartSearch() {
+		return shouldRestartSearch;
+	}
+
+	public String getQuerySearch() {
+		return querySearch;
+	}
+
+	public void clearQuerySearch() {
+		querySearch = null;
 	}
 }
