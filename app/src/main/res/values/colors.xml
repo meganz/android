@@ -173,6 +173,7 @@
     <color name="dark_primary_color">#FFF30C14</color>
     <color name="dark_primary_color_secondary">#FFD50004</color>
     <color name="status_bar_search">#FFCCCCCC</color>
+    <color name="status_bar_sms_verification">#40B0D7</color>
     <color name="status_bar_navigation_view">#FF33CCB7</color>
     <color name="white_50_opacity">#80FFFFFF</color>
     <color name="white_15_opacity">#26FFFFFF</color>
